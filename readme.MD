@@ -1,1 +1,14 @@
-OK
+fangyuanyouyue
+ - xiaofangyuan-common
+ - xiaofangyuan-base
+	- redis-server
+	- rabbit-server
+ - xiaofangyuan-microserver
+	- user-service
+	- forum-service
+	- goods-service
+ - xiaofangyuan-server
+	- config-server
+	- eureke-server
+	- zuul-server
+ - xiaofangyuan-scheduler
