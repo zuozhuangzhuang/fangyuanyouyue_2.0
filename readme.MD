@@ -1,6 +1,6 @@
 fangyuanyouyue
- - xiaofangyuan-common
  - xiaofangyuan-base
+ - xiaofangyuan-common
 	- redis-server
 	- rabbit-server
  - xiaofangyuan-microserver
