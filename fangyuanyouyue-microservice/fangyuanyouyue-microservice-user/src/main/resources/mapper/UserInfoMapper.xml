@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangyuanyouyue.user.dao.UserInfoMapper">
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.user.model.UserInfo">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="login_pwd" jdbcType="VARCHAR" property="loginPwd" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+    <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl" />
+    <result column="bg_img_url" jdbcType="VARCHAR" property="bgImgUrl" />
+    <result column="gender" jdbcType="INTEGER" property="gender" />
+    <result column="signature" jdbcType="VARCHAR" property="signature" />
+    <result column="contact" jdbcType="VARCHAR" property="contact" />
+    <result column="level" jdbcType="INTEGER" property="level" />
+    <result column="level_desc" jdbcType="VARCHAR" property="levelDesc" />
+    <result column="reg_type" jdbcType="INTEGER" property="regType" />
+    <result column="reg_platform" jdbcType="INTEGER" property="regPlatform" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="pwd_err_count" jdbcType="INTEGER" property="pwdErrCount" />
+    <result column="pay_pwd_err_count" jdbcType="INTEGER" property="payPwdErrCount" />
+    <result column="last_login_time" jdbcType="TIMESTAMP" property="lastLoginTime" />
+    <result column="last_login_platform" jdbcType="INTEGER" property="lastLoginPlatform" />
+    <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, phone, email, address, login_pwd, nick_name, head_img_url, bg_img_url, gender, 
+    signature, contact, level, level_desc, reg_type, reg_platform, status, pwd_err_count, 
+    pay_pwd_err_count, last_login_time, last_login_platform, add_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from user_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from user_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.fangyuanyouyue.user.model.UserInfo" useGeneratedKeys="true" keyProperty="id">
+    insert into user_info (id, phone, email, 
+      address, login_pwd, nick_name, 
+      head_img_url, bg_img_url, gender, 
+      signature, contact, level, 
+      level_desc, reg_type, reg_platform, 
+      status, pwd_err_count, pay_pwd_err_count, 
+      last_login_time, last_login_platform, add_time, 
+      update_time)
+    values (#{id,jdbcType=INTEGER}, #{phone,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
+      #{address,jdbcType=VARCHAR}, #{loginPwd,jdbcType=VARCHAR}, #{nickName,jdbcType=VARCHAR}, 
+      #{headImgUrl,jdbcType=VARCHAR}, #{bgImgUrl,jdbcType=VARCHAR}, #{gender,jdbcType=INTEGER}, 
+      #{signature,jdbcType=VARCHAR}, #{contact,jdbcType=VARCHAR}, #{level,jdbcType=INTEGER}, 
+      #{levelDesc,jdbcType=VARCHAR}, #{regType,jdbcType=INTEGER}, #{regPlatform,jdbcType=INTEGER}, 
+      #{status,jdbcType=INTEGER}, #{pwdErrCount,jdbcType=INTEGER}, #{payPwdErrCount,jdbcType=INTEGER}, 
+      #{lastLoginTime,jdbcType=TIMESTAMP}, #{lastLoginPlatform,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.user.model.UserInfo">
+    insert into user_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="phone != null">
+        phone,
+      </if>
+      <if test="email != null">
+        email,
+      </if>
+      <if test="address != null">
+        address,
+      </if>
+      <if test="loginPwd != null">
+        login_pwd,
+      </if>
+      <if test="nickName != null">
+        nick_name,
+      </if>
+      <if test="headImgUrl != null">
+        head_img_url,
+      </if>
+      <if test="bgImgUrl != null">
+        bg_img_url,
+      </if>
+      <if test="gender != null">
+        gender,
+      </if>
+      <if test="signature != null">
+        signature,
+      </if>
+      <if test="contact != null">
+        contact,
+      </if>
+      <if test="level != null">
+        level,
+      </if>
+      <if test="levelDesc != null">
+        level_desc,
+      </if>
+      <if test="regType != null">
+        reg_type,
+      </if>
+      <if test="regPlatform != null">
+        reg_platform,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="pwdErrCount != null">
+        pwd_err_count,
+      </if>
+      <if test="payPwdErrCount != null">
+        pay_pwd_err_count,
+      </if>
+      <if test="lastLoginTime != null">
+        last_login_time,
+      </if>
+      <if test="lastLoginPlatform != null">
+        last_login_platform,
+      </if>
+      <if test="addTime != null">
+        add_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="phone != null">
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null">
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="loginPwd != null">
+        #{loginPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="nickName != null">
+        #{nickName,jdbcType=VARCHAR},
+      </if>
+      <if test="headImgUrl != null">
+        #{headImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="bgImgUrl != null">
+        #{bgImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="gender != null">
+        #{gender,jdbcType=INTEGER},
+      </if>
+      <if test="signature != null">
+        #{signature,jdbcType=VARCHAR},
+      </if>
+      <if test="contact != null">
+        #{contact,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null">
+        #{level,jdbcType=INTEGER},
+      </if>
+      <if test="levelDesc != null">
+        #{levelDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="regType != null">
+        #{regType,jdbcType=INTEGER},
+      </if>
+      <if test="regPlatform != null">
+        #{regPlatform,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="pwdErrCount != null">
+        #{pwdErrCount,jdbcType=INTEGER},
+      </if>
+      <if test="payPwdErrCount != null">
+        #{payPwdErrCount,jdbcType=INTEGER},
+      </if>
+      <if test="lastLoginTime != null">
+        #{lastLoginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastLoginPlatform != null">
+        #{lastLoginPlatform,jdbcType=INTEGER},
+      </if>
+      <if test="addTime != null">
+        #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.user.model.UserInfo">
+    update user_info
+    <set>
+      <if test="phone != null">
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null">
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="loginPwd != null">
+        login_pwd = #{loginPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="nickName != null">
+        nick_name = #{nickName,jdbcType=VARCHAR},
+      </if>
+      <if test="headImgUrl != null">
+        head_img_url = #{headImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="bgImgUrl != null">
+        bg_img_url = #{bgImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="gender != null">
+        gender = #{gender,jdbcType=INTEGER},
+      </if>
+      <if test="signature != null">
+        signature = #{signature,jdbcType=VARCHAR},
+      </if>
+      <if test="contact != null">
+        contact = #{contact,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null">
+        level = #{level,jdbcType=INTEGER},
+      </if>
+      <if test="levelDesc != null">
+        level_desc = #{levelDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="regType != null">
+        reg_type = #{regType,jdbcType=INTEGER},
+      </if>
+      <if test="regPlatform != null">
+        reg_platform = #{regPlatform,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="pwdErrCount != null">
+        pwd_err_count = #{pwdErrCount,jdbcType=INTEGER},
+      </if>
+      <if test="payPwdErrCount != null">
+        pay_pwd_err_count = #{payPwdErrCount,jdbcType=INTEGER},
+      </if>
+      <if test="lastLoginTime != null">
+        last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastLoginPlatform != null">
+        last_login_platform = #{lastLoginPlatform,jdbcType=INTEGER},
+      </if>
+      <if test="addTime != null">
+        add_time = #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.user.model.UserInfo">
+    update user_info
+    set phone = #{phone,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      login_pwd = #{loginPwd,jdbcType=VARCHAR},
+      nick_name = #{nickName,jdbcType=VARCHAR},
+      head_img_url = #{headImgUrl,jdbcType=VARCHAR},
+      bg_img_url = #{bgImgUrl,jdbcType=VARCHAR},
+      gender = #{gender,jdbcType=INTEGER},
+      signature = #{signature,jdbcType=VARCHAR},
+      contact = #{contact,jdbcType=VARCHAR},
+      level = #{level,jdbcType=INTEGER},
+      level_desc = #{levelDesc,jdbcType=VARCHAR},
+      reg_type = #{regType,jdbcType=INTEGER},
+      reg_platform = #{regPlatform,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      pwd_err_count = #{pwdErrCount,jdbcType=INTEGER},
+      pay_pwd_err_count = #{payPwdErrCount,jdbcType=INTEGER},
+      last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},
+      last_login_platform = #{lastLoginPlatform,jdbcType=INTEGER},
+      add_time = #{addTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="getUserByNickName" parameterType="String" resultMap="BaseResultMap">
+    select * from user_info where nick_name = #{nickName,jdbcType=VARCHAR}
+  </select>
+  <select id="getUserByPhone" parameterType="String" resultMap="BaseResultMap">
+    select * from user_info where phone = #{phone,jdbcType=VARCHAR}
+  </select>
+  <select id="shopList" resultType="Map">
+    select a.*,b.*,c.* from user_info a,user_info_ext b,user_vip c where a.id = b.user_id and a.id = c.user_id and b.status = 1
+    <if test="nickName != null">
+      and a.nick_name like "%"#{nickName,jdbcType=VARCHAR}"%"
+    </if>
+    order by c.vip_level desc,c.vip_type desc,b.auth_type limit #{start},#{limit}
+  </select>
+</mapper>

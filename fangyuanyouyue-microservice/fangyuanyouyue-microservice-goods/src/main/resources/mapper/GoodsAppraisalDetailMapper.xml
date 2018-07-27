@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangyuanyouyue.goods.dao.GoodsAppraisalDetailMapper">
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.goods.model.GoodsAppraisalDetail">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="appraisal_id" jdbcType="INTEGER" property="appraisalId" />
+    <result column="goods_id" jdbcType="INTEGER" property="goodsId" />
+    <result column="opinion" jdbcType="VARCHAR" property="opinion" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="price" jdbcType="DECIMAL" property="price" />
+    <result column="submit_time" jdbcType="TIMESTAMP" property="submitTime" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.goods.model.GoodsAppraisalDetail">
+    <result column="description" jdbcType="LONGVARCHAR" property="description" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, appraisal_id, goods_id, opinion, status, title, price, submit_time, type, add_time, 
+    update_time
+  </sql>
+  <sql id="Blob_Column_List">
+    description
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from goods_appraisal_detail
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from goods_appraisal_detail
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.fangyuanyouyue.goods.model.GoodsAppraisalDetail" useGeneratedKeys="true" keyProperty="id">
+    insert into goods_appraisal_detail (id, appraisal_id, goods_id, 
+      opinion, status, title, 
+      price, submit_time, type, 
+      add_time, update_time, description
+      )
+    values (#{id,jdbcType=INTEGER}, #{appraisalId,jdbcType=INTEGER}, #{goodsId,jdbcType=INTEGER}, 
+      #{opinion,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, 
+      #{price,jdbcType=DECIMAL}, #{submitTime,jdbcType=TIMESTAMP}, #{type,jdbcType=INTEGER}, 
+      #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.goods.model.GoodsAppraisalDetail">
+    insert into goods_appraisal_detail
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="appraisalId != null">
+        appraisal_id,
+      </if>
+      <if test="goodsId != null">
+        goods_id,
+      </if>
+      <if test="opinion != null">
+        opinion,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="title != null">
+        title,
+      </if>
+      <if test="price != null">
+        price,
+      </if>
+      <if test="submitTime != null">
+        submit_time,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="addTime != null">
+        add_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="appraisalId != null">
+        #{appraisalId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsId != null">
+        #{goodsId,jdbcType=INTEGER},
+      </if>
+      <if test="opinion != null">
+        #{opinion,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null">
+        #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="submitTime != null">
+        #{submitTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="addTime != null">
+        #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.goods.model.GoodsAppraisalDetail">
+    update goods_appraisal_detail
+    <set>
+      <if test="appraisalId != null">
+        appraisal_id = #{appraisalId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsId != null">
+        goods_id = #{goodsId,jdbcType=INTEGER},
+      </if>
+      <if test="opinion != null">
+        opinion = #{opinion,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null">
+        price = #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="submitTime != null">
+        submit_time = #{submitTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="addTime != null">
+        add_time = #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.fangyuanyouyue.goods.model.GoodsAppraisalDetail">
+    update goods_appraisal_detail
+    set appraisal_id = #{appraisalId,jdbcType=INTEGER},
+      goods_id = #{goodsId,jdbcType=INTEGER},
+      opinion = #{opinion,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      title = #{title,jdbcType=VARCHAR},
+      price = #{price,jdbcType=DECIMAL},
+      submit_time = #{submitTime,jdbcType=TIMESTAMP},
+      type = #{type,jdbcType=INTEGER},
+      add_time = #{addTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      description = #{description,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.goods.model.GoodsAppraisalDetail">
+    update goods_appraisal_detail
+    set appraisal_id = #{appraisalId,jdbcType=INTEGER},
+      goods_id = #{goodsId,jdbcType=INTEGER},
+      opinion = #{opinion,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      title = #{title,jdbcType=VARCHAR},
+      price = #{price,jdbcType=DECIMAL},
+      submit_time = #{submitTime,jdbcType=TIMESTAMP},
+      type = #{type,jdbcType=INTEGER},
+      add_time = #{addTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByUserIdGoodsId" parameterType="Integer" resultMap="BaseResultMap">
+    select a.* from goods_appraisal_detail a left join goods_appraisal b on a.appraisal_id=b.id where b.user_id = #{userId,jdbcType=INTEGER} and a.goods_id = #{goodsId,jdbcType=INTEGER}
+  </select>
+</mapper>

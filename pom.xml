@@ -174,6 +174,18 @@
 				<artifactId>aliyun-sdk-oss</artifactId>
 				<version>2.8.3</version>
 			</dependency>
+			<!-- https://mvnrepository.com/artifact/com.aliyun/aliyun-java-sdk-core -->
+			<dependency>
+				<groupId>com.aliyun</groupId>
+				<artifactId>aliyun-java-sdk-core</artifactId>
+				<version>4.0.2</version>
+			</dependency>
+			<!-- https://mvnrepository.com/artifact/com.aliyun/aliyun-java-sdk-sms -->
+			<dependency>
+				<groupId>com.aliyun</groupId>
+				<artifactId>aliyun-java-sdk-sms</artifactId>
+				<version>3.0.0-rc1</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

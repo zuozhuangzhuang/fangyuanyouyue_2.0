@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangyuanyouyue.user.dao.UserInfoExtMapper">
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.user.model.UserInfoExt">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="identity" jdbcType="VARCHAR" property="identity" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="pay_pwd" jdbcType="VARCHAR" property="payPwd" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
+    <result column="auth_type" jdbcType="INTEGER" property="authType" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="credit" jdbcType="INTEGER" property="credit" />
+    <result column="score" jdbcType="INTEGER" property="score" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, user_id, identity, name, pay_pwd, status, add_time, auth_type, update_time, credit, 
+    score
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from user_info_ext
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from user_info_ext
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.fangyuanyouyue.user.model.UserInfoExt" useGeneratedKeys="true" keyProperty="id">
+    insert into user_info_ext (id, user_id, identity, 
+      name, pay_pwd, status, 
+      add_time, auth_type, update_time, 
+      credit, score)
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{identity,jdbcType=VARCHAR}, 
+      #{name,jdbcType=VARCHAR}, #{payPwd,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+      #{addTime,jdbcType=TIMESTAMP}, #{authType,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{credit,jdbcType=INTEGER}, #{score,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.user.model.UserInfoExt">
+    insert into user_info_ext
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="identity != null">
+        identity,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="payPwd != null">
+        pay_pwd,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="addTime != null">
+        add_time,
+      </if>
+      <if test="authType != null">
+        auth_type,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="credit != null">
+        credit,
+      </if>
+      <if test="score != null">
+        score,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="identity != null">
+        #{identity,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="payPwd != null">
+        #{payPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="addTime != null">
+        #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="authType != null">
+        #{authType,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="credit != null">
+        #{credit,jdbcType=INTEGER},
+      </if>
+      <if test="score != null">
+        #{score,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.user.model.UserInfoExt">
+    update user_info_ext
+    <set>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="identity != null">
+        identity = #{identity,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="payPwd != null">
+        pay_pwd = #{payPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="addTime != null">
+        add_time = #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="authType != null">
+        auth_type = #{authType,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="credit != null">
+        credit = #{credit,jdbcType=INTEGER},
+      </if>
+      <if test="score != null">
+        score = #{score,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.user.model.UserInfoExt">
+    update user_info_ext
+    set user_id = #{userId,jdbcType=INTEGER},
+      identity = #{identity,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      pay_pwd = #{payPwd,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      add_time = #{addTime,jdbcType=TIMESTAMP},
+      auth_type = #{authType,jdbcType=INTEGER},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      credit = #{credit,jdbcType=INTEGER},
+      score = #{score,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectByUserId" parameterType="Integer" resultMap="BaseResultMap">
+    select * from user_info_ext where user_id = #{userId,jdbcType=INTEGER}
+  </select>
+</mapper>

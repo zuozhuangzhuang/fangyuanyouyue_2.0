@@ -20,6 +20,7 @@
 		<module>fangyuanyouyue-microservice-user</module>
 		<module>fangyuanyouyue-microservice-goods</module>
 		<module>fangyuanyouyue-microservice-forum</module>
+		<module>fangyuanyouyue-microservice-order</module>
 	</modules>
 	
 </project>

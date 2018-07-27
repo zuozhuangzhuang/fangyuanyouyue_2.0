@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fangyuanyouyue.goods.dao.GoodsQuickSearchMapper" >
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.goods.model.GoodsQuickSearch" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="price_min" property="priceMin" jdbcType="DECIMAL" />
+    <result column="price_max" property="priceMax" jdbcType="DECIMAL" />
+    <result column="sort" property="sort" jdbcType="INTEGER" />
+    <result column="search_count" property="searchCount" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="add_time" property="addTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, price_min, price_max, sort, search_count, status, add_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_quick_search
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from goods_quick_search
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.fangyuanyouyue.goods.model.GoodsQuickSearch" useGeneratedKeys="true" keyProperty="id">
+    insert into goods_quick_search (id, price_min, price_max, 
+      sort, search_count, status, 
+      add_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{priceMin,jdbcType=DECIMAL}, #{priceMax,jdbcType=DECIMAL}, 
+      #{sort,jdbcType=INTEGER}, #{searchCount,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
+      #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.goods.model.GoodsQuickSearch" >
+    insert into goods_quick_search
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="priceMin != null" >
+        price_min,
+      </if>
+      <if test="priceMax != null" >
+        price_max,
+      </if>
+      <if test="sort != null" >
+        sort,
+      </if>
+      <if test="searchCount != null" >
+        search_count,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="addTime != null" >
+        add_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="priceMin != null" >
+        #{priceMin,jdbcType=DECIMAL},
+      </if>
+      <if test="priceMax != null" >
+        #{priceMax,jdbcType=DECIMAL},
+      </if>
+      <if test="sort != null" >
+        #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="searchCount != null" >
+        #{searchCount,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="addTime != null" >
+        #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.goods.model.GoodsQuickSearch" >
+    update goods_quick_search
+    <set >
+      <if test="priceMin != null" >
+        price_min = #{priceMin,jdbcType=DECIMAL},
+      </if>
+      <if test="priceMax != null" >
+        price_max = #{priceMax,jdbcType=DECIMAL},
+      </if>
+      <if test="sort != null" >
+        sort = #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="searchCount != null" >
+        search_count = #{searchCount,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="addTime != null" >
+        add_time = #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.goods.model.GoodsQuickSearch" >
+    update goods_quick_search
+    set price_min = #{priceMin,jdbcType=DECIMAL},
+      price_max = #{priceMax,jdbcType=DECIMAL},
+      sort = #{sort,jdbcType=INTEGER},
+      search_count = #{searchCount,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      add_time = #{addTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="getQuickSearchList" resultMap="BaseResultMap">
+    select * from goods_quick_search where status = 1 order by sort
+  </select>
+</mapper>

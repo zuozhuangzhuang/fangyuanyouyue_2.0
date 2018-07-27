@@ -1,0 +1,19 @@
+package com.fangyuanyouyue.user.service;
+
+import com.fangyuanyouyue.base.exception.ServiceException;
+
+/**
+ * 实名认证相关接口
+ */
+public interface UserInfoExtService {
+    /**
+     * 实名认证
+     * @param token
+     * @param name
+     * @param identity
+     * @param identityImgCoverUrl
+     * @param identityImgBackUrl
+     * @throws ServiceException
+     */
+    void certification(String token, String name, String identity, String identityImgCoverUrl, String identityImgBackUrl) throws ServiceException;
+}

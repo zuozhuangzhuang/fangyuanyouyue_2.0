@@ -15,5 +15,9 @@
 		<artifactId>fangyuanyouyue</artifactId>
 		<version>1.0-SNAPSHOT</version>
     </parent> 
+
+    <modules>
+    	<module>fangyuanyouyue-common-message</module>
+    </modules>
 	
 </project>
