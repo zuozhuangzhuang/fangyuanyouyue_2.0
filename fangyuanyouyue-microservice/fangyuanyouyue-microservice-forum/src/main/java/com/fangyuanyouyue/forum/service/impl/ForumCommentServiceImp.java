@@ -6,12 +6,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.forum.constants.StatusEnum;
 import com.fangyuanyouyue.forum.dao.ForumCommentMapper;
 import com.fangyuanyouyue.forum.dto.ForumCommentDto;
 import com.fangyuanyouyue.forum.model.ForumComment;
 import com.fangyuanyouyue.forum.service.ForumCommentService;
-import com.fangyuanyouyue.forum.utils.ServiceException;
 
 
 @Service(value = "forumCommentService")

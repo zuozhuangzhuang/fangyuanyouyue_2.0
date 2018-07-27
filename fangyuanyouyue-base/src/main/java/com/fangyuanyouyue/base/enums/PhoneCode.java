@@ -1,4 +1,4 @@
-package com.fangyuanyouyue.forum.utils;
+package com.fangyuanyouyue.base.enums;
 
 /**
  * 手机验证码session的key

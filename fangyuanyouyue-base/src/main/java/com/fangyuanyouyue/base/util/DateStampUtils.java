@@ -1,4 +1,4 @@
-package com.fangyuanyouyue.forum.utils;
+package com.fangyuanyouyue.base.util;
 
 import java.sql.Timestamp;
 import java.text.ParseException;

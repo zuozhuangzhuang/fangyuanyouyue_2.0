@@ -11,12 +11,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.fangyuanyouyue.forum.client.BaseController;
+import com.fangyuanyouyue.base.BaseController;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.ResultUtil;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.forum.dto.BannerIndexDto;
 import com.fangyuanyouyue.forum.param.ForumParam;
 import com.fangyuanyouyue.forum.service.BannerIndexService;
-import com.fangyuanyouyue.forum.utils.ReCode;
-import com.fangyuanyouyue.forum.utils.ResultUtil;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -39,7 +40,7 @@ public class BannerIndexController extends BaseController {
 			@ApiImplicitParam(name = "limit", value = "每页条数", required = true, dataType = "Integer", paramType = "query") })
 	@PostMapping(value = "/list")
 	@ResponseBody
-	public String bannerList(ForumParam param) throws IOException {
+	public BaseResp bannerList(ForumParam param) throws IOException {
 		try {
 			log.info("----》获取banner列表《----");
 			log.info("参数：" + param.toString());

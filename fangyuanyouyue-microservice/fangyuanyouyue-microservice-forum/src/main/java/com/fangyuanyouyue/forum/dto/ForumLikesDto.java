@@ -3,8 +3,8 @@ package com.fangyuanyouyue.forum.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.forum.model.ForumLikes;
-import com.fangyuanyouyue.forum.utils.DateUtil;
 
 /**
  * 点赞

@@ -1,7 +1,9 @@
-package com.fangyuanyouyue.forum.utils;
+package com.fangyuanyouyue.base;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import com.fangyuanyouyue.base.util.DateUtil;
 
 
 /**
@@ -19,8 +21,6 @@ public class ResultUtil {
 	private Object data;
 	//响应结果
 	private String report;
-
-
 
 	public ResultUtil() {
 		super();

@@ -1,4 +1,4 @@
-package com.fangyuanyouyue.forum.utils;
+package com.fangyuanyouyue.base.util;
 
 import org.apache.log4j.Logger;
 import org.bouncycastle.util.encoders.Hex;

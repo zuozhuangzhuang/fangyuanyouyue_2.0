@@ -5,13 +5,13 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.forum.dao.ForumInfoMapper;
 import com.fangyuanyouyue.forum.dto.ForumInfoDto;
 import com.fangyuanyouyue.forum.model.ForumInfo;
 import com.fangyuanyouyue.forum.service.ForumCommentService;
 import com.fangyuanyouyue.forum.service.ForumInfoService;
 import com.fangyuanyouyue.forum.service.ForumLikesService;
-import com.fangyuanyouyue.forum.utils.ServiceException;
 
 
 @Service(value = "forumInfoService")

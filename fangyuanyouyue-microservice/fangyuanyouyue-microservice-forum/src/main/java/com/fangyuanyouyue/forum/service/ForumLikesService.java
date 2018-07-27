@@ -2,9 +2,8 @@ package com.fangyuanyouyue.forum.service;
 
 import java.util.List;
 
-import com.fangyuanyouyue.forum.dto.ForumCommentDto;
+import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.forum.dto.ForumLikesDto;
-import com.fangyuanyouyue.forum.utils.ServiceException;
 
 /**
  * 论坛帖子接口

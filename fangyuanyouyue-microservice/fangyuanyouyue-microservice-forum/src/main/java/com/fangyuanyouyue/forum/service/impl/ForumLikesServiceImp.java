@@ -6,11 +6,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.forum.dao.ForumLikesMapper;
 import com.fangyuanyouyue.forum.dto.ForumLikesDto;
 import com.fangyuanyouyue.forum.model.ForumLikes;
 import com.fangyuanyouyue.forum.service.ForumLikesService;
-import com.fangyuanyouyue.forum.utils.ServiceException;
 
 
 @Service(value = "forumLikesService")

@@ -2,8 +2,8 @@ package com.fangyuanyouyue.forum.service;
 
 import java.util.List;
 
+import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.forum.dto.ForumColumnDto;
-import com.fangyuanyouyue.forum.utils.ServiceException;
 
 /**
  * 专栏接口

@@ -10,6 +10,7 @@ fangyuanyouyue
 	- fangyuanyouyue-microservice-user	//用户相关微服务
 	- fangyuanyouyue-microservice-goods	//商品相关微服务
 	- fangyuanyouyue-microservice-forum	//论坛相关微服务
+	- fangyuanyouyue-microservice-order	//订单相关微服务
  - fangyuanyouyue-server
 	- fangyuanyouyue-server-eureka		//服务治理eureka
 	- fangyuanyouyue-server-config		//配置服务，可能会废弃

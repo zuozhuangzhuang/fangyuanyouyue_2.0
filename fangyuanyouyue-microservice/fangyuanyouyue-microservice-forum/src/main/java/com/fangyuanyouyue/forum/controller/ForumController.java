@@ -11,12 +11,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.fangyuanyouyue.forum.client.BaseController;
+import com.fangyuanyouyue.base.BaseController;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.ResultUtil;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.forum.dto.ForumInfoDto;
 import com.fangyuanyouyue.forum.param.ForumParam;
 import com.fangyuanyouyue.forum.service.ForumInfoService;
-import com.fangyuanyouyue.forum.utils.ReCode;
-import com.fangyuanyouyue.forum.utils.ResultUtil;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -39,7 +40,7 @@ public class ForumController extends BaseController {
     })
     @PostMapping(value = "/detail")
     @ResponseBody
-    public String forumDetail(ForumParam param) throws IOException {
+    public BaseResp forumDetail(ForumParam param) throws IOException {
         try {
             log.info("----》获取帖子详情《----");
             log.info("参数：" + param.toString());
@@ -68,7 +69,7 @@ public class ForumController extends BaseController {
     })
     @PostMapping(value = "/list")
     @ResponseBody
-    public String forumList(ForumParam param) throws IOException {
+    public BaseResp forumList(ForumParam param) throws IOException {
         try {
             log.info("----》获取帖子详情《----");
             log.info("参数：" + param.toString());
