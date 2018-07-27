@@ -17,7 +17,9 @@
     </parent> 
 
 	<modules>
-		<module>eureka-server</module>
+		<module>fangyuanyouyue-server-eureka</module>
+		<module>fangyuanyouyue-server-zuul</module>
+		<module>fangyuanyouyue-server-config</module>
 	</modules>
 	
 </project>
