@@ -198,8 +198,9 @@ public class UserInfoServiceImpl implements UserInfoService {
             userInfoExt.setUserId(user.getId());
             userInfoExt.setStatus(2);//实名登记状态 1已实名 2未实名
             //TODO 信誉度待定
-            userInfoExt.setCredit(100);
-            userInfoExt.setScore(0);
+            userInfoExt.setCredit(100);//信誉度
+            userInfoExt.setScore(0);//用户积分
+            userInfoExt.setAuthType(2);//认证状态 1已认证 2未认证
             userInfoExt.setAddTime(DateStampUtils.getTimesteamp());
             userInfoExtMapper.insert(userInfoExt);
             //用户会员系统
@@ -446,8 +447,9 @@ public class UserInfoServiceImpl implements UserInfoService {
             userInfoExt.setUserId(user.getId());
             userInfoExt.setStatus(2);//实名登记状态 1已实名 2未实名
             //TODO 信誉度待定
-            userInfoExt.setCredit(100);
-            userInfoExt.setScore(0);
+            userInfoExt.setCredit(100);//信誉度
+            userInfoExt.setScore(0);//用户积分
+            userInfoExt.setAuthType(2);//认证状态 1已认证 2未认证
             userInfoExt.setAddTime(DateStampUtils.getTimesteamp());
             userInfoExtMapper.insert(userInfoExt);
             //用户会员系统
@@ -584,11 +586,6 @@ public class UserInfoServiceImpl implements UserInfoService {
                     userFans.setToUserId(toUserId);
                     userFans.setUserId(userId);
                     userFansMapper.insert(userFans);
-                    List<UserInfo> list = new ArrayList<>();
-                    Iterator<UserInfo> iterator = list.iterator();
-                    while(iterator.hasNext()){
-                        iterator.remove();
-                    }
                 }else if(type == 1){//取消关注
                     if(userFans == null){
                         throw new ServiceException("未关注，取消关注失败！");
