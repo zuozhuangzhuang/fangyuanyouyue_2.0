@@ -1,9 +1,18 @@
 package com.fangyuanyouyue.goods.controller;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
+import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BaseController;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.goods.dto.GoodsDto;
+import com.fangyuanyouyue.goods.param.GoodsParam;
+import com.fangyuanyouyue.goods.service.CollectService;
+import com.fangyuanyouyue.goods.service.SchedualUserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,21 +23,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSONObject;
-import com.fangyuanyouyue.base.BaseController;
-import com.fangyuanyouyue.base.BaseResp;
-import com.fangyuanyouyue.base.ResultUtil;
-import com.fangyuanyouyue.base.enums.ReCode;
-import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.goods.dto.GoodsDto;
-import com.fangyuanyouyue.goods.param.GoodsParam;
-import com.fangyuanyouyue.goods.service.CollectService;
-import com.fangyuanyouyue.goods.service.SchedualUserService;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Controller
 @RequestMapping(value = "/collect")
@@ -43,7 +40,7 @@ public class CollectController extends BaseController{
     @Autowired
     private SchedualUserService schedualUserService;//调用其他service时用
 
-    @ApiOperation(value = "收藏/关注或取消", notes = "(void)收藏/关注或取消",response = ResultUtil.class)
+    @ApiOperation(value = "收藏/关注或取消", notes = "(void)收藏/关注或取消",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true,dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "collectId", value = "收藏对象ID", allowMultiple = true,required = true, dataType = "int", paramType = "query"),
@@ -99,7 +96,7 @@ public class CollectController extends BaseController{
         }
     }
 
-    @ApiOperation(value = "获取我的收藏/关注", notes = "(GoodsDto)获取我的收藏/关注的商品或抢购",response = ResultUtil.class)
+    @ApiOperation(value = "获取我的收藏/关注", notes = "(GoodsDto)获取我的收藏/关注的商品或抢购",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true,dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "type", value = "类型 1关注 2收藏", required = true, dataType = "String", paramType = "query"),

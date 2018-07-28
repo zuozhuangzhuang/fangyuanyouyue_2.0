@@ -1,9 +1,19 @@
 package com.fangyuanyouyue.goods.controller;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
+import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BaseController;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.goods.dto.GoodsCommentDto;
+import com.fangyuanyouyue.goods.param.GoodsParam;
+import com.fangyuanyouyue.goods.service.CommentService;
+import com.fangyuanyouyue.goods.service.GoodsInfoService;
+import com.fangyuanyouyue.goods.service.SchedualUserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,22 +24,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSONObject;
-import com.fangyuanyouyue.base.BaseController;
-import com.fangyuanyouyue.base.BaseResp;
-import com.fangyuanyouyue.base.ResultUtil;
-import com.fangyuanyouyue.base.enums.ReCode;
-import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.goods.dto.GoodsCommentDto;
-import com.fangyuanyouyue.goods.param.GoodsParam;
-import com.fangyuanyouyue.goods.service.CommentService;
-import com.fangyuanyouyue.goods.service.GoodsInfoService;
-import com.fangyuanyouyue.goods.service.SchedualUserService;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping(value = "/comment")
@@ -46,7 +43,7 @@ public class CommentController extends BaseController{
     @Autowired
     private CommentService commentService;
 
-    @ApiOperation(value = "发布评论/回复", notes = "(void)发布评论/回复",response = ResultUtil.class)
+    @ApiOperation(value = "发布评论/回复", notes = "(void)发布评论/回复",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true,dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "goodsId", value = "商品id",required = true,dataType = "int", paramType = "query"),
@@ -92,7 +89,7 @@ public class CommentController extends BaseController{
         }
     }
 
-    @ApiOperation(value = "评论点赞", notes = "(void)评论点赞",response = ResultUtil.class)
+    @ApiOperation(value = "评论点赞", notes = "(void)评论点赞",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true,dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "commentId", value = "回复评论id",required = true, dataType = "int", paramType = "query")
@@ -129,7 +126,7 @@ public class CommentController extends BaseController{
         }
     }
 
-    @ApiOperation(value = "查看全部评论", notes = "(GoodsCommentDto)查看全部评论",response = ResultUtil.class)
+    @ApiOperation(value = "查看全部评论", notes = "(GoodsCommentDto)查看全部评论",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "goodsId", value = "商品ID", required = true,dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "start", value = "起始页数", required = true,dataType = "int", paramType = "query"),

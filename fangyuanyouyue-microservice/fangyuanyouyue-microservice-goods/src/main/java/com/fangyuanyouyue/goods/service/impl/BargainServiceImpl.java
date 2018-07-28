@@ -3,6 +3,7 @@ package com.fangyuanyouyue.goods.service.impl;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +47,9 @@ public class BargainServiceImpl implements BargainService{
                 goodsBargain.setUserId(userId);
                 goodsBargain.setGoodsId(goodsId);
                 goodsBargain.setPrice(price);
-                goodsBargain.setReason(reason);
+                if(StringUtils.isNotEmpty(reason)){
+                    goodsBargain.setReason(reason);
+                }
                 goodsBargain.setStatus(1);//状态 1申请 2同意 3拒绝
                 goodsBargain.setAddTime(DateStampUtils.getTimesteamp());
                 goodsBargainMapper.insert(goodsBargain);
