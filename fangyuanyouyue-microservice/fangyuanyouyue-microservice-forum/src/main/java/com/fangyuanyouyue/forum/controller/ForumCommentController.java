@@ -23,7 +23,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping(value = "/comment")
-@Api(tags = "论坛评论Controller")
+@Api(description = "论坛评论Controller")
 @RefreshScope
 public class ForumCommentController extends BaseController {
 	protected Logger log = Logger.getLogger(this.getClass());
@@ -33,9 +33,9 @@ public class ForumCommentController extends BaseController {
 
 	@ApiOperation(value = "帖子评论", notes = "根据id获取论坛详情", response = BaseResp.class)
 	@ApiImplicitParams({
-			@ApiImplicitParam(name = "forumId", value = "帖子id", required = true, dataType = "Integer", paramType = "query"),
-			@ApiImplicitParam(name = "start", value = "起始条数", required = true, dataType = "Integer", paramType = "query"),
-			@ApiImplicitParam(name = "limit", value = "每页条数", required = true, dataType = "Integer", paramType = "query") })
+			@ApiImplicitParam(name = "forumId", value = "帖子id", required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "start", value = "起始条数", required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "limit", value = "每页条数", required = true, dataType = "int", paramType = "query") })
 	@PostMapping(value = "/list")
 	@ResponseBody
 	public BaseResp forumComment(ForumParam param) throws IOException {
@@ -61,9 +61,9 @@ public class ForumCommentController extends BaseController {
 
 	@ApiOperation(value = "添加评论", notes = "添加评论", response = BaseResp.class)
 	@ApiImplicitParams({
-			@ApiImplicitParam(name = "forumId", value = "帖子id", required = true, dataType = "Integer", paramType = "query"),
+			@ApiImplicitParam(name = "forumId", value = "帖子id", required = true, dataType = "int", paramType = "query"),
 			@ApiImplicitParam(name = "content", value = "评论内容", required = true, dataType = "String", paramType = "query"),
-			@ApiImplicitParam(name = "commentId", value = "被回复的评论id", required = false, dataType = "Integer", paramType = "query") })
+			@ApiImplicitParam(name = "commentId", value = "被回复的评论id", required = false, dataType = "int", paramType = "query") })
 	@PostMapping(value = "/add")
 	@ResponseBody
 	public BaseResp saveComment(ForumParam param) throws IOException {

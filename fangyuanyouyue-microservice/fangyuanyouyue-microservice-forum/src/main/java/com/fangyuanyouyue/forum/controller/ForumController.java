@@ -23,7 +23,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping(value = "/forum")
-@Api( tags = {"帖子/视频Controller"})
+@Api(description = "帖子/视频Controller")
 @RefreshScope
 public class ForumController extends BaseController {
     protected Logger log = Logger.getLogger(this.getClass());
@@ -33,7 +33,7 @@ public class ForumController extends BaseController {
 
     @ApiOperation(value = "帖子详情", notes = "根据id获取帖子详情",response = BaseResp.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "forumId", value = "帖子id",required = true, dataType = "Integer", paramType = "query")
+            @ApiImplicitParam(name = "forumId", value = "帖子id",required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/detail")
     @ResponseBody
@@ -60,9 +60,9 @@ public class ForumController extends BaseController {
 
     @ApiOperation(value = "帖子列表", notes = "根据专栏id获取帖子列表",response = BaseResp.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "columnId", value = "专栏id",required = true, dataType = "Integer", paramType = "query"),
-            @ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "Integer", paramType = "query"),
-            @ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "Integer", paramType = "query")
+            @ApiImplicitParam(name = "columnId", value = "专栏id",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/list")
     @ResponseBody

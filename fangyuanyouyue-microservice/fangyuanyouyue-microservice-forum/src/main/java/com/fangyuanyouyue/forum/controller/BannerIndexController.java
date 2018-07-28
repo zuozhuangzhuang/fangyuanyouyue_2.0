@@ -23,7 +23,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping(value = "/banner")
-@Api(tags = "Banner Controller")
+@Api(description = "Banner Controller")
 @RefreshScope
 public class BannerIndexController extends BaseController {
 	protected Logger log = Logger.getLogger(this.getClass());
@@ -33,8 +33,8 @@ public class BannerIndexController extends BaseController {
 
 	@ApiOperation(value = "Banner", notes = "获取Banner列表", response = BaseResp.class)
 	@ApiImplicitParams({
-			@ApiImplicitParam(name = "start", value = "起始条数", required = true, dataType = "Integer", paramType = "query"),
-			@ApiImplicitParam(name = "limit", value = "每页条数", required = true, dataType = "Integer", paramType = "query") })
+			@ApiImplicitParam(name = "start", value = "起始条数", required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "limit", value = "每页条数", required = true, dataType = "int", paramType = "query") })
 	@PostMapping(value = "/list")
 	@ResponseBody
 	public BaseResp bannerList(ForumParam param) throws IOException {

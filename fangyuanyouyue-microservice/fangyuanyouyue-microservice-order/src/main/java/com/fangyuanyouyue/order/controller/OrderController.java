@@ -74,7 +74,7 @@ public class OrderController extends BaseController{
             Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
             JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if((Integer)jsonObject.get("code") != 0){
+            if(jsonObject != null && (Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
             redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
