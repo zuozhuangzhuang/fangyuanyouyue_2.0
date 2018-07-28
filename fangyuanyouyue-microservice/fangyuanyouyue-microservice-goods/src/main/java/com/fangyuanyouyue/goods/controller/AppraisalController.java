@@ -1,8 +1,18 @@
 package com.fangyuanyouyue.goods.controller;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
+import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BaseController;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.goods.param.GoodsParam;
+import com.fangyuanyouyue.goods.service.AppraisalService;
+import com.fangyuanyouyue.goods.service.CartService;
+import com.fangyuanyouyue.goods.service.SchedualUserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,21 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSONObject;
-import com.fangyuanyouyue.base.BaseController;
-import com.fangyuanyouyue.base.BaseResp;
-import com.fangyuanyouyue.base.ResultUtil;
-import com.fangyuanyouyue.base.enums.ReCode;
-import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.goods.param.GoodsParam;
-import com.fangyuanyouyue.goods.service.AppraisalService;
-import com.fangyuanyouyue.goods.service.CartService;
-import com.fangyuanyouyue.goods.service.SchedualUserService;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping(value = "/appraisal")
@@ -46,7 +43,7 @@ public class AppraisalController extends BaseController{
 
     @ApiOperation(value = "申请鉴定", notes = "(void)申请鉴定分为四种情况：1.卖家对自己商品进行鉴定，可显示到商品详情中 " +
             "2.买家对别人的商品进行鉴定，只能自己看到 3.用户上传图片鉴定图片中的物品(这个是全民鉴定还是官方鉴定) " +
-            "4.官方认证店铺中的所有商品都是已鉴定",response = ResultUtil.class)
+            "4.官方认证店铺中的所有商品都是已鉴定",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "goodsIds", value = "商品ID数组", allowMultiple = true,dataType = "int", paramType = "query"),
@@ -88,7 +85,7 @@ public class AppraisalController extends BaseController{
 
 
     //我的鉴定
-//    @ApiOperation(value = "我的鉴定", notes = "我的鉴定",response = ResultUtil.class)
+//    @ApiOperation(value = "我的鉴定", notes = "我的鉴定",response = BaseResp.class)
 //    @ApiImplicitParams({
 //            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query")
 //    })

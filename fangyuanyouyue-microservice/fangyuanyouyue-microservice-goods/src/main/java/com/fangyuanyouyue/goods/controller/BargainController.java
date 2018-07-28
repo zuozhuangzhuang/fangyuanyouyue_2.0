@@ -1,9 +1,20 @@
 package com.fangyuanyouyue.goods.controller;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
+import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BaseController;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.goods.dto.BargainDto;
+import com.fangyuanyouyue.goods.param.GoodsParam;
+import com.fangyuanyouyue.goods.service.AppraisalService;
+import com.fangyuanyouyue.goods.service.BargainService;
+import com.fangyuanyouyue.goods.service.CartService;
+import com.fangyuanyouyue.goods.service.SchedualUserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,23 +25,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSONObject;
-import com.fangyuanyouyue.base.BaseController;
-import com.fangyuanyouyue.base.BaseResp;
-import com.fangyuanyouyue.base.ResultUtil;
-import com.fangyuanyouyue.base.enums.ReCode;
-import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.goods.dto.BargainDto;
-import com.fangyuanyouyue.goods.param.GoodsParam;
-import com.fangyuanyouyue.goods.service.AppraisalService;
-import com.fangyuanyouyue.goods.service.BargainService;
-import com.fangyuanyouyue.goods.service.CartService;
-import com.fangyuanyouyue.goods.service.SchedualUserService;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping(value = "/bargain")
@@ -49,12 +46,12 @@ public class BargainController extends BaseController{
     @Autowired
     private BargainService bargainService;
 
-    @ApiOperation(value = "商品压价申请", notes = "(void)用户发起对商品的议价，直接扣除用户余额 ",response = ResultUtil.class)
+    @ApiOperation(value = "商品压价申请", notes = "(void)用户发起对商品的议价，直接扣除用户余额 ",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "goodsId", value = "商品ID",required = true,dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "price", value = "出价钱", required = true, dataType = "BigDecimal", paramType = "query"),
-            @ApiImplicitParam(name = "reason", value = "议价理由", required = true, dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "reason", value = "议价理由", dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/addBargain")
     @ResponseBody
@@ -79,9 +76,6 @@ public class BargainController extends BaseController{
             if(param.getPrice() == null){
                 return toError(ReCode.FAILD.getValue(),"出价钱不能为空！");
             }
-            if(StringUtils.isEmpty(param.getReason())){
-                return toError(ReCode.FAILD.getValue(),"议价理由不能为空！");
-            }
             //申请商品压价
             bargainService.addBargain(userId,param.getGoodsId(),param.getPrice(),param.getReason());
             return toSuccess();
@@ -95,7 +89,7 @@ public class BargainController extends BaseController{
     }
 
 
-    @ApiOperation(value = "处理压价", notes = "(void)处理压价，包括：取消压价返还余额；卖家同意压价，生成订单；卖家拒绝压价，返还余额",response = ResultUtil.class)
+    @ApiOperation(value = "处理压价", notes = "(void)处理压价，包括：取消压价返还余额；卖家同意压价，生成订单；卖家拒绝压价，返还余额",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "goodsId", value = "商品ID",required = true,dataType = "int", paramType = "query"),
@@ -140,7 +134,7 @@ public class BargainController extends BaseController{
         }
     }
 
-    @ApiOperation(value = "我的压价列表", notes = "(BargainDto)买家获取自己所压价商品的列表",response = ResultUtil.class)
+    @ApiOperation(value = "我的压价列表", notes = "(BargainDto)买家获取自己所压价商品的列表",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query")
     })
@@ -174,7 +168,7 @@ public class BargainController extends BaseController{
     }
 
 
-//    @ApiOperation(value = "压价详情", notes = "",response = ResultUtil.class)
+//    @ApiOperation(value = "压价详情", notes = "",response = BaseResp.class)
 //    @ApiImplicitParams({
 //            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
 //            @ApiImplicitParam(name = "goodsId", value = "商品ID",required = true,dataType = "int", paramType = "query")

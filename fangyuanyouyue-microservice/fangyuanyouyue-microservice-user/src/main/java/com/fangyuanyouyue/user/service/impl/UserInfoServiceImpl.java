@@ -105,8 +105,9 @@ public class UserInfoServiceImpl implements UserInfoService {
         userInfoExt.setUserId(user.getId());
         userInfoExt.setStatus(2);//实名登记状态 1已实名 2未实名
         //TODO 信誉度待定
-        userInfoExt.setCredit(100);
-        userInfoExt.setScore(0);
+        userInfoExt.setCredit(100);//信誉度
+        userInfoExt.setScore(0);//用户积分
+        userInfoExt.setAuthType(2);//认证状态 1已认证 2未认证
         userInfoExt.setAddTime(DateStampUtils.getTimesteamp());
         userInfoExtMapper.insert(userInfoExt);
         //用户会员系统

@@ -1,8 +1,18 @@
 package com.fangyuanyouyue.user.controller;
 
-import java.io.IOException;
-import java.util.List;
-
+import com.fangyuanyouyue.base.BaseController;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.user.dto.UserAddressDto;
+import com.fangyuanyouyue.user.model.UserInfo;
+import com.fangyuanyouyue.user.param.UserParam;
+import com.fangyuanyouyue.user.service.UserAddressInfoService;
+import com.fangyuanyouyue.user.service.UserInfoService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,21 +22,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.fangyuanyouyue.base.BaseController;
-import com.fangyuanyouyue.base.BaseResp;
-import com.fangyuanyouyue.base.ResultUtil;
-import com.fangyuanyouyue.base.enums.ReCode;
-import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.user.dto.UserAddressDto;
-import com.fangyuanyouyue.user.model.UserInfo;
-import com.fangyuanyouyue.user.param.UserParam;
-import com.fangyuanyouyue.user.service.UserAddressInfoService;
-import com.fangyuanyouyue.user.service.UserInfoService;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import java.io.IOException;
+import java.util.List;
 
 @Controller
 @RequestMapping(value = "/address")
@@ -39,7 +36,7 @@ public class AddressController extends BaseController{
     @Autowired
     private UserAddressInfoService userAddressInfoService;
 
-    @ApiOperation(value = "添加收货地址", notes = "(UserAddressDto)添加收货地址",response = ResultUtil.class)
+    @ApiOperation(value = "添加收货地址", notes = "(UserAddressDto)添加收货地址",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "receiverName", value = "收货人姓名",  required = true,dataType = "String", paramType = "query"),
@@ -92,7 +89,7 @@ public class AddressController extends BaseController{
     }
 
 
-    @ApiOperation(value = "修改收货地址", notes = "(void)修改收货地址",response = ResultUtil.class)
+    @ApiOperation(value = "修改收货地址", notes = "(void)修改收货地址",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "addressId", value = "收货地址ID", required = true, dataType = "int", paramType = "query"),
@@ -146,7 +143,7 @@ public class AddressController extends BaseController{
         }
     }
 
-    @ApiOperation(value = "删除收货地址", notes = "(UserAddressDto)删除收货地址",response = ResultUtil.class)
+    @ApiOperation(value = "删除收货地址", notes = "(UserAddressDto)删除收货地址",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "addressId", value = "地址id", required = true, dataType = "int", paramType = "query")
@@ -182,7 +179,7 @@ public class AddressController extends BaseController{
         }
     }
 
-    @ApiOperation(value = "获取收货地址列表", notes = "(UserAddressDto)获取收货地址列表",response = ResultUtil.class)
+    @ApiOperation(value = "获取收货地址列表", notes = "(UserAddressDto)获取收货地址列表",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "addressId", value = "地址id",dataType = "int", paramType = "query")
@@ -217,7 +214,7 @@ public class AddressController extends BaseController{
 
 
 
-    @ApiOperation(value = "设置默认收货地址", notes = "(void)设置默认收货地址",response = ResultUtil.class)
+    @ApiOperation(value = "设置默认收货地址", notes = "(void)设置默认收货地址",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "addressId", value = "地址id", required = true, dataType = "int", paramType = "query")
@@ -251,7 +248,7 @@ public class AddressController extends BaseController{
     }
 
 
-    @ApiOperation(value = "获取默认地址", notes = "(UserAddressDto)获取默认地址",response = ResultUtil.class)
+    @ApiOperation(value = "获取默认地址", notes = "(UserAddressDto)获取默认地址",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query")
     })

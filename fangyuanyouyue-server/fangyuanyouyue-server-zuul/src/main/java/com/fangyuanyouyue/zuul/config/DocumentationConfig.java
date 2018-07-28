@@ -14,10 +14,14 @@ public class DocumentationConfig implements SwaggerResourcesProvider {
     @Override
     public List<SwaggerResource> get() {
         List resources = new ArrayList<>();
-        resources.add(swaggerResource("用户系统", "/user/v2/api-docs", "1.0"));
-        resources.add(swaggerResource("权限系统", "/auth/v2/api-docs", "1.0"));
+//        resources.add(swaggerResource("消息系统", "/message/v2/api-docs", "1.0"));
+//        resources.add(swaggerResource("权限系统", "/auth/v2/api-docs", "1.0"));
         resources.add(swaggerResource("商品系统", "/goods/v2/api-docs", "1.0"));
-        resources.add(swaggerResource("短信系统", "/sms/v2/api-docs", "1.0"));
+        resources.add(swaggerResource("论坛系统", "/forum/v2/api-docs", "1.0"));
+        resources.add(swaggerResource("订单系统", "/order/v2/api-docs", "1.0"));
+//        resources.add(swaggerResource("支付系统", "/payment/v2/api-docs", "1.0"));
+//        resources.add(swaggerResource("钱包系统", "/wallet/v2/api-docs", "1.0"));
+        resources.add(swaggerResource("用户系统", "/user/v2/api-docs", "1.0"));
         return resources;
     }
 
