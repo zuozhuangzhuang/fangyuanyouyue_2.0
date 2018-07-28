@@ -22,8 +22,8 @@ public class BaseController {
 	 */
 	public BaseResp toSuccess(Object object) throws IOException {
 		BaseResp resp = new BaseResp();
-		resp.setReCode(ReCode.SUCCESS.getValue());
-		resp.setReMsg(ReCode.SUCCESS.getMessage());
+		resp.setCode(ReCode.SUCCESS.getValue());
+		resp.setReport(ReCode.SUCCESS.getMessage());
 		resp.setData(object);
 		return resp;
 	}
@@ -36,8 +36,8 @@ public class BaseController {
 	 */
 	public BaseResp toSuccess() throws IOException {
 		BaseResp resp = new BaseResp();
-		resp.setReCode(ReCode.SUCCESS.getValue());
-		resp.setReMsg(ReCode.SUCCESS.getMessage());
+		resp.setCode(ReCode.SUCCESS.getValue());
+		resp.setReport(ReCode.SUCCESS.getMessage());
 		return resp;
 	}
 
@@ -51,8 +51,8 @@ public class BaseController {
 	 */
 	public BaseResp toError(Integer reCode, String reMsg) throws IOException {
 		BaseResp resp = new BaseResp();
-		resp.setReCode(reCode);
-		resp.setReMsg(reMsg);
+		resp.setCode(reCode);
+		resp.setReport(reMsg);
 		return resp;
 	}
 

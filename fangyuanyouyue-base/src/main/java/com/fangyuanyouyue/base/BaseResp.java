@@ -15,28 +15,28 @@ public class BaseResp implements Serializable {
 	private static final long serialVersionUID = 2247892260490038849L;
 
 	// 状态码
-	private Integer reCode;
+	private Integer code;
 
 	// 结果原因
-	private String reMsg;
+	private String report;
 
 	// 数据
 	private Object data;
 
-	public Integer getReCode() {
-		return reCode;
+	public Integer getCode() {
+		return code;
 	}
 
-	public void setReCode(Integer reCode) {
-		this.reCode = reCode;
+	public void setCode(Integer code) {
+		this.code = code;
 	}
 
-	public String getReMsg() {
-		return reMsg;
+	public String getReport() {
+		return report;
 	}
 
-	public void setReMsg(String reMsg) {
-		this.reMsg = reMsg;
+	public void setReport(String report) {
+		this.report = report;
 	}
 
 	public Object getData() {

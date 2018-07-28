@@ -51,7 +51,7 @@ public class BargainController extends BaseController{
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "goodsId", value = "商品ID",required = true,dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "price", value = "出价钱", required = true, dataType = "BigDecimal", paramType = "query"),
-            @ApiImplicitParam(name = "reason", value = "议价理由", required = true, dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "reason", value = "议价理由", dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/addBargain")
     @ResponseBody
@@ -75,9 +75,6 @@ public class BargainController extends BaseController{
             }
             if(param.getPrice() == null){
                 return toError(ReCode.FAILD.getValue(),"出价钱不能为空！");
-            }
-            if(StringUtils.isEmpty(param.getReason())){
-                return toError(ReCode.FAILD.getValue(),"议价理由不能为空！");
             }
             //申请商品压价
             bargainService.addBargain(userId,param.getGoodsId(),param.getPrice(),param.getReason());
