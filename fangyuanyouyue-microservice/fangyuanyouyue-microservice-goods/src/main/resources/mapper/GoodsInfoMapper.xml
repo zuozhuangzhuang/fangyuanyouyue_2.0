@@ -275,7 +275,7 @@
   <select id="getGoodsList" parameterType="Integer" resultMap="BaseResultMap">
     select * from goods_info a left join user_info_ext b on a.user_id = b.user_id
     <where>
-      1=1
+      a.status <![CDATA[ <> ]]> 5
       <if test="status != null">
         and a.status = #{status,jdbcType=INTEGER}
       </if>

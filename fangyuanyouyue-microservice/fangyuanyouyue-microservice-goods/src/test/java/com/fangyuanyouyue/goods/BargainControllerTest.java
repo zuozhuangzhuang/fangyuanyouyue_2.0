@@ -71,4 +71,18 @@ public class BargainControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
+
+    /**
+     * 我的压价列表
+     * @throws Exception
+     */
+    @Test
+    @Transactional
+    public void bargainList() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/bargain/bargainList")
+                .param("token","10025FY1532648364148")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
 }

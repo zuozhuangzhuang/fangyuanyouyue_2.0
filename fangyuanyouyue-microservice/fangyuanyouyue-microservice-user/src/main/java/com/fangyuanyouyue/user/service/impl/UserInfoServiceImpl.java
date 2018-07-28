@@ -61,7 +61,8 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Override
     public UserInfo getUserByToken(String token) throws ServiceException {
         Integer userId = (Integer)redisTemplate.opsForValue().get(token);
-        return userInfoMapper.selectByPrimaryKey(userId);
+        UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
+        return userInfo;
     }
 
     @Override
@@ -543,7 +544,9 @@ public class UserInfoServiceImpl implements UserInfoService {
 //    }
 
     @Override
-    public UserDto userInfo(Integer userId) throws ServiceException {
+    public UserDto userInfo(String token,Integer userId) throws ServiceException {
+        Integer userIdByToken = (Integer)redisTemplate.opsForValue().get(token);
+        redisTemplate.expire(token,7,TimeUnit.DAYS);
         UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
         if(userInfo == null){
             throw new ServiceException("用户不存在！");
@@ -551,6 +554,11 @@ public class UserInfoServiceImpl implements UserInfoService {
             UserDto userDto = setUserDtoByInfo("",userInfo);
             userDto.setFansCount(userFansMapper.fansCount(userId));
             userDto.setCollectCount(userFansMapper.collectCount(userId));
+            //判断token用户是否关注userId用户
+            UserFans userFans = userFansMapper.selectByUserIdToUserId(userIdByToken, userId);
+            if(userFans != null){
+               userDto.setIsFollow(1);//是否关注 1是 2否
+            }
             return userDto;
         }
     }

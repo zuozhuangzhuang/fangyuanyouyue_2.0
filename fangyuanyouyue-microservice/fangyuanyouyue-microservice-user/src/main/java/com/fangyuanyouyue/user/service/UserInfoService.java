@@ -152,7 +152,7 @@ public interface UserInfoService {
      * @return
      * @throws ServiceException
      */
-    UserDto userInfo(Integer userId) throws ServiceException;
+    UserDto userInfo(String token,Integer userId) throws ServiceException;
 
     /**
      * 添加关注/取消关注

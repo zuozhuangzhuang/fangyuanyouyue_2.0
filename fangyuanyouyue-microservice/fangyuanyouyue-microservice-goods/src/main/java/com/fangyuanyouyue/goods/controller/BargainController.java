@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.goods.controller;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
@@ -19,7 +20,7 @@ import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.ResultUtil;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.goods.model.GoodsBargain;
+import com.fangyuanyouyue.goods.dto.BargainDto;
 import com.fangyuanyouyue.goods.param.GoodsParam;
 import com.fangyuanyouyue.goods.service.AppraisalService;
 import com.fangyuanyouyue.goods.service.BargainService;
@@ -48,7 +49,7 @@ public class BargainController extends BaseController{
     @Autowired
     private BargainService bargainService;
 
-    @ApiOperation(value = "商品压价申请", notes = "用户发起对商品的议价，直接扣除用户余额 ",response = ResultUtil.class)
+    @ApiOperation(value = "商品压价申请", notes = "(void)用户发起对商品的议价，直接扣除用户余额 ",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "goodsId", value = "商品ID",required = true,dataType = "int", paramType = "query"),
@@ -83,7 +84,7 @@ public class BargainController extends BaseController{
             }
             //申请商品压价
             bargainService.addBargain(userId,param.getGoodsId(),param.getPrice(),param.getReason());
-            return toSuccess( "申请商品压价成功！");
+            return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
@@ -94,7 +95,7 @@ public class BargainController extends BaseController{
     }
 
 
-    @ApiOperation(value = "处理压价", notes = "处理压价，包括：取消压价返还余额；卖家同意压价，生成订单；卖家拒绝压价，返还余额",response = ResultUtil.class)
+    @ApiOperation(value = "处理压价", notes = "(void)处理压价，包括：取消压价返还余额；卖家同意压价，生成订单；卖家拒绝压价，返还余额",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "goodsId", value = "商品ID",required = true,dataType = "int", paramType = "query"),
@@ -129,7 +130,7 @@ public class BargainController extends BaseController{
             }
             //处理压价
             bargainService.updateBargain(userId,param.getGoodsId(),param.getBargainId(),param.getStatus());
-            return toSuccess( "处理压价成功！");
+            return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
@@ -139,7 +140,7 @@ public class BargainController extends BaseController{
         }
     }
 
-    @ApiOperation(value = "我的压价", notes = "买家获取自己所压价商品的列表",response = ResultUtil.class)
+    @ApiOperation(value = "我的压价列表", notes = "(BargainDto)买家获取自己所压价商品的列表",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query")
     })
@@ -147,7 +148,7 @@ public class BargainController extends BaseController{
     @ResponseBody
     public BaseResp bargainList(GoodsParam param) throws IOException {
         try {
-            log.info("----》我的压价《----");
+            log.info("----》我的压价列表《----");
             log.info("参数：" + param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
@@ -160,13 +161,9 @@ public class BargainController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
-            if(param.getGoodsId() == null){
-                return toError(ReCode.FAILD.getValue(),"商品ID不能为空！");
-            }
-            //TODO 压价详情
-            GoodsBargain goodsBargain = bargainService.bargainDetail(userId, param.getBargainId(), param.getGoodsId());
-//            bargainService.addBargain(userId,param.getGoodsId(),param.getPrice(),param.getReason());
-            return toSuccess( "获取压价详情成功！");
+            //TODO 我的压价列表
+            List<BargainDto> bargainDtos = bargainService.bargainList(userId);
+            return toSuccess( bargainDtos);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
@@ -175,6 +172,7 @@ public class BargainController extends BaseController{
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
         }
     }
+
 
 //    @ApiOperation(value = "压价详情", notes = "",response = ResultUtil.class)
 //    @ApiImplicitParams({

@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.order.controller;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.ResultUtil;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.order.dto.OrderDto;
 import com.fangyuanyouyue.order.param.OrderParam;
@@ -45,7 +47,7 @@ public class OrderController extends BaseController{
     private OrderService orderService;
     //TODO 1.商品加入购物车后单个下单 2.商品加入购物车后打包下单 3.商品不加入购物车直接下单 4.抢购不加入购物车直接下单
 
-    @ApiOperation(value = "商品下单", notes = "商品下单")
+    @ApiOperation(value = "商品下单", notes = "(OrderDto)商品下单",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "goodsIds", value = "商品ID数组",allowMultiple = true,required = true, dataType = "int", paramType = "query"),
@@ -88,7 +90,7 @@ public class OrderController extends BaseController{
         }
     }
 
-    @ApiOperation(value = "取消订单", notes = "取消订单")
+    @ApiOperation(value = "取消订单", notes = "(void)取消订单",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "orderId", value = "订单ID",required = true, dataType = "int", paramType = "query")
@@ -125,7 +127,7 @@ public class OrderController extends BaseController{
     }
 
 
-    @ApiOperation(value = "订单详情", notes = "订单详情")
+    @ApiOperation(value = "订单详情", notes = "(OrderDto)订单详情",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "orderId", value = "订单ID",required = true, dataType = "int", paramType = "query")
@@ -160,31 +162,50 @@ public class OrderController extends BaseController{
         }
     }
 
-//    @ApiOperation(value = "我拍下的商品", notes = "我拍下的商品")
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "userId ", value = "用户id", required = true, dataType = "int", paramType = "query"),
-//            @ApiImplicitParam(name = "start", value = "分页start", required = true, dataType = "int", paramType = "query"),
-//            @ApiImplicitParam(name = "limit", value = "分页limit", required = true, dataType = "int", paramType = "query"),
-//            @ApiImplicitParam(name = "type", value = "订单状态 0 待付款  1待收货  2已完成  3全部", dataType = "string", paramType = "query")
-//    })
-//    @PostMapping(value = "/buyGoods")
-//    @ResponseBody
-//    public String buyGoods(OrderParam param) throws IOException {
-//        try {
-//            log.info("----》我拍下的商品《----");
-//            log.info("参数："+param.toString());
-//            if(param.getStart()==null){
-//                return toError("start不能为空！");
-//            }
-//            if(param.getLimit()==null){
-//                return toError("limit不能为空！");
-//            }
-//            //TODO 我拍下的商品
-//
-//            return toSuccess("获取商品列表成功！");
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return toError("系统繁忙，请稍后再试！");
-//        }
-//    }
+    @ApiOperation(value = "我的订单列表", notes = "(OrderDto)我的订单列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token ", value = "用户token", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "start", value = "分页start", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "分页limit", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1买家（我买下的） 2卖家（我卖出的）", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "订单状态 0全部 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货",required = true, dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/myOrderList")
+    @ResponseBody
+    public BaseResp myOrderList(OrderParam param) throws IOException {
+        try {
+            log.info("----》我的订单列表《----");
+            log.info("参数："+param.toString());
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+            }
+            Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
+            String verifyUser = schedualUserService.verifyUserById(userId);
+            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+            if((Integer)jsonObject.get("code") != 0){
+                return toError(jsonObject.getString("report"));
+            }
+            redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
+
+            if(param.getStart()==null){
+                return toError("start不能为空！");
+            }
+            if(param.getLimit()==null){
+                return toError("limit不能为空！");
+            }
+            if(param.getType() == null){
+                return toError("类型不能为空！");
+            }
+            if(param.getStatus() == null){
+                return toError("订单状态不能为空！");
+            }
+            //TODO 我的订单列表
+            List<OrderDto> orderDtos = orderService.myOrderList(userId, param.getStart(), param.getLimit(), param.getType(), param.getStatus());
+            return toSuccess(orderDtos);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
 }

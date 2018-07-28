@@ -44,14 +44,13 @@ public class AppraisalController extends BaseController{
     @Autowired
     private AppraisalService appraisalService;
 
-    @ApiOperation(value = "申请鉴定", notes = "申请鉴定分为四种情况：1.卖家对自己商品进行鉴定，可显示到商品详情中 " +
+    @ApiOperation(value = "申请鉴定", notes = "(void)申请鉴定分为四种情况：1.卖家对自己商品进行鉴定，可显示到商品详情中 " +
             "2.买家对别人的商品进行鉴定，只能自己看到 3.用户上传图片鉴定图片中的物品(这个是全民鉴定还是官方鉴定) " +
             "4.官方认证店铺中的所有商品都是已鉴定",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "goodsIds", value = "商品ID数组", allowMultiple = true,dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "title", value = "鉴定标题", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "price", value = "鉴定赏金",  dataType = "BigDecimal", paramType = "query"),
+            @ApiImplicitParam(name = "price", value = "鉴定赏金", dataType = "BigDecimal", paramType = "query"),
             @ApiImplicitParam(name = "description", value = "描述",  dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "imgUrl", value = "图片地址",  dataType = "String", paramType = "query")
     })

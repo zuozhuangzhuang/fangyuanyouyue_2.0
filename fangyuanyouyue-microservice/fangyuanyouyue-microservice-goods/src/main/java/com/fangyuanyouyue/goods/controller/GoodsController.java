@@ -50,7 +50,7 @@ public class GoodsController extends BaseController{
     @Autowired
     protected RedisTemplate redisTemplate;
 
-    @ApiOperation(value = "获取商品/抢购列表", notes = "根据start和limit获取分页后的商品/抢购，根据用户token获取买家相关商品/抢购列表，" +
+    @ApiOperation(value = "获取商品/抢购列表", notes = "(GoodsDto)根据start和limit获取分页后的商品/抢购，根据用户token获取买家相关商品/抢购列表，" +
             "根据userId获取卖家相关商品/抢购列表，根据search、synthesizer、priceMin、priceMax、quality、goodsCategoryIds对列表进行筛选，根据type进行区分商品和抢购",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token，不为空则为：我的商品", dataType = "String", paramType = "query"),
@@ -110,7 +110,7 @@ public class GoodsController extends BaseController{
         }
     }
 
-    @ApiOperation(value = "发布商品/抢购", notes = "发布商品/抢购",response = ResultUtil.class)
+    @ApiOperation(value = "发布商品/抢购", notes = "(GoodsDto)发布商品/抢购",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true,dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "goodsInfoName", value = "商品名称", required = true, dataType = "String", paramType = "query"),
@@ -188,7 +188,7 @@ public class GoodsController extends BaseController{
     }
 
 
-    @ApiOperation(value = "批量删除商品", notes = "批量删除商品",response = ResultUtil.class)
+    @ApiOperation(value = "批量删除商品", notes = "(void)批量删除商品",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "goodsIds", value = "商品id数组", required = true, allowMultiple = true, dataType = "int", paramType = "query")
@@ -224,7 +224,7 @@ public class GoodsController extends BaseController{
 
             //TODO 批量删除商品
             goodsInfoService.deleteGoods(param.getGoodsIds());
-            return toSuccess("批量删除商品成功！");
+            return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
@@ -235,7 +235,7 @@ public class GoodsController extends BaseController{
     }
 
 
-    @ApiOperation(value = "编辑商品/抢购", notes = "对已发布的商品或抢购进行修改",response = ResultUtil.class)
+    @ApiOperation(value = "编辑商品/抢购", notes = "(void)对已发布的商品或抢购进行修改",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true,dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "goodsId", value = "商品ID", required = true,dataType = "int", paramType = "query"),
@@ -269,7 +269,7 @@ public class GoodsController extends BaseController{
             }
             redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
             goodsInfoService.modifyGoods(param);
-            return toSuccess("编辑商品成功！");
+            return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
@@ -280,7 +280,7 @@ public class GoodsController extends BaseController{
     }
 
     //商品详情
-    @ApiOperation(value = "商品详情", notes = "商品详情",response = ResultUtil.class)
+    @ApiOperation(value = "商品详情", notes = "(GoodsDto)商品详情",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "goodsId", value = "商品id", required = true, dataType = "int", paramType = "query")
@@ -324,7 +324,7 @@ public class GoodsController extends BaseController{
     }
 
     //分类列表
-    @ApiOperation(value = "获取分类列表", notes = "获取分类列表",response = ResultUtil.class)
+    @ApiOperation(value = "获取分类列表", notes = "(GoodsCategoryDto)获取分类列表",response = ResultUtil.class)
     @GetMapping(value = "/categoryList")
     @ResponseBody
     public BaseResp categoryList() throws IOException {
@@ -340,7 +340,7 @@ public class GoodsController extends BaseController{
     }
 
     //同类推荐
-    @ApiOperation(value = "同类推荐", notes = "同类推荐",response = ResultUtil.class)
+    @ApiOperation(value = "同类推荐", notes = "(GoodsDto)同类推荐",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "goodsId", value = "商品id", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "start", value = "分页start", required = true, dataType = "int", paramType = "query"),
@@ -377,7 +377,7 @@ public class GoodsController extends BaseController{
 
 
     //获取首页轮播图
-    @ApiOperation(value = "获取首页轮播图", notes = "获取首页轮播图",response = ResultUtil.class)
+    @ApiOperation(value = "获取首页轮播图", notes = "(BannerIndexDto)获取首页轮播图",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "轮播图类型", required = true, dataType = "int", paramType = "query")
     })
@@ -400,7 +400,7 @@ public class GoodsController extends BaseController{
     }
 
     //新增首页轮播图
-    @ApiOperation(value = "新增首页轮播图", notes = "新增首页轮播图",response = ResultUtil.class)
+    @ApiOperation(value = "新增首页轮播图", notes = "(BannerIndex)新增首页轮播图",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "businessId", value = "业务ID:商品ID/用户ID", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "jumpType", value = "跳转类型,0:商品 1：个人", required = true, dataType = "int", paramType = "query"),
@@ -443,7 +443,7 @@ public class GoodsController extends BaseController{
     }
 
     //修改首页轮播图
-    @ApiOperation(value = "修改首页轮播图", notes = "修改首页轮播图",response = ResultUtil.class)
+    @ApiOperation(value = "修改首页轮播图", notes = "(BannerIndex)修改首页轮播图",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "bannerIndexId", value = "轮播图ID", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "businessId", value = "业务ID:商品ID/用户ID", required = true, dataType = "int", paramType = "query"),
@@ -491,7 +491,7 @@ public class GoodsController extends BaseController{
 
 
     //热门搜索
-    @ApiOperation(value = "热门搜索", notes = "热门搜索",response = ResultUtil.class)
+    @ApiOperation(value = "热门搜索", notes = "(SearchDto)热门搜索",response = ResultUtil.class)
     @GetMapping(value = "/hotSearch")
     @ResponseBody
     public BaseResp hotSearch() throws IOException{
@@ -511,7 +511,7 @@ public class GoodsController extends BaseController{
 
 
     //热门分类
-    @ApiOperation(value = "热门分类", notes = "热门分类",response = ResultUtil.class)
+    @ApiOperation(value = "热门分类", notes = "(GoodsCategoryDto)热门分类",response = ResultUtil.class)
     @GetMapping(value = "/hotCategary")
     @ResponseBody
     public BaseResp hotCategary() throws IOException{
@@ -531,7 +531,7 @@ public class GoodsController extends BaseController{
 
 
     //获取快速查询条件
-    @ApiOperation(value = "获取快速查询条件", notes = "获取快速查询条件",response = ResultUtil.class)
+    @ApiOperation(value = "获取快速查询条件", notes = "(GoodsQuickSearchDto)获取快速查询条件",response = ResultUtil.class)
     @GetMapping(value = "/quickSearch")
     @ResponseBody
     public BaseResp quickSearch() throws IOException{
@@ -551,7 +551,7 @@ public class GoodsController extends BaseController{
 
 
     //举报商品
-    @ApiOperation(value = "举报商品", notes = "举报商品",response = ResultUtil.class)
+    @ApiOperation(value = "举报商品", notes = "(void)举报商品",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "goodsId", value = "商品ID", required = true, dataType = "int", paramType = "query"),
@@ -576,7 +576,7 @@ public class GoodsController extends BaseController{
             redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
             //举报商品
             goodsInfoService.reportGoods(userId,param.getGoodsId(),param.getReason());
-            return toSuccess("举报商品成功！");
+            return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());

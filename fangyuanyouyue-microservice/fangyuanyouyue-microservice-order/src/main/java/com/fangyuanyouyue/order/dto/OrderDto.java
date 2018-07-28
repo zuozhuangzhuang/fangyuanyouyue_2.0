@@ -1,10 +1,11 @@
 package com.fangyuanyouyue.order.dto;
 
-import com.fangyuanyouyue.order.model.OrderInfo;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.order.model.OrderInfo;
 
 /**
  * 订单DTO
@@ -28,6 +29,7 @@ public class OrderDto {
     //订单支付信息 收货地址信息支付信息中
     private OrderPayDto orderPayDto;//订单支付表
 
+    private String addTime;//下单时间
 
     public OrderDto() {
     }
@@ -38,6 +40,7 @@ public class OrderDto {
         this.orderNo = orderInfo.getOrderNo();
         this.totalAmount = orderInfo.getAmount();
         this.status = orderInfo.getStatus();
+        this.addTime = DateUtil.getFormatDate(orderInfo.getAddTime(), DateUtil.DATE_FORMT);
     }
 
     public static ArrayList<OrderDto> toDtoList(List<OrderInfo> list) {
@@ -115,4 +118,11 @@ public class OrderDto {
         this.orderPayDto = orderPayDto;
     }
 
+    public String getAddTime() {
+        return addTime;
+    }
+
+    public void setAddTime(String addTime) {
+        this.addTime = addTime;
+    }
 }

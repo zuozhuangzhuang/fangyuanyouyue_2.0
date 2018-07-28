@@ -1,9 +1,9 @@
 package com.fangyuanyouyue.order.param;
 
+import java.util.Arrays;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
-import java.util.Arrays;
 
 @ApiModel(value = "订单参数类")
 public class OrderParam{
@@ -29,6 +29,9 @@ public class OrderParam{
 
     @ApiModelProperty(name = "orderId", value = "订单ID", dataType = "int",hidden = true)
     private Integer orderId;//订单ID
+
+    @ApiModelProperty(name = "status", value = "订单状态 0 待付款  1待收货  2已完成  3全部", dataType = "int",hidden = true)
+    private Integer status;//订单状态 0 待付款  1待收货  2已完成  3全部
 
     public Integer getStart() {
         return start;
@@ -94,6 +97,14 @@ public class OrderParam{
         this.orderId = orderId;
     }
 
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return "OrderParam{" +
@@ -105,6 +116,7 @@ public class OrderParam{
                 ", goodsIds=" + Arrays.toString(goodsIds) +
                 ", addressId=" + addressId +
                 ", orderId=" + orderId +
+                ", status=" + status +
                 '}';
     }
 }

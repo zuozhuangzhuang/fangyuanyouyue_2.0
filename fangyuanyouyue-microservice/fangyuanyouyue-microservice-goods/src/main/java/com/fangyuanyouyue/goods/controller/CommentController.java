@@ -46,7 +46,7 @@ public class CommentController extends BaseController{
     @Autowired
     private CommentService commentService;
 
-    @ApiOperation(value = "发布评论/回复", notes = "发布评论/回复",response = ResultUtil.class)
+    @ApiOperation(value = "发布评论/回复", notes = "(void)发布评论/回复",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true,dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "goodsId", value = "商品id",required = true,dataType = "int", paramType = "query"),
@@ -92,7 +92,7 @@ public class CommentController extends BaseController{
         }
     }
 
-    @ApiOperation(value = "评论点赞", notes = "评论点赞",response = ResultUtil.class)
+    @ApiOperation(value = "评论点赞", notes = "(void)评论点赞",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true,dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "commentId", value = "回复评论id",required = true, dataType = "int", paramType = "query")
@@ -129,7 +129,7 @@ public class CommentController extends BaseController{
         }
     }
 
-    @ApiOperation(value = "查看全部评论", notes = "查看全部评论",response = ResultUtil.class)
+    @ApiOperation(value = "查看全部评论", notes = "(GoodsCommentDto)查看全部评论",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "goodsId", value = "商品ID", required = true,dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "start", value = "起始页数", required = true,dataType = "int", paramType = "query"),

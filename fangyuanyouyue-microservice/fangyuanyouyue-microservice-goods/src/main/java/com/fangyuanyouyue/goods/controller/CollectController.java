@@ -43,7 +43,7 @@ public class CollectController extends BaseController{
     @Autowired
     private SchedualUserService schedualUserService;//调用其他service时用
 
-    @ApiOperation(value = "收藏/关注或取消", notes = "收藏/关注或取消",response = ResultUtil.class)
+    @ApiOperation(value = "收藏/关注或取消", notes = "(void)收藏/关注或取消",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true,dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "collectId", value = "收藏对象ID", allowMultiple = true,required = true, dataType = "int", paramType = "query"),
@@ -99,7 +99,7 @@ public class CollectController extends BaseController{
         }
     }
 
-    @ApiOperation(value = "获取我的收藏/关注", notes = "获取我的收藏/关注的商品或抢购",response = ResultUtil.class)
+    @ApiOperation(value = "获取我的收藏/关注", notes = "(GoodsDto)获取我的收藏/关注的商品或抢购",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true,dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "type", value = "类型 1关注 2收藏", required = true, dataType = "String", paramType = "query"),

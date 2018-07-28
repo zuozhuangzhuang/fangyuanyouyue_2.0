@@ -82,4 +82,22 @@ public class OrderControllerTest {
                 .andReturn();
     }
 
+    /**
+     * 我的订单列表
+     * @throws Exception
+     */
+    @Test
+    @Transactional
+    public void myOrderList() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/order/myOrderList")
+                .param("token","10025FY1532677840708")
+                .param("start","0")
+                .param("limit","10")
+                .param("type","1")
+                .param("status","1")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
 }

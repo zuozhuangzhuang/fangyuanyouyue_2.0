@@ -1,5 +1,7 @@
 package com.fangyuanyouyue.order.service;
 
+import java.util.List;
+
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.order.dto.OrderDto;
 
@@ -30,4 +32,16 @@ public interface OrderService {
      * @throws ServiceException
      */
     OrderDto orderDetail(Integer userId,Integer orderId) throws ServiceException;
+
+    /**
+     * 我的订单列表
+     * @param userId
+     * @param start
+     * @param limit
+     * @param type
+     * @param status
+     * @return
+     * @throws ServiceException
+     */
+    List<OrderDto> myOrderList(Integer userId, Integer start,Integer limit,Integer type,Integer status) throws ServiceException;
 }

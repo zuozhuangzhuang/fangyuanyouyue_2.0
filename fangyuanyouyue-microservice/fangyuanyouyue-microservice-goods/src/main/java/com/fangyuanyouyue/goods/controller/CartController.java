@@ -46,7 +46,7 @@ public class CartController extends BaseController{
 
 
     //添加商品到购物车
-    @ApiOperation(value = "添加商品到购物车", notes = "添加商品到购物车",response = ResultUtil.class)
+    @ApiOperation(value = "添加商品到购物车", notes = "(void)添加商品到购物车",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "goodsId", value = "商品ID", required = true, dataType = "int", paramType = "query")
@@ -70,7 +70,7 @@ public class CartController extends BaseController{
 
             //添加商品到购物车 返回购物车内商品列表
             cartService.addGoodsToCart(userId, param.getGoodsId());
-            return toSuccess( "添加商品到购物车成功！");
+            return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
@@ -81,7 +81,7 @@ public class CartController extends BaseController{
     }
 
     //我的购物车
-    @ApiOperation(value = "我的购物车", notes = "我的购物车",response = ResultUtil.class)
+    @ApiOperation(value = "我的购物车", notes = "(CartShopDto)我的购物车",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query")
     })
@@ -116,7 +116,7 @@ public class CartController extends BaseController{
 
 
     //移出购物车
-    @ApiOperation(value = "移出购物车", notes = "移出购物车",response = ResultUtil.class)
+    @ApiOperation(value = "移出购物车", notes = "(void)移出购物车",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "cartDetailIds", value = "购物车详情ID数组",allowMultiple = true,  required = true, dataType = "int", paramType = "query")
@@ -143,7 +143,7 @@ public class CartController extends BaseController{
             }
             //移出购物车
             cartService.cartRemove(param.getCartDetailIds());
-            return toSuccess( "移出购物车成功！");
+            return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
@@ -155,7 +155,7 @@ public class CartController extends BaseController{
 
 
     //移出购物车
-    @ApiOperation(value = "精选", notes = "购物车内的精选推荐",response = ResultUtil.class)
+    @ApiOperation(value = "精选", notes = "(GoodsDto)购物车内的精选推荐",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query")
     })

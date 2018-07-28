@@ -132,4 +132,7 @@
   <select id="selectAllByGoodsId" parameterType="Integer" resultMap="BaseResultMap">
     select * from goods_bargain where goods_id = #{goodsId} and status = 1
   </select>
+  <select id="selectAllByUserId" parameterType="Integer" resultMap="BaseResultMap">
+    select * from goods_bargain where user_id = #{userId}
+  </select>
 </mapper>

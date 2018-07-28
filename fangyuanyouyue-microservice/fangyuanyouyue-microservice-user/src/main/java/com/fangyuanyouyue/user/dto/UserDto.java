@@ -12,6 +12,8 @@ import com.fangyuanyouyue.user.model.UserVip;
  */
 public class UserDto {
     //UserInfo 用户基本信息表
+    private Integer userId;//用户ID
+
     private String token;//用户token
 
     private String phone;//手机号码
@@ -52,6 +54,8 @@ public class UserDto {
     private Integer fansCount;//粉丝数量
 
     private Integer collectCount;//关注数量
+
+    private Integer isFollow = 2;//是否关注 1是 2否
 
     //UserAddressDto
     private UserAddressDto defaultAddress;//用户默认收货地址
@@ -109,6 +113,7 @@ public class UserDto {
         }
         //UserInfo
         if(userInfo != null){
+            this.userId = userInfo.getId();
             this.phone = userInfo.getPhone();
             this.email = userInfo.getEmail();
             this.userAddress = userInfo.getAddress();
@@ -348,5 +353,21 @@ public class UserDto {
 
     public void setAuthType(Integer authType) {
         this.authType = authType;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public Integer getIsFollow() {
+        return isFollow;
+    }
+
+    public void setIsFollow(Integer isFollow) {
+        this.isFollow = isFollow;
     }
 }

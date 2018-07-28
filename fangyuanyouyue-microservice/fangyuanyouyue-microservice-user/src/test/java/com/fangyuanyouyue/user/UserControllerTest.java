@@ -336,7 +336,8 @@ public class UserControllerTest {
     @Transactional
     public void userInfo() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/user/userInfo")
-                .param("userId","16")
+                .param("token","10025FY1532677840708")
+                .param("userId","22")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

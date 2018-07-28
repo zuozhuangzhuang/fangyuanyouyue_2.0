@@ -32,7 +32,7 @@ public class FileUploadController extends BaseController {
     @Autowired
     private FileUploadService fileUploadService;
 
-    @ApiOperation(value = "图片上传", notes = "图片上传",response = ResultUtil.class)
+    @ApiOperation(value = "图片上传", notes = "(String)图片上传",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "imgFile", value = "图片，格式为：jpeg，png，jpg",dataType = "file", paramType = "form")
     })
@@ -62,7 +62,7 @@ public class FileUploadController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "视频上传", notes = "视频上传",response = ResultUtil.class)
+    @ApiOperation(value = "视频上传", notes = "(String)视频上传",response = ResultUtil.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "videoFile", value = "视频",dataType = "file", paramType = "form")
     })

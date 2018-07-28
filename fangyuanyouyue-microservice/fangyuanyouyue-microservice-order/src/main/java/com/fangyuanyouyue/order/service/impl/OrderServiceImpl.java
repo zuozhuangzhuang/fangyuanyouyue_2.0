@@ -229,4 +229,19 @@ public class OrderServiceImpl implements OrderService{
             throw new ServiceException("订单异常！");
         }
     }
+
+    @Override
+    public List<OrderDto> myOrderList(Integer userId, Integer start, Integer limit, Integer type, Integer status) throws ServiceException {
+        //获取用户信息
+        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
+        List<OrderInfo> listByUserIdTypeStatus = orderInfoMapper.getListByUserIdTypeStatus(userId, start * limit, limit, type, status);
+        ArrayList<OrderDto> orderDtos = OrderDto.toDtoList(listByUserIdTypeStatus);
+        for(OrderDto orderDto:orderDtos){
+            List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
+            ArrayList<OrderDetailDto> orderDetailDtos = OrderDetailDto.toDtoList(orderDetails, orderDto.getStatus());
+            orderDto.setOrderDetailDtos(orderDetailDtos);
+            orderDto.setNickName(user.getNickName());
+        }
+        return orderDtos;
+    }
 }
