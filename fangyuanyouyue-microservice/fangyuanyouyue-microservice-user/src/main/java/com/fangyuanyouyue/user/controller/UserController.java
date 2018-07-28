@@ -1,9 +1,23 @@
 package com.fangyuanyouyue.user.controller;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
+import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BaseController;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.PhoneCode;
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.base.util.AES;
+import com.fangyuanyouyue.base.util.MD5Util;
+import com.fangyuanyouyue.user.dto.ShopDto;
+import com.fangyuanyouyue.user.dto.UserDto;
+import com.fangyuanyouyue.user.model.UserInfo;
+import com.fangyuanyouyue.user.model.WeChatSession;
+import com.fangyuanyouyue.user.param.UserParam;
+import com.fangyuanyouyue.user.service.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -20,30 +34,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 
-import com.alibaba.fastjson.JSONObject;
-import com.fangyuanyouyue.base.BaseController;
-import com.fangyuanyouyue.base.BaseResp;
-import com.fangyuanyouyue.base.ResultUtil;
-import com.fangyuanyouyue.base.enums.PhoneCode;
-import com.fangyuanyouyue.base.enums.ReCode;
-import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.base.util.AES;
-import com.fangyuanyouyue.base.util.MD5Util;
-import com.fangyuanyouyue.user.dto.ShopDto;
-import com.fangyuanyouyue.user.dto.UserDto;
-import com.fangyuanyouyue.user.model.UserInfo;
-import com.fangyuanyouyue.user.model.WeChatSession;
-import com.fangyuanyouyue.user.param.UserParam;
-import com.fangyuanyouyue.user.service.SchedualGoodsService;
-import com.fangyuanyouyue.user.service.SchedualMessageService;
-import com.fangyuanyouyue.user.service.UserAddressInfoService;
-import com.fangyuanyouyue.user.service.UserInfoExtService;
-import com.fangyuanyouyue.user.service.UserInfoService;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Controller
 @RequestMapping(value = "/user")
@@ -64,7 +57,7 @@ public class UserController extends BaseController {
     @Autowired
     private RedisTemplate redisTemplate;
 
-    @ApiOperation(value = "注册", notes = "(UserDto)注册",response = ResultUtil.class)
+    @ApiOperation(value = "注册", notes = "(UserDto)注册",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "phone", value = "手机号",required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "loginPwd", value = "登录密码,MD5小写",required = true, dataType = "String", paramType = "query"),
@@ -112,7 +105,7 @@ public class UserController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "用户登录", notes = "(UserDto)用户登录",response = ResultUtil.class)
+    @ApiOperation(value = "用户登录", notes = "(UserDto)用户登录",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "phone", value = "手机号", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "loginPwd", value = "登录密码,MD5小写", required = true, dataType = "String", paramType = "query"),
@@ -148,7 +141,7 @@ public class UserController extends BaseController {
     }
 
 
-    @ApiOperation(value = "APP三方注册/登录", notes = "(UserDto)APP三方注册/登录",response = ResultUtil.class)
+    @ApiOperation(value = "APP三方注册/登录", notes = "(UserDto)APP三方注册/登录",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "thirdNickName", value = "第三方账号昵称", required = true,dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "thirdHeadImgUrl", value = "第三方账号头像地址",required = true, dataType = "String", paramType = "query"),
@@ -182,7 +175,7 @@ public class UserController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "三方绑定", notes = "(UserDto)三方绑定",response = ResultUtil.class)
+    @ApiOperation(value = "三方绑定", notes = "(UserDto)三方绑定",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "unionId", value = "第三方唯一ID", required = true, dataType = "String", paramType = "query"),
@@ -223,7 +216,7 @@ public class UserController extends BaseController {
     }
 
 
-    @ApiOperation(value = "实名认证", notes = "(void)实名认证",response = ResultUtil.class)
+    @ApiOperation(value = "实名认证", notes = "(void)实名认证",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "name", value = "真实姓名", required = true,dataType = "String", paramType = "query"),
@@ -266,7 +259,7 @@ public class UserController extends BaseController {
     }
 
 
-    @ApiOperation(value = "完善资料", notes = "(void)完善资料",response = ResultUtil.class)
+    @ApiOperation(value = "完善资料", notes = "(void)完善资料",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "phone", value = "手机号码",dataType = "String", paramType = "query"),
@@ -330,7 +323,7 @@ public class UserController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "找回密码", notes = "(void)找回密码",response = ResultUtil.class)
+    @ApiOperation(value = "找回密码", notes = "(void)找回密码",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "phone", value = "用户手机", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "newPwd", value = "新密码密码，md5加密，32位小写字母",required = true, dataType = "String", paramType = "query")
@@ -359,7 +352,7 @@ public class UserController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "修改密码", notes = "(void)修改密码",response = ResultUtil.class)
+    @ApiOperation(value = "修改密码", notes = "(void)修改密码",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "loginPwd", value = "登录密码，md5加密，32位小写字母", required = true, dataType = "String", paramType = "query"),
@@ -401,7 +394,7 @@ public class UserController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "修改绑定手机", notes = "(UserDto)修改绑定手机",response = ResultUtil.class)
+    @ApiOperation(value = "修改绑定手机", notes = "(UserDto)修改绑定手机",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "phone", value = "手机号", required = true, dataType = "String", paramType = "query")
@@ -446,7 +439,7 @@ public class UserController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "合并账号", notes = "(UserDto)合并账号",response = ResultUtil.class)
+    @ApiOperation(value = "合并账号", notes = "(UserDto)合并账号",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "phone", value = "手机号", required = true, dataType = "String", paramType = "query")
@@ -483,7 +476,7 @@ public class UserController extends BaseController {
     }
 
 
-    @ApiOperation(value = "小程序登录", notes = "(UserDto)小程序登录",response = ResultUtil.class)
+    @ApiOperation(value = "小程序登录", notes = "(UserDto)小程序登录",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "code", value = "code值", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "thirdNickName", value = "第三方账号昵称", required = true, dataType = "String", paramType = "query"),
@@ -568,7 +561,7 @@ public class UserController extends BaseController {
     }
 
 
-    @ApiOperation(value = "发送验证码", notes = "(void)发送验证码",response = ResultUtil.class)
+    @ApiOperation(value = "发送验证码", notes = "(void)发送验证码",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "phone", value = "用户手机号", required = true, dataType = "String", paramType = "query"),
@@ -627,7 +620,7 @@ public class UserController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "验证验证码", notes = "(void)验证验证码",response = ResultUtil.class)
+    @ApiOperation(value = "验证验证码", notes = "(void)验证验证码",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "code", value = "验证码", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "phone", value = "用户手机号", required = true, dataType = "String", paramType = "query")
@@ -659,7 +652,7 @@ public class UserController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "获取个人店铺列表", notes = "(ShopDto)获取个人店铺列表",response = ResultUtil.class)
+    @ApiOperation(value = "获取个人店铺列表", notes = "(ShopDto)获取个人店铺列表",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "nickName", value = "用户昵称", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
@@ -690,7 +683,7 @@ public class UserController extends BaseController {
     }
 
 
-    @ApiOperation(value = "获取用户信息", notes = "(UserDto)获取用户信息",response = ResultUtil.class)
+    @ApiOperation(value = "获取用户信息", notes = "(UserDto)获取用户信息",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "userId", value = "卖家ID", required = true,dataType = "int", paramType = "query")

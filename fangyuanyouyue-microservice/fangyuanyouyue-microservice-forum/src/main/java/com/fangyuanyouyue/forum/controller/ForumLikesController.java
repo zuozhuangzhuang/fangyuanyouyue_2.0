@@ -1,8 +1,15 @@
 package com.fangyuanyouyue.forum.controller;
 
-import java.io.IOException;
-import java.util.List;
-
+import com.fangyuanyouyue.base.BaseController;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.forum.dto.ForumLikesDto;
+import com.fangyuanyouyue.forum.param.ForumParam;
+import com.fangyuanyouyue.forum.service.ForumLikesService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -11,18 +18,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.fangyuanyouyue.base.BaseController;
-import com.fangyuanyouyue.base.BaseResp;
-import com.fangyuanyouyue.base.ResultUtil;
-import com.fangyuanyouyue.base.enums.ReCode;
-import com.fangyuanyouyue.forum.dto.ForumLikesDto;
-import com.fangyuanyouyue.forum.param.ForumParam;
-import com.fangyuanyouyue.forum.service.ForumLikesService;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import java.io.IOException;
+import java.util.List;
 
 @Controller
 @RequestMapping(value = "/likes")
@@ -34,7 +31,7 @@ public class ForumLikesController extends BaseController {
 	@Autowired
 	private ForumLikesService forumLikesService;
 
-	@ApiOperation(value = "帖子点赞", notes = "根据id获取帖子点赞列表", response = ResultUtil.class)
+	@ApiOperation(value = "帖子点赞", notes = "根据id获取帖子点赞列表", response = BaseResp.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "forumId", value = "帖子id", required = true, dataType = "Integer", paramType = "query"),
 			@ApiImplicitParam(name = "start", value = "起始条数", required = true, dataType = "Integer", paramType = "query"),
@@ -62,7 +59,7 @@ public class ForumLikesController extends BaseController {
 		}
 	}
 
-	@ApiOperation(value = "添加点赞", notes = "添加评论", response = ResultUtil.class)
+	@ApiOperation(value = "添加点赞", notes = "添加评论", response = BaseResp.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "forumId", value = "帖子id", required = true, dataType = "Integer", paramType = "query"),
 			@ApiImplicitParam(name = "content", value = "评论内容", required = true, dataType = "String", paramType = "query"),

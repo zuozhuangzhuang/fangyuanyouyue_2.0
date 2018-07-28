@@ -1,9 +1,19 @@
 package com.fangyuanyouyue.goods.controller;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
+import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BaseController;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.goods.dto.CartShopDto;
+import com.fangyuanyouyue.goods.dto.GoodsDto;
+import com.fangyuanyouyue.goods.param.GoodsParam;
+import com.fangyuanyouyue.goods.service.CartService;
+import com.fangyuanyouyue.goods.service.SchedualUserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,22 +24,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSONObject;
-import com.fangyuanyouyue.base.BaseController;
-import com.fangyuanyouyue.base.BaseResp;
-import com.fangyuanyouyue.base.ResultUtil;
-import com.fangyuanyouyue.base.enums.ReCode;
-import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.goods.dto.CartShopDto;
-import com.fangyuanyouyue.goods.dto.GoodsDto;
-import com.fangyuanyouyue.goods.param.GoodsParam;
-import com.fangyuanyouyue.goods.service.CartService;
-import com.fangyuanyouyue.goods.service.SchedualUserService;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping(value = "/cart")
@@ -46,7 +43,7 @@ public class CartController extends BaseController{
 
 
     //添加商品到购物车
-    @ApiOperation(value = "添加商品到购物车", notes = "(void)添加商品到购物车",response = ResultUtil.class)
+    @ApiOperation(value = "添加商品到购物车", notes = "(void)添加商品到购物车",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "goodsId", value = "商品ID", required = true, dataType = "int", paramType = "query")
@@ -81,7 +78,7 @@ public class CartController extends BaseController{
     }
 
     //我的购物车
-    @ApiOperation(value = "我的购物车", notes = "(CartShopDto)我的购物车",response = ResultUtil.class)
+    @ApiOperation(value = "我的购物车", notes = "(CartShopDto)我的购物车",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query")
     })
@@ -116,7 +113,7 @@ public class CartController extends BaseController{
 
 
     //移出购物车
-    @ApiOperation(value = "移出购物车", notes = "(void)移出购物车",response = ResultUtil.class)
+    @ApiOperation(value = "移出购物车", notes = "(void)移出购物车",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "cartDetailIds", value = "购物车详情ID数组",allowMultiple = true,  required = true, dataType = "int", paramType = "query")
@@ -155,7 +152,7 @@ public class CartController extends BaseController{
 
 
     //移出购物车
-    @ApiOperation(value = "精选", notes = "(GoodsDto)购物车内的精选推荐",response = ResultUtil.class)
+    @ApiOperation(value = "精选", notes = "(GoodsDto)购物车内的精选推荐",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query")
     })
