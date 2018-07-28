@@ -83,18 +83,5 @@ public enum IdGenerator {
 		}
 		return lastip;
 	}
-	
-	public static void main(String[] args) {
-		final IdGenerator idg = IdGenerator.INSTANCE; 
-		String id = idg.nextId();
-		System.out.println(id);
-		id = idg.nextId();
-		System.out.println(id);
-		id = idg.nextId();
-		System.out.println(id);
-		id = idg.nextId();
-		System.out.println(id);
-		id = idg.nextId();
-		System.out.println(id);
-	}
+
 }

@@ -32,8 +32,5 @@ public class CheckCode {
 		return sb.toString();
 	}
 	
-	public static void main(String... args){
-		System.out.println(getCheckCode());
-	}
-
+	
 }

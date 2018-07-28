@@ -1,17 +1,19 @@
 package com.fangyuanyouyue.user.config;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger.web.UiConfiguration;
 
 /**
  * swagger配置类
@@ -44,10 +46,20 @@ import springfox.documentation.swagger.web.UiConfiguration;
 // @ApiModelProperty：描述一个model的属性
 // contact：name 作者 email 作者邮箱地址
 @Configuration
-public class swagger {
+public class SwaggerConfig {
 
+    
     @Bean
     public Docket createRestApi() {
+    	
+        ParameterBuilder parameterBuilder = new ParameterBuilder();
+        
+        parameterBuilder.name("Authentication")
+            .description("token")
+            .modelRef(new ModelRef("string"))
+            .parameterType("header")
+            .required(false).build();
+        
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()

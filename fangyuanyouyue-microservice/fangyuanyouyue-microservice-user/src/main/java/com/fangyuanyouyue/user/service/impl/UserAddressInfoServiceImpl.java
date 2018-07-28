@@ -4,17 +4,17 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
+import com.fangyuanyouyue.user.constant.StatusEnum;
 import com.fangyuanyouyue.user.dao.UserAddressInfoMapper;
 import com.fangyuanyouyue.user.dao.UserInfoMapper;
 import com.fangyuanyouyue.user.dto.UserAddressDto;
 import com.fangyuanyouyue.user.model.UserAddressInfo;
 import com.fangyuanyouyue.user.model.UserInfo;
+import com.fangyuanyouyue.user.service.SchedualRedisService;
 import com.fangyuanyouyue.user.service.UserAddressInfoService;
 
 @Service(value = "userAddressInfoService")
@@ -24,12 +24,14 @@ public class UserAddressInfoServiceImpl implements UserAddressInfoService{
     @Autowired
     private UserAddressInfoMapper userAddressInfoMapper;
     @Autowired
-    protected RedisTemplate redisTemplate;
+    protected SchedualRedisService schedualRedisService;
 
     @Override
     public List<UserAddressDto> addAddress(String token, String receiverName, String receiverPhone, String province, String city, String area, String address, String postCode, Integer type) throws ServiceException {
-        Integer userId = (Integer)redisTemplate.opsForValue().get(token);
-        redisTemplate.expire(token,7, TimeUnit.DAYS);
+        //TODO 保存缓存
+    	//Integer userId = (Integer)schedualRedisService.get(token);
+    	//schedualRedisService.set(token, userId, 7*24*60l);
+        
         UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
         if(userInfo == null){
             throw new ServiceException("用户不存在！");
@@ -110,7 +112,7 @@ public class UserAddressInfoServiceImpl implements UserAddressInfoService{
             //取消旧默认地址
             UserAddressInfo defaultAddress = userAddressInfoMapper.selectDefaultAddressByUserId(userId);
             if(defaultAddress != null){
-                defaultAddress.setType(Integer.valueOf(Status.OTHER.getValue()));
+                defaultAddress.setType(Integer.valueOf(StatusEnum.ADDRESS_OTHER.getValue()));
                 userAddressInfoMapper.updateByPrimaryKey(defaultAddress);
             }
             //设置新默认地址
@@ -118,7 +120,7 @@ public class UserAddressInfoServiceImpl implements UserAddressInfoService{
             if(userAddressInfo == null){
                 throw new ServiceException("参数错误！");
             }
-            userAddressInfo.setType(Integer.valueOf(Status.ISDEFAULT.getValue()));
+            userAddressInfo.setType(Integer.valueOf(StatusEnum.ADDRESS_DEFAULT.getValue()));
             userAddressInfoMapper.updateByPrimaryKey(userAddressInfo);
         }
     }
