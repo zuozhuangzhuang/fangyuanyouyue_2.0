@@ -2,7 +2,7 @@
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://eureka.fangyuanyouyue.com/
+      defaultZone: http://172.18.80.212:8761/eureka/
 #服务的端口
 server:
   port: 8769
