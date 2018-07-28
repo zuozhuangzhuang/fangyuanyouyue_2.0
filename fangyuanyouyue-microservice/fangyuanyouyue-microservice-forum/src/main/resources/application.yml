@@ -2,7 +2,7 @@ eureka:
   client:
     serviceUrl:
 #     服务注册中心的地址
-      defaultZone: http://172.20.55.4:8761/eureka/
+      defaultZone: http://172.18.80.212:8761/eureka/
 #0 端口随机
 server:
   port: 0
