@@ -548,8 +548,11 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public UserDto userInfo(String token,Integer userId) throws ServiceException {
-        Integer userIdByToken = (Integer)redisTemplate.opsForValue().get(token);
-        redisTemplate.expire(token,7,TimeUnit.DAYS);
+        Integer userIdByToken = null;
+        if(StringUtils.isNotEmpty(token)){
+            userIdByToken = (Integer)redisTemplate.opsForValue().get(token);
+            redisTemplate.expire(token,7,TimeUnit.DAYS);
+        }
         UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
         if(userInfo == null){
             throw new ServiceException("用户不存在！");
