@@ -1,9 +1,9 @@
 server:
-  port: 8761
+  port: 80
 
 eureka:
   instance:
-    hostname: 172.18.80.212
+    hostname: eureka.fangyuanyouyue.com
   #通过eureka.client.registerWithEureka：false和fetchRegistry：false来表明自己是一个eureka server.
   client:
     registerWithEureka: false
