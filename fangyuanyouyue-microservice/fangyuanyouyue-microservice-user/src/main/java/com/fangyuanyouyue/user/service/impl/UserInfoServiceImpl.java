@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONArray;
@@ -18,7 +17,6 @@ import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.MD5Util;
 import com.fangyuanyouyue.user.dao.IdentityAuthApplyMapper;
-import com.fangyuanyouyue.user.dao.UserAddressInfoMapper;
 import com.fangyuanyouyue.user.dao.UserFansMapper;
 import com.fangyuanyouyue.user.dao.UserInfoExtMapper;
 import com.fangyuanyouyue.user.dao.UserInfoMapper;
@@ -34,6 +32,7 @@ import com.fangyuanyouyue.user.model.UserThirdParty;
 import com.fangyuanyouyue.user.model.UserVip;
 import com.fangyuanyouyue.user.param.UserParam;
 import com.fangyuanyouyue.user.service.SchedualGoodsService;
+import com.fangyuanyouyue.user.service.SchedualRedisService;
 import com.fangyuanyouyue.user.service.UserInfoService;
 
 @Service(value = "userInfoService")
@@ -48,22 +47,53 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Autowired
     private UserInfoExtMapper userInfoExtMapper;
     @Autowired
-    private UserAddressInfoMapper userAddressInfoMapper;
-    @Autowired
     private UserVipMapper userVipMapper;
     @Autowired
-    protected RedisTemplate redisTemplate;
-    @Autowired
     private SchedualGoodsService schedualGoodsService;
+    @Autowired
+    private SchedualRedisService schedualRedisService;
     @Autowired
     private UserFansMapper userFansMapper;
 
     @Override
     public UserInfo getUserByToken(String token) throws ServiceException {
-        Integer userId = (Integer)redisTemplate.opsForValue().get(token);
-        UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
-        return userInfo;
+        Integer userId = (Integer)schedualRedisService.get(token);
+        if(userId!=null) {
+            //更新时间
+            schedualRedisService.set(token, userId.toString(), 7*24*60*60l);
+            schedualRedisService.set(userId.toString(), token, 7*24*60*60l);
+            UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
+            return userInfo;
+        }
+        return null;
     }
+    
+    /**
+     * 设置token
+     * @param token
+     * @param userId
+     */
+    private String setToken(String token,Integer userId){
+        //生成用户token，存到Redis
+        token = 10000+userId+"FY"+DateStampUtils.getGMTUnixTimeByCalendar()+"";
+        
+        //覆盖原来的
+        schedualRedisService.set(token, userId.toString(), 7*24*60*60l);
+        schedualRedisService.set(userId.toString(), token, 7*24*60*60l);
+        
+        //redisTemplate.opsForValue().set(token,userId);
+       // redisTemplate.expire(token,7,TimeUnit.DAYS);
+        
+       // if(redisTemplate.opsForValue().get(userId) != null){
+            //更新userId:token的value，同时使旧token失效
+       //     redisTemplate.opsForValue().set(redisTemplate.opsForValue().get(userId),null);
+       // }
+        //存入userId:token，用来在更新token时确保旧token失效，时效7天
+       // schedualRedisService.set(userId,token);
+       // redisTemplate.expire(userId,7,TimeUnit.DAYS);
+        return token;
+    }
+    
 
     @Override
     public UserInfo selectByPrimaryKey(Integer id) {
@@ -228,17 +258,20 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public UserDto thirdBind(String token,String unionId,Integer type) throws ServiceException {
-        Integer userId = (Integer)redisTemplate.opsForValue().get(token);
-        redisTemplate.expire(token,7,TimeUnit.DAYS);
+        //Integer userId = (Integer)redisTemplate.opsForValue().get(token);
+        //redisTemplate.expire(token,7,TimeUnit.DAYS);
         //根据用户ID获取用户，生成新的三方登陆信息
-        UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
+        //UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
+        
+    	UserInfo userInfo = getUserByToken(token);
+        
         if(userInfo == null){
             throw new ServiceException("用户不存在！");
         }else{
             UserThirdParty userThirdParty = userThirdPartyMapper.getUserByThirdNoType(unionId,type);
             //校验是否绑定三方账号
             if(userThirdParty != null){
-                if(userThirdParty.getUserId() == userId){
+                if(userThirdParty.getUserId() == userInfo.getId()){
                     throw new ServiceException("请勿重复绑定！");
                 }else{
                     UserInfo user = userInfoMapper.selectByPrimaryKey(userThirdParty.getUserId());
@@ -269,17 +302,21 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public void updatePwd(String token, String newPwd) throws ServiceException {
-        Integer userId = (Integer)redisTemplate.opsForValue().get(token);
-        redisTemplate.expire(token,7,TimeUnit.DAYS);
-        UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
+        //Integer userId = (Integer)redisTemplate.opsForValue().get(token);
+       // redisTemplate.expire(token,7,TimeUnit.DAYS);
+       // UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
+
+    	UserInfo userInfo = getUserByToken(token);
         updatePwd(newPwd, userInfo);
     }
 
     @Override
     public UserDto modify(UserParam param) throws ServiceException {
-        Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
-        redisTemplate.expire(param.getToken(),7,TimeUnit.DAYS);
-        UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
+       // Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
+       // redisTemplate.expire(param.getToken(),7,TimeUnit.DAYS);
+        //UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
+
+    	UserInfo userInfo = getUserByToken(param.getToken());
         if(userInfo == null){
             throw new ServiceException("用户不存在！");
         }else{
@@ -313,7 +350,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             }
             userInfoMapper.updateByPrimaryKey(userInfo);
             //用户扩展信息表
-            UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(userId);
+            UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(userInfo.getId());
             if(StringUtils.isNotEmpty(param.getIdentity())){
                 userInfoExt.setIdentity(param.getIdentity());
             }
@@ -332,9 +369,11 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public UserDto updatePhone(String token, String phone) throws ServiceException {
-        Integer userId = (Integer)redisTemplate.opsForValue().get(token);
-        redisTemplate.expire(token,7,TimeUnit.DAYS);
-        UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
+        //Integer userId = (Integer)redisTemplate.opsForValue().get(token);
+        //redisTemplate.expire(token,7,TimeUnit.DAYS);
+        //UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
+
+    	UserInfo userInfo = getUserByToken(token);
         if(userInfo == null){
             throw new ServiceException("用户不存在！");
         }else{
@@ -347,9 +386,10 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public UserDto accountMerge(String token, String phone) throws ServiceException {
-        Integer userId = (Integer)redisTemplate.opsForValue().get(token);
-        redisTemplate.expire(token,7,TimeUnit.DAYS);
-        UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
+        //Integer userId = (Integer)redisTemplate.opsForValue().get(token);
+        //redisTemplate.expire(token,7,TimeUnit.DAYS);
+        //UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
+    	UserInfo userInfo = getUserByToken(token);
         if(userInfo == null){
             throw new ServiceException("第三方用户不存在！");
         }else{
@@ -484,25 +524,6 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
     }
 
-    /**
-     * 设置token
-     * @param token
-     * @param userId
-     */
-    private String setToken(String token,Integer userId){
-        //生成用户token，存到Redis
-        token = 10000+userId+"FY"+DateStampUtils.getGMTUnixTimeByCalendar()+"";
-        redisTemplate.opsForValue().set(token,userId);
-        redisTemplate.expire(token,7,TimeUnit.DAYS);
-        if(redisTemplate.opsForValue().get(userId) != null){
-            //更新userId:token的value，同时使旧token失效
-            redisTemplate.opsForValue().set(redisTemplate.opsForValue().get(userId),null);
-        }
-        //存入userId:token，用来在更新token时确保旧token失效，时效7天
-        redisTemplate.opsForValue().set(userId,token);
-        redisTemplate.expire(userId,7,TimeUnit.DAYS);
-        return token;
-    }
 
     @Override
     public List<ShopDto> shopList(String nickName,Integer type, Integer start, Integer limit) throws ServiceException {
@@ -546,9 +567,10 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public UserDto userInfo(String token,Integer userId) throws ServiceException {
-        Integer userIdByToken = (Integer)redisTemplate.opsForValue().get(token);
-        redisTemplate.expire(token,7,TimeUnit.DAYS);
-        UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
+        //Integer userIdByToken = (Integer)redisTemplate.opsForValue().get(token);
+        //redisTemplate.expire(token,7,TimeUnit.DAYS);
+        //UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
+    	UserInfo userInfo = getUserByToken(token);
         if(userInfo == null){
             throw new ServiceException("用户不存在！");
         }else{
@@ -556,7 +578,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             userDto.setFansCount(userFansMapper.fansCount(userId));
             userDto.setCollectCount(userFansMapper.collectCount(userId));
             //判断token用户是否关注userId用户
-            UserFans userFans = userFansMapper.selectByUserIdToUserId(userIdByToken, userId);
+            UserFans userFans = userFansMapper.selectByUserIdToUserId(userInfo.getId(), userId);
             if(userFans != null){
                userDto.setIsFollow(1);//是否关注 1是 2否
             }
