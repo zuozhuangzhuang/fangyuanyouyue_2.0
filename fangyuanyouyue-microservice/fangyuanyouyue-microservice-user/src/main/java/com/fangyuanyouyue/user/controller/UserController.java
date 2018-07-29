@@ -55,7 +55,6 @@ public class UserController extends BaseController {
     private SchedualRedisService schedualRedisService;//调用redis-service
     @Autowired
     private SchedualMessageService schedualMessageService;//message-service
-    @Autowired
 
     @ApiOperation(value = "注册", notes = "(UserDto)注册",response = BaseResp.class)
     @ApiImplicitParams({
