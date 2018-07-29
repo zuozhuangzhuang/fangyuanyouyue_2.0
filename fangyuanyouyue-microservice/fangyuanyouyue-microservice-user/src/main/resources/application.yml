@@ -21,8 +21,8 @@ spring:
       url: jdbc:mysql://rm-wz92a6yw952x0zgxnfo.mysql.rds.aliyuncs.com:3306/xiaofangyuan?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true
 #      username: root
       username: root
-#      password: Xiaofangyuan123
-      password: 123456
+      password: Xiaofangyuan123
+#      password: 123456
       # 使用druid数据源
       type: com.alibaba.druid.pool.DruidDataSource
       driver-class-name: com.mysql.jdbc.Driver
