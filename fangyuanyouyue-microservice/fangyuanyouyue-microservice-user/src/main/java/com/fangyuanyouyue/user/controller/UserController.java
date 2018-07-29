@@ -608,9 +608,11 @@ public class UserController extends BaseController {
             //调用短信系统发送短信
             JSONObject jsonObject = JSONObject.parseObject(schedualMessageService.sendCode(param.getPhone(),param.getType()));
             String code = jsonObject.getString("data");
-            log.info("code:"+code);
+            log.info("code---:"+code);
 
-            schedualRedisService.set(param.getPhone(), code, 60l);
+            boolean result = schedualRedisService.set(param.getPhone(), code, 60l);
+            log.info("缓存结果："+result);
+            
             //redisTemplate.opsForValue().set(param.getPhone(),code);
             //redisTemplate.expire(param.getPhone(),60,TimeUnit.SECONDS);
             return toSuccess("发送验证码成功");
