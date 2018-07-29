@@ -5,7 +5,7 @@ eureka:
       defaultZone: http://eureka-server:8761/eureka/ 
 server:
   #0 端口随机
-  port: 8888
+  port: 0
 spring:
   application:
     #服务与服务之间相互调用一般都是根据这个name
@@ -13,7 +13,7 @@ spring:
 #Redis配置
   redis:
     database: 0 # Redis数据库索引（默认为0）
-    host: 127.0.0.1  #Redis服务器地址
+    host: redis  #Redis服务器地址
     port: 6379 # Redis服务器连接端口
     #password: 123456 # Redis服务器连接密码（默认为空）
     jedis:
