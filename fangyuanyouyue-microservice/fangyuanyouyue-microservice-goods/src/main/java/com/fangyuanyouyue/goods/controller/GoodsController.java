@@ -10,6 +10,7 @@ import com.fangyuanyouyue.goods.model.BannerIndex;
 import com.fangyuanyouyue.goods.model.GoodsInfo;
 import com.fangyuanyouyue.goods.param.GoodsParam;
 import com.fangyuanyouyue.goods.service.GoodsInfoService;
+import com.fangyuanyouyue.goods.service.SchedualRedisService;
 import com.fangyuanyouyue.goods.service.SchedualUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -38,6 +39,8 @@ public class GoodsController extends BaseController{
     private SchedualUserService schedualUserService;//调用其他service时用
     @Autowired
     protected RedisTemplate redisTemplate;
+    @Autowired
+    private SchedualRedisService schedualRedisService;
 
     @ApiOperation(value = "获取商品/抢购列表", notes = "(GoodsDto)根据start和limit获取分页后的商品/抢购，根据用户token获取买家相关商品/抢购列表，" +
             "根据userId获取卖家相关商品/抢购列表，根据search、synthesizer、priceMin、priceMax、quality、goodsCategoryIds对列表进行筛选，根据type进行区分商品和抢购",response = BaseResp.class)
@@ -69,13 +72,12 @@ public class GoodsController extends BaseController{
             }
             if(StringUtils.isNotEmpty(param.getToken())){//我的商品验证用户
                 //根据用户token获取userId
-                Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
+                Integer userId = (Integer)schedualRedisService.get(param.getToken());
                 String verifyUser = schedualUserService.verifyUserById(userId);
                 JSONObject jsonObject = JSONObject.parseObject(verifyUser);
                 if((Integer)jsonObject.get("code") != 0){
                     return toError(jsonObject.getString("report"));
                 }
-                redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
                 param.setUserId(userId);
             }else{
                 if(param.getQuality() != null && param.getQuality() == 4){//我的关注，要求登录授权
@@ -125,13 +127,12 @@ public class GoodsController extends BaseController{
             if(StringUtils.isEmpty(param.getToken())){
                 return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
             }
-            Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
             JSONObject jsonObject = JSONObject.parseObject(verifyUser);
             if((Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
             JSONObject user = JSONObject.parseObject(jsonObject.getString("data"));
             if(StringUtils.isEmpty(param.getGoodsInfoName())){
                 return toError(ReCode.FAILD.getValue(),"标题不能为空！");
@@ -192,13 +193,12 @@ public class GoodsController extends BaseController{
             if(StringUtils.isEmpty(param.getToken())){
                 return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
             }
-            Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
             JSONObject jsonObject = JSONObject.parseObject(verifyUser);
             if((Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
             if(param.getGoodsIds().length<1){
                 return toError(ReCode.FAILD.getValue(),"商品ID不能为空！");
             }
@@ -250,13 +250,12 @@ public class GoodsController extends BaseController{
             if(StringUtils.isEmpty(param.getToken())){
                 return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
             }
-            Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
             JSONObject jsonObject = JSONObject.parseObject(verifyUser);
             if((Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
             goodsInfoService.modifyGoods(param);
             return toSuccess();
         } catch (ServiceException e) {
@@ -287,13 +286,12 @@ public class GoodsController extends BaseController{
             GoodsDto goodsDto;
             if(StringUtils.isNotEmpty(param.getToken())){//商品详情验证用户
                 //根据用户token获取userId
-                Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
+                Integer userId = (Integer)schedualRedisService.get(param.getToken());
                 String verifyUser = schedualUserService.verifyUserById(userId);
                 JSONObject jsonObject = JSONObject.parseObject(verifyUser);
                 if((Integer)jsonObject.get("code") != 0){
                     return toError(jsonObject.getString("report"));
                 }
-                redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
                 param.setUserId(userId);
                 //获取用户是否已关注此商品
                 goodsDto = goodsInfoService.goodsInfoByToken(param.getGoodsId(),param.getUserId());
@@ -556,13 +554,12 @@ public class GoodsController extends BaseController{
             if(StringUtils.isEmpty(param.getToken())){
                 return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
             }
-            Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
             JSONObject jsonObject = JSONObject.parseObject(verifyUser);
             if((Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
             //举报商品
             goodsInfoService.reportGoods(userId,param.getGoodsId(),param.getReason());
             return toSuccess();
