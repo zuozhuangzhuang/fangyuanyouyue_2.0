@@ -1,29 +1,13 @@
 package com.fangyuanyouyue.user.controller;
 
-import com.alibaba.fastjson.JSONObject;
-import com.fangyuanyouyue.base.BaseController;
-import com.fangyuanyouyue.base.BaseResp;
-import com.fangyuanyouyue.base.enums.PhoneCode;
-import com.fangyuanyouyue.base.enums.ReCode;
-import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.base.util.AES;
-import com.fangyuanyouyue.base.util.MD5Util;
-import com.fangyuanyouyue.user.dto.ShopDto;
-import com.fangyuanyouyue.user.dto.UserDto;
-import com.fangyuanyouyue.user.model.UserInfo;
-import com.fangyuanyouyue.user.model.WeChatSession;
-import com.fangyuanyouyue.user.param.UserParam;
-import com.fangyuanyouyue.user.service.*;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import java.io.IOException;
+import java.util.List;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,9 +18,28 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BaseController;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.base.util.AES;
+import com.fangyuanyouyue.base.util.MD5Util;
+import com.fangyuanyouyue.user.constant.PhoneCodeEnum;
+import com.fangyuanyouyue.user.dto.ShopDto;
+import com.fangyuanyouyue.user.dto.UserDto;
+import com.fangyuanyouyue.user.model.UserInfo;
+import com.fangyuanyouyue.user.model.WeChatSession;
+import com.fangyuanyouyue.user.param.UserParam;
+import com.fangyuanyouyue.user.service.SchedualMessageService;
+import com.fangyuanyouyue.user.service.SchedualRedisService;
+import com.fangyuanyouyue.user.service.UserInfoExtService;
+import com.fangyuanyouyue.user.service.UserInfoService;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 
 @Controller
 @RequestMapping(value = "/user")
@@ -49,13 +52,9 @@ public class UserController extends BaseController {
     @Autowired
     private UserInfoExtService userInfoExtService;
     @Autowired
-    private UserAddressInfoService userAddressInfoService;
-    @Autowired
-    private SchedualGoodsService schedualGoodsService;//调用goods-service
+    private SchedualRedisService schedualRedisService;//调用redis-service
     @Autowired
     private SchedualMessageService schedualMessageService;//message-service
-    @Autowired
-    private RedisTemplate redisTemplate;
 
     @ApiOperation(value = "注册", notes = "(UserDto)注册",response = BaseResp.class)
     @ApiImplicitParams({
@@ -584,26 +583,22 @@ public class UserController extends BaseController {
             //验证用户
             //根据手机号获取用户，如果存在，则说明为旧手机号,调用user-service
             UserInfo userInfo=userInfoService.getUserByPhone(param.getPhone());
-            if(PhoneCode.TYPE_REGIST.getCode() == param.getType()){//使用手机号注册新用户
+            if(PhoneCodeEnum.TYPE_REGIST.getCode() == param.getType()){//使用手机号注册新用户
                 if(userInfo != null){
                     return toError(ReCode.FAILD.getValue(),"此手机号已被注册！");
                 }
-            }else if(PhoneCode.TYPE_FINDPWD.getCode() == param.getType()){//为1 找回密码
-                if(userInfo == null){
-                    return toError(ReCode.FAILD.getValue(),"用户不存在，请注册！");
-                }
-            }else if(PhoneCode.TYPE_OLD_PHONE.getCode() == param.getType()){//为3验证旧手机，给旧手机发验证码去验证
+            }else if(PhoneCodeEnum.TYPE_OLD_PHONE.getCode() == param.getType()){//为3验证旧手机，给旧手机发验证码去验证
 //                if(userInfo != null){//已存在此手机号
 //                    //验证此手机是否存在其他识别号
 //                    if(StringUtils.isNotEmpty(param.getUnionId())){//根据传入参数判断是qq还是微信绑定
 //
 //                    }
 //                }
-            }else if(PhoneCode.TYPE_NEW_PHONE.getCode() == param.getType()){//为4绑定新手机
+            }else if(PhoneCodeEnum.TYPE_NEW_PHONE.getCode() == param.getType()){//为4绑定新手机
                 if(userInfo != null){
                     return toError(ReCode.FAILD.getValue(),"此手机号已被注册！");
                 }
-            }else if(PhoneCode.TYPE_AUTH.getCode() == param.getType()){//为5认证店铺
+            }else if(PhoneCodeEnum.TYPE_AUTH.getCode() == param.getType()){//为5认证店铺
 				/*if(count == 0){
 					return toError(ReCode.FAILD.getValue(),"此手机号尚未注册！");
 				}*/
@@ -613,10 +608,13 @@ public class UserController extends BaseController {
             //调用短信系统发送短信
             JSONObject jsonObject = JSONObject.parseObject(schedualMessageService.sendCode(param.getPhone(),param.getType()));
             String code = jsonObject.getString("data");
-            log.info("code:"+code);
+            log.info("code---:"+code);
 
-            redisTemplate.opsForValue().set(param.getPhone(),code);
-            redisTemplate.expire(param.getPhone(),60,TimeUnit.SECONDS);
+            boolean result = schedualRedisService.set(param.getPhone(), code, 60l);
+            log.info("缓存结果："+result);
+            
+            //redisTemplate.opsForValue().set(param.getPhone(),code);
+            //redisTemplate.expire(param.getPhone(),60,TimeUnit.SECONDS);
             return toSuccess("发送验证码成功");
         } catch (Exception e) {
             e.printStackTrace();
@@ -642,12 +640,12 @@ public class UserController extends BaseController {
             if(StringUtils.isEmpty(param.getCode())){
                 return toError(ReCode.FAILD.getValue(),"验证码不能为空！");
             }
-            String code = (String) redisTemplate.opsForValue().get(param.getPhone());
+            //TODO 从缓存获取
+            String code = (String) schedualRedisService.get(param.getPhone());
             log.info("验证码:1."+code+" 2."+param.getCode());
             if(StringUtils.isEmpty(code) || !code.equals(param.getCode())){
                 return toError(ReCode.FAILD.getValue(),"验证码错误！");
             }
-
 
             return toSuccess("验证验证码成功");
         } catch (Exception e) {
@@ -749,7 +747,10 @@ public class UserController extends BaseController {
             if(param.getToUserId() == null){
                 return toError(ReCode.FAILD.getValue(),"被关注人不能为空！");
             }
-            redisTemplate.expire(param.getToken(),7,TimeUnit.DAYS);
+            
+            //TODO 更新缓存时间
+            //schedualRedisService.set(key, value, expire)
+            //redisTemplate.expire(param.getToken(),7,TimeUnit.DAYS);
             //添加/取消关注
             userInfoService.fansFollow(user.getId(), param.getToUserId(),param.getType());
             if(param.getType() == 0){

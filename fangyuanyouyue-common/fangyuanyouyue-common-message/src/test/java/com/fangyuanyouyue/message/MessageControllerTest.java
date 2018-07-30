@@ -14,7 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 @RunWith(SpringRunner.class)
@@ -36,7 +35,6 @@ public class MessageControllerTest {
     }
 
     @Test
-    @Transactional
     public void sendCode() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/message/sendCode")
                 .param("phone","18103966057")

@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -25,8 +24,6 @@ import io.swagger.annotations.Api;
 @RefreshScope
 public class MessageController extends BaseController{
     protected Logger log = Logger.getLogger(this.getClass());
-    @Autowired
-    private RedisTemplate redisTemplate;
     @Autowired
     private MessageService messageService;
 

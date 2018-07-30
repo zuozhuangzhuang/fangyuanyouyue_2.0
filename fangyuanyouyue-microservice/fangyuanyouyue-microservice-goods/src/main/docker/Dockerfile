@@ -1,6 +1,5 @@
 FROM frolvlad/alpine-oraclejdk8:slim
 VOLUME /tmp
-ADD goods-service-0.0.1-SNAPSHOT.jar goods-service.jar
-#RUN bash -c 'touch /goods-service.jar'
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/goods-service.jar"]
-EXPOSE 8761
+ADD fangyuanyouyue-microservice-goods-1.0-SNAPSHOT.jar fangyuanyouyue-microservice-goods.jar
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/fangyuanyouyue-microservice-goods.jar"]
+#EXPOSE 8761

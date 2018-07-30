@@ -3,7 +3,7 @@ package com.fangyuanyouyue.base.util;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 
 /**
  * 与snowflake算法区别,返回字符串id,占用更多字节,但直观从id中看出生成时间
@@ -83,18 +83,5 @@ public enum IdGenerator {
 		}
 		return lastip;
 	}
-	
-	public static void main(String[] args) {
-		final IdGenerator idg = IdGenerator.INSTANCE; 
-		String id = idg.nextId();
-		System.out.println(id);
-		id = idg.nextId();
-		System.out.println(id);
-		id = idg.nextId();
-		System.out.println(id);
-		id = idg.nextId();
-		System.out.println(id);
-		id = idg.nextId();
-		System.out.println(id);
-	}
+
 }

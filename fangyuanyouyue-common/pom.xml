@@ -18,6 +18,7 @@
 
     <modules>
     	<module>fangyuanyouyue-common-message</module>
+    	<module>fangyuanyouyue-common-redis</module>
     </modules>
 	
 </project>

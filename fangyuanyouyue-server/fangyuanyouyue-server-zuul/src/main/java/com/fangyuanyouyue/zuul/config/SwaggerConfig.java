@@ -25,7 +25,7 @@ public class SwaggerConfig {
                 .description("小方圆接口文档说明")
                 .termsOfServiceUrl("http://localhost:8769")
                 .contact(new Contact("左壮壮", "", "zuozhuang_zzz@163.com"))
-                .version("版本1.0吧")
+                .version("v1.0")
                 .build();
     }
 

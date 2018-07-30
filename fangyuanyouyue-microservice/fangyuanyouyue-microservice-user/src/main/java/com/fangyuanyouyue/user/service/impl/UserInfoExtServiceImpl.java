@@ -1,9 +1,6 @@
 package com.fangyuanyouyue.user.service.impl;
 
-import java.util.concurrent.TimeUnit;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
@@ -11,8 +8,10 @@ import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.user.dao.IdentityAuthApplyMapper;
 import com.fangyuanyouyue.user.dao.UserInfoExtMapper;
 import com.fangyuanyouyue.user.model.IdentityAuthApply;
+import com.fangyuanyouyue.user.model.UserInfo;
 import com.fangyuanyouyue.user.model.UserInfoExt;
 import com.fangyuanyouyue.user.service.UserInfoExtService;
+import com.fangyuanyouyue.user.service.UserInfoService;
 
 @Service(value = "userInfoExtService")
 public class UserInfoExtServiceImpl implements UserInfoExtService {
@@ -22,13 +21,14 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
     @Autowired
     private UserInfoExtMapper userInfoExtMapper;
     @Autowired
-    protected RedisTemplate redisTemplate;
+    protected UserInfoService userInfoService;
 
     @Override
     public void certification(String token, String name, String identity, String identityImgCoverUrl, String identityImgBackUrl) throws ServiceException {
-        Integer userId = (Integer)redisTemplate.opsForValue().get(token);
-        redisTemplate.expire(token,7, TimeUnit.DAYS);
-        IdentityAuthApply identityAuthApply = identityAuthApplyMapper.selectByUserId(userId);
+        //Integer userId = (Integer)redisTemplate.opsForValue().get(token);
+        //redisTemplate.expire(token,7, TimeUnit.DAYS);
+        UserInfo userInfo = userInfoService.getUserByToken(token);
+        IdentityAuthApply identityAuthApply = identityAuthApplyMapper.selectByUserId(userInfo.getId());
         if(identityAuthApply != null){
             if(identityAuthApply.getStatus() == 1){
                 throw new ServiceException("您已提交过实名认证，请耐心等待！");
@@ -37,10 +37,10 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
             }
         }else{
             //用户扩展信息表
-            UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(userId);
+            UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(userInfo.getId());
             userInfoExt.setIdentity(identity);
             userInfoExt.setName(name);
-            userInfoExt.setUserId(userId);
+            userInfoExt.setUserId(userInfo.getId());
             userInfoExt.setStatus(2);//实名登记状态 1已实名 2未实名
             userInfoExt.setCredit(100);
             userInfoExt.setScore(0);
