@@ -587,6 +587,10 @@ public class UserController extends BaseController {
                 if(userInfo != null){
                     return toError(ReCode.FAILD.getValue(),"此手机号已被注册！");
                 }
+            }else if(PhoneCodeEnum.TYPE_FINDPWD.getCode() == param.getType()){//为1 找回密码
+                if(userInfo == null){
+                    return toError(ReCode.FAILD.getValue(),"用户不存在，请注册！");
+                }
             }else if(PhoneCodeEnum.TYPE_OLD_PHONE.getCode() == param.getType()){//为3验证旧手机，给旧手机发验证码去验证
 //                if(userInfo != null){//已存在此手机号
 //                    //验证此手机是否存在其他识别号
