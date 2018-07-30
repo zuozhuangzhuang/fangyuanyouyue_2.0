@@ -10,7 +10,7 @@ import java.util.List;
  * 订单详情表DTO
  */
 public class OrderDetailDto {
-    private Integer userId;//用户id
+    private Integer userId;//卖家id
 
     private Integer orderId;//订单id
 
