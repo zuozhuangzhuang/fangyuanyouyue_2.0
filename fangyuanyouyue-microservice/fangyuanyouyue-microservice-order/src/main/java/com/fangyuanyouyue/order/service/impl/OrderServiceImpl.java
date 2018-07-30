@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fangyuanyouyue.order.dto.SellerDto;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -93,6 +94,8 @@ public class OrderServiceImpl implements OrderService{
         orderPayMapper.insert(orderPay);
 
         List<OrderDetailDto> orderDetailDtos = new ArrayList<>();
+        //卖家DTO列表
+        List<SellerDto> sellerDtos = new ArrayList<>();
         if(type == 1){//状态 1普通商品
             for(Integer goodsId:goodsIds){
                 GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(goodsId)).getString("data")),GoodsInfo.class);
@@ -100,10 +103,14 @@ public class OrderServiceImpl implements OrderService{
 //                throw new ServiceException("商品异常！");
                     continue;
                 }else{
+                    if(goods.getStatus() != 1){//非出售中商品
+                        throw new ServiceException("商品中包含已售出商品！");
+                    }
                     //计算总订单总金额
                     //每个商品生成一个订单详情表
                     OrderDetail orderDetail = new OrderDetail();
-                    orderDetail.setUserId(userId);
+                    //卖家ID
+                    orderDetail.setUserId(goods.getUserId());
                     orderDetail.setOrderId(orderInfo.getId());
                     orderDetail.setGoodsId(goodsId);
                     orderDetail.setGoodsName(goods.getName());
@@ -123,6 +130,23 @@ public class OrderServiceImpl implements OrderService{
                     OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail,1);//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
                     orderDetailDtos.add(orderDetailDto);
 
+                    //获取卖家信息
+                    UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(goods.getUserId())).getString("data")), UserInfo.class);
+                    SellerDto sellerDto = new SellerDto();
+                    sellerDto.setSellerHeadImgUrl(seller.getHeadImgUrl());
+                    sellerDto.setSellerId(seller.getId());
+                    sellerDto.setSellerName(seller.getNickName());
+                    boolean flag = true;
+                    for(SellerDto dto:sellerDtos){
+                        if(dto.getSellerId() == seller.getId()){
+                            flag = false;
+                        }
+                    }
+                    if(flag){
+                        sellerDtos.add(sellerDto);
+                    }
+
+
                     amount = amount.add(orderDetailDto.getOrgPrice());//实际支付
                     payAmount = payAmount.add(orderDetailDto.getPrice());//原价
                     //取运费最高者计算
@@ -136,9 +160,13 @@ public class OrderServiceImpl implements OrderService{
             if(goods == null){
                 throw new ServiceException("抢购异常！");
             }else {
+                if(goods.getStatus() != 1){//非出售中抢购
+                    throw new ServiceException("抢购已售出！");
+                }
                 //每个商品生成一个订单详情表
                 OrderDetail orderDetail = new OrderDetail();
-                orderDetail.setUserId(userId);
+                //卖家ID
+                orderDetail.setUserId(goods.getUserId());
                 orderDetail.setOrderId(orderInfo.getId());
                 orderDetail.setGoodsId(goodsIds[0]);
                 orderDetail.setGoodsName(goods.getName());
@@ -157,6 +185,22 @@ public class OrderServiceImpl implements OrderService{
                 //生成DTO
                 OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail,1);//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
                 orderDetailDtos.add(orderDetailDto);
+
+                //获取卖家信息
+                UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(goods.getUserId())).getString("data")), UserInfo.class);
+                SellerDto sellerDto = new SellerDto();
+                sellerDto.setSellerHeadImgUrl(seller.getHeadImgUrl());
+                sellerDto.setSellerId(seller.getId());
+                sellerDto.setSellerName(seller.getNickName());
+                boolean flag = true;
+                for(SellerDto dto:sellerDtos){
+                    if(dto.getSellerId() == seller.getId()){
+                        flag = false;
+                    }
+                }
+                if(flag){
+                    sellerDtos.add(sellerDto);
+                }
 
                 amount = amount.add(orderDetailDto.getOrgPrice());//实际支付
                 payAmount = payAmount.add(orderDetailDto.getPrice());//原价
@@ -183,7 +227,7 @@ public class OrderServiceImpl implements OrderService{
         orderDto.setNickName(user.getNickName());
         orderDto.setOrderPayDto(orderPayDto);
         orderDto.setOrderDetailDtos(orderDetailDtos);
-
+        orderDto.setSellerDtos(sellerDtos);
         return orderDto;
     }
 
@@ -239,6 +283,29 @@ public class OrderServiceImpl implements OrderService{
         for(OrderDto orderDto:orderDtos){
             List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
             ArrayList<OrderDetailDto> orderDetailDtos = OrderDetailDto.toDtoList(orderDetails, orderDto.getStatus());
+
+            //卖家信息DTO
+            List<SellerDto> sellerDtos = new ArrayList<>();
+            for(OrderDetailDto orderDetailDto:orderDetailDtos){
+//                GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(orderDetailDto.getGoodsId())).getString("data")),GoodsInfo.class);
+                //获取卖家信息
+                UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(orderDetailDto.getUserId())).getString("data")), UserInfo.class);
+
+                SellerDto sellerDto = new SellerDto();
+                sellerDto.setSellerHeadImgUrl(seller.getHeadImgUrl());
+                sellerDto.setSellerId(seller.getId());
+                sellerDto.setSellerName(seller.getNickName());
+                boolean flag = true;
+                for(SellerDto dto:sellerDtos){
+                    if(dto.getSellerId() == seller.getId()){
+                        flag = false;
+                    }
+                }
+                if(flag){
+                    sellerDtos.add(sellerDto);
+                }
+            }
+            orderDto.setSellerDtos(sellerDtos);
             orderDto.setOrderDetailDtos(orderDetailDtos);
             orderDto.setNickName(user.getNickName());
         }
