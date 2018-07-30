@@ -9,7 +9,7 @@ import java.util.Date;
 public class OrderDetail {
     private Integer id;//唯一自增ID
 
-    private Integer userId;//用户id
+    private Integer userId;//卖家id
 
     private Integer orderId;//订单id
 
