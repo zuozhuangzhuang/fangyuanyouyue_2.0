@@ -31,6 +31,9 @@ public class OrderDto {
 
     private String addTime;//下单时间
 
+    //卖家信息
+    private List<SellerDto> sellerDtos;//卖家列表
+
     public OrderDto() {
     }
 
@@ -124,5 +127,13 @@ public class OrderDto {
 
     public void setAddTime(String addTime) {
         this.addTime = addTime;
+    }
+
+    public List<SellerDto> getSellerDtos() {
+        return sellerDtos;
+    }
+
+    public void setSellerDtos(List<SellerDto> sellerDtos) {
+        this.sellerDtos = sellerDtos;
     }
 }
