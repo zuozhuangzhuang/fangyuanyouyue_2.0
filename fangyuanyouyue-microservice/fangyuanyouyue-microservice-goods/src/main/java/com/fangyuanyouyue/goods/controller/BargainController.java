@@ -7,10 +7,7 @@ import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.goods.dto.BargainDto;
 import com.fangyuanyouyue.goods.param.GoodsParam;
-import com.fangyuanyouyue.goods.service.AppraisalService;
-import com.fangyuanyouyue.goods.service.BargainService;
-import com.fangyuanyouyue.goods.service.CartService;
-import com.fangyuanyouyue.goods.service.SchedualUserService;
+import com.fangyuanyouyue.goods.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -27,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping(value = "/bargain")
@@ -45,6 +41,8 @@ public class BargainController extends BaseController{
     private AppraisalService appraisalService;
     @Autowired
     private BargainService bargainService;
+    @Autowired
+    private SchedualRedisService schedualRedisService;
 
     @ApiOperation(value = "商品压价申请", notes = "(void)用户发起对商品的议价，直接扣除用户余额 ",response = BaseResp.class)
     @ApiImplicitParams({
@@ -63,13 +61,12 @@ public class BargainController extends BaseController{
             if(StringUtils.isEmpty(param.getToken())){
                 return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
             }
-            Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
             JSONObject jsonObject = JSONObject.parseObject(verifyUser);
             if((Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
             if(param.getGoodsId() == null){
                 return toError(ReCode.FAILD.getValue(),"商品ID不能为空！");
             }
@@ -106,13 +103,12 @@ public class BargainController extends BaseController{
             if(StringUtils.isEmpty(param.getToken())){
                 return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
             }
-            Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
             JSONObject jsonObject = JSONObject.parseObject(verifyUser);
             if((Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
             if(param.getGoodsId() == null){
                 return toError(ReCode.FAILD.getValue(),"商品ID不能为空！");
             }
@@ -148,13 +144,12 @@ public class BargainController extends BaseController{
             if(StringUtils.isEmpty(param.getToken())){
                 return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
             }
-            Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
             JSONObject jsonObject = JSONObject.parseObject(verifyUser);
             if((Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
             //TODO 我的压价列表
             List<BargainDto> bargainDtos = bargainService.bargainList(userId);
             return toSuccess( bargainDtos);
