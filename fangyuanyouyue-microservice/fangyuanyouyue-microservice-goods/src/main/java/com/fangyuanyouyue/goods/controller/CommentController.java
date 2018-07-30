@@ -9,6 +9,7 @@ import com.fangyuanyouyue.goods.dto.GoodsCommentDto;
 import com.fangyuanyouyue.goods.param.GoodsParam;
 import com.fangyuanyouyue.goods.service.CommentService;
 import com.fangyuanyouyue.goods.service.GoodsInfoService;
+import com.fangyuanyouyue.goods.service.SchedualRedisService;
 import com.fangyuanyouyue.goods.service.SchedualUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -42,6 +43,8 @@ public class CommentController extends BaseController{
     protected RedisTemplate redisTemplate;
     @Autowired
     private CommentService commentService;
+    @Autowired
+    private SchedualRedisService schedualRedisService;
 
     @ApiOperation(value = "发布评论/回复", notes = "(void)发布评论/回复",response = BaseResp.class)
     @ApiImplicitParams({
@@ -66,13 +69,12 @@ public class CommentController extends BaseController{
             if(param.getGoodsId() == null){
                 return toError(ReCode.FAILD.getValue(),"商品id不能为空！");
             }
-            Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
             JSONObject jsonObject = JSONObject.parseObject(verifyUser);
             if((Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
             if(param.getImg1Url() == null && StringUtils.isEmpty(param.getContent())){
                 return toError(ReCode.FAILD.getValue(),"内容不能为空！");
             }
@@ -104,7 +106,7 @@ public class CommentController extends BaseController{
             if(StringUtils.isEmpty(param.getToken())){
                 return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
             }
-            Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
             JSONObject jsonObject = JSONObject.parseObject(verifyUser);
             if((Integer)jsonObject.get("code") != 0){
@@ -113,7 +115,6 @@ public class CommentController extends BaseController{
             if(param.getCommentId() == null){
                 return toError(ReCode.FAILD.getValue(),"评论id不能为空！");
             }
-            redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
 
             commentService.commentLikes(param.getCommentId());
             return toSuccess("评论点赞成功！");
