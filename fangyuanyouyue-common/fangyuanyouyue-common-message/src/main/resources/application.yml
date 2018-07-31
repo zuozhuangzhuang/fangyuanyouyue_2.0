@@ -1,0 +1,14 @@
+eureka:
+  client:
+    serviceUrl:
+#     服务注册中心的地址
+      defaultZone: http://eureka-server:8761/eureka/
+#为0 端口随机
+server:
+  port: 0
+spring:
+  application:
+    #服务与服务之间相互调用一般都是根据这个name
+    name: message-service
+
+

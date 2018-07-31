@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fangyuanyouyue.goods.dao.GoodsCommentMapper" >
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.goods.model.GoodsComment" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="goods_id" property="goodsId" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="comment_id" property="commentId" jdbcType="INTEGER" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="likes_count" property="likesCount" jdbcType="INTEGER" />
+    <result column="img1_url" property="img1Url" jdbcType="VARCHAR" />
+    <result column="img2_url" property="img2Url" jdbcType="VARCHAR" />
+    <result column="img3_url" property="img3Url" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="add_time" property="addTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, goods_id, user_id, comment_id, content, likes_count, img1_url, img2_url, img3_url, 
+    status, add_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from goods_comment
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from goods_comment
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.fangyuanyouyue.goods.model.GoodsComment"  useGeneratedKeys="true" keyProperty="id">
+    insert into goods_comment (id, goods_id, user_id, 
+      comment_id, content, likes_count, 
+      img1_url, img2_url, img3_url, 
+      status, add_time, update_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{goodsId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, 
+      #{commentId,jdbcType=INTEGER}, #{content,jdbcType=VARCHAR}, #{likesCount,jdbcType=INTEGER}, 
+      #{img1Url,jdbcType=VARCHAR}, #{img2Url,jdbcType=VARCHAR}, #{img3Url,jdbcType=VARCHAR}, 
+      #{status,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.goods.model.GoodsComment" >
+    insert into goods_comment
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="goodsId != null" >
+        goods_id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="commentId != null" >
+        comment_id,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+      <if test="likesCount != null" >
+        likes_count,
+      </if>
+      <if test="img1Url != null" >
+        img1_url,
+      </if>
+      <if test="img2Url != null" >
+        img2_url,
+      </if>
+      <if test="img3Url != null" >
+        img3_url,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="addTime != null" >
+        add_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="goodsId != null" >
+        #{goodsId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="commentId != null" >
+        #{commentId,jdbcType=INTEGER},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="likesCount != null" >
+        #{likesCount,jdbcType=INTEGER},
+      </if>
+      <if test="img1Url != null" >
+        #{img1Url,jdbcType=VARCHAR},
+      </if>
+      <if test="img2Url != null" >
+        #{img2Url,jdbcType=VARCHAR},
+      </if>
+      <if test="img3Url != null" >
+        #{img3Url,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="addTime != null" >
+        #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.goods.model.GoodsComment" >
+    update goods_comment
+    <set >
+      <if test="goodsId != null" >
+        goods_id = #{goodsId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="commentId != null" >
+        comment_id = #{commentId,jdbcType=INTEGER},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="likesCount != null" >
+        likes_count = #{likesCount,jdbcType=INTEGER},
+      </if>
+      <if test="img1Url != null" >
+        img1_url = #{img1Url,jdbcType=VARCHAR},
+      </if>
+      <if test="img2Url != null" >
+        img2_url = #{img2Url,jdbcType=VARCHAR},
+      </if>
+      <if test="img3Url != null" >
+        img3_url = #{img3Url,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="addTime != null" >
+        add_time = #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.goods.model.GoodsComment" >
+    update goods_comment
+    set goods_id = #{goodsId,jdbcType=INTEGER},
+      user_id = #{userId,jdbcType=INTEGER},
+      comment_id = #{commentId,jdbcType=INTEGER},
+      content = #{content,jdbcType=VARCHAR},
+      likes_count = #{likesCount,jdbcType=INTEGER},
+      img1_url = #{img1Url,jdbcType=VARCHAR},
+      img2_url = #{img2Url,jdbcType=VARCHAR},
+      img3_url = #{img3Url,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      add_time = #{addTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectMapByGoodsIdCommentId" parameterType="Integer" resultType="Map">
+    select * from goods_comment a left join user_info b on a.user_id = b.id
+    <where>
+      a.status = 1
+      <if test="commentId != null">
+        and a.comment_id = #{commentId,jdbcType=INTEGER}
+      </if>
+      <if test="goodsId != null">
+        and a.goods_id = #{goodsId,jdbcType=INTEGER}
+      </if>
+    </where>
+    order by a.add_time
+    <if test="start != null and limit != null">
+      limit #{start},#{limit}
+    </if>
+  </select>
+  <select id="selectByCommentId" parameterType="Integer" resultType="Map">
+    select * from goods_comment a left join user_info b on a.user_id = b.id where a.id = #{commentId,jdbcType=INTEGER}
+  </select>
+  <select id="selectCount" parameterType="Integer" resultType="Integer">
+    select count(id) from goods_comment where goods_id = #{goodsId,jdbcType=INTEGER}
+  </select>
+  <select id="selectByGoodsId" parameterType="Integer" resultType="Map">
+    select * from goods_comment a left join user_info b on a.user_id = b.id where a.goods_id = #{goodsId,jdbcType=INTEGER} and ISNULL(a.comment_id) limit #{start,jdbcType=INTEGER},#{limit,jdbcType=INTEGER}
+  </select>
+</mapper>

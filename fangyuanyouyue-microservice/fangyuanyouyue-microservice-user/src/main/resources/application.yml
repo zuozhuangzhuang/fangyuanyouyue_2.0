@@ -1,0 +1,44 @@
+#为0 端口随机
+server:
+  port: 0
+spring:
+#zipkin
+  zipkin:
+    base-url: http://localhost:9411
+#max-file-size 单个数据大小限制
+#max-request-size 总数据大小限制
+  servlet:
+    multipart:
+      max-file-size: 1024MB
+      max-request-size: 10240MB
+  mvc:
+    async:
+      request-timeout: 30s
+  profiles:
+    active: dev
+#springcloud-bus
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ["health","info","bus-refresh"]
+  cloud:
+    bus:
+      trace:
+        enabled: true
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.fangyuanyouyue.user.model
+
+mapper:
+  mappers:  com.fangyuanyouyue.user.dao
+  not-empty: false
+  identity: MYSQL
+
+#pagehelper
+pagehelper:
+    helperDialect: mysql
+    reasonable: true
+    supportMethodsArguments: true
+    params: count=countSql
+    returnPageInfo: check

@@ -1,0 +1,60 @@
+#为0 端口随机
+server:
+  port: 0
+spring:
+#zipkin
+  zipkin:
+    base-url: http://localhost:9411
+#max-file-size 单个数据大小限制
+#max-request-size 总数据大小限制
+  servlet:
+    multipart:
+      max-file-size: 1024MB
+      max-request-size: 10240MB
+  mvc:
+    async:
+      request-timeout: 30s
+  profiles:
+    active: dev
+#springcloud-bus
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ["health","info","bus-refresh"]
+  cloud:
+    bus:
+      trace:
+        enabled: true
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.fangyuanyouyue.order.model
+
+mapper:
+  mappers:  com.fangyuanyouyue.order.dao
+  not-empty: false
+  identity: MYSQL
+
+#pagehelper
+pagehelper:
+    helperDialect: mysql
+    reasonable: true
+    supportMethodsArguments: true
+    params: count=countSql
+    returnPageInfo: check
+##断路器开关
+#feign:
+#    hystrix:
+#        enabled: true
+##防止springboot2.0以上出现Unable to connect to Command Metric Stream
+##默认其实的切入点是：/actuator/hystrix.stream 要改成/hystrix.stream
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: "*"
+#base-path: /
+# 打印sql
+logging:
+  level:
+    com.fangyuanyouyue.order: DEBUG

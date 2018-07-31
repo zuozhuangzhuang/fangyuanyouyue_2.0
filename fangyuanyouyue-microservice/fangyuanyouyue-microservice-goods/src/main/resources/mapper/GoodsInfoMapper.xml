@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangyuanyouyue.goods.dao.GoodsInfoMapper">
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.goods.model.GoodsInfo">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="price" jdbcType="DECIMAL" property="price" />
+    <result column="postage" jdbcType="DECIMAL" property="postage" />
+    <result column="sort" jdbcType="INTEGER" property="sort" />
+    <result column="label" jdbcType="VARCHAR" property="label" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="floor_price" jdbcType="DECIMAL" property="floorPrice" />
+    <result column="interval_time" jdbcType="TIMESTAMP" property="intervalTime" />
+    <result column="markdown" jdbcType="DECIMAL" property="markdown" />
+    <result column="last_interval_time" jdbcType="TIMESTAMP" property="lastIntervalTime" />
+    <result column="is_appraisal" jdbcType="INTEGER" property="isAppraisal" />
+    <result column="video_url" jdbcType="VARCHAR" property="videoUrl" />
+    <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.goods.model.GoodsInfo">
+    <result column="description" jdbcType="LONGVARCHAR" property="description" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, user_id, name, price, postage, sort, label, type, status, floor_price, interval_time, 
+    markdown, last_interval_time, is_appraisal, video_url, add_time, update_time
+  </sql>
+  <sql id="Blob_Column_List">
+    description
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from goods_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from goods_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.fangyuanyouyue.goods.model.GoodsInfo">
+    insert into goods_info (id, user_id, name, 
+      price, postage, sort, 
+      label, type, status, 
+      floor_price, interval_time, markdown, 
+      last_interval_time, is_appraisal, video_url, 
+      add_time, update_time, description
+      )
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, 
+      #{price,jdbcType=DECIMAL}, #{postage,jdbcType=DECIMAL}, #{sort,jdbcType=INTEGER}, 
+      #{label,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
+      #{floorPrice,jdbcType=DECIMAL}, #{intervalTime,jdbcType=TIMESTAMP}, #{markdown,jdbcType=DECIMAL}, 
+      #{lastIntervalTime,jdbcType=TIMESTAMP}, #{isAppraisal,jdbcType=INTEGER}, #{videoUrl,jdbcType=VARCHAR}, 
+      #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.goods.model.GoodsInfo">
+    insert into goods_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="price != null">
+        price,
+      </if>
+      <if test="postage != null">
+        postage,
+      </if>
+      <if test="sort != null">
+        sort,
+      </if>
+      <if test="label != null">
+        label,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="floorPrice != null">
+        floor_price,
+      </if>
+      <if test="intervalTime != null">
+        interval_time,
+      </if>
+      <if test="markdown != null">
+        markdown,
+      </if>
+      <if test="lastIntervalTime != null">
+        last_interval_time,
+      </if>
+      <if test="isAppraisal != null">
+        is_appraisal,
+      </if>
+      <if test="videoUrl != null">
+        video_url,
+      </if>
+      <if test="addTime != null">
+        add_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null">
+        #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="postage != null">
+        #{postage,jdbcType=DECIMAL},
+      </if>
+      <if test="sort != null">
+        #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="label != null">
+        #{label,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="floorPrice != null">
+        #{floorPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="intervalTime != null">
+        #{intervalTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="markdown != null">
+        #{markdown,jdbcType=DECIMAL},
+      </if>
+      <if test="lastIntervalTime != null">
+        #{lastIntervalTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isAppraisal != null">
+        #{isAppraisal,jdbcType=INTEGER},
+      </if>
+      <if test="videoUrl != null">
+        #{videoUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="addTime != null">
+        #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.goods.model.GoodsInfo">
+    update goods_info
+    <set>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null">
+        price = #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="postage != null">
+        postage = #{postage,jdbcType=DECIMAL},
+      </if>
+      <if test="sort != null">
+        sort = #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="label != null">
+        label = #{label,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="floorPrice != null">
+        floor_price = #{floorPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="intervalTime != null">
+        interval_time = #{intervalTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="markdown != null">
+        markdown = #{markdown,jdbcType=DECIMAL},
+      </if>
+      <if test="lastIntervalTime != null">
+        last_interval_time = #{lastIntervalTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isAppraisal != null">
+        is_appraisal = #{isAppraisal,jdbcType=INTEGER},
+      </if>
+      <if test="videoUrl != null">
+        video_url = #{videoUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="addTime != null">
+        add_time = #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.fangyuanyouyue.goods.model.GoodsInfo">
+    update goods_info
+    set user_id = #{userId,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR},
+      price = #{price,jdbcType=DECIMAL},
+      postage = #{postage,jdbcType=DECIMAL},
+      sort = #{sort,jdbcType=INTEGER},
+      label = #{label,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      floor_price = #{floorPrice,jdbcType=DECIMAL},
+      interval_time = #{intervalTime,jdbcType=TIMESTAMP},
+      markdown = #{markdown,jdbcType=DECIMAL},
+      last_interval_time = #{lastIntervalTime,jdbcType=TIMESTAMP},
+      is_appraisal = #{isAppraisal,jdbcType=INTEGER},
+      video_url = #{videoUrl,jdbcType=VARCHAR},
+      add_time = #{addTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      description = #{description,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.goods.model.GoodsInfo">
+    update goods_info
+    set user_id = #{userId,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR},
+      price = #{price,jdbcType=DECIMAL},
+      postage = #{postage,jdbcType=DECIMAL},
+      sort = #{sort,jdbcType=INTEGER},
+      label = #{label,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      floor_price = #{floorPrice,jdbcType=DECIMAL},
+      interval_time = #{intervalTime,jdbcType=TIMESTAMP},
+      markdown = #{markdown,jdbcType=DECIMAL},
+      last_interval_time = #{lastIntervalTime,jdbcType=TIMESTAMP},
+      is_appraisal = #{isAppraisal,jdbcType=INTEGER},
+      video_url = #{videoUrl,jdbcType=VARCHAR},
+      add_time = #{addTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="getGoodsList" parameterType="Integer" resultMap="BaseResultMap">
+    select * from goods_info a left join user_info_ext b on a.user_id = b.user_id
+    <where>
+      a.status <![CDATA[ <> ]]> 5
+      <if test="status != null">
+        and a.status = #{status,jdbcType=INTEGER}
+      </if>
+      <if test="userId != null and quality == null">
+        and a.user_id = #{userId,jdbcType=INTEGER}
+      </if>
+      <if test="priceMin != null">
+        and a.price <![CDATA[ >= ]]> #{priceMin,jdbcType=DECIMAL}
+      </if>
+      <if test="priceMax != null">
+        and a.price <![CDATA[ < ]]> #{priceMax,jdbcType=DECIMAL}
+      </if>
+      <if test="search != null and search != ''">
+        and (a.name like "%"#{search}"%" or a.description like "%"#{search}"%" or a.user_id in (select id from user_info where nick_name like "%"#{search}"%"))
+      </if>
+      <if test="type != null">
+        and a.type = #{type,jdbcType=INTEGER}
+      </if>
+      <if test="quality != null">
+        <if test="quality == 1">
+          and b.auth_type = 1
+        </if>
+        <if test="quality == 2">
+          and a.id in (select goods_id from goods_appraisal_detail where type = 1 and status = 1)
+        </if>
+        <if test="quality == 3">
+          and b.credit <![CDATA[ > ]]> 150
+        </if>
+        <if test="userId != null and quality == 4">
+          and a.user_id in (select to_user_id from user_fans where user_id = #{userId,jdbcType=INTEGER})
+        </if>
+        <if test="type == 2 and quality == 5">
+          and a.status = 2
+        </if>
+      </if>
+      <if test="goodsCategoryIds != null">
+        and a.id in (select goods_id from goods_correlation where (goods_category_id in
+        <foreach close=")" collection="goodsCategoryIds" index="index" item="categoryId" open="(" separator=",">
+          #{categoryId,jdbcType=INTEGER}
+        </foreach>
+        or category_parent_id in
+        <foreach close=")" collection="goodsCategoryIds" index="index" item="categoryId" open="(" separator=",">
+          #{categoryId,jdbcType=INTEGER}
+        </foreach>
+        ))
+      </if>
+    </where>
+    order by
+    <if test="synthesize != null">
+      <if test="synthesize == 1">
+
+      </if>
+      <if test="synthesize == 2">
+        b.credit desc,
+      </if>
+      <if test="synthesize == 3">
+        a.price,
+      </if>
+      <if test="synthesize == 4">
+        a.price desc,
+      </if>
+    </if>
+    a.update_time desc limit #{start},#{limit}
+  </select>
+  <select id="getGoodsByGoodsIds" parameterType="Integer" resultMap="BaseResultMap">
+    select * from goods_info
+    <where>
+      <foreach close=")" collection="goodsIds" item="id" open=" and id in(" separator=",">
+        #{id,jdbcType=INTEGER}
+      </foreach>
+    </where>
+    order by update_time desc
+  </select>
+  <select id="selectGoodsByIntervalTime" parameterType="Long" resultMap="BaseResultMap">
+        select * from goods_info where type = 2 and status = 1 and interval_time <![CDATA[ <= ]]> (#{nowTime} - last_interval_time)
+    </select>
+  <select id="selectMyCollectGoods" parameterType="Integer" resultMap="BaseResultMap">
+    select a.* from goods_info a left join collect b on a.id=b.collect_id
+    <where>
+      1=1
+      <if test="collectType != null">
+        and a.type = #{collectType,jdbcType=INTEGER}
+      </if>
+      <if test="userId != null">
+        and b.user_id = #{userId,jdbcType=INTEGER}
+      </if>
+      <if test="type != null">
+        and b.type = #{type,jdbcType=INTEGER}
+      </if>
+      <if test="goodsId != null">
+        and a.id = #{goodsId,jdbcType=INTEGER}
+      </if>
+    </where>
+  </select>
+  <select id="selectByCategoryIds" parameterType="Integer" resultMap="BaseResultMap">
+    select a.* from goods_info a,user_info_ext b,user_vip c where a.user_id = b.user_id and a.user_id = c.user_id and a.status = 1
+    and a.id in (select goods_id from goods_correlation where goods_category_id in
+    <foreach close=")" collection="goodsCategoryIds" index="index" item="categoryId" open="(" separator=",">
+      #{categoryId,jdbcType=INTEGER}
+    </foreach>
+    ) order by c.vip_level desc,c.vip_type desc,b.auth_type,a.update_time desc limit #{start},#{limit}
+  </select>
+  <!--<select id="getGoodsAuthType" parameterType="Integer" resultType="Integer">-->
+    <!--select b.auth_type from goods_info a,user_info_ext b where a.user_id=b.user_id and a.id = #{goodsId}-->
+  <!--</select>-->
+  <select id="getGoodsUserInfoExtAndVip" parameterType="Integer" resultType="Map">
+    select * from user_info_ext a,goods_info b,user_vip c where a.user_id = b.user_id and a.user_id = c.user_id and b.id = #{goodsId}
+  </select>
+  <select id="getGoodsUserFansCount" parameterType="Integer" resultType="Integer">
+    select count(*) from user_fans where to_user_id = (select user_id from goods_info where goods_info.id = #{goodsId})
+  </select>
+  <select id="getGoodsUserCollectCount" parameterType="Integer" resultType="Integer">
+    select count(*) from user_fans where user_id = (select user_id from goods_info where goods_info.id = #{goodsId})
+  </select>
+</mapper>

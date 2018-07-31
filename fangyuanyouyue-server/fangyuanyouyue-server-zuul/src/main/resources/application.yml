@@ -1,0 +1,58 @@
+#服务注册中心的地址
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka-server:8761/eureka/
+#服务的端口
+server:
+  port: 8769
+#服务名
+spring:
+  application:
+    name: server-zuul
+#文件上传大小限制
+#max-file-size 单个数据大小限制
+#max-request-size 总数据大小限制
+  servlet:
+    multipart:
+      max-file-size: 1024MB
+      max-request-size: 10240MB
+#zuul.routes.api-a.sensitiveHeaders="*"\
+zuul:
+  host:
+    socket-timeout-millis: 60000
+    connect-timeout-millis: 60000
+  routes:
+#消息系统
+    message-service:
+      path: /message/**
+      serviceId: message-service
+#权限系统
+    auth-service:
+      path: /auth/**
+      serviceId: auth-service
+#商品系统
+    goods-service:
+      path: /goods/**
+      serviceId: goods-service
+#论坛系统
+    forum-service:
+      path: /forum/**
+      serviceId: forum-service
+#订单系统
+    order-service:
+      path: /order/**
+      serviceId: order-service
+#支付系统
+    payment-service:
+      path: /payment/**
+      serviceId: payment-service
+#钱包系统
+    wallet-service:
+      path: /wallet/**
+      serviceId: wallet-service
+#用户系统
+    user-service:
+      path: /user/**
+      serviceId: user-service
+  sensitive-headers: "*"
