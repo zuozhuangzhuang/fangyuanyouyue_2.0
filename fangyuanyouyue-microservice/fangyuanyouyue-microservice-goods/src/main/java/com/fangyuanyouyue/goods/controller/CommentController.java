@@ -80,8 +80,8 @@ public class CommentController extends BaseController{
             }
             param.setUserId(userId);
 
-            commentService.addComment(param);
-            return toSuccess("发布评论/回复成功！");
+            Integer commentId = commentService.addComment(param);
+            return toSuccess(commentId);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
@@ -91,10 +91,11 @@ public class CommentController extends BaseController{
         }
     }
 
-    @ApiOperation(value = "评论点赞", notes = "(void)评论点赞",response = BaseResp.class)
+    @ApiOperation(value = "评论点赞(取消点赞)", notes = "(void)评论点赞",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true,dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "commentId", value = "回复评论id",required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "commentId", value = "回复评论id",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1点赞 2取消点赞",required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/commentLikes")
     @ResponseBody
@@ -115,9 +116,17 @@ public class CommentController extends BaseController{
             if(param.getCommentId() == null){
                 return toError(ReCode.FAILD.getValue(),"评论id不能为空！");
             }
-
-            commentService.commentLikes(param.getCommentId());
-            return toSuccess("评论点赞成功！");
+            if(param.getType() == null){
+                return toError(ReCode.FAILD.getValue(),"类型不能为空！");
+            }
+            commentService.commentLikes(userId,param.getCommentId(),param.getType());
+            if(param.getType().intValue() == 1){
+                return toSuccess("评论点赞成功！");
+            }else if(param.getType().intValue() == 2){
+                return toSuccess("取消点赞成功！");
+            }else{
+                return toError(ReCode.FAILD.getValue(),"类型异常！");
+            }
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
@@ -129,6 +138,7 @@ public class CommentController extends BaseController{
 
     @ApiOperation(value = "查看全部评论", notes = "(GoodsCommentDto)查看全部评论",response = BaseResp.class)
     @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token",dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "goodsId", value = "商品ID", required = true,dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "start", value = "起始页数", required = true,dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "limit", value = "每页个数", required = true,dataType = "int", paramType = "query")
@@ -139,13 +149,23 @@ public class CommentController extends BaseController{
         try {
             log.info("----》查看全部评论《----");
             log.info("参数："+param.toString());
+            if(StringUtils.isNotEmpty(param.getToken())){
+                //根据用户token获取userId
+                Integer userId = (Integer)schedualRedisService.get(param.getToken());
+                String verifyUser = schedualUserService.verifyUserById(userId);
+                JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+                if((Integer)jsonObject.get("code") != 0){
+                    return toError(jsonObject.getString("report"));
+                }
+                param.setUserId(userId);
+            }
             if(param.getGoodsId() == null){
                 return toError(ReCode.FAILD.getValue(),"商品id不能为空！");
             }
             if(param.getStart() == null || param.getLimit() == null){
                 return toError(ReCode.FAILD.getValue(),"分页参数不能为空！");
             }
-            List<GoodsCommentDto> comments = commentService.getComments(param.getGoodsId(),param.getStart(),param.getLimit());
+            List<GoodsCommentDto> comments = commentService.getComments(param.getUserId(),param.getGoodsId(),param.getStart(),param.getLimit());
             return toSuccess(comments);
         } catch (ServiceException e) {
             e.printStackTrace();

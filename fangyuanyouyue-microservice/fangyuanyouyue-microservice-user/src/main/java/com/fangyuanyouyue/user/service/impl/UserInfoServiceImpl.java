@@ -34,8 +34,10 @@ import com.fangyuanyouyue.user.param.UserParam;
 import com.fangyuanyouyue.user.service.SchedualGoodsService;
 import com.fangyuanyouyue.user.service.SchedualRedisService;
 import com.fangyuanyouyue.user.service.UserInfoService;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service(value = "userInfoService")
+@Transactional(rollbackFor=Exception.class)
 public class UserInfoServiceImpl implements UserInfoService {
     protected Logger log = Logger.getLogger(this.getClass());
     @Autowired
@@ -569,8 +571,12 @@ public class UserInfoServiceImpl implements UserInfoService {
     public UserDto userInfo(String token,Integer userId) throws ServiceException {
         //Integer userIdByToken = (Integer)redisTemplate.opsForValue().get(token);
         //redisTemplate.expire(token,7,TimeUnit.DAYS);
-        //UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
-    	UserInfo userInfo = getUserByToken(token);
+        UserInfo userByToken = new UserInfo();
+        if(StringUtils.isNotEmpty(token)){
+            userByToken = getUserByToken(token);
+        }
+        UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
+
         if(userInfo == null){
             throw new ServiceException("用户不存在！");
         }else{
@@ -578,7 +584,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             userDto.setFansCount(userFansMapper.fansCount(userId));
             userDto.setCollectCount(userFansMapper.collectCount(userId));
             //判断token用户是否关注userId用户
-            UserFans userFans = userFansMapper.selectByUserIdToUserId(userInfo.getId(), userId);
+            UserFans userFans = userFansMapper.selectByUserIdToUserId(userId,userByToken.getId());
             if(userFans != null){
                userDto.setIsFollow(1);//是否关注 1是 2否
             }

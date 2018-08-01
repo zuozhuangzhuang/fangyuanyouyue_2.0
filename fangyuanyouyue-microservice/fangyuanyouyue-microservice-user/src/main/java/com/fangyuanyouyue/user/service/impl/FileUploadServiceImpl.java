@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.aliyun.oss.OSSClient;
@@ -12,6 +13,7 @@ import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.user.service.FileUploadService;
 
 @Service(value = "uploadFileService")
+@Transactional(rollbackFor=Exception.class)
 public class FileUploadServiceImpl implements FileUploadService{
     @Value("${access_key_id}")
     private String accessKeyId;

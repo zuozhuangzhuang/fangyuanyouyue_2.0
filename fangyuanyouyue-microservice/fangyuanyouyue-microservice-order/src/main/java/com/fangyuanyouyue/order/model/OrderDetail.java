@@ -2,14 +2,13 @@ package com.fangyuanyouyue.order.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
-
 /**
  * 订单详情DTO
  */
 public class OrderDetail {
     private Integer id;//唯一自增ID
 
-    private Integer userId;//卖家id
+    private Integer userId;//用户id
 
     private Integer orderId;//订单id
 
@@ -32,6 +31,8 @@ public class OrderDetail {
     private BigDecimal price;//实际支付金额
 
     private String description;//商品描述
+
+    private Integer sellerId;//卖家ID
 
     public Integer getId() {
         return id;
@@ -127,6 +128,14 @@ public class OrderDetail {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public Integer getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(Integer sellerId) {
+        this.sellerId = sellerId;
     }
 
     public String getDescription() {

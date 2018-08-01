@@ -1,57 +1,35 @@
 package com.fangyuanyouyue.goods.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
-import com.fangyuanyouyue.goods.dao.BannerIndexMapper;
-import com.fangyuanyouyue.goods.dao.CollectMapper;
-import com.fangyuanyouyue.goods.dao.GoodsCategoryMapper;
-import com.fangyuanyouyue.goods.dao.GoodsCommentMapper;
-import com.fangyuanyouyue.goods.dao.GoodsCorrelationMapper;
-import com.fangyuanyouyue.goods.dao.GoodsImgMapper;
-import com.fangyuanyouyue.goods.dao.GoodsInfoMapper;
-import com.fangyuanyouyue.goods.dao.GoodsQuickSearchMapper;
-import com.fangyuanyouyue.goods.dao.HotSearchMapper;
-import com.fangyuanyouyue.goods.dao.ReportGoodsMapper;
-import com.fangyuanyouyue.goods.dto.BannerIndexDto;
-import com.fangyuanyouyue.goods.dto.GoodsCategoryDto;
-import com.fangyuanyouyue.goods.dto.GoodsCommentDto;
-import com.fangyuanyouyue.goods.dto.GoodsDto;
-import com.fangyuanyouyue.goods.dto.GoodsQuickSearchDto;
-import com.fangyuanyouyue.goods.dto.SearchDto;
-import com.fangyuanyouyue.goods.model.BannerIndex;
-import com.fangyuanyouyue.goods.model.Collect;
-import com.fangyuanyouyue.goods.model.GoodsCategory;
-import com.fangyuanyouyue.goods.model.GoodsCorrelation;
-import com.fangyuanyouyue.goods.model.GoodsImg;
-import com.fangyuanyouyue.goods.model.GoodsInfo;
-import com.fangyuanyouyue.goods.model.GoodsQuickSearch;
-import com.fangyuanyouyue.goods.model.HotSearch;
-import com.fangyuanyouyue.goods.model.ReportGoods;
-import com.fangyuanyouyue.goods.model.UserInfo;
+import com.fangyuanyouyue.goods.dao.*;
+import com.fangyuanyouyue.goods.dto.*;
+import com.fangyuanyouyue.goods.model.*;
 import com.fangyuanyouyue.goods.param.GoodsParam;
 import com.fangyuanyouyue.goods.service.GoodsInfoService;
 import com.fangyuanyouyue.goods.service.SchedualUserService;
 import com.github.pagehelper.PageHelper;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Service(value = "goodsInfoService")
+@Transactional(rollbackFor=Exception.class)
 public class GoodsInfoServiceImpl implements GoodsInfoService{
     @Autowired
     private GoodsInfoMapper goodsInfoMapper;
     @Autowired
     private GoodsImgMapper goodsImgMapper;
     @Autowired
-    private GoodsCorrelationMapper goodsCorrelationMapper;
-    @Autowired
     private GoodsCategoryMapper goodsCategoryMapper;
+    @Autowired
+    private GoodsCorrelationMapper goodsCorrelationMapper;
     @Autowired
     private GoodsCommentMapper goodsCommentMapperl;
     @Autowired
@@ -66,6 +44,8 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     private SchedualUserService schedualUserService;//调用其他service时用
     @Autowired
     private ReportGoodsMapper reportGoodsMapper;
+    @Autowired
+    private CommentLikesMapper commentLikesMapper;
     @Override
     public GoodsInfo selectByPrimaryKey(Integer id) {
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(id);
@@ -104,21 +84,15 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 hotSearchMapper.updateByPrimaryKey(hotSearch);
             }
         }
-        //分页
-//        PageHelper.startPage(param.getStart(), param.getLimit());
         List<GoodsInfo> goodsInfos =goodsInfoMapper.getGoodsList(param.getUserId(),param.getStatus(),param.getSearch(),
                 param.getPriceMin(),param.getPriceMax(),param.getSynthesize(),param.getQuality(),param.getStart()*param.getLimit(),param.getLimit(),param.getType(),param.getGoodsCategoryIds());
-//        PageResults list = new PageResults();
-//        list.setPageSize(param.getStart());
-//        list.setResults(goodsInfos);
-//        list.setCurrentPage(param.getStart());
         //分类热度加一
         if(param.getGoodsCategoryIds() != null && param.getGoodsCategoryIds().length>0){
             goodsCategoryMapper.addSearchCountByCategoryIds(param.getGoodsCategoryIds());
         }
         List<GoodsDto> goodsDtos = new ArrayList<>();
         for (GoodsInfo goodsInfo:goodsInfos) {
-            goodsDtos.add(setDtoByGoodsInfo(goodsInfo));
+            goodsDtos.add(setDtoByGoodsInfo(null,goodsInfo));
         }
         return goodsDtos;
     }
@@ -159,12 +133,12 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         //每个图片储存一条商品图片表信息
         for(int i=0;i<param.getImgUrls().length;i++){
             if(i == 0){
-                saveGoodsPicOne(goodsInfo.getId(),param.getImgUrls()[i],param.getType(),1);
+                saveGoodsPicOne(goodsInfo.getId(),param.getImgUrls()[i],1,i+1);
             }else{
-                saveGoodsPicOne(goodsInfo.getId(),param.getImgUrls()[i],param.getType(),2);
+                saveGoodsPicOne(goodsInfo.getId(),param.getImgUrls()[i],2,i+1);
             }
         }
-        return setDtoByGoodsInfo(goodsInfo);
+        return setDtoByGoodsInfo(null,goodsInfo);
     }
 
     /**
@@ -173,7 +147,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
      * @return
      * @throws ServiceException
      */
-    private GoodsDto setDtoByGoodsInfo(GoodsInfo goodsInfo) throws ServiceException{
+    private GoodsDto setDtoByGoodsInfo(Integer userId,GoodsInfo goodsInfo) throws ServiceException{
         if(goodsInfo == null){
             throw new ServiceException("获取商品失败！");
         }else{
@@ -188,6 +162,11 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                     goodsCommentDto.setToUserId((Integer)map.get("user_id"));
                     goodsCommentDto.setToUserHeadImgUrl((String)map.get("head_img_url"));
                     goodsCommentDto.setToUserName((String)map.get("nick_name"));
+                }
+                //获取每条评论是否点赞
+                CommentLikes commentLikes = commentLikesMapper.selectByUserId(userId, goodsCommentDto.getId());
+                if(commentLikes != null){
+                    goodsCommentDto.setIsLike(1);
                 }
             }
 
@@ -219,7 +198,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     @Override
     public void deleteGoods(Integer[] goodsIds) throws ServiceException {
         //TODO 如果商品存在用户议价，取消所有议价并返还用户余额？
-        //TODO 删除商品所有评论
+        //TODO 删除商品所有评论？
         //批量修改商品状态为删除
         for(Integer goodsId:goodsIds){
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
@@ -302,7 +281,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         GoodsDto goodsDto;
         //是否收藏/关注 1未关注未收藏（商品/抢购） 2已关注未收藏(抢购) 3未关注已收藏（商品/抢购） 4已关注已收藏(抢购)
         if(goodsInfos != null && goodsInfos.size() > 0){
-            goodsDto = setDtoByGoodsInfo(goodsInfos.get(0));
+            goodsDto = setDtoByGoodsInfo(userId,goodsInfos.get(0));
             if(goodsInfos.size()>1){
                 goodsDto.setIsCollect(4);
             }else{
@@ -316,7 +295,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             }
         }else{
             goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
-            goodsDto = setDtoByGoodsInfo(goodsInfo);
+            goodsDto = setDtoByGoodsInfo(null,goodsInfo);
             goodsDto.setIsCollect(1);
         }
         //是否官方认证
@@ -340,7 +319,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         if(goodsInfo == null){
             throw new ServiceException("获取商品失败！");
         }
-        GoodsDto goodsDto = setDtoByGoodsInfo(goodsInfo);
+        GoodsDto goodsDto = setDtoByGoodsInfo(null,goodsInfo);
         //是否官方认证
         Map<String, Object> goodsUserInfoExtAndVip = goodsInfoMapper.getGoodsUserInfoExtAndVip(goodsId);
         if(goodsUserInfoExtAndVip != null){
@@ -371,7 +350,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             //获取商品的分类集合
             List<GoodsDto> goodsDtos = new ArrayList<>();
             for(GoodsInfo model:goodsInfos){
-                goodsDtos.add(setDtoByGoodsInfo(model));
+                goodsDtos.add(setDtoByGoodsInfo(null,model));
             }
             return goodsDtos;
         }

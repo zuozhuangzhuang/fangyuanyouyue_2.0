@@ -36,5 +36,5 @@ public interface CartService {
      * @return
      * @throws ServiceException
      */
-    List<GoodsDto> choice(Integer userId) throws ServiceException;
+    List<GoodsDto> choice(Integer userId,Integer start,Integer limit) throws ServiceException;
 }

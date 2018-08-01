@@ -28,8 +28,10 @@ import com.fangyuanyouyue.goods.model.GoodsInfo;
 import com.fangyuanyouyue.goods.model.UserInfo;
 import com.fangyuanyouyue.goods.service.CollectService;
 import com.fangyuanyouyue.goods.service.SchedualUserService;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service(value = "collectService")
+@Transactional(rollbackFor=Exception.class)
 public class CollectServiceImpl implements CollectService{
     @Autowired
     private CollectMapper collectMapper;

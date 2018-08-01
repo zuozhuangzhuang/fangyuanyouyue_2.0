@@ -199,15 +199,14 @@ public class GoodsController extends BaseController{
             if((Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            if(param.getGoodsIds().length<1){
+            if(param.getGoodsIds() != null && param.getGoodsIds().length<1){
                 return toError(ReCode.FAILD.getValue(),"商品ID不能为空！");
             }
             for(Integer goodsId:param.getGoodsIds()){
-                //TODO 依次查询商品是否有未完成订单，有订单则不能删
+                //依次查询商品是否有未完成订单，有订单则不能删
                 GoodsInfo goodsInfo = goodsInfoService.selectByPrimaryKey(goodsId);
-                if(false){
-
-                    return toError(ReCode.FAILD.getValue(),"商品"+goodsInfo.getName()+"存在未完成订单，请勿删除！");
+                if(goodsInfo.getStatus() == 2){
+                    return toError(ReCode.FAILD.getValue(),"商品【"+goodsInfo.getName()+"】存在未完成订单，请勿删除！");
                 }
             }
 

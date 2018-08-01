@@ -8,6 +8,8 @@ import java.util.Map;
  * 商品评论Dto
  */
 public class GoodsCommentDto {
+    //评论点赞状态
+    private Integer isLike = 2;//评论是否点赞 1已点赞 2未点赞
     //GoodsComment
     private Integer id;//评论ID
 
@@ -188,5 +190,13 @@ public class GoodsCommentDto {
 
     public void setToUserHeadImgUrl(String toUserHeadImgUrl) {
         this.toUserHeadImgUrl = toUserHeadImgUrl;
+    }
+
+    public Integer getIsLike() {
+        return isLike;
+    }
+
+    public void setIsLike(Integer isLike) {
+        this.isLike = isLike;
     }
 }

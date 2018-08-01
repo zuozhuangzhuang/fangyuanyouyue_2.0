@@ -12,8 +12,10 @@ import com.fangyuanyouyue.user.model.UserInfo;
 import com.fangyuanyouyue.user.model.UserInfoExt;
 import com.fangyuanyouyue.user.service.UserInfoExtService;
 import com.fangyuanyouyue.user.service.UserInfoService;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service(value = "userInfoExtService")
+@Transactional(rollbackFor=Exception.class)
 public class UserInfoExtServiceImpl implements UserInfoExtService {
 
     @Autowired

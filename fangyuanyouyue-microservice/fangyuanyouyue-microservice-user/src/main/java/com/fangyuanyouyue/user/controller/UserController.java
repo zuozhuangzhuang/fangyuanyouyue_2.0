@@ -312,7 +312,7 @@ public class UserController extends BaseController {
             }
             //TODO 完善资料
             userInfoService.modify(param);
-            return toSuccess("完善资料成功");
+            return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());

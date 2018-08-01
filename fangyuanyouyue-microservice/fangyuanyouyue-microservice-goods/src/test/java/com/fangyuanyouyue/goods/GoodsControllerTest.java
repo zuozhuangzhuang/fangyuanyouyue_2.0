@@ -103,8 +103,8 @@ public class GoodsControllerTest {
     @Transactional
     public void deleteGoods() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/goods/deleteGoods")
-                .param("token","10025FY1531851479276")
-                .param("goodsInfoIds","1,2,3")
+                .param("token","10025FY1532974762055")
+                .param("goodsIds","1,2,3")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

@@ -15,8 +15,10 @@ import com.fangyuanyouyue.goods.dto.BargainDto;
 import com.fangyuanyouyue.goods.model.GoodsBargain;
 import com.fangyuanyouyue.goods.model.GoodsInfo;
 import com.fangyuanyouyue.goods.service.BargainService;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service(value = "bargainService")
+@Transactional(rollbackFor=Exception.class)
 public class BargainServiceImpl implements BargainService{
     @Autowired
     private GoodsBargainMapper goodsBargainMapper;

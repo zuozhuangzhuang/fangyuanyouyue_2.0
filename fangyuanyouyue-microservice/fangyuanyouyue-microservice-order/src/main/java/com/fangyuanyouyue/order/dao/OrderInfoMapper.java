@@ -20,5 +20,30 @@ public interface OrderInfoMapper {
 
     int updateByPrimaryKey(OrderInfo record);
 
-    List<OrderInfo> getListByUserIdTypeStatus(@Param("userId")Integer userId,@Param("start") Integer start,@Param("limit")Integer limit,@Param("type")Integer type,@Param("status")Integer status);
+    /**
+     * 获取订单列表
+     * @param userId
+     * @param start
+     * @param limit
+     * @param status
+     * @return
+     */
+    List<OrderInfo> getListByUserIdStatus(@Param("userId")Integer userId, @Param("start") Integer start, @Param("limit")Integer limit, @Param("status")Integer status);
+
+    /**
+     * 根据卖家获取订单列表
+     * @param userId
+     * @param start
+     * @param limit
+     * @param status
+     * @return
+     */
+    List<OrderInfo> getOrderBySellerId(@Param("userId")Integer userId, @Param("start") Integer start, @Param("limit")Integer limit, @Param("status")Integer status);
+
+    /**
+     * 获取总订单的子订单
+     * @param userId
+     * @return
+     */
+    List<OrderInfo> selectChildOrderByOrderId(@Param("userId")Integer userId,@Param("mainOrderId")Integer mainOrderId);
 }

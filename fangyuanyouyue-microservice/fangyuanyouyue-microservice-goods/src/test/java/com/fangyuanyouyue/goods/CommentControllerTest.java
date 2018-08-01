@@ -72,9 +72,10 @@ public class CommentControllerTest {
     public void commentLikes() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/comment/commentLikes")
                 //用户token：notNull
-                .param("token","10025FY1531851479276")
+                .param("token","10025FY1532974762055")
                 //评论id
-                .param("commentId","8")
+                .param("commentId","2")
+                .param("type","1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

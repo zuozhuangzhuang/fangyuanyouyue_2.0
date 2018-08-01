@@ -151,10 +151,12 @@ public class CartController extends BaseController{
     }
 
 
-    //移出购物车
+    //精选
     @ApiOperation(value = "精选", notes = "(GoodsDto)购物车内的精选推荐",response = BaseResp.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/choice")
     @ResponseBody
@@ -172,8 +174,14 @@ public class CartController extends BaseController{
             if((Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
+            if(param.getStart() == null || param.getStart() < 0){
+                return toError(ReCode.FAILD.getValue(),"起始页数错误！");
+            }
+            if(param.getLimit() == null || param.getLimit() < 1){
+                return toError(ReCode.FAILD.getValue(),"每页个数错误！");
+            }
             //精选
-            List<GoodsDto> goodsDtos = cartService.choice(userId);
+            List<GoodsDto> goodsDtos = cartService.choice(userId,param.getStart(),param.getLimit());
             return toSuccess(goodsDtos);
         } catch (ServiceException e) {
             e.printStackTrace();

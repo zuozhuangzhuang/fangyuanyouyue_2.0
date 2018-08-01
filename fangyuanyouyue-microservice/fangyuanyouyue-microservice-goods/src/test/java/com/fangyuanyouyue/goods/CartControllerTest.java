@@ -60,7 +60,7 @@ public class CartControllerTest {
     @Transactional
     public void getCart() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/cart/getCart")
-                .param("token","10024FY1531855810000")
+                .param("token","10025FY1532740241270")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -77,6 +77,22 @@ public class CartControllerTest {
         mvc.perform(MockMvcRequestBuilders.post("/cart/cartRemove")
                 .param("token","10025FY1531851479276")
                 .param("cartDetailIds","1,2,3")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 精选
+     * @throws Exception
+     */
+    @Test
+    @Transactional
+    public void choice() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/cart/choice")
+                .param("token","10025FY1532974762055")
+                .param("start","0")
+                .param("limit","10")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

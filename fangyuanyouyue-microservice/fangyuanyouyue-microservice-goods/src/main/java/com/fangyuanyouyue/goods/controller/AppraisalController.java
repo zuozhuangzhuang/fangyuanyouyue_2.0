@@ -5,6 +5,7 @@ import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.goods.dto.OrderDto;
 import com.fangyuanyouyue.goods.param.GoodsParam;
 import com.fangyuanyouyue.goods.service.AppraisalService;
 import com.fangyuanyouyue.goods.service.CartService;
@@ -43,7 +44,7 @@ public class AppraisalController extends BaseController{
     @Autowired
     private SchedualRedisService schedualRedisService;
 
-    @ApiOperation(value = "申请鉴定", notes = "(void)申请鉴定分为四种情况：1.卖家对自己商品进行鉴定，可显示到商品详情中 " +
+    @ApiOperation(value = "申请鉴定", notes = "(OrderDto)申请鉴定分为四种情况：1.卖家对自己商品进行鉴定，可显示到商品详情中 " +
             "2.买家对别人的商品进行鉴定，只能自己看到 3.用户上传图片鉴定图片中的物品(这个是全民鉴定还是官方鉴定) " +
             "4.官方认证店铺中的所有商品都是已鉴定",response = BaseResp.class)
     @ApiImplicitParams({
@@ -74,9 +75,9 @@ public class AppraisalController extends BaseController{
                     toError(ReCode.FAILD.getValue(),"至少包含一张图片或一段视频！");
                 }
             }
-            //TODO 申请鉴定，需要生成订单并返回订单信息
-            appraisalService.addAppraisal(userId,param.getGoodsIds(),param.getTitle(), param.getDescription(),param.getPrice(),param.getImgUrl());
-            return toSuccess( "申请鉴定成功！");
+            //申请鉴定，需要生成订单并返回订单信息
+            OrderDto orderDto = appraisalService.addAppraisal(userId, param.getGoodsIds(), param.getTitle(), param.getDescription(), param.getImgUrl(),param.getVideoUrl());
+            return toSuccess(orderDto);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());

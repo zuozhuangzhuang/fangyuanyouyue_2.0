@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.fangyuanyouyue.order.dao.OrderDetailMapper">
-  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.order.model.OrderDetail">
+<mapper namespace="com.fangyuanyouyue.goods.dao.OrderDetailMapper">
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.goods.model.OrderDetail">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="user_id" jdbcType="INTEGER" property="userId" />
     <result column="order_id" jdbcType="INTEGER" property="orderId" />
@@ -16,7 +16,7 @@
     <result column="price" jdbcType="DECIMAL" property="price" />
     <result column="seller_id" jdbcType="INTEGER" property="sellerId" />
   </resultMap>
-  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.order.model.OrderDetail">
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.goods.model.OrderDetail">
     <result column="description" jdbcType="LONGVARCHAR" property="description" />
   </resultMap>
   <sql id="Base_Column_List">
@@ -38,7 +38,7 @@
     delete from order_detail
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.order.model.OrderDetail" useGeneratedKeys="true" keyProperty="id">
+  <insert id="insert" parameterType="com.fangyuanyouyue.goods.model.OrderDetail">
     insert into order_detail (id, user_id, order_id, 
       goods_id, goods_name, add_time, 
       update_time, coupon_id, main_img_url, 
@@ -50,7 +50,7 @@
       #{orgprice,jdbcType=DECIMAL}, #{freight,jdbcType=DECIMAL}, #{price,jdbcType=DECIMAL}, 
       #{sellerId,jdbcType=INTEGER}, #{description,jdbcType=LONGVARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.order.model.OrderDetail">
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.goods.model.OrderDetail">
     insert into order_detail
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -141,7 +141,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.order.model.OrderDetail">
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.goods.model.OrderDetail">
     update order_detail
     <set>
       <if test="userId != null">
@@ -186,7 +186,7 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.fangyuanyouyue.order.model.OrderDetail">
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.fangyuanyouyue.goods.model.OrderDetail">
     update order_detail
     set user_id = #{userId,jdbcType=INTEGER},
       order_id = #{orderId,jdbcType=INTEGER},
@@ -203,7 +203,7 @@
       description = #{description,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.order.model.OrderDetail">
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.goods.model.OrderDetail">
     update order_detail
     set user_id = #{userId,jdbcType=INTEGER},
       order_id = #{orderId,jdbcType=INTEGER},
@@ -219,13 +219,4 @@
       seller_id = #{sellerId,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
-
-  <select id="selectByOrderId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from order_detail
-    <where>
-      <if test="orderId != null">
-        and order_id = #{orderId,jdbcType=INTEGER}
-      </if>
-    </where>
-  </select>
 </mapper>

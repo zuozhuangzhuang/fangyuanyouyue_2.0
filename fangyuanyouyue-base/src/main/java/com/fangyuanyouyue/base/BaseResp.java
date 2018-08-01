@@ -47,4 +47,12 @@ public class BaseResp implements Serializable {
 		this.data = data;
 	}
 
+	@Override
+	public String toString() {
+		return "BaseResp{" +
+				"code=" + code +
+				", report='" + report + '\'' +
+				", data=" + data +
+				'}';
+	}
 }

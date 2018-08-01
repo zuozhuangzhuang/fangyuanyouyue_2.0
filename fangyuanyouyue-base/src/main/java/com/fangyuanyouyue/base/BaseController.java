@@ -25,6 +25,7 @@ public class BaseController {
 		resp.setCode(ReCode.SUCCESS.getValue());
 		resp.setReport(ReCode.SUCCESS.getMessage());
 		resp.setData(object);
+		log.info("返回值："+resp.toString());
 		return resp;
 	}
 
@@ -38,6 +39,7 @@ public class BaseController {
 		BaseResp resp = new BaseResp();
 		resp.setCode(ReCode.SUCCESS.getValue());
 		resp.setReport(ReCode.SUCCESS.getMessage());
+        log.info("返回值："+resp.toString());
 		return resp;
 	}
 

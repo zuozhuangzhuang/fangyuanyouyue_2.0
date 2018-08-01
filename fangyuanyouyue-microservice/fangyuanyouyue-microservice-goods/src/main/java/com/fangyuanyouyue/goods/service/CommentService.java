@@ -12,20 +12,24 @@ public interface CommentService {
      * @param param
      * @throws ServiceException
      */
-    void addComment(GoodsParam param) throws ServiceException;
+    Integer addComment(GoodsParam param) throws ServiceException;
 
     /**
      * 评论点赞
+     * @param userId
      * @param commentId
      * @throws ServiceException
      */
-    void commentLikes(Integer commentId) throws ServiceException;
+    void commentLikes(Integer userId,Integer commentId,Integer type) throws ServiceException;
 
     /**
      * 查看全部评论
+     * @param userId
      * @param goodsId
+     * @param start
+     * @param limit
      * @return
      * @throws ServiceException
      */
-    List<GoodsCommentDto> getComments(Integer goodsId,Integer start,Integer limit) throws ServiceException;
+    List<GoodsCommentDto> getComments(Integer userId,Integer goodsId,Integer start,Integer limit) throws ServiceException;
 }

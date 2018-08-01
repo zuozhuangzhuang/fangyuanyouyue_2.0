@@ -33,6 +33,8 @@ public class OrderDetail {
 
     private String description;//商品描述
 
+    private Integer sellerId;//卖家ID
+
     public Integer getId() {
         return id;
     }
@@ -127,6 +129,14 @@ public class OrderDetail {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public Integer getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(Integer sellerId) {
+        this.sellerId = sellerId;
     }
 
     public String getDescription() {

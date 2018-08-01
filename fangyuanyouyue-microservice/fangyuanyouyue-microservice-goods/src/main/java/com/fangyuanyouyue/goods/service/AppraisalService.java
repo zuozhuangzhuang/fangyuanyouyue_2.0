@@ -1,19 +1,19 @@
 package com.fangyuanyouyue.goods.service;
 
-import java.math.BigDecimal;
-
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.goods.dto.OrderDto;
 
 public interface AppraisalService {
     /**
      * 申请鉴定
      * @param userId
      * @param goodsIds
-//     * @param type
      * @param title
      * @param description
-     * @param price
+     * @param imgUrl
+     * @param videoUrl
+     * @return
      * @throws ServiceException
      */
-    void addAppraisal(Integer userId, Integer[] goodsIds,  String title, String description, BigDecimal price,String imgUrl) throws ServiceException;
+    OrderDto addAppraisal(Integer userId, Integer[] goodsIds, String title, String description, String imgUrl,String videoUrl) throws ServiceException;
 }

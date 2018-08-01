@@ -16,8 +16,10 @@ import com.fangyuanyouyue.user.model.UserInfo;
 import com.fangyuanyouyue.user.service.SchedualRedisService;
 import com.fangyuanyouyue.user.service.UserAddressInfoService;
 import com.fangyuanyouyue.user.service.UserInfoService;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service(value = "userAddressInfoService")
+@Transactional(rollbackFor=Exception.class)
 public class UserAddressInfoServiceImpl implements UserAddressInfoService{
     @Autowired
     private UserInfoMapper userInfoMapper;
