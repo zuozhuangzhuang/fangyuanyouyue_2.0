@@ -61,7 +61,7 @@ public class OrderController extends BaseController{
             log.info("----》商品下单《----");
             log.info("参数："+param.toString());
             //参数判断
-            if(param.getGoodsIds()==null && param.getGoodsIds().length == 0){
+            if(param.getGoodsIds()==null || param.getGoodsIds().length == 0){
                 return toError("商品id不能为空！");
             }
             if(param.getAddressId()==null || param.getAddressId().intValue()==0){

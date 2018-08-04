@@ -32,13 +32,13 @@ public interface OrderInfoMapper {
 
     /**
      * 根据卖家获取订单列表
-     * @param userId
+     * @param sellerId
      * @param start
      * @param limit
      * @param status
      * @return
      */
-    List<OrderInfo> getOrderBySellerId(@Param("userId")Integer userId, @Param("start") Integer start, @Param("limit")Integer limit, @Param("status")Integer status);
+    List<OrderInfo> getOrderBySellerId(@Param("sellerId")Integer sellerId, @Param("start") Integer start, @Param("limit")Integer limit, @Param("status")Integer status);
 
     /**
      * 获取总订单的子订单

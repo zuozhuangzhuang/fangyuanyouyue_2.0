@@ -59,4 +59,9 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
         }
     }
 
+    @Override
+    public boolean userIsAuth(Integer userId) throws ServiceException {
+        UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(userId);
+        return userInfoExt.getAuthType() == 1;
+    }
 }

@@ -90,11 +90,11 @@ public class OrderControllerTest {
     @Transactional
     public void myOrderList() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/order/myOrderList")
-                .param("token","10025FY1533082419307")
+                .param("token","10025FY1533144562288")
                 .param("start","0")
                 .param("limit","10")
                 //类型 1买家（我买下的） 2卖家（我卖出的）
-                .param("type","1")
+                .param("type","2")
                 //订单状态 0全部 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
                 .param("status","0")
                 .accept(MediaType.APPLICATION_JSON))

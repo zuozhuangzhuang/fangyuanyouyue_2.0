@@ -27,7 +27,7 @@
     delete from order_info
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.goods.model.OrderInfo">
+  <insert id="insert" parameterType="com.fangyuanyouyue.goods.model.OrderInfo"  useGeneratedKeys="true" keyProperty="id">
     insert into order_info (id, user_id, main_order_id, 
       order_no, amount, count, 
       status, add_time, update_time, 

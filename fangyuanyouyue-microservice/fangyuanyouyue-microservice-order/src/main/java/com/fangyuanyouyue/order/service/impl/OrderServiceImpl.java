@@ -50,6 +50,7 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public OrderDto saveOrder(String token,Integer[] goodsIds, Integer userId, Integer addressId,Integer type) throws ServiceException {
+        // FIXME: 2018/8/3 邮费计算错误
         //获取收货地址
         String result = schedualUserService.getAddressList(token,addressId);
         JSONArray addressArray = JSONArray.parseArray(JSONObject.parseObject(result).getString("data"));
@@ -75,7 +76,7 @@ public class OrderServiceImpl implements OrderService{
 
         BigDecimal amount = new BigDecimal(0);//原价，初始为0
         BigDecimal payAmount = new BigDecimal(0);//实际支付金额,初始为0
-        BigDecimal freight = new BigDecimal(0);//邮费，初始为0
+        BigDecimal payFreight = new BigDecimal(0);//总邮费，初始为0
         orderInfo.setAmount(amount);
         orderInfo.setCount(goodsIds.length);
         orderInfo.setStatus(1);//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
@@ -86,12 +87,15 @@ public class OrderServiceImpl implements OrderService{
         orderPay.setOrderId(orderInfo.getId());
         orderPay.setReceiverName(addressInfo.getReceiverName());
         orderPay.setReceiverPhone(addressInfo.getReceiverPhone());
+        orderPay.setProvince(addressInfo.getProvince());
+        orderPay.setCity(addressInfo.getCity());
+        orderPay.setArea(addressInfo.getArea());
         orderPay.setAddress(addressInfo.getAddress());
         orderPay.setPostCode(addressInfo.getPostCode());
         orderPay.setOrderNo(orderInfo.getOrderNo());
         orderPay.setAmount(amount);
         orderPay.setPayAmount(payAmount);
-        orderPay.setFreight(freight);//运费金额，初始化为0
+        orderPay.setFreight(payFreight);//运费金额，初始化为0
         orderPay.setCount(goodsIds.length);
         orderPay.setStatus(1);//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
         orderPay.setAddTime(DateStampUtils.getTimesteamp());
@@ -101,7 +105,8 @@ public class OrderServiceImpl implements OrderService{
         //卖家DTO列表
         List<SellerDto> sellerDtos = new ArrayList<>();
         Map<Integer,List<GoodsInfo>> sellerGoods = new HashMap<>();
-        if(type == 1){//状态 1普通商品
+        if(type == 1){
+            //状态 1普通商品
             for(Integer goodsId:goodsIds){
                 GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(goodsId)).getString("data")),GoodsInfo.class);
                 if(goods == null){
@@ -111,6 +116,7 @@ public class OrderServiceImpl implements OrderService{
                     if(goods.getStatus() != 1){//非出售中商品
                         throw new ServiceException("商品中包含已售出商品！");
                     }
+                    BigDecimal freight = new BigDecimal(0);//邮费，初始为0
                     //计算总订单总金额
                     //每个商品生成一个订单详情表
                     OrderDetail orderDetail = new OrderDetail();
@@ -125,10 +131,17 @@ public class OrderServiceImpl implements OrderService{
                     //商品主图
                     String goodsMainImg = JSONObject.parseObject(schedualGoodsService.goodsMainImg(goodsId)).getString("data");
                     orderDetail.setMainImgUrl(goodsMainImg);
-                    orderDetail.setPrice(goods.getPrice());
+                    orderDetail.setAmount(goods.getPrice());
                     //TODO 计算优惠券（每个商品都可以使用优惠券）
-                    orderDetail.setOrgprice(goods.getPrice());
-                    orderDetail.setFreight(goods.getPostage());
+                    //取运费最高者计算
+                    if(goods.getPostage().compareTo(freight) > 0){
+                        freight = goods.getPostage();
+                        orderDetail.setFreight(freight);
+                    }else{//如果不是最高邮费，就设置为0
+                        orderDetail.setFreight(new BigDecimal(0));
+                    }
+                    //实际支付加上邮费
+                    orderDetail.setPayAmount(goods.getPrice().add(orderDetail.getFreight()));
                     orderDetail.setDescription(goods.getDescription());
                     orderDetailMapper.insert(orderDetail);
                     //修改商品的状态为已售出
@@ -160,15 +173,14 @@ public class OrderServiceImpl implements OrderService{
                     }
                     goodsList.add(goods);
 
+                    payFreight = payFreight.add(orderDetailDto.getFreight());//总邮费
+                    amount = amount.add(orderDetailDto.getAmount());//原价
+                    payAmount = payAmount.add(orderDetailDto.getPayAmount());//实际支付
 
-                    amount = amount.add(orderDetailDto.getOrgPrice());//原价
-                    payAmount = payAmount.add(orderDetailDto.getPrice());//实际支付
-                    //取运费最高者计算
-                    if(freight.compareTo(goods.getPostage()) > 0){
-                        freight = goods.getPostage();
-                    }
                 }
             }
+            //删除买家购物车内此商品信息:goodsFeign/cartRemove
+            schedualGoodsService.cartRemove(userId,goodsIds);
         }else if(type == 2){// 2抢购商品
             GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(goodsIds[0])).getString("data")),GoodsInfo.class);
             if(goods == null){
@@ -190,10 +202,12 @@ public class OrderServiceImpl implements OrderService{
                 //商品主图
                 String goodsMainImg = JSONObject.parseObject(schedualGoodsService.goodsMainImg(goodsIds[0])).getString("data");
                 orderDetail.setMainImgUrl(goodsMainImg);
-                orderDetail.setPrice(goods.getPrice());
+                orderDetail.setAmount(goods.getPrice());
                 //TODO 计算优惠券（每个商品都可以使用优惠券）
-                orderDetail.setOrgprice(goods.getPrice());
+                //抢购下单只有一件
                 orderDetail.setFreight(goods.getPostage());
+                //实际支付加上邮费
+                orderDetail.setPayAmount(goods.getPrice().add(orderDetail.getFreight()));
                 orderDetail.setDescription(goods.getDescription());
                 orderDetailMapper.insert(orderDetail);
                 //修改商品的状态为已售出
@@ -217,13 +231,9 @@ public class OrderServiceImpl implements OrderService{
                 if(flag){
                     sellerDtos.add(sellerDto);
                 }
-
-                amount = amount.add(orderDetailDto.getOrgPrice());//实际支付
-                payAmount = payAmount.add(orderDetailDto.getPrice());//原价
-                //取运费最高者计算
-                if(freight.compareTo(goods.getPostage()) > 0){
-                    freight = goods.getPostage();
-                }
+                payFreight = payFreight.add(orderDetailDto.getFreight());//总邮费
+                amount = amount.add(orderDetailDto.getAmount());//原价
+                payAmount = payAmount.add(orderDetailDto.getPayAmount());//实际支付
             }
         }else{
             throw new ServiceException("商品状态错误！");
@@ -235,7 +245,7 @@ public class OrderServiceImpl implements OrderService{
         separatesOrder(orderInfo,orderPay,sellerGoods);
         orderPay.setAmount(amount);
         orderPay.setPayAmount(payAmount);
-        orderPay.setFreight(freight);
+        orderPay.setFreight(payFreight);
         orderPayMapper.updateByPrimaryKey(orderPay);
 
 
@@ -248,10 +258,6 @@ public class OrderServiceImpl implements OrderService{
         return orderDto;
     }
 
-    /**
-     * 计算运费，
-     * @return
-     */
     /**
      * 生成子订单
      * @param mainOrder 提供订单信息
@@ -278,7 +284,7 @@ public class OrderServiceImpl implements OrderService{
 
             BigDecimal amount = new BigDecimal(0);//原价，初始为0
             BigDecimal payAmount = new BigDecimal(0);//实际支付金额,初始为0
-            BigDecimal freight = new BigDecimal(0);//邮费，初始为0
+            BigDecimal payFreight = new BigDecimal(0);//总邮费，初始为0
             orderInfo.setAmount(amount);
             orderInfo.setCount(listMap.get(sellerId).size());
             orderInfo.setStatus(mainOrder.getStatus());//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
@@ -293,18 +299,22 @@ public class OrderServiceImpl implements OrderService{
             orderPay.setOrderId(orderInfo.getId());
             orderPay.setReceiverName(mainOrderPay.getReceiverName());
             orderPay.setReceiverPhone(mainOrderPay.getReceiverPhone());
+            orderPay.setProvince(mainOrderPay.getProvince());
+            orderPay.setCity(mainOrderPay.getCity());
+            orderPay.setArea(mainOrderPay.getArea());
             orderPay.setAddress(mainOrderPay.getAddress());
             orderPay.setPostCode(mainOrderPay.getPostCode());
             orderPay.setOrderNo(orderInfo.getOrderNo());
             orderPay.setAmount(amount);
             orderPay.setPayAmount(payAmount);
-            orderPay.setFreight(freight);//运费金额，初始化为0
+            orderPay.setFreight(payFreight);//运费金额，初始化为0
             orderPay.setCount(mainOrderPay.getCount());
             orderPay.setStatus(1);//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
             orderPay.setAddTime(DateStampUtils.getTimesteamp());
             orderPayMapper.insert(orderPay);
             //订单详情，出现在这里的商品都是正常的商品，不再做判断
             for(GoodsInfo goods:listMap.get(sellerId)){
+                BigDecimal freight = new BigDecimal(0);//邮费，初始为0
                 //计算总订单总金额
                 //每个商品生成一个订单详情表
                 OrderDetail orderDetail = new OrderDetail();
@@ -319,27 +329,29 @@ public class OrderServiceImpl implements OrderService{
                 //商品主图
                 String goodsMainImg = JSONObject.parseObject(schedualGoodsService.goodsMainImg(goods.getId())).getString("data");
                 orderDetail.setMainImgUrl(goodsMainImg);
-                orderDetail.setPrice(goods.getPrice());
+                orderDetail.setAmount(goods.getPrice());
                 //TODO 计算优惠券（每个商品都可以使用优惠券）
-                orderDetail.setOrgprice(goods.getPrice());
-                orderDetail.setFreight(goods.getPostage());
+                //取运费最高者计算
+                if(goods.getPostage().compareTo(freight) > 0){
+                    freight = goods.getPostage();
+                    orderDetail.setFreight(freight);
+                }else{//如果不是最高邮费，就设置为0
+                    orderDetail.setFreight(new BigDecimal(0));
+                }
+                //实际支付加上邮费
+                orderDetail.setPayAmount(goods.getPrice().add(orderDetail.getFreight()));
                 orderDetail.setDescription(goods.getDescription());
                 orderDetailMapper.insert(orderDetail);
-                amount = amount.add(orderDetail.getOrgprice());//原价
-                payAmount = payAmount.add(orderDetail.getPrice());//实际支付
-                //取运费最高者计算
-                if(freight.compareTo(goods.getPostage()) > 0){
-                    freight = goods.getPostage();
-                }
+                payFreight = payFreight.add(orderDetail.getFreight());
+                amount = amount.add(orderDetail.getAmount());//原价
+                payAmount = payAmount.add(orderDetail.getPayAmount());//实际支付
             }
             orderInfo.setAmount(amount);
             orderInfoMapper.updateByPrimaryKey(orderInfo);
-            //原价
-            orderPay.setAmount(amount);
-            //实际支付
-            orderPay.setPayAmount(payAmount);
-            //邮费
-            orderPay.setFreight(freight);
+
+            orderPay.setAmount(amount);//原价
+            orderPay.setPayAmount(payAmount);//实际支付
+            orderPay.setFreight(payFreight);//总邮费
             orderPayMapper.updateByPrimaryKey(orderPay);
         }
     }
@@ -397,6 +409,13 @@ public class OrderServiceImpl implements OrderService{
             OrderDto orderDto = new OrderDto(orderInfo);
             orderDto.setOrderPayDto(orderPayDto);
             ArrayList<OrderDetailDto> orderDetailDtos = OrderDetailDto.toDtoList(orderDetails,orderPay.getStatus());
+//            for(OrderDetailDto orderDetailDto:orderDetailDtos){
+//                if(orderDetailDto.getFreight().compareTo(new BigDecimal(0)) > 0){
+//                    //订单详情DTO邮费为0则说明邮费不是最高或者邮费为0
+//                    //支付表中加上此邮费
+//                    orderPayDto.getFreight().add(orderDetailDto.getFreight());
+//                }
+//            }
             orderDto.setOrderDetailDtos(orderDetailDtos);
 
             orderDto.setNickName(user.getNickName());

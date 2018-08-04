@@ -16,4 +16,12 @@ public interface UserInfoExtService {
      * @throws ServiceException
      */
     void certification(String token, String name, String identity, String identityImgCoverUrl, String identityImgBackUrl) throws ServiceException;
+
+    /**
+     * 用户是否官方认证
+     * @param userId
+     * @return
+     * @throws ServiceException
+     */
+    boolean userIsAuth(Integer userId) throws ServiceException;
 }

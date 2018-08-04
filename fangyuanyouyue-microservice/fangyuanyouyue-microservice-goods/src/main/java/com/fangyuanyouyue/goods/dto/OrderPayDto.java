@@ -16,6 +16,12 @@ public class OrderPayDto {
 
     private String receiverPhone;//收货人手机
 
+    private String province;//省份
+
+    private String city;//城市
+
+    private String area;//区域
+
     private String address;//详细地址
 
     private String postCode;//邮政编码
@@ -39,6 +45,9 @@ public class OrderPayDto {
         this.orderId = orderPay.getOrderId();
         this.receiverName = orderPay.getReceiverName();
         this.receiverPhone = orderPay.getReceiverPhone();
+        this.province = orderPay.getProvince();
+        this.city = orderPay.getCity();
+        this.area = orderPay.getArea();
         this.address = orderPay.getAddress();
         this.postCode = orderPay.getPostCode();
         this.orderNo = orderPay.getOrderNo();
@@ -146,5 +155,29 @@ public class OrderPayDto {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getArea() {
+        return area;
+    }
+
+    public void setArea(String area) {
+        this.area = area;
     }
 }

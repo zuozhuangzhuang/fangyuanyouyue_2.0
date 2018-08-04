@@ -19,4 +19,9 @@ public class SchedualGoodsServiceImpl implements SchedualGoodsService{
     public String goodsMainImg(Integer goodsId) {
         return "系统繁忙，请稍后重试！";
     }
+
+    @Override
+    public String cartRemove(Integer userId, Integer[] goodsIds) {
+        return "系统繁忙，请稍后重试！";
+    }
 }

@@ -2,7 +2,6 @@ package com.fangyuanyouyue.goods.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
-
 /**
  * 订单详情DTO
  */
@@ -25,11 +24,11 @@ public class OrderDetail {
 
     private String mainImgUrl;//商品主图
 
-    private BigDecimal orgprice;//商品原价
+    private BigDecimal amount;//商品原价
 
     private BigDecimal freight;//运送费
 
-    private BigDecimal price;//实际支付金额
+    private BigDecimal payAmount;//实际支付金额
 
     private String description;//商品描述
 
@@ -107,12 +106,12 @@ public class OrderDetail {
         this.mainImgUrl = mainImgUrl == null ? null : mainImgUrl.trim();
     }
 
-    public BigDecimal getOrgprice() {
-        return orgprice;
+    public BigDecimal getAmount() {
+        return amount;
     }
 
-    public void setOrgprice(BigDecimal orgprice) {
-        this.orgprice = orgprice;
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
     }
 
     public BigDecimal getFreight() {
@@ -123,12 +122,12 @@ public class OrderDetail {
         this.freight = freight;
     }
 
-    public BigDecimal getPrice() {
-        return price;
+    public BigDecimal getPayAmount() {
+        return payAmount;
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
+    public void setPayAmount(BigDecimal payAmount) {
+        this.payAmount = payAmount;
     }
 
     public Integer getSellerId() {

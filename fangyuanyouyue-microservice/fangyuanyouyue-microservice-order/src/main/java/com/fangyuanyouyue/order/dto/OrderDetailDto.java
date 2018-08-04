@@ -10,7 +10,7 @@ import java.util.List;
  * 订单详情表DTO
  */
 public class OrderDetailDto {
-    private Integer userId;//卖家id
+    private Integer userId;//买家id
 
     private Integer orderId;//订单id
 
@@ -18,9 +18,9 @@ public class OrderDetailDto {
 
     private String goodsName;//商品标题
 
-    private BigDecimal price;//商品价格
+    private BigDecimal amount;//商品价格
 
-    private BigDecimal orgPrice;//商品原价
+    private BigDecimal payAmount;//商品原价
 
     private BigDecimal freight;//运送费
 
@@ -43,8 +43,8 @@ public class OrderDetailDto {
         this.goodsId = orderDetail.getGoodsId();
         this.goodsName = orderDetail.getGoodsName();
         this.iconImg = orderDetail.getMainImgUrl();
-        this.price = orderDetail.getPrice();
-        this.orgPrice = orderDetail.getOrgprice();
+        this.amount = orderDetail.getAmount();
+        this.payAmount = orderDetail.getPayAmount();
         this.freight = orderDetail.getFreight();
         this.status = status;
         this.description = orderDetail.getDescription();
@@ -94,20 +94,20 @@ public class OrderDetailDto {
         this.goodsName = goodsName;
     }
 
-    public BigDecimal getPrice() {
-        return price;
+    public BigDecimal getAmount() {
+        return amount;
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
     }
 
-    public BigDecimal getOrgPrice() {
-        return orgPrice;
+    public BigDecimal getPayAmount() {
+        return payAmount;
     }
 
-    public void setOrgPrice(BigDecimal orgPrice) {
-        this.orgPrice = orgPrice;
+    public void setPayAmount(BigDecimal payAmount) {
+        this.payAmount = payAmount;
     }
 
     public BigDecimal getFreight() {

@@ -17,6 +17,11 @@ public class SchedualUserServiceImpl implements SchedualUserService{
     }
 
     @Override
+    public String userIsAuth(Integer userId) {
+        return "系统繁忙，请稍后重试！";
+    }
+
+    @Override
     public String verifyUserByUnionId(String unionId, Integer type) {
         return "系统繁忙，请稍后重试！";
     }

@@ -1,7 +1,9 @@
 package com.fangyuanyouyue.goods.dao;
 
 import com.fangyuanyouyue.goods.model.OrderPay;
+import org.apache.ibatis.annotations.Mapper;
 
+@Mapper
 public interface OrderPayMapper {
     int deleteByPrimaryKey(Integer id);
 

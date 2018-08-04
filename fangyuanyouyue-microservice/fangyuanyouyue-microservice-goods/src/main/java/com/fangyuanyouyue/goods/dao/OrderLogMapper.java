@@ -1,7 +1,9 @@
 package com.fangyuanyouyue.goods.dao;
 
 import com.fangyuanyouyue.goods.model.OrderLog;
+import org.apache.ibatis.annotations.Mapper;
 
+@Mapper
 public interface OrderLogMapper {
     int deleteByPrimaryKey(Integer id);
 

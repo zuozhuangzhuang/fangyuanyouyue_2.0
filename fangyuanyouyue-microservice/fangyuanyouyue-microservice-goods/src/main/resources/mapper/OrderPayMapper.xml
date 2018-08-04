@@ -1,42 +1,46 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.fangyuanyouyue.goods.dao.OrderPayMapper" >
-  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.goods.model.OrderPay" >
-    <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="order_id" property="orderId" jdbcType="INTEGER" />
-    <result column="receiver_name" property="receiverName" jdbcType="VARCHAR" />
-    <result column="receiver_phone" property="receiverPhone" jdbcType="VARCHAR" />
-    <result column="address" property="address" jdbcType="VARCHAR" />
-    <result column="post_code" property="postCode" jdbcType="VARCHAR" />
-    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
-    <result column="amount" property="amount" jdbcType="DECIMAL" />
-    <result column="pay_amount" property="payAmount" jdbcType="DECIMAL" />
-    <result column="freight" property="freight" jdbcType="DECIMAL" />
-    <result column="count" property="count" jdbcType="INTEGER" />
-    <result column="pay_type" property="payType" jdbcType="INTEGER" />
-    <result column="pay_no" property="payNo" jdbcType="VARCHAR" />
-    <result column="pay_time" property="payTime" jdbcType="VARCHAR" />
-    <result column="send_type" property="sendType" jdbcType="INTEGER" />
-    <result column="logistic_status" property="logisticStatus" jdbcType="INTEGER" />
-    <result column="logistic_code" property="logisticCode" jdbcType="VARCHAR" />
-    <result column="logistic_company" property="logisticCompany" jdbcType="VARCHAR" />
-    <result column="remarks" property="remarks" jdbcType="VARCHAR" />
-    <result column="status" property="status" jdbcType="INTEGER" />
-    <result column="add_time" property="addTime" jdbcType="TIMESTAMP" />
-    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangyuanyouyue.goods.dao.OrderPayMapper">
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.goods.model.OrderPay">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="order_id" jdbcType="INTEGER" property="orderId" />
+    <result column="receiver_name" jdbcType="VARCHAR" property="receiverName" />
+    <result column="receiver_phone" jdbcType="VARCHAR" property="receiverPhone" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="post_code" jdbcType="VARCHAR" property="postCode" />
+    <result column="order_no" jdbcType="VARCHAR" property="orderNo" />
+    <result column="amount" jdbcType="DECIMAL" property="amount" />
+    <result column="pay_amount" jdbcType="DECIMAL" property="payAmount" />
+    <result column="freight" jdbcType="DECIMAL" property="freight" />
+    <result column="count" jdbcType="INTEGER" property="count" />
+    <result column="pay_type" jdbcType="INTEGER" property="payType" />
+    <result column="pay_no" jdbcType="VARCHAR" property="payNo" />
+    <result column="pay_time" jdbcType="VARCHAR" property="payTime" />
+    <result column="send_type" jdbcType="INTEGER" property="sendType" />
+    <result column="logistic_status" jdbcType="INTEGER" property="logisticStatus" />
+    <result column="logistic_code" jdbcType="VARCHAR" property="logisticCode" />
+    <result column="logistic_company" jdbcType="VARCHAR" property="logisticCompany" />
+    <result column="remarks" jdbcType="VARCHAR" property="remarks" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="province" jdbcType="VARCHAR" property="province" />
+    <result column="city" jdbcType="VARCHAR" property="city" />
+    <result column="area" jdbcType="VARCHAR" property="area" />
   </resultMap>
-  <sql id="Base_Column_List" >
+  <sql id="Base_Column_List">
     id, order_id, receiver_name, receiver_phone, address, post_code, order_no, amount, 
     pay_amount, freight, count, pay_type, pay_no, pay_time, send_type, logistic_status, 
-    logistic_code, logistic_company, remarks, status, add_time, update_time
+    logistic_code, logistic_company, remarks, status, add_time, update_time, province, 
+    city, area
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from order_pay
     where id = #{id,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from order_pay
     where id = #{id,jdbcType=INTEGER}
   </delete>
@@ -48,7 +52,8 @@
       pay_no, pay_time, send_type, 
       logistic_status, logistic_code, logistic_company, 
       remarks, status, add_time, 
-      update_time)
+      update_time, province, city, 
+      area)
     values (#{id,jdbcType=INTEGER}, #{orderId,jdbcType=INTEGER}, #{receiverName,jdbcType=VARCHAR}, 
       #{receiverPhone,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{postCode,jdbcType=VARCHAR}, 
       #{orderNo,jdbcType=VARCHAR}, #{amount,jdbcType=DECIMAL}, #{payAmount,jdbcType=DECIMAL}, 
@@ -56,217 +61,245 @@
       #{payNo,jdbcType=VARCHAR}, #{payTime,jdbcType=VARCHAR}, #{sendType,jdbcType=INTEGER}, 
       #{logisticStatus,jdbcType=INTEGER}, #{logisticCode,jdbcType=VARCHAR}, #{logisticCompany,jdbcType=VARCHAR}, 
       #{remarks,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP})
+      #{updateTime,jdbcType=TIMESTAMP}, #{province,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR}, 
+      #{area,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.goods.model.OrderPay" >
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.goods.model.OrderPay">
     insert into order_pay
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         id,
       </if>
-      <if test="orderId != null" >
+      <if test="orderId != null">
         order_id,
       </if>
-      <if test="receiverName != null" >
+      <if test="receiverName != null">
         receiver_name,
       </if>
-      <if test="receiverPhone != null" >
+      <if test="receiverPhone != null">
         receiver_phone,
       </if>
-      <if test="address != null" >
+      <if test="address != null">
         address,
       </if>
-      <if test="postCode != null" >
+      <if test="postCode != null">
         post_code,
       </if>
-      <if test="orderNo != null" >
+      <if test="orderNo != null">
         order_no,
       </if>
-      <if test="amount != null" >
+      <if test="amount != null">
         amount,
       </if>
-      <if test="payAmount != null" >
+      <if test="payAmount != null">
         pay_amount,
       </if>
-      <if test="freight != null" >
+      <if test="freight != null">
         freight,
       </if>
-      <if test="count != null" >
+      <if test="count != null">
         count,
       </if>
-      <if test="payType != null" >
+      <if test="payType != null">
         pay_type,
       </if>
-      <if test="payNo != null" >
+      <if test="payNo != null">
         pay_no,
       </if>
-      <if test="payTime != null" >
+      <if test="payTime != null">
         pay_time,
       </if>
-      <if test="sendType != null" >
+      <if test="sendType != null">
         send_type,
       </if>
-      <if test="logisticStatus != null" >
+      <if test="logisticStatus != null">
         logistic_status,
       </if>
-      <if test="logisticCode != null" >
+      <if test="logisticCode != null">
         logistic_code,
       </if>
-      <if test="logisticCompany != null" >
+      <if test="logisticCompany != null">
         logistic_company,
       </if>
-      <if test="remarks != null" >
+      <if test="remarks != null">
         remarks,
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         status,
       </if>
-      <if test="addTime != null" >
+      <if test="addTime != null">
         add_time,
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         update_time,
       </if>
+      <if test="province != null">
+        province,
+      </if>
+      <if test="city != null">
+        city,
+      </if>
+      <if test="area != null">
+        area,
+      </if>
     </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         #{id,jdbcType=INTEGER},
       </if>
-      <if test="orderId != null" >
+      <if test="orderId != null">
         #{orderId,jdbcType=INTEGER},
       </if>
-      <if test="receiverName != null" >
+      <if test="receiverName != null">
         #{receiverName,jdbcType=VARCHAR},
       </if>
-      <if test="receiverPhone != null" >
+      <if test="receiverPhone != null">
         #{receiverPhone,jdbcType=VARCHAR},
       </if>
-      <if test="address != null" >
+      <if test="address != null">
         #{address,jdbcType=VARCHAR},
       </if>
-      <if test="postCode != null" >
+      <if test="postCode != null">
         #{postCode,jdbcType=VARCHAR},
       </if>
-      <if test="orderNo != null" >
+      <if test="orderNo != null">
         #{orderNo,jdbcType=VARCHAR},
       </if>
-      <if test="amount != null" >
+      <if test="amount != null">
         #{amount,jdbcType=DECIMAL},
       </if>
-      <if test="payAmount != null" >
+      <if test="payAmount != null">
         #{payAmount,jdbcType=DECIMAL},
       </if>
-      <if test="freight != null" >
+      <if test="freight != null">
         #{freight,jdbcType=DECIMAL},
       </if>
-      <if test="count != null" >
+      <if test="count != null">
         #{count,jdbcType=INTEGER},
       </if>
-      <if test="payType != null" >
+      <if test="payType != null">
         #{payType,jdbcType=INTEGER},
       </if>
-      <if test="payNo != null" >
+      <if test="payNo != null">
         #{payNo,jdbcType=VARCHAR},
       </if>
-      <if test="payTime != null" >
+      <if test="payTime != null">
         #{payTime,jdbcType=VARCHAR},
       </if>
-      <if test="sendType != null" >
+      <if test="sendType != null">
         #{sendType,jdbcType=INTEGER},
       </if>
-      <if test="logisticStatus != null" >
+      <if test="logisticStatus != null">
         #{logisticStatus,jdbcType=INTEGER},
       </if>
-      <if test="logisticCode != null" >
+      <if test="logisticCode != null">
         #{logisticCode,jdbcType=VARCHAR},
       </if>
-      <if test="logisticCompany != null" >
+      <if test="logisticCompany != null">
         #{logisticCompany,jdbcType=VARCHAR},
       </if>
-      <if test="remarks != null" >
+      <if test="remarks != null">
         #{remarks,jdbcType=VARCHAR},
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         #{status,jdbcType=INTEGER},
       </if>
-      <if test="addTime != null" >
+      <if test="addTime != null">
         #{addTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="province != null">
+        #{province,jdbcType=VARCHAR},
+      </if>
+      <if test="city != null">
+        #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="area != null">
+        #{area,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.goods.model.OrderPay" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.goods.model.OrderPay">
     update order_pay
-    <set >
-      <if test="orderId != null" >
+    <set>
+      <if test="orderId != null">
         order_id = #{orderId,jdbcType=INTEGER},
       </if>
-      <if test="receiverName != null" >
+      <if test="receiverName != null">
         receiver_name = #{receiverName,jdbcType=VARCHAR},
       </if>
-      <if test="receiverPhone != null" >
+      <if test="receiverPhone != null">
         receiver_phone = #{receiverPhone,jdbcType=VARCHAR},
       </if>
-      <if test="address != null" >
+      <if test="address != null">
         address = #{address,jdbcType=VARCHAR},
       </if>
-      <if test="postCode != null" >
+      <if test="postCode != null">
         post_code = #{postCode,jdbcType=VARCHAR},
       </if>
-      <if test="orderNo != null" >
+      <if test="orderNo != null">
         order_no = #{orderNo,jdbcType=VARCHAR},
       </if>
-      <if test="amount != null" >
+      <if test="amount != null">
         amount = #{amount,jdbcType=DECIMAL},
       </if>
-      <if test="payAmount != null" >
+      <if test="payAmount != null">
         pay_amount = #{payAmount,jdbcType=DECIMAL},
       </if>
-      <if test="freight != null" >
+      <if test="freight != null">
         freight = #{freight,jdbcType=DECIMAL},
       </if>
-      <if test="count != null" >
+      <if test="count != null">
         count = #{count,jdbcType=INTEGER},
       </if>
-      <if test="payType != null" >
+      <if test="payType != null">
         pay_type = #{payType,jdbcType=INTEGER},
       </if>
-      <if test="payNo != null" >
+      <if test="payNo != null">
         pay_no = #{payNo,jdbcType=VARCHAR},
       </if>
-      <if test="payTime != null" >
+      <if test="payTime != null">
         pay_time = #{payTime,jdbcType=VARCHAR},
       </if>
-      <if test="sendType != null" >
+      <if test="sendType != null">
         send_type = #{sendType,jdbcType=INTEGER},
       </if>
-      <if test="logisticStatus != null" >
+      <if test="logisticStatus != null">
         logistic_status = #{logisticStatus,jdbcType=INTEGER},
       </if>
-      <if test="logisticCode != null" >
+      <if test="logisticCode != null">
         logistic_code = #{logisticCode,jdbcType=VARCHAR},
       </if>
-      <if test="logisticCompany != null" >
+      <if test="logisticCompany != null">
         logistic_company = #{logisticCompany,jdbcType=VARCHAR},
       </if>
-      <if test="remarks != null" >
+      <if test="remarks != null">
         remarks = #{remarks,jdbcType=VARCHAR},
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         status = #{status,jdbcType=INTEGER},
       </if>
-      <if test="addTime != null" >
+      <if test="addTime != null">
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="province != null">
+        province = #{province,jdbcType=VARCHAR},
+      </if>
+      <if test="city != null">
+        city = #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="area != null">
+        area = #{area,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.goods.model.OrderPay" >
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.goods.model.OrderPay">
     update order_pay
     set order_id = #{orderId,jdbcType=INTEGER},
       receiver_name = #{receiverName,jdbcType=VARCHAR},
@@ -288,7 +321,10 @@
       remarks = #{remarks,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      province = #{province,jdbcType=VARCHAR},
+      city = #{city,jdbcType=VARCHAR},
+      area = #{area,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>
