@@ -16,4 +16,12 @@ public interface AppraisalService {
      * @throws ServiceException
      */
     OrderDto addAppraisal(Integer userId, Integer[] goodsIds, String title, String description, String imgUrl,String videoUrl) throws ServiceException;
+
+    /**
+     * 取消鉴定，删除鉴定订单
+     * @param userId
+     * @param orderId
+     * @throws ServiceException
+     */
+    void cancelAppraisal(Integer userId,Integer orderId) throws ServiceException;
 }

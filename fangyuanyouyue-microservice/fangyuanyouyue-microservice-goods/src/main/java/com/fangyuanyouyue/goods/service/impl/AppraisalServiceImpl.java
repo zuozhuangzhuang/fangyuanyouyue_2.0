@@ -143,9 +143,9 @@ public class AppraisalServiceImpl implements AppraisalService{
                                 }
                             }
                         }
-                        orderDetail.setPrice(price);
+                        orderDetail.setAmount(price);
                         //鉴定订单没有优惠
-                        orderDetail.setOrgprice(price);
+                        orderDetail.setPayAmount(price);
                         //鉴定订单没有邮费
                         orderDetail.setFreight(new BigDecimal(0));
                         orderDetail.setDescription(goodsInfo.getDescription());
@@ -154,8 +154,8 @@ public class AppraisalServiceImpl implements AppraisalService{
                         OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail,1);//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
                         orderDetailDtos.add(orderDetailDto);
 
-                        amount = amount.add(price);//实际支付
-                        payAmount = payAmount.add(orderDetailDto.getPrice());//原价
+                        amount = amount.add(price);//原价
+                        payAmount = payAmount.add(orderDetailDto.getAmount());//实际支付
                     }
                 }
             }
@@ -185,9 +185,9 @@ public class AppraisalServiceImpl implements AppraisalService{
 //            orderDetail.setGoodsId(goodsId);
 //            orderDetail.setGoodsName(goodsInfo.getName());
             orderDetail.setAddTime(DateStampUtils.getTimesteamp());
-            orderDetail.setPrice(price);
+            orderDetail.setAmount(price);
             //鉴定订单没有优惠
-            orderDetail.setOrgprice(price);
+            orderDetail.setPayAmount(price);
             //鉴定订单没有邮费
             orderDetail.setFreight(new BigDecimal(0));
             orderDetail.setDescription(description);
@@ -196,8 +196,8 @@ public class AppraisalServiceImpl implements AppraisalService{
             OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail,1);//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
             orderDetailDtos.add(orderDetailDto);
 
-            amount = amount.add(orderDetailDto.getOrgPrice());//实际支付
-            payAmount = payAmount.add(orderDetailDto.getPrice());//原价
+            amount = amount.add(orderDetailDto.getAmount());//原价
+            payAmount = payAmount.add(orderDetailDto.getPayAmount());//实际支付
         }
 
         orderInfo.setAmount(amount);
@@ -217,5 +217,15 @@ public class AppraisalServiceImpl implements AppraisalService{
         orderDto.setOrderDetailDtos(orderDetailDtos);
         return orderDto;
         //用户需要支付对应的资金才可以鉴定成功
+    }
+
+    @Override
+    public void cancelAppraisal(Integer userId, Integer orderId) throws ServiceException {
+        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderId);
+        if(orderInfo == null){
+            throw new ServiceException("订单异常！");
+        }else{
+
+        }
     }
 }

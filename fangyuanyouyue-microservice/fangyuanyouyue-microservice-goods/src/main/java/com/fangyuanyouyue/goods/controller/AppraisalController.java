@@ -7,6 +7,7 @@ import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.goods.dto.OrderDto;
 import com.fangyuanyouyue.goods.param.GoodsParam;
+import com.fangyuanyouyue.goods.param.OrderParam;
 import com.fangyuanyouyue.goods.service.AppraisalService;
 import com.fangyuanyouyue.goods.service.CartService;
 import com.fangyuanyouyue.goods.service.SchedualRedisService;
@@ -86,6 +87,43 @@ public class AppraisalController extends BaseController{
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
         }
     }
+
+    @ApiOperation(value = "取消鉴定", notes = "取消鉴定",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orderId", value = "订单ID",dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/cancelAppraisal")
+    @ResponseBody
+    public BaseResp cancelAppraisal(OrderParam param) throws IOException {
+        try {
+            log.info("----》取消鉴定《----");
+            log.info("参数：" + param.toString());
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+            }
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            String verifyUser = schedualUserService.verifyUserById(userId);
+            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+            if((Integer)jsonObject.get("code") != 0){
+                return toError(jsonObject.getString("report"));
+            }
+            if(param.getOrderId() == null){
+                toError(ReCode.FAILD.getValue(),"订单ID不能为空！");
+            }
+            //取消鉴定，删除订单及详情
+            appraisalService.cancelAppraisal(userId,param.getOrderId());
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
 
 
     //我的鉴定
