@@ -1,10 +1,12 @@
 package com.fangyuanyouyue.goods.dao;
 
 import com.fangyuanyouyue.goods.model.GoodsCategory;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+@Mapper
 public interface GoodsCategoryMapper {
     int deleteByPrimaryKey(Integer id);
 

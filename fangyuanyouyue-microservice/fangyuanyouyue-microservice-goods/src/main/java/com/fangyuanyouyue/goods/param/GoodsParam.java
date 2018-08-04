@@ -205,6 +205,9 @@ public class GoodsParam{
     @ApiModelProperty(name = "bargainId", value = "压价详情ID", dataType = "int",hidden = true)
     private Integer bargainId;//压价详情ID
 
+    @ApiModelProperty(name = "addressId", value = "收货地址id", dataType = "int",hidden = true)
+    private Integer addressId;//收货地址id
+
     public Integer getStart() {
         return start;
     }
@@ -608,6 +611,14 @@ public class GoodsParam{
         this.bargainId = bargainId;
     }
 
+    public Integer getAddressId() {
+        return addressId;
+    }
+
+    public void setAddressId(Integer addressId) {
+        this.addressId = addressId;
+    }
+
     @Override
     public String toString() {
         return "GoodsParam{" +
@@ -661,6 +672,7 @@ public class GoodsParam{
                 ", opinion='" + opinion + '\'' +
                 ", reason='" + reason + '\'' +
                 ", bargainId=" + bargainId +
+                ", addressId=" + addressId +
                 '}';
     }
 }

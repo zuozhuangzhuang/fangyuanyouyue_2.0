@@ -200,4 +200,11 @@
   <select id="selectByGoodsId" parameterType="Integer" resultType="Map">
     select * from goods_comment a left join user_info b on a.user_id = b.id where a.goods_id = #{goodsId,jdbcType=INTEGER} and ISNULL(a.comment_id) limit #{start,jdbcType=INTEGER},#{limit,jdbcType=INTEGER}
   </select>
+  <select id="selectByUserId" parameterType="Integer" resultType="Map">
+    select * from goods_comment a left join user_info b on a.user_id = b.id where a.user_id = #{userId} and a.status = 1 order by a.add_time desc limit #{start},#{limit}
+  </select>
+
+  <select id="selectCommentByCommentId" parameterType="Integer" resultMap="BaseResultMap">
+    select * from goods_comment where comment_id = #{commentId} and status = 1
+  </select>
 </mapper>

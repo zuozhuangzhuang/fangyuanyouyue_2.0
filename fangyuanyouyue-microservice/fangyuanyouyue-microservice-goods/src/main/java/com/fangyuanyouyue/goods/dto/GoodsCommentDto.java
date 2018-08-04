@@ -13,6 +13,14 @@ public class GoodsCommentDto {
     //GoodsComment
     private Integer id;//评论ID
 
+    private Integer goodsId;//评论商品id
+
+    private String mainUrl;//商品主图
+
+    private String goodsName;//商品名称
+
+    private String descprition;//商品描述
+
     private Integer fromUserId;//发表评论用户id
 
     private String fromUserName;//发表评论用户昵称
@@ -48,6 +56,7 @@ public class GoodsCommentDto {
 
     public GoodsCommentDto(Map map) {
         this.id = (Integer)map.get("id");
+        this.goodsId = (Integer)map.get("goods_id");
         this.fromUserId = (Integer)map.get("user_id");
         this.fromUserName = (String)map.get("nick_name");
         this.fromUserHeadImgUrl = (String)map.get("head_img_url");
@@ -198,5 +207,37 @@ public class GoodsCommentDto {
 
     public void setIsLike(Integer isLike) {
         this.isLike = isLike;
+    }
+
+    public Integer getGoodsId() {
+        return goodsId;
+    }
+
+    public void setGoodsId(Integer goodsId) {
+        this.goodsId = goodsId;
+    }
+
+    public String getMainUrl() {
+        return mainUrl;
+    }
+
+    public void setMainUrl(String mainUrl) {
+        this.mainUrl = mainUrl;
+    }
+
+    public String getGoodsName() {
+        return goodsName;
+    }
+
+    public void setGoodsName(String goodsName) {
+        this.goodsName = goodsName;
+    }
+
+    public String getDescprition() {
+        return descprition;
+    }
+
+    public void setDescprition(String descprition) {
+        this.descprition = descprition;
     }
 }

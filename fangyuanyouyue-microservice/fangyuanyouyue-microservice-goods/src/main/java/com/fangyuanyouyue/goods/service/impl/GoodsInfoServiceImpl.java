@@ -102,6 +102,12 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         //商品表 goods_info
         GoodsInfo goodsInfo = new GoodsInfo();
         goodsInfo.setUserId(userId);
+        //TODO 是否鉴定根据用户是否官方认证
+        if(Boolean.valueOf(JSONObject.parseObject(schedualUserService.userIsAuth(userId)).getString("data"))){
+            goodsInfo.setIsAppraisal(1);//已认证
+        }else{
+            goodsInfo.setIsAppraisal(2);//未认证
+        }
         goodsInfo.setName(param.getGoodsInfoName());
         goodsInfo.setDescription(param.getDescription());
         goodsInfo.setPrice(param.getPrice());
@@ -119,6 +125,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             goodsInfo.setIntervalTime(param.getIntervalTime());
             goodsInfo.setMarkdown(param.getMarkdown());
         }
+        goodsInfo.setUpdateTime(DateStampUtils.getTimesteamp());
         goodsInfoMapper.insert(goodsInfo);
 
         //初始化商品分类关联表
@@ -152,6 +159,12 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             throw new ServiceException("获取商品失败！");
         }else{
             List<GoodsImg> goodsImgs = goodsImgMapper.getImgsByGoodsId(goodsInfo.getId());
+            String mainImgUrl = null;
+            for(GoodsImg goodsImg:goodsImgs){
+                if(goodsImg.getType() == 1){
+                    mainImgUrl = goodsImg.getImgUrl();
+                }
+            }
             List<GoodsCorrelation> goodsCorrelations = goodsCorrelationMapper.getCorrelationsByGoodsId(goodsInfo.getId());
             //按照先后顺序获取评论
             List<Map<String, Object>> maps = goodsCommentMapperl.selectMapByGoodsIdCommentId(null,goodsInfo.getId(), 0, 3);
@@ -163,10 +176,15 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                     goodsCommentDto.setToUserHeadImgUrl((String)map.get("head_img_url"));
                     goodsCommentDto.setToUserName((String)map.get("nick_name"));
                 }
-                //获取每条评论是否点赞
-                CommentLikes commentLikes = commentLikesMapper.selectByUserId(userId, goodsCommentDto.getId());
-                if(commentLikes != null){
-                    goodsCommentDto.setIsLike(1);
+                goodsCommentDto.setGoodsName(goodsInfo.getName());
+                goodsCommentDto.setDescprition(goodsInfo.getDescription());
+                goodsCommentDto.setMainUrl(mainImgUrl);
+                if(userId != null){
+                    //获取每条评论是否点赞
+                    CommentLikes commentLikes = commentLikesMapper.selectByUserId(userId, goodsCommentDto.getId());
+                    if(commentLikes != null){
+                        goodsCommentDto.setIsLike(1);
+                    }
                 }
             }
 
@@ -295,7 +313,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             }
         }else{
             goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
-            goodsDto = setDtoByGoodsInfo(null,goodsInfo);
+            goodsDto = setDtoByGoodsInfo(userId,goodsInfo);
             goodsDto.setIsCollect(1);
         }
         //是否官方认证
