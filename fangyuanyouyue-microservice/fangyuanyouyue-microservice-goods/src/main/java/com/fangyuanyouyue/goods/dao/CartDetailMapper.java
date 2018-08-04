@@ -21,9 +21,23 @@ public interface CartDetailMapper {
 
     int updateByPrimaryKey(CartDetail record);
 
+
     List<CartDetail> selectByCartId(Integer cartId);
 
+    /**
+     * 根据购物车ID商品ID获取订单详情表信息
+     * @param cartId
+     * @param goodsId
+     * @return
+     */
     CartDetail selectByCartIdGoodsId(@Param("cartId") Integer cartId, @Param("goodsId")Integer goodsId);
 
+    /**
+     *
+     * @param cartId
+     * @param userId
+     * @return
+     */
     List<Map<String,Object>> selectByCartIdUserId(@Param("cartId")Integer cartId, @Param("userId") Integer userId);
+
 }

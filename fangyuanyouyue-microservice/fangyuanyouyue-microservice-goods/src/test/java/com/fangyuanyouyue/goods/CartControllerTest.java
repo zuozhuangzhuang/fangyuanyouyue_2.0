@@ -44,8 +44,8 @@ public class CartControllerTest {
     @Transactional
     public void addGoodsToCart() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/cart/addGoodsToCart")
-                .param("token","10025FY1532052608373")
-                .param("goodsId","1,2,3")
+                .param("token","10025FY1533144562288")
+                .param("goodsId","32")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -60,7 +60,7 @@ public class CartControllerTest {
     @Transactional
     public void getCart() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/cart/getCart")
-                .param("token","10025FY1532740241270")
+                .param("token","10025FY1533144562288")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -75,8 +75,8 @@ public class CartControllerTest {
     @Transactional
     public void cartRemove() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/cart/cartRemove")
-                .param("token","10025FY1531851479276")
-                .param("cartDetailIds","1,2,3")
+                .param("token","10025FY1533144562288")
+                .param("cartDetailIds","37,38")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -90,7 +90,7 @@ public class CartControllerTest {
     @Transactional
     public void choice() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/cart/choice")
-                .param("token","10025FY1532974762055")
+                .param("token","10025FY1533144562288")
                 .param("start","0")
                 .param("limit","10")
                 .accept(MediaType.APPLICATION_JSON))

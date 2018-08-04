@@ -40,11 +40,6 @@ public class CartServiceImpl implements CartService {
     private GoodsCommentMapper goodsCommentMapperl;
 
 
-    @Value("${pic_server:errorPicServer}")
-    private String PIC_SERVER;// 图片服务器
-
-    @Value("${pic_path:errorPicPath}")
-    private String PIC_PATH;// 图片存放路径
 
 
     @Override
@@ -63,9 +58,12 @@ public class CartServiceImpl implements CartService {
 
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
             //判断商品还在不
-            if (goodsInfo == null) {
+            if (goodsInfo == null || goodsInfo.getStatus().intValue() == 5) {
                 throw new ServiceException("商品不存在或已下架！");
             } else {
+                if(goodsInfo.getStatus().intValue() != 1){//1出售中
+                    throw new ServiceException("商品状态异常！");
+                }
                 CartDetail cartDetail = cartDetailMapper.selectByCartIdGoodsId(cartInfo.getId(), goodsId);
                 //判断购物车是否已经有这个商品了
                 if (cartDetail == null) {
@@ -78,7 +76,6 @@ public class CartServiceImpl implements CartService {
                     cartDetail.setUserId(goodsInfo.getUserId());
                     cartDetail.setNickName(user.getString("nickName"));
                     cartDetail.setHeadImgUrl(user.getString("headImgUrl"));
-                    cartDetail.setStatus(1);//商品是否显示 1显示2不显示
                     cartDetailMapper.insert(cartDetail);
                 } else {
                     throw new ServiceException("商品已存在购物车中，请勿重复添加！");
@@ -104,6 +101,9 @@ public class CartServiceImpl implements CartService {
                     cartShopDto.setNickName(cartDetail.getNickName());
 
                     List<CartDetailDto> cartDetailDtos = CartDetailDto.toDtoList(cartDetailMapper.selectByCartIdUserId(cart.getId(), cartDetail.getUserId()));
+                    if(cartDetailDtos == null){
+                        continue;
+                    }
                     for (CartDetailDto cartDetailDto : cartDetailDtos) {
                         List<GoodsImg> imgsByGoodsId = goodsImgMapper.getImgsByGoodsId(cartDetailDto.getGoodsId());
                         for (GoodsImg goodsImg : imgsByGoodsId) {
@@ -111,6 +111,9 @@ public class CartServiceImpl implements CartService {
                                 cartDetailDto.setMainUrl(goodsImg.getImgUrl());
                             }
                         }
+                        //传递商品状态
+                        GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(cartDetailDto.getGoodsId());
+                        cartDetailDto.setStatus(goodsInfo.getStatus());
                     }
                     cartShopDto.setCartDetail(cartDetailDtos);
                     cartShopDtos.add(cartShopDto);
@@ -157,6 +160,12 @@ public class CartServiceImpl implements CartService {
             throw new ServiceException("获取商品失败！");
         } else {
             List<GoodsImg> goodsImgs = goodsImgMapper.getImgsByGoodsId(goodsInfo.getId());
+            String mainImgUrl = null;
+            for(GoodsImg goodsImg:goodsImgs){
+                if(goodsImg.getType() == 1){
+                    mainImgUrl = goodsImg.getImgUrl();
+                }
+            }
             List<GoodsCorrelation> goodsCorrelations = goodsCorrelationMapper.getCorrelationsByGoodsId(goodsInfo.getId());
             //按照先后顺序获取评论
             List<Map<String, Object>> maps = goodsCommentMapperl.selectMapByGoodsIdCommentId(null, goodsInfo.getId(), 0, 3);
@@ -168,6 +177,9 @@ public class CartServiceImpl implements CartService {
                     goodsCommentDto.setToUserHeadImgUrl((String) map.get("head_img_url"));
                     goodsCommentDto.setToUserName((String) map.get("nick_name"));
                 }
+                goodsCommentDto.setGoodsName(goodsInfo.getName());
+                goodsCommentDto.setDescprition(goodsInfo.getDescription());
+                goodsCommentDto.setMainUrl(mainImgUrl);
             }
 
             //获取卖家信息
@@ -175,6 +187,24 @@ public class CartServiceImpl implements CartService {
             GoodsDto goodsDto = new GoodsDto(user, goodsInfo, goodsImgs, goodsCorrelations, goodsCommentDtos);
             goodsDto.setCommentCount(goodsCommentMapperl.selectCount(goodsInfo.getId()));
             return goodsDto;
+        }
+    }
+
+    @Override
+    public void cartRemoveByIds(Integer userId,Integer[] goodsIds) throws ServiceException {
+        //根据商品ID数组删除购物车内信息
+        CartInfo cart = cartInfoMapper.selectByUserId(userId);
+        if (cart == null) {
+            throw new ServiceException("购物车异常！");
+        } else {
+            for(Integer goodsId : goodsIds){
+                CartDetail cartDetail = cartDetailMapper.selectByCartIdGoodsId(cart.getId(),goodsId);
+                if (cartDetail == null) {
+                    throw new ServiceException("购物车详情数据异常！");
+                } else {
+                    cartDetailMapper.deleteByPrimaryKey(cartDetail.getId());
+                }
+            }
         }
     }
 }

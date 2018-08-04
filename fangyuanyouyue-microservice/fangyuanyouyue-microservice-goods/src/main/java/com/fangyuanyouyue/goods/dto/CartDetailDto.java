@@ -25,6 +25,8 @@ public class CartDetailDto {
 
     private String mainUrl;//商品主图
 
+    private Integer status;//商品状态 1出售中 2已售出
+
     public CartDetailDto() {
     }
 
@@ -36,6 +38,7 @@ public class CartDetailDto {
         this.description = (String)map.get("description");
         this.price = (BigDecimal)map.get("price");
         this.postage = (BigDecimal)map.get("postage");
+        this.status = (Integer)map.get("status2");
     }
 
     public static List<CartDetailDto> toDtoList(List<Map<String,Object>> list) {
@@ -111,5 +114,13 @@ public class CartDetailDto {
 
     public void setPostage(BigDecimal postage) {
         this.postage = postage;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 }

@@ -32,9 +32,16 @@ public interface CartService {
     void cartRemove(Integer[] cartDetailIds) throws ServiceException;
 
     /**
-     *
+     * 精选
      * @return
      * @throws ServiceException
      */
     List<GoodsDto> choice(Integer userId,Integer start,Integer limit) throws ServiceException;
+
+    /**
+     * 根据商品ID数组删除购物车记录
+     * @param goodsIds
+     * @throws ServiceException
+     */
+    void cartRemoveByIds(Integer userId,Integer[] goodsIds) throws ServiceException;
 }
