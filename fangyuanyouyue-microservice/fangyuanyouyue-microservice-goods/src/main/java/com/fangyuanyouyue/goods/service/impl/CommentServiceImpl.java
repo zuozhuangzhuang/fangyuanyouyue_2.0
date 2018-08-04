@@ -1,10 +1,15 @@
 package com.fangyuanyouyue.goods.service.impl;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import com.fangyuanyouyue.goods.dao.CommentLikesMapper;
+import com.fangyuanyouyue.goods.dao.GoodsImgMapper;
+import com.fangyuanyouyue.goods.dao.GoodsInfoMapper;
 import com.fangyuanyouyue.goods.model.CommentLikes;
+import com.fangyuanyouyue.goods.model.GoodsImg;
+import com.fangyuanyouyue.goods.model.GoodsInfo;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,9 +29,11 @@ public class CommentServiceImpl implements CommentService{
     @Autowired
     private GoodsCommentMapper goodsCommentMapper;
     @Autowired
-    private GoodsCommentMapper goodsCommentMapperl;
-    @Autowired
     private CommentLikesMapper commentLikesMapper;
+    @Autowired
+    private GoodsInfoMapper goodsInfoMapper;
+    @Autowired
+    private GoodsImgMapper goodsImgMapper;
 
     @Override
     public Integer addComment(GoodsParam param) throws ServiceException {
@@ -122,7 +129,7 @@ public class CommentServiceImpl implements CommentService{
         if(goodsCommentDtos != null && goodsCommentDtos.size()>0){
             for(GoodsCommentDto goodsCommentDto:goodsCommentDtos){
                 //获取被评论人的信息
-                Map<String, Object> map = goodsCommentMapperl.selectByCommentId(goodsCommentDto.getCommentId());
+                Map<String, Object> map = goodsCommentMapper.selectByCommentId(goodsCommentDto.getCommentId());
                 if(map != null){
                     goodsCommentDto.setToUserId((Integer)map.get("user_id"));
                     goodsCommentDto.setToUserHeadImgUrl((String)map.get("head_img_url"));
@@ -133,5 +140,56 @@ public class CommentServiceImpl implements CommentService{
             }
         }
         return goodsCommentDtos;
+    }
+
+    @Override
+    public List<GoodsCommentDto> myComments(Integer userId, Integer type, Integer start, Integer limit) throws ServiceException {
+        //TODO 根据用户ID获取所有user_id为userId且status=1的评论，按照时间排序，并根据评论商品ID获取商品信息，根据userId获取用户信息
+        List<Map<String, Object>> maps = goodsCommentMapper.selectByUserId(userId, start * limit, limit);
+        List<GoodsCommentDto> goodsCommentDtos = GoodsCommentDto.mapToDtoList(maps);
+        Iterator<GoodsCommentDto> it = goodsCommentDtos.iterator();
+        while(it.hasNext()){
+            GoodsCommentDto goodsCommentDto = it.next();
+            GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsCommentDto.getGoodsId());
+            if(goodsInfo.getType().intValue() != type.intValue()){
+                it.remove();
+                continue;
+            }
+            List<GoodsImg> imgsByGoodsId = goodsImgMapper.getImgsByGoodsId(goodsInfo.getId());
+            StringBuffer mainImgUrl = new StringBuffer();
+            for(GoodsImg goodsImg:imgsByGoodsId){
+                if(goodsImg.getType() == 1){
+                    mainImgUrl.append(goodsImg.getImgUrl());
+                }
+            }
+            //获取被评论人的信息
+            Map<String, Object> map = goodsCommentMapper.selectByCommentId(goodsCommentDto.getCommentId());
+            if(map != null){
+                goodsCommentDto.setToUserId((Integer)map.get("user_id"));
+                goodsCommentDto.setToUserHeadImgUrl((String)map.get("head_img_url"));
+                goodsCommentDto.setToUserName((String)map.get("nick_name"));
+            }
+            goodsCommentDto.setGoodsName(goodsInfo.getName());
+            goodsCommentDto.setMainUrl(mainImgUrl.toString());
+            goodsCommentDto.setDescprition(goodsInfo.getDescription());
+        }
+        return goodsCommentDtos;
+    }
+
+    @Override
+    public void deleteComment(Integer commentId) throws ServiceException {
+        //获取评论信息
+        GoodsComment goodsComment = goodsCommentMapper.selectByPrimaryKey(commentId);
+        if(goodsComment == null || goodsComment.getStatus() == 2){
+            throw new ServiceException("评论不存在！");
+        }else{
+            goodsComment.setStatus(2);//状态 1正常 2隐藏
+            goodsCommentMapper.updateByPrimaryKey(goodsComment);
+            List<GoodsComment> replys = goodsCommentMapper.selectCommentByCommentId(commentId);
+            for(GoodsComment reply:replys){
+                reply.setStatus(2);
+                goodsCommentMapper.updateByPrimaryKey(reply);
+            }
+        }
     }
 }

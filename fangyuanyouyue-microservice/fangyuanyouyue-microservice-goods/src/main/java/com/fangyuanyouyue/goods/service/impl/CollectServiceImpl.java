@@ -151,6 +151,12 @@ public class CollectServiceImpl implements CollectService{
             throw new ServiceException("获取商品失败！");
         }else{
             List<GoodsImg> goodsImgs = goodsImgMapper.getImgsByGoodsId(goodsInfo.getId());
+            String mainImgUrl = null;
+            for(GoodsImg goodsImg:goodsImgs){
+                if(goodsImg.getType() == 1){
+                    mainImgUrl = goodsImg.getImgUrl();
+                }
+            }
             List<GoodsCorrelation> goodsCorrelations = goodsCorrelationMapper.getCorrelationsByGoodsId(goodsInfo.getId());
             //按照先后顺序获取评论
             List<Map<String, Object>> maps = goodsCommentMapperl.selectMapByGoodsIdCommentId(null,goodsInfo.getId(), 0, 3);
@@ -162,6 +168,9 @@ public class CollectServiceImpl implements CollectService{
                     goodsCommentDto.setToUserHeadImgUrl((String)map.get("head_img_url"));
                     goodsCommentDto.setToUserName((String)map.get("nick_name"));
                 }
+                goodsCommentDto.setMainUrl(mainImgUrl);
+                goodsCommentDto.setGoodsName(goodsInfo.getName());
+                goodsCommentDto.setDescprition(goodsInfo.getDescription());
             }
             //获取卖家信息
             UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(goodsInfo.getUserId())).getString("data")), UserInfo.class);

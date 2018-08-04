@@ -162,11 +162,89 @@ public class CommentController extends BaseController{
             if(param.getGoodsId() == null){
                 return toError(ReCode.FAILD.getValue(),"商品id不能为空！");
             }
-            if(param.getStart() == null || param.getLimit() == null){
-                return toError(ReCode.FAILD.getValue(),"分页参数不能为空！");
+            if(param.getStart() == null || param.getStart().intValue() < 0 || param.getLimit() == null || param.getLimit() < 1){
+                return toError(ReCode.FAILD.getValue(),"分页参数异常！");
             }
             List<GoodsCommentDto> comments = commentService.getComments(param.getUserId(),param.getGoodsId(),param.getStart(),param.getLimit());
             return toSuccess(comments);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
+
+    @ApiOperation(value = "（商品/抢购）我的评论", notes = "(GoodsCommentDto)查看（商品/抢购）我的评论",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token",required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1商品 2抢购",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "start", value = "起始页数", required = true,dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true,dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/myComments")
+    @ResponseBody
+    public BaseResp myComments(GoodsParam param) throws IOException {
+        try {
+            log.info("----》（商品/抢购）我的评论《----");
+            log.info("参数："+param.toString());
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+            }
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            String verifyUser = schedualUserService.verifyUserById(userId);
+            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+            if((Integer)jsonObject.get("code") != 0){
+                return toError(jsonObject.getString("report"));
+            }
+            if(param.getType() == null){
+                return toError(ReCode.FAILD.getValue(),"类型不能为空！");
+            }
+            if(param.getStart() == null || param.getStart().intValue() < 0 || param.getLimit() == null || param.getLimit() < 1){
+                return toError(ReCode.FAILD.getValue(),"分页参数异常！");
+            }
+            //（商品/抢购）我的评论
+            List<GoodsCommentDto> myComments = commentService.myComments(userId,param.getType(),param.getStart(),param.getLimit());
+            return toSuccess(myComments);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
+
+    @ApiOperation(value = "删除评论", notes = "(void)删除评论",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token", required = true,dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "commentId", value = "评论id",required = true, dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/deleteComment")
+    @ResponseBody
+    public BaseResp deleteComment(GoodsParam param) throws IOException {
+        try {
+            log.info("----》删除评论《----");
+            log.info("参数："+param.toString());
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+            }
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            String verifyUser = schedualUserService.verifyUserById(userId);
+            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+            if((Integer)jsonObject.get("code") != 0){
+                return toError(jsonObject.getString("report"));
+            }
+            if(param.getCommentId() == null){
+                return toError(ReCode.FAILD.getValue(),"评论id不能为空！");
+            }
+            commentService.deleteComment(param.getCommentId());
+            return toSuccess("删除评论成功！");
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());

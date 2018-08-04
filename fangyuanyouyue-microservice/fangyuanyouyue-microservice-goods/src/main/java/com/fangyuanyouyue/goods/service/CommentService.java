@@ -32,4 +32,22 @@ public interface CommentService {
      * @throws ServiceException
      */
     List<GoodsCommentDto> getComments(Integer userId,Integer goodsId,Integer start,Integer limit) throws ServiceException;
+
+    /**
+     * （商品/抢购）我的评论
+     * @param userId
+     * @param type
+     * @param start
+     * @param limit
+     * @return
+     * @throws ServiceException
+     */
+    List<GoodsCommentDto> myComments(Integer userId,Integer type,Integer start,Integer limit) throws ServiceException;
+
+    /**
+     * 删除评论
+     * @param commentId
+     * @throws ServiceException
+     */
+    void deleteComment(Integer commentId) throws ServiceException;
 }
