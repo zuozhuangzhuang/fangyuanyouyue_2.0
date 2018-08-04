@@ -3,6 +3,7 @@ package com.fangyuanyouyue.user.controller;
 import java.io.IOException;
 import java.util.List;
 
+import com.fangyuanyouyue.user.dto.UserFansDto;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -312,7 +313,7 @@ public class UserController extends BaseController {
             }
             //TODO 完善资料
             userInfoService.modify(param);
-            return toSuccess("完善资料成功");
+            return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
@@ -587,6 +588,10 @@ public class UserController extends BaseController {
                 if(userInfo != null){
                     return toError(ReCode.FAILD.getValue(),"此手机号已被注册！");
                 }
+            }else if(PhoneCodeEnum.TYPE_FINDPWD.getCode() == param.getType()){//为1 找回密码
+                if(userInfo == null){
+                    return toError(ReCode.FAILD.getValue(),"用户不存在，请注册！");
+                }
             }else if(PhoneCodeEnum.TYPE_OLD_PHONE.getCode() == param.getType()){//为3验证旧手机，给旧手机发验证码去验证
 //                if(userInfo != null){//已存在此手机号
 //                    //验证此手机是否存在其他识别号
@@ -748,9 +753,6 @@ public class UserController extends BaseController {
                 return toError(ReCode.FAILD.getValue(),"被关注人不能为空！");
             }
             
-            //TODO 更新缓存时间
-            //schedualRedisService.set(key, value, expire)
-            //redisTemplate.expire(param.getToken(),7,TimeUnit.DAYS);
             //添加/取消关注
             userInfoService.fansFollow(user.getId(), param.getToUserId(),param.getType());
             if(param.getType() == 0){
@@ -768,40 +770,47 @@ public class UserController extends BaseController {
     }
 
 
-//    @ApiOperation(value = "我的粉丝", notes = "我的粉丝o")
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "userId", value = "用户id", required = true, dataType = "Integer", paramType = "query"),
-//            @ApiImplicitParam(name = "start value = "分页start", required = true, dataType = "Integer", paramType = "query"),
-//            @ApiImplicitParam(name = "limit", value = "分页limit", required = true, dataType = "Integer", paramType = "query")
-//    })
-//    @PostMapping(value = "/myFans")
-//    @ResponseBody
-//    public String myFans(UserParam param) throws IOException {
-//        try {
-//            log.info("----》我的粉丝《----");
-//            log.info("参数："+param.toString());
-//            if(param.getStart()==null){
-//                return toError(ReCode.FAILD.getValue(),"分页start不能为空！");
-//            }
-//            if(param.getLimit()==null){
-//                return toError(ReCode.FAILD.getValue(),"分页limit不能为空！");
-//            }
-//            UserInfo user=userInfoService.selectByPrimaryKey(param.getUserId());
-//            if(user==null){
-//                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
-//            }
-//            if(user.getStatus() == 2){
-//                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
-//            }
-//            //我的粉丝
-//            BaseClientResult result = new BaseClientResult(Status.YES.getValue(), "获取我的粉丝成功！");
-//            return toResult(result);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
-//        }
-//    }
-//
+    @ApiOperation(value = "我的关注/我的粉丝", notes = "（UserFansDto）我的关注/我的粉丝")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1我的关注 2我的粉丝", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "start", value = "分页start", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "分页limit", required = true, dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/myFansOrFollows")
+    @ResponseBody
+    public BaseResp myFansOrFollows(UserParam param) throws IOException {
+        try {
+            log.info("----》我的关注/我的粉丝《----");
+            log.info("参数："+param.toString());
+            UserInfo user=userInfoService.getUserByToken(param.getToken());
+            if(user==null){
+                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+            }
+            if(user.getStatus() == 2){
+                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
+            }
+            if(param.getStart() == null || param.getStart() < 0){
+                return toError(ReCode.FAILD.getValue(),"起始页数错误！");
+            }
+            if(param.getLimit() == null || param.getLimit() < 1){
+                return toError(ReCode.FAILD.getValue(),"每页个数错误！");
+            }
+            if(param.getType() == null){
+                return toError(ReCode.FAILD.getValue(),"类型不能为空！");
+            }
+            //我的关注/我的粉丝
+            List<UserFansDto> userFansDtos = userInfoService.myFansOrFollows(user.getId(), param.getType(),param.getStart(), param.getLimit());
+            return toSuccess(userFansDtos);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
 //
 //
 //

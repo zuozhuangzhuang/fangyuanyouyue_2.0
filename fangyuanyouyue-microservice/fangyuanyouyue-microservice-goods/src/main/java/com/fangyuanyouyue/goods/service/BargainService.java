@@ -16,7 +16,7 @@ public interface BargainService {
      * @param reason
      * @throws ServiceException
      */
-    void addBargain(Integer userId, Integer goodsId, BigDecimal price,String reason) throws ServiceException;
+    void addBargain(Integer userId, Integer goodsId, BigDecimal price,String reason,Integer addressId) throws ServiceException;
 
     /**
      * 处理压价
@@ -29,10 +29,12 @@ public interface BargainService {
     /**
      * 我的压价列表
      * @param userId
+     * @param start
+     * @param limit
      * @return
      * @throws ServiceException
      */
-    List<BargainDto> bargainList(Integer userId) throws ServiceException;
+    List<BargainDto> bargainList(Integer userId,Integer start,Integer limit) throws ServiceException;
     /**
      * 压价详情
      * @param userId

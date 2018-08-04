@@ -359,23 +359,25 @@ public class UserControllerTest {
                 .andReturn();
     }
 
-//
-//    /**
-//     * 我的粉丝
-//     * @throws Exception
-//     */
-//    @Test
-//    @Transactional
-//    public void myFans() throws Exception {
-//        mvc.perform(MockMvcRequestBuilders.post("/user/myFans")
-//                .param("token","6008FY1525397451364")
-//                .param("start","1")
-//                .param("limit","10")
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andDo(MockMvcResultHandlers.print())
-//                .andReturn();
-//    }
-//
+
+    /**
+     * 我的粉丝/我的关注
+     * @throws Exception
+     */
+    @Test
+    @Transactional
+    public void myFansOrFollows() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/user/myFansOrFollows")
+                .param("token","10025FY1533144562288")
+                //类型 1我的关注 2我的粉丝
+                .param("type","1")
+                .param("start","0")
+                .param("limit","10")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
 
 //    /**
 //     * 我的关注

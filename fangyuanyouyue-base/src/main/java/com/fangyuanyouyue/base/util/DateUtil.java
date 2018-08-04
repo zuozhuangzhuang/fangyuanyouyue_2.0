@@ -14,6 +14,7 @@ import java.util.Date;
 @SuppressWarnings("unchecked")
 public class DateUtil {
 	public static final String DATE_FORMT="yyyy-MM-dd HH:mm:ss";
+	public static final String DATE_FORMT_YEAR="yyyy-MM-dd";
 	private static Calendar calendar = Calendar.getInstance();
 
 	/**

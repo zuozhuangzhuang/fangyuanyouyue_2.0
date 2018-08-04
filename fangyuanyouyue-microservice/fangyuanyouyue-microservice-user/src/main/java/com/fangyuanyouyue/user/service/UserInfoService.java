@@ -5,6 +5,7 @@ import java.util.List;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.user.dto.ShopDto;
 import com.fangyuanyouyue.user.dto.UserDto;
+import com.fangyuanyouyue.user.dto.UserFansDto;
 import com.fangyuanyouyue.user.model.UserInfo;
 import com.fangyuanyouyue.user.param.UserParam;
 
@@ -161,4 +162,15 @@ public interface UserInfoService {
      * @throws ServiceException
      */
     void fansFollow(Integer userId,Integer toUserId,Integer type) throws ServiceException;
+
+    /**
+     * 我的粉丝
+     * @param userId
+     * @param start
+     * @param limit
+     * @return
+     * @throws ServiceException
+     */
+    List<UserFansDto> myFansOrFollows(Integer userId,Integer type,Integer start,Integer limit) throws ServiceException;
+
 }

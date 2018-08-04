@@ -43,15 +43,15 @@ public class AddressControllerTest {
     @Transactional
     public void addAddress() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/address/addAddress")
-                .param("token","10014FY1531254449019")
-                .param("receiverName","左壮壮")
+                .param("token","10025FY1533082419307")
+                .param("receiverName","左壮")
                 .param("receiverPhone","18103966057")
                 .param("province","广东省")
                 .param("city","深圳市")
                 .param("area","罗湖区")
                 .param("address","世界金融中心B座1015")
                 .param("postCode","450000")
-                .param("type","2")
+                .param("type","1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -65,9 +65,9 @@ public class AddressControllerTest {
     @Transactional
     public void updateAddress() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/address/updateAddress")
-                .param("token","10014FY1531254449019")
-                .param("addressId","1")
-                .param("receiverName","左壮壮")
+                .param("token","10025FY1533082419307")
+                .param("addressId","27")
+                .param("receiverName","左壮")
                 .param("receiverPhone","18103966057")
                 .param("province","广东省")
                 .param("city","深圳市")

@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangyuanyouyue.goods.dao.OrderDetailMapper">
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.goods.model.OrderDetail">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="order_id" jdbcType="INTEGER" property="orderId" />
+    <result column="goods_id" jdbcType="INTEGER" property="goodsId" />
+    <result column="goods_name" jdbcType="VARCHAR" property="goodsName" />
+    <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="coupon_id" jdbcType="INTEGER" property="couponId" />
+    <result column="main_img_url" jdbcType="VARCHAR" property="mainImgUrl" />
+    <result column="amount" jdbcType="DECIMAL" property="amount" />
+    <result column="freight" jdbcType="DECIMAL" property="freight" />
+    <result column="pay_amount" jdbcType="DECIMAL" property="payAmount" />
+    <result column="seller_id" jdbcType="INTEGER" property="sellerId" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.goods.model.OrderDetail">
+    <result column="description" jdbcType="LONGVARCHAR" property="description" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, user_id, order_id, goods_id, goods_name, add_time, update_time, coupon_id, main_img_url, 
+    amount, freight, pay_amount, seller_id
+  </sql>
+  <sql id="Blob_Column_List">
+    description
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from order_detail
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from order_detail
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.fangyuanyouyue.goods.model.OrderDetail" useGeneratedKeys="true" keyProperty="id">
+    insert into order_detail (id, user_id, order_id, 
+      goods_id, goods_name, add_time, 
+      update_time, coupon_id, main_img_url, 
+      amount, freight, pay_amount, 
+      seller_id, description)
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{orderId,jdbcType=INTEGER}, 
+      #{goodsId,jdbcType=INTEGER}, #{goodsName,jdbcType=VARCHAR}, #{addTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{couponId,jdbcType=INTEGER}, #{mainImgUrl,jdbcType=VARCHAR}, 
+      #{amount,jdbcType=DECIMAL}, #{freight,jdbcType=DECIMAL}, #{payAmount,jdbcType=DECIMAL}, 
+      #{sellerId,jdbcType=INTEGER}, #{description,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.goods.model.OrderDetail">
+    insert into order_detail
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="orderId != null">
+        order_id,
+      </if>
+      <if test="goodsId != null">
+        goods_id,
+      </if>
+      <if test="goodsName != null">
+        goods_name,
+      </if>
+      <if test="addTime != null">
+        add_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="couponId != null">
+        coupon_id,
+      </if>
+      <if test="mainImgUrl != null">
+        main_img_url,
+      </if>
+      <if test="amount != null">
+        amount,
+      </if>
+      <if test="freight != null">
+        freight,
+      </if>
+      <if test="payAmount != null">
+        pay_amount,
+      </if>
+      <if test="sellerId != null">
+        seller_id,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="orderId != null">
+        #{orderId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsId != null">
+        #{goodsId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsName != null">
+        #{goodsName,jdbcType=VARCHAR},
+      </if>
+      <if test="addTime != null">
+        #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="couponId != null">
+        #{couponId,jdbcType=INTEGER},
+      </if>
+      <if test="mainImgUrl != null">
+        #{mainImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="amount != null">
+        #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="freight != null">
+        #{freight,jdbcType=DECIMAL},
+      </if>
+      <if test="payAmount != null">
+        #{payAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="sellerId != null">
+        #{sellerId,jdbcType=INTEGER},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.goods.model.OrderDetail">
+    update order_detail
+    <set>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="orderId != null">
+        order_id = #{orderId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsId != null">
+        goods_id = #{goodsId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsName != null">
+        goods_name = #{goodsName,jdbcType=VARCHAR},
+      </if>
+      <if test="addTime != null">
+        add_time = #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="couponId != null">
+        coupon_id = #{couponId,jdbcType=INTEGER},
+      </if>
+      <if test="mainImgUrl != null">
+        main_img_url = #{mainImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="amount != null">
+        amount = #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="freight != null">
+        freight = #{freight,jdbcType=DECIMAL},
+      </if>
+      <if test="payAmount != null">
+        pay_amount = #{payAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="sellerId != null">
+        seller_id = #{sellerId,jdbcType=INTEGER},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.fangyuanyouyue.goods.model.OrderDetail">
+    update order_detail
+    set user_id = #{userId,jdbcType=INTEGER},
+      order_id = #{orderId,jdbcType=INTEGER},
+      goods_id = #{goodsId,jdbcType=INTEGER},
+      goods_name = #{goodsName,jdbcType=VARCHAR},
+      add_time = #{addTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      coupon_id = #{couponId,jdbcType=INTEGER},
+      main_img_url = #{mainImgUrl,jdbcType=VARCHAR},
+      amount = #{amount,jdbcType=DECIMAL},
+      freight = #{freight,jdbcType=DECIMAL},
+      pay_amount = #{payAmount,jdbcType=DECIMAL},
+      seller_id = #{sellerId,jdbcType=INTEGER},
+      description = #{description,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.goods.model.OrderDetail">
+    update order_detail
+    set user_id = #{userId,jdbcType=INTEGER},
+      order_id = #{orderId,jdbcType=INTEGER},
+      goods_id = #{goodsId,jdbcType=INTEGER},
+      goods_name = #{goodsName,jdbcType=VARCHAR},
+      add_time = #{addTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      coupon_id = #{couponId,jdbcType=INTEGER},
+      main_img_url = #{mainImgUrl,jdbcType=VARCHAR},
+      amount = #{amount,jdbcType=DECIMAL},
+      freight = #{freight,jdbcType=DECIMAL},
+      pay_amount = #{payAmount,jdbcType=DECIMAL},
+      seller_id = #{sellerId,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

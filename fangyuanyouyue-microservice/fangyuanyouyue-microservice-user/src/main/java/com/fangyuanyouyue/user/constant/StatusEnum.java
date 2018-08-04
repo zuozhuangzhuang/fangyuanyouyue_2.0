@@ -8,8 +8,8 @@ package com.fangyuanyouyue.user.constant;
 public enum StatusEnum {
 	
 	
-	ADDRESS_DEFAULT(0),
-	ADDRESS_OTHER(1),
+	ADDRESS_DEFAULT(1),
+	ADDRESS_OTHER(2),
 	;
 	
 	private Integer code;

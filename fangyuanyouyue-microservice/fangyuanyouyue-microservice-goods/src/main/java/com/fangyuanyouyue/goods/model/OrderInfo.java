@@ -25,6 +25,8 @@ public class OrderInfo {
 
     private Date updateTime;//更新时间
 
+    private Integer sellerId;//卖家ID
+
     public Integer getId() {
         return id;
     }
@@ -95,5 +97,13 @@ public class OrderInfo {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Integer getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(Integer sellerId) {
+        this.sellerId = sellerId;
     }
 }

@@ -1,27 +1,23 @@
 package com.fangyuanyouyue.goods.controller;
 
-import java.io.IOException;
-
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-
+import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.goods.model.GoodsInfo;
 import com.fangyuanyouyue.goods.param.GoodsParam;
+import com.fangyuanyouyue.goods.service.CartService;
 import com.fangyuanyouyue.goods.service.GoodsInfoService;
+import com.fangyuanyouyue.goods.service.SchedualRedisService;
 import com.fangyuanyouyue.goods.service.SchedualUserService;
-
 import io.swagger.annotations.Api;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping(value = "/goodsFeign")
@@ -34,8 +30,9 @@ public class FeignController extends BaseController{
     @Autowired
     private SchedualUserService schedualUserService;//调用其他service时用
     @Autowired
-    protected RedisTemplate redisTemplate;
-
+    private SchedualRedisService schedualRedisService;
+    @Autowired
+    private CartService cartService;
 
     @GetMapping(value = "/goodsMainImg")
     @ResponseBody
@@ -56,6 +53,7 @@ public class FeignController extends BaseController{
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
         }
     }
+
     @GetMapping(value = "/goodsInfo")
     @ResponseBody
     public BaseResp goodsInfo(GoodsParam param) throws IOException {
@@ -99,4 +97,36 @@ public class FeignController extends BaseController{
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
         }
     }
+
+    //移出购物车
+    @PostMapping(value = "/cartRemove")
+    @ResponseBody
+    public BaseResp cartRemove(GoodsParam param) throws IOException{
+        try {
+            log.info("----》移出购物车《----");
+            log.info("参数：" + param.toString());
+            //验证用户
+            if(param.getUserId() == null){
+                return toError(ReCode.FAILD.getValue(),"用户id不能为空！");
+            }
+            String verifyUser = schedualUserService.verifyUserById(param.getUserId());
+            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+            if((Integer)jsonObject.get("code") != 0){
+                return toError(jsonObject.getString("report"));
+            }
+            if(param.getGoodsIds() == null || param.getGoodsIds().length == 0){
+                return toError(ReCode.FAILD.getValue(),"商品id不能为空！");
+            }
+            //移出购物车
+            cartService.cartRemoveByIds(param.getUserId(),param.getGoodsIds());
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
 }

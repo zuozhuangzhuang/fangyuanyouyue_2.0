@@ -4,10 +4,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.order.dto.OrderDto;
 import com.fangyuanyouyue.order.param.OrderParam;
 import com.fangyuanyouyue.order.service.OrderService;
 import com.fangyuanyouyue.order.service.SchedualGoodsService;
+import com.fangyuanyouyue.order.service.SchedualRedisService;
 import com.fangyuanyouyue.order.service.SchedualUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -18,6 +20,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -25,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 
 @RestController
@@ -42,7 +44,8 @@ public class OrderController extends BaseController{
     protected RedisTemplate redisTemplate;
     @Autowired
     private OrderService orderService;
-    //TODO 1.商品加入购物车后单个下单 2.商品加入购物车后打包下单 3.商品不加入购物车直接下单 4.抢购不加入购物车直接下单
+    @Autowired
+    private SchedualRedisService schedualRedisService;
 
     @ApiOperation(value = "商品下单", notes = "(OrderDto)商品下单",response = BaseResp.class)
     @ApiImplicitParams({
@@ -58,7 +61,7 @@ public class OrderController extends BaseController{
             log.info("----》商品下单《----");
             log.info("参数："+param.toString());
             //参数判断
-            if(param.getGoodsIds()==null && param.getGoodsIds().length == 0){
+            if(param.getGoodsIds()==null || param.getGoodsIds().length == 0){
                 return toError("商品id不能为空！");
             }
             if(param.getAddressId()==null || param.getAddressId().intValue()==0){
@@ -71,16 +74,18 @@ public class OrderController extends BaseController{
             if(StringUtils.isEmpty(param.getToken())){
                 return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
             }
-            Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
             JSONObject jsonObject = JSONObject.parseObject(verifyUser);
             if(jsonObject != null && (Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
             //TODO 下单商品
             OrderDto orderDto = orderService.saveOrder(param.getToken(),param.getGoodsIds(), userId, param.getAddressId(),param.getType());
             return toSuccess(orderDto);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -106,16 +111,18 @@ public class OrderController extends BaseController{
             if(StringUtils.isEmpty(param.getToken())){
                 return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
             }
-            Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
             JSONObject jsonObject = JSONObject.parseObject(verifyUser);
             if((Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
-            //TODO 取消订单
+            //取消订单
             orderService.cancelOrder(userId,param.getOrderId());
             return toSuccess("取消订单成功！");
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -143,16 +150,18 @@ public class OrderController extends BaseController{
             if(StringUtils.isEmpty(param.getToken())){
                 return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
             }
-            Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
             JSONObject jsonObject = JSONObject.parseObject(verifyUser);
             if((Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
-            //TODO 订单详情
+            //订单详情
             OrderDto orderDto = orderService.orderDetail(userId, param.getOrderId());
             return toSuccess(orderDto);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -161,7 +170,7 @@ public class OrderController extends BaseController{
 
     @ApiOperation(value = "我的订单列表", notes = "(OrderDto)我的订单列表")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "token ", value = "用户token", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "start", value = "分页start", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "limit", value = "分页limit", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "type", value = "类型 1买家（我买下的） 2卖家（我卖出的）", required = true, dataType = "int", paramType = "query"),
@@ -177,13 +186,12 @@ public class OrderController extends BaseController{
             if(StringUtils.isEmpty(param.getToken())){
                 return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
             }
-            Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
             JSONObject jsonObject = JSONObject.parseObject(verifyUser);
             if((Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
 
             if(param.getStart()==null){
                 return toError("start不能为空！");
@@ -200,9 +208,63 @@ public class OrderController extends BaseController{
             //TODO 我的订单列表
             List<OrderDto> orderDtos = orderService.myOrderList(userId, param.getStart(), param.getLimit(), param.getType(), param.getStatus());
             return toSuccess(orderDtos);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
         }
     }
+
+
+//    @ApiOperation(value = "订单余额支付", notes = "(OrderDto)订单余额支付")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+//            @ApiImplicitParam(name = "start", value = "分页start", required = true, dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "limit", value = "分页limit", required = true, dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "type", value = "类型 1买家（我买下的） 2卖家（我卖出的）", required = true, dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "status", value = "订单状态 0全部 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货",required = true, dataType = "int", paramType = "query")
+//    })
+//    @PostMapping(value = "/getOrderPayBalance")
+//    @ResponseBody
+//    public BaseResp getOrderPayBalance(OrderParam param) throws IOException {
+//        try {
+//            log.info("----》订单余额支付《----");
+//            log.info("参数："+param.toString());
+//            //验证用户
+//            if(StringUtils.isEmpty(param.getToken())){
+//                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+//            }
+//            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+//            String verifyUser = schedualUserService.verifyUserById(userId);
+//            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+//            if((Integer)jsonObject.get("code") != 0){
+//                return toError(jsonObject.getString("report"));
+//            }
+//
+//            if(param.getStart()==null){
+//                return toError("start不能为空！");
+//            }
+//            if(param.getLimit()==null){
+//                return toError("limit不能为空！");
+//            }
+//            if(param.getType() == null){
+//                return toError("类型不能为空！");
+//            }
+//            if(param.getStatus() == null){
+//                return toError("订单状态不能为空！");
+//            }
+//            //TODO 订单余额支付
+//            List<OrderDto> orderDtos = orderService.myOrderList(userId, param.getStart(), param.getLimit(), param.getType(), param.getStatus());
+//            return toSuccess(orderDtos);
+//        } catch (ServiceException e) {
+//            e.printStackTrace();
+//            return toError(e.getMessage());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return toError("系统繁忙，请稍后再试！");
+//        }
+//    }
+
 }

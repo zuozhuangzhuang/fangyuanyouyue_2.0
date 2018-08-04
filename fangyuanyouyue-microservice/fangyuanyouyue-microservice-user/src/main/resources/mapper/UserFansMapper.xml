@@ -86,7 +86,7 @@
       <if test="userId != null">
         and user_id = #{userId,jdbcType=INTEGER}
       </if>
-      <if test="toUserId != null">
+      <if test="userId != null and toUserId != null">
         and to_user_id = #{toUserId,jdbcType=INTEGER}
       </if>
     </where>
@@ -96,5 +96,19 @@
   </select>
   <select id="collectCount" parameterType="Integer" resultType="Integer">
     select count(*) from user_fans where user_id = #{userId,jdbcType=INTEGER}
+  </select>
+
+  <select id="myFansOrFollows" parameterType="Integer" resultType="Map">
+    select * from user_info a,user_fans b,user_vip c,user_info_ext d
+    <where>
+      a.id = c.user_id and a.id = d.user_id
+      <if test="userId != null and type == 1">
+        and a.id = b.to_user_id and b.user_id = #{userId}
+      </if>
+      <if test="userId != null and type == 2">
+        and a.id = b.user_id and b.to_user_id = #{userId}
+      </if>
+    </where>
+    order by b.add_time desc limit #{start},#{limit}
   </select>
 </mapper>

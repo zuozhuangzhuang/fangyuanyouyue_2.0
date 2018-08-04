@@ -18,4 +18,7 @@ public interface SchedualGoodsService {
 
     @RequestMapping(value = "/goodsFeign/goodsMainImg",method = RequestMethod.GET)
     String goodsMainImg(@RequestParam(value = "goodsId") Integer goodsId);
+
+    @RequestMapping(value = "/goodsFeign/cartRemove",method = RequestMethod.POST)
+    String cartRemove(@RequestParam("userId")Integer userId,@RequestParam(value = "goodsIds") Integer[] goodsIds);
 }

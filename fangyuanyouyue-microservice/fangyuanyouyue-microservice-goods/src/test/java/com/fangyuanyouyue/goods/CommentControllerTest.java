@@ -71,10 +71,11 @@ public class CommentControllerTest {
     @Transactional
     public void commentLikes() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/comment/commentLikes")
-                //用户token：notNull
-                .param("token","10025FY1531851479276")
+                .param("token","10025FY1532974762055")
                 //评论id
-                .param("commentId","8")
+                .param("commentId","2")
+                //类型 1商品 2抢购
+                .param("type","1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -92,6 +93,42 @@ public class CommentControllerTest {
                 .param("goodsId","1")
                 .param("start","0")
                 .param("limit","1")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * （商品/抢购）我的评论
+     * @throws Exception
+     */
+    @Test
+    @Transactional
+    public void myComments() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/comment/myComments")
+                //商品ID
+                .param("token","10025FY1533144562288")
+                //类型 1商品 2抢购
+                .param("type","2")
+                .param("start","0")
+                .param("limit","10")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+
+    /**
+     * 评论点赞
+     * @throws Exception
+     */
+    @Test
+    @Transactional
+    public void deleteComment() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/comment/deleteComment")
+                .param("token","10025FY1533144562288")
+                //评论id
+                .param("commentId","163")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

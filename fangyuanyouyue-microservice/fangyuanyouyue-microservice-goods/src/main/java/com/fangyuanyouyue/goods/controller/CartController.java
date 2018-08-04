@@ -9,6 +9,7 @@ import com.fangyuanyouyue.goods.dto.CartShopDto;
 import com.fangyuanyouyue.goods.dto.GoodsDto;
 import com.fangyuanyouyue.goods.param.GoodsParam;
 import com.fangyuanyouyue.goods.service.CartService;
+import com.fangyuanyouyue.goods.service.SchedualRedisService;
 import com.fangyuanyouyue.goods.service.SchedualUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -40,7 +41,8 @@ public class CartController extends BaseController{
     protected RedisTemplate redisTemplate;
     @Autowired
     private CartService cartService;
-
+    @Autowired
+    private SchedualRedisService schedualRedisService;
 
     //添加商品到购物车
     @ApiOperation(value = "添加商品到购物车", notes = "(void)添加商品到购物车",response = BaseResp.class)
@@ -58,7 +60,7 @@ public class CartController extends BaseController{
             if(StringUtils.isEmpty(param.getToken())){
                 return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
             }
-            Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
             JSONObject jsonObject = JSONObject.parseObject(verifyUser);
             if((Integer)jsonObject.get("code") != 0){
@@ -92,13 +94,12 @@ public class CartController extends BaseController{
             if(StringUtils.isEmpty(param.getToken())){
                 return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
             }
-            Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
             JSONObject jsonObject = JSONObject.parseObject(verifyUser);
             if((Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
             //我的购物车
             List<CartShopDto> cart = cartService.getCart(userId);
             return toSuccess( cart);
@@ -128,13 +129,12 @@ public class CartController extends BaseController{
             if(StringUtils.isEmpty(param.getToken())){
                 return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
             }
-            Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
             JSONObject jsonObject = JSONObject.parseObject(verifyUser);
             if((Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
             if(param.getCartDetailIds() == null || param.getCartDetailIds().length == 0){
                 return toError(ReCode.FAILD.getValue(),"购物车详情id不能为空！");
             }
@@ -151,10 +151,12 @@ public class CartController extends BaseController{
     }
 
 
-    //移出购物车
+    //精选
     @ApiOperation(value = "精选", notes = "(GoodsDto)购物车内的精选推荐",response = BaseResp.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/choice")
     @ResponseBody
@@ -166,15 +168,20 @@ public class CartController extends BaseController{
             if(StringUtils.isEmpty(param.getToken())){
                 return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
             }
-            Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
             JSONObject jsonObject = JSONObject.parseObject(verifyUser);
             if((Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
+            if(param.getStart() == null || param.getStart() < 0){
+                return toError(ReCode.FAILD.getValue(),"起始页数错误！");
+            }
+            if(param.getLimit() == null || param.getLimit() < 1){
+                return toError(ReCode.FAILD.getValue(),"每页个数错误！");
+            }
             //精选
-            List<GoodsDto> goodsDtos = cartService.choice(userId);
+            List<GoodsDto> goodsDtos = cartService.choice(userId,param.getStart(),param.getLimit());
             return toSuccess(goodsDtos);
         } catch (ServiceException e) {
             e.printStackTrace();

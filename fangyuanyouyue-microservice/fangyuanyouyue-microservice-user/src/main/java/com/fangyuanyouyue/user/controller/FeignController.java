@@ -130,5 +130,32 @@ public class FeignController  extends BaseController {
         }
     }
 
+    @ApiOperation(value = "用户是否官方认证", notes = "用户是否官方认证",hidden = true)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "unionId", value = "三方唯一识别号", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1微信 2QQ 3微博", required = true, dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/userIsAuth")
+    @ResponseBody
+    public BaseResp userIsAuth(Integer userId) throws IOException {
+        try {
+            log.info("----》用户是否官方认证《----");
+            if(userId == null){
+                return toError(ReCode.FAILD.getValue(),"用户ID不能为空！");
+            }
+            UserInfo userInfo = userInfoService.selectByPrimaryKey(userId);
+            if(userInfo==null){
+                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+            }
+            if(userInfo.getStatus() == 2){
+                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
+            }
+            boolean isAuth = userInfoExtService.userIsAuth(userId);
+            return toSuccess(isAuth);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
 
 }

@@ -22,5 +22,10 @@ public interface OrderDetailMapper {
 
     int updateByPrimaryKey(OrderDetail record);
 
+    /**
+     * 根据订单ID获取订单详情列表
+     * @param orderId
+     * @return
+     */
     List<OrderDetail> selectByOrderId(@Param("orderId") Integer orderId);
 }

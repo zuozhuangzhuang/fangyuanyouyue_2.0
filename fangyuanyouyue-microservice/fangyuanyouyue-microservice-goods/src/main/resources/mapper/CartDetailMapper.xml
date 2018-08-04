@@ -11,11 +11,9 @@
     <result column="user_id" jdbcType="INTEGER" property="userId" />
     <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
     <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl" />
-    <result column="status" jdbcType="INTEGER" property="status" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, cart_id, goods_id, price, add_time, update_time, user_id, nick_name, head_img_url,
-    status
+    id, cart_id, goods_id, price, add_time, update_time, user_id, nick_name, head_img_url
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -29,13 +27,13 @@
   </delete>
   <insert id="insert" parameterType="com.fangyuanyouyue.goods.model.CartDetail" useGeneratedKeys="true" keyProperty="id">
     insert into cart_detail (id, cart_id, goods_id, 
-      price, add_time,
-      update_time, user_id, nick_name, 
-      head_img_url, status)
+      price, add_time, update_time, 
+      user_id, nick_name, head_img_url
+      )
     values (#{id,jdbcType=INTEGER}, #{cartId,jdbcType=INTEGER}, #{goodsId,jdbcType=INTEGER}, 
-      #{price,jdbcType=DECIMAL}, #{addTime,jdbcType=TIMESTAMP},
-      #{updateTime,jdbcType=TIMESTAMP}, #{userId,jdbcType=INTEGER}, #{nickName,jdbcType=VARCHAR}, 
-      #{headImgUrl,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER})
+      #{price,jdbcType=DECIMAL}, #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{userId,jdbcType=INTEGER}, #{nickName,jdbcType=VARCHAR}, #{headImgUrl,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.fangyuanyouyue.goods.model.CartDetail">
     insert into cart_detail
@@ -67,9 +65,6 @@
       <if test="headImgUrl != null">
         head_img_url,
       </if>
-      <if test="status != null">
-        status,
-      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -98,9 +93,6 @@
       </if>
       <if test="headImgUrl != null">
         #{headImgUrl,jdbcType=VARCHAR},
-      </if>
-      <if test="status != null">
-        #{status,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -131,9 +123,6 @@
       <if test="headImgUrl != null">
         head_img_url = #{headImgUrl,jdbcType=VARCHAR},
       </if>
-      <if test="status != null">
-        status = #{status,jdbcType=INTEGER},
-      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -146,18 +135,20 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       user_id = #{userId,jdbcType=INTEGER},
       nick_name = #{nickName,jdbcType=VARCHAR},
-      head_img_url = #{headImgUrl,jdbcType=VARCHAR},
-      status = #{status,jdbcType=INTEGER}
+      head_img_url = #{headImgUrl,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
   <select id="selectByCartId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from cart_detail where cart_id = #{cartId,jdbcType=INTEGER} and status = 1 group by user_id
+    select * from cart_detail where cart_id = #{cartId,jdbcType=INTEGER} group by user_id
   </select>
   <select id="selectByCartIdUserId" parameterType="Integer" resultType="Map">
-    select * from cart_detail a left join goods_info b on a.goods_id = b.id where a.cart_id = #{cartId,jdbcType=INTEGER} and a.user_id = #{userId,jdbcType=INTEGER} and a.status = 1
+    select * from cart_detail a left join goods_info b on a.goods_id = b.id where a.cart_id = #{cartId,jdbcType=INTEGER} and a.user_id = #{userId,jdbcType=INTEGER}
   </select>
   <select id="selectByCartIdGoodsId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from cart_detail where cart_id = #{cartId,jdbcType=INTEGER} and goods_id = #{goodsId,jdbcType=INTEGER} and status = 1
+    select * from cart_detail where cart_id = #{cartId,jdbcType=INTEGER} and goods_id = #{goodsId,jdbcType=INTEGER}
+  </select>
+  <select id="selectByUserIdGoodsId" parameterType="Integer" resultMap="BaseResultMap">
+    select * from cart_detail where user_id = #{userId} and goods_id = #{goodsId}
   </select>
 </mapper>

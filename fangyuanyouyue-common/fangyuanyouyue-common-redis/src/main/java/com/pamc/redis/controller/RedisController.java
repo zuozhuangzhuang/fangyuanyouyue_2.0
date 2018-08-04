@@ -1,21 +1,17 @@
 package com.pamc.redis.controller;
 
-import javax.annotation.Resource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.fangyuanyouyue.base.BaseController;
 import com.pamc.redis.param.RedisParam;
 import com.pamc.redis.service.RedisService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 /**
  * 
@@ -34,9 +30,7 @@ public class RedisController extends BaseController {
 
 	/**
 	 * 保存string
-	 * 
-	 * @param key
-	 * @param value
+	 * @param str
 	 * @return
 	 */
 	@PostMapping(value = "/set")
@@ -51,7 +45,7 @@ public class RedisController extends BaseController {
 	 * @param key
 	 * @return
 	 */
-	@GetMapping(value = "get")
+	@PostMapping(value = "get",headers = "Accept=application/json")
 	@ResponseBody
 	public Object getObject(String key) {
 		return redisService.get(key);

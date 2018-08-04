@@ -16,8 +16,10 @@ import com.fangyuanyouyue.user.model.UserInfo;
 import com.fangyuanyouyue.user.service.SchedualRedisService;
 import com.fangyuanyouyue.user.service.UserAddressInfoService;
 import com.fangyuanyouyue.user.service.UserInfoService;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service(value = "userAddressInfoService")
+@Transactional(rollbackFor=Exception.class)
 public class UserAddressInfoServiceImpl implements UserAddressInfoService{
     @Autowired
     private UserInfoMapper userInfoMapper;
@@ -30,10 +32,6 @@ public class UserAddressInfoServiceImpl implements UserAddressInfoService{
 
     @Override
     public List<UserAddressDto> addAddress(String token, String receiverName, String receiverPhone, String province, String city, String area, String address, String postCode, Integer type) throws ServiceException {
-        //TODO 保存缓存
-    	//Integer userId = (Integer)schedualRedisService.get(token);
-    	//schedualRedisService.set(token, userId, 7*24*60l);
-        
         UserInfo userInfo = userInfoService.getUserByToken(token);
         if(userInfo == null){
             throw new ServiceException("用户不存在！");
@@ -48,6 +46,14 @@ public class UserAddressInfoServiceImpl implements UserAddressInfoService{
             userAddressInfo.setArea(area);
             userAddressInfo.setAddress(address);
             if(type != null){
+                if(type == 1){//设置为默认地址
+                    //查询是否已存在默认地址,取消旧默认地址
+                    UserAddressInfo defaultAddress = userAddressInfoMapper.selectDefaultAddressByUserId(userInfo.getId());
+                    if(defaultAddress != null){
+                        defaultAddress.setType(StatusEnum.ADDRESS_OTHER.getCode());
+                        userAddressInfoMapper.updateByPrimaryKey(defaultAddress);
+                    }
+                }
                 userAddressInfo.setType(type);
             }
             userAddressInfoMapper.insert(userAddressInfo);
@@ -59,10 +65,6 @@ public class UserAddressInfoServiceImpl implements UserAddressInfoService{
 
     @Override
     public UserAddressDto updateAddress(String token, Integer addressId, String receiverName, String receiverPhone, String province, String city, String area, String address, String postCode, Integer type) throws ServiceException {
-        //Integer userId = (Integer)redisTemplate.opsForValue().get(token);
-       // redisTemplate.expire(token,7,TimeUnit.DAYS);
-       // UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
-
         UserInfo userInfo = userInfoService.getUserByToken(token);
         if(userInfo == null){
             throw new ServiceException("此用户不存在！");
@@ -78,7 +80,17 @@ public class UserAddressInfoServiceImpl implements UserAddressInfoService{
                 userAddressInfo.setArea(area);
                 userAddressInfo.setAddress(address);
                 userAddressInfo.setPostCode(postCode);
-                userAddressInfo.setType(type);
+                if(type != null){
+                    if(type == 1){//设置为默认地址
+                        //查询是否已存在默认地址,取消旧默认地址
+                        UserAddressInfo defaultAddress = userAddressInfoMapper.selectDefaultAddressByUserId(userInfo.getId());
+                        if(defaultAddress != null){
+                            defaultAddress.setType(StatusEnum.ADDRESS_OTHER.getCode());
+                            userAddressInfoMapper.updateByPrimaryKey(defaultAddress);
+                        }
+                    }
+                    userAddressInfo.setType(type);
+                }
                 userAddressInfoMapper.updateByPrimaryKey(userAddressInfo);
                 return new UserAddressDto(userAddressInfo);
             }
@@ -87,9 +99,6 @@ public class UserAddressInfoServiceImpl implements UserAddressInfoService{
 
     @Override
     public List<UserAddressDto> deleteAddress(String token, Integer addressId) throws ServiceException {
-        //Integer userId = (Integer)redisTemplate.opsForValue().get(token);
-        //redisTemplate.expire(token,7,TimeUnit.DAYS);
-        //UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
         UserInfo userInfo = userInfoService.getUserByToken(token);
         if(userInfo == null){
             throw new ServiceException("此用户不存在！");
@@ -108,10 +117,6 @@ public class UserAddressInfoServiceImpl implements UserAddressInfoService{
 
     @Override
     public void defaultAddress(String token, Integer addressId) throws ServiceException {
-        //Integer userId = (Integer)redisTemplate.opsForValue().get(token);
-       // redisTemplate.expire(token,7,TimeUnit.DAYS);
-       // UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
-
         UserInfo userInfo = userInfoService.getUserByToken(token);
         if(userInfo == null){
             throw new ServiceException("此用户不存在！");
@@ -119,7 +124,7 @@ public class UserAddressInfoServiceImpl implements UserAddressInfoService{
             //取消旧默认地址
             UserAddressInfo defaultAddress = userAddressInfoMapper.selectDefaultAddressByUserId(userInfo.getId());
             if(defaultAddress != null){
-                defaultAddress.setType(Integer.valueOf(StatusEnum.ADDRESS_OTHER.getValue()));
+                defaultAddress.setType(StatusEnum.ADDRESS_OTHER.getCode());
                 userAddressInfoMapper.updateByPrimaryKey(defaultAddress);
             }
             //设置新默认地址
@@ -127,16 +132,13 @@ public class UserAddressInfoServiceImpl implements UserAddressInfoService{
             if(userAddressInfo == null){
                 throw new ServiceException("参数错误！");
             }
-            userAddressInfo.setType(Integer.valueOf(StatusEnum.ADDRESS_DEFAULT.getValue()));
+            userAddressInfo.setType(StatusEnum.ADDRESS_DEFAULT.getCode());
             userAddressInfoMapper.updateByPrimaryKey(userAddressInfo);
         }
     }
 
     @Override
     public List<UserAddressDto> getAddressList(String token,Integer addressId) throws ServiceException {
-        //Integer userId = (Integer)redisTemplate.opsForValue().get(token);
-        //redisTemplate.expire(token,7,TimeUnit.DAYS);
-        //UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
         UserInfo userInfo = userInfoService.getUserByToken(token);
         if(userInfo == null){
             throw new ServiceException("用户不存在！");
@@ -151,10 +153,6 @@ public class UserAddressInfoServiceImpl implements UserAddressInfoService{
 
     @Override
     public UserAddressDto getDefaultAddress(String token) throws ServiceException {
-        //Integer userId = (Integer)redisTemplate.opsForValue().get(token);
-        //redisTemplate.expire(token,7,TimeUnit.DAYS);
-        //UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
-
         UserInfo userInfo = userInfoService.getUserByToken(token);
         if(userInfo == null){
             throw new ServiceException("用户不存在！");

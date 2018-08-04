@@ -14,6 +14,6 @@ public interface SchedualRedisService {
     @RequestMapping(value = "/redis/set",method = RequestMethod.POST)
     Boolean set(@RequestParam(value = "key") String key,@RequestParam(value = "value") String value,@RequestParam(value = "expire") Long expire);
 
-    @RequestMapping(value = "/redis/get",method = RequestMethod.GET)
+    @RequestMapping(value = "/redis/get",method = RequestMethod.POST)
     Object get(@RequestParam(value = "key") String key);
 }

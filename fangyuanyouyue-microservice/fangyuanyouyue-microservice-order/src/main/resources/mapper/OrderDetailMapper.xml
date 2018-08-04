@@ -11,16 +11,17 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="coupon_id" jdbcType="INTEGER" property="couponId" />
     <result column="main_img_url" jdbcType="VARCHAR" property="mainImgUrl" />
-    <result column="orgPrice" jdbcType="DECIMAL" property="orgprice" />
+    <result column="amount" jdbcType="DECIMAL" property="amount" />
     <result column="freight" jdbcType="DECIMAL" property="freight" />
-    <result column="price" jdbcType="DECIMAL" property="price" />
+    <result column="pay_amount" jdbcType="DECIMAL" property="payAmount" />
+    <result column="seller_id" jdbcType="INTEGER" property="sellerId" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.order.model.OrderDetail">
     <result column="description" jdbcType="LONGVARCHAR" property="description" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, order_id, goods_id, goods_name, add_time, update_time, coupon_id, main_img_url, 
-    orgPrice, freight, price
+    amount, freight, pay_amount, seller_id
   </sql>
   <sql id="Blob_Column_List">
     description
@@ -41,13 +42,13 @@
     insert into order_detail (id, user_id, order_id, 
       goods_id, goods_name, add_time, 
       update_time, coupon_id, main_img_url, 
-      orgPrice, freight, price, 
-      description)
+      amount, freight, pay_amount, 
+      seller_id, description)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{orderId,jdbcType=INTEGER}, 
       #{goodsId,jdbcType=INTEGER}, #{goodsName,jdbcType=VARCHAR}, #{addTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP}, #{couponId,jdbcType=INTEGER}, #{mainImgUrl,jdbcType=VARCHAR}, 
-      #{orgprice,jdbcType=DECIMAL}, #{freight,jdbcType=DECIMAL}, #{price,jdbcType=DECIMAL}, 
-      #{description,jdbcType=LONGVARCHAR})
+      #{amount,jdbcType=DECIMAL}, #{freight,jdbcType=DECIMAL}, #{payAmount,jdbcType=DECIMAL}, 
+      #{sellerId,jdbcType=INTEGER}, #{description,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.fangyuanyouyue.order.model.OrderDetail">
     insert into order_detail
@@ -79,14 +80,17 @@
       <if test="mainImgUrl != null">
         main_img_url,
       </if>
-      <if test="orgprice != null">
-        orgPrice,
+      <if test="amount != null">
+        amount,
       </if>
       <if test="freight != null">
         freight,
       </if>
-      <if test="price != null">
-        price,
+      <if test="payAmount != null">
+        pay_amount,
+      </if>
+      <if test="sellerId != null">
+        seller_id,
       </if>
       <if test="description != null">
         description,
@@ -120,14 +124,17 @@
       <if test="mainImgUrl != null">
         #{mainImgUrl,jdbcType=VARCHAR},
       </if>
-      <if test="orgprice != null">
-        #{orgprice,jdbcType=DECIMAL},
+      <if test="amount != null">
+        #{amount,jdbcType=DECIMAL},
       </if>
       <if test="freight != null">
         #{freight,jdbcType=DECIMAL},
       </if>
-      <if test="price != null">
-        #{price,jdbcType=DECIMAL},
+      <if test="payAmount != null">
+        #{payAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="sellerId != null">
+        #{sellerId,jdbcType=INTEGER},
       </if>
       <if test="description != null">
         #{description,jdbcType=LONGVARCHAR},
@@ -161,14 +168,17 @@
       <if test="mainImgUrl != null">
         main_img_url = #{mainImgUrl,jdbcType=VARCHAR},
       </if>
-      <if test="orgprice != null">
-        orgPrice = #{orgprice,jdbcType=DECIMAL},
+      <if test="amount != null">
+        amount = #{amount,jdbcType=DECIMAL},
       </if>
       <if test="freight != null">
         freight = #{freight,jdbcType=DECIMAL},
       </if>
-      <if test="price != null">
-        price = #{price,jdbcType=DECIMAL},
+      <if test="payAmount != null">
+        pay_amount = #{payAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="sellerId != null">
+        seller_id = #{sellerId,jdbcType=INTEGER},
       </if>
       <if test="description != null">
         description = #{description,jdbcType=LONGVARCHAR},
@@ -186,9 +196,10 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       coupon_id = #{couponId,jdbcType=INTEGER},
       main_img_url = #{mainImgUrl,jdbcType=VARCHAR},
-      orgPrice = #{orgprice,jdbcType=DECIMAL},
+      amount = #{amount,jdbcType=DECIMAL},
       freight = #{freight,jdbcType=DECIMAL},
-      price = #{price,jdbcType=DECIMAL},
+      pay_amount = #{payAmount,jdbcType=DECIMAL},
+      seller_id = #{sellerId,jdbcType=INTEGER},
       description = #{description,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -202,12 +213,12 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       coupon_id = #{couponId,jdbcType=INTEGER},
       main_img_url = #{mainImgUrl,jdbcType=VARCHAR},
-      orgPrice = #{orgprice,jdbcType=DECIMAL},
+      amount = #{amount,jdbcType=DECIMAL},
       freight = #{freight,jdbcType=DECIMAL},
-      price = #{price,jdbcType=DECIMAL}
+      pay_amount = #{payAmount,jdbcType=DECIMAL},
+      seller_id = #{sellerId,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
-
 
   <select id="selectByOrderId" parameterType="Integer" resultMap="BaseResultMap">
     select * from order_detail

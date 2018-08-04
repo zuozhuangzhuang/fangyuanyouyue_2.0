@@ -77,9 +77,9 @@ public class GoodsControllerTest {
     @Transactional
     public void addGoods() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/goods/addGoods")
-                .param("token","10025FY1531851479276")
+                .param("token","10025FY1533144562288")
                 .param("goodsInfoName","我是商品")
-                .param("goodsCategoryIds","10,21")
+                .param("goodsCategoryIds","10,22")
                 .param("description","这是个商品，你爱信不信")
                 .param("price","1000")
                 .param("postage","10")
@@ -103,8 +103,8 @@ public class GoodsControllerTest {
     @Transactional
     public void deleteGoods() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/goods/deleteGoods")
-                .param("token","10025FY1531851479276")
-                .param("goodsInfoIds","1,2,3")
+                .param("token","10025FY1532974762055")
+                .param("goodsIds","1,2,3")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -117,7 +117,7 @@ public class GoodsControllerTest {
     @Transactional
     public void goodsInfo() throws Exception {
         mvc.perform(MockMvcRequestBuilders.get("/goods/goodsInfo")
-//                .param("token","10025FY1532456125699")
+//                .param("token","10015FY1532920444058")
                 .param("goodsId","1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())

@@ -2,7 +2,6 @@ package com.fangyuanyouyue.goods.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
-
 /**
  * 购物车明细表
  */
@@ -13,13 +12,7 @@ public class CartDetail {
 
     private Integer goodsId;//商品ID
 
-    private String name;//商品名称
-
-    private String description;//商品详情
-
     private BigDecimal price;//商品价格
-
-    private String mainUrl;//商品主图
 
     private Date addTime;//添加时间
 
@@ -30,8 +23,6 @@ public class CartDetail {
     private String nickName;//店铺名字
 
     private String headImgUrl;//店铺头像图片地址
-
-    private Integer status;//商品是否显示 1显示2不显示
 
     public Integer getId() {
         return id;
@@ -57,36 +48,12 @@ public class CartDetail {
         this.goodsId = goodsId;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public BigDecimal getPrice() {
         return price;
     }
 
     public void setPrice(BigDecimal price) {
         this.price = price;
-    }
-
-    public String getMainUrl() {
-        return mainUrl;
-    }
-
-    public void setMainUrl(String mainUrl) {
-        this.mainUrl = mainUrl;
     }
 
     public Date getAddTime() {
@@ -118,7 +85,7 @@ public class CartDetail {
     }
 
     public void setNickName(String nickName) {
-        this.nickName = nickName;
+        this.nickName = nickName == null ? null : nickName.trim();
     }
 
     public String getHeadImgUrl() {
@@ -126,14 +93,6 @@ public class CartDetail {
     }
 
     public void setHeadImgUrl(String headImgUrl) {
-        this.headImgUrl = headImgUrl;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
+        this.headImgUrl = headImgUrl == null ? null : headImgUrl.trim();
     }
 }

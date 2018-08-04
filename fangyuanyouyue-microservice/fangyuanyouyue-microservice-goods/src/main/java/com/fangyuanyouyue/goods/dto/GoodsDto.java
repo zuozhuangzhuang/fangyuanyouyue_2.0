@@ -40,7 +40,7 @@ public class GoodsDto {
 
     private Integer authType;//官方认证状态 1已认证 2未认证
 
-    private Integer isAppraisal;//是否官方鉴定 1未鉴定 2已鉴定
+    private Integer isAppraisal;//是否官方鉴定 1已鉴定 2未鉴定
 
     private Integer isCollect;//是否收藏/关注 1未关注未收藏（商品/抢购） 2已关注未收藏(抢购) 3未关注已收藏（商品/抢购） 4已关注已收藏(抢购)
 
@@ -116,8 +116,8 @@ public class GoodsDto {
                 this.lastIntervalTime = DateUtil.getFormatDate(goodsInfo.getLastIntervalTime(), DateUtil.DATE_FORMT);
             }
             this.isAppraisal = goodsInfo.getIsAppraisal();
-            this.addTime = DateUtil.getFormatDate(goodsInfo.getAddTime(), DateUtil.DATE_FORMT);
-            this.updateTime = DateUtil.getFormatDate(goodsInfo.getUpdateTime(), DateUtil.DATE_FORMT);
+            this.addTime = DateUtil.getFormatDate(goodsInfo.getAddTime(), DateUtil.DATE_FORMT_YEAR);
+            this.updateTime = DateUtil.getFormatDate(goodsInfo.getUpdateTime(), DateUtil.DATE_FORMT_YEAR);
             this.videoUrl = goodsInfo.getVideoUrl();
         }
         //GoodsImg

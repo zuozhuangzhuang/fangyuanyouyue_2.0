@@ -5,9 +5,12 @@ import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.goods.dto.OrderDto;
 import com.fangyuanyouyue.goods.param.GoodsParam;
+import com.fangyuanyouyue.goods.param.OrderParam;
 import com.fangyuanyouyue.goods.service.AppraisalService;
 import com.fangyuanyouyue.goods.service.CartService;
+import com.fangyuanyouyue.goods.service.SchedualRedisService;
 import com.fangyuanyouyue.goods.service.SchedualUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -24,7 +27,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping(value = "/appraisal")
@@ -40,16 +42,18 @@ public class AppraisalController extends BaseController{
     private CartService cartService;
     @Autowired
     private AppraisalService appraisalService;
+    @Autowired
+    private SchedualRedisService schedualRedisService;
 
-    @ApiOperation(value = "申请鉴定", notes = "(void)申请鉴定分为四种情况：1.卖家对自己商品进行鉴定，可显示到商品详情中 " +
+    @ApiOperation(value = "申请鉴定", notes = "(OrderDto)申请鉴定分为四种情况：1.卖家对自己商品进行鉴定，可显示到商品详情中 " +
             "2.买家对别人的商品进行鉴定，只能自己看到 3.用户上传图片鉴定图片中的物品(这个是全民鉴定还是官方鉴定) " +
             "4.官方认证店铺中的所有商品都是已鉴定",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "goodsIds", value = "商品ID数组", allowMultiple = true,dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "price", value = "鉴定赏金", dataType = "BigDecimal", paramType = "query"),
             @ApiImplicitParam(name = "description", value = "描述",  dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "imgUrl", value = "图片地址",  dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "imgUrls", value = "图片地址数组",allowMultiple = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "videoUrl", value = "视频路径",dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/addAppraisal")
     @ResponseBody
@@ -61,19 +65,20 @@ public class AppraisalController extends BaseController{
             if(StringUtils.isEmpty(param.getToken())){
                 return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
             }
-            Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
             JSONObject jsonObject = JSONObject.parseObject(verifyUser);
             if((Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
-            if(StringUtils.isEmpty(param.getTitle())){
-                return toError(ReCode.FAILD.getValue(),"鉴定标题不能为空！");
+            if(param.getGoodsIds() == null){
+                if(param.getImgUrls() == null && param.getVideoUrl() == null){
+                    toError(ReCode.FAILD.getValue(),"至少包含一张图片或一段视频！");
+                }
             }
-            //申请鉴定
-            appraisalService.addAppraisal(userId,param.getGoodsIds(),param.getTitle(), param.getDescription(),param.getPrice(),param.getImgUrl());
-            return toSuccess( "申请鉴定成功！");
+            //申请鉴定，需要生成订单并返回订单信息
+            OrderDto orderDto = appraisalService.addAppraisal(userId, param.getGoodsIds(), param.getTitle(), param.getDescription(), param.getImgUrl(),param.getVideoUrl());
+            return toSuccess(orderDto);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
@@ -82,6 +87,43 @@ public class AppraisalController extends BaseController{
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
         }
     }
+
+    @ApiOperation(value = "取消鉴定", notes = "取消鉴定",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orderId", value = "订单ID",dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/cancelAppraisal")
+    @ResponseBody
+    public BaseResp cancelAppraisal(OrderParam param) throws IOException {
+        try {
+            log.info("----》取消鉴定《----");
+            log.info("参数：" + param.toString());
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+            }
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            String verifyUser = schedualUserService.verifyUserById(userId);
+            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+            if((Integer)jsonObject.get("code") != 0){
+                return toError(jsonObject.getString("report"));
+            }
+            if(param.getOrderId() == null){
+                toError(ReCode.FAILD.getValue(),"订单ID不能为空！");
+            }
+            //取消鉴定，删除订单及详情
+            appraisalService.cancelAppraisal(userId,param.getOrderId());
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
 
 
     //我的鉴定

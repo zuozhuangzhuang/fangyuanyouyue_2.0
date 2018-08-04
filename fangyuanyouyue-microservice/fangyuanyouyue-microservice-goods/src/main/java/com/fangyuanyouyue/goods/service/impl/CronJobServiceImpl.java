@@ -19,6 +19,7 @@ import com.fangyuanyouyue.goods.dao.HotSearchMapper;
 import com.fangyuanyouyue.goods.model.GoodsInfo;
 import com.fangyuanyouyue.goods.service.CronJobService;
 import com.fangyuanyouyue.goods.service.SchedualUserService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -28,6 +29,7 @@ import com.fangyuanyouyue.goods.service.SchedualUserService;
  */
 
 @Component
+@Transactional(rollbackFor=Exception.class)
 public class CronJobServiceImpl implements CronJobService {
 
 	protected Logger log  =  Logger.getLogger(this.getClass());

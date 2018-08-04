@@ -51,6 +51,12 @@ public class OrderPay {
 
     private Date updateTime;//更新时间
 
+    private String province;//省份
+
+    private String city;//城市
+
+    private String area;//区域
+
     public Integer getId() {
         return id;
     }
@@ -225,5 +231,29 @@ public class OrderPay {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province == null ? null : province.trim();
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city == null ? null : city.trim();
+    }
+
+    public String getArea() {
+        return area;
+    }
+
+    public void setArea(String area) {
+        this.area = area == null ? null : area.trim();
     }
 }

@@ -3,6 +3,9 @@ package com.fangyuanyouyue.order.model;
 import java.math.BigDecimal;
 import java.util.Date;
 
+/**
+ * 商品详情表
+ */
 public class GoodsInfo {
     private Integer id;
 

@@ -60,17 +60,17 @@ public class CollectControllerTest {
 
 
     /**
-     * 收藏/关注
+     * 获取我的收藏/关注
      * @throws Exception
      */
     @Test
     @Transactional
     public void collectList() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/collect/collectList")
-                .param("token","10025FY1531851479276")
+                .param("token","10025FY1533144562288")
                 //类型 1关注 2收藏
                 .param("type","1")
-                //关注/收藏类型 关注/收藏类型 1商品 2抢购 3视频 4专栏 5鉴赏
+                //关注/收藏类型 1商品 2抢购（只有抢购可以关注）
                 .param("collectType","2")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.fangyuanyouyue.user.dto.UserFansDto;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +35,10 @@ import com.fangyuanyouyue.user.param.UserParam;
 import com.fangyuanyouyue.user.service.SchedualGoodsService;
 import com.fangyuanyouyue.user.service.SchedualRedisService;
 import com.fangyuanyouyue.user.service.UserInfoService;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service(value = "userInfoService")
+@Transactional(rollbackFor=Exception.class)
 public class UserInfoServiceImpl implements UserInfoService {
     protected Logger log = Logger.getLogger(this.getClass());
     @Autowired
@@ -555,22 +558,15 @@ public class UserInfoServiceImpl implements UserInfoService {
         return shopDtos;
     }
 
-//    public static void main(String[] args) {
-//        SchedualGoodsService schedualGoodsService = new SchedualGoodsServiceImpl();
-//        String goodsLists = schedualGoodsService.goodsList(16, 0, 3);
-//        System.out.println("goodsLists:"+goodsLists);
-//        JSONObject jsonObject = JSONObject.parseObject(goodsLists);
-//        System.out.println("jsonObject:"+jsonObject);
-//        JSONObject goodsList = JSONArray.parseObject(jsonObject.getString("data"));
-//        System.out.println("goodsList:"+goodsList);
-//    }
 
     @Override
     public UserDto userInfo(String token,Integer userId) throws ServiceException {
-        //Integer userIdByToken = (Integer)redisTemplate.opsForValue().get(token);
-        //redisTemplate.expire(token,7,TimeUnit.DAYS);
-        //UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
-    	UserInfo userInfo = getUserByToken(token);
+        UserInfo userByToken = null;
+        if(StringUtils.isNotEmpty(token)){
+            userByToken = getUserByToken(token);
+        }
+        UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
+
         if(userInfo == null){
             throw new ServiceException("用户不存在！");
         }else{
@@ -578,9 +574,11 @@ public class UserInfoServiceImpl implements UserInfoService {
             userDto.setFansCount(userFansMapper.fansCount(userId));
             userDto.setCollectCount(userFansMapper.collectCount(userId));
             //判断token用户是否关注userId用户
-            UserFans userFans = userFansMapper.selectByUserIdToUserId(userInfo.getId(), userId);
-            if(userFans != null){
-               userDto.setIsFollow(1);//是否关注 1是 2否
+            if(userByToken != null){
+                UserFans userFans = userFansMapper.selectByUserIdToUserId(userByToken.getId(),userId);
+                if(userFans != null){
+                   userDto.setIsFollow(1);//是否关注 1是 2否
+                }
             }
             return userDto;
         }
@@ -624,5 +622,16 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
     }
 
+    @Override
+    public List<UserFansDto> myFansOrFollows(Integer userId,Integer type,Integer start,Integer limit) throws ServiceException {
+        UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
+        if(userInfo == null){
+            throw new ServiceException("用户不存在！");
+        }else{
+            List<Map<String, Object>> maps = userFansMapper.myFansOrFollows(userId,type,start*limit, limit);
+            List<UserFansDto> userFollowsDtos = UserFansDto.toDtoList(maps);
+            return userFollowsDtos;
+        }
+    }
 
 }
