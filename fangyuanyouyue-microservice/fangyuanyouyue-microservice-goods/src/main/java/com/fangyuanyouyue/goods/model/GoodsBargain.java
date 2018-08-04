@@ -2,7 +2,6 @@ package com.fangyuanyouyue.goods.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
-
 /**
  * 商品议价表
  */
@@ -22,6 +21,8 @@ public class GoodsBargain {
     private Date addTime;//添加时间
 
     private Date updateTime;//更新时间
+
+    private Integer addressId;//收货地址ID
 
     public Integer getId() {
         return id;
@@ -85,5 +86,13 @@ public class GoodsBargain {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Integer getAddressId() {
+        return addressId;
+    }
+
+    public void setAddressId(Integer addressId) {
+        this.addressId = addressId;
     }
 }
