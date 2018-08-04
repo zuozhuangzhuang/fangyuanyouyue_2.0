@@ -42,13 +42,14 @@ public class BargainControllerTest {
      * @throws Exception
      */
     @Test
-    @Transactional
+//    @Transactional
     public void addBargain() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/bargain/addBargain")
-                .param("token","10025FY1532484001421")
-                .param("goodsId","9")
-                .param("price","100")
+                .param("token","10036FY1533190696203")
+                .param("goodsId","85")
+                .param("price","800")
                 .param("reason","交个朋友")
+                .param("addressId","45")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -60,12 +61,13 @@ public class BargainControllerTest {
      * @throws Exception
      */
     @Test
-    @Transactional
+//    @Transactional
     public void updateBargain() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/bargain/updateBargain")
-                .param("token","10025FY1532484001421")
-                .param("goodsId","1")
-                .param("bargainId","1")
+                .param("token","10025FY1533144562288")
+                .param("goodsId","85")
+                .param("bargainId","15")
+                //状态 2同意 3拒绝 4取消
                 .param("status","2")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
@@ -80,7 +82,7 @@ public class BargainControllerTest {
     @Transactional
     public void bargainList() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/bargain/bargainList")
-                .param("token","10025FY1532648364148")
+                .param("token","10025FY1533144562288")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

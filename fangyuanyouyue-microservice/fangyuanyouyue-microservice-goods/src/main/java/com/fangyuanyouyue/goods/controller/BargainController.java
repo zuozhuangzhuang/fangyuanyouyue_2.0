@@ -49,7 +49,8 @@ public class BargainController extends BaseController{
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "goodsId", value = "商品ID",required = true,dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "price", value = "出价钱", required = true, dataType = "BigDecimal", paramType = "query"),
-            @ApiImplicitParam(name = "reason", value = "议价理由", dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "reason", value = "议价理由", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "addressId", value = "收货地址id",required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/addBargain")
     @ResponseBody
@@ -73,8 +74,11 @@ public class BargainController extends BaseController{
             if(param.getPrice() == null){
                 return toError(ReCode.FAILD.getValue(),"出价钱不能为空！");
             }
-            //申请商品压价
-            bargainService.addBargain(userId,param.getGoodsId(),param.getPrice(),param.getReason());
+            if(param.getAddressId() == null){
+                return toError(ReCode.FAILD.getValue(),"收货地址不能为空！");
+            }
+            //TODO 申请商品压价
+            bargainService.addBargain(userId,param.getGoodsId(),param.getPrice(),param.getReason(),param.getAddressId());
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
@@ -132,7 +136,9 @@ public class BargainController extends BaseController{
 
     @ApiOperation(value = "我的压价列表", notes = "(BargainDto)买家获取自己所压价商品的列表",response = BaseResp.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "start", value = "起始页数", required = true,dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true,dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/bargainList")
     @ResponseBody
@@ -150,8 +156,11 @@ public class BargainController extends BaseController{
             if((Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
+            if(param.getStart() == null || param.getStart().intValue() < 0 || param.getLimit() == null || param.getLimit() < 1){
+                return toError(ReCode.FAILD.getValue(),"分页参数异常！");
+            }
             //TODO 我的压价列表
-            List<BargainDto> bargainDtos = bargainService.bargainList(userId);
+            List<BargainDto> bargainDtos = bargainService.bargainList(userId,param.getStart(),param.getLimit());
             return toSuccess( bargainDtos);
         } catch (ServiceException e) {
             e.printStackTrace();
