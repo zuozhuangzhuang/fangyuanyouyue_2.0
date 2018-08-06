@@ -1,6 +1,9 @@
 package com.fangyuanyouyue.goods.dto;
 
 import com.fangyuanyouyue.goods.model.HotSearch;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +11,9 @@ import java.util.List;
 /**
  * 热门搜索DTO
  */
+@Getter
+@Setter
+@ToString
 public class SearchDto {
     private Integer id;
     private String name;//搜索名称
@@ -33,27 +39,4 @@ public class SearchDto {
         return dtolist;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getCount() {
-        return count;
-    }
-
-    public void setCount(Integer count) {
-        this.count = count;
-    }
 }

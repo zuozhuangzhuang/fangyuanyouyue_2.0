@@ -6,10 +6,16 @@ import java.util.List;
 
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.order.model.OrderInfo;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * 订单DTO
  */
+@Getter
+@Setter
+@ToString
 public class OrderDto {
     //订单信息
     private Integer userId;//买家id
@@ -57,83 +63,4 @@ public class OrderDto {
         return dtolist;
     }
 
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public String getNickName() {
-        return nickName;
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
-    }
-
-    public Integer getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(Integer orderId) {
-        this.orderId = orderId;
-    }
-
-    public String getOrderNo() {
-        return orderNo;
-    }
-
-    public void setOrderNo(String orderNo) {
-        this.orderNo = orderNo;
-    }
-
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public List<OrderDetailDto> getOrderDetailDtos() {
-        return orderDetailDtos;
-    }
-
-    public void setOrderDetailDtos(List<OrderDetailDto> orderDetailDtos) {
-        this.orderDetailDtos = orderDetailDtos;
-    }
-
-    public OrderPayDto getOrderPayDto() {
-        return orderPayDto;
-    }
-
-    public void setOrderPayDto(OrderPayDto orderPayDto) {
-        this.orderPayDto = orderPayDto;
-    }
-
-    public String getAddTime() {
-        return addTime;
-    }
-
-    public void setAddTime(String addTime) {
-        this.addTime = addTime;
-    }
-
-    public List<SellerDto> getSellerDtos() {
-        return sellerDtos;
-    }
-
-    public void setSellerDtos(List<SellerDto> sellerDtos) {
-        this.sellerDtos = sellerDtos;
-    }
 }

@@ -1,5 +1,9 @@
 package com.fangyuanyouyue.user.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +11,9 @@ import java.util.Map;
 /**
  * 用户粉丝DTO
  */
+@Getter
+@Setter
+@ToString
 public class UserFansDto {
     private Integer userId;//用户ID
 
@@ -46,69 +53,6 @@ public class UserFansDto {
             dtolist.add(dto);
         }
         return dtolist;
-    }
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public Integer getLevel() {
-        return level;
-    }
-
-    public void setLevel(Integer level) {
-        this.level = level;
-    }
-
-    public Integer getVipLevel() {
-        return vipLevel;
-    }
-
-    public void setVipLevel(Integer vipLevel) {
-        this.vipLevel = vipLevel;
-    }
-
-    public Integer getCredit() {
-        return credit;
-    }
-
-    public void setCredit(Integer credit) {
-        this.credit = credit;
-    }
-
-    public String getNickName() {
-        return nickName;
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
-    }
-
-    public String getHeadImgUrl() {
-        return headImgUrl;
-    }
-
-    public void setHeadImgUrl(String headImgUrl) {
-        this.headImgUrl = headImgUrl;
-    }
-
-    public String getSignature() {
-        return signature;
-    }
-
-    public void setSignature(String signature) {
-        this.signature = signature;
-    }
-
-    public Integer getAuthtype() {
-        return authtype;
-    }
-
-    public void setAuthtype(Integer authtype) {
-        this.authtype = authtype;
     }
 
 }

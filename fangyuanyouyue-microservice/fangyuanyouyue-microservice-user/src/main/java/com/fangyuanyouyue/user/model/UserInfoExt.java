@@ -1,10 +1,17 @@
 package com.fangyuanyouyue.user.model;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.util.Date;
 
 /**
  * 用户扩展信息表
  */
+@Getter
+@Setter
+@ToString
 public class UserInfoExt {
     private Integer id;//唯一自增ID
 
@@ -28,91 +35,4 @@ public class UserInfoExt {
 
     private Integer score;//用户积分
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public String getIdentity() {
-        return identity;
-    }
-
-    public void setIdentity(String identity) {
-        this.identity = identity == null ? null : identity.trim();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name == null ? null : name.trim();
-    }
-
-    public String getPayPwd() {
-        return payPwd;
-    }
-
-    public void setPayPwd(String payPwd) {
-        this.payPwd = payPwd == null ? null : payPwd.trim();
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public Date getAddTime() {
-        return addTime;
-    }
-
-    public void setAddTime(Date addTime) {
-        this.addTime = addTime;
-    }
-
-    public Integer getAuthType() {
-        return authType;
-    }
-
-    public void setAuthType(Integer authType) {
-        this.authType = authType;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public Integer getCredit() {
-        return credit;
-    }
-
-    public void setCredit(Integer credit) {
-        this.credit = credit;
-    }
-
-    public Integer getScore() {
-        return score;
-    }
-
-    public void setScore(Integer score) {
-        this.score = score;
-    }
 }

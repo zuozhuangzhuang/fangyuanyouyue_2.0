@@ -1,10 +1,17 @@
 package com.fangyuanyouyue.goods.model;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.util.Date;
 
 /**
  * 商品图片表
  */
+@Getter
+@Setter
+@ToString
 public class GoodsImg {
     private Integer id;
 
@@ -18,51 +25,4 @@ public class GoodsImg {
 
     private Date addTime;//添加时间
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getGoodsId() {
-        return goodsId;
-    }
-
-    public void setGoodsId(Integer goodsId) {
-        this.goodsId = goodsId;
-    }
-
-    public String getImgUrl() {
-        return imgUrl;
-    }
-
-    public void setImgUrl(String imgUrl) {
-        this.imgUrl = imgUrl == null ? null : imgUrl.trim();
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
-    }
-
-    public Date getAddTime() {
-        return addTime;
-    }
-
-    public void setAddTime(Date addTime) {
-        this.addTime = addTime;
-    }
-
-    public Integer getSort() {
-        return sort;
-    }
-
-    public void setSort(Integer sort) {
-        this.sort = sort;
-    }
 }

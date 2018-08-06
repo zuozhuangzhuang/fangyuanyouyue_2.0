@@ -1,6 +1,9 @@
 package com.fangyuanyouyue.order.dto;
 
 import com.fangyuanyouyue.order.model.OrderDetail;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -9,6 +12,9 @@ import java.util.List;
 /**
  * 订单详情表DTO
  */
+@Getter
+@Setter
+@ToString
 public class OrderDetailDto {
     private Integer userId;//买家id
 
@@ -62,91 +68,4 @@ public class OrderDetailDto {
         return dtolist;
     }
 
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public Integer getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(Integer orderId) {
-        this.orderId = orderId;
-    }
-
-    public Integer getGoodsId() {
-        return goodsId;
-    }
-
-    public void setGoodsId(Integer goodsId) {
-        this.goodsId = goodsId;
-    }
-
-    public String getGoodsName() {
-        return goodsName;
-    }
-
-    public void setGoodsName(String goodsName) {
-        this.goodsName = goodsName;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public BigDecimal getPayAmount() {
-        return payAmount;
-    }
-
-    public void setPayAmount(BigDecimal payAmount) {
-        this.payAmount = payAmount;
-    }
-
-    public BigDecimal getFreight() {
-        return freight;
-    }
-
-    public void setFreight(BigDecimal freight) {
-        this.freight = freight;
-    }
-
-    public String getIconImg() {
-        return iconImg;
-    }
-
-    public void setIconImg(String iconImg) {
-        this.iconImg = iconImg;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public Integer getAllowReturn() {
-        return allowReturn;
-    }
-
-    public void setAllowReturn(Integer allowReturn) {
-        this.allowReturn = allowReturn;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

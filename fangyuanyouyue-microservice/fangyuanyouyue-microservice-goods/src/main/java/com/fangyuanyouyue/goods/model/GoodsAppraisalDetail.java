@@ -1,11 +1,18 @@
 package com.fangyuanyouyue.goods.model;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
 /**
  * 商品鉴定详情表
  */
+@Getter
+@Setter
+@ToString
 public class GoodsAppraisalDetail {
     private Integer id;//唯一自增ID
 
@@ -31,99 +38,4 @@ public class GoodsAppraisalDetail {
 
     private Integer type;//鉴定类型 1商家鉴定 2买家 3普通用户
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getAppraisalId() {
-        return appraisalId;
-    }
-
-    public void setAppraisalId(Integer appraisalId) {
-        this.appraisalId = appraisalId;
-    }
-
-    public Integer getGoodsId() {
-        return goodsId;
-    }
-
-    public void setGoodsId(Integer goodsId) {
-        this.goodsId = goodsId;
-    }
-
-    public String getOpinion() {
-        return opinion;
-    }
-
-    public void setOpinion(String opinion) {
-        this.opinion = opinion == null ? null : opinion.trim();
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title == null ? null : title.trim();
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public Date getSubmitTime() {
-        return submitTime;
-    }
-
-    public void setSubmitTime(Date submitTime) {
-        this.submitTime = submitTime;
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
-    }
-
-    public Date getAddTime() {
-        return addTime;
-    }
-
-    public void setAddTime(Date addTime) {
-        this.addTime = addTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description == null ? null : description.trim();
-    }
 }

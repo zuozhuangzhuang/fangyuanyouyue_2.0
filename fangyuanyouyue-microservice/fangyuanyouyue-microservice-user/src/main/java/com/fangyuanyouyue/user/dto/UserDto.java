@@ -1,5 +1,8 @@
 package com.fangyuanyouyue.user.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.apache.commons.lang.StringUtils;
 
 import com.fangyuanyouyue.user.model.IdentityAuthApply;
@@ -10,6 +13,9 @@ import com.fangyuanyouyue.user.model.UserVip;
 /**
  * 用户信息
  */
+@Getter
+@Setter
+@ToString
 public class UserDto {
     //UserInfo 用户基本信息表
     private Integer userId;//用户ID
@@ -163,211 +169,4 @@ public class UserDto {
 //        }
     }
 
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getUserAddress() {
-        return userAddress;
-    }
-
-    public void setUserAddress(String userAddress) {
-        this.userAddress = userAddress;
-    }
-
-    public String getNickName() {
-        return nickName;
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
-    }
-
-    public String getHeadImgUrl() {
-        return headImgUrl;
-    }
-
-    public void setHeadImgUrl(String headImgUrl) {
-        this.headImgUrl = headImgUrl;
-    }
-
-    public String getBgImgUrl() {
-        return bgImgUrl;
-    }
-
-    public void setBgImgUrl(String bgImgUrl) {
-        this.bgImgUrl = bgImgUrl;
-    }
-
-    public Integer getGender() {
-        return gender;
-    }
-
-    public void setGender(Integer gender) {
-        this.gender = gender;
-    }
-
-    public String getSignature() {
-        return signature;
-    }
-
-    public void setSignature(String signature) {
-        this.signature = signature;
-    }
-
-    public String getContact() {
-        return contact;
-    }
-
-    public void setContact(String contact) {
-        this.contact = contact;
-    }
-
-    public Integer getLevel() {
-        return level;
-    }
-
-    public void setLevel(Integer level) {
-        this.level = level;
-    }
-
-    public String getLevelDesc() {
-        return levelDesc;
-    }
-
-    public void setLevelDesc(String levelDesc) {
-        this.levelDesc = levelDesc;
-    }
-
-    public Integer getExtStatus() {
-        return extStatus;
-    }
-
-    public void setExtStatus(Integer extStatus) {
-        this.extStatus = extStatus;
-    }
-
-    public Integer getVipLevel() {
-        return vipLevel;
-    }
-
-    public void setVipLevel(Integer vipLevel) {
-        this.vipLevel = vipLevel;
-    }
-
-    public String getVipLevelDesc() {
-        return vipLevelDesc;
-    }
-
-    public void setVipLevelDesc(String vipLevelDesc) {
-        this.vipLevelDesc = vipLevelDesc;
-    }
-
-    public Integer getVipType() {
-        return vipType;
-    }
-
-    public void setVipType(Integer vipType) {
-        this.vipType = vipType;
-    }
-
-    public Integer getVipStatus() {
-        return vipStatus;
-    }
-
-    public void setVipStatus(Integer vipStatus) {
-        this.vipStatus = vipStatus;
-    }
-
-    public Integer getIdentityStatus() {
-        return identityStatus;
-    }
-
-    public void setIdentityStatus(Integer identityStatus) {
-        this.identityStatus = identityStatus;
-    }
-
-    public Integer getFansCount() {
-        return fansCount;
-    }
-
-    public void setFansCount(Integer fansCount) {
-        this.fansCount = fansCount;
-    }
-
-    public Integer getCollectCount() {
-        return collectCount;
-    }
-
-    public void setCollectCount(Integer collectCount) {
-        this.collectCount = collectCount;
-    }
-
-    public UserAddressDto getDefaultAddress() {
-        return defaultAddress;
-    }
-
-    public void setDefaultAddress(UserAddressDto defaultAddress) {
-        this.defaultAddress = defaultAddress;
-    }
-
-    public Integer getScore() {
-        return score;
-    }
-
-    public void setScore(Integer score) {
-        this.score = score;
-    }
-
-    public Integer getCredit() {
-        return credit;
-    }
-
-    public void setCredit(Integer credit) {
-        this.credit = credit;
-    }
-
-    public Integer getAuthType() {
-        return authType;
-    }
-
-    public void setAuthType(Integer authType) {
-        this.authType = authType;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public Integer getIsFollow() {
-        return isFollow;
-    }
-
-    public void setIsFollow(Integer isFollow) {
-        this.isFollow = isFollow;
-    }
 }

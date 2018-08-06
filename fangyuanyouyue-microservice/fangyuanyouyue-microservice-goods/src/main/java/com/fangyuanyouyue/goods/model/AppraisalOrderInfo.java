@@ -4,26 +4,30 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 商品分类关联表
+ * 鉴定订单表
  */
 @Getter
 @Setter
 @ToString
-public class GoodsCorrelation {
+public class AppraisalOrderInfo {
     private Integer id;//唯一自增ID
 
-    private Integer goodsCategoryId;//商品分类ID
+    private Integer userId;//用户id
 
-    private Integer goodsId;//商品ID
+    private Integer appraisalId;//鉴定id
 
-    private Integer categoryParentId;//商品分类父ID
+    private String orderNo;//订单号
+
+    private BigDecimal amount;//订单总金额
+
+    private Integer count;//商品总数
 
     private Date addTime;//添加时间
 
     private Date updateTime;//更新时间
-
 
 }

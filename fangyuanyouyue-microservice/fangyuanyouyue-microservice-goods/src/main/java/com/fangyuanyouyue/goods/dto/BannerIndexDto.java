@@ -2,6 +2,9 @@ package com.fangyuanyouyue.goods.dto;
 
 import com.fangyuanyouyue.goods.model.BannerIndex;
 import com.fangyuanyouyue.goods.model.GoodsCorrelation;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,6 +13,9 @@ import java.util.List;
 /**
  * 轮播图dto
  */
+@Getter
+@Setter
+@ToString
 public class BannerIndexDto {
     private Integer bannerId;//唯一自增ID
 
@@ -50,68 +56,5 @@ public class BannerIndexDto {
             dtolist.add(dto);
         }
         return dtolist;
-    }
-    public Integer getBannerId() {
-        return bannerId;
-    }
-
-    public void setBannerId(Integer bannerId) {
-        this.bannerId = bannerId;
-    }
-
-    public Integer getBusinessId() {
-        return businessId;
-    }
-
-    public void setBusinessId(Integer businessId) {
-        this.businessId = businessId;
-    }
-
-    public Integer getJumpType() {
-        return jumpType;
-    }
-
-    public void setJumpType(Integer jumpType) {
-        this.jumpType = jumpType;
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getImgUrl() {
-        return imgUrl;
-    }
-
-    public void setImgUrl(String imgUrl) {
-        this.imgUrl = imgUrl;
-    }
-
-    public Integer getSort() {
-        return sort;
-    }
-
-    public void setSort(Integer sort) {
-        this.sort = sort;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
     }
 }

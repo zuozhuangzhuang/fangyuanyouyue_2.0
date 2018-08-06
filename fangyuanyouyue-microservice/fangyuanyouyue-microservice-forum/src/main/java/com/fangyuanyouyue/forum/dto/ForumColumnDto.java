@@ -4,10 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fangyuanyouyue.forum.model.ForumColumn;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * 论坛专栏
  */
+@Getter
+@Setter
+@ToString
 public class ForumColumnDto {
 
     private Integer columnId;//帖子id
@@ -39,38 +45,5 @@ public class ForumColumnDto {
         return dtolist;
     }
 
-	public Integer getColumnId() {
-		return columnId;
-	}
-
-	public void setColumnId(Integer columnId) {
-		this.columnId = columnId;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getCoverImgUrl() {
-		return coverImgUrl;
-	}
-
-	public void setCoverImgUrl(String coverImgUrl) {
-		this.coverImgUrl = coverImgUrl;
-	}
-
-	public Integer getFansCount() {
-		return fansCount;
-	}
-
-	public void setFansCount(Integer fansCount) {
-		this.fansCount = fansCount;
-	}
-
-	
    
 }

@@ -1,8 +1,15 @@
 package com.fangyuanyouyue.user.model;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 /**
  * 微信小程序相关信息
  */
+@Getter
+@Setter
+@ToString
 public class WeChatSession {
     public static final long serialVersionUID = 1L;
     public static final String APPID = "wx69860c142cdc5391";
@@ -18,75 +25,4 @@ public class WeChatSession {
     private Long addTime;
     private Long updateTime;//更新时间
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public String getOpenid() {
-        return openid;
-    }
-
-    public void setOpenid(String openid) {
-        this.openid = openid;
-    }
-
-    public String getUnionid() {
-        return unionid;
-    }
-
-    public void setUnionid(String unionid) {
-        this.unionid = unionid;
-    }
-
-    public String getSession_key() {
-        return session_key;
-    }
-
-    public void setSession_key(String session_key) {
-        this.session_key = session_key;
-    }
-
-    public Long getAddTime() {
-        return addTime;
-    }
-
-    public void setAddTime(Long addTime) {
-        this.addTime = addTime;
-    }
-
-    public Long getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Long updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getEncryptedData() {
-        return encryptedData;
-    }
-
-    public void setEncryptedData(String encryptedData) {
-        this.encryptedData = encryptedData;
-    }
-
-    public String getIv() {
-        return iv;
-    }
-
-    public void setIv(String iv) {
-        this.iv = iv;
-    }
 }

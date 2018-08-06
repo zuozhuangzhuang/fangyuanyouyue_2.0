@@ -1,5 +1,9 @@
 package com.fangyuanyouyue.goods.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +11,9 @@ import java.util.Map;
 /**
  * 商品评论Dto
  */
+@Getter
+@Setter
+@ToString
 public class GoodsCommentDto {
     //评论点赞状态
     private Integer isLike = 2;//评论是否点赞 1已点赞 2未点赞
@@ -79,165 +86,5 @@ public class GoodsCommentDto {
             dtolist.add(dto);
         }
         return dtolist;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getCommentId() {
-        return commentId;
-    }
-
-    public void setCommentId(Integer commentId) {
-        this.commentId = commentId;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public Integer getLikesCount() {
-        return likesCount;
-    }
-
-    public void setLikesCount(Integer likesCount) {
-        this.likesCount = likesCount;
-    }
-
-    public String getImg1Url() {
-        return img1Url;
-    }
-
-    public void setImg1Url(String img1Url) {
-        this.img1Url = img1Url;
-    }
-
-    public String getImg2Url() {
-        return img2Url;
-    }
-
-    public void setImg2Url(String img2Url) {
-        this.img2Url = img2Url;
-    }
-
-    public String getImg3Url() {
-        return img3Url;
-    }
-
-    public void setImg3Url(String img3Url) {
-        this.img3Url = img3Url;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public List<GoodsCommentDto> getReplys() {
-        return replys;
-    }
-
-    public void setReplys(List<GoodsCommentDto> replys) {
-        this.replys = replys;
-    }
-
-    public Integer getFromUserId() {
-        return fromUserId;
-    }
-
-    public void setFromUserId(Integer fromUserId) {
-        this.fromUserId = fromUserId;
-    }
-
-    public String getFromUserName() {
-        return fromUserName;
-    }
-
-    public void setFromUserName(String fromUserName) {
-        this.fromUserName = fromUserName;
-    }
-
-    public String getFromUserHeadImgUrl() {
-        return fromUserHeadImgUrl;
-    }
-
-    public void setFromUserHeadImgUrl(String fromUserHeadImgUrl) {
-        this.fromUserHeadImgUrl = fromUserHeadImgUrl;
-    }
-
-    public Integer getToUserId() {
-        return toUserId;
-    }
-
-    public void setToUserId(Integer toUserId) {
-        this.toUserId = toUserId;
-    }
-
-    public String getToUserName() {
-        return toUserName;
-    }
-
-    public void setToUserName(String toUserName) {
-        this.toUserName = toUserName;
-    }
-
-    public String getToUserHeadImgUrl() {
-        return toUserHeadImgUrl;
-    }
-
-    public void setToUserHeadImgUrl(String toUserHeadImgUrl) {
-        this.toUserHeadImgUrl = toUserHeadImgUrl;
-    }
-
-    public Integer getIsLike() {
-        return isLike;
-    }
-
-    public void setIsLike(Integer isLike) {
-        this.isLike = isLike;
-    }
-
-    public Integer getGoodsId() {
-        return goodsId;
-    }
-
-    public void setGoodsId(Integer goodsId) {
-        this.goodsId = goodsId;
-    }
-
-    public String getMainUrl() {
-        return mainUrl;
-    }
-
-    public void setMainUrl(String mainUrl) {
-        this.mainUrl = mainUrl;
-    }
-
-    public String getGoodsName() {
-        return goodsName;
-    }
-
-    public void setGoodsName(String goodsName) {
-        this.goodsName = goodsName;
-    }
-
-    public String getDescprition() {
-        return descprition;
-    }
-
-    public void setDescprition(String descprition) {
-        this.descprition = descprition;
     }
 }

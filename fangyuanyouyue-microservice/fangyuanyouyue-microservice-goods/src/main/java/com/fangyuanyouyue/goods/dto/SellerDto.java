@@ -1,8 +1,15 @@
 package com.fangyuanyouyue.goods.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 /**
  * 店铺信息DTO
  */
+@Getter
+@Setter
+@ToString
 public class SellerDto {
     private String sellerName;//卖家昵称
 
@@ -14,29 +21,5 @@ public class SellerDto {
     public SellerDto() {
     }
 
-
-    public String getSellerName() {
-        return sellerName;
-    }
-
-    public void setSellerName(String sellerName) {
-        this.sellerName = sellerName;
-    }
-
-    public Integer getSellerId() {
-        return sellerId;
-    }
-
-    public void setSellerId(Integer sellerId) {
-        this.sellerId = sellerId;
-    }
-
-    public String getSellerHeadImgUrl() {
-        return sellerHeadImgUrl;
-    }
-
-    public void setSellerHeadImgUrl(String sellerHeadImgUrl) {
-        this.sellerHeadImgUrl = sellerHeadImgUrl;
-    }
 
 }

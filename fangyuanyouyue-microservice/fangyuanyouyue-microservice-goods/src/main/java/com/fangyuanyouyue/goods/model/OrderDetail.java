@@ -1,10 +1,17 @@
 package com.fangyuanyouyue.goods.model;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.math.BigDecimal;
 import java.util.Date;
 /**
  * 订单详情DTO
  */
+@Getter
+@Setter
+@ToString
 public class OrderDetail {
     private Integer id;//唯一自增ID
 
@@ -34,115 +41,4 @@ public class OrderDetail {
 
     private Integer sellerId;//卖家ID
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public Integer getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(Integer orderId) {
-        this.orderId = orderId;
-    }
-
-    public Integer getGoodsId() {
-        return goodsId;
-    }
-
-    public void setGoodsId(Integer goodsId) {
-        this.goodsId = goodsId;
-    }
-
-    public String getGoodsName() {
-        return goodsName;
-    }
-
-    public void setGoodsName(String goodsName) {
-        this.goodsName = goodsName == null ? null : goodsName.trim();
-    }
-
-    public Date getAddTime() {
-        return addTime;
-    }
-
-    public void setAddTime(Date addTime) {
-        this.addTime = addTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public Integer getCouponId() {
-        return couponId;
-    }
-
-    public void setCouponId(Integer couponId) {
-        this.couponId = couponId;
-    }
-
-    public String getMainImgUrl() {
-        return mainImgUrl;
-    }
-
-    public void setMainImgUrl(String mainImgUrl) {
-        this.mainImgUrl = mainImgUrl == null ? null : mainImgUrl.trim();
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public BigDecimal getFreight() {
-        return freight;
-    }
-
-    public void setFreight(BigDecimal freight) {
-        this.freight = freight;
-    }
-
-    public BigDecimal getPayAmount() {
-        return payAmount;
-    }
-
-    public void setPayAmount(BigDecimal payAmount) {
-        this.payAmount = payAmount;
-    }
-
-    public Integer getSellerId() {
-        return sellerId;
-    }
-
-    public void setSellerId(Integer sellerId) {
-        this.sellerId = sellerId;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description == null ? null : description.trim();
-    }
 }

@@ -1,6 +1,9 @@
 package com.fangyuanyouyue.goods.dto;
 
 import com.fangyuanyouyue.goods.model.GoodsQuickSearch;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -9,6 +12,9 @@ import java.util.List;
 /**
  * 商品快速搜索条件表DTO
  */
+@Getter
+@Setter
+@ToString
 public class GoodsQuickSearchDto {
     private Integer id;//唯一自增ID
 
@@ -45,51 +51,4 @@ public class GoodsQuickSearchDto {
         return dtolist;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public BigDecimal getPriceMin() {
-        return priceMin;
-    }
-
-    public void setPriceMin(BigDecimal priceMin) {
-        this.priceMin = priceMin;
-    }
-
-    public BigDecimal getPriceMax() {
-        return priceMax;
-    }
-
-    public void setPriceMax(BigDecimal priceMax) {
-        this.priceMax = priceMax;
-    }
-
-    public Integer getSort() {
-        return sort;
-    }
-
-    public void setSort(Integer sort) {
-        this.sort = sort;
-    }
-
-    public Integer getSearchCount() {
-        return searchCount;
-    }
-
-    public void setSearchCount(Integer searchCount) {
-        this.searchCount = searchCount;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
 }

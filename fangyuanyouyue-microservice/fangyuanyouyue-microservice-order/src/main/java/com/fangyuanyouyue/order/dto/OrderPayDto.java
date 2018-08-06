@@ -2,6 +2,9 @@ package com.fangyuanyouyue.order.dto;
 
 import com.fangyuanyouyue.order.model.OrderInfo;
 import com.fangyuanyouyue.order.model.OrderPay;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -10,6 +13,9 @@ import java.util.List;
 /**
  * 订单支付表dto
  */
+@Getter
+@Setter
+@ToString
 public class OrderPayDto {
     private Integer orderId;//订单id
 
@@ -68,117 +74,5 @@ public class OrderPayDto {
             dtolist.add(dto);
         }
         return dtolist;
-    }
-
-    public Integer getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(Integer orderId) {
-        this.orderId = orderId;
-    }
-
-    public String getReceiverName() {
-        return receiverName;
-    }
-
-    public void setReceiverName(String receiverName) {
-        this.receiverName = receiverName;
-    }
-
-    public String getReceiverPhone() {
-        return receiverPhone;
-    }
-
-    public void setReceiverPhone(String receiverPhone) {
-        this.receiverPhone = receiverPhone;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getPostCode() {
-        return postCode;
-    }
-
-    public void setPostCode(String postCode) {
-        this.postCode = postCode;
-    }
-
-    public String getOrderNo() {
-        return orderNo;
-    }
-
-    public void setOrderNo(String orderNo) {
-        this.orderNo = orderNo;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public BigDecimal getPayAmount() {
-        return payAmount;
-    }
-
-    public void setPayAmount(BigDecimal payAmount) {
-        this.payAmount = payAmount;
-    }
-
-    public BigDecimal getFreight() {
-        return freight;
-    }
-
-    public void setFreight(BigDecimal freight) {
-        this.freight = freight;
-    }
-
-    public Integer getCount() {
-        return count;
-    }
-
-    public void setCount(Integer count) {
-        this.count = count;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public String getProvince() {
-        return province;
-    }
-
-    public void setProvince(String province) {
-        this.province = province;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getArea() {
-        return area;
-    }
-
-    public void setArea(String area) {
-        this.area = area;
     }
 }

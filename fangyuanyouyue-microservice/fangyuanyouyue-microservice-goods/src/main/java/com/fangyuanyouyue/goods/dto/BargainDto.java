@@ -1,6 +1,9 @@
 package com.fangyuanyouyue.goods.dto;
 
 import com.fangyuanyouyue.goods.model.GoodsBargain;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -10,6 +13,9 @@ import java.util.Map;
 /**
  * 商品议价表DTO
  */
+@Getter
+@Setter
+@ToString
 public class BargainDto {
     private Integer goodsId;//商品id
 
@@ -47,69 +53,5 @@ public class BargainDto {
             dtolist.add(dto);
         }
         return dtolist;
-    }
-
-    public Integer getBargainId() {
-        return bargainId;
-    }
-
-    public void setBargainId(Integer bargainId) {
-        this.bargainId = bargainId;
-    }
-
-    public Integer getGoodsId() {
-        return goodsId;
-    }
-
-    public void setGoodsId(Integer goodsId) {
-        this.goodsId = goodsId;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public String getNickName() {
-        return nickName;
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
-    }
-
-    public String getHeadImgUrl() {
-        return headImgUrl;
-    }
-
-    public void setHeadImgUrl(String headImgUrl) {
-        this.headImgUrl = headImgUrl;
-    }
-
-    public String getMainUrl() {
-        return mainUrl;
-    }
-
-    public void setMainUrl(String mainUrl) {
-        this.mainUrl = mainUrl;
     }
 }
