@@ -97,4 +97,11 @@ public interface GoodsInfoMapper {
      * @return
      */
     Integer getGoodsUserCollectCount(Integer goodsId);
+
+    /**
+     * 根据用户ID获取商品列表
+     * @param userId
+     * @return
+     */
+    List<GoodsInfo> selectGoodsByUserId(@Param("userId")Integer userId,@Param("start")Integer start,@Param("limit")Integer limit);
 }

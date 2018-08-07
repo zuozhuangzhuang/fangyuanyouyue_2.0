@@ -113,6 +113,9 @@ public class GoodsParam{
     @ApiModelProperty(name = "commentId", value = "回复评论id", dataType = "int",hidden = true)
     private Integer commentId;//回复评论id
 
+    @ApiModelProperty(name = "commentIds", value = "回复评论id数组", dataType = "int",hidden = true)
+    private Integer[] commentIds;//回复评论id
+
     @ApiModelProperty(name = "content", value = "评论内容", dataType = "String",hidden = true)
     private String content;//评论内容
 

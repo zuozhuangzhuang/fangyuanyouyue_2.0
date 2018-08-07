@@ -93,6 +93,12 @@ public class GoodsDto {
 
     private Integer credit;//信誉度
 
+    //GoodsBargain
+    private List<BargainDto> bargainDtos;//用户议价信息列表
+
+    //OrderInfo
+    private Integer orderId;//订单ID
+
     public GoodsDto() {
     }
 

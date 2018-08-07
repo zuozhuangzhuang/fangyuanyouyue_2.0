@@ -390,4 +390,7 @@
   <select id="getGoodsUserCollectCount" parameterType="Integer" resultType="Integer">
     select count(*) from user_fans where user_id = (select user_id from goods_info where goods_info.id = #{goodsId})
   </select>
+  <select id="selectGoodsByUserId" parameterType="Integer" resultMap="BaseResultMap">
+    select * from goods_info where user_id = #{userId} and status <![CDATA[ <> ]]> 5 order by update_time desc limit #{start},#{limit}
+  </select>
 </mapper>
