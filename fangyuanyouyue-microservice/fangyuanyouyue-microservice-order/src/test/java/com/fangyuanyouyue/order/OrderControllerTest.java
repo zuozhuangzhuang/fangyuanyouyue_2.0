@@ -40,12 +40,14 @@ public class OrderControllerTest {
      * @throws Exception
      */
     @Test
-    @Transactional
-    public void saveOrder() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/order/saveOrder")
-                .param("token","10025FY1533082419307")
-                .param("goodsIds","10,11")
-                .param("addressId","27")
+//    @Transactional
+    public void saveOrderByCart() throws Exception {
+        String a = "[{\"sellerId\":16,\"addOrderDetailDtos\":[{\"goodsId\":2,\"couponId\":10}]}]";
+        String b = "[{\"sellerId\":25,\"addOrderDetailDtos\":[{\"goodsId\":101},{\"goodsId\":102}]},{\"sellerId\":24,\"addOrderDetailDtos\":[{\"goodsId\":33}]}]";
+        mvc.perform(MockMvcRequestBuilders.post("/order/saveOrderByCart")
+                .param("token","10036FY1533354566271")
+                .param("sellerList",b)
+                .param("addressId","45")
                 .param("type","1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
@@ -75,8 +77,8 @@ public class OrderControllerTest {
     @Transactional
     public void orderDetail() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/order/orderDetail")
-                .param("token","10025FY1532736035809")
-                .param("orderId","172")
+                .param("token","10036FY1533354566271")
+                .param("orderId","846")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -90,16 +92,36 @@ public class OrderControllerTest {
     @Transactional
     public void myOrderList() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/order/myOrderList")
-                .param("token","10025FY1533144562288")
+                .param("token","10025FY1533317806918")
                 .param("start","0")
                 .param("limit","10")
                 //类型 1买家（我买下的） 2卖家（我卖出的）
                 .param("type","2")
                 //订单状态 0全部 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
-                .param("status","0")
+                .param("status","2")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
 
+
+    /**
+     * 商品/抢购直接下单
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void saveOrder() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/order/saveOrder")
+                .param("token","10036FY1533354566271")
+                .param("goodsId","98")
+                //优惠券ID
+                .param("couponId","")
+                .param("addressId","45")
+                //类型 1普通商品 2抢购商品
+                .param("type","1")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
 }

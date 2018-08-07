@@ -7,14 +7,15 @@ import com.fangyuanyouyue.order.dto.OrderDto;
 
 public interface OrderService {
     /**
-     * 商品下单
-     * @param goodsIds
+     * 购物车商品下单
+     * @param token
+     * @param sellerList
      * @param userId
      * @param addressId
      * @return
      * @throws ServiceException
      */
-    OrderDto saveOrder(String token,Integer[] goodsIds,Integer userId,Integer addressId,Integer type) throws ServiceException;
+    OrderDto saveOrderByCart(String token,String sellerList,Integer userId,Integer addressId) throws ServiceException;
 
     /**
      * 取消订单
@@ -44,4 +45,16 @@ public interface OrderService {
      * @throws ServiceException
      */
     List<OrderDto> myOrderList(Integer userId, Integer start,Integer limit,Integer type,Integer status) throws ServiceException;
+
+    /**
+     * 商品/抢购直接下单
+     * @param token
+     * @param goodsId
+     * @param couponId
+     * @param userId
+     * @param addressId
+     * @return
+     * @throws ServiceException
+     */
+    OrderDto saveOrder(String token,Integer goodsId,Integer couponId,Integer userId,Integer addressId) throws ServiceException;
 }

@@ -18,6 +18,8 @@ import java.util.List;
 public class OrderDetailDto {
     private Integer userId;//买家id
 
+    private Integer sellerId;//卖家id
+
     private Integer orderId;//订单id
 
     private Integer goodsId;//商品id
@@ -34,7 +36,7 @@ public class OrderDetailDto {
 
     private String description;//商品详情
 
-    private Integer status;//状态 1待支付 2待发货 3待收货 4已完成 5已取消  7已申请退货
+    private Integer status;//状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除 7已申请退货
 
     private Integer allowReturn = 0;//是否可以退货  0可退货  1不可退货
 
@@ -45,6 +47,7 @@ public class OrderDetailDto {
 
     public OrderDetailDto(OrderDetail orderDetail,Integer status) {
         this.userId = orderDetail.getUserId();
+        this.sellerId = orderDetail.getSellerId();
         this.orderId = orderDetail.getOrderId();
         this.goodsId = orderDetail.getGoodsId();
         this.goodsName = orderDetail.getGoodsName();

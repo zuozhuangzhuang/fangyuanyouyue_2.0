@@ -47,32 +47,28 @@ public class OrderController extends BaseController{
     @Autowired
     private SchedualRedisService schedualRedisService;
 
-    @ApiOperation(value = "商品下单", notes = "(OrderDto)商品下单",response = BaseResp.class)
+    @ApiOperation(value = "购物车商品下单", notes = "(OrderDto)购物车商品下单",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "goodsIds", value = "商品ID数组",allowMultiple = true,required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "addressId", value = "收货地址id",required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "type", value = "类型 1普通商品 2抢购商品",required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "sellerList", value = "下单信息，格式为：[{\"sellerId\":16,\"addOrderDetailDtos\":[{\"goodsId\":2,\"couponId\":10}]},{\"sellerId\":25,\"addOrderDetailDtos\":[{\"goodsId\":102}]}]的字符串",required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "addressId", value = "收货地址id",required = true, dataType = "int", paramType = "query")
     })
-    @PostMapping(value = "/saveOrder")
+    @PostMapping(value = "/saveOrderByCart")
     @ResponseBody
-    public BaseResp saveOrder(OrderParam param) throws IOException {
+    public BaseResp saveOrderByCart(OrderParam param) throws IOException {
         try {
-            log.info("----》商品下单《----");
+            log.info("----》购物车商品下单《----");
             log.info("参数："+param.toString());
             //参数判断
-            if(param.getGoodsIds()==null || param.getGoodsIds().length == 0){
-                return toError("商品id不能为空！");
-            }
             if(param.getAddressId()==null || param.getAddressId().intValue()==0){
                 return toError("收货地址id不能为空！");
-            }
-            if(param.getType() == null){
-                return toError("类型不能为空！");
             }
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
                 return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+            }
+            if(param.getSellerList() == null){
+                return toError(ReCode.FAILD.getValue(),"下单信息不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -81,7 +77,7 @@ public class OrderController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             //TODO 下单商品
-            OrderDto orderDto = orderService.saveOrder(param.getToken(),param.getGoodsIds(), userId, param.getAddressId(),param.getType());
+            OrderDto orderDto = orderService.saveOrderByCart(param.getToken(),param.getSellerList(), userId, param.getAddressId());
             return toSuccess(orderDto);
         } catch (ServiceException e) {
             e.printStackTrace();
@@ -168,6 +164,7 @@ public class OrderController extends BaseController{
         }
     }
 
+
     @ApiOperation(value = "我的订单列表", notes = "(OrderDto)我的订单列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
@@ -217,7 +214,52 @@ public class OrderController extends BaseController{
         }
     }
 
+    @ApiOperation(value = "商品/抢购直接下单", notes = "(OrderDto)商品/抢购直接下单",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "goodsId", value = "商品ID",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "couponId", value = "优惠券ID", dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "addressId", value = "收货地址id",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1普通商品 2抢购商品",required = true, dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/saveOrder")
+    @ResponseBody
+    public BaseResp saveOrder(OrderParam param) throws IOException {
+        try {
+            log.info("----》商品/抢购直接下单《----");
+            log.info("参数："+param.toString());
+            //参数判断
+            if(param.getAddressId()==null || param.getAddressId().intValue()==0){
+                return toError("收货地址id不能为空！");
+            }
+            if(param.getGoodsId() == null){
+                return toError("商品ID不能为空！");
+            }
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+            }
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            String verifyUser = schedualUserService.verifyUserById(userId);
+            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+            if(jsonObject != null && (Integer)jsonObject.get("code") != 0){
+                return toError(jsonObject.getString("report"));
+            }
+            if(param.getType().intValue() == 2){
+                //TODO 非会员只能免费抢购一次，会员可无限制抢购——验证是否为会员
 
+            }
+            //TODO 下单商品
+            OrderDto orderDto = orderService.saveOrder(param.getToken(),param.getGoodsId(),param.getCouponId(), userId, param.getAddressId());
+            return toSuccess(orderDto);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
 //    @ApiOperation(value = "订单余额支付", notes = "(OrderDto)订单余额支付")
 //    @ApiImplicitParams({
 //            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),

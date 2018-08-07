@@ -6,6 +6,7 @@ import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.Date;
+
 /**
  * 订单详情表
  */
@@ -40,4 +41,7 @@ public class OrderDetail {
     private String description;//商品描述
 
     private Integer sellerId;//卖家ID
+
+    private Integer mainOrderId;//主订单ID
+
 }

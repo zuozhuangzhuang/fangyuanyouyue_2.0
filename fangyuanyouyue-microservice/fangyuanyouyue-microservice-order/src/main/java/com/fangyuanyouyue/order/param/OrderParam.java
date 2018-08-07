@@ -28,8 +28,10 @@ public class OrderParam{
     @ApiModelProperty(name = "goodsIds", value = "商品ID数组", dataType = "int",hidden = true)
     private Integer[] goodsIds;//商品ID数组
 
+
     @ApiModelProperty(name = "sellerList", value = "商品信息数组", dataType = "String",hidden = true)
     private String sellerList;//商品信息数组
+
 
     @ApiModelProperty(name = "addressId", value = "收货地址id", dataType = "int",hidden = true)
     private Integer addressId;//收货地址id
@@ -40,4 +42,9 @@ public class OrderParam{
     @ApiModelProperty(name = "status", value = "订单状态 0 待付款  1待收货  2已完成  3全部", dataType = "int",hidden = true)
     private Integer status;//订单状态 0 待付款  1待收货  2已完成  3全部
 
+    @ApiModelProperty(name = "goodsId", value = "商品ID", dataType = "int",hidden = true)
+    private Integer goodsId;//商品ID
+
+    @ApiModelProperty(name = "couponId", value = "优惠券ID", dataType = "int",hidden = true)
+    private Integer couponId;//优惠券ID
 }

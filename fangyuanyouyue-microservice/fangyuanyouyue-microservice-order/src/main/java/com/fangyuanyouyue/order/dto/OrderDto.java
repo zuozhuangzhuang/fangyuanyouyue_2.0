@@ -28,7 +28,7 @@ public class OrderDto {
 
     private BigDecimal totalAmount;//订单总额
 
-    private Integer status;//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
+    private Integer status;//状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除 7已申请退货
 
     //商品信息
     private List<OrderDetailDto> orderDetailDtos;//订单商品列表

@@ -28,4 +28,11 @@ public interface OrderDetailMapper {
      * @return
      */
     List<OrderDetail> selectByOrderId(@Param("orderId") Integer orderId);
+
+    /**
+     * 根据主订单ID获取订单详情列表
+     * @param mainOrderId
+     * @return
+     */
+    List<OrderDetail> selectByMainOrderId(@Param("mainOrderId") Integer mainOrderId);
 }

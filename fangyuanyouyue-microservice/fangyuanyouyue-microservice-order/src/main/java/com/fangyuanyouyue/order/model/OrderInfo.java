@@ -25,7 +25,7 @@ public class OrderInfo {
 
     private Integer count;//商品总数
 
-    private Integer status;//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
+    private Integer status;//状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除 7已申请退货
 
     private Date addTime;//添加时间
 
@@ -33,4 +33,5 @@ public class OrderInfo {
 
     private Integer sellerId;//卖家ID
 
+    private Integer isResolve;//是否拆单 1是 2否
 }
