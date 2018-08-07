@@ -119,16 +119,16 @@ public class CommentControllerTest {
 
 
     /**
-     * 评论点赞
+     * 批量删除评论
      * @throws Exception
      */
     @Test
     @Transactional
     public void deleteComment() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/comment/deleteComment")
-                .param("token","10025FY1533144562288")
+                .param("token","10025FY1533317806918")
                 //评论id
-                .param("commentId","163")
+                .param("commentIds","166,167")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
