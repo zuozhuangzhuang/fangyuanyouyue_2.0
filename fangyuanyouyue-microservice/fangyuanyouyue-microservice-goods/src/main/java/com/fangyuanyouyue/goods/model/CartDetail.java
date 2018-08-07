@@ -27,8 +27,4 @@ public class CartDetail {
 
     private Integer userId;//店铺ID
 
-    private String nickName;//店铺名字
-
-    private String headImgUrl;//店铺头像图片地址
-
 }

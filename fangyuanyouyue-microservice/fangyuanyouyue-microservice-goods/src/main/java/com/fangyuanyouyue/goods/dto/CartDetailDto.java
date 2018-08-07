@@ -34,6 +34,8 @@ public class CartDetailDto {
 
     private Integer status;//商品状态 1出售中 2已售出
 
+    private Integer userId;//店铺ID
+
     public CartDetailDto() {
     }
 
