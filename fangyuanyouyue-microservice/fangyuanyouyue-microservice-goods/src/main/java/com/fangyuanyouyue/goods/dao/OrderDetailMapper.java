@@ -28,4 +28,12 @@ public interface OrderDetailMapper {
      * @return
      */
     List<OrderDetail> selectByOrderId(@Param("orderId") Integer orderId);
+
+
+    /**
+     * 卖家根据商品ID获取进行中的订单
+     * @param goodsId
+     * @return
+     */
+    OrderDetail selectOrderByGoodsIdStatus(@Param("userId")Integer userId, @Param("goodsId")Integer goodsId);
 }
