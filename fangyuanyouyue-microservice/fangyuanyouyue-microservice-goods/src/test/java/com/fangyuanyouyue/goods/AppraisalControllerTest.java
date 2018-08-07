@@ -40,11 +40,11 @@ public class AppraisalControllerTest {
      * @throws Exception
      */
     @Test
-    @Transactional
+//    @Transactional
     public void addAppraisal() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/appraisal/addAppraisal")
-                .param("token","10025FY1532974762055")
-                .param("goodsIds","5,6")
+                .param("token","10025FY1533317806918")
+                .param("goodsIds","1,2")
                 //描述
                 .param("description","我想鉴定一下，这是我家传的宝贝")
                 .param("imgUrls","")

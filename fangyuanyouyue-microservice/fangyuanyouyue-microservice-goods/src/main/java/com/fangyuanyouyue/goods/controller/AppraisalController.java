@@ -5,6 +5,7 @@ import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.goods.dto.AppraisalOrderInfoDto;
 import com.fangyuanyouyue.goods.dto.OrderDto;
 import com.fangyuanyouyue.goods.param.GoodsParam;
 import com.fangyuanyouyue.goods.param.OrderParam;
@@ -77,8 +78,8 @@ public class AppraisalController extends BaseController{
                 }
             }
             //申请鉴定，需要生成订单并返回订单信息
-            OrderDto orderDto = appraisalService.addAppraisal(userId, param.getGoodsIds(), param.getTitle(), param.getDescription(), param.getImgUrl(),param.getVideoUrl());
-            return toSuccess(orderDto);
+            AppraisalOrderInfoDto appraisalOrderInfoDto = appraisalService.addAppraisal(userId, param.getGoodsIds(), param.getTitle(), param.getDescription(), param.getImgUrl(),param.getVideoUrl());
+            return toSuccess(appraisalOrderInfoDto);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());

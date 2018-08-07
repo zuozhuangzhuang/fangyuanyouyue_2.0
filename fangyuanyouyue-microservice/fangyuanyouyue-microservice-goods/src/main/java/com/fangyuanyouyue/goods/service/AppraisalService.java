@@ -1,9 +1,13 @@
 package com.fangyuanyouyue.goods.service;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.goods.dto.OrderDto;
+import com.fangyuanyouyue.goods.dto.AppraisalOrderInfoDto;
 
+/**
+ * 官方鉴定
+ */
 public interface AppraisalService {
+
     /**
      * 申请鉴定
      * @param userId
@@ -15,7 +19,7 @@ public interface AppraisalService {
      * @return
      * @throws ServiceException
      */
-    OrderDto addAppraisal(Integer userId, Integer[] goodsIds, String title, String description, String imgUrl,String videoUrl) throws ServiceException;
+    AppraisalOrderInfoDto addAppraisal(Integer userId, Integer[] goodsIds, String title, String description, String imgUrl, String videoUrl) throws ServiceException;
 
     /**
      * 取消鉴定，删除鉴定订单
@@ -24,4 +28,5 @@ public interface AppraisalService {
      * @throws ServiceException
      */
     void cancelAppraisal(Integer userId,Integer orderId) throws ServiceException;
+
 }
