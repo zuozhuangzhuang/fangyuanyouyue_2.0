@@ -164,4 +164,8 @@ public class UserParam{
 	@ApiModelProperty(name = "toUserId", value = "加密算法的初始向量", dataType = "int",hidden = true)
 	private Integer toUserId;//被关注人ID
 
+	//UserInfoExt
+
+	@ApiModelProperty(name = "authType", value = "认证状态 1已认证 2未认证", dataType = "int",hidden = true)
+	private Integer authType;//认证状态 1已认证 2未认证
 }

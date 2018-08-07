@@ -663,7 +663,8 @@ public class UserController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "nickName", value = "用户昵称", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "authType", value = "获取认证店铺列表 认证状态 1已认证", dataType = "int", paramType = "query")
     })
     @GetMapping(value = "/shopList")
     @ResponseBody
@@ -678,7 +679,7 @@ public class UserController extends BaseController {
                 return toError(ReCode.FAILD.getValue(),"每页个数错误！");
             }
 
-            List<ShopDto> shopDtos = userInfoService.shopList(param.getNickName(),param.getType(), param.getStart(), param.getLimit());
+            List<ShopDto> shopDtos = userInfoService.shopList(param.getNickName(),param.getType(), param.getStart(), param.getLimit(),param.getAuthType());
             return toSuccess(shopDtos);
         } catch (ServiceException e) {
             e.printStackTrace();
@@ -810,6 +811,9 @@ public class UserController extends BaseController {
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
         }
     }
+
+
+
 
 //
 //

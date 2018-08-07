@@ -145,7 +145,7 @@ public interface UserInfoService {
      * @return
      * @throws ServiceException
      */
-    List<ShopDto> shopList(String nickName,Integer type,Integer start,Integer limit) throws ServiceException;
+    List<ShopDto> shopList(String nickName,Integer type,Integer start,Integer limit,Integer authType) throws ServiceException;
 
     /**
      * 获取用户信息
