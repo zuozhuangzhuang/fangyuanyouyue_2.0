@@ -140,12 +140,28 @@
   </update>
 
   <select id="selectByUserIdGoodsId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from goods_bargain where user_id = #{userId} and goods_id = #{goodsId} and status = 1
+    select * from goods_bargain where user_id = #{userId} and goods_id = #{goodsId}
+    <if test="status != null">
+
+    </if>
   </select>
   <select id="selectAllByGoodsId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from goods_bargain where goods_id = #{goodsId} and status = 1
+    select * from goods_bargain
+    <where>
+      1=1
+      <if test="goodsId != null">
+        and goods_id = #{goodsId}
+      </if>
+      <if test="status != null">
+        and status = #{status}
+      </if>
+    </where>
+    order by add_time desc
   </select>
   <select id="selectAllByUserId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from goods_bargain where user_id = #{userId} order by add_time desc limit #{start},#{limit}
+    select * from goods_bargain where user_id = #{userId} order by add_time desc
+  </select>
+  <select id="selectGoodsIdsByUserId" parameterType="Integer" resultType="Integer">
+    select DISTINCT goods_id from goods_bargain where user_id = #{userId} order by add_time desc limit #{start},#{limit}
   </select>
 </mapper>

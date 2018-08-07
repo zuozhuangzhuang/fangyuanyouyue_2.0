@@ -15,7 +15,7 @@ import java.util.Date;
 public class GoodsBargain {
     private Integer id;//唯一自增ID
 
-    private Integer userId;//用户id
+    private Integer userId;//申请用户id
 
     private Integer goodsId;//商品id
 
@@ -23,7 +23,7 @@ public class GoodsBargain {
 
     private String reason;//议价理由
 
-    private Integer status;//状态 1申请 2同意 3拒绝
+    private Integer status;//状态 1申请 2同意 3拒绝 4取消
 
     private Date addTime;//添加时间
 

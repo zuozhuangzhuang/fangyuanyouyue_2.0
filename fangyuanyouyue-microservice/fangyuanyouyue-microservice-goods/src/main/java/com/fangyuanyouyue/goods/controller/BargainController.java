@@ -5,7 +5,7 @@ import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.goods.dto.BargainDto;
+import com.fangyuanyouyue.goods.dto.GoodsDto;
 import com.fangyuanyouyue.goods.param.GoodsParam;
 import com.fangyuanyouyue.goods.service.*;
 import io.swagger.annotations.Api;
@@ -134,7 +134,7 @@ public class BargainController extends BaseController{
         }
     }
 
-    @ApiOperation(value = "我的压价列表", notes = "(BargainDto)买家获取自己所压价商品的列表",response = BaseResp.class)
+    @ApiOperation(value = "我的议价", notes = "(GoodsDto)买家获取自己所压价商品的列表",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "start", value = "起始页数", required = true,dataType = "int", paramType = "query"),
@@ -144,7 +144,7 @@ public class BargainController extends BaseController{
     @ResponseBody
     public BaseResp bargainList(GoodsParam param) throws IOException {
         try {
-            log.info("----》我的压价列表《----");
+            log.info("----》我的议价《----");
             log.info("参数：" + param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
@@ -160,8 +160,8 @@ public class BargainController extends BaseController{
                 return toError(ReCode.FAILD.getValue(),"分页参数异常！");
             }
             //TODO 我的压价列表
-            List<BargainDto> bargainDtos = bargainService.bargainList(userId,param.getStart(),param.getLimit());
-            return toSuccess( bargainDtos);
+            List<GoodsDto> goodsDtos = bargainService.bargainList(userId,param.getStart(),param.getLimit());
+            return toSuccess(goodsDtos);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());

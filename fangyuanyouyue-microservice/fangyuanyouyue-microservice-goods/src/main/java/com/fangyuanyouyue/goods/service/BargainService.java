@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.goods.dto.BargainDto;
+import com.fangyuanyouyue.goods.dto.GoodsDto;
 import com.fangyuanyouyue.goods.model.GoodsBargain;
 
 public interface BargainService {
@@ -34,7 +35,7 @@ public interface BargainService {
      * @return
      * @throws ServiceException
      */
-    List<BargainDto> bargainList(Integer userId,Integer start,Integer limit) throws ServiceException;
+    List<GoodsDto> bargainList(Integer userId, Integer start, Integer limit) throws ServiceException;
     /**
      * 压价详情
      * @param userId

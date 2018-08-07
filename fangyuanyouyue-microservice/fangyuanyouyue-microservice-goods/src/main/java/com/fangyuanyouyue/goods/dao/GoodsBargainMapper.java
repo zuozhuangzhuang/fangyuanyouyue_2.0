@@ -22,24 +22,31 @@ public interface GoodsBargainMapper {
 
 
     /**
-     * 根据用户ID和商品ID获取压价信息
+     * 根据买家ID和商品ID获取压价信息
      * @param userId
      * @param goodsId
      * @return
      */
-    GoodsBargain selectByUserIdGoodsId(@Param("userId")Integer userId, @Param("goodsId")Integer goodsId);
+    List<GoodsBargain> selectByUserIdGoodsId(@Param("userId")Integer userId, @Param("goodsId")Integer goodsId,@Param("status")Integer status);
 
     /**
      * 获取商品所有申请中的压价信息
      * @param goodsId
      * @return
      */
-    List<GoodsBargain> selectAllByGoodsId(@Param("goodsId")Integer goodsId);
+    List<GoodsBargain> selectAllByGoodsId(@Param("goodsId")Integer goodsId,@Param("status")Integer status);
 
     /**
      * 根据用户ID获取所有压价列表，不区分状态
      * @param userId
      * @return
      */
-    List<GoodsBargain> selectAllByUserId(@Param("userId")Integer userId,@Param("start")Integer start,@Param("limit")Integer limit);
+    List<GoodsBargain> selectAllByUserId(@Param("userId")Integer userId);
+
+    /**
+     * 根据用户ID获取所有压过价的商品ID列表
+     * @param userId
+     * @return
+     */
+    List<Integer> selectGoodsIdsByUserId(@Param("userId")Integer userId,@Param("start")Integer start,@Param("limit")Integer limit);
 }
