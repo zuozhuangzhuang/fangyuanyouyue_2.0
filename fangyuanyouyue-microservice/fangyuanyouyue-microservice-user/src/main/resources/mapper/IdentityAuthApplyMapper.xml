@@ -152,6 +152,6 @@
   </update>
 
   <select id="selectByUserId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from identity_auth_apply where user_id = #{userId,jdbcType=INTEGER}
+    select * from identity_auth_apply where user_id = #{userId,jdbcType=INTEGER} and status <![CDATA[ <> ]]> 3
   </select>
 </mapper>
