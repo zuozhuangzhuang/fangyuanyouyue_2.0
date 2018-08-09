@@ -20,7 +20,7 @@ public class DocumentationConfig implements SwaggerResourcesProvider {
         resources.add(swaggerResource("论坛系统", "/forum/v2/api-docs", "1.0"));
         resources.add(swaggerResource("订单系统", "/order/v2/api-docs", "1.0"));
 //        resources.add(swaggerResource("支付系统", "/payment/v2/api-docs", "1.0"));
-//        resources.add(swaggerResource("钱包系统", "/wallet/v2/api-docs", "1.0"));
+        resources.add(swaggerResource("钱包系统", "/wallet/v2/api-docs", "1.0"));
         resources.add(swaggerResource("用户系统", "/user/v2/api-docs", "1.0"));
         return resources;
     }
