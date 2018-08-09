@@ -5,7 +5,6 @@ import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.wallet.dto.BonusPoolDto;
 import com.fangyuanyouyue.wallet.dto.WalletDto;
 import com.fangyuanyouyue.wallet.param.WalletParam;
 import com.fangyuanyouyue.wallet.service.SchedualRedisService;
@@ -20,14 +19,12 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.List;
 
 @Controller
 @RequestMapping(value = "/wallet")
