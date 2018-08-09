@@ -260,53 +260,51 @@ public class OrderController extends BaseController{
             return toError("系统繁忙，请稍后再试！");
         }
     }
-//    @ApiOperation(value = "订单余额支付", notes = "(OrderDto)订单余额支付")
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
-//            @ApiImplicitParam(name = "start", value = "分页start", required = true, dataType = "int", paramType = "query"),
-//            @ApiImplicitParam(name = "limit", value = "分页limit", required = true, dataType = "int", paramType = "query"),
-//            @ApiImplicitParam(name = "type", value = "类型 1买家（我买下的） 2卖家（我卖出的）", required = true, dataType = "int", paramType = "query"),
-//            @ApiImplicitParam(name = "status", value = "订单状态 0全部 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货",required = true, dataType = "int", paramType = "query")
-//    })
-//    @PostMapping(value = "/getOrderPayBalance")
-//    @ResponseBody
-//    public BaseResp getOrderPayBalance(OrderParam param) throws IOException {
-//        try {
-//            log.info("----》订单余额支付《----");
-//            log.info("参数："+param.toString());
-//            //验证用户
-//            if(StringUtils.isEmpty(param.getToken())){
-//                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
-//            }
-//            Integer userId = (Integer)schedualRedisService.get(param.getToken());
-//            String verifyUser = schedualUserService.verifyUserById(userId);
-//            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-//            if((Integer)jsonObject.get("code") != 0){
-//                return toError(jsonObject.getString("report"));
-//            }
-//
-//            if(param.getStart()==null){
-//                return toError("start不能为空！");
-//            }
-//            if(param.getLimit()==null){
-//                return toError("limit不能为空！");
-//            }
-//            if(param.getType() == null){
-//                return toError("类型不能为空！");
-//            }
-//            if(param.getStatus() == null){
-//                return toError("订单状态不能为空！");
-//            }
-//            //TODO 订单余额支付
-//            List<OrderDto> orderDtos = orderService.myOrderList(userId, param.getStart(), param.getLimit(), param.getType(), param.getStatus());
-//            return toSuccess(orderDtos);
-//        } catch (ServiceException e) {
-//            e.printStackTrace();
-//            return toError(e.getMessage());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return toError("系统繁忙，请稍后再试！");
-//        }
-//    }
+
+
+    @ApiOperation(value = "订单支付", notes = "(OrderDto)订单支付")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orderId", value = "订单ID", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "支付方式 1支付宝 2微信 3余额支付", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "payPwd", value = "支付密码", dataType = "String", paramType = "query")
+    })
+    @PostMapping(value = "/getOrderPay")
+    @ResponseBody
+    public BaseResp getOrderPay(OrderParam param) throws IOException {
+        try {
+            log.info("----》订单支付《----");
+            log.info("参数："+param.toString());
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+            }
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            String verifyUser = schedualUserService.verifyUserById(userId);
+            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+            if((Integer)jsonObject.get("code") != 0){
+                return toError(jsonObject.getString("report"));
+            }
+
+            if(param.getOrderId()==null){
+                return toError("订单ID不能为空！");
+            }
+            if(param.getType()==null){
+                return toError("支付类型不能为空！");
+            }
+            if(param.getPayPwd() == null){
+                return toError("支付密码不能为空！");
+            }
+            //TODO 订单支付
+            String payInfo = orderService.getOrderPay(userId, param.getOrderId(), param.getType(), param.getPayPwd());
+            return toSuccess(payInfo);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
 
 }

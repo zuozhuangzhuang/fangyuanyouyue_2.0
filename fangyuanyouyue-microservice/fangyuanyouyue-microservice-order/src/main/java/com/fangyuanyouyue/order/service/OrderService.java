@@ -57,4 +57,15 @@ public interface OrderService {
      * @throws ServiceException
      */
     OrderDto saveOrder(String token,Integer goodsId,Integer couponId,Integer userId,Integer addressId) throws ServiceException;
+
+    /**
+     * 订单支付
+     * @param userId
+     * @param orderId
+     * @param type
+     * @param payPwd
+     * @return
+     * @throws ServiceException
+     */
+    String getOrderPay(Integer userId,Integer orderId,Integer type,String payPwd) throws ServiceException;
 }

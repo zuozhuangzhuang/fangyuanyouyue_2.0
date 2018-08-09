@@ -53,4 +53,12 @@ public interface OrderInfoMapper {
      * @return
      */
     OrderInfo selectByGoodsId(@Param("goodsId")Integer goodsId);
+
+    /**
+     * 根据用户ID、订单ID获取订单信息
+     * @param orderId
+     * @param userId
+     * @return
+     */
+    OrderInfo getOrderByUserIdOrderId(@Param("orderId")Integer orderId,@Param("userId")Integer userId);
 }

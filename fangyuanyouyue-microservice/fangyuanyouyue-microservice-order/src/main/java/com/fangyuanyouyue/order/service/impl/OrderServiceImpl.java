@@ -3,7 +3,9 @@ package com.fangyuanyouyue.order.service.impl;
 import java.math.BigDecimal;
 import java.util.*;
 
+import com.alibaba.fastjson.JSONException;
 import com.fangyuanyouyue.order.dto.*;
+import com.fangyuanyouyue.order.service.SchedualWalletService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,6 +42,8 @@ public class OrderServiceImpl implements OrderService{
     private OrderDetailMapper orderDetailMapper;
     @Autowired
     private OrderPayMapper orderPayMapper;
+    @Autowired
+    private SchedualWalletService schedualWalletService;
 
     @Override
     public OrderDto saveOrderByCart(String token,String sellerString, Integer userId, Integer addressId) throws ServiceException {
@@ -63,18 +67,23 @@ public class OrderServiceImpl implements OrderService{
         //卖家DTO列表
         List<SellerDto> sellerDtos = new ArrayList<>();
         List<AddOrderDto> addOrderDtos = new ArrayList<>();
-        JSONArray objects = JSONArray.parseArray(sellerString);
-        for(int i=0;i<objects.size();i++){
-            String str = objects.getString(i);
-            AddOrderDto addOrderDto = JSONObject.toJavaObject(JSONObject.parseObject(str), AddOrderDto.class);
-            addOrderDtos.add(addOrderDto);
-            //获取卖家信息
-            UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(addOrderDto.getSellerId())).getString("data")), UserInfo.class);
-            SellerDto sellerDto = new SellerDto();
-            sellerDto.setSellerHeadImgUrl(seller.getHeadImgUrl());
-            sellerDto.setSellerId(seller.getId());
-            sellerDto.setSellerName(seller.getNickName());
-            sellerDtos.add(sellerDto);
+        JSONArray objects;
+        try {
+            objects = JSONArray.parseArray(sellerString);
+            for(int i=0;i<objects.size();i++){
+                String str = objects.getString(i);
+                AddOrderDto addOrderDto = JSONObject.toJavaObject(JSONObject.parseObject(str), AddOrderDto.class);
+                addOrderDtos.add(addOrderDto);
+                //获取卖家信息
+                UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(addOrderDto.getSellerId())).getString("data")), UserInfo.class);
+                SellerDto sellerDto = new SellerDto();
+                sellerDto.setSellerHeadImgUrl(seller.getHeadImgUrl());
+                sellerDto.setSellerId(seller.getId());
+                sellerDto.setSellerName(seller.getNickName());
+                sellerDtos.add(sellerDto);
+            }
+        }catch(JSONException exception){
+            throw new ServiceException("下单信息错误！");
         }
         //1.下总订单
         //2.下支付订单
@@ -139,10 +148,16 @@ public class OrderServiceImpl implements OrderService{
         int count = 0;//商品数，初始为0
         for(AddOrderDto addOrderDto:addOrderDstos){
             List<AddOrderDetailDto> addOrderDetailDtos = addOrderDto.getAddOrderDetailDtos();
+            if(addOrderDetailDtos == null || addOrderDetailDtos.size() < 1){
+                throw new ServiceException("商品信息错误！");
+            }
             for(AddOrderDetailDto addOrderDetailDto:addOrderDetailDtos) {
                 GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(addOrderDetailDto.getGoodsId())).getString("data")), GoodsInfo.class);
                 if (goods.getStatus() != 1) {//状态 1出售中 2已售出 5删除
                     throw new ServiceException("商品状态异常！");
+                }
+                if(goods.getUserId().intValue() == mainOrder.getUserId().intValue()){
+                    throw new ServiceException("不可以对自己的商品进行下单！");
                 }
                 count++;
                 goodsList.add(goods.getId());
@@ -458,6 +473,9 @@ public class OrderServiceImpl implements OrderService{
         if (goods.getStatus() != 1) {//状态 1出售中 2已售出 5删除
             throw new ServiceException("商品状态异常！");
         }
+        if(goods.getUserId().intValue() == userId.intValue()){
+            throw new ServiceException("不可以对自己的商品进行下单！");
+        }
         //1.下订单
         //2.下支付订单
         OrderInfo orderInfo = new OrderInfo();
@@ -527,5 +545,56 @@ public class OrderServiceImpl implements OrderService{
         orderDto.setNickName(user.getNickName());
         return orderDto;
 
+    }
+
+    @Override
+    public String getOrderPay(Integer userId, Integer orderId, Integer type, String payPwd) throws ServiceException {
+        //只有买家能调用订单支付接口，直接根据orderId查询订单
+        OrderInfo orderInfo = orderInfoMapper.getOrderByUserIdOrderId(orderId,userId);
+        if(orderInfo == null){
+            throw new ServiceException("订单不存在！");
+        }else{
+            if(orderInfo.getStatus() != 1){//状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除 7已申请退货
+                throw new ServiceException("订单状态异常！");
+            }else{
+                OrderPay orderPay = orderPayMapper.selectByOrderId(orderId);
+                if(type.intValue() == 1){//支付宝
+
+                }else if(type.intValue() == 2){//微信
+
+                }else if(type.intValue() == 3){//余额
+                    //验证支付密码
+                    Boolean verifyPayPwd = Boolean.valueOf(JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getString("data"));
+                    if(!verifyPayPwd){
+                        throw new ServiceException("支付密码错误！");
+                    }else{
+                        //调用wallet-service修改余额功能
+                        schedualWalletService.updateBalance(userId, orderPay.getPayAmount(),2);
+                    }
+                }else{
+                    throw new ServiceException("支付类型错误！");
+                }
+                //TODO 拆单
+                if(orderInfo.getSellerId() == null){//订单为合并主订单，进行拆单
+                    orderInfo.setIsResolve(1);//是否拆单 1是 2否
+                    //获取子订单
+                    List<OrderInfo> orderInfos = orderInfoMapper.selectChildOrderByOrderId(userId, orderId);
+                    for(OrderInfo childOrder:orderInfos){
+                        childOrder.setIsResolve(2);
+                        childOrder.setStatus(2);
+                        orderInfoMapper.updateByPrimaryKey(childOrder);
+                        OrderPay pay = orderPayMapper.selectByOrderId(childOrder.getId());
+                        pay.setStatus(2);
+                        orderPayMapper.updateByPrimaryKey(pay);
+                    }
+                }
+                orderInfo.setStatus(2);
+                orderInfoMapper.updateByPrimaryKey(orderInfo);
+                orderPay.setStatus(2);
+                orderPayMapper.updateByPrimaryKey(orderPay);
+                //TODO 通知卖家去发货
+            }
+        }
+        return null;
     }
 }

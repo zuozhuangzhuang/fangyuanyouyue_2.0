@@ -124,4 +124,21 @@ public class OrderControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
+    /**
+     * 订单支付
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void getOrderPay() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/order/getOrderPay")
+                .param("token","10041FY1533753292042")
+                .param("orderId","909")
+                //支付方式 1支付宝 2微信 3余额支付
+                .param("type","3")
+                .param("payPwd","123456")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
 }

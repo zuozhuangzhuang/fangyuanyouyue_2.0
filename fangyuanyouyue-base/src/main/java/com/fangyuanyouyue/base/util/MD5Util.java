@@ -151,7 +151,7 @@ public class MD5Util
       }
     }
     String salt = sb.toString();
-    System.out.println("salt:"+salt);
+//    System.out.println("salt:"+salt);
     password = md5Hex(password + salt);
     char[] cs = new char[48];
     for (int i = 0; i < 48; i += 3) {

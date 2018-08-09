@@ -47,4 +47,7 @@ public class OrderParam{
 
     @ApiModelProperty(name = "couponId", value = "优惠券ID", dataType = "int",hidden = true)
     private Integer couponId;//优惠券ID
+
+    @ApiModelProperty(name = "payPwd", value = "支付密码", dataType = "String",hidden = true)
+    private String payPwd;//支付密码
 }

@@ -45,6 +45,11 @@ public class OrderPayDto {
 
     private Integer status;//状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除 7已申请退货
 
+    //order_refund
+    private Integer returnStatus;//退货状态 1申请退货 2退货成功 3拒绝退货
+
+    private String sellerReturnStatus;//卖家是否同意退货状态 null正常  1申请退货 2卖家直接同意退货 3卖家直接拒绝退货 4卖家48h不处理默认同意退货 5卖家72h小时不处理默认不同意退货
+
     public OrderPayDto() {
     }
 
