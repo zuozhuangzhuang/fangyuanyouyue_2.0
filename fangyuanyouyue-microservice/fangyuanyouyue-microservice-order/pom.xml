@@ -77,11 +77,6 @@
 			<groupId>org.darkphoenixs</groupId>
 			<artifactId>log4j</artifactId>
 		</dependency>
-		<!-- 分页插件 -->
-		<dependency>
-			<groupId>com.github.pagehelper</groupId>
-			<artifactId>pagehelper</artifactId>
-		</dependency>
 		<!-- alibaba的druid数据库连接池 -->
 		<dependency>
 			<groupId>com.alibaba</groupId>
@@ -92,23 +87,19 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-redis</artifactId>
 		</dependency>
-		<!--阿里云oss图片上传 -->
-		<dependency>
-			<groupId>com.aliyun.oss</groupId>
-			<artifactId>aliyun-sdk-oss</artifactId>
-		</dependency>
+		<!--fastjson -->
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+		<!--lombok-->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>1.16.18</version>
 			<scope>provided</scope>
 		</dependency>
-	</dependencies>
+    </dependencies>
 
 	<build>
 		<plugins>
