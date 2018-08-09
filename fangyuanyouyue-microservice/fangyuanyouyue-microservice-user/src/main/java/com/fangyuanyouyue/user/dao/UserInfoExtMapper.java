@@ -2,6 +2,7 @@ package com.fangyuanyouyue.user.dao;
 
 import com.fangyuanyouyue.user.model.UserInfoExt;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface UserInfoExtMapper {
@@ -22,5 +23,5 @@ public interface UserInfoExtMapper {
      * @param userId
      * @return
      */
-    UserInfoExt selectByUserId(int userId);
+    UserInfoExt selectByUserId(@Param("userId")Integer userId);
 }

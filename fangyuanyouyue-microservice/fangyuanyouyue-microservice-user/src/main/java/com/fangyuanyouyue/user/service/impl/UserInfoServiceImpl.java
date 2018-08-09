@@ -1,12 +1,15 @@
 package com.fangyuanyouyue.user.service.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.fangyuanyouyue.user.dao.*;
 import com.fangyuanyouyue.user.dto.UserFansDto;
+import com.fangyuanyouyue.user.model.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,20 +20,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.MD5Util;
-import com.fangyuanyouyue.user.dao.IdentityAuthApplyMapper;
-import com.fangyuanyouyue.user.dao.UserFansMapper;
-import com.fangyuanyouyue.user.dao.UserInfoExtMapper;
-import com.fangyuanyouyue.user.dao.UserInfoMapper;
-import com.fangyuanyouyue.user.dao.UserThirdPartyMapper;
-import com.fangyuanyouyue.user.dao.UserVipMapper;
 import com.fangyuanyouyue.user.dto.ShopDto;
 import com.fangyuanyouyue.user.dto.UserDto;
-import com.fangyuanyouyue.user.model.IdentityAuthApply;
-import com.fangyuanyouyue.user.model.UserFans;
-import com.fangyuanyouyue.user.model.UserInfo;
-import com.fangyuanyouyue.user.model.UserInfoExt;
-import com.fangyuanyouyue.user.model.UserThirdParty;
-import com.fangyuanyouyue.user.model.UserVip;
 import com.fangyuanyouyue.user.param.UserParam;
 import com.fangyuanyouyue.user.service.SchedualGoodsService;
 import com.fangyuanyouyue.user.service.SchedualRedisService;
@@ -57,6 +48,8 @@ public class UserInfoServiceImpl implements UserInfoService {
     private SchedualRedisService schedualRedisService;
     @Autowired
     private UserFansMapper userFansMapper;
+    @Autowired
+    private UserWalletMapper userWalletMapper;
 
     @Override
     public UserInfo getUserByToken(String token) throws ServiceException {
@@ -137,10 +130,9 @@ public class UserInfoServiceImpl implements UserInfoService {
         UserInfoExt userInfoExt = new UserInfoExt();
         userInfoExt.setUserId(user.getId());
         userInfoExt.setStatus(2);//实名登记状态 1已实名 2未实名
-        //TODO 信誉度待定
-        userInfoExt.setCredit(100);//信誉度
-        userInfoExt.setScore(0);//用户积分
         userInfoExt.setAuthType(2);//认证状态 1已认证 2未认证
+        //TODO 信誉度待定
+        userInfoExt.setCredit(100L);//信誉度
         userInfoExt.setAddTime(DateStampUtils.getTimesteamp());
         userInfoExtMapper.insert(userInfoExt);
         //用户会员系统
@@ -151,6 +143,14 @@ public class UserInfoServiceImpl implements UserInfoService {
         userVipMapper.insert(userVip);
         //TODO 注册通讯账户
         //TODO 调用钱包系统初始化接口
+        UserWallet userWallet = new UserWallet();
+        userWallet.setUserId(user.getId());
+        userWallet.setBalance(new BigDecimal(0));
+        userWallet.setBalanceFrozen(new BigDecimal(0));
+        userWallet.setPoint(0L);//剩余积分
+        userWallet.setScore(0L);//用户总积分
+        userWallet.setAddTime(DateStampUtils.getTimesteamp());
+        userWalletMapper.insert(userWallet);
         //初始化用户钱包
         UserDto userDto = setUserDtoByInfo(token,user);
         return userDto;
@@ -230,9 +230,9 @@ public class UserInfoServiceImpl implements UserInfoService {
             UserInfoExt userInfoExt = new UserInfoExt();
             userInfoExt.setUserId(user.getId());
             userInfoExt.setStatus(2);//实名登记状态 1已实名 2未实名
+            userInfoExt.setAuthType(2);//认证状态 1已认证 2未认证
             //TODO 信誉度待定
-            userInfoExt.setCredit(100);
-            userInfoExt.setScore(0);
+            userInfoExt.setCredit(100L);//信誉度
             userInfoExt.setAddTime(DateStampUtils.getTimesteamp());
             userInfoExtMapper.insert(userInfoExt);
             //用户会员系统
@@ -243,7 +243,14 @@ public class UserInfoServiceImpl implements UserInfoService {
             userVipMapper.insert(userVip);
             //TODO 注册通讯账户
             //TODO 调用钱包系统初始化接口
-
+            UserWallet userWallet = new UserWallet();
+            userWallet.setUserId(user.getId());
+            userWallet.setBalance(new BigDecimal(0));
+            userWallet.setBalanceFrozen(new BigDecimal(0));
+            userWallet.setPoint(0L);
+            userWallet.setScore(0L);//用户总积分
+            userWallet.setAddTime(DateStampUtils.getTimesteamp());
+            userWalletMapper.insert(userWallet);
             UserDto userDto = setUserDtoByInfo(token,user);
             return userDto;
         }else{
@@ -354,6 +361,9 @@ public class UserInfoServiceImpl implements UserInfoService {
             userInfoMapper.updateByPrimaryKey(userInfo);
             //用户扩展信息表
             UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(userInfo.getId());
+            if(userInfoExt == null){
+                throw new ServiceException("用户扩展信息错误！");
+            }
             if(StringUtils.isNotEmpty(param.getIdentity())){
                 userInfoExt.setIdentity(param.getIdentity());
             }
@@ -488,9 +498,9 @@ public class UserInfoServiceImpl implements UserInfoService {
             UserInfoExt userInfoExt = new UserInfoExt();
             userInfoExt.setUserId(user.getId());
             userInfoExt.setStatus(2);//实名登记状态 1已实名 2未实名
+            userInfoExt.setAuthType(2);//认证状态 1已认证 2未认证
             //TODO 信誉度待定
-            userInfoExt.setCredit(100);
-            userInfoExt.setScore(0);
+            userInfoExt.setCredit(100L);//信誉度
             userInfoExt.setAddTime(DateStampUtils.getTimesteamp());
             userInfoExtMapper.insert(userInfoExt);
             //用户会员系统
@@ -501,6 +511,14 @@ public class UserInfoServiceImpl implements UserInfoService {
             userVipMapper.insert(userVip);
             //TODO 注册通讯账户
             //TODO 调用钱包系统初始化接口
+            UserWallet userWallet = new UserWallet();
+            userWallet.setUserId(user.getId());
+            userWallet.setBalance(new BigDecimal(0));
+            userWallet.setBalanceFrozen(new BigDecimal(0));
+            userWallet.setPoint(0L);
+            userWallet.setScore(0L);//用户总积分
+            userWallet.setAddTime(DateStampUtils.getTimesteamp());
+            userWalletMapper.insert(userWallet);
             UserDto userDto = setUserDtoByInfo(token,user);
             return userDto;
         }else{

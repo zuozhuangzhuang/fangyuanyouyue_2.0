@@ -1,7 +1,5 @@
 package com.fangyuanyouyue.user.dto;
 
-import com.fangyuanyouyue.user.model.UserAddressInfo;
-import com.fangyuanyouyue.user.model.UserInfo;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -31,7 +29,7 @@ public class ShopDto {
 
     private Integer vipType;//会员类型 1体验会员 2月会员 3年会员
 
-    private Integer credit;//信誉度
+    private Long credit;//信誉度
 
     private Integer authtype;//认证状态 1已认证 2未认证
 
@@ -54,7 +52,7 @@ public class ShopDto {
         this.level = (Integer)map.get("level");
         this.vipLevel = (Integer)map.get("vip_level");
         this.vipType = (Integer)map.get("vip_type");
-        this.credit = (Integer)map.get("credit");
+        this.credit = (Long)map.get("credit");
         this.authtype = (Integer)map.get("auth_type");
         this.signature = (String)map.get("signature");
     }

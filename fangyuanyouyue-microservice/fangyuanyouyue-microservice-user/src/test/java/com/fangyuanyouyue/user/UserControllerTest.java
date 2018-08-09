@@ -132,17 +132,17 @@ public class UserControllerTest {
      * @throws Exception
      */
     @Test
-    @Transactional
+//    @Transactional
     public void certification() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/user/certification")
-                .param("token","6008FY1525397451364")
+                .param("token","10025FY1533317806918")
                 .param("name","左壮壮")
                 //身份证号
                 .param("identity","41282419940411771X")
                 //身份证封面图路径
-                .param("identityImgCoverUrl","")
+//                .param("identityImgCoverUrl","")
                 //身份证背面路径
-                .param("identityImgBackUrl","")
+//                .param("identityImgBackUrl","")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

@@ -11,15 +11,13 @@
     <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
     <result column="auth_type" jdbcType="INTEGER" property="authType" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="credit" jdbcType="INTEGER" property="credit" />
-    <result column="score" jdbcType="INTEGER" property="score" />
+    <result column="credit" jdbcType="BIGINT" property="credit" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, user_id, identity, name, pay_pwd, status, add_time, auth_type, update_time, credit, 
-    score
+    id, user_id, identity, name, pay_pwd, status, auth_type, add_time, update_time, credit
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from user_info_ext
     where id = #{id,jdbcType=INTEGER}
@@ -28,17 +26,17 @@
     delete from user_info_ext
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.user.model.UserInfoExt" useGeneratedKeys="true" keyProperty="id">
-    insert into user_info_ext (id, user_id, identity, 
-      name, pay_pwd, status, 
-      add_time, auth_type, update_time, 
-      credit, score)
-    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{identity,jdbcType=VARCHAR}, 
-      #{name,jdbcType=VARCHAR}, #{payPwd,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
-      #{addTime,jdbcType=TIMESTAMP}, #{authType,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{credit,jdbcType=INTEGER}, #{score,jdbcType=INTEGER})
+  <insert id="insert" parameterType="com.fangyuanyouyue.user.model.UserInfoExt">
+    insert into user_info_ext (id, user_id, identity,
+    name, pay_pwd, status,
+    auth_type, add_time, update_time,
+    credit)
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{identity,jdbcType=VARCHAR},
+    #{name,jdbcType=VARCHAR}, #{payPwd,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},
+    #{authType,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+    #{credit,jdbcType=BIGINT})
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.user.model.UserInfoExt">
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.user.model.UserInfoExt" useGeneratedKeys="true" keyProperty="id">
     insert into user_info_ext
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -59,20 +57,17 @@
       <if test="status != null">
         status,
       </if>
-      <if test="addTime != null">
-        add_time,
-      </if>
       <if test="authType != null">
         auth_type,
+      </if>
+      <if test="addTime != null">
+        add_time,
       </if>
       <if test="updateTime != null">
         update_time,
       </if>
       <if test="credit != null">
         credit,
-      </if>
-      <if test="score != null">
-        score,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -94,20 +89,17 @@
       <if test="status != null">
         #{status,jdbcType=INTEGER},
       </if>
-      <if test="addTime != null">
-        #{addTime,jdbcType=TIMESTAMP},
-      </if>
       <if test="authType != null">
         #{authType,jdbcType=INTEGER},
+      </if>
+      <if test="addTime != null">
+        #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="credit != null">
-        #{credit,jdbcType=INTEGER},
-      </if>
-      <if test="score != null">
-        #{score,jdbcType=INTEGER},
+        #{credit,jdbcType=BIGINT},
       </if>
     </trim>
   </insert>
@@ -129,20 +121,17 @@
       <if test="status != null">
         status = #{status,jdbcType=INTEGER},
       </if>
-      <if test="addTime != null">
-        add_time = #{addTime,jdbcType=TIMESTAMP},
-      </if>
       <if test="authType != null">
         auth_type = #{authType,jdbcType=INTEGER},
+      </if>
+      <if test="addTime != null">
+        add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="credit != null">
-        credit = #{credit,jdbcType=INTEGER},
-      </if>
-      <if test="score != null">
-        score = #{score,jdbcType=INTEGER},
+        credit = #{credit,jdbcType=BIGINT},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -154,11 +143,10 @@
       name = #{name,jdbcType=VARCHAR},
       pay_pwd = #{payPwd,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
-      add_time = #{addTime,jdbcType=TIMESTAMP},
       auth_type = #{authType,jdbcType=INTEGER},
+      add_time = #{addTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      credit = #{credit,jdbcType=INTEGER},
-      score = #{score,jdbcType=INTEGER}
+      credit = #{credit,jdbcType=BIGINT}
     where id = #{id,jdbcType=INTEGER}
   </update>
 

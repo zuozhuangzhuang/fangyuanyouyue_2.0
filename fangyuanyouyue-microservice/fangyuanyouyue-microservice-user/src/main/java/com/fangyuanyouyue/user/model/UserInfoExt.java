@@ -25,14 +25,13 @@ public class UserInfoExt {
 
     private Integer status;//实名登记状态 1已实名 2未实名
 
+    private Integer authType;//认证状态 1已认证 2未认证
+
+    private Long credit;//信誉度
+
     private Date addTime;//添加时间
 
     private Date updateTime;//更新时间
 
-    private Integer credit;//信誉度
-
-    private Integer authType;//认证状态 1已认证 2未认证
-
-    private Integer score;//用户积分
 
 }

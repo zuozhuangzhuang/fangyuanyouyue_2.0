@@ -66,16 +66,17 @@ public class UserDto {
     //UserAddressDto
     private UserAddressDto defaultAddress;//用户默认收货地址
 
-
-    //UserInfoExt 用户扩展表
+    //UserWallet
     private Integer score;//用户积分
+    //UserInfoExt 用户扩展表
 
-    private Integer credit;//信誉度
+    private Long credit;//信誉度
 
     private Integer authType;//认证状态 1已认证 2未认证
 
     private Integer extStatus;//实名登记状态 1已实名 2未实名
 
+    private Integer isPayPwd;//是否设置支付密码 1是 2否
     /**
      * ↓↓↓↓↓↓↓注释掉不需要返回的属性↓↓↓↓↓↓↓
      */
@@ -135,9 +136,13 @@ public class UserDto {
         //UserInfoExt
         if(userInfoExt != null){
             this.credit = userInfoExt.getCredit();
-            this.score = userInfoExt.getScore();
             this.authType = userInfoExt.getAuthType();
             this.extStatus = userInfoExt.getStatus();
+            if(StringUtils.isEmpty(userInfoExt.getPayPwd())){
+                this.isPayPwd = 2;
+            }else{
+                this.isPayPwd = 1;
+            }
         }
         //IdentityAuthApply
         if(identityAuthApply != null){

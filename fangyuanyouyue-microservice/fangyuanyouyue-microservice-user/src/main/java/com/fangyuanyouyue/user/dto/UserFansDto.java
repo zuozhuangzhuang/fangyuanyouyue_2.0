@@ -21,7 +21,7 @@ public class UserFansDto {
 
     private Integer vipLevel;//会员等级 1铂金会员 2至尊会员
 
-    private Integer credit;//信誉度
+    private Long credit;//信誉度
 
     private String nickName;//昵称
 
@@ -40,7 +40,7 @@ public class UserFansDto {
         this.userId = (Integer)map.get("id");
         this.level = (Integer)map.get("level");
         this.vipLevel = (Integer)map.get("vip_level");
-        this.credit = (Integer)map.get("credit");
+        this.credit = (Long)map.get("credit");
         this.authtype = (Integer)map.get("auth_type");
         this.signature = (String)map.get("signature");
     }
