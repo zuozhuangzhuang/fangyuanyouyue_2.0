@@ -32,7 +32,7 @@ public class GoodsDto {
 
     private String label;//标签
 
-    private Integer status;//状态 普通商品 1出售中 2已售出 5删除
+    private Integer status;//状态 1出售中 2已售出 3（抢购）已结束 5删除
 
     private BigDecimal floorPrice;//最低价
 
@@ -91,7 +91,7 @@ public class GoodsDto {
 
     private Integer vipLevel;//会员等级 1铂金会员 2至尊会员
 
-    private Integer credit;//信誉度
+    private Long credit;//信誉度
 
     //GoodsBargain
     private List<BargainDto> bargainDtos;//用户议价信息列表

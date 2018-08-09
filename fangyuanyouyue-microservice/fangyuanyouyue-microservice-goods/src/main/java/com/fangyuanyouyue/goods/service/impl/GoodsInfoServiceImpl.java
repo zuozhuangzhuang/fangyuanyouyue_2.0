@@ -130,7 +130,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         //商品表 goods_info
         GoodsInfo goodsInfo = new GoodsInfo();
         goodsInfo.setUserId(userId);
-        //TODO 是否鉴定根据用户是否官方认证
+        //是否鉴定根据用户是否官方认证
         if(Boolean.valueOf(JSONObject.parseObject(schedualUserService.userIsAuth(userId)).getString("data"))){
             goodsInfo.setIsAppraisal(1);//已认证
         }else{
@@ -322,18 +322,23 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
 
     @Override
     public GoodsDto goodsInfoByToken(Integer goodsId, Integer userId) throws ServiceException {
-        List<GoodsInfo> goodsInfos = goodsInfoMapper.selectMyCollectGoods(userId, null, null, goodsId);
+        //获取收藏表信息获取商品集合（存在多条此商品重复信息）
+        List<GoodsInfo> goodsInfos = goodsInfoMapper.selectMyCollectGoods(userId, null, null, goodsId,null,null);
         GoodsInfo goodsInfo;
         GoodsDto goodsDto;
         //是否收藏/关注 1未关注未收藏（商品/抢购） 2已关注未收藏(抢购) 3未关注已收藏（商品/抢购） 4已关注已收藏(抢购)
-        if(goodsInfos != null && goodsInfos.size() > 0){
+        if(goodsInfos != null && goodsInfos.size() > 0){//如果goodsInfos大于多条，说明存在多条收藏状态
             goodsInfo = goodsInfos.get(0);
             goodsDto = setDtoByGoodsInfo(userId,goodsInfo);
+            //如果有两条，说明即收藏，又关注
             if(goodsInfos.size()>1){
                 goodsDto.setIsCollect(4);
             }else{
-                //判断是收藏还是关注
-                Collect collect = collectMapper.selectByGoodsId(goodsId, null);
+                //只有一条收藏数据——判断是收藏还是关注
+                Collect collect = collectMapper.selectByCollectId(userId,goodsId, null);
+                if(collect == null){
+                    throw new ServiceException("获取收藏信息失败！");
+                }
                 if(collect.getType() == 1){//类型 1关注 2收藏
                     goodsDto.setIsCollect(2);
                 }else{
@@ -349,7 +354,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         Map<String, Object> goodsUserInfoExtAndVip = goodsInfoMapper.getGoodsUserInfoExtAndVip(goodsId);
         goodsDto.setAuthType((Integer)goodsUserInfoExtAndVip.get("auth_type"));
         goodsDto.setVipLevel((Integer)goodsUserInfoExtAndVip.get("vip_level"));
-        goodsDto.setCredit((Integer)goodsUserInfoExtAndVip.get("credit"));
+        goodsDto.setCredit((Long)goodsUserInfoExtAndVip.get("credit"));
         //卖家信息
         //粉丝数
         goodsDto.setFansCount(goodsInfoMapper.getGoodsUserFansCount(goodsId));
@@ -369,11 +374,6 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 }
                 goodsDto.setBargainDtos(bargainDtos);
             }
-            //如果商品status为已售出，获取商品所属订单ID
-            if(goodsInfo.getStatus().intValue() == 2){
-                OrderDetail orderDetail = orderDetailMapper.selectOrderByGoodsIdStatus(userId, goodsInfo.getId());
-                goodsDto.setOrderId(orderDetail.getOrderId());
-            }
         }else{//买家
             List<GoodsBargain> bargain = goodsBargainMapper.selectByUserIdGoodsId(userId, goodsInfo.getId(), null);
             List<BargainDto> bargainDtos = BargainDto.toDtoList(bargain);
@@ -383,6 +383,11 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 bargainDto.setHeadImgUrl(seller.getHeadImgUrl());
             }
             goodsDto.setBargainDtos(bargainDtos);
+        }
+        //如果商品status为已售出，获取商品所属订单ID
+        if(goodsInfo.getStatus().intValue() == 2){
+            OrderDetail orderDetail = orderDetailMapper.selectOrderByGoodsIdStatus(userId, goodsInfo.getId());
+            goodsDto.setOrderId(orderDetail.getOrderId());
         }
 
 
@@ -401,7 +406,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         if(goodsUserInfoExtAndVip != null){
             goodsDto.setAuthType((Integer)goodsUserInfoExtAndVip.get("auth_type"));
             goodsDto.setVipLevel((Integer)goodsUserInfoExtAndVip.get("vip_level"));
-            goodsDto.setCredit((Integer)goodsUserInfoExtAndVip.get("credit"));
+            goodsDto.setCredit((Long)goodsUserInfoExtAndVip.get("credit"));
         }
         //卖家信息
         //粉丝数
@@ -523,6 +528,15 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         if(goodsInfo == null){
             throw new ServiceException("获取商品失败！");
         }else{
+            if(status == 2){//已售出
+                //拒绝此商品的所有议价
+                //压价信息
+                List<GoodsBargain> goodsBargains = goodsBargainMapper.selectAllByGoodsId(goodsId,1);//状态 1申请 2同意 3拒绝 4取消
+                for(GoodsBargain bargain:goodsBargains){
+                    bargain.setStatus(3);
+                    goodsBargainMapper.updateByPrimaryKey(bargain);
+                }
+            }
             goodsInfo.setStatus(status);
             goodsInfoMapper.updateByPrimaryKey(goodsInfo);
         }

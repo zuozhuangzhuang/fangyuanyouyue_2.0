@@ -217,4 +217,7 @@ public class GoodsParam{
     @ApiModelProperty(name = "addressId", value = "收货地址id", dataType = "int",hidden = true)
     private Integer addressId;//收货地址id
 
+    @ApiModelProperty(name = "payPwd", value = "支付密码", dataType = "String",hidden = true)
+    private String payPwd;//支付密码
+
 }

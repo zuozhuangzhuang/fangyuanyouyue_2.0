@@ -369,6 +369,11 @@
         and a.id = #{goodsId,jdbcType=INTEGER}
       </if>
     </where>
+    order by b.add_time desc
+    <if test="start != null and limit != null">
+      limit #{start},#{limit}
+    </if>
+
   </select>
   <select id="selectByCategoryIds" parameterType="Integer" resultMap="BaseResultMap">
     select a.* from goods_info a,user_info_ext b,user_vip c where a.user_id = b.user_id and a.user_id = c.user_id and a.status = 1
