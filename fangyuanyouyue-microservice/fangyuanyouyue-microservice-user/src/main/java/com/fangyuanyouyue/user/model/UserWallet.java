@@ -1,4 +1,4 @@
-package com.fangyuanyouyue.wallet.model;
+package com.fangyuanyouyue.user.model;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -29,5 +29,4 @@ public class UserWallet {
     private Date addTime;//添加时间
 
     private Date updateTime;//更新时间
-
 }

@@ -1,21 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.fangyuanyouyue.wallet.dao.UserWalletMapper">
-  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.wallet.model.UserWallet">
-    <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="user_id" jdbcType="INTEGER" property="userId" />
-    <result column="balance" jdbcType="DECIMAL" property="balance" />
-    <result column="balance_frozen" jdbcType="DECIMAL" property="balanceFrozen" />
-    <result column="point" jdbcType="BIGINT" property="point" />
-    <result column="score" jdbcType="BIGINT" property="score" />
-    <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
-    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fangyuanyouyue.user.dao.UserWalletMapper" >
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.user.model.UserWallet" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="balance" property="balance" jdbcType="DECIMAL" />
+    <result column="balance_frozen" property="balanceFrozen" jdbcType="DECIMAL" />
+    <result column="point" property="point" jdbcType="BIGINT" />
+    <result column="add_time" property="addTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, balance, balance_frozen, point, score, add_time, update_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from user_wallet
     where id = #{id,jdbcType=INTEGER}
@@ -24,17 +23,17 @@
     delete from user_wallet
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.wallet.model.UserWallet" useGeneratedKeys="true" keyProperty="id">
-    insert into user_wallet (id, user_id, balance, 
-      balance_frozen, point, score, 
-      add_time, update_time
-      )
-    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{balance,jdbcType=DECIMAL}, 
-      #{balanceFrozen,jdbcType=DECIMAL}, #{point,jdbcType=BIGINT}, #{score,jdbcType=BIGINT}, 
-      #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
-      )
+  <insert id="insert" parameterType="com.fangyuanyouyue.user.model.UserWallet" useGeneratedKeys="true" keyProperty="id">
+    insert into user_wallet (id, user_id, balance,
+    balance_frozen, point, score,
+    add_time, update_time
+    )
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{balance,jdbcType=DECIMAL},
+    #{balanceFrozen,jdbcType=DECIMAL}, #{point,jdbcType=BIGINT}, #{score,jdbcType=BIGINT},
+    #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+    )
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.wallet.model.UserWallet">
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.user.model.UserWallet">
     insert into user_wallet
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -89,7 +88,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.wallet.model.UserWallet">
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.user.model.UserWallet">
     update user_wallet
     <set>
       <if test="userId != null">
@@ -116,7 +115,7 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.wallet.model.UserWallet">
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.user.model.UserWallet">
     update user_wallet
     set user_id = #{userId,jdbcType=INTEGER},
       balance = #{balance,jdbcType=DECIMAL},
@@ -127,15 +126,4 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
-
-  <select id="selectByUserId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from user_wallet
-    <where>
-      1=1
-      <if test="userId != null">
-        and user_id = #{userId}
-      </if>
-    </where>
-  </select>
-
 </mapper>
