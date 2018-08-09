@@ -25,8 +25,8 @@ public class WalletParam {
     @ApiModelProperty(name = "type", value = "类型", dataType = "int",hidden = true)
     private Integer type;//类型
 
-    @ApiModelProperty(name = "type", value = "支付宝账号(如果体现方试是支付宝，必填)", dataType = "String",hidden = true)
-    private String account;//支付宝账号(如果体现方试是支付宝，必填)
+    @ApiModelProperty(name = "type", value = "支付宝账号(如果提现方式是支付宝，必填)", dataType = "String",hidden = true)
+    private String account;//支付宝账号(如果提现方式是支付宝，必填)
 
     @ApiModelProperty(name = "type", value = "真实姓名", dataType = "String",hidden = true)
     private String realName;//真实姓名
@@ -40,10 +40,10 @@ public class WalletParam {
     @ApiModelProperty(name = "amount", value = "金额", dataType = "BigDecimal",hidden = true)
     private BigDecimal amount;//金额
 
-    @ApiModelProperty(name = "vipLevel", value = "金额", dataType = "int",hidden = true)
+    @ApiModelProperty(name = "vipLevel", value = "会员等级", dataType = "int",hidden = true)
     private Integer vipLevel;//会员等级
 
-    @ApiModelProperty(name = "vipType", value = "金额", dataType = "int",hidden = true)
+    @ApiModelProperty(name = "vipType", value = "会员类型", dataType = "int",hidden = true)
     private Integer vipType;//会员类型
 
 }
