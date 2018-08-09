@@ -72,7 +72,7 @@ public class AppraisalController extends BaseController{
             if((Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            if(param.getGoodsIds() == null){
+            if(param.getGoodsIds() == null || param.getGoodsIds().length < 1){
                 if(param.getImgUrls() == null && param.getVideoUrl() == null){
                     toError(ReCode.FAILD.getValue(),"至少包含一张图片或一段视频！");
                 }

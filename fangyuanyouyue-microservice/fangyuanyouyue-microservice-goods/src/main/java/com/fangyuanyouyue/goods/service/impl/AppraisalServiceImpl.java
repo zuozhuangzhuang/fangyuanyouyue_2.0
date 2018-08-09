@@ -81,7 +81,7 @@ public class AppraisalServiceImpl implements AppraisalService{
                         //TODO 根据鉴定费算法
                         BigDecimal price = new BigDecimal(10);
                         goodsAppraisalDetail.setPrice(price);
-                        if(goodsInfo.getUserId() == userId){
+                        if(goodsInfo.getUserId().intValue() == userId.intValue()){
                             goodsAppraisalDetail.setType(1);//鉴定类型 1商家鉴定 2买家 3普通用户
                             goodsInfo.setIsAppraisal(2);//是否鉴定 1未鉴定 2已鉴定
                         }else{
