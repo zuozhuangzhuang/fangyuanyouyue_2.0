@@ -64,6 +64,9 @@ public class CartServiceImpl implements CartService {
                 if(goodsInfo.getStatus().intValue() != 1){//1出售中
                     throw new ServiceException("商品状态异常！");
                 }
+                if(goodsInfo.getUserId().intValue() == userId.intValue()){
+                    throw new ServiceException("不可以把自己的商品加入到购物车！");
+                }
                 CartDetail cartDetail = cartDetailMapper.selectByCartIdGoodsId(cartInfo.getId(), goodsId);
                 //判断购物车是否已经有这个商品了
                 if (cartDetail == null) {

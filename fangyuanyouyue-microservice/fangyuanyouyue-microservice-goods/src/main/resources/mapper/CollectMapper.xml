@@ -114,15 +114,18 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <select id="selectByGoodsId" parameterType="Integer" resultMap="BaseResultMap">
+  <select id="selectByCollectId" parameterType="Integer" resultMap="BaseResultMap">
     select * from collect
     <where>
       1 = 1
+      <if test="userId != null">
+        and user_id = #{userId}
+      </if>
       <if test="collectId != null">
-        and collect_id = #{collectId,jdbcType=INTEGER}
+        and collect_id = #{collectId}
       </if>
       <if test="type != null">
-        and type = #{type,jdbcType=INTEGER}
+        and type = #{type}
       </if>
     </where>
   </select>

@@ -102,7 +102,9 @@ public class CollectController extends BaseController{
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true,dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "type", value = "类型 1关注 2收藏", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "collectType", value = "关注/收藏类型 1商品 2抢购（只有抢购可以关注）", required = true, dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "collectType", value = "关注/收藏类型 1商品 2抢购（只有抢购可以关注）", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/collectList")
     @ResponseBody
@@ -129,7 +131,13 @@ public class CollectController extends BaseController{
             if(param.getCollectType() == null){
                 return toError(ReCode.FAILD.getValue(),"关注/收藏类型不能为空！");
             }
-            List<GoodsDto> goodsDtos = collectService.collectList(userId, param.getCollectType(), param.getType());
+            if(param.getStart() == null || param.getStart() < 0){
+                return toError(ReCode.FAILD.getValue(),"起始页数错误！");
+            }
+            if(param.getLimit() == null || param.getLimit() < 1){
+                return toError(ReCode.FAILD.getValue(),"每页个数错误！");
+            }
+            List<GoodsDto> goodsDtos = collectService.collectList(userId, param.getCollectType(), param.getType(),param.getStart(),param.getLimit());
             return toSuccess(goodsDtos);
         } catch (ServiceException e) {
             e.printStackTrace();

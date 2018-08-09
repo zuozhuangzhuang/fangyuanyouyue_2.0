@@ -55,6 +55,7 @@ public class BaseController {
 		BaseResp resp = new BaseResp();
 		resp.setCode(reCode);
 		resp.setReport(reMsg);
+		log.info("返回值："+resp.toString());
 		return resp;
 	}
 

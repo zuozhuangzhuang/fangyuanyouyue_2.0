@@ -12,6 +12,7 @@ import com.fangyuanyouyue.goods.dto.GoodsDto;
 import com.fangyuanyouyue.goods.model.*;
 import com.fangyuanyouyue.goods.service.BargainService;
 import com.fangyuanyouyue.goods.service.SchedualUserService;
+import com.fangyuanyouyue.goods.service.SchedualWalletService;
 import org.apache.catalina.User;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,13 +47,18 @@ public class BargainServiceImpl implements BargainService{
     private GoodsCommentMapper goodsCommentMapper;
     @Autowired
     private CommentLikesMapper commentLikesMapper;
+    @Autowired
+    private SchedualWalletService schedualWalletService;
 
     @Override
-    public void addBargain(Integer userId, Integer goodsId, BigDecimal price, String reason,Integer addressId) throws ServiceException {
+    public void addBargain(Integer userId, Integer goodsId, BigDecimal price, String reason,Integer addressId,String payPwd) throws ServiceException {
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
         if(goodsInfo == null){
             throw new ServiceException("商品不存在！");
         }else{
+            if(goodsInfo.getUserId().intValue() == userId.intValue()){
+                throw new ServiceException("不可以对自己的商品进行压价！");
+            }
             if(goodsInfo.getStatus().intValue() != 1){
                 throw new ServiceException("商品已售出或已下架！");
             }
@@ -65,9 +71,10 @@ public class BargainServiceImpl implements BargainService{
             }
             //如果用户已经存在申请中的压价，不能压第二次
             List<GoodsBargain> goodsBargains = goodsBargainMapper.selectByUserIdGoodsId(userId, goodsId,1);
-            if(goodsBargains != null || goodsBargains.size()>0){
+            if(goodsBargains != null && goodsBargains.size()>0){
                 throw new ServiceException("此商品您已压价！");
             }else{
+
                 GoodsBargain goodsBargain = new GoodsBargain();
                 goodsBargain.setUserId(userId);
                 goodsBargain.setGoodsId(goodsId);
@@ -78,17 +85,28 @@ public class BargainServiceImpl implements BargainService{
                 }
                 goodsBargain.setStatus(1);//状态 1申请 2同意 3拒绝 4取消
                 goodsBargain.setAddTime(DateStampUtils.getTimesteamp());
+                //验证支付密码
+                // FIXME: 2018/8/9 客户端完成支付功能后取消注释
+                /*Boolean verifyPayPwd = Boolean.valueOf(JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getString("data"));
+                if(!verifyPayPwd){
+                    throw new ServiceException("支付密码错误！");
+                }else{
+                    //压价时扣除用户余额，如果余额不足就不可以议价
+                    //调用wallet-service修改余额功能
+                    schedualWalletService.updateBalance(userId, goodsBargain.getPrice(),2);
+                    goodsBargainMapper.insert(goodsBargain);
+                }*/
+                schedualWalletService.updateBalance(userId, goodsBargain.getPrice(),2);
                 goodsBargainMapper.insert(goodsBargain);
-                //压价时扣除用户余额，如果余额不足就不可以议价
-                //TODO 扣除用户余额，调用钱包系统
                 //TODO 压价时环信发送信息到店家
             }
         }
     }
 
     @Override
-    public void updateBargain(Integer userId, Integer goodsId,Integer bargainId,Integer status) throws ServiceException {
+    public Integer updateBargain(Integer userId, Integer goodsId,Integer bargainId,Integer status) throws ServiceException {
         GoodsBargain goodsBargain = goodsBargainMapper.selectByPrimaryKey(bargainId);
+        Integer orderId = null;
         //查询用户正在申请的压价
         //2.卖家同意压价 3.卖家拒绝压价 4.买家取消压价
         if(goodsBargain == null){
@@ -128,8 +146,9 @@ public class BargainServiceImpl implements BargainService{
 
                     orderInfo.setAmount(goodsInfo.getPrice());//原价
                     orderInfo.setCount(1);
-                    orderInfo.setStatus(1);//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
+                    orderInfo.setStatus(2);//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
                     orderInfo.setAddTime(DateStampUtils.getTimesteamp());
+                    orderInfo.setSellerId(goodsInfo.getUserId());
                     orderInfoMapper.insert(orderInfo);
                     //生成订单支付表
                     UserAddressInfo addressInfo = userAddressInfoMapper.selectByPrimaryKey(goodsBargain.getAddressId());
@@ -192,6 +211,7 @@ public class BargainServiceImpl implements BargainService{
                         bargain.setStatus(3);
                         goodsBargainMapper.updateByPrimaryKey(bargain);
                     }
+                    orderId = orderInfo.getId();
                 }else if(status.intValue() == 3){
                     //TODO 退回余额
                 }else{
@@ -208,6 +228,7 @@ public class BargainServiceImpl implements BargainService{
             }
             goodsBargain.setStatus(status);//状态 2同意 3拒绝 4取消
             goodsBargainMapper.updateByPrimaryKey(goodsBargain);
+            return orderId;
         }
     }
 
