@@ -2,14 +2,19 @@
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://eureka-server:8761/eureka/
+#      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://192.168.1.66:8761/eureka/
+
+ribbon:
+  ReadTimeout: 60000
+  SocketTimeout: 60000
 #服务的端口
 server:
   port: 8769
 #服务名
 spring:
   application:
-    name: server-zuul
+    name: zuul-server
 #文件上传大小限制
 #max-file-size 单个数据大小限制
 #max-request-size 总数据大小限制
@@ -22,6 +27,8 @@ zuul:
   host:
     socket-timeout-millis: 60000
     connect-timeout-millis: 60000
+##大文件支持，加入zuul拦截
+#hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds: 60000
   routes:
 #消息系统
     message-service:
