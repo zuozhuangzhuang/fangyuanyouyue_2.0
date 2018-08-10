@@ -37,7 +37,6 @@ public class AppraisalOrderInfoDto {
     public AppraisalOrderInfoDto(AppraisalOrderInfo appraisalOrderInfo) {
         this.orderId = appraisalOrderInfo.getId();
         this.userId = appraisalOrderInfo.getUserId();
-        this.appraisalId = appraisalOrderInfo.getAppraisalId();
         this.orderNo = appraisalOrderInfo.getOrderNo();
         this.amount = appraisalOrderInfo.getAmount();
         this.count = appraisalOrderInfo.getCount();

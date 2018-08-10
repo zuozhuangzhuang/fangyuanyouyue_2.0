@@ -4,7 +4,6 @@
   <resultMap id="BaseResultMap" type="com.fangyuanyouyue.goods.model.AppraisalOrderInfo" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="user_id" property="userId" jdbcType="INTEGER" />
-    <result column="appraisal_id" property="appraisalId" jdbcType="INTEGER" />
     <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
     <result column="amount" property="amount" jdbcType="DECIMAL" />
     <result column="count" property="count" jdbcType="INTEGER" />
@@ -12,7 +11,7 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, user_id, appraisal_id, order_no, amount, count, add_time, update_time
+    id, user_id, order_no, amount, count, add_time, update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -25,10 +24,10 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.fangyuanyouyue.goods.model.AppraisalOrderInfo" useGeneratedKeys="true" keyProperty="id">
-    insert into appraisal_order_info (id, user_id, appraisal_id, 
+    insert into appraisal_order_info (id, user_id,
       order_no, amount, count, 
       add_time, update_time)
-    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{appraisalId,jdbcType=INTEGER}, 
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER},
       #{orderNo,jdbcType=VARCHAR}, #{amount,jdbcType=DECIMAL}, #{count,jdbcType=INTEGER}, 
       #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
   </insert>
@@ -40,9 +39,6 @@
       </if>
       <if test="userId != null" >
         user_id,
-      </if>
-      <if test="appraisalId != null" >
-        appraisal_id,
       </if>
       <if test="orderNo != null" >
         order_no,
@@ -67,9 +63,6 @@
       <if test="userId != null" >
         #{userId,jdbcType=INTEGER},
       </if>
-      <if test="appraisalId != null" >
-        #{appraisalId,jdbcType=INTEGER},
-      </if>
       <if test="orderNo != null" >
         #{orderNo,jdbcType=VARCHAR},
       </if>
@@ -93,9 +86,6 @@
       <if test="userId != null" >
         user_id = #{userId,jdbcType=INTEGER},
       </if>
-      <if test="appraisalId != null" >
-        appraisal_id = #{appraisalId,jdbcType=INTEGER},
-      </if>
       <if test="orderNo != null" >
         order_no = #{orderNo,jdbcType=VARCHAR},
       </if>
@@ -117,7 +107,6 @@
   <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.goods.model.AppraisalOrderInfo" >
     update appraisal_order_info
     set user_id = #{userId,jdbcType=INTEGER},
-      appraisal_id = #{appraisalId,jdbcType=INTEGER},
       order_no = #{orderNo,jdbcType=VARCHAR},
       amount = #{amount,jdbcType=DECIMAL},
       count = #{count,jdbcType=INTEGER},

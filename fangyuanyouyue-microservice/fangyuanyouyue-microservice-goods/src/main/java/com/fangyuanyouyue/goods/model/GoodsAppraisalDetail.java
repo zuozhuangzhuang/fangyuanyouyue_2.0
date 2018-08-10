@@ -6,7 +6,6 @@ import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.Date;
-
 /**
  * 商品鉴定详情表
  */
@@ -16,7 +15,7 @@ import java.util.Date;
 public class GoodsAppraisalDetail {
     private Integer id;//唯一自增ID
 
-    private Integer appraisalId;//鉴定id
+    private Integer orderId;//鉴定id
 
     private Integer goodsId;//商品id
 
@@ -38,4 +37,7 @@ public class GoodsAppraisalDetail {
 
     private Integer type;//鉴定类型 1商家鉴定 2买家 3普通用户
 
+    private Integer isShow;//是否鉴定展示 1是 2否
+
+    private Integer userId;//用户ID
 }

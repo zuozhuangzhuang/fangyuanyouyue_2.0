@@ -18,8 +18,6 @@ public class AppraisalOrderInfo {
 
     private Integer userId;//用户id
 
-    private Integer appraisalId;//鉴定id
-
     private String orderNo;//订单号
 
     private BigDecimal amount;//订单总金额
@@ -29,5 +27,4 @@ public class AppraisalOrderInfo {
     private Date addTime;//添加时间
 
     private Date updateTime;//更新时间
-
 }
