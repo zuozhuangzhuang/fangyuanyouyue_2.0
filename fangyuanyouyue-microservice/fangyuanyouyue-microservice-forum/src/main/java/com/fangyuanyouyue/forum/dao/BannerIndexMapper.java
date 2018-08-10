@@ -2,10 +2,12 @@ package com.fangyuanyouyue.forum.dao;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.fangyuanyouyue.forum.model.BannerIndex;
 
+@Mapper
 public interface BannerIndexMapper {
     int deleteByPrimaryKey(Integer id);
 
