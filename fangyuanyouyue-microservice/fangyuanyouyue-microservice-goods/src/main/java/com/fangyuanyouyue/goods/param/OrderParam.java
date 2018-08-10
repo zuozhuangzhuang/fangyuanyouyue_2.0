@@ -21,4 +21,9 @@ public class OrderParam {
     @ApiModelProperty(name = "orderId", value = "订单ID", dataType = "int",hidden = true)
     private Integer orderId;//订单ID
 
+    @ApiModelProperty(name = "payPwd", value = "支付密码", dataType = "String",hidden = true)
+    private String payPwd;//支付密码
+
+    @ApiModelProperty(name = "type", value = "支付方式 1支付宝 2微信 3余额支付", dataType = "int",hidden = true)
+    private Integer type;//支付方式 1支付宝 2微信 3余额支付
 }

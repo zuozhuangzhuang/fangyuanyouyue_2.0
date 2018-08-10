@@ -161,6 +161,7 @@ public class FeignController  extends BaseController {
     public BaseResp verifyPayPwd(Integer userId,String payPwd) throws IOException {
         try {
             log.info("----》验证支付密码《----");
+            log.info("参数：userId：" + userId + ",payPwd："+ payPwd);
             if(userId == null){
                 return toError(ReCode.FAILD.getValue(),"用户ID不能为空！");
             }

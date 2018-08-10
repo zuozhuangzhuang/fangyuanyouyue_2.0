@@ -559,9 +559,9 @@ public class OrderServiceImpl implements OrderService{
             }else{
                 OrderPay orderPay = orderPayMapper.selectByOrderId(orderId);
                 if(type.intValue() == 1){//支付宝
-
+                    return "支付宝支付回调";
                 }else if(type.intValue() == 2){//微信
-
+                    return "微信支付回调";
                 }else if(type.intValue() == 3){//余额
                     //验证支付密码
                     Boolean verifyPayPwd = Boolean.valueOf(JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getString("data"));
@@ -593,8 +593,8 @@ public class OrderServiceImpl implements OrderService{
                 orderPay.setStatus(2);
                 orderPayMapper.updateByPrimaryKey(orderPay);
                 //TODO 通知卖家去发货
+                return "余额支付成功";
             }
         }
-        return null;
     }
 }

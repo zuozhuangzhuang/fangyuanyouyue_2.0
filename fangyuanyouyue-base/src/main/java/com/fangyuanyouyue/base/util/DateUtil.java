@@ -78,7 +78,20 @@ public class DateUtil {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		return sdf.format(temp_date);
 	}
-
+	/**
+	 * 得到n月后的日期
+	 *
+	 * @param month
+	 * @return
+	 */
+	public static String getDateAfterMonth(Date date,int month) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		c.add(c.MONTH, month);// 属性很多也有月等等，可以操作各种时间日期
+		Date temp_date = c.getTime();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		return sdf.format(temp_date);
+	}
 	/**
 	 * 得到n年后的日期,自定义参数
 	 * 
@@ -285,7 +298,7 @@ public class DateUtil {
 	}
 
 	/***
-	 * @comments 计算时间与当前时间的时间差
+	 * @comments 计算时间1与时间2的时间差
 	 * @param date1
 	 * @param date2
 	 */
@@ -300,6 +313,8 @@ public class DateUtil {
 		long hour=(l/(60*60*1000)-day*24);
 		long min=((l/(60*1000))-day*24*60-hour*60);
 		long s=(l/1000-day*24*60*60-hour*60*60-min*60);
-		return ""+day+"天"+hour+"小时"+min+"分"+s+"秒";
+		return ""+hour+"小时"+min+"分"+s+"秒";
 	}
+
+
 }
