@@ -25,7 +25,7 @@
     delete from goods_bargain
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.goods.model.GoodsBargain">
+  <insert id="insert" parameterType="com.fangyuanyouyue.goods.model.GoodsBargain" useGeneratedKeys="true" keyProperty="id">
     insert into goods_bargain (id, user_id, goods_id, 
       price, reason, status, 
       add_time, update_time, address_id
