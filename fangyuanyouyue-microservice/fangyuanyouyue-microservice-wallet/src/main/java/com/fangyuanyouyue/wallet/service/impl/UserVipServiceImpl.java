@@ -19,6 +19,15 @@ public class UserVipServiceImpl implements UserVipService{
         if(userVip == null){
             throw new ServiceException("获取用户会员信息失败！");
         }
+        //TODO 计算结束时间
+        switch (vipType){
+            case 1://1体验会员
+                break;
+            case 2://2月会员
+                break;
+            case 3://3年会员
+                break;
+        }
     }
 
 

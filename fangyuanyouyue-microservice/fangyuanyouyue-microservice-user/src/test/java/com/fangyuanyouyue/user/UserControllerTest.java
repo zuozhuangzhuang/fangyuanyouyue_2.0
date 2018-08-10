@@ -78,9 +78,9 @@ public class UserControllerTest {
     @Transactional
     public void login() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/user/login")
-                .param("phone","18103966057")
+                .param("phone","181039660571")
                 .param("loginPwd","123456")
-                .param("lastLoginPlatform","1")
+                .param("loginPlatform","1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

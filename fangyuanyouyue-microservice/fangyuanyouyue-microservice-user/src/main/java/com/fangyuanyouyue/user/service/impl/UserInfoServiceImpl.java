@@ -435,8 +435,8 @@ public class UserInfoServiceImpl implements UserInfoService {
 //            List<UserAddressInfo> userAddressInfos = userAddressInfoMapper.selectAddressByUserId(user.getId());
 //            UserThirdParty userThirdParty = userThirdPartyMapper.getUserThirdByUserId(user.getId());
             UserVip userVip = userVipMapper.getUserVipByUserId(user.getId());
-            IdentityAuthApply identityAuthApply = identityAuthApplyMapper.selectByUserId(user.getId());
-            UserDto userDto = new UserDto(token,user,userVip,userInfoExt,identityAuthApply);
+//            IdentityAuthApply identityAuthApply = identityAuthApplyMapper.selectByUserId(user.getId());
+            UserDto userDto = new UserDto(token,user,userVip,userInfoExt);
             return userDto;
         }
     }

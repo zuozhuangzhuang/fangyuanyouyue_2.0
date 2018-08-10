@@ -71,6 +71,6 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
         if(userInfoExt == null){
             throw new ServiceException("用户扩展信息错误！");
         }
-        return MD5Util.verify(userInfoExt.getPayPwd(),MD5Util.MD5(payPwd));
+        return MD5Util.verify(MD5Util.MD5(payPwd),userInfoExt.getPayPwd());
     }
 }

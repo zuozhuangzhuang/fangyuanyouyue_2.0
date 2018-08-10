@@ -378,7 +378,6 @@ public class UserController extends BaseController {
                 return toError(ReCode.FAILD.getValue(),"第三方用户不可修改密码！");
             }
             //判断旧密码是否正确
-//            if(!MD5Util.MD5(param.getLoginPwd()).equals(user.getLoginPwd())){
             if(!MD5Util.verify(MD5Util.MD5(param.getLoginPwd()),user.getLoginPwd())){
                 return toError(ReCode.FAILD.getValue(),"旧密码不正确！");
             }

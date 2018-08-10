@@ -1,14 +1,12 @@
 package com.fangyuanyouyue.user.dto;
 
+import com.fangyuanyouyue.user.model.UserInfo;
+import com.fangyuanyouyue.user.model.UserInfoExt;
+import com.fangyuanyouyue.user.model.UserVip;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.apache.commons.lang.StringUtils;
-
-import com.fangyuanyouyue.user.model.IdentityAuthApply;
-import com.fangyuanyouyue.user.model.UserInfo;
-import com.fangyuanyouyue.user.model.UserInfoExt;
-import com.fangyuanyouyue.user.model.UserVip;
 
 /**
  * 用户信息
@@ -42,19 +40,24 @@ public class UserDto {
 
     private Integer level;//用户等级
 
-    private String levelDesc;//等级描述
+//    private String levelDesc;//等级描述
 
 
-    private Integer identityStatus;//实名认证状态 1申请 2通过 3拒绝
+//    private Integer identityStatus;//实名认证状态 1申请 2通过 3拒绝
 
     //UserVip
     private Integer vipLevel;//会员等级
 
     private String vipLevelDesc;//会员等级描述
 
-    private Integer vipType;//会员类型 1体验会员 2月会员 3年会员
+//    private Integer vipType;//会员类型 1体验会员 2月会员 3年会员
 
     private Integer vipStatus;//会员状态 1已开通 2未开通
+
+//    private String vipStartTime;//会员开通时间
+
+//    private String vipEndTime;//会员过期时间
+
 
     //UserFans
     private Integer fansCount;//粉丝数量
@@ -64,13 +67,15 @@ public class UserDto {
     private Integer isFollow = 2;//是否关注 1是 2否
 
     //UserAddressDto
-    private UserAddressDto defaultAddress;//用户默认收货地址
+//    private UserAddressDto defaultAddress;//用户默认收货地址
 
     //UserWallet
-    private Integer score;//用户积分
+//    private Integer score;//用户积分
     //UserInfoExt 用户扩展表
 
-    private Long credit;//信誉度
+//    private Long credit;//信誉度
+
+    private Integer creditLevel;//信誉度等级 1差 2低 3中 4高 5优
 
     private Integer authType;//认证状态 1已认证 2未认证
 
@@ -105,8 +110,6 @@ public class UserDto {
 
 //    private String name;//真实姓名
 
-
-
     /**
      * ↑↑↑↑↑↑注释掉不需要返回的属性↑↑↑↑↑↑
      */
@@ -114,7 +117,7 @@ public class UserDto {
     public UserDto() {
     }
 
-    public UserDto(String token,UserInfo userInfo, UserVip userVip, UserInfoExt userInfoExt,IdentityAuthApply identityAuthApply) {
+    public UserDto(String token,UserInfo userInfo, UserVip userVip, UserInfoExt userInfoExt) {
         if(StringUtils.isNotEmpty(token)){
             this.token = token;
         }
@@ -131,11 +134,27 @@ public class UserDto {
             this.signature = userInfo.getSignature();
             this.contact = userInfo.getContact();
             this.level = userInfo.getLevel();
-            this.levelDesc = userInfo.getLevelDesc();
+//            this.levelDesc = userInfo.getLevelDesc();
         }
         //UserInfoExt
         if(userInfoExt != null){
-            this.credit = userInfoExt.getCredit();
+//            this.credit = userInfoExt.getCredit();
+            //信誉度
+            Long credit = userInfoExt.getCredit();
+            if(credit != null){
+                if(credit < -100){//差
+                    this.creditLevel = 1;
+                }else if(-100 <= credit && credit < 1000){//低
+                    this.creditLevel = 2;
+                }else if(1000 <= credit && credit < 10000){//中
+                    this.creditLevel = 3;
+                }else if(10000 <= credit && credit < 500000){//高
+                    this.creditLevel = 4;
+                }else if(500000 <= credit){//优
+                    this.creditLevel = 5;
+                }
+            }
+
             this.authType = userInfoExt.getAuthType();
             this.extStatus = userInfoExt.getStatus();
             if(StringUtils.isEmpty(userInfoExt.getPayPwd())){
@@ -145,14 +164,14 @@ public class UserDto {
             }
         }
         //IdentityAuthApply
-        if(identityAuthApply != null){
+//        if(identityAuthApply != null){
 //            this.identity = identityAuthApply.getIdentity();
 //            this.name = identityAuthApply.getName();
 //            this.identityImgCover = identityAuthApply.getIdentityImgCover();
 //            this.identityImgBack = identityAuthApply.getIdentityImgBack();
 //            this.identityRejectDesc = identityAuthApply.getRejectDesc();
-            this.identityStatus = identityAuthApply.getStatus();
-        }
+//            this.identityStatus = identityAuthApply.getStatus();
+//        }
         //UserThirdParty
 //        if(userThirdParty != null){
 //            this.thirdType = userThirdParty.getType();
@@ -165,8 +184,15 @@ public class UserDto {
         if(userVip != null){
             this.vipLevel = userVip.getVipLevel();
             this.vipLevelDesc = userVip.getLevelDesc();
-            this.vipType = userVip.getVipType();
+//            this.vipType = userVip.getVipType();
             this.vipStatus = userVip.getStatus();
+            //开始时间
+//            if(userVip.getAddTime() != null){
+//                this.vipStartTime = DateUtil.getFormatDate(userVip.getAddTime(), DateUtil.DATE_FORMT);
+//            }
+//            if(userVip.getEndTime() != null){
+//                this.vipEndTime = DateUtil.getFormatDate(userVip.getEndTime(), DateUtil.DATE_FORMT);
+//            }
         }
         //UserAddressInfo
 //        if(userAddressInfos != null && userAddressInfos.size()>0){
