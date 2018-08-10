@@ -205,6 +205,9 @@ public class GoodsParam{
     @ApiModelProperty(name = "opinion", value = "鉴定观点", dataType = "String",hidden = true)
     private String opinion;//鉴定观点
 
+    @ApiModelProperty(name = "detailId", value = "鉴定详情ID", dataType = "int",hidden = true)
+    private Integer detailId;//鉴定详情ID
+
 
     //ReportGoods
     @ApiModelProperty(name = "reason", value = "举报原因", dataType = "String",hidden = true)

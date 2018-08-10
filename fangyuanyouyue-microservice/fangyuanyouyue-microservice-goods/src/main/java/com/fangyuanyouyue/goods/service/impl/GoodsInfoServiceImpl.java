@@ -147,6 +147,9 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         }
         goodsInfo.setType(param.getType());
         goodsInfo.setStatus(1);//状态 1出售中 2 已售出 5删除
+        if(StringUtils.isNotEmpty(param.getVideoUrl())){
+            goodsInfo.setVideoUrl(param.getVideoUrl());
+        }
         goodsInfo.setAddTime(DateStampUtils.getTimesteamp());
         if(param.getType() == 2){
             goodsInfo.setFloorPrice(param.getFloorPrice());
