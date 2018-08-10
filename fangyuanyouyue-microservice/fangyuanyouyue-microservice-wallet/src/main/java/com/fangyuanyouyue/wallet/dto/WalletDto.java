@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.wallet.dto;
 
 import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.wallet.model.UserVip;
 import com.fangyuanyouyue.wallet.model.UserWallet;
 import lombok.Getter;
 import lombok.Setter;
@@ -56,9 +57,9 @@ public class WalletDto {
      */
     private String levelDesc;//等级描述(升级还需xxx积分)
 
-    private Date startTime;//会员开通时间
+    private String startTime;//会员开通时间
 
-    private Date endTime;//会员过期时间
+    private String endTime;//会员过期时间
 
     private Integer vipLevel;//会员等级 1铂金会员 2至尊会员
 
@@ -72,15 +73,61 @@ public class WalletDto {
     public WalletDto() {
     }
 
-    public WalletDto(UserWallet userWallet) {
-        this.walletId = userWallet.getId();
-        this.userId = userWallet.getUserId();
-        this.balance = userWallet.getBalance();
-        this.balanceFrozen = userWallet.getBalanceFrozen();
-        this.point = userWallet.getPoint();
-        this.score = userWallet.getScore();
-        this.addTime = DateUtil.getFormatDate(userWallet.getAddTime(), DateUtil.DATE_FORMT);
-        this.updateTime = DateUtil.getFormatDate(userWallet.getAddTime(), DateUtil.DATE_FORMT);
+    public WalletDto(UserWallet userWallet, UserVip userVip) {
+        if(userWallet != null){
+            this.walletId = userWallet.getId();
+            this.userId = userWallet.getUserId();
+            this.balance = userWallet.getBalance();
+            this.balanceFrozen = userWallet.getBalanceFrozen();
+            this.point = userWallet.getPoint();
+            this.score = userWallet.getScore();
+            this.addTime = DateUtil.getFormatDate(userWallet.getAddTime(), DateUtil.DATE_FORMT);
+            this.updateTime = DateUtil.getFormatDate(userWallet.getAddTime(), DateUtil.DATE_FORMT);
+            this.score = userWallet.getScore();
+            //积分等级，计算总积分
+            if(score != null){
+                if(0 <= score && score < 500){//Lv1
+                    this.level = 1;
+                    this.levelDesc = "升级还需"+(500-score)+"积分";
+                }else if(500 <= score && score < 3000){//Lv2
+                    this.level = 2;
+                    this.levelDesc = "升级还需"+(3000-score)+"积分";
+                }else if(3000 <= score && score < 10000){//Lv3
+                    this.level = 3;
+                    this.levelDesc = "升级还需"+(10000-score-score)+"积分";
+                }else if(10000 <= score && score < 30000){//Lv4
+                    this.level = 4;
+                    this.levelDesc = "升级还需"+(30000-score)+"积分";
+                }else if(30000 <= score && score < 80000){//Lv5
+                    this.level = 5;
+                    this.levelDesc = "升级还需"+(80000-score)+"积分";
+                }else if(80000 <= score && score < 200000){//Lv6
+                    this.level = 6;
+                    this.levelDesc = "升级还需"+(200000-score)+"积分";
+                }else if(200000 <= score && score < 600000){//Lv7
+                    this.level = 7;
+                    this.levelDesc = "升级还需"+(600000-score)+"积分";
+                }else if(600000 <= score && score < 1000000){//Lv8
+                    this.level = 8;
+                    this.levelDesc = "升级还需"+(1000000-score)+"积分";
+                }else if(1000000 <= score){//Lv9
+                    this.level = 9;
+                    this.levelDesc = "您已升至满级！";
+                }
+            }
+        }
+        if(userVip != null){
+            if(userVip.getStartTime() != null){
+                this.startTime = DateUtil.getFormatDate(userVip.getStartTime(), DateUtil.DATE_FORMT);
+            }
+            if(userVip.getEndTime() != null){
+                this.endTime = DateUtil.getFormatDate(userVip.getEndTime(), DateUtil.DATE_FORMT);
+            }
+            this.vipLevel = userVip.getVipLevel();
+            this.vipLevelDesc = userVip.getLevelDesc();
+            this.vipType = userVip.getVipType();
+            this.status = userVip.getStatus();
+        }
     }
 
 }
