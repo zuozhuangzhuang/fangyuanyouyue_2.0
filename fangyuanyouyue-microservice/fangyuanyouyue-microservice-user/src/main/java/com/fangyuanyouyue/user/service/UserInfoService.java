@@ -6,6 +6,7 @@ import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.user.dto.ShopDto;
 import com.fangyuanyouyue.user.dto.UserDto;
 import com.fangyuanyouyue.user.dto.UserFansDto;
+import com.fangyuanyouyue.user.dto.WaitProcessDto;
 import com.fangyuanyouyue.user.model.UserInfo;
 import com.fangyuanyouyue.user.param.UserParam;
 
@@ -173,4 +174,11 @@ public interface UserInfoService {
      */
     List<UserFansDto> myFansOrFollows(Integer userId,Integer type,Integer start,Integer limit) throws ServiceException;
 
+    /**
+     * 获取待处理信息
+     * @param userId
+     * @return
+     * @throws ServiceException
+     */
+    WaitProcessDto myWaitProcess(Integer userId) throws ServiceException;
 }

@@ -42,8 +42,9 @@ public class WalletController extends BaseController{
     @ApiOperation(value = "充值", notes = "(void)充值",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "price", value = "充值金额",  required = true,dataType = "BigDecimal", paramType = "query"),
-            @ApiImplicitParam(name = "type", value = "充值方式 0支付宝 1微信 2公众号微信",required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "amount", value = "充值金额",  required = true,dataType = "BigDecimal", paramType = "query"),
+            //TODO 3公众号微信 和 1微信支付 有啥区别
+            @ApiImplicitParam(name = "type", value = "充值方式 1微信 2支付宝（3公众号微信）",required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/recharge")
     @ResponseBody
@@ -61,7 +62,7 @@ public class WalletController extends BaseController{
             if(jsonObject != null && (Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            if(param.getPrice()==null){
+            if(param.getAmount()==null){
                 return toError("充值金额不能为空！");
             }
             if(param.getPrice().compareTo(new BigDecimal(0)) < 0){
@@ -70,8 +71,8 @@ public class WalletController extends BaseController{
             if(param.getType() == null){
                 return toError("充值方式不能为空！");
             }
-            //充值
-            walletService.recharge(userId,param.getPrice(),param.getType());
+            //TODO 充值
+            walletService.recharge(userId,param.getAmount(),param.getType());
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
@@ -86,8 +87,8 @@ public class WalletController extends BaseController{
     @ApiOperation(value = "提现", notes = "(void)提现",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "price", value = "提现金额",  required = true,dataType = "BigDecimal", paramType = "query"),
-            @ApiImplicitParam(name = "type", value = "提现方式 0支付宝 1微信",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "amount", value = "提现金额",  required = true,dataType = "BigDecimal", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "提现方式 1微信 2支付宝 ",required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "account", value = "支付宝账号(如果体现方试是支付宝，必填)", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "realName", value = "真实姓名",required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "payPwd", value = "支付密码",required = true, dataType = "String", paramType = "query")
@@ -108,13 +109,13 @@ public class WalletController extends BaseController{
             if(jsonObject != null && (Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            if(param.getPrice()==null || param.getPrice().doubleValue()==0 ){
+            if(param.getAmount()==null || param.getAmount().doubleValue()==0 ){
                 return toError("提现金额不能为空！");
             }
             if(param.getType() == null){
                 return toError("提现方式不能为空！");
             }
-            if(param.getPrice().doubleValue() < 100){
+            if(param.getAmount().doubleValue() < 100){
                 return toError("提现金额不能少于100！");
             }
             if("0".equals(param.getType()) && StringUtils.isEmpty(param.getAccount())){
@@ -123,8 +124,8 @@ public class WalletController extends BaseController{
             if("0".equals(param.getType()) && StringUtils.isEmpty(param.getRealName())){
                 return toError("真实姓名不能为空！");
             }
-            //充值
-            walletService.withdrawDeposit(userId,param.getPrice(),param.getType(),param.getAccount(),param.getRealName(),param.getPayPwd());
+            //TODO 提现
+            walletService.withdrawDeposit(userId,param.getAmount(),param.getType(),param.getAccount(),param.getRealName(),param.getPayPwd());
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();

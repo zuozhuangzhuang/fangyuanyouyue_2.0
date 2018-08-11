@@ -37,11 +37,11 @@ public interface GoodsBargainMapper {
     List<GoodsBargain> selectAllByGoodsId(@Param("goodsId")Integer goodsId,@Param("status")Integer status);
 
     /**
-     * 根据用户ID获取所有压价列表，不区分状态
+     * 根据用户ID、status获取所有压价列表
      * @param userId
      * @return
      */
-    List<GoodsBargain> selectAllByUserId(@Param("userId")Integer userId);
+    List<GoodsBargain> selectAllByUserId(@Param("userId")Integer userId,@Param("status")Integer status);
 
     /**
      * 根据用户ID获取所有压过价的商品ID列表

@@ -5,12 +5,19 @@ import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.order.dto.CompanyDto;
 import com.fangyuanyouyue.order.dto.OrderDto;
 import com.fangyuanyouyue.order.param.OrderParam;
 import com.fangyuanyouyue.order.service.OrderService;
 import com.fangyuanyouyue.order.service.SchedualGoodsService;
 import com.fangyuanyouyue.order.service.SchedualRedisService;
 import com.fangyuanyouyue.order.service.SchedualUserService;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -27,6 +34,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -285,7 +293,6 @@ public class OrderController extends BaseController{
             if((Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-
             if(param.getOrderId()==null){
                 return toError("订单ID不能为空！");
             }
@@ -306,5 +313,190 @@ public class OrderController extends BaseController{
             return toError("系统繁忙，请稍后再试！");
         }
     }
+
+
+    @ApiOperation(value = "卖家确认发货", notes = "(void)卖家确认发货")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orderId", value = "订单ID", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "companyId", value = "物流公司", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "number", value = "物流号", required = true, dataType = "String", paramType = "query")
+    })
+    @PostMapping(value = "/sendGoods")
+    @ResponseBody
+    public BaseResp sendGoods(OrderParam param) throws IOException {
+        try {
+            log.info("----》卖家确认发货《----");
+            log.info("参数："+param.toString());
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+            }
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            String verifyUser = schedualUserService.verifyUserById(userId);
+            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+            if((Integer)jsonObject.get("code") != 0){
+                return toError(jsonObject.getString("report"));
+            }
+            if(param.getOrderId()==null || param.getOrderId().intValue()==0){
+                return toError("订单ID不能为空！");
+            }
+            if(param.getCompanyId()==null || param.getCompanyId().intValue()==0){
+                return toError("物流公司ID不能为空！");
+            }
+            if(org.apache.commons.lang3.StringUtils.isEmpty(param.getNumber())){
+                return toError("物流号不能为空！");
+            }
+            //TODO 卖家确认发货
+            orderService.sendGoods(userId, param.getOrderId(), param.getCompanyId(),param.getNumber());
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "买家确认收货", notes = "(void)买家确认收货")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orderId", value = "订单ID", required = true, dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/getGoods")
+    @ResponseBody
+    public BaseResp getGoods(OrderParam param) throws IOException {
+        try {
+            log.info("----》买家确认收货《----");
+            log.info("参数："+param.toString());
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+            }
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            String verifyUser = schedualUserService.verifyUserById(userId);
+            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+            if((Integer)jsonObject.get("code") != 0){
+                return toError(jsonObject.getString("report"));
+            }
+            if(param.getOrderId()==null || param.getOrderId().intValue()==0){
+                return toError("订单ID不能为空！");
+            }
+            //TODO 买家确认收货
+            orderService.getGoods(userId, param.getOrderId());
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+
+    @ApiOperation(value = "物流公司", notes = "(CompanyDto)物流公司")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query")
+    })
+    @PostMapping(value = "/companyList")
+    @ResponseBody
+    public BaseResp companyList(OrderParam param) throws IOException {
+        try {
+            log.info("----》物流公司《----");
+            log.info("参数："+param.toString());
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+            }
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            String verifyUser = schedualUserService.verifyUserById(userId);
+            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+            if((Integer)jsonObject.get("code") != 0){
+                return toError(jsonObject.getString("report"));
+            }
+            //TODO 物流公司
+            List<CompanyDto> companyDtos = orderService.companyList();
+            return toSuccess(companyDtos);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+
+//
+//    @ApiOperation(value = "物流公司", notes = "()物流公司")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query")
+//    })
+//    @PostMapping(value = "/companyList")
+//    @ResponseBody
+//    public BaseResp companyList(OrderParam param) throws IOException {
+//        try {
+//            log.info("----》物流公司《----");
+//            log.info("参数："+param.toString());
+//            //验证用户
+//            if(StringUtils.isEmpty(param.getToken())){
+//                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+//            }
+//            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+//            String verifyUser = schedualUserService.verifyUserById(userId);
+//            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+//            if((Integer)jsonObject.get("code") != 0){
+//                return toError(jsonObject.getString("report"));
+//            }
+//            if(param.getOrderId()==null){
+//                return toError("订单ID不能为空！");
+//            }
+////            /**
+////             *
+////             */
+////            //订单物流详情，即时查询
+////            List<LogisticsInfoDto> dtos = new ArrayList<LogisticsInfoDto>();
+////            try{
+////                /*
+////                 * author zzz
+////                 * 每次查看订单详情都要请求物流信息，感觉不合理，如果希望后台控制物流查询，至少也得独立出来一个接口，防止服务器资源被无故占用
+////                 */
+////                KdniaoTrackQueryAPI utils = new KdniaoTrackQueryAPI();
+////                String datas = utils.getOrderTracesByJson(order.getCompanyNo(),order.getLogistics());
+////                logisticLog.info(datas);
+////
+////                ObjectMapper mapper = new ObjectMapper();
+////                JsonFactory factory = mapper.getFactory();
+////                JsonParser jp = factory.createParser(datas);
+////                ObjectNode obj = mapper.readTree(jp);
+////
+////                ArrayNode data = (ArrayNode) obj.get("Traces");
+////
+////                for (int j = 0; j < data.size(); j++) {
+////                    JsonNode trace=data.get(j);
+////
+////                    LogisticsInfoDto logisticsInfo = new LogisticsInfoDto();
+////                    //以上的操作，都是为了获取下面这俩字段，然后放到logisticsInfo里面
+////                    logisticsInfo.setAcceptTime(trace.get("AcceptTime").asText());
+////                    logisticsInfo.setInfo(trace.get("AcceptStation").asText());
+////                    dtos.add(logisticsInfo);
+////                }
+////            }catch(Exception e){
+////                logisticLog.error("查找不到快递");
+////            }
+//            //TODO 物流公司
+//            List<CompanyDto> companyDtos = orderService.companyList();
+//            return toSuccess(companyDtos);
+//        } catch (ServiceException e) {
+//            e.printStackTrace();
+//            return toError(e.getMessage());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return toError("系统繁忙，请稍后再试！");
+//        }
+//    }
+
 
 }

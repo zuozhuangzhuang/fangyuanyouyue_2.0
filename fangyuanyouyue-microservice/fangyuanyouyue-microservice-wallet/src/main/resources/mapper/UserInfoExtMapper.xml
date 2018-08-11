@@ -26,7 +26,7 @@
     delete from user_info_ext
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.wallet.model.UserInfoExt">
+  <insert id="insert" parameterType="com.fangyuanyouyue.wallet.model.UserInfoExt" useGeneratedKeys="true" keyProperty="id">
     insert into user_info_ext (id, user_id, identity, 
       name, pay_pwd, status, 
       auth_type, add_time, update_time, 

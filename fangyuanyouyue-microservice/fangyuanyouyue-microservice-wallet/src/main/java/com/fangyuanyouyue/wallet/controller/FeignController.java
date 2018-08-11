@@ -44,8 +44,11 @@ public class FeignController extends BaseController{
             if(param.getScore() == null){
                 return toError("积分错误！");
             }
+            if(param.getType() == null){
+                return toError("类型错误！");
+            }
             //修改积分
-            walletService.updateScore(param.getUserId(),param.getScore());
+            walletService.updateScore(param.getUserId(),param.getScore(),param.getType());
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();

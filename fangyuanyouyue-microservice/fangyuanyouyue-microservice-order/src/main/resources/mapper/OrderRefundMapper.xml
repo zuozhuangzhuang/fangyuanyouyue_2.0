@@ -185,4 +185,17 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectByOrderIdStatus" parameterType="Integer" resultMap="BaseResultMap">
+    select * from order_refund
+    <where>
+      1=1
+      <if test="orderId != null">
+        and order_id = #{orderId}
+      </if>
+      <if test="status != null">
+        and status = #{status}
+      </if>
+    </where>
+  </select>
 </mapper>

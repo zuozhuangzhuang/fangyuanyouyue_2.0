@@ -50,4 +50,10 @@ public class OrderParam{
 
     @ApiModelProperty(name = "payPwd", value = "支付密码", dataType = "String",hidden = true)
     private String payPwd;//支付密码
+
+    @ApiModelProperty(name = "companyId", value = "物流公司ID", dataType = "int",hidden = true)
+    private Integer companyId;//物流公司ID
+
+    @ApiModelProperty(name = "number", value = "物流公司编号", dataType = "int",hidden = true)
+    private String number;//物流公司编号
 }

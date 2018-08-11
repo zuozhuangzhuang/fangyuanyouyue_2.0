@@ -5,7 +5,6 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.Date;
-
 /**
  * 用户会员信息表
  */
@@ -25,12 +24,11 @@ public class UserVip {
 
     private String levelDesc;//会员等级描述
 
-    private Integer vipType;//会员类型 1体验会员 2月会员 3年会员
+    private Integer vipType;//会员类型 1一个月 2三个月 3一年会员
 
-    private Integer status;//会员状态1已开通 2未开通
+    private Integer status;//会员状态 1已开通 2未开通
 
     private Date addTime;//添加时间
 
     private Date updateTime;//更新时间
-
 }

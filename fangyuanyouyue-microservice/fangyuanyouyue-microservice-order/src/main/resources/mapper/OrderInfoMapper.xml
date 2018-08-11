@@ -173,7 +173,10 @@
         and status = #{status}
       </if>
     </where>
-    order by add_time desc limit #{start},#{limit}
+    order by add_time desc
+    <if test="start != null and limit != null">
+      limit #{start},#{limit}
+    </if>
   </select>
 
 

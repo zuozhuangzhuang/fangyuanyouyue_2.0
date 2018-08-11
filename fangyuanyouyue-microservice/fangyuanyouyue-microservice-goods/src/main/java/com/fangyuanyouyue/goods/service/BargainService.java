@@ -37,6 +37,7 @@ public interface BargainService {
      * @throws ServiceException
      */
     List<GoodsDto> bargainList(Integer userId, Integer start, Integer limit) throws ServiceException;
+
     /**
      * 压价详情
      * @param userId
@@ -46,4 +47,13 @@ public interface BargainService {
      * @throws ServiceException
      */
     GoodsBargain bargainDetail(Integer userId,Integer bargainId, Integer goodsId) throws ServiceException;
+
+
+    /**
+     * 获取统计信息
+     * @param userId
+     * @return
+     * @throws ServiceException
+     */
+    Integer getProcess(Integer userId) throws ServiceException;
 }

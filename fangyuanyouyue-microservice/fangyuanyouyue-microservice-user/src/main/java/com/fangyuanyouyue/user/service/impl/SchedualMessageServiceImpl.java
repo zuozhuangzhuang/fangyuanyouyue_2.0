@@ -8,6 +8,6 @@ public class SchedualMessageServiceImpl implements SchedualMessageService {
 
     @Override
     public String sendCode(String phone, Integer typet) {
-        return "系统繁忙，请稍后重试！";
+        return "发送验证码失败！";
     }
 }

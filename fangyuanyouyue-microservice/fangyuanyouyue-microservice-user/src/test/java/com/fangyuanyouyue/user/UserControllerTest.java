@@ -379,53 +379,21 @@ public class UserControllerTest {
                 .andReturn();
     }
 
+    /**
+     * 获取待处理信息
+     * @throws Exception
+     */
+    @Test
+    @Transactional
+    public void myWaitProcess() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/user/myWaitProcess")
+                .param("token","10041FY1533753292042")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
 
-//    /**
-//     * 我的关注
-//     * @throws Exception
-//     */
-//    @Test
-//    @Transactional
-//    public void myFollows() throws Exception {
-//        mvc.perform(MockMvcRequestBuilders.post("/user/myFollows")
-//                .param("token","6008FY1525397451364")
-//                .param("start","1")
-//                .param("limit","10")
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andDo(MockMvcResultHandlers.print())
-//                .andReturn();
-//    }
-//
-//    /**
-//     * 好友列表
-//     * @throws Exception
-//     */
-//    @Test
-//    @Transactional
-//    public void friendList() throws Exception {
-//        mvc.perform(MockMvcRequestBuilders.post("/user/friendList")
-//                .param("token","6008FY1525397451364")
-//                .param("start","1")
-//                .param("limit","10")
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andDo(MockMvcResultHandlers.print())
-//                .andReturn();
-//    }
-//
-//    /**
-//     * 签到
-//     * @throws Exception
-//     */
-//    @Test
-//    @Transactional
-//    public void sign() throws Exception {
-//        mvc.perform(MockMvcRequestBuilders.post("/user/sign")
-//                .param("token","6008FY1525397451364")
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andDo(MockMvcResultHandlers.print())
-//                .andReturn();
-//    }
-//
+
 
 
 }

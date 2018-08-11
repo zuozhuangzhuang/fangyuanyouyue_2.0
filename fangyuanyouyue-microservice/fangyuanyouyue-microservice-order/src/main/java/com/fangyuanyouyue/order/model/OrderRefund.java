@@ -33,7 +33,7 @@ public class OrderRefund {
 
     private String pic6;
 
-    private Integer status;//状态
+    private Integer status;//状态 1申请退货 2退货成功 3拒绝退货
 
     private Date addTime;//添加时间
 

@@ -21,4 +21,14 @@ public interface SchedualWalletService {
      */
     @RequestMapping(value = "/walletFeign/updateBalance",method = RequestMethod.POST)
     String updateBalance(@RequestParam(value = "userId") Integer userId,@RequestParam(value = "amount") BigDecimal amount,@RequestParam(value = "type") Integer type);
+
+    /**
+     * 修改积分
+     * @param userId
+     * @param score
+     * @param type 1增加 2减少
+     * @return
+     */
+    @RequestMapping(value = "/walletFeign/updateScore",method = RequestMethod.POST)
+    String updateScore(@RequestParam(value = "userId") Integer userId,@RequestParam(value = "score") Long score,@RequestParam(value = "type") Integer type);
 }

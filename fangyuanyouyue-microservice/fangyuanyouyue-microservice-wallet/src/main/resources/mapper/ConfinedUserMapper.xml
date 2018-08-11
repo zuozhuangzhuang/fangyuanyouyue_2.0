@@ -90,4 +90,17 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectByUserIdStatus" parameterType="Integer" resultMap="BaseResultMap">
+    select * from confined_user
+    <where>
+      1=1
+      <if test="userId != null">
+        and user_id = #{userId}
+      </if>
+      <if test="status != null">
+        and status = #{status}
+      </if>
+    </where>
+  </select>
 </mapper>

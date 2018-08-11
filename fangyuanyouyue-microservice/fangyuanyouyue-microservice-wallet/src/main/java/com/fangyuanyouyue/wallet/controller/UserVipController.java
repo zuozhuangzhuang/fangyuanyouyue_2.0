@@ -46,7 +46,7 @@ public class UserVipController extends BaseController{
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "vipLevel", value = "会员等级 1铂金会员 2至尊会员",required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "vipType", value = "会员类型 1体验会员 2月会员 3年会员",required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "vipType", value = "会员类型 1一个月 2三个月 3一年会员",required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/openMebber")
     @ResponseBody
@@ -82,4 +82,44 @@ public class UserVipController extends BaseController{
         }
     }
 
+
+//    @ApiOperation(value = "续费会员", notes = "(void)续费会员",response = BaseResp.class)
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+//            @ApiImplicitParam(name = "vipLevel", value = "会员等级 1铂金会员 2至尊会员",required = true, dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "vipType", value = "会员类型 1体验会员 2月会员 3年会员",required = true, dataType = "int", paramType = "query")
+//    })
+//    @PostMapping(value = "/openMebber")
+//    @ResponseBody
+//    public BaseResp openMebber(WalletParam param) throws IOException {
+//        try {
+//            log.info("----》续费会员《----");
+//            log.info("参数："+param.toString());
+//            //验证用户
+//            if(StringUtils.isEmpty(param.getToken())){
+//                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+//            }
+//            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+//            String verifyUser = schedualUserService.verifyUserById(userId);
+//            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+//            if(jsonObject != null && (Integer)jsonObject.get("code") != 0){
+//                return toError(jsonObject.getString("report"));
+//            }
+//            if(param.getVipLevel()==null){
+//                return toError("会员等级不能为空！");
+//            }
+//            if(param.getVipType() == null){
+//                return toError("会员类型不能为空！");
+//            }
+//            //TODO 续费会员
+//            userVipService.openMebber(userId,param.getVipLevel(),param.getVipType());
+//            return toSuccess();
+//        } catch (ServiceException e) {
+//            e.printStackTrace();
+//            return toError(e.getMessage());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+//        }
+//    }
 }

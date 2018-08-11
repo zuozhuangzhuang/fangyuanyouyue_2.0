@@ -69,14 +69,14 @@ public class DateUtil {
 	 * @param year
 	 * @return
 	 */
-	public static String getDateAfter(int year) {
-		Date date = new Date();
+	public static Date getDateAfterYear(Date date,int year) {
+//		Date date = new Date();
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
 		c.add(c.YEAR, year);// 属性很多也有月等等，可以操作各种时间日期
 		Date temp_date = c.getTime();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		return sdf.format(temp_date);
+//		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		return temp_date;
 	}
 	/**
 	 * 得到n月后的日期
@@ -84,13 +84,13 @@ public class DateUtil {
 	 * @param month
 	 * @return
 	 */
-	public static String getDateAfterMonth(Date date,int month) {
+	public static Date getDateAfterMonth(Date date,int month) {
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
 		c.add(c.MONTH, month);// 属性很多也有月等等，可以操作各种时间日期
 		Date temp_date = c.getTime();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		return sdf.format(temp_date);
+//		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		return temp_date;
 	}
 	/**
 	 * 得到n年后的日期,自定义参数

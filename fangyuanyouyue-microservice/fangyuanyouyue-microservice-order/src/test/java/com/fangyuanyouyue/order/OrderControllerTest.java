@@ -124,6 +124,7 @@ public class OrderControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
+
     /**
      * 订单支付
      * @throws Exception
@@ -133,10 +134,57 @@ public class OrderControllerTest {
     public void getOrderPay() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/order/getOrderPay")
                 .param("token","10041FY1533753292042")
-                .param("orderId","909")
+                .param("orderId","921")
                 //支付方式 1支付宝 2微信 3余额支付
                 .param("type","3")
-                .param("payPwd","123456")
+                .param("payPwd","e10adc3949ba59abbe56e057f20f883e")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 卖家确认发货
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void sendGoods() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/order/sendGoods")
+                .param("token","10041FY1533753292042")
+                .param("orderId","909")
+                .param("companyId","")
+                //物流号
+                .param("number","")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 买家确认收货
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void getGoods() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/order/getGoods")
+                .param("token","10041FY1533753292042")
+                .param("orderId","921")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 物流公司
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void companyList() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/order/companyList")
+                .param("token","10041FY1533753292042")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

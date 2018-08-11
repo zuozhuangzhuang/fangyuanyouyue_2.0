@@ -40,23 +40,13 @@ public class UserDto {
 
     private Integer level;//用户等级
 
-//    private String levelDesc;//等级描述
-
-
-//    private Integer identityStatus;//实名认证状态 1申请 2通过 3拒绝
 
     //UserVip
     private Integer vipLevel;//会员等级
 
     private String vipLevelDesc;//会员等级描述
 
-//    private Integer vipType;//会员类型 1体验会员 2月会员 3年会员
-
     private Integer vipStatus;//会员状态 1已开通 2未开通
-
-//    private String vipStartTime;//会员开通时间
-
-//    private String vipEndTime;//会员过期时间
 
 
     //UserFans
@@ -66,6 +56,29 @@ public class UserDto {
 
     private Integer isFollow = 2;//是否关注 1是 2否
 
+    private Integer creditLevel;//信誉度等级 1差 2低 3中 4高 5优
+
+    private Integer authType;//认证状态 1已认证 2未认证
+
+    private Integer extStatus;//实名登记状态 1已实名 2未实名
+
+    private Integer isPayPwd;//是否设置支付密码 1是 2否
+
+
+    /**
+     * ↓↓↓↓↓↓↓注释掉不需要返回的属性↓↓↓↓↓↓↓
+     *
+     */
+
+//    private Integer vipType;//会员类型 1体验会员 2月会员 3年会员
+
+//    private String vipStartTime;//会员开通时间
+
+//    private String vipEndTime;//会员过期时间
+
+//    private String levelDesc;//等级描述
+
+//    private Integer identityStatus;//实名认证状态 1申请 2通过 3拒绝
     //UserAddressDto
 //    private UserAddressDto defaultAddress;//用户默认收货地址
 
@@ -74,17 +87,6 @@ public class UserDto {
     //UserInfoExt 用户扩展表
 
 //    private Long credit;//信誉度
-
-    private Integer creditLevel;//信誉度等级 1差 2低 3中 4高 5优
-
-    private Integer authType;//认证状态 1已认证 2未认证
-
-    private Integer extStatus;//实名登记状态 1已实名 2未实名
-
-    private Integer isPayPwd;//是否设置支付密码 1是 2否
-    /**
-     * ↓↓↓↓↓↓↓注释掉不需要返回的属性↓↓↓↓↓↓↓
-     */
 
     //IdentityAuthApply
 //    private String identityImgCover;//身份证封面图

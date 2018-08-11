@@ -2,6 +2,7 @@ package com.fangyuanyouyue.user.dao;
 
 import com.fangyuanyouyue.user.model.UserWallet;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface UserWalletMapper {
@@ -16,4 +17,11 @@ public interface UserWalletMapper {
     int updateByPrimaryKeySelective(UserWallet record);
 
     int updateByPrimaryKey(UserWallet record);
+
+    /**
+     * 根据用户ID获取钱包
+     * @param userId
+     * @return
+     */
+    UserWallet selectByUserId(@Param("userId")Integer userId);
 }

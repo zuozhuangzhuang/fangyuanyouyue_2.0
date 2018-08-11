@@ -46,4 +46,7 @@ public class WalletParam {
     @ApiModelProperty(name = "vipType", value = "会员类型", dataType = "int",hidden = true)
     private Integer vipType;//会员类型
 
+    @ApiModelProperty(name = "payType", value = "支付类型 1微信 2支付宝 3余额", dataType = "int",hidden = true)
+    private Integer payType;//支付类型 1微信 2支付宝 3余额
+
 }

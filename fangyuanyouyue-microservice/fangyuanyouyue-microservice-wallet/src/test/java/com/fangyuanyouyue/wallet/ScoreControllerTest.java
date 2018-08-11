@@ -22,7 +22,7 @@ import org.springframework.web.context.WebApplicationContext;
 @WebAppConfiguration
 @ContextConfiguration
 @Rollback
-public class WalletControllerTest {
+public class ScoreControllerTest {
     @Autowired
     private WebApplicationContext context;
 
@@ -37,49 +37,28 @@ public class WalletControllerTest {
 
 
     /**
-     * 充值
+     * 获取奖池信息
      * @throws Exception
      */
     @Test
     @Transactional
-    public void recharge() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/wallet/recharge")
-                .param("token","10025FY1533317806918")
-                .param("price","100")
-                .param("type","1")
+    public void getBonusPool() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.get("/score/getBonusPool")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
 
-    /**
-     * 提现
-     * @throws Exception
-     */
-    @Test
-    @Transactional
-    public void withdrawDeposit() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/wallet/withdrawDeposit")
-                .param("token","10025FY1533317806918")
-                .param("price","")
-                .param("type","")
-                .param("account","")
-                .param("realName","")
-                .param("payPwd","")
-                .accept(MediaType.APPLICATION_JSON))
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
-    }
 
     /**
-     * 获取用户钱包信息
+     * 抽奖
      * @throws Exception
      */
     @Test
-    @Transactional
-    public void getWallet() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/wallet/getWallet")
-                .param("token","10025FY1533317806918")
+//    @Transactional
+    public void lottery() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/score/lottery")
+                .param("token","10025FY1533837647461")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

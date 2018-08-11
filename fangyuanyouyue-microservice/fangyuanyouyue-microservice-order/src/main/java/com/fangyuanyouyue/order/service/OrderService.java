@@ -3,6 +3,7 @@ package com.fangyuanyouyue.order.service;
 import java.util.List;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.order.dto.CompanyDto;
 import com.fangyuanyouyue.order.dto.OrderDto;
 
 public interface OrderService {
@@ -68,4 +69,38 @@ public interface OrderService {
      * @throws ServiceException
      */
     String getOrderPay(Integer userId,Integer orderId,Integer type,String payPwd) throws ServiceException;
+
+    /**
+     * 获取统计数据
+     * @param userId
+     * @param type
+     * @return
+     * @throws ServiceException
+     */
+    Integer getProcess(Integer userId,Integer type) throws ServiceException;
+
+    /**
+     * 卖家确认发货
+     * @param userId
+     * @param orderId
+     * @param companyId
+     * @param number
+     * @throws ServiceException
+     */
+    void sendGoods(Integer userId,Integer orderId,Integer companyId,String number) throws ServiceException;
+
+    /**
+     * 买家确认收货
+     * @param userId
+     * @param orderId
+     * @throws ServiceException
+     */
+    void getGoods(Integer userId,Integer orderId) throws ServiceException;
+
+    /**
+     * 物流公司列表
+     * @return
+     * @throws ServiceException
+     */
+    List<CompanyDto> companyList() throws ServiceException;
 }

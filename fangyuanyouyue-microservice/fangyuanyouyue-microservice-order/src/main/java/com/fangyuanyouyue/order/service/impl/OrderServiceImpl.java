@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import com.alibaba.fastjson.JSONException;
+import com.fangyuanyouyue.order.dao.*;
 import com.fangyuanyouyue.order.dto.*;
+import com.fangyuanyouyue.order.model.*;
 import com.fangyuanyouyue.order.service.SchedualWalletService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +17,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.IdGenerator;
-import com.fangyuanyouyue.order.dao.OrderDetailMapper;
-import com.fangyuanyouyue.order.dao.OrderInfoMapper;
-import com.fangyuanyouyue.order.dao.OrderPayMapper;
-import com.fangyuanyouyue.order.model.GoodsInfo;
-import com.fangyuanyouyue.order.model.OrderDetail;
-import com.fangyuanyouyue.order.model.OrderInfo;
-import com.fangyuanyouyue.order.model.OrderPay;
-import com.fangyuanyouyue.order.model.UserAddressInfo;
-import com.fangyuanyouyue.order.model.UserInfo;
 import com.fangyuanyouyue.order.service.OrderService;
 import com.fangyuanyouyue.order.service.SchedualGoodsService;
 import com.fangyuanyouyue.order.service.SchedualUserService;
@@ -44,6 +37,10 @@ public class OrderServiceImpl implements OrderService{
     private OrderPayMapper orderPayMapper;
     @Autowired
     private SchedualWalletService schedualWalletService;
+    @Autowired
+    private OrderRefundMapper orderRefundMapper;
+    @Autowired
+    private CompanyMapper companyMapper;
 
     @Override
     public OrderDto saveOrderByCart(String token,String sellerString, Integer userId, Integer addressId) throws ServiceException {
@@ -558,14 +555,21 @@ public class OrderServiceImpl implements OrderService{
                 throw new ServiceException("订单状态异常！");
             }else{
                 OrderPay orderPay = orderPayMapper.selectByOrderId(orderId);
+
+                if(orderPay == null){
+                    throw new ServiceException("订单支付信息异常！");
+                }
                 if(type.intValue() == 1){//支付宝
+                    orderPay.setPayNo("");
                     return "支付宝支付回调";
                 }else if(type.intValue() == 2){//微信
+                    orderPay.setPayNo("");
                     return "微信支付回调";
                 }else if(type.intValue() == 3){//余额
                     //验证支付密码
                     Boolean verifyPayPwd = Boolean.valueOf(JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getString("data"));
                     if(!verifyPayPwd){
+                        //TODO userInfo修改支付密码错误次数
                         throw new ServiceException("支付密码错误！");
                     }else{
                         //调用wallet-service修改余额功能
@@ -584,17 +588,116 @@ public class OrderServiceImpl implements OrderService{
                         childOrder.setStatus(2);
                         orderInfoMapper.updateByPrimaryKey(childOrder);
                         OrderPay pay = orderPayMapper.selectByOrderId(childOrder.getId());
+                        pay.setPayType(type);
+                        pay.setPayTime(DateStampUtils.getTimesteamp());
                         pay.setStatus(2);
                         orderPayMapper.updateByPrimaryKey(pay);
                     }
                 }
                 orderInfo.setStatus(2);
                 orderInfoMapper.updateByPrimaryKey(orderInfo);
+                orderPay.setPayType(type);
+                orderPay.setPayTime(DateStampUtils.getTimesteamp());
                 orderPay.setStatus(2);
                 orderPayMapper.updateByPrimaryKey(orderPay);
                 //TODO 通知卖家去发货
                 return "余额支付成功";
             }
         }
+    }
+
+    @Override
+    public Integer getProcess(Integer userId, Integer type) throws ServiceException {
+        /**
+         * 订单：
+         *  1 我买下的：
+         *   待付款+待收货
+         *  2 我卖出的：
+         *   待发货+待处理退货
+         */
+        Integer count = 0;
+        if(type.intValue() == 1){
+            //状态 1待支付 3待收货
+            List<OrderInfo> list1 = orderInfoMapper.getListByUserIdStatus(userId, null, null, 1);
+            List<OrderInfo> list2 = orderInfoMapper.getListByUserIdStatus(userId, null, null, 3);
+            count = (list1 == null?0:list1.size())+(list2 == null?0:list2.size());
+        }else{
+            //状态 2待发货  7已申请退货
+            List<OrderInfo> list1 = orderInfoMapper.getListByUserIdStatus(userId, null, null, 2);
+            List<OrderInfo> list2 = orderInfoMapper.getListByUserIdStatus(userId, null, null, 7);
+            for(OrderInfo orderInfo:list2){
+                //状态 1申请退货 2退货成功 3拒绝退货
+                OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderInfo.getId(), 1);
+                if(orderRefund != null){
+                    count++;
+                }
+            }
+            count+=(list1 == null?0:list1.size());
+        }
+        return count;
+    }
+
+    @Override
+    public void sendGoods(Integer userId, Integer orderId, Integer companyId, String number) throws ServiceException {
+        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderId);
+        if(orderInfo == null){
+            throw new ServiceException("订单不存在！");
+        }else{
+            if(orderInfo.getStatus() != 2){//状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除 7已申请退货
+                throw new ServiceException("订单状态异常！");
+            }else{
+                OrderPay orderPay = orderPayMapper.selectByOrderId(orderId);
+                if(orderPay == null){
+                    throw new ServiceException("订单支付信息异常！");
+                }
+                //获取物流公司名
+                Company company = companyMapper.selectByPrimaryKey(companyId);
+                //物流状态
+//                orderPay.setLogisticStatus();
+                orderPay.setLogisticCompany(company.getName());
+                orderPay.setLogisticCode(number);
+                orderPay.setStatus(3);
+                orderPayMapper.updateByPrimaryKey(orderPay);
+                orderInfo.setStatus(3);
+                orderInfoMapper.updateByPrimaryKey(orderInfo);
+            }
+        }
+    }
+
+    @Override
+    public void getGoods(Integer userId, Integer orderId) throws ServiceException {
+        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderId);
+        if (orderInfo == null) {
+            throw new ServiceException("订单不存在！");
+        } else {
+            if (orderInfo.getStatus() != 3) {//状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除 7已申请退货
+                throw new ServiceException("订单状态异常！");
+            } else {
+                OrderPay orderPay = orderPayMapper.selectByOrderId(orderId);
+                if (orderPay == null) {
+                    throw new ServiceException("订单支付信息异常！");
+                }
+                //修改订单支付表状态
+                orderPay.setStatus(4);
+                orderPayMapper.updateByPrimaryKey(orderPay);
+                //修改订单状态
+                orderInfo.setStatus(4);
+                orderInfoMapper.updateByPrimaryKey(orderInfo);
+                //卖家增加余额
+                schedualWalletService.updateBalance(orderInfo.getSellerId(),orderPay.getPayAmount(),1);
+                //TODO 卖家成交增加积分
+                if(orderPay.getPayAmount().compareTo(new BigDecimal(2000)) <= 0){//2000以内+20分
+                    schedualWalletService.updateScore(orderInfo.getSellerId(),20L,1);
+                }else{//2000以上+50分
+                    schedualWalletService.updateScore(orderInfo.getSellerId(),50L,1);
+                }
+            }
+        }
+    }
+
+    @Override
+    public List<CompanyDto> companyList() throws ServiceException{
+        List<Company> list = companyMapper.getList();
+        return CompanyDto.toDtoList(list);
     }
 }

@@ -8,23 +8,28 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 用户充值明细表
+ * 用户收支明细表
  */
 @Getter
 @Setter
 @ToString
-public class UserRechargeDetail {
+public class UserBalanceDetail {
     private Integer id;//唯一自增ID
 
     private Integer userId;//用户id
 
     private BigDecimal amount;//金额
 
-    private Integer payType;//支付类型 1微信 2支付宝
+    private BigDecimal beforAmount;//操作前金额
 
-    private String payNo;//第三方支付流水号
+    private BigDecimal afterAmount;//操作后金额
+
+    private Integer payType;//支付类型 1微信 2支付宝 3余额
+
+    private Integer type;//收支类型 1收入 2支出
 
     private Date addTime;//添加时间
 
     private Date updateTime;//更新时间
+
 }

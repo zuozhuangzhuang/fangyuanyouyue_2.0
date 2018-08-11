@@ -2,6 +2,9 @@ package com.fangyuanyouyue.user.service.impl;
 
 import java.util.UUID;
 
+import com.fangyuanyouyue.base.util.VideoUtil;
+import org.apache.tomcat.jni.File;
+import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,6 +69,8 @@ public class FileUploadServiceImpl implements FileUploadService{
         }catch(Exception e){
             e.printStackTrace();
         }
+        //TODO 视频截取图片
+//        VideoUtil.fetchPic();
         return fileUrl;
     }
 
@@ -81,4 +86,6 @@ public class FileUploadServiceImpl implements FileUploadService{
         String date = DateUtil.getCurrentDate("/yyyy/MM/dd/");
         return date + fileName;
     }
+
+
 }

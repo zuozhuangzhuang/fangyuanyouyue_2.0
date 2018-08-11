@@ -40,11 +40,13 @@ public class UserVipControllerTest {
      * @throws Exception
      */
     @Test
-    @Transactional
+//    @Transactional
     public void openMebber() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/wallet/openMebber")
-                .param("token","10025FY1533317806918")
+        mvc.perform(MockMvcRequestBuilders.post("/userVip/openMebber")
+                .param("token","10025FY1533837647461")
+                //会员等级 1铂金会员 2至尊会员
                 .param("vipLevel","2")
+                //会员类型 1一个月 2三个月 3一年会员
                 .param("vipType","3")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())

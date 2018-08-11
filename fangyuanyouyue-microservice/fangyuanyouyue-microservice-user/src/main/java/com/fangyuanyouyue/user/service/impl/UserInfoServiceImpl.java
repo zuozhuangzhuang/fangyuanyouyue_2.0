@@ -9,7 +9,9 @@ import java.util.concurrent.TimeUnit;
 
 import com.fangyuanyouyue.user.dao.*;
 import com.fangyuanyouyue.user.dto.UserFansDto;
+import com.fangyuanyouyue.user.dto.WaitProcessDto;
 import com.fangyuanyouyue.user.model.*;
+import com.fangyuanyouyue.user.service.SchedualOrderService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +52,8 @@ public class UserInfoServiceImpl implements UserInfoService {
     private UserFansMapper userFansMapper;
     @Autowired
     private UserWalletMapper userWalletMapper;
+    @Autowired
+    private SchedualOrderService schedualOrderService;
 
     @Override
     public UserInfo getUserByToken(String token) throws ServiceException {
@@ -437,6 +441,34 @@ public class UserInfoServiceImpl implements UserInfoService {
             UserVip userVip = userVipMapper.getUserVipByUserId(user.getId());
 //            IdentityAuthApply identityAuthApply = identityAuthApplyMapper.selectByUserId(user.getId());
             UserDto userDto = new UserDto(token,user,userVip,userInfoExt);
+            //TODO 单独请求用户等级，还是返回到UserDto中
+            UserWallet userWallet = userWalletMapper.selectByUserId(user.getId());
+            if(userWallet == null){
+                throw new ServiceException("获取钱包失败！");
+            }else{
+                long score = userWallet.getScore();
+                if(0 <= score && score < 500){//Lv1
+                    userDto.setLevel(1);
+                }else if(500 <= score && score < 3000){//Lv2
+                    userDto.setLevel(2);
+                }else if(3000 <= score && score < 10000){//Lv3
+                    userDto.setLevel(3);
+                }else if(10000 <= score && score < 30000){//Lv4
+                    userDto.setLevel(4);
+                }else if(30000 <= score && score < 80000){//Lv5
+                    userDto.setLevel(5);
+                }else if(80000 <= score && score < 200000){//Lv6
+                    userDto.setLevel(6);
+                }else if(200000 <= score && score < 600000){//Lv7
+                    userDto.setLevel(7);
+                }else if(600000 <= score && score < 1000000){//Lv8
+                    userDto.setLevel(8);
+                }else if(1000000 <= score){//Lv9
+                    userDto.setLevel(9);
+                }else{
+                    throw new ServiceException("积分错误！");
+                }
+            }
             return userDto;
         }
     }
@@ -646,10 +678,34 @@ public class UserInfoServiceImpl implements UserInfoService {
         if(userInfo == null){
             throw new ServiceException("用户不存在！");
         }else{
+            //分页获取粉丝列表/关注列表
             List<Map<String, Object>> maps = userFansMapper.myFansOrFollows(userId,type,start*limit, limit);
             List<UserFansDto> userFollowsDtos = UserFansDto.toDtoList(maps);
             return userFollowsDtos;
         }
     }
 
+    @Override
+    public WaitProcessDto myWaitProcess(Integer userId) throws ServiceException {
+        WaitProcessDto waitProcessDto = new WaitProcessDto();
+        /**
+         * 订单：
+         *  我买下的：
+         *   待付款+待收货
+         *  我卖出的：
+         *   待发货+待处理退货
+         */
+        Integer buy = JSONObject.parseObject(schedualOrderService.getProcess(userId, 1)).getInteger("data");
+        waitProcessDto.setBuy(buy);
+        Integer sell = JSONObject.parseObject(schedualOrderService.getProcess(userId, 2)).getInteger("data");
+        waitProcessDto.setSell(sell);
+        /**
+         * 市集：
+         *  商品：
+         *   待处理的议价
+         */
+        Integer goods = JSONObject.parseObject(schedualGoodsService.getProcess(userId)).getInteger("data");
+        waitProcessDto.setGoods(goods);
+        return waitProcessDto;
+    }
 }

@@ -127,6 +127,9 @@ public class BargainServiceImpl implements BargainService{
             if(goodsBargain.getStatus().intValue() == 3){
                 throw new ServiceException("已拒绝压价！");
             }
+            if(goodsBargain.getStatus().intValue() == 4){
+                throw new ServiceException("已取消压价！");
+            }
             if(goodsInfo.getUserId().intValue() == userId.intValue()){
                 //卖家处理压价
                 if(status == 4){
@@ -213,7 +216,9 @@ public class BargainServiceImpl implements BargainService{
                     }
                     orderId = orderInfo.getId();
                 }else if(status.intValue() == 3){
-                    //TODO 退回余额
+                    //退回余额
+                    //调用wallet-service修改余额功能
+                    schedualWalletService.updateBalance(goodsBargain.getUserId(), goodsBargain.getPrice(),1);
                 }else{
                     throw new ServiceException("状态异常！");
                 }
@@ -222,7 +227,9 @@ public class BargainServiceImpl implements BargainService{
                 if(status.intValue() == 2 || status.intValue() == 3){
                     throw new ServiceException("买家不可同意或拒绝议价！");
                 }
-                //TODO 退回余额
+                //退回余额
+                //调用wallet-service修改余额功能
+                schedualWalletService.updateBalance(goodsBargain.getUserId(), goodsBargain.getPrice(),1);
             }else{
                 throw new ServiceException("压价信息异常！");
             }
@@ -252,27 +259,6 @@ public class BargainServiceImpl implements BargainService{
             goodsDtos.add(goodsDto);
         }
         return goodsDtos;
-        /*else if(type.intValue() == 2){//我的发布
-            //根据卖家ID获取此用户的所有压价申请，筛选出商品ID列表，遍历商品列表，根据商品ID和用户ID查询压价列表，存入商品dto中
-            List<GoodsInfo> goodsInfos = goodsInfoMapper.selectGoodsByUserId(userId,start*limit,limit);
-            List<GoodsDto> goodsDtos = new ArrayList<>();
-            for(GoodsInfo goodsInfo:goodsInfos){
-                GoodsDto goodsDto = setDtoByGoodsInfo(userId,goodsInfo);
-                //压价信息
-                List<GoodsBargain> bargains = goodsBargainMapper.selectAllByGoodsId(goodsInfo.getId(),null);
-                List<BargainDto> bargainDtos = BargainDto.toDtoList(bargains);
-                for(BargainDto bargainDto:bargainDtos){
-                    UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(bargainDto.getUserId())).getString("data")), UserInfo.class);
-                    bargainDto.setNickName(seller.getNickName());
-                    bargainDto.setHeadImgUrl(seller.getHeadImgUrl());
-                }
-                goodsDto.setBargainDtos(bargainDtos);
-                goodsDtos.add(goodsDto);
-            }
-            return goodsDtos;
-        }else{
-            throw new ServiceException("类型错误！");
-        }*/
     }
 
     @Override
@@ -351,4 +337,16 @@ public class BargainServiceImpl implements BargainService{
         }
     }
 
+
+    @Override
+    public Integer getProcess(Integer userId) throws ServiceException {
+        /**
+         * 市集：
+         *  商品：
+         *   待处理的议价
+         */
+        //状态 1申请
+        List<GoodsBargain> goodsIdsByUserId = goodsBargainMapper.selectAllByUserId(userId,1);
+        return goodsIdsByUserId == null?0:goodsIdsByUserId.size();
+    }
 }

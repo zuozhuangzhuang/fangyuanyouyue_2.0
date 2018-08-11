@@ -126,4 +126,16 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+  <select id="selectByUserId" parameterType="Integer" resultMap="BaseResultMap">
+    select * from user_wallet
+    <where>
+      1=1
+      <if test="userId != null">
+        and user_id = #{userId}
+      </if>
+    </where>
+  </select>
+
 </mapper>

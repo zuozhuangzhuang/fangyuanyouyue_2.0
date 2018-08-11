@@ -45,46 +45,31 @@ public class FeignController extends BaseController{
     private SchedualRedisService schedualRedisService;
 
 
-//    @ApiOperation(value = "生成订单", notes = "(OrderDto)生成订单",response = BaseResp.class)
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
-//            @ApiImplicitParam(name = "goodsIds", value = "商品ID数组",allowMultiple = true,required = true, dataType = "int", paramType = "query"),
-//            @ApiImplicitParam(name = "addressId", value = "收货地址id", dataType = "int", paramType = "query"),
-//            @ApiImplicitParam(name = "type", value = "类型 1普通商品 2抢购商品",required = true, dataType = "int", paramType = "query")
-//    })
-//    @PostMapping(value = "/saveOrder")
-//    @ResponseBody
-//    public BaseResp saveOrder(OrderParam param) throws IOException {
-//        try {
-//            log.info("----》生成订单《----");
-//            log.info("参数："+param.toString());
-//            //参数判断
-//            if(param.getGoodsIds()==null && param.getGoodsIds().length == 0){
-//                return toError("商品id不能为空！");
-//            }
-//            if(param.getType() == null){
-//                return toError("类型不能为空！");
-//            }
-//            //验证用户
-//            if(StringUtils.isEmpty(param.getToken())){
-//                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
-//            }
-//            Integer userId = (Integer)schedualRedisService.get(param.getToken());
-//            String verifyUser = schedualUserService.verifyUserById(userId);
-//            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-//            if(jsonObject != null && (Integer)jsonObject.get("code") != 0){
-//                return toError(jsonObject.getString("report"));
-//            }
-//            //TODO 下单商品
-//            OrderDto orderDto = orderService.saveOrder(param.getToken(),param.getGoodsIds(), userId, param.getAddressId(),param.getType());
-//            return toSuccess(orderDto);
-//        } catch (ServiceException e) {
-//            e.printStackTrace();
-//            return toError(e.getMessage());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return toError("系统繁忙，请稍后再试！");
-//        }
-//    }
+    @ApiOperation(value = "获取待处理订单", notes = "(OrderDto)生成订单",response = BaseResp.class)
+    @PostMapping(value = "/getProcess")
+    @ResponseBody
+    public BaseResp getProcess(Integer userId,Integer type) throws IOException {
+        try {
+            log.info("----》生成订单《----");
+            log.info("参数：userId："+userId+",type："+type);
+            //参数判断
+            //验证用户
+            if(userId == null){
+                return toError(ReCode.FAILD.getValue(),"用户id不能为空！");
+            }
+            if(type == null){
+                return toError(ReCode.FAILD.getValue(),"类型不能为空！");
+            }
+            //下单商品
+            Integer count = orderService.getProcess(userId,type);
+            return toSuccess(count);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
 
 }

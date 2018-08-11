@@ -11,4 +11,9 @@ public class SchedualWalletServiceImpl implements SchedualWalletService{
     public String updateBalance(Integer userId, BigDecimal amount,Integer type) {
         return "修改余额失败！";
     }
+
+    @Override
+    public String updateScore(Integer userId, Long score,Integer type) {
+        return "修改积分失败！";
+    }
 }

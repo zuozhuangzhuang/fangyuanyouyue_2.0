@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.fangyuanyouyue.user.dto.UserFansDto;
+import com.fangyuanyouyue.user.dto.WaitProcessDto;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -812,108 +813,34 @@ public class UserController extends BaseController {
     }
 
 
-
-
-//
-//
-//
-//    @ApiOperation(value = "我的关注", notes = "我的关注")
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "userId", value = "用户id", required = true, dataType = "Integer", paramType = "query"),
-//            @ApiImplicitParam(name = "start", value = "分页start", required = true, dataType = "Integer", paramType = "query"),
-//            @ApiImplicitParam(name = "limit", value = "分页limit", required = true, dataType = "Integer", paramType = "query")
-//    })
-//    @PostMapping(value = "/myFollows")
-//    @ResponseBody
-//    public String myFollows(UserParam param) throws IOException {
-//        try {
-//            log.info("----》我的关注《----");
-//            log.info("参数："+param.toString());
-//            if(param.getStart()==null){
-//                return toError(ReCode.FAILD.getValue(),"分页start不能为空！");
-//            }
-//            if(param.getLimit()==null){
-//                return toError(ReCode.FAILD.getValue(),"分页limit不能为空！");
-//            }
-//            //我的关注
-//            BaseClientResult result = new BaseClientResult(Status.YES.getValue(), "获取我的关注列表成功！");
-//            return toResult(result);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
-//        }
-//    }
-//
-//    @ApiOperation(value = "好友列表", notes = "好友列表")
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "userId", value = "用户id", required = true, dataType = "Integer", paramType = "query"),
-//            @ApiImplicitParam(name = "start", value = "分页start", required = true, dataType = "Integer", paramType = "query"),
-//            @ApiImplicitParam(name = "limit", value = "分页limit", required = true, dataType = "Integer", paramType = "query")
-//    })
-//    @PostMapping(value = "/friendList")
-//    @ResponseBody
-//    public String friendList(UserParam param) throws IOException {
-//        try {
-//            log.info("----》好友列表《----");
-//            log.info("参数："+param.toString());
-//            if(param.getStart()==null){
-//                return toError(ReCode.FAILD.getValue(),"分页start不能为空！");
-//            }
-//            if(param.getLimit()==null){
-//                return toError(ReCode.FAILD.getValue(),"分页limit不能为空！");
-//            }
-//            UserInfo user=userInfoService.selectByPrimaryKey(param.getUserId());
-//            if(user==null){
-//                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
-//            }
-//            if(user.getStatus() == 2){
-//                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
-//            }
-//            //好友列表
-//            BaseClientResult result = new BaseClientResult(Status.YES.getValue(), "获取好友列表成功！");
-//            return toResult(result);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
-//        }
-//    }
-//
-//    @ApiOperation(value = "签到", notes = "签到")
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "userId", value = "用户id", required = true, dataType = "Integer", paramType = "query"),
-//    })
-//    @PostMapping(value = "/sign")
-//    @ResponseBody
-//    public String sign(UserParam param) throws IOException {
-//        try {
-//            log.info("----》签到《----");
-//            log.info("参数："+param.toString());
-//            UserInfo user=userInfoService.selectByPrimaryKey(param.getUserId());
-//            if(user==null){
-//                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
-//            }
-//            if(user.getStatus() == 2){
-//                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
-//            }
-//            //签到
-//            BaseClientResult result = new BaseClientResult(Status.YES.getValue(), "签到成功！");
-//            return toResult(result);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
-//        }
-//    }
-
-    //测试配置文件获取
-//    @Value("${name:errorName}")
-//    String name;
-//    @Value("${version:errorVersion}")
-//    String version;
-//    @RequestMapping("/hi")
-//    @ResponseBody
-//    public String hi() {
-//        return "hi,I am " + name + ",version is " + version;
-//    }
+    @ApiOperation(value = "获取待处理信息", notes = "（WaitProcessDto）获取待处理信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query")
+    })
+    @PostMapping(value = "/myWaitProcess")
+    @ResponseBody
+    public BaseResp myWaitProcess(UserParam param) throws IOException {
+        try {
+            log.info("----》获取待处理信息《----");
+            log.info("参数："+param.toString());
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError(ReCode.FAILD.getValue(),"用户ID不能为空！");
+            }
+            UserInfo user=userInfoService.getUserByToken(param.getToken());
+            if(user==null){
+                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+            }
+            //获取待处理信息
+            WaitProcessDto waitProcessDto = userInfoService.myWaitProcess(user.getId());
+            return toSuccess(waitProcessDto);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
 
 
     public static void main(String[] args) {

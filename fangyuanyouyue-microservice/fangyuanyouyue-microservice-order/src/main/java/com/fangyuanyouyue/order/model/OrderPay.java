@@ -2,6 +2,7 @@ package com.fangyuanyouyue.order.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -11,6 +12,7 @@ import java.util.Date;
  */
 @Getter
 @Setter
+@ToString
 public class OrderPay {
     private Integer id;//唯一自增ID
 
@@ -34,11 +36,11 @@ public class OrderPay {
 
     private Integer count;//商品总数
 
-    private Integer payType;//支付类型
+    private Integer payType;//支付类型 1微信 2支付宝 3余额
 
     private String payNo;//支付流水号
 
-    private String payTime;//支付时间
+    private Date payTime;//支付时间
 
     private Integer sendType;//配送方式
 
