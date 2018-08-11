@@ -1,17 +1,8 @@
 package com.fangyuanyouyue.wallet.controller;
 
-import com.alibaba.fastjson.JSONObject;
-import com.fangyuanyouyue.base.BaseController;
-import com.fangyuanyouyue.base.BaseResp;
-import com.fangyuanyouyue.base.enums.ReCode;
-import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.wallet.dto.BonusPoolDto;
-import com.fangyuanyouyue.wallet.param.WalletParam;
-import com.fangyuanyouyue.wallet.service.*;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import java.io.IOException;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +13,24 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.IOException;
-import java.util.List;
+import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BaseController;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.wallet.dto.BonusPoolDto;
+import com.fangyuanyouyue.wallet.dto.PointGoodsDto;
+import com.fangyuanyouyue.wallet.param.WalletParam;
+import com.fangyuanyouyue.wallet.service.PointGoodsService;
+import com.fangyuanyouyue.wallet.service.PointOrderService;
+import com.fangyuanyouyue.wallet.service.SchedualRedisService;
+import com.fangyuanyouyue.wallet.service.SchedualUserService;
+import com.fangyuanyouyue.wallet.service.ScoreService;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 
 @Controller
 @RequestMapping(value = "/score")
@@ -40,7 +47,9 @@ public class ScoreController extends BaseController{
     @Autowired
     private SchedualRedisService schedualRedisService;
     @Autowired
-    private UserVipService userVipService;
+    private PointGoodsService pointGoodsService;
+    @Autowired
+    private PointOrderService pointOrderService;
 
     @ApiOperation(value = "获取奖池信息", notes = "(WalletDto)获取奖池信息",response = BaseResp.class)
     @GetMapping(value = "/getBonusPool")
@@ -93,4 +102,63 @@ public class ScoreController extends BaseController{
         }
     }
 
+
+    @ApiOperation(value = "积分商品列表", notes = "获取积分商城列表",response = BaseResp.class)
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
+        @ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query")
+    })
+    @GetMapping(value = "/goods/list")
+    @ResponseBody
+    public BaseResp goodsList(WalletParam param) throws IOException {
+        try {
+            log.info("----》积分商品列表《----");
+            log.info("参数："+param.toString());
+            
+            List<PointGoodsDto> list = pointGoodsService.getPointGoods(param.getStart(), param.getLimit());
+            
+            return toSuccess(list);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+    
+    @ApiOperation(value = "兑换商品", notes = "积分兑换商品",response = BaseResp.class)
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+        @ApiImplicitParam(name = "goodsId", value = "商城ID",required = true, dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/goods/buy")
+    @ResponseBody
+    public BaseResp goodsBuy(WalletParam param) throws IOException {
+        try {
+            log.info("----》积分兑换《----");
+            log.info("参数："+param.toString());
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+            }
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            String verifyUser = schedualUserService.verifyUserById(userId);
+            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+            if(jsonObject != null && (Integer)jsonObject.get("code") != 0){
+                return toError(jsonObject.getString("report"));
+            }
+            pointOrderService.saveOrder(userId, param.getGoodsId());
+            
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+    
+    
 }
