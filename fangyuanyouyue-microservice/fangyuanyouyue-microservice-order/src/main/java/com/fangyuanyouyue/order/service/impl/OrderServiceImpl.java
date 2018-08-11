@@ -545,7 +545,7 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    public String getOrderPay(Integer userId, Integer orderId, Integer type, String payPwd) throws ServiceException {
+    public String getOrderPay(Integer userId, Integer orderId, Integer payType, String payPwd) throws ServiceException {
         //只有买家能调用订单支付接口，直接根据orderId查询订单
         OrderInfo orderInfo = orderInfoMapper.getOrderByUserIdOrderId(orderId,userId);
         if(orderInfo == null){
@@ -559,13 +559,14 @@ public class OrderServiceImpl implements OrderService{
                 if(orderPay == null){
                     throw new ServiceException("订单支付信息异常！");
                 }
-                if(type.intValue() == 1){//支付宝
-                    orderPay.setPayNo("");
-                    return "支付宝支付回调";
-                }else if(type.intValue() == 2){//微信
+
+                if(payType.intValue() == 1){//微信
                     orderPay.setPayNo("");
                     return "微信支付回调";
-                }else if(type.intValue() == 3){//余额
+                }else if(payType.intValue() == 2){//支付宝
+                    orderPay.setPayNo("");
+                    return "支付宝支付回调";
+                }else if(payType.intValue() == 3){//余额
                     //验证支付密码
                     Boolean verifyPayPwd = Boolean.valueOf(JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getString("data"));
                     if(!verifyPayPwd){
@@ -588,7 +589,7 @@ public class OrderServiceImpl implements OrderService{
                         childOrder.setStatus(2);
                         orderInfoMapper.updateByPrimaryKey(childOrder);
                         OrderPay pay = orderPayMapper.selectByOrderId(childOrder.getId());
-                        pay.setPayType(type);
+                        pay.setPayType(payType);
                         pay.setPayTime(DateStampUtils.getTimesteamp());
                         pay.setStatus(2);
                         orderPayMapper.updateByPrimaryKey(pay);
@@ -596,7 +597,7 @@ public class OrderServiceImpl implements OrderService{
                 }
                 orderInfo.setStatus(2);
                 orderInfoMapper.updateByPrimaryKey(orderInfo);
-                orderPay.setPayType(type);
+                orderPay.setPayType(payType);
                 orderPay.setPayTime(DateStampUtils.getTimesteamp());
                 orderPay.setStatus(2);
                 orderPayMapper.updateByPrimaryKey(orderPay);

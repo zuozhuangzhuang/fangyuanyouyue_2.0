@@ -63,12 +63,12 @@ public interface OrderService {
      * 订单支付
      * @param userId
      * @param orderId
-     * @param type
+     * @param payType
      * @param payPwd
      * @return
      * @throws ServiceException
      */
-    String getOrderPay(Integer userId,Integer orderId,Integer type,String payPwd) throws ServiceException;
+    String getOrderPay(Integer userId,Integer orderId,Integer payType,String payPwd) throws ServiceException;
 
     /**
      * 获取统计数据

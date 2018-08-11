@@ -274,7 +274,7 @@ public class OrderController extends BaseController{
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "orderId", value = "订单ID", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "type", value = "支付方式 1支付宝 2微信 3余额支付", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "payType", value = "支付方式  1微信 2支付宝 3余额", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "payPwd", value = "支付密码", dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/getOrderPay")
@@ -296,14 +296,14 @@ public class OrderController extends BaseController{
             if(param.getOrderId()==null){
                 return toError("订单ID不能为空！");
             }
-            if(param.getType()==null){
+            if(param.getPayType()==null){
                 return toError("支付类型不能为空！");
             }
             if(param.getPayPwd() == null){
                 return toError("支付密码不能为空！");
             }
             //TODO 订单支付
-            String payInfo = orderService.getOrderPay(userId, param.getOrderId(), param.getType(), param.getPayPwd());
+            String payInfo = orderService.getOrderPay(userId, param.getOrderId(), param.getPayType(), param.getPayPwd());
             return toSuccess(payInfo);
         } catch (ServiceException e) {
             e.printStackTrace();
