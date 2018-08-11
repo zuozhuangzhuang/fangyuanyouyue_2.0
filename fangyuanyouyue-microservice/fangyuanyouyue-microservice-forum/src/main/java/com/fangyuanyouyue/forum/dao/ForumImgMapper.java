@@ -3,7 +3,9 @@ package com.fangyuanyouyue.forum.dao;
 import java.util.List;
 
 import com.fangyuanyouyue.forum.model.ForumImg;
+import org.apache.ibatis.annotations.Mapper;
 
+@Mapper
 public interface ForumImgMapper {
     int deleteByPrimaryKey(Integer id);
 

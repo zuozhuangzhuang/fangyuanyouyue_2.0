@@ -5,10 +5,16 @@ import java.util.List;
 
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.forum.model.ForumInfo;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * 论坛信息
  */
+@Getter
+@Setter
+@ToString
 public class ForumInfoDto {
 
     private Integer forumId;//帖子id
@@ -68,125 +74,6 @@ public class ForumInfoDto {
         return dtolist;
     }
 
-	public Integer getForumId() {
-		return forumId;
-	}
-
-	public void setForumId(Integer forumId) {
-		this.forumId = forumId;
-	}
-
-	public Integer getUserId() {
-		return userId;
-	}
-
-	public void setUserId(Integer userId) {
-		this.userId = userId;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getVideoUrl() {
-		return videoUrl;
-	}
-
-	public void setVideoUrl(String videoUrl) {
-		this.videoUrl = videoUrl;
-	}
-
-	public Integer getVideoLength() {
-		return videoLength;
-	}
-
-	public void setVideoLength(Integer videoLength) {
-		this.videoLength = videoLength;
-	}
-
-	public String getLabel() {
-		return label;
-	}
-
-	public void setLabel(String label) {
-		this.label = label;
-	}
-
-	public Integer getType() {
-		return type;
-	}
-
-	public void setType(Integer type) {
-		this.type = type;
-	}
-
-	public Integer getStatus() {
-		return status;
-	}
-
-	public void setStatus(Integer status) {
-		this.status = status;
-	}
-
-	public String getAddTime() {
-		return addTime;
-	}
-
-	public void setAddTime(String addTime) {
-		this.addTime = addTime;
-	}
-
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
-
-	public String getNickName() {
-		return nickName;
-	}
-
-	public void setNickName(String nickName) {
-		this.nickName = nickName;
-	}
-
-	public String getHeadImgUrl() {
-		return headImgUrl;
-	}
-
-	public void setHeadImgUrl(String headImgUrl) {
-		this.headImgUrl = headImgUrl;
-	}
-
-	public Long getCommentCount() {
-		return commentCount;
-	}
-
-	public void setCommentCount(Long commentCount) {
-		this.commentCount = commentCount;
-	}
-
-	public Long getLikesCount() {
-		return likesCount;
-	}
-
-	public void setLikesCount(Long likesCount) {
-		this.likesCount = likesCount;
-	}
-
-	public List<String> getImgs() {
-		return imgs;
-	}
-
-	public void setImgs(List<String> imgs) {
-		this.imgs = imgs;
-	}
 
 	
    

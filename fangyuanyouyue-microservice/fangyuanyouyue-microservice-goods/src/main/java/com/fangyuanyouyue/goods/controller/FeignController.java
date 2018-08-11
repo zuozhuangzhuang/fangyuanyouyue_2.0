@@ -7,10 +7,7 @@ import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.goods.model.GoodsInfo;
 import com.fangyuanyouyue.goods.param.GoodsParam;
-import com.fangyuanyouyue.goods.service.CartService;
-import com.fangyuanyouyue.goods.service.GoodsInfoService;
-import com.fangyuanyouyue.goods.service.SchedualRedisService;
-import com.fangyuanyouyue.goods.service.SchedualUserService;
+import com.fangyuanyouyue.goods.service.*;
 import io.swagger.annotations.Api;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +30,8 @@ public class FeignController extends BaseController{
     private SchedualRedisService schedualRedisService;
     @Autowired
     private CartService cartService;
+    @Autowired
+    private BargainService bargainService;
 
     @GetMapping(value = "/goodsMainImg")
     @ResponseBody
@@ -129,4 +128,27 @@ public class FeignController extends BaseController{
         }
     }
 
+
+    //获取统计信息
+    @PostMapping(value = "/getProcess")
+    @ResponseBody
+    public BaseResp getProcess(Integer userId) throws IOException{
+        try {
+            log.info("----》获取统计信息《----");
+            log.info("参数：userId：" + userId);
+            //验证用户
+            if(userId == null){
+                return toError(ReCode.FAILD.getValue(),"用户id不能为空！");
+            }
+            //获取统计信息
+            Integer count = bargainService.getProcess(userId);
+            return toSuccess(count);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
 }

@@ -1,6 +1,9 @@
 package com.fangyuanyouyue.goods.dto;
 
 import com.fangyuanyouyue.goods.model.GoodsImg;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +11,9 @@ import java.util.List;
 /**
  * 商品图片Dto
  */
+@Getter
+@Setter
+@ToString
 public class GoodsImgDto {
 
     private Integer goodsImgId;//图片id
@@ -42,43 +48,4 @@ public class GoodsImgDto {
         return dtolist;
     }
 
-    public Integer getGoodsImgId() {
-        return goodsImgId;
-    }
-
-    public void setGoodsImgId(Integer goodsImgId) {
-        this.goodsImgId = goodsImgId;
-    }
-
-    public Integer getGoodsId() {
-        return goodsId;
-    }
-
-    public void setGoodsId(Integer goodsId) {
-        this.goodsId = goodsId;
-    }
-
-    public String getImgUrl() {
-        return imgUrl;
-    }
-
-    public void setImgUrl(String imgUrl) {
-        this.imgUrl = imgUrl;
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
-    }
-
-    public Integer getSort() {
-        return sort;
-    }
-
-    public void setSort(Integer sort) {
-        this.sort = sort;
-    }
 }

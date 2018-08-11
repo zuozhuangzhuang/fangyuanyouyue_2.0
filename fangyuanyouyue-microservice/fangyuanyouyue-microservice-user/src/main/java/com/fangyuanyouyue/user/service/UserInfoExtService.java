@@ -24,4 +24,13 @@ public interface UserInfoExtService {
      * @throws ServiceException
      */
     boolean userIsAuth(Integer userId) throws ServiceException;
+
+    /**
+     * 验证支付密码
+     * @param userId
+     * @param payPwd
+     * @return
+     * @throws ServiceException
+     */
+    boolean verifyPayPwd(Integer userId,String payPwd) throws ServiceException;
 }

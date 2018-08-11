@@ -9,11 +9,9 @@
     <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="user_id" jdbcType="INTEGER" property="userId" />
-    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
-    <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, cart_id, goods_id, price, add_time, update_time, user_id, nick_name, head_img_url
+    id, cart_id, goods_id, price, add_time, update_time, user_id
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -28,12 +26,10 @@
   <insert id="insert" parameterType="com.fangyuanyouyue.goods.model.CartDetail" useGeneratedKeys="true" keyProperty="id">
     insert into cart_detail (id, cart_id, goods_id, 
       price, add_time, update_time, 
-      user_id, nick_name, head_img_url
-      )
+      user_id)
     values (#{id,jdbcType=INTEGER}, #{cartId,jdbcType=INTEGER}, #{goodsId,jdbcType=INTEGER}, 
       #{price,jdbcType=DECIMAL}, #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{userId,jdbcType=INTEGER}, #{nickName,jdbcType=VARCHAR}, #{headImgUrl,jdbcType=VARCHAR}
-      )
+      #{userId,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.fangyuanyouyue.goods.model.CartDetail">
     insert into cart_detail
@@ -59,12 +55,6 @@
       <if test="userId != null">
         user_id,
       </if>
-      <if test="nickName != null">
-        nick_name,
-      </if>
-      <if test="headImgUrl != null">
-        head_img_url,
-      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -87,12 +77,6 @@
       </if>
       <if test="userId != null">
         #{userId,jdbcType=INTEGER},
-      </if>
-      <if test="nickName != null">
-        #{nickName,jdbcType=VARCHAR},
-      </if>
-      <if test="headImgUrl != null">
-        #{headImgUrl,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -117,12 +101,6 @@
       <if test="userId != null">
         user_id = #{userId,jdbcType=INTEGER},
       </if>
-      <if test="nickName != null">
-        nick_name = #{nickName,jdbcType=VARCHAR},
-      </if>
-      <if test="headImgUrl != null">
-        head_img_url = #{headImgUrl,jdbcType=VARCHAR},
-      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -133,9 +111,7 @@
       price = #{price,jdbcType=DECIMAL},
       add_time = #{addTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      user_id = #{userId,jdbcType=INTEGER},
-      nick_name = #{nickName,jdbcType=VARCHAR},
-      head_img_url = #{headImgUrl,jdbcType=VARCHAR}
+      user_id = #{userId,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
 

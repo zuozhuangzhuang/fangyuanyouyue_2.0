@@ -6,10 +6,16 @@ import java.util.List;
 
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.order.model.OrderInfo;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * 订单DTO
  */
+@Getter
+@Setter
+@ToString
 public class OrderDto {
     //订单信息
     private Integer userId;//买家id
@@ -22,7 +28,12 @@ public class OrderDto {
 
     private BigDecimal totalAmount;//订单总额
 
-    private Integer status;//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
+    private Integer status;//状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除 7已申请退货
+
+    //order_refund
+    private Integer returnStatus;//退货状态 1申请退货 2退货成功 3拒绝退货
+
+    private String sellerReturnStatus;//卖家是否同意退货状态 null正常  1申请退货 2卖家直接同意退货 3卖家直接拒绝退货 4卖家48h不处理默认同意退货 5卖家72h小时不处理默认不同意退货
 
     //商品信息
     private List<OrderDetailDto> orderDetailDtos;//订单商品列表
@@ -57,83 +68,4 @@ public class OrderDto {
         return dtolist;
     }
 
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public String getNickName() {
-        return nickName;
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
-    }
-
-    public Integer getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(Integer orderId) {
-        this.orderId = orderId;
-    }
-
-    public String getOrderNo() {
-        return orderNo;
-    }
-
-    public void setOrderNo(String orderNo) {
-        this.orderNo = orderNo;
-    }
-
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public List<OrderDetailDto> getOrderDetailDtos() {
-        return orderDetailDtos;
-    }
-
-    public void setOrderDetailDtos(List<OrderDetailDto> orderDetailDtos) {
-        this.orderDetailDtos = orderDetailDtos;
-    }
-
-    public OrderPayDto getOrderPayDto() {
-        return orderPayDto;
-    }
-
-    public void setOrderPayDto(OrderPayDto orderPayDto) {
-        this.orderPayDto = orderPayDto;
-    }
-
-    public String getAddTime() {
-        return addTime;
-    }
-
-    public void setAddTime(String addTime) {
-        this.addTime = addTime;
-    }
-
-    public List<SellerDto> getSellerDtos() {
-        return sellerDtos;
-    }
-
-    public void setSellerDtos(List<SellerDto> sellerDtos) {
-        this.sellerDtos = sellerDtos;
-    }
 }

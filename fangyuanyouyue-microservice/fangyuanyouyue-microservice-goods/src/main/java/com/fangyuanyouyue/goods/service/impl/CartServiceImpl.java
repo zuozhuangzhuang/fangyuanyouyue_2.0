@@ -64,6 +64,9 @@ public class CartServiceImpl implements CartService {
                 if(goodsInfo.getStatus().intValue() != 1){//1出售中
                     throw new ServiceException("商品状态异常！");
                 }
+                if(goodsInfo.getUserId().intValue() == userId.intValue()){
+                    throw new ServiceException("不可以把自己的商品加入到购物车！");
+                }
                 CartDetail cartDetail = cartDetailMapper.selectByCartIdGoodsId(cartInfo.getId(), goodsId);
                 //判断购物车是否已经有这个商品了
                 if (cartDetail == null) {
@@ -74,8 +77,6 @@ public class CartServiceImpl implements CartService {
                     cartDetail.setGoodsId(goodsId);
                     cartDetail.setPrice(goodsInfo.getPrice());
                     cartDetail.setUserId(goodsInfo.getUserId());
-                    cartDetail.setNickName(user.getString("nickName"));
-                    cartDetail.setHeadImgUrl(user.getString("headImgUrl"));
                     cartDetailMapper.insert(cartDetail);
                 } else {
                     throw new ServiceException("商品已存在购物车中，请勿重复添加！");
@@ -95,10 +96,12 @@ public class CartServiceImpl implements CartService {
             List<CartDetail> cartDetails = cartDetailMapper.selectByCartId(cart.getId());
             if (cartDetails != null) {
                 for (CartDetail cartDetail : cartDetails) {
+                    //获取卖家信息
+                    UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(cartDetail.getUserId())).getString("data")), UserInfo.class);
                     CartShopDto cartShopDto = new CartShopDto();
                     cartShopDto.setUserId(cartDetail.getUserId());
-                    cartShopDto.setHeadImgUrl(cartDetail.getHeadImgUrl());
-                    cartShopDto.setNickName(cartDetail.getNickName());
+                    cartShopDto.setHeadImgUrl(user.getHeadImgUrl());
+                    cartShopDto.setNickName(user.getNickName());
 
                     List<CartDetailDto> cartDetailDtos = CartDetailDto.toDtoList(cartDetailMapper.selectByCartIdUserId(cart.getId(), cartDetail.getUserId()));
                     if(cartDetailDtos == null){
@@ -114,6 +117,7 @@ public class CartServiceImpl implements CartService {
                         //传递商品状态
                         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(cartDetailDto.getGoodsId());
                         cartDetailDto.setStatus(goodsInfo.getStatus());
+                        cartDetailDto.setUserId(cartDetail.getUserId());
                     }
                     cartShopDto.setCartDetail(cartDetailDtos);
                     cartShopDtos.add(cartShopDto);

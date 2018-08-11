@@ -1,6 +1,9 @@
 package com.fangyuanyouyue.order.dto;
 
 import com.fangyuanyouyue.order.model.OrderDetail;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -9,8 +12,13 @@ import java.util.List;
 /**
  * 订单详情表DTO
  */
+@Getter
+@Setter
+@ToString
 public class OrderDetailDto {
     private Integer userId;//买家id
+
+    private Integer sellerId;//卖家id
 
     private Integer orderId;//订单id
 
@@ -28,9 +36,15 @@ public class OrderDetailDto {
 
     private String description;//商品详情
 
-    private Integer status;//状态 1待支付 2待发货 3待收货 4已完成 5已取消  7已申请退货
+    private Integer status;//状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除 7已申请退货
 
     private Integer allowReturn = 0;//是否可以退货  0可退货  1不可退货
+
+    //order_refund
+    private Integer returnStatus;//退货状态 1申请退货 2退货成功 3拒绝退货
+
+    private String sellerReturnStatus;//卖家是否同意退货状态 null正常  1申请退货 2卖家直接同意退货 3卖家直接拒绝退货 4卖家48h不处理默认同意退货 5卖家72h小时不处理默认不同意退货
+
 
     //优惠券
 
@@ -39,6 +53,7 @@ public class OrderDetailDto {
 
     public OrderDetailDto(OrderDetail orderDetail,Integer status) {
         this.userId = orderDetail.getUserId();
+        this.sellerId = orderDetail.getSellerId();
         this.orderId = orderDetail.getOrderId();
         this.goodsId = orderDetail.getGoodsId();
         this.goodsName = orderDetail.getGoodsName();
@@ -51,7 +66,7 @@ public class OrderDetailDto {
 //        this.allowReturn = allowReturn;
     }
 
-    public static ArrayList<OrderDetailDto> toDtoList(List<OrderDetail> list,Integer status) {
+    public static ArrayList<OrderDetailDto> toDtoList(List<OrderDetail> list, Integer status) {
         if (list == null)
             return null;
         ArrayList<OrderDetailDto> dtolist = new ArrayList<>();
@@ -62,91 +77,4 @@ public class OrderDetailDto {
         return dtolist;
     }
 
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public Integer getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(Integer orderId) {
-        this.orderId = orderId;
-    }
-
-    public Integer getGoodsId() {
-        return goodsId;
-    }
-
-    public void setGoodsId(Integer goodsId) {
-        this.goodsId = goodsId;
-    }
-
-    public String getGoodsName() {
-        return goodsName;
-    }
-
-    public void setGoodsName(String goodsName) {
-        this.goodsName = goodsName;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public BigDecimal getPayAmount() {
-        return payAmount;
-    }
-
-    public void setPayAmount(BigDecimal payAmount) {
-        this.payAmount = payAmount;
-    }
-
-    public BigDecimal getFreight() {
-        return freight;
-    }
-
-    public void setFreight(BigDecimal freight) {
-        this.freight = freight;
-    }
-
-    public String getIconImg() {
-        return iconImg;
-    }
-
-    public void setIconImg(String iconImg) {
-        this.iconImg = iconImg;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public Integer getAllowReturn() {
-        return allowReturn;
-    }
-
-    public void setAllowReturn(Integer allowReturn) {
-        this.allowReturn = allowReturn;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

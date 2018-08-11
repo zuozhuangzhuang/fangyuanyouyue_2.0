@@ -1,19 +1,18 @@
 package com.fangyuanyouyue.goods.dto;
 
-import com.fangyuanyouyue.goods.model.GoodsCategory;
 import com.fangyuanyouyue.goods.model.GoodsCorrelation;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-/*
-
-
-
- */
 /**
  * 商品分类关联表Dto
  */
+@Getter
+@Setter
+@ToString
 public class GoodsCorrelationDto {
     private Integer correlationId;//唯一自增ID
 
@@ -41,36 +40,5 @@ public class GoodsCorrelationDto {
             dtolist.add(dto);
         }
         return dtolist;
-    }
-    public Integer getCorrelationId() {
-        return correlationId;
-    }
-
-    public void setCorrelationId(Integer correlationId) {
-        this.correlationId = correlationId;
-    }
-
-    public Integer getGoodsCategoryId() {
-        return goodsCategoryId;
-    }
-
-    public void setGoodsCategoryId(Integer goodsCategoryId) {
-        this.goodsCategoryId = goodsCategoryId;
-    }
-
-    public Integer getGoodsId() {
-        return goodsId;
-    }
-
-    public void setGoodsId(Integer goodsId) {
-        this.goodsId = goodsId;
-    }
-
-    public Integer getCategoryParentId() {
-        return categoryParentId;
-    }
-
-    public void setCategoryParentId(Integer categoryParentId) {
-        this.categoryParentId = categoryParentId;
     }
 }

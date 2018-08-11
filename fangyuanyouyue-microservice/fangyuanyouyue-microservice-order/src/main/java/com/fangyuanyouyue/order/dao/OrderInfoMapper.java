@@ -21,7 +21,7 @@ public interface OrderInfoMapper {
     int updateByPrimaryKey(OrderInfo record);
 
     /**
-     * 获取订单列表
+     * 获取未拆单订单列表
      * @param userId
      * @param start
      * @param limit
@@ -31,7 +31,7 @@ public interface OrderInfoMapper {
     List<OrderInfo> getListByUserIdStatus(@Param("userId")Integer userId, @Param("start") Integer start, @Param("limit")Integer limit, @Param("status")Integer status);
 
     /**
-     * 根据卖家获取订单列表
+     * 根据卖家获取已拆单订单列表
      * @param sellerId
      * @param start
      * @param limit
@@ -46,4 +46,19 @@ public interface OrderInfoMapper {
      * @return
      */
     List<OrderInfo> selectChildOrderByOrderId(@Param("userId")Integer userId,@Param("mainOrderId")Integer mainOrderId);
+
+    /**
+     * 根据商品ID获取进行中的订单
+     * @param goodsId
+     * @return
+     */
+    OrderInfo selectByGoodsId(@Param("goodsId")Integer goodsId);
+
+    /**
+     * 根据用户ID、订单ID获取订单信息
+     * @param orderId
+     * @param userId
+     * @return
+     */
+    OrderInfo getOrderByUserIdOrderId(@Param("orderId")Integer orderId,@Param("userId")Integer userId);
 }

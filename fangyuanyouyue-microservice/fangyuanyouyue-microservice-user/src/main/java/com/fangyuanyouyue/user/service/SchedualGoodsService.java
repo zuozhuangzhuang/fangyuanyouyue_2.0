@@ -15,4 +15,7 @@ public interface SchedualGoodsService {
 
     @RequestMapping(value = "/goods/goodsInfo",method = RequestMethod.POST)
     String goodsInfo(@RequestParam(value = "goodsId") Integer goodsId);
+
+    @RequestMapping(value = "/goodsFeign/getProcess",method = RequestMethod.POST)
+    String getProcess(@RequestParam(value = "userId") Integer userId);
 }

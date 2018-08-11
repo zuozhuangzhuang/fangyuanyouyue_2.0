@@ -5,10 +5,16 @@ import java.util.List;
 
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.forum.model.ForumComment;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * 评论
  */
+@Getter
+@Setter
+@ToString
 public class ForumCommentDto {
 
     private Integer commentId;//评论ID
@@ -48,61 +54,6 @@ public class ForumCommentDto {
         return dtolist;
     }
 
-	public Integer getForumId() {
-		return forumId;
-	}
-
-	public void setForumId(Integer forumId) {
-		this.forumId = forumId;
-	}
-
-	public Integer getUserId() {
-		return userId;
-	}
-
-	public void setUserId(Integer userId) {
-		this.userId = userId;
-	}
-
-	public Integer getCommentId() {
-		return commentId;
-	}
-
-	public void setCommentId(Integer commentId) {
-		this.commentId = commentId;
-	}
-
-	public String getNickName() {
-		return nickName;
-	}
-
-	public void setNickName(String nickName) {
-		this.nickName = nickName;
-	}
-
-	public String getHeadImgUrl() {
-		return headImgUrl;
-	}
-
-	public void setHeadImgUrl(String headImgUrl) {
-		this.headImgUrl = headImgUrl;
-	}
-
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
-
-	public String getAddTime() {
-		return addTime;
-	}
-
-	public void setAddTime(String addTime) {
-		this.addTime = addTime;
-	}
 
 
 	

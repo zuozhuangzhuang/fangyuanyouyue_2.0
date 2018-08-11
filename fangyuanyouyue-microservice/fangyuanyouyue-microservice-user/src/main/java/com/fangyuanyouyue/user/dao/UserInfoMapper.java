@@ -25,5 +25,12 @@ public interface UserInfoMapper {
 
     UserInfo getUserByNickName(String nickName);
 
-    List<Map<String,Object>> shopList(@Param("nickName") String nickName,@Param("start") Integer start,@Param("limit") Integer limit);
+    /**
+     * 根据状态获取个人店铺列表
+     * @param nickName
+     * @param start
+     * @param limit
+     * @return
+     */
+    List<Map<String,Object>> shopList(@Param("nickName") String nickName,@Param("start") Integer start,@Param("limit") Integer limit,@Param("authType")Integer authType);
 }

@@ -1,11 +1,15 @@
 package com.fangyuanyouyue.order.param;
 
-import java.util.Arrays;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 @ApiModel(value = "订单参数类")
+@Getter
+@Setter
+@ToString
 public class OrderParam{
     //公用
     @ApiModelProperty(name = "start", value = "起始页", dataType = "int",hidden = true)
@@ -24,6 +28,11 @@ public class OrderParam{
     @ApiModelProperty(name = "goodsIds", value = "商品ID数组", dataType = "int",hidden = true)
     private Integer[] goodsIds;//商品ID数组
 
+
+    @ApiModelProperty(name = "sellerList", value = "商品信息数组", dataType = "String",hidden = true)
+    private String sellerList;//商品信息数组
+
+
     @ApiModelProperty(name = "addressId", value = "收货地址id", dataType = "int",hidden = true)
     private Integer addressId;//收货地址id
 
@@ -33,90 +42,18 @@ public class OrderParam{
     @ApiModelProperty(name = "status", value = "订单状态 0 待付款  1待收货  2已完成  3全部", dataType = "int",hidden = true)
     private Integer status;//订单状态 0 待付款  1待收货  2已完成  3全部
 
-    public Integer getStart() {
-        return start;
-    }
+    @ApiModelProperty(name = "goodsId", value = "商品ID", dataType = "int",hidden = true)
+    private Integer goodsId;//商品ID
 
-    public void setStart(Integer start) {
-        this.start = start;
-    }
+    @ApiModelProperty(name = "couponId", value = "优惠券ID", dataType = "int",hidden = true)
+    private Integer couponId;//优惠券ID
 
-    public Integer getLimit() {
-        return limit;
-    }
+    @ApiModelProperty(name = "payPwd", value = "支付密码", dataType = "String",hidden = true)
+    private String payPwd;//支付密码
 
-    public void setLimit(Integer limit) {
-        this.limit = limit;
-    }
+    @ApiModelProperty(name = "companyId", value = "物流公司ID", dataType = "int",hidden = true)
+    private Integer companyId;//物流公司ID
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public Integer[] getGoodsIds() {
-        return goodsIds;
-    }
-
-    public void setGoodsIds(Integer[] goodsIds) {
-        this.goodsIds = goodsIds;
-    }
-
-    public Integer getAddressId() {
-        return addressId;
-    }
-
-    public void setAddressId(Integer addressId) {
-        this.addressId = addressId;
-    }
-
-    public Integer getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(Integer orderId) {
-        this.orderId = orderId;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    @Override
-    public String toString() {
-        return "OrderParam{" +
-                "start=" + start +
-                ", limit=" + limit +
-                ", name='" + name + '\'' +
-                ", type=" + type +
-                ", token='" + token + '\'' +
-                ", goodsIds=" + Arrays.toString(goodsIds) +
-                ", addressId=" + addressId +
-                ", orderId=" + orderId +
-                ", status=" + status +
-                '}';
-    }
+    @ApiModelProperty(name = "number", value = "物流公司编号", dataType = "int",hidden = true)
+    private String number;//物流公司编号
 }

@@ -78,9 +78,9 @@ public class UserControllerTest {
     @Transactional
     public void login() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/user/login")
-                .param("phone","18103966057")
+                .param("phone","181039660571")
                 .param("loginPwd","123456")
-                .param("lastLoginPlatform","1")
+                .param("loginPlatform","1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -132,17 +132,17 @@ public class UserControllerTest {
      * @throws Exception
      */
     @Test
-    @Transactional
+//    @Transactional
     public void certification() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/user/certification")
-                .param("token","6008FY1525397451364")
+                .param("token","10025FY1533317806918")
                 .param("name","左壮壮")
                 //身份证号
                 .param("identity","41282419940411771X")
                 //身份证封面图路径
-                .param("identityImgCoverUrl","")
+//                .param("identityImgCoverUrl","")
                 //身份证背面路径
-                .param("identityImgBackUrl","")
+//                .param("identityImgBackUrl","")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -320,9 +320,10 @@ public class UserControllerTest {
     @Transactional
     public void shopList() throws Exception {
         mvc.perform(MockMvcRequestBuilders.get("/user/shopList")
-//                .param("nickName","佛")
+                .param("nickName","佛")
                 .param("start","0")
                 .param("limit","10")
+                .param("authType","1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -378,53 +379,21 @@ public class UserControllerTest {
                 .andReturn();
     }
 
+    /**
+     * 获取待处理信息
+     * @throws Exception
+     */
+    @Test
+    @Transactional
+    public void myWaitProcess() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/user/myWaitProcess")
+                .param("token","10041FY1533753292042")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
 
-//    /**
-//     * 我的关注
-//     * @throws Exception
-//     */
-//    @Test
-//    @Transactional
-//    public void myFollows() throws Exception {
-//        mvc.perform(MockMvcRequestBuilders.post("/user/myFollows")
-//                .param("token","6008FY1525397451364")
-//                .param("start","1")
-//                .param("limit","10")
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andDo(MockMvcResultHandlers.print())
-//                .andReturn();
-//    }
-//
-//    /**
-//     * 好友列表
-//     * @throws Exception
-//     */
-//    @Test
-//    @Transactional
-//    public void friendList() throws Exception {
-//        mvc.perform(MockMvcRequestBuilders.post("/user/friendList")
-//                .param("token","6008FY1525397451364")
-//                .param("start","1")
-//                .param("limit","10")
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andDo(MockMvcResultHandlers.print())
-//                .andReturn();
-//    }
-//
-//    /**
-//     * 签到
-//     * @throws Exception
-//     */
-//    @Test
-//    @Transactional
-//    public void sign() throws Exception {
-//        mvc.perform(MockMvcRequestBuilders.post("/user/sign")
-//                .param("token","6008FY1525397451364")
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andDo(MockMvcResultHandlers.print())
-//                .andReturn();
-//    }
-//
+
 
 
 }

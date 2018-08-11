@@ -1,7 +1,17 @@
 package com.fangyuanyouyue.user.model;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.util.Date;
 
+/**
+ * 用户粉丝表
+ */
+@Getter
+@Setter
+@ToString
 public class UserFans {
     private Integer id;//唯一自增ID
 
@@ -11,35 +21,4 @@ public class UserFans {
 
     private Date addTime;//添加时间
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public Integer getToUserId() {
-        return toUserId;
-    }
-
-    public void setToUserId(Integer toUserId) {
-        this.toUserId = toUserId;
-    }
-
-    public Date getAddTime() {
-        return addTime;
-    }
-
-    public void setAddTime(Date addTime) {
-        this.addTime = addTime;
-    }
 }

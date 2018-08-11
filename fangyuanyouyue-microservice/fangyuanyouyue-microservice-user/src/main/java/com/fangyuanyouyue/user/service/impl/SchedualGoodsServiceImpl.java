@@ -7,11 +7,16 @@ import org.springframework.stereotype.Component;
 public class SchedualGoodsServiceImpl implements SchedualGoodsService{
     @Override
     public String goodsList(Integer userId, Integer start, Integer limit) {
-        return "系统繁忙，请稍后重试！";
+        return "获取商品列表失败！";
     }
 
     @Override
     public String goodsInfo(Integer goodsId) {
-        return "系统繁忙，请稍后重试！";
+        return "获取商品详情失败！";
+    }
+
+    @Override
+    public String getProcess(Integer key) {
+        return "获取统计数据失败！";
     }
 }

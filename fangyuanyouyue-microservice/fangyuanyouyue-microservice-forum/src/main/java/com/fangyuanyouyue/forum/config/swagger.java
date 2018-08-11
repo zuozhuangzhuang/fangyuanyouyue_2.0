@@ -59,8 +59,8 @@ public class swagger {
     }
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("小方圆用户系统api")
-                .description("用户系统接口文档说明")
+                .title("小方圆论坛系统api")
+                .description("论坛系统接口文档说明")
                 .contact(new Contact("左壮壮", "", "zuozhuang_zzz@163.com"))
                 .version("1.0")
                 .build();

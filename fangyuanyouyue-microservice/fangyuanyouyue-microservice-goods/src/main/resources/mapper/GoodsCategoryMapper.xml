@@ -26,7 +26,7 @@
     delete from goods_category
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.goods.model.GoodsCategory">
+  <insert id="insert" parameterType="com.fangyuanyouyue.goods.model.GoodsCategory" useGeneratedKeys="true" keyProperty="id">
     insert into goods_category (id, parent_id, name, 
       img_url, sort, type, 
       status, search_count, add_time, 

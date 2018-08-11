@@ -22,7 +22,7 @@
     delete from goods_img
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.goods.model.GoodsImg">
+  <insert id="insert" parameterType="com.fangyuanyouyue.goods.model.GoodsImg" useGeneratedKeys="true" keyProperty="id">
     insert into goods_img (id, goods_id, img_url, 
       type, add_time, sort
       )

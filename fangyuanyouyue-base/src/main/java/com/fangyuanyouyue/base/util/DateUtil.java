@@ -69,16 +69,29 @@ public class DateUtil {
 	 * @param year
 	 * @return
 	 */
-	public static String getDateAfter(int year) {
-		Date date = new Date();
+	public static Date getDateAfterYear(Date date,int year) {
+//		Date date = new Date();
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
 		c.add(c.YEAR, year);// 属性很多也有月等等，可以操作各种时间日期
 		Date temp_date = c.getTime();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		return sdf.format(temp_date);
+//		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		return temp_date;
 	}
-
+	/**
+	 * 得到n月后的日期
+	 *
+	 * @param month
+	 * @return
+	 */
+	public static Date getDateAfterMonth(Date date,int month) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		c.add(c.MONTH, month);// 属性很多也有月等等，可以操作各种时间日期
+		Date temp_date = c.getTime();
+//		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		return temp_date;
+	}
 	/**
 	 * 得到n年后的日期,自定义参数
 	 * 
@@ -283,4 +296,25 @@ public class DateUtil {
 
 		return Integer.parseInt(String.valueOf(between_days));
 	}
+
+	/***
+	 * @comments 计算时间1与时间2的时间差
+	 * @param date1
+	 * @param date2
+	 */
+	public static String getTimeDifference(long date1,long date2){
+		//格式日期格式，在此我用的是"2018-01-24 19:49:50"这种格式
+		//可以更改为自己使用的格式，例如：yyyy/MM/dd HH:mm:ss 。。。
+//		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//		Date now = new Date();
+//			Date date=df.parse(strTime2);
+		long l=date1-date2;       //获取时间差
+		long day=l/(24*60*60*1000);
+		long hour=(l/(60*60*1000)-day*24);
+		long min=((l/(60*1000))-day*24*60-hour*60);
+		long s=(l/1000-day*24*60*60-hour*60*60-min*60);
+		return ""+hour+"小时"+min+"分"+s+"秒";
+	}
+
+
 }

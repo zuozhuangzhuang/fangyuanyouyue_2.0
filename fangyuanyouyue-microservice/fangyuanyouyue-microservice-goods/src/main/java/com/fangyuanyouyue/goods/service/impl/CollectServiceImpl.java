@@ -57,7 +57,7 @@ public class CollectServiceImpl implements CollectService{
     @Override
     public void collectGoods(Integer userId, Integer[] collectIds, Integer collectType, Integer type,Integer status) throws ServiceException {
         for(Integer collectId:collectIds){
-            Collect collect = collectMapper.selectByGoodsId(collectId, type);
+            Collect collect = collectMapper.selectByCollectId(userId,collectId, type);
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(collectId);
             if(goodsInfo == null){
                 throw new ServiceException("商品数据异常！");
@@ -72,9 +72,17 @@ public class CollectServiceImpl implements CollectService{
                         if(type == 1){
                             throw new ServiceException("已关注，请勿重新关注！");
                         }else{
-                            //已收藏的跳过！
-                            continue;
-//                            throw new ServiceException("已收藏，请勿重新收藏！");
+                            //批量收藏存在已收藏的跳过！
+                            int count = 0;
+                            if(collectIds.length > 1){
+                                count++;
+                                if(collectIds.length == count){
+                                    throw new ServiceException("已全部收藏，请勿重新收藏！");
+                                }
+                                continue;
+                            }else{
+                                throw new ServiceException("已收藏，请勿重新收藏！");
+                            }
                         }
                     }else if(status == 2){//取消关注/收藏
                         collectMapper.deleteByPrimaryKey(collect.getId());
@@ -118,7 +126,7 @@ public class CollectServiceImpl implements CollectService{
     }
 
     @Override
-    public List<GoodsDto> collectList(Integer userId, Integer collectType, Integer type) throws ServiceException {
+    public List<GoodsDto> collectList(Integer userId, Integer collectType, Integer type,Integer start,Integer limit) throws ServiceException {
         //collectType 关注/收藏类型 1商品 2抢购 3视频 4专栏 5鉴赏
         //type 类型 1关注 2收藏
         if(type == 1){
@@ -132,7 +140,7 @@ public class CollectServiceImpl implements CollectService{
         }else{
             throw new ServiceException("类型错误！");
         }
-        List<GoodsInfo> goodsInfos = goodsInfoMapper.selectMyCollectGoods(userId, collectType, type,null);
+        List<GoodsInfo> goodsInfos = goodsInfoMapper.selectMyCollectGoods(userId, collectType, type,null,start*limit,limit);
         List<GoodsDto> goodsDtos = new ArrayList<>();
         for (GoodsInfo goodsInfo:goodsInfos) {
             goodsDtos.add(setDtoByGoodsInfo(goodsInfo));

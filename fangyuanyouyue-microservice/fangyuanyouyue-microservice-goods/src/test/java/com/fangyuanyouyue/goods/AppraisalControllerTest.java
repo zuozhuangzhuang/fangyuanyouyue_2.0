@@ -40,18 +40,97 @@ public class AppraisalControllerTest {
      * @throws Exception
      */
     @Test
-    @Transactional
+//    @Transactional
     public void addAppraisal() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/appraisal/addAppraisal")
-                .param("token","10025FY1532974762055")
-                .param("goodsIds","5,6")
+//                .param("token","10041FY1533753292042")
+                .param("token","10025FY1533837647461")
+                .param("goodsIds","1,2")
                 //描述
-                .param("description","我想鉴定一下，这是我家传的宝贝")
-                .param("imgUrls","")
-                .param("videoUrl","")
+//                .param("description","我想鉴定一下，这是我家传的宝贝")
+//                .param("imgUrls","123,124,125,126")
+//                .param("videoUrl","127")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
 
+    /**
+     * 取消鉴定
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void cancelAppraisal() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/appraisal/cancelAppraisal")
+                .param("token","10041FY1533753292042")
+                .param("orderId","27")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 鉴定查询
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void getAppraisal() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/appraisal/getAppraisal")
+                .param("token","10041FY1533753292042")
+                .param("start","0")
+                .param("limit","10")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 鉴定结果
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void appraisalDetail() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/appraisal/appraisalDetail")
+                .param("token","10041FY1533753292042")
+                .param("detailId","78")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 鉴定支付
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void payAppraisal() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/appraisal/payAppraisal")
+                .param("token","10041FY1533753292042")
+                .param("orderId","26")
+                .param("payPwd","e10adc3949ba59abbe56e057f20f883e")
+                //支付方式 1支付宝 2微信 3余额支付
+                .param("type","3")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 鉴定展示
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void getAllAppraisal() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.get("/appraisal/getAllAppraisal")
+                .param("start","0")
+                .param("limit","10")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
 }

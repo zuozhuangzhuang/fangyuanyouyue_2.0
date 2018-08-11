@@ -39,5 +39,4 @@ public interface CartDetailMapper {
      * @return
      */
     List<Map<String,Object>> selectByCartIdUserId(@Param("cartId")Integer cartId, @Param("userId") Integer userId);
-
 }

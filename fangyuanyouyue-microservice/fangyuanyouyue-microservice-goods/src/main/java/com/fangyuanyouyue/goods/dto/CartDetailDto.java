@@ -1,5 +1,9 @@
 package com.fangyuanyouyue.goods.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +12,9 @@ import java.util.Map;
 /**
  * 购物车详情DTO
  */
+@Getter
+@Setter
+@ToString
 public class CartDetailDto {
     private Integer cartDetailId;//购物车详情ID
 
@@ -26,6 +33,8 @@ public class CartDetailDto {
     private String mainUrl;//商品主图
 
     private Integer status;//商品状态 1出售中 2已售出
+
+    private Integer userId;//店铺ID
 
     public CartDetailDto() {
     }
@@ -52,75 +61,4 @@ public class CartDetailDto {
         return dtolist;
     }
 
-    public Integer getCartDetailId() {
-        return cartDetailId;
-    }
-
-    public void setCartDetailId(Integer cartDetailId) {
-        this.cartDetailId = cartDetailId;
-    }
-
-    public Integer getCartId() {
-        return cartId;
-    }
-
-    public void setCartId(Integer cartId) {
-        this.cartId = cartId;
-    }
-
-    public Integer getGoodsId() {
-        return goodsId;
-    }
-
-    public void setGoodsId(Integer goodsId) {
-        this.goodsId = goodsId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public String getMainUrl() {
-        return mainUrl;
-    }
-
-    public void setMainUrl(String mainUrl) {
-        this.mainUrl = mainUrl;
-    }
-
-    public BigDecimal getPostage() {
-        return postage;
-    }
-
-    public void setPostage(BigDecimal postage) {
-        this.postage = postage;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
 }

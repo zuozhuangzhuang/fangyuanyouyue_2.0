@@ -20,9 +20,10 @@ public interface CollectMapper {
 
     /**
      * 根据类型和ID获取收藏记录
+     * @param userId
      * @param collectId
      * @param type
      * @return
      */
-    Collect selectByGoodsId(@Param("collectId") Integer collectId,@Param("type")Integer type);
+    Collect selectByCollectId(@Param("userId")Integer userId,@Param("collectId") Integer collectId,@Param("type")Integer type);
 }

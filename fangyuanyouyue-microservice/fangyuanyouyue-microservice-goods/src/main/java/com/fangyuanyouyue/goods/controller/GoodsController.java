@@ -47,7 +47,7 @@ public class GoodsController extends BaseController{
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token，不为空则为：我的商品", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "userId", value = "卖家id，不为空则为：他的商品", dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "status", value = "商品状态 普通商品 1出售中 2已售出 5删除", dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "状态 1出售中 2已售出 3（抢购）已结束 5删除", dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "search", value = "搜索词条", dataType = "String", paramType = "query"),
@@ -111,7 +111,7 @@ public class GoodsController extends BaseController{
             @ApiImplicitParam(name = "postage", value = "运费", required = true, dataType = "BigDecimal", paramType = "query"),
             @ApiImplicitParam(name = "label", value = "标签", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "floorPrice", value = "最低价", dataType = "BigDecimal", paramType = "query"),
-            @ApiImplicitParam(name = "intervalTime", value = "降价时间间隔", dataType = "date", paramType = "query"),
+            @ApiImplicitParam(name = "intervalTime", value = "降价时间间隔", dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "markdown", value = "降价幅度", dataType = "BigDecimal", paramType = "query"),
             @ApiImplicitParam(name = "type", value = "类型 1普通商品 2抢购商品", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "imgUrls", value = "商品图片路径数组", required = true,allowMultiple = true,dataType = "String", paramType = "query"),

@@ -1,0 +1,40 @@
+#为0 端口随机
+server:
+  port: 0
+
+#zipkin
+  zipkin:
+    base-url: http://localhost:9411
+spring:
+  profiles:
+    active: dev
+#springcloud-bus
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ["health","info","bus-refresh"]
+  cloud:
+    bus:
+      trace:
+        enabled: true
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.fangyuanyouyue.wallet.model
+mapper:
+  mappers:  com.fangyuanyouyue.wallet.dao
+  not-empty: false
+  identity: MYSQL
+
+#pagehelper分页
+pagehelper:
+    helperDialect: mysql
+    reasonable: true
+    supportMethodsArguments: true
+    params: count=countSql
+    returnPageInfo: check
+debug: true
+# 打印sql
+logging:
+  level:
+    com.fangyuanyouyue.goods: DEBUG

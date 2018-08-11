@@ -2,6 +2,9 @@ package com.fangyuanyouyue.goods.dto;
 
 import com.fangyuanyouyue.goods.model.GoodsCategory;
 import com.fangyuanyouyue.goods.model.GoodsImg;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,6 +13,9 @@ import java.util.List;
 /**
  * 商品分类Dto
  */
+@Getter
+@Setter
+@ToString
 public class GoodsCategoryDto {
     private Integer categoryId;//分类ID
 
@@ -49,69 +55,5 @@ public class GoodsCategoryDto {
             dtolist.add(dto);
         }
         return dtolist;
-    }
-
-    public Integer getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(Integer categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public Integer getParentId() {
-        return parentId;
-    }
-
-    public void setParentId(Integer parentId) {
-        this.parentId = parentId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getImgUrl() {
-        return imgUrl;
-    }
-
-    public void setImgUrl(String imgUrl) {
-        this.imgUrl = imgUrl;
-    }
-
-    public Integer getSort() {
-        return sort;
-    }
-
-    public void setSort(Integer sort) {
-        this.sort = sort;
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public List<GoodsCategoryDto> getChildList() {
-        return childList;
-    }
-
-    public void setChildList(List<GoodsCategoryDto> childList) {
-        this.childList = childList;
     }
 }

@@ -5,7 +5,7 @@ import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.goods.dto.BargainDto;
+import com.fangyuanyouyue.goods.dto.GoodsDto;
 import com.fangyuanyouyue.goods.param.GoodsParam;
 import com.fangyuanyouyue.goods.service.*;
 import io.swagger.annotations.Api;
@@ -50,7 +50,9 @@ public class BargainController extends BaseController{
             @ApiImplicitParam(name = "goodsId", value = "商品ID",required = true,dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "price", value = "出价钱", required = true, dataType = "BigDecimal", paramType = "query"),
             @ApiImplicitParam(name = "reason", value = "议价理由", dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "addressId", value = "收货地址id",required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "addressId", value = "收货地址id",required = true, dataType = "int", paramType = "query"),
+            // FIXME: 2018/8/9 客户端完成支付功能后修改为必须参数
+            @ApiImplicitParam(name = "payPwd", value = "支付密码", dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/addBargain")
     @ResponseBody
@@ -77,8 +79,12 @@ public class BargainController extends BaseController{
             if(param.getAddressId() == null){
                 return toError(ReCode.FAILD.getValue(),"收货地址不能为空！");
             }
+            // FIXME: 2018/8/9 客户端完成支付功能后取消注释
+            /*if(StringUtils.isEmpty(param.getPayPwd())){
+                return toError(ReCode.FAILD.getValue(),"支付密码不能为空！");
+            }*/
             //TODO 申请商品压价
-            bargainService.addBargain(userId,param.getGoodsId(),param.getPrice(),param.getReason(),param.getAddressId());
+            bargainService.addBargain(userId,param.getGoodsId(),param.getPrice(),param.getReason(),param.getAddressId(),param.getPayPwd());
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
@@ -123,8 +129,8 @@ public class BargainController extends BaseController{
                 return toError(ReCode.FAILD.getValue(),"状态不能为空！");
             }
             //处理压价
-            bargainService.updateBargain(userId,param.getGoodsId(),param.getBargainId(),param.getStatus());
-            return toSuccess();
+            Integer orderId = bargainService.updateBargain(userId, param.getGoodsId(), param.getBargainId(), param.getStatus());
+            return toSuccess(orderId);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
@@ -134,7 +140,7 @@ public class BargainController extends BaseController{
         }
     }
 
-    @ApiOperation(value = "我的压价列表", notes = "(BargainDto)买家获取自己所压价商品的列表",response = BaseResp.class)
+    @ApiOperation(value = "我的议价", notes = "(GoodsDto)买家获取自己所压价商品的列表",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "start", value = "起始页数", required = true,dataType = "int", paramType = "query"),
@@ -144,7 +150,7 @@ public class BargainController extends BaseController{
     @ResponseBody
     public BaseResp bargainList(GoodsParam param) throws IOException {
         try {
-            log.info("----》我的压价列表《----");
+            log.info("----》我的议价《----");
             log.info("参数：" + param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
@@ -160,8 +166,8 @@ public class BargainController extends BaseController{
                 return toError(ReCode.FAILD.getValue(),"分页参数异常！");
             }
             //TODO 我的压价列表
-            List<BargainDto> bargainDtos = bargainService.bargainList(userId,param.getStart(),param.getLimit());
-            return toSuccess( bargainDtos);
+            List<GoodsDto> goodsDtos = bargainService.bargainList(userId,param.getStart(),param.getLimit());
+            return toSuccess(goodsDtos);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());

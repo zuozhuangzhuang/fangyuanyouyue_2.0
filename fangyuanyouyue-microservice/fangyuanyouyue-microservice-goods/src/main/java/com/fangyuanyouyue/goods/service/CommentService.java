@@ -46,8 +46,8 @@ public interface CommentService {
 
     /**
      * 删除评论
-     * @param commentId
+     * @param commentIds
      * @throws ServiceException
      */
-    void deleteComment(Integer commentId) throws ServiceException;
+    void deleteComment(Integer[] commentIds) throws ServiceException;
 }

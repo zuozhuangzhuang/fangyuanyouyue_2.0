@@ -1,7 +1,14 @@
 package com.fangyuanyouyue.forum.model;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.util.Date;
 
+@Getter
+@Setter
+@ToString
 public class ForumImg {
     private Integer id;
 
@@ -11,35 +18,4 @@ public class ForumImg {
 
     private Date addTime;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getForumId() {
-        return forumId;
-    }
-
-    public void setForumId(Integer forumId) {
-        this.forumId = forumId;
-    }
-
-    public String getImgUrl() {
-        return imgUrl;
-    }
-
-    public void setImgUrl(String imgUrl) {
-        this.imgUrl = imgUrl == null ? null : imgUrl.trim();
-    }
-
-    public Date getAddTime() {
-        return addTime;
-    }
-
-    public void setAddTime(Date addTime) {
-        this.addTime = addTime;
-    }
 }

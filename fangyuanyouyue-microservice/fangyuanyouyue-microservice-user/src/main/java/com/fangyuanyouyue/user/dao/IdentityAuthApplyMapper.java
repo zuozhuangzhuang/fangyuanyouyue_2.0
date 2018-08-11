@@ -3,6 +3,9 @@ package com.fangyuanyouyue.user.dao;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.user.model.IdentityAuthApply;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 @Mapper
 public interface IdentityAuthApplyMapper {
@@ -20,5 +23,10 @@ public interface IdentityAuthApplyMapper {
 
     IdentityAuthApply certification(int userId, String name, String identity, String identity_img_cover, String identity_img_back) throws ServiceException;
 
-    IdentityAuthApply selectByUserId(Integer userId);
+    /**
+     * 根据用户ID和状态值获取用户实名认证申请记录
+     * @param userId
+     * @return
+     */
+    IdentityAuthApply selectByUserId(@Param("userId")Integer userId);
 }

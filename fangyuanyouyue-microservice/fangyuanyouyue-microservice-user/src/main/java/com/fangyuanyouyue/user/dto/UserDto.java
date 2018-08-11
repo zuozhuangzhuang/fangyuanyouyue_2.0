@@ -1,15 +1,19 @@
 package com.fangyuanyouyue.user.dto;
 
-import org.apache.commons.lang.StringUtils;
-
-import com.fangyuanyouyue.user.model.IdentityAuthApply;
 import com.fangyuanyouyue.user.model.UserInfo;
 import com.fangyuanyouyue.user.model.UserInfoExt;
 import com.fangyuanyouyue.user.model.UserVip;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * 用户信息
  */
+@Getter
+@Setter
+@ToString
 public class UserDto {
     //UserInfo 用户基本信息表
     private Integer userId;//用户ID
@@ -36,19 +40,14 @@ public class UserDto {
 
     private Integer level;//用户等级
 
-    private String levelDesc;//等级描述
-
-
-    private Integer identityStatus;//实名认证状态 1申请 2通过 3拒绝
 
     //UserVip
     private Integer vipLevel;//会员等级
 
     private String vipLevelDesc;//会员等级描述
 
-    private Integer vipType;//会员类型 1体验会员 2月会员 3年会员
-
     private Integer vipStatus;//会员状态 1已开通 2未开通
+
 
     //UserFans
     private Integer fansCount;//粉丝数量
@@ -57,22 +56,37 @@ public class UserDto {
 
     private Integer isFollow = 2;//是否关注 1是 2否
 
-    //UserAddressDto
-    private UserAddressDto defaultAddress;//用户默认收货地址
-
-
-    //UserInfoExt 用户扩展表
-    private Integer score;//用户积分
-
-    private Integer credit;//信誉度
+    private Integer creditLevel;//信誉度等级 1差 2低 3中 4高 5优
 
     private Integer authType;//认证状态 1已认证 2未认证
 
     private Integer extStatus;//实名登记状态 1已实名 2未实名
 
+    private Integer isPayPwd;//是否设置支付密码 1是 2否
+
+
     /**
      * ↓↓↓↓↓↓↓注释掉不需要返回的属性↓↓↓↓↓↓↓
+     *
      */
+
+//    private Integer vipType;//会员类型 1体验会员 2月会员 3年会员
+
+//    private String vipStartTime;//会员开通时间
+
+//    private String vipEndTime;//会员过期时间
+
+//    private String levelDesc;//等级描述
+
+//    private Integer identityStatus;//实名认证状态 1申请 2通过 3拒绝
+    //UserAddressDto
+//    private UserAddressDto defaultAddress;//用户默认收货地址
+
+    //UserWallet
+//    private Integer score;//用户积分
+    //UserInfoExt 用户扩展表
+
+//    private Long credit;//信誉度
 
     //IdentityAuthApply
 //    private String identityImgCover;//身份证封面图
@@ -98,8 +112,6 @@ public class UserDto {
 
 //    private String name;//真实姓名
 
-
-
     /**
      * ↑↑↑↑↑↑注释掉不需要返回的属性↑↑↑↑↑↑
      */
@@ -107,7 +119,7 @@ public class UserDto {
     public UserDto() {
     }
 
-    public UserDto(String token,UserInfo userInfo, UserVip userVip, UserInfoExt userInfoExt,IdentityAuthApply identityAuthApply) {
+    public UserDto(String token,UserInfo userInfo, UserVip userVip, UserInfoExt userInfoExt) {
         if(StringUtils.isNotEmpty(token)){
             this.token = token;
         }
@@ -124,24 +136,44 @@ public class UserDto {
             this.signature = userInfo.getSignature();
             this.contact = userInfo.getContact();
             this.level = userInfo.getLevel();
-            this.levelDesc = userInfo.getLevelDesc();
+//            this.levelDesc = userInfo.getLevelDesc();
         }
         //UserInfoExt
         if(userInfoExt != null){
-            this.credit = userInfoExt.getCredit();
-            this.score = userInfoExt.getScore();
+//            this.credit = userInfoExt.getCredit();
+            //信誉度
+            Long credit = userInfoExt.getCredit();
+            if(credit != null){
+                if(credit < -100){//差
+                    this.creditLevel = 1;
+                }else if(-100 <= credit && credit < 1000){//低
+                    this.creditLevel = 2;
+                }else if(1000 <= credit && credit < 10000){//中
+                    this.creditLevel = 3;
+                }else if(10000 <= credit && credit < 500000){//高
+                    this.creditLevel = 4;
+                }else if(500000 <= credit){//优
+                    this.creditLevel = 5;
+                }
+            }
+
             this.authType = userInfoExt.getAuthType();
             this.extStatus = userInfoExt.getStatus();
+            if(StringUtils.isEmpty(userInfoExt.getPayPwd())){
+                this.isPayPwd = 2;
+            }else{
+                this.isPayPwd = 1;
+            }
         }
         //IdentityAuthApply
-        if(identityAuthApply != null){
+//        if(identityAuthApply != null){
 //            this.identity = identityAuthApply.getIdentity();
 //            this.name = identityAuthApply.getName();
 //            this.identityImgCover = identityAuthApply.getIdentityImgCover();
 //            this.identityImgBack = identityAuthApply.getIdentityImgBack();
 //            this.identityRejectDesc = identityAuthApply.getRejectDesc();
-            this.identityStatus = identityAuthApply.getStatus();
-        }
+//            this.identityStatus = identityAuthApply.getStatus();
+//        }
         //UserThirdParty
 //        if(userThirdParty != null){
 //            this.thirdType = userThirdParty.getType();
@@ -154,8 +186,15 @@ public class UserDto {
         if(userVip != null){
             this.vipLevel = userVip.getVipLevel();
             this.vipLevelDesc = userVip.getLevelDesc();
-            this.vipType = userVip.getVipType();
+//            this.vipType = userVip.getVipType();
             this.vipStatus = userVip.getStatus();
+            //开始时间
+//            if(userVip.getAddTime() != null){
+//                this.vipStartTime = DateUtil.getFormatDate(userVip.getAddTime(), DateUtil.DATE_FORMT);
+//            }
+//            if(userVip.getEndTime() != null){
+//                this.vipEndTime = DateUtil.getFormatDate(userVip.getEndTime(), DateUtil.DATE_FORMT);
+//            }
         }
         //UserAddressInfo
 //        if(userAddressInfos != null && userAddressInfos.size()>0){
@@ -163,211 +202,4 @@ public class UserDto {
 //        }
     }
 
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getUserAddress() {
-        return userAddress;
-    }
-
-    public void setUserAddress(String userAddress) {
-        this.userAddress = userAddress;
-    }
-
-    public String getNickName() {
-        return nickName;
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
-    }
-
-    public String getHeadImgUrl() {
-        return headImgUrl;
-    }
-
-    public void setHeadImgUrl(String headImgUrl) {
-        this.headImgUrl = headImgUrl;
-    }
-
-    public String getBgImgUrl() {
-        return bgImgUrl;
-    }
-
-    public void setBgImgUrl(String bgImgUrl) {
-        this.bgImgUrl = bgImgUrl;
-    }
-
-    public Integer getGender() {
-        return gender;
-    }
-
-    public void setGender(Integer gender) {
-        this.gender = gender;
-    }
-
-    public String getSignature() {
-        return signature;
-    }
-
-    public void setSignature(String signature) {
-        this.signature = signature;
-    }
-
-    public String getContact() {
-        return contact;
-    }
-
-    public void setContact(String contact) {
-        this.contact = contact;
-    }
-
-    public Integer getLevel() {
-        return level;
-    }
-
-    public void setLevel(Integer level) {
-        this.level = level;
-    }
-
-    public String getLevelDesc() {
-        return levelDesc;
-    }
-
-    public void setLevelDesc(String levelDesc) {
-        this.levelDesc = levelDesc;
-    }
-
-    public Integer getExtStatus() {
-        return extStatus;
-    }
-
-    public void setExtStatus(Integer extStatus) {
-        this.extStatus = extStatus;
-    }
-
-    public Integer getVipLevel() {
-        return vipLevel;
-    }
-
-    public void setVipLevel(Integer vipLevel) {
-        this.vipLevel = vipLevel;
-    }
-
-    public String getVipLevelDesc() {
-        return vipLevelDesc;
-    }
-
-    public void setVipLevelDesc(String vipLevelDesc) {
-        this.vipLevelDesc = vipLevelDesc;
-    }
-
-    public Integer getVipType() {
-        return vipType;
-    }
-
-    public void setVipType(Integer vipType) {
-        this.vipType = vipType;
-    }
-
-    public Integer getVipStatus() {
-        return vipStatus;
-    }
-
-    public void setVipStatus(Integer vipStatus) {
-        this.vipStatus = vipStatus;
-    }
-
-    public Integer getIdentityStatus() {
-        return identityStatus;
-    }
-
-    public void setIdentityStatus(Integer identityStatus) {
-        this.identityStatus = identityStatus;
-    }
-
-    public Integer getFansCount() {
-        return fansCount;
-    }
-
-    public void setFansCount(Integer fansCount) {
-        this.fansCount = fansCount;
-    }
-
-    public Integer getCollectCount() {
-        return collectCount;
-    }
-
-    public void setCollectCount(Integer collectCount) {
-        this.collectCount = collectCount;
-    }
-
-    public UserAddressDto getDefaultAddress() {
-        return defaultAddress;
-    }
-
-    public void setDefaultAddress(UserAddressDto defaultAddress) {
-        this.defaultAddress = defaultAddress;
-    }
-
-    public Integer getScore() {
-        return score;
-    }
-
-    public void setScore(Integer score) {
-        this.score = score;
-    }
-
-    public Integer getCredit() {
-        return credit;
-    }
-
-    public void setCredit(Integer credit) {
-        this.credit = credit;
-    }
-
-    public Integer getAuthType() {
-        return authType;
-    }
-
-    public void setAuthType(Integer authType) {
-        this.authType = authType;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public Integer getIsFollow() {
-        return isFollow;
-    }
-
-    public void setIsFollow(Integer isFollow) {
-        this.isFollow = isFollow;
-    }
 }

@@ -17,6 +17,8 @@
     </parent> 
 
 	<modules>
+		<module>fangyuanyouyue-microservice-auth</module>
+		<module>fangyuanyouyue-microservice-wallet</module>
 		<module>fangyuanyouyue-microservice-user</module>
 		<module>fangyuanyouyue-microservice-goods</module>
 		<module>fangyuanyouyue-microservice-forum</module>

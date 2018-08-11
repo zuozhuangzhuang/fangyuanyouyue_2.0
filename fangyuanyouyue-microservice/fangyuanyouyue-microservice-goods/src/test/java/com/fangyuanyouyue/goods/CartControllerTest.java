@@ -60,7 +60,7 @@ public class CartControllerTest {
     @Transactional
     public void getCart() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/cart/getCart")
-                .param("token","10025FY1533144562288")
+                .param("token","10025FY1533317806918")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

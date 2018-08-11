@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.goods.dto.BargainDto;
+import com.fangyuanyouyue.goods.dto.GoodsDto;
 import com.fangyuanyouyue.goods.model.GoodsBargain;
 
 public interface BargainService {
@@ -14,9 +15,10 @@ public interface BargainService {
      * @param goodsId
      * @param price
      * @param reason
+     * @param payPwd
      * @throws ServiceException
      */
-    void addBargain(Integer userId, Integer goodsId, BigDecimal price,String reason,Integer addressId) throws ServiceException;
+    void addBargain(Integer userId, Integer goodsId, BigDecimal price,String reason,Integer addressId,String payPwd) throws ServiceException;
 
     /**
      * 处理压价
@@ -24,7 +26,7 @@ public interface BargainService {
      * @param goodsId
      * @throws ServiceException
      */
-    void updateBargain(Integer userId, Integer goodsId,Integer bargainId,Integer status) throws ServiceException;
+    Integer updateBargain(Integer userId, Integer goodsId,Integer bargainId,Integer status) throws ServiceException;
 
     /**
      * 我的压价列表
@@ -34,7 +36,8 @@ public interface BargainService {
      * @return
      * @throws ServiceException
      */
-    List<BargainDto> bargainList(Integer userId,Integer start,Integer limit) throws ServiceException;
+    List<GoodsDto> bargainList(Integer userId, Integer start, Integer limit) throws ServiceException;
+
     /**
      * 压价详情
      * @param userId
@@ -44,4 +47,13 @@ public interface BargainService {
      * @throws ServiceException
      */
     GoodsBargain bargainDetail(Integer userId,Integer bargainId, Integer goodsId) throws ServiceException;
+
+
+    /**
+     * 获取统计信息
+     * @param userId
+     * @return
+     * @throws ServiceException
+     */
+    Integer getProcess(Integer userId) throws ServiceException;
 }

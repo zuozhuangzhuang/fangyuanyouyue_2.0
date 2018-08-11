@@ -131,10 +131,6 @@ public class FeignController  extends BaseController {
     }
 
     @ApiOperation(value = "用户是否官方认证", notes = "用户是否官方认证",hidden = true)
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "unionId", value = "三方唯一识别号", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "type", value = "类型 1微信 2QQ 3微博", required = true, dataType = "int", paramType = "query")
-    })
     @PostMapping(value = "/userIsAuth")
     @ResponseBody
     public BaseResp userIsAuth(Integer userId) throws IOException {
@@ -158,4 +154,32 @@ public class FeignController  extends BaseController {
         }
     }
 
+
+    @ApiOperation(value = "验证支付密码", notes = "验证支付密码",hidden = true)
+    @PostMapping(value = "/verifyPayPwd")
+    @ResponseBody
+    public BaseResp verifyPayPwd(Integer userId,String payPwd) throws IOException {
+        try {
+            log.info("----》验证支付密码《----");
+            log.info("参数：userId：" + userId + ",payPwd："+ payPwd);
+            if(userId == null){
+                return toError(ReCode.FAILD.getValue(),"用户ID不能为空！");
+            }
+            UserInfo userInfo = userInfoService.selectByPrimaryKey(userId);
+            if(userInfo==null){
+                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+            }
+            if(userInfo.getStatus() == 2){
+                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
+            }
+            if(StringUtils.isEmpty(payPwd)){
+                return toError(ReCode.FAILD.getValue(),"支付密码不能为空！");
+            }
+            boolean verifyPayPwd = userInfoExtService.verifyPayPwd(userId,payPwd);
+            return toSuccess(verifyPayPwd);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
 }

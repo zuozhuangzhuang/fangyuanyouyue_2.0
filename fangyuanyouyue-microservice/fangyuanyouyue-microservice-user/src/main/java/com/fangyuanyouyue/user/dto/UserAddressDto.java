@@ -1,6 +1,9 @@
 package com.fangyuanyouyue.user.dto;
 
 import com.fangyuanyouyue.user.model.UserAddressInfo;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +11,9 @@ import java.util.List;
 /**
  * 用户地址
  */
+@Getter
+@Setter
+@ToString
 public class UserAddressDto {
     //UserAddressInfo
     private Integer userAddresId;//收货地址ID
@@ -54,75 +60,4 @@ public class UserAddressDto {
         return dtolist;
     }
 
-    public Integer getUserAddresId() {
-        return userAddresId;
-    }
-
-    public void setUserAddresId(Integer userAddresId) {
-        this.userAddresId = userAddresId;
-    }
-
-    public String getReceiverName() {
-        return receiverName;
-    }
-
-    public void setReceiverName(String receiverName) {
-        this.receiverName = receiverName;
-    }
-
-    public String getReceiverPhone() {
-        return receiverPhone;
-    }
-
-    public void setReceiverPhone(String receiverPhone) {
-        this.receiverPhone = receiverPhone;
-    }
-
-    public String getProvince() {
-        return province;
-    }
-
-    public void setProvince(String province) {
-        this.province = province;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getArea() {
-        return area;
-    }
-
-    public void setArea(String area) {
-        this.area = area;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getPostCode() {
-        return postCode;
-    }
-
-    public void setPostCode(String postCode) {
-        this.postCode = postCode;
-    }
-
-    public Integer getAddressType() {
-        return addressType;
-    }
-
-    public void setAddressType(Integer addressType) {
-        this.addressType = addressType;
-    }
 }

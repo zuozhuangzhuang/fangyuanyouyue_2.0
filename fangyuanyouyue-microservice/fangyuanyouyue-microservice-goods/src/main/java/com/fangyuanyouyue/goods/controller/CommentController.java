@@ -222,7 +222,7 @@ public class CommentController extends BaseController{
     @ApiOperation(value = "删除评论", notes = "(void)删除评论",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true,dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "commentId", value = "评论id",required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "commentIds", value = "评论id数组",allowMultiple = true,required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/deleteComment")
     @ResponseBody
@@ -240,10 +240,10 @@ public class CommentController extends BaseController{
             if((Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            if(param.getCommentId() == null){
+            if(param.getCommentIds() == null || param.getCommentIds().length < 1){
                 return toError(ReCode.FAILD.getValue(),"评论id不能为空！");
             }
-            commentService.deleteComment(param.getCommentId());
+            commentService.deleteComment(param.getCommentIds());
             return toSuccess("删除评论成功！");
         } catch (ServiceException e) {
             e.printStackTrace();

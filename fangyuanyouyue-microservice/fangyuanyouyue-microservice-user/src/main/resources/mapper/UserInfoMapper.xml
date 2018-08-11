@@ -302,6 +302,9 @@
     <if test="nickName != null">
       and a.nick_name like "%"#{nickName,jdbcType=VARCHAR}"%"
     </if>
+    <if test="authType != null">
+      and b.auth_type = #{authType}
+    </if>
     order by c.vip_level desc,c.vip_type desc,b.auth_type limit #{start},#{limit}
   </select>
 </mapper>

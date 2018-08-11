@@ -15,13 +15,14 @@
     <result column="freight" jdbcType="DECIMAL" property="freight" />
     <result column="pay_amount" jdbcType="DECIMAL" property="payAmount" />
     <result column="seller_id" jdbcType="INTEGER" property="sellerId" />
+    <result column="main_order_id" jdbcType="INTEGER" property="mainOrderId" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.goods.model.OrderDetail">
     <result column="description" jdbcType="LONGVARCHAR" property="description" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, order_id, goods_id, goods_name, add_time, update_time, coupon_id, main_img_url, 
-    amount, freight, pay_amount, seller_id
+    amount, freight, pay_amount, seller_id, main_order_id
   </sql>
   <sql id="Blob_Column_List">
     description
@@ -43,12 +44,14 @@
       goods_id, goods_name, add_time, 
       update_time, coupon_id, main_img_url, 
       amount, freight, pay_amount, 
-      seller_id, description)
+      seller_id, main_order_id, description
+      )
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{orderId,jdbcType=INTEGER}, 
       #{goodsId,jdbcType=INTEGER}, #{goodsName,jdbcType=VARCHAR}, #{addTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP}, #{couponId,jdbcType=INTEGER}, #{mainImgUrl,jdbcType=VARCHAR}, 
       #{amount,jdbcType=DECIMAL}, #{freight,jdbcType=DECIMAL}, #{payAmount,jdbcType=DECIMAL}, 
-      #{sellerId,jdbcType=INTEGER}, #{description,jdbcType=LONGVARCHAR})
+      #{sellerId,jdbcType=INTEGER}, #{mainOrderId,jdbcType=INTEGER}, #{description,jdbcType=LONGVARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.fangyuanyouyue.goods.model.OrderDetail">
     insert into order_detail
@@ -91,6 +94,9 @@
       </if>
       <if test="sellerId != null">
         seller_id,
+      </if>
+      <if test="mainOrderId != null">
+        main_order_id,
       </if>
       <if test="description != null">
         description,
@@ -136,6 +142,9 @@
       <if test="sellerId != null">
         #{sellerId,jdbcType=INTEGER},
       </if>
+      <if test="mainOrderId != null">
+        #{mainOrderId,jdbcType=INTEGER},
+      </if>
       <if test="description != null">
         #{description,jdbcType=LONGVARCHAR},
       </if>
@@ -180,6 +189,9 @@
       <if test="sellerId != null">
         seller_id = #{sellerId,jdbcType=INTEGER},
       </if>
+      <if test="mainOrderId != null">
+        main_order_id = #{mainOrderId,jdbcType=INTEGER},
+      </if>
       <if test="description != null">
         description = #{description,jdbcType=LONGVARCHAR},
       </if>
@@ -200,6 +212,7 @@
       freight = #{freight,jdbcType=DECIMAL},
       pay_amount = #{payAmount,jdbcType=DECIMAL},
       seller_id = #{sellerId,jdbcType=INTEGER},
+      main_order_id = #{mainOrderId,jdbcType=INTEGER},
       description = #{description,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -216,7 +229,17 @@
       amount = #{amount,jdbcType=DECIMAL},
       freight = #{freight,jdbcType=DECIMAL},
       pay_amount = #{payAmount,jdbcType=DECIMAL},
-      seller_id = #{sellerId,jdbcType=INTEGER}
+      seller_id = #{sellerId,jdbcType=INTEGER},
+      main_order_id = #{mainOrderId,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectOrderByGoodsIdStatus" parameterType="Integer" resultMap="BaseResultMap">
+    select * from order_detail
+    <where>
+      <if test="goodsId != null">
+        and goods_id = #{goodsId}
+      </if>
+    </where>
+  </select>
 </mapper>

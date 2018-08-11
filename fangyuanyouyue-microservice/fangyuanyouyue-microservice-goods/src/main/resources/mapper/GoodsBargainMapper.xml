@@ -25,7 +25,7 @@
     delete from goods_bargain
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.goods.model.GoodsBargain">
+  <insert id="insert" parameterType="com.fangyuanyouyue.goods.model.GoodsBargain" useGeneratedKeys="true" keyProperty="id">
     insert into goods_bargain (id, user_id, goods_id, 
       price, reason, status, 
       add_time, update_time, address_id
@@ -140,12 +140,37 @@
   </update>
 
   <select id="selectByUserIdGoodsId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from goods_bargain where user_id = #{userId} and goods_id = #{goodsId} and status = 1
+    select * from goods_bargain where user_id = #{userId} and goods_id = #{goodsId}
+    <if test="status != null">
+      and status = #{status}
+    </if>
   </select>
   <select id="selectAllByGoodsId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from goods_bargain where goods_id = #{goodsId} and status = 1
+    select * from goods_bargain
+    <where>
+      1=1
+      <if test="goodsId != null">
+        and goods_id = #{goodsId}
+      </if>
+      <if test="status != null">
+        and status = #{status}
+      </if>
+    </where>
+    order by add_time desc
   </select>
   <select id="selectAllByUserId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from goods_bargain where user_id = #{userId} order by add_time desc limit #{start},#{limit}
+    select * from goods_bargain
+    <where>
+      1=1
+      <if test="userId != null">
+        and user_id = #{userId}
+      </if>
+      <if test="status != null">
+        and status = #{status}
+      </if>
+    </where>
+  </select>
+  <select id="selectGoodsIdsByUserId" parameterType="Integer" resultType="Integer">
+    select DISTINCT goods_id from goods_bargain where user_id = #{userId} order by add_time desc limit #{start},#{limit}
   </select>
 </mapper>
