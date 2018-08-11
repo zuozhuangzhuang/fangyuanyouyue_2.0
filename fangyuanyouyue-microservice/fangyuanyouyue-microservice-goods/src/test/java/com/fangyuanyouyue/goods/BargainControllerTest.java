@@ -82,10 +82,11 @@ public class BargainControllerTest {
     @Transactional
     public void bargainList() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/bargain/bargainList")
-                .param("token","10025FY1533317806918")
+                .param("token","10041FY1533753292042")
                 .param("start","0")
                 .param("limit","10")
                 .param("type","2")
+                .param("search","我的")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

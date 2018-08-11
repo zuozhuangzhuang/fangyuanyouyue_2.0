@@ -170,6 +170,6 @@
     </where>
   </update>
   <select id="getHotCategaryList" resultMap="BaseResultMap">
-    select * from goods_category where type = 2 order by id
+    select * from goods_category where type = 2 order by id limit 0,10
   </select>
 </mapper>

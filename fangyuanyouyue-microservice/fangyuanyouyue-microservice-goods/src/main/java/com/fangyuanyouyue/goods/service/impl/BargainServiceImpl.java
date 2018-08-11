@@ -240,9 +240,9 @@ public class BargainServiceImpl implements BargainService{
     }
 
     @Override
-    public List<GoodsDto> bargainList(Integer userId,Integer start,Integer limit) throws ServiceException {
+    public List<GoodsDto> bargainList(Integer userId,Integer start,Integer limit,String search) throws ServiceException {
         //根据申请议价用户ID获取此用户的所有压价申请，筛选出商品ID列表，遍历商品列表，根据商品ID和用户ID查询压价列表，存入商品dto中
-        List<Integer> goodsIdsByUserId = goodsBargainMapper.selectGoodsIdsByUserId(userId,start*limit,limit);
+        List<Integer> goodsIdsByUserId = goodsBargainMapper.selectGoodsIdsByUserId(userId,start*limit,limit,search);
         List<GoodsDto> goodsDtos = new ArrayList<>();
         for(Integer goodsId:goodsIdsByUserId){
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);

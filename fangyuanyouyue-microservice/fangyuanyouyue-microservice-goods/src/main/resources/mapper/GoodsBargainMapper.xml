@@ -170,7 +170,19 @@
       </if>
     </where>
   </select>
+  <!--<select id="selectGoodsIdsByUserId" parameterType="Integer" resultType="Integer">-->
+    <!--select DISTINCT goods_id from goods_bargain where user_id = #{userId} order by add_time desc limit #{start},#{limit}-->
+  <!--</select>-->
   <select id="selectGoodsIdsByUserId" parameterType="Integer" resultType="Integer">
-    select DISTINCT goods_id from goods_bargain where user_id = #{userId} order by add_time desc limit #{start},#{limit}
+    select DISTINCT a.goods_id from goods_bargain a,goods_info b,user_info c
+    <where>
+      a.goods_id = b.id and b.user_id = c.id
+      <if test="userId != null">
+        and a.user_id = #{userId}
+      </if>
+      <if test="search != null and search != ''">
+        and (b.name like "%"#{search}"%" or b.description like "%"#{search}"%" or c.nick_name like "%"#{search}"%")
+      </if>
+    </where>
   </select>
 </mapper>

@@ -33,10 +33,11 @@ public interface BargainService {
      * @param userId
      * @param start
      * @param limit
+     * @param search
      * @return
      * @throws ServiceException
      */
-    List<GoodsDto> bargainList(Integer userId, Integer start, Integer limit) throws ServiceException;
+    List<GoodsDto> bargainList(Integer userId, Integer start, Integer limit,String search) throws ServiceException;
 
     /**
      * 压价详情

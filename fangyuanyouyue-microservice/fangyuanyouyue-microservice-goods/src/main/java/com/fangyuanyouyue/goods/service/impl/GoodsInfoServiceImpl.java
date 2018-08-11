@@ -492,7 +492,6 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
 
     @Override
     public List<SearchDto> hotSearch() throws ServiceException {
-        PageHelper.startPage(0,10);
         List<HotSearch> hotSearchList = hotSearchMapper.getHotSearchList();
         List<SearchDto> searchDtos = SearchDto.toDtoList(hotSearchList);
         if(searchDtos == null || searchDtos.size()==0){
@@ -504,7 +503,6 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
 
     @Override
     public List<GoodsCategoryDto> hotCategary() throws ServiceException {
-        PageHelper.startPage(0,10);
         List<GoodsCategory> hotCategaryList = goodsCategoryMapper.getHotCategaryList();
         List<GoodsCategoryDto> goodsCategoryDtos = GoodsCategoryDto.toDtoList(hotCategaryList);
         if(goodsCategoryDtos == null || goodsCategoryDtos.size()==0){

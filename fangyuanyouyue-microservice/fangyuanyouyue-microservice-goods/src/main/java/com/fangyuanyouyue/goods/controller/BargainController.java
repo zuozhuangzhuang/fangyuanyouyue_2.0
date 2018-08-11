@@ -144,7 +144,8 @@ public class BargainController extends BaseController{
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "start", value = "起始页数", required = true,dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "limit", value = "每页个数", required = true,dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true,dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "search", value = "搜索字段", dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/bargainList")
     @ResponseBody
@@ -166,7 +167,7 @@ public class BargainController extends BaseController{
                 return toError(ReCode.FAILD.getValue(),"分页参数异常！");
             }
             //TODO 我的压价列表
-            List<GoodsDto> goodsDtos = bargainService.bargainList(userId,param.getStart(),param.getLimit());
+            List<GoodsDto> goodsDtos = bargainService.bargainList(userId,param.getStart(),param.getLimit(),param.getSearch());
             return toSuccess(goodsDtos);
         } catch (ServiceException e) {
             e.printStackTrace();
