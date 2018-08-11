@@ -137,17 +137,19 @@ public class WalletServiceImpl implements WalletService{
         if(userWallet == null){
             throw new ServiceException("获取钱包信息失败！");
         }else{
-            Long updateScore = userWallet.getPoint()+score;
             if(type == 1){//增加积分 同时增加总积分和积分余额
                 userWallet.setScore(userWallet.getScore()+score);
+                userWallet.setPoint(userWallet.getPoint()+score);
             }else{//减少积分
+                Long updateScore = userWallet.getPoint()-score;
                 //修改积分后的用户积分余额
                 //如果修改后的积分余额低于0，就返回积分不足
                 if(updateScore < 0){
                     throw new ServiceException("积分不足！");
                 }
+                userWallet.setScore(updateScore);
+                userWallet.setPoint(updateScore);
             }
-            userWallet.setPoint(updateScore);
             userWalletMapper.updateByPrimaryKey(userWallet);
         }
     }
@@ -179,4 +181,28 @@ public class WalletServiceImpl implements WalletService{
         }
     }
 
+    @Override
+    public Integer getAppraisalCount(Integer userId) throws ServiceException {
+        UserWallet userWallet = userWalletMapper.selectByUserId(userId);
+        if(userWallet == null){
+            throw new ServiceException("获取钱包信息失败！");
+        }else{
+            return userWallet.getAppraisalCount() == null?0:userWallet.getAppraisalCount();
+        }
+    }
+
+    @Override
+    public void updateAppraisalCount(Integer userId, Integer count) throws ServiceException {
+        UserWallet userWallet = userWalletMapper.selectByUserId(userId);
+        if(userWallet == null){
+            throw new ServiceException("获取钱包信息失败！");
+        }else{
+            if(userWallet.getAppraisalCount() < count){
+                throw new ServiceException("剩余鉴定次数不足！");
+            }else{
+                userWallet.setAppraisalCount(userWallet.getAppraisalCount()-count);
+                userWalletMapper.updateByPrimaryKey(userWallet);
+            }
+        }
+    }
 }

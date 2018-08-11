@@ -55,5 +55,19 @@ public interface WalletService {
      */
     void updateBalance(Integer userId,BigDecimal amount,Integer type) throws ServiceException;
 
+    /**
+     * 查询免费鉴定次数
+     * @param userId
+     * @return
+     * @throws ServiceException
+     */
+    Integer getAppraisalCount(Integer userId) throws ServiceException;
 
+    /**
+     * 修改剩余免费鉴定次数
+     * @param userId
+     * @param count
+     * @throws ServiceException
+     */
+    void updateAppraisalCount(Integer userId,Integer count) throws ServiceException;
 }

@@ -170,4 +170,55 @@ public class WalletController extends BaseController{
     }
 
 
+//    @ApiOperation(value = "支付", notes = "(void)支付",response = BaseResp.class)
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+//            @ApiImplicitParam(name = "orderId", value = "订单ID",  required = true,dataType = "BigDecimal", paramType = "query"),
+//            @ApiImplicitParam(name = "type", value = "支付方式 1支付宝 2微信 3余额支付",required = true, dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "orderType", value = "订单类型 1商品下单 2开通会员 3商品压价 4商品鉴定 5全民鉴定",required = true, dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "payPwd", value = "支付密码",required = true, dataType = "String", paramType = "query")
+//    })
+//    @PostMapping(value = "/payOrder")
+//    @ResponseBody
+//    public BaseResp payOrder(WalletParam param) throws IOException {
+//        try {
+//            log.info("----》支付《----");
+//            log.info("参数："+param.toString());
+//            //验证用户
+//            if(StringUtils.isEmpty(param.getToken())){
+//                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+//            }
+//            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+//            String verifyUser = schedualUserService.verifyUserById(userId);
+//            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+//            if(jsonObject != null && (Integer)jsonObject.get("code") != 0){
+//                return toError(jsonObject.getString("report"));
+//            }
+//            if(param.getOrderId==null || param.getAmount().doubleValue()==0 ){
+//                return toError("提现金额不能为空！");
+//            }
+//            if(param.getType() == null){
+//                return toError("提现方式不能为空！");
+//            }
+//            if(param.getAmount().doubleValue() < 100){
+//                return toError("提现金额不能少于100！");
+//            }
+//            if("0".equals(param.getType()) && StringUtils.isEmpty(param.getAccount())){
+//                return toError("请输入支付宝账号！");
+//            }
+//            if("0".equals(param.getType()) && StringUtils.isEmpty(param.getRealName())){
+//                return toError("真实姓名不能为空！");
+//            }
+//            //TODO 支付
+//            walletService.withdrawDeposit(userId,param.getAmount(),param.getType(),param.getAccount(),param.getRealName(),param.getPayPwd());
+//            return toSuccess();
+//        } catch (ServiceException e) {
+//            e.printStackTrace();
+//            return toError(e.getMessage());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+//        }
+//    }
+
 }

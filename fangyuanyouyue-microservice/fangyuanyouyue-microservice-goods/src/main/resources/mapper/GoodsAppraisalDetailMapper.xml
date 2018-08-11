@@ -217,6 +217,12 @@
     select * from goods_appraisal_detail
     <where>
       user_id = #{userId}
+      <if test="status != null">
+        and status = #{status}
+      </if>
+      <if test="status == null">
+        and status <![CDATA[ <> ]]> 4
+      </if>
       <if test="orderId != null">
         and order_id = #{orderId}
       </if>
@@ -227,6 +233,19 @@
   </select>
 
   <select id="getListByStatus" parameterType="Integer" resultMap="BaseResultMap">
-    select * from goods_appraisal_detail where status <![CDATA[ <> ]]> 0 and is_show = 1 order by submit_time desc limit #{start},#{limit}
+    select * from goods_appraisal_detail where status <![CDATA[ <> ]]> 0 and status <![CDATA[ <> ]]> 4 and is_show = 1 order by submit_time desc limit #{start},#{limit}
+  </select>
+
+  <select id="getListByOrderIdStatus" parameterType="Integer" resultMap="BaseResultMap">
+    select * from goods_appraisal_detail
+    <where>
+      1=1
+      <if test="orderId != null">
+        and order_id = #{orderId}
+      </if>
+      <if test="status">
+        and status = #{status}
+      </if>
+    </where>
   </select>
 </mapper>

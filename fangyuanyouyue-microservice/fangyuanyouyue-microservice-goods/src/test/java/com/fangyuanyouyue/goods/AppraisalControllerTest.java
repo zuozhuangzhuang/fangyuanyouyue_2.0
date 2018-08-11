@@ -43,13 +43,13 @@ public class AppraisalControllerTest {
 //    @Transactional
     public void addAppraisal() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/appraisal/addAppraisal")
-//                .param("token","10041FY1533753292042")
-                .param("token","10025FY1533837647461")
-                .param("goodsIds","1,2")
+                .param("token","10041FY1533753292042")
+//                .param("token","10025FY1533837647461")
+//                .param("goodsIds","1,2")
                 //描述
-//                .param("description","我想鉴定一下，这是我家传的宝贝")
-//                .param("imgUrls","123,124,125,126")
-//                .param("videoUrl","127")
+                .param("description","我也有个大胆的想法")
+                .param("imgUrls","hhhhhhhh3")
+                .param("videoUrl","hhhhhhhh4")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

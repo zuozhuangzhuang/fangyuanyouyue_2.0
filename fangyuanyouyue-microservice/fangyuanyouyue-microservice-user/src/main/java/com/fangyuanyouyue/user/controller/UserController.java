@@ -565,7 +565,7 @@ public class UserController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "phone", value = "用户手机号", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "type", value = "验证码类型 0表示注册 1表示密码找回 2 表示支付密码相关 3验证旧手机，4绑定新手机 5店铺认证", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "验证码类型 0注册 1表找回密码 2 设置/修改支付密码 3验证旧手机，4绑定新手机 5店铺认证", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "unionId", value = "三方唯一识别号", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "thirdType", value = "类型 1微信 2QQ 3微博", dataType = "int", paramType = "query")
     })
@@ -592,6 +592,8 @@ public class UserController extends BaseController {
                 if(userInfo == null){
                     return toError(ReCode.FAILD.getValue(),"用户不存在，请注册！");
                 }
+            }else if(PhoneCodeEnum.TYPE_SET_PAY_PWD.getCode() == param.getType()){//2 设置支付密码
+
             }else if(PhoneCodeEnum.TYPE_OLD_PHONE.getCode() == param.getType()){//为3验证旧手机，给旧手机发验证码去验证
 //                if(userInfo != null){//已存在此手机号
 //                    //验证此手机是否存在其他识别号

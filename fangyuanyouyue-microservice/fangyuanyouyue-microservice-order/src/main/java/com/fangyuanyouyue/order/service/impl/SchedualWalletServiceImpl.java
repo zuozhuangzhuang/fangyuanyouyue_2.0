@@ -16,4 +16,5 @@ public class SchedualWalletServiceImpl implements SchedualWalletService{
     public String updateScore(Integer userId, Long score,Integer type) {
         return "修改积分失败！";
     }
+
 }

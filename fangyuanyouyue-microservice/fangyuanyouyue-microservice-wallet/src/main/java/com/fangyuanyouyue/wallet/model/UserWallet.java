@@ -30,4 +30,5 @@ public class UserWallet {
 
     private Date updateTime;//更新时间
 
+    private Integer appraisalCount;//免费鉴定次数
 }

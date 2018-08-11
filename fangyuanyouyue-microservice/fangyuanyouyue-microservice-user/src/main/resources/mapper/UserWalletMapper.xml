@@ -1,20 +1,22 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.fangyuanyouyue.user.dao.UserWalletMapper" >
-  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.user.model.UserWallet" >
-    <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="user_id" property="userId" jdbcType="INTEGER" />
-    <result column="balance" property="balance" jdbcType="DECIMAL" />
-    <result column="balance_frozen" property="balanceFrozen" jdbcType="DECIMAL" />
-    <result column="point" property="point" jdbcType="BIGINT" />
-    <result column="add_time" property="addTime" jdbcType="TIMESTAMP" />
-    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangyuanyouyue.user.dao.UserWalletMapper">
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.user.model.UserWallet">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="balance" jdbcType="DECIMAL" property="balance" />
+    <result column="balance_frozen" jdbcType="DECIMAL" property="balanceFrozen" />
+    <result column="point" jdbcType="BIGINT" property="point" />
+    <result column="score" jdbcType="BIGINT" property="score" />
+    <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="appraisal_count" jdbcType="INTEGER" property="appraisalCount" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, user_id, balance, balance_frozen, point, score, add_time, update_time
+    id, user_id, balance, balance_frozen, point, score, add_time, update_time, appraisal_count
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select
+    select 
     <include refid="Base_Column_List" />
     from user_wallet
     where id = #{id,jdbcType=INTEGER}
@@ -24,14 +26,14 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.fangyuanyouyue.user.model.UserWallet" useGeneratedKeys="true" keyProperty="id">
-    insert into user_wallet (id, user_id, balance,
-    balance_frozen, point, score,
-    add_time, update_time
-    )
-    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{balance,jdbcType=DECIMAL},
-    #{balanceFrozen,jdbcType=DECIMAL}, #{point,jdbcType=BIGINT}, #{score,jdbcType=BIGINT},
-    #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
-    )
+    insert into user_wallet (id, user_id, balance, 
+      balance_frozen, point, score, 
+      add_time, update_time, appraisal_count
+      )
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{balance,jdbcType=DECIMAL}, 
+      #{balanceFrozen,jdbcType=DECIMAL}, #{point,jdbcType=BIGINT}, #{score,jdbcType=BIGINT}, 
+      #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{appraisalCount,jdbcType=INTEGER}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.fangyuanyouyue.user.model.UserWallet">
     insert into user_wallet
@@ -60,6 +62,9 @@
       <if test="updateTime != null">
         update_time,
       </if>
+      <if test="appraisalCount != null">
+        appraisal_count,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -85,6 +90,9 @@
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="appraisalCount != null">
+        #{appraisalCount,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -112,6 +120,9 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="appraisalCount != null">
+        appraisal_count = #{appraisalCount,jdbcType=INTEGER},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -123,7 +134,8 @@
       point = #{point,jdbcType=BIGINT},
       score = #{score,jdbcType=BIGINT},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      appraisal_count = #{appraisalCount,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
 

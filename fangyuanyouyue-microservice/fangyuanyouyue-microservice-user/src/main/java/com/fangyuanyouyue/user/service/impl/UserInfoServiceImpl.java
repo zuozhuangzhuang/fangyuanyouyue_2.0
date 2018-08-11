@@ -154,6 +154,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         userWallet.setPoint(0L);//剩余积分
         userWallet.setScore(0L);//用户总积分
         userWallet.setAddTime(DateStampUtils.getTimesteamp());
+        userWallet.setAppraisalCount(1);//普通用户只有1次免费鉴定
         userWalletMapper.insert(userWallet);
         //初始化用户钱包
         UserDto userDto = setUserDtoByInfo(token,user);
@@ -254,6 +255,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             userWallet.setPoint(0L);
             userWallet.setScore(0L);//用户总积分
             userWallet.setAddTime(DateStampUtils.getTimesteamp());
+            userWallet.setAppraisalCount(1);//普通用户只有1次免费鉴定
             userWalletMapper.insert(userWallet);
             UserDto userDto = setUserDtoByInfo(token,user);
             return userDto;
@@ -468,6 +470,8 @@ public class UserInfoServiceImpl implements UserInfoService {
                 }else{
                     throw new ServiceException("积分错误！");
                 }
+                //免费鉴定次数
+                userDto.setAppraisalCount(userWallet.getAppraisalCount());
             }
             return userDto;
         }
@@ -550,6 +554,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             userWallet.setPoint(0L);
             userWallet.setScore(0L);//用户总积分
             userWallet.setAddTime(DateStampUtils.getTimesteamp());
+            userWallet.setAppraisalCount(1);//普通用户只有1次免费鉴定
             userWalletMapper.insert(userWallet);
             UserDto userDto = setUserDtoByInfo(token,user);
             return userDto;
