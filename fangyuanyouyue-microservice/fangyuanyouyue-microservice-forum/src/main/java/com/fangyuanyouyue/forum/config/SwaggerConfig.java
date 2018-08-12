@@ -44,7 +44,7 @@ import springfox.documentation.swagger.web.UiConfiguration;
 // @ApiModelProperty：描述一个model的属性
 // contact：name 作者 email 作者邮箱地址
 @Configuration
-public class swagger {
+public class SwaggerConfig {
 
     @Bean
     public Docket createRestApi() {

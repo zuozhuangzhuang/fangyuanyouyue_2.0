@@ -46,6 +46,8 @@ public class ForumInfoDto {
     private Long commentCount;//评论数量
     
     private Long likesCount;//点赞数量
+
+    private Long viewCount;//浏览数量
     
     public ForumInfoDto() {
     	
@@ -63,6 +65,7 @@ public class ForumInfoDto {
         this.nickName = forumInfo.getNickName();
         this.headImgUrl = forumInfo.getHeadImgUrl();
     }
+    
     public static List<ForumInfoDto> toDtoList(List<ForumInfo> list) {
         if (list == null)
             return null;

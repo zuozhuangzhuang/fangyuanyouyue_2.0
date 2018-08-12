@@ -2,7 +2,6 @@ package com.fangyuanyouyue.user.service.impl;
 
 import java.util.UUID;
 
-import com.fangyuanyouyue.base.util.VideoUtil;
 import org.apache.tomcat.jni.File;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.springframework.beans.factory.annotation.Value;

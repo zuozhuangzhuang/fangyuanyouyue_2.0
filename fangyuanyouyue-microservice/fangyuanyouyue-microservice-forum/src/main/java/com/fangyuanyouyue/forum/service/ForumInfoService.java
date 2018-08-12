@@ -27,7 +27,7 @@ public interface ForumInfoService {
 	 * @return
 	 * @throws ServiceException
 	 */
-    List<ForumInfoDto> getForumList(Integer columnId,Integer start,Integer limit) throws ServiceException;
+    List<ForumInfoDto> getForumList(Integer columnId,Integer userId, Integer type, String keyword,Integer start,Integer limit) throws ServiceException;
     
     
 }

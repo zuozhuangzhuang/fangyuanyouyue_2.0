@@ -6,7 +6,9 @@ package com.fangyuanyouyue.user.constant;
  *
  */
 public enum StatusEnum {
-	
+
+	YES(1),
+	NO(2),
 	
 	ADDRESS_DEFAULT(1),
 	ADDRESS_OTHER(2),

@@ -344,7 +344,7 @@ public class OrderController extends BaseController{
             if(param.getCompanyId()==null || param.getCompanyId().intValue()==0){
                 return toError("物流公司ID不能为空！");
             }
-            if(org.apache.commons.lang3.StringUtils.isEmpty(param.getNumber())){
+            if(StringUtils.isEmpty(param.getNumber())){
                 return toError("物流号不能为空！");
             }
             //TODO 卖家确认发货

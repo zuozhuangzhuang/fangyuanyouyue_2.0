@@ -17,10 +17,11 @@
     <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
     <result column="head_img_url" property="headImgUrl" jdbcType="VARCHAR" />
     <result column="content" property="content" jdbcType="LONGVARCHAR" />
+    <result column="is_chosen" property="isChosen" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, column_id, user_id, title, video_url, video_length, label, sort, type, status, add_time, 
-    update_time,content
+    update_time,content,is_chosen
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -38,7 +39,20 @@
     select 
     a.*,b.nick_name,b.head_img_url
     from forum_info a,user_info b
-    where a.user_id=b.id and a.column_id = #{columnId} limit #{start},#{limit}
+    where a.user_id=b.id 
+    <if test="columnId != null" >
+         and a.column_id = #{columnId} 
+    </if>
+    <if test="type != null" >
+         and a.type = #{type} 
+    </if>
+    <if test="userId != null" >
+         and a.user_id = #{userId} 
+    </if>
+    <if test="keyword != null" >
+         and a.title like #{keyword}
+    </if>
+    limit #{start},#{limit}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from forum_info
@@ -48,12 +62,13 @@
     insert into forum_info (id, user_id, title, 
       video_url, video_length, label, 
       sort, type, status, 
-      add_time, update_time, content
+      add_time, update_time, content,is_chosen
       )
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, 
       #{videoUrl,jdbcType=VARCHAR}, #{videoLength,jdbcType=INTEGER}, #{label,jdbcType=VARCHAR}, 
       #{sort,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
-      #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR}
+      #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR},
+      #{isChosen,jdbcType=INTEGER}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.fangyuanyouyue.forum.model.ForumInfo" >
@@ -95,6 +110,9 @@
       <if test="content != null" >
         content,
       </if>
+      <if test="isChosen != null" >
+        is_chosen,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -132,6 +150,9 @@
       </if>
       <if test="content != null" >
         #{content,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="isChosen != null" >
+        #{isChosen,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -171,6 +192,9 @@
       <if test="content != null" >
         content = #{content,jdbcType=LONGVARCHAR},
       </if>
+      <if test="isChosen != null" >
+        is_chosen = #{isChosen,jdbcType=INTEGER},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -186,7 +210,8 @@
       status = #{status,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      content = #{content,jdbcType=LONGVARCHAR}
+      content = #{content,jdbcType=LONGVARCHAR},
+      is_chosen = #{isChosen,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.forum.model.ForumInfo" >
@@ -200,7 +225,8 @@
       type = #{type,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      is_chosen = #{isChosen,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

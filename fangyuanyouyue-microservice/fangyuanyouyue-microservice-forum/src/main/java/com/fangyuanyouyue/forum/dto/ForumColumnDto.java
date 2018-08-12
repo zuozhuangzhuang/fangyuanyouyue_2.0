@@ -17,6 +17,10 @@ import lombok.ToString;
 public class ForumColumnDto {
 
     private Integer columnId;//帖子id
+    
+    private Integer typeId;//类型id
+    
+    private String typeName;//类型名称
 
     private String name;//专栏名称
 
@@ -33,6 +37,8 @@ public class ForumColumnDto {
         this.name = forumInfo.getName();
         this.coverImgUrl = forumInfo.getCoverImgUrl();
         this.fansCount = forumInfo.getFansCount();
+        this.typeId = forumInfo.getTypeId();
+        this.typeName = forumInfo.getTypeName();
     }
     public static List<ForumColumnDto> toDtoList(List<ForumColumn> list) {
         if (list == null)

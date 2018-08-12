@@ -5,30 +5,42 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
-import com.fangyuanyouyue.user.dao.*;
-import com.fangyuanyouyue.user.dto.UserFansDto;
-import com.fangyuanyouyue.user.dto.WaitProcessDto;
-import com.fangyuanyouyue.user.model.*;
-import com.fangyuanyouyue.user.service.SchedualOrderService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.MD5Util;
+import com.fangyuanyouyue.user.constant.StatusEnum;
+import com.fangyuanyouyue.user.dao.IdentityAuthApplyMapper;
+import com.fangyuanyouyue.user.dao.UserFansMapper;
+import com.fangyuanyouyue.user.dao.UserInfoExtMapper;
+import com.fangyuanyouyue.user.dao.UserInfoMapper;
+import com.fangyuanyouyue.user.dao.UserThirdPartyMapper;
+import com.fangyuanyouyue.user.dao.UserVipMapper;
+import com.fangyuanyouyue.user.dao.UserWalletMapper;
 import com.fangyuanyouyue.user.dto.ShopDto;
 import com.fangyuanyouyue.user.dto.UserDto;
+import com.fangyuanyouyue.user.dto.UserFansDto;
+import com.fangyuanyouyue.user.dto.WaitProcessDto;
+import com.fangyuanyouyue.user.model.UserFans;
+import com.fangyuanyouyue.user.model.UserInfo;
+import com.fangyuanyouyue.user.model.UserInfoExt;
+import com.fangyuanyouyue.user.model.UserThirdParty;
+import com.fangyuanyouyue.user.model.UserVip;
+import com.fangyuanyouyue.user.model.UserWallet;
 import com.fangyuanyouyue.user.param.UserParam;
 import com.fangyuanyouyue.user.service.SchedualGoodsService;
+import com.fangyuanyouyue.user.service.SchedualMessageService;
+import com.fangyuanyouyue.user.service.SchedualOrderService;
 import com.fangyuanyouyue.user.service.SchedualRedisService;
 import com.fangyuanyouyue.user.service.UserInfoService;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service(value = "userInfoService")
 @Transactional(rollbackFor=Exception.class)
@@ -54,6 +66,8 @@ public class UserInfoServiceImpl implements UserInfoService {
     private UserWalletMapper userWalletMapper;
     @Autowired
     private SchedualOrderService schedualOrderService;
+    @Autowired
+    private SchedualMessageService schedualMessageService;
 
     @Override
     public UserInfo getUserByToken(String token) throws ServiceException {
@@ -146,6 +160,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         userVip.setAddTime(DateStampUtils.getTimesteamp());
         userVipMapper.insert(userVip);
         //TODO 注册通讯账户
+        registIMUser(user);
         //TODO 调用钱包系统初始化接口
         UserWallet userWallet = new UserWallet();
         userWallet.setUserId(user.getId());
@@ -187,6 +202,8 @@ public class UserInfoServiceImpl implements UserInfoService {
                 //设置用户token到Redis
                 String token = setToken("",user.getId());
                 //TODO 注册通讯账户
+                registIMUser(user);
+                
                 //TODO 获取用户的相关信息：好友列表
                 UserDto userDto = setUserDtoByInfo(token,user);
                 return userDto;
@@ -247,6 +264,8 @@ public class UserInfoServiceImpl implements UserInfoService {
             userVip.setAddTime(DateStampUtils.getTimesteamp());
             userVipMapper.insert(userVip);
             //TODO 注册通讯账户
+            registIMUser(user);
+            
             //TODO 调用钱包系统初始化接口
             UserWallet userWallet = new UserWallet();
             userWallet.setUserId(user.getId());
@@ -266,6 +285,9 @@ public class UserInfoServiceImpl implements UserInfoService {
             userInfo.setLastLoginTime(DateStampUtils.getTimesteamp());
             userInfo.setLastLoginPlatform(param.getLoginPlatform());
             userInfoMapper.updateByPrimaryKey(userInfo);
+
+            registIMUser(userInfo);
+            
             String token = setToken("",userInfo.getId());
             UserDto userDto = setUserDtoByInfo(token,userInfo);
             return userDto;
@@ -307,6 +329,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 UserDto userDto = setUserDtoByInfo(token,userInfo);
                 return userDto;
             }
+
         }
     }
 
@@ -546,6 +569,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             userVip.setAddTime(DateStampUtils.getTimesteamp());
             userVipMapper.insert(userVip);
             //TODO 注册通讯账户
+            registIMUser(user);
             //TODO 调用钱包系统初始化接口
             UserWallet userWallet = new UserWallet();
             userWallet.setUserId(user.getId());
@@ -563,6 +587,9 @@ public class UserInfoServiceImpl implements UserInfoService {
             userInfo.setLastLoginPlatform(3);//最后登录平台 1安卓 2IOS 3小程序
             userInfo.setLastLoginTime(DateStampUtils.getTimesteamp());
             userInfoMapper.updateByPrimaryKey(userInfo);
+
+            registIMUser(userInfo);
+            
             String token = setToken("",userInfo.getId());
             userThirdParty.setSessionKey(session_key);
             userThirdPartyMapper.updateByPrimaryKey(userThirdParty);
@@ -713,4 +740,14 @@ public class UserInfoServiceImpl implements UserInfoService {
         waitProcessDto.setGoods(goods);
         return waitProcessDto;
     }
+
+	@Override
+	public void registIMUser(UserInfo user) throws ServiceException {
+		//判断用户是否已经注册环信
+		if(user.getIsRegHx()==null||user.getIsRegHx()==StatusEnum.NO.getCode()) {
+	        schedualMessageService.easemobRegist(user.getId().toString(), MD5Util.MD5("xiaofangyuan"+user.getId().toString()));
+			user.setIsRegHx(StatusEnum.YES.getCode());
+			userInfoMapper.updateByPrimaryKey(user);
+		}
+	}
 }

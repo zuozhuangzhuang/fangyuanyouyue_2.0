@@ -79,6 +79,10 @@
 			<groupId>com.aliyun</groupId>
 			<artifactId>aliyun-java-sdk-sms</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>com.easemob</groupId>
+            <artifactId>rest-java-sdk</artifactId>
+        </dependency>
 	</dependencies>
 
 	<build>

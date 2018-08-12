@@ -48,9 +48,9 @@ public class ForumInfoServiceImp implements ForumInfoService {
 	}
 
 	@Override
-	public List<ForumInfoDto> getForumList(Integer columnId, Integer start, Integer limit)
+	public List<ForumInfoDto> getForumList(Integer columnId,Integer userId, Integer type, String keyword, Integer start, Integer limit)
 			throws ServiceException {
-		List<ForumInfo> list = forumInfoMapper.selectList(columnId, start, limit);
+		List<ForumInfo> list = forumInfoMapper.selectList(columnId,userId,type,keyword, start, limit);
 
 		return ForumInfoDto.toDtoList(list);
 	}

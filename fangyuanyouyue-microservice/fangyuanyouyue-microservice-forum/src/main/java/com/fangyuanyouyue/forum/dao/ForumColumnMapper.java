@@ -22,5 +22,7 @@ public interface ForumColumnMapper {
     int updateByPrimaryKey(ForumColumn record);
     
     List<ForumColumn> selectPage(@Param("start")Integer start,@Param("limit")Integer limit);
+
+    List<ForumColumn> selectChosen(@Param("isChosen")Integer isChosen);
     
 }

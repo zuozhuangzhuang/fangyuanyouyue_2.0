@@ -18,6 +18,9 @@ public class ForumParam{
 	@ApiModelProperty(name = "limit", value = "限制页", dataType = "int",hidden = true)
 	private Integer limit; // 限制页
 
+    @ApiModelProperty(name = "token", value = "用户token", dataType = "String",hidden = true)
+    private String token;//用户token
+
 	@ApiModelProperty(name = "type", value = "类型", dataType = "int",hidden = true)
 	private Integer type;//类型
 
@@ -40,4 +43,9 @@ public class ForumParam{
 	@ApiModelProperty(name = "commentId", value = "评论ID", dataType = "int",hidden = true)
 	private Integer commentId;//帖子内容
 
+	@ApiModelProperty(name = "keyword", value = "关键字搜索", dataType = "String",hidden = true)
+	private String keyword;//帖子内容
+
+	@ApiModelProperty(name = "searchType", value = "搜索类型", dataType = "String",hidden = true)
+	private Integer searchType;//帖子内容
 }
