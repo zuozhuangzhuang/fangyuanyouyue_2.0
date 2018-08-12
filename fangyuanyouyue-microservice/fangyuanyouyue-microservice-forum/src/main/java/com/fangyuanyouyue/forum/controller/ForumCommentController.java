@@ -6,6 +6,8 @@ import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.forum.dto.ForumCommentDto;
 import com.fangyuanyouyue.forum.param.ForumParam;
 import com.fangyuanyouyue.forum.service.ForumCommentService;
+import com.fangyuanyouyue.forum.service.SchedualRedisService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -28,11 +30,14 @@ import java.util.List;
 public class ForumCommentController extends BaseController {
 	protected Logger log = Logger.getLogger(this.getClass());
 
+    @Autowired
+    private SchedualRedisService schedualRedisService;
 	@Autowired
 	private ForumCommentService forumCommentService;
 
-	@ApiOperation(value = "帖子评论", notes = "根据id获取论坛详情", response = BaseResp.class)
+	@ApiOperation(value = "帖子评论", notes = "根据帖子id获取评论列表", response = BaseResp.class)
 	@ApiImplicitParams({
+        @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
 			@ApiImplicitParam(name = "forumId", value = "帖子id", required = true, dataType = "int", paramType = "query"),
 			@ApiImplicitParam(name = "start", value = "起始条数", required = true, dataType = "int", paramType = "query"),
 			@ApiImplicitParam(name = "limit", value = "每页条数", required = true, dataType = "int", paramType = "query") })
@@ -61,6 +66,7 @@ public class ForumCommentController extends BaseController {
 
 	@ApiOperation(value = "添加评论", notes = "添加评论", response = BaseResp.class)
 	@ApiImplicitParams({
+        @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
 			@ApiImplicitParam(name = "forumId", value = "帖子id", required = true, dataType = "int", paramType = "query"),
 			@ApiImplicitParam(name = "content", value = "评论内容", required = true, dataType = "String", paramType = "query"),
 			@ApiImplicitParam(name = "commentId", value = "被回复的评论id", required = false, dataType = "int", paramType = "query") })
@@ -70,6 +76,17 @@ public class ForumCommentController extends BaseController {
 		try {
 			log.info("----》获取帖子评论《----");
 			log.info("参数：" + param.toString());
+
+			if (param.getToken() == null) {
+				return toError("token不能为空");
+			}
+			
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            
+            if(userId!=null) {
+            	//TODO 暂时不需要处理
+            }
+			
 			if (param.getForumId() == null) {
 				return toError("帖子ID不能为空");
 			}
@@ -77,7 +94,7 @@ public class ForumCommentController extends BaseController {
 				return toError("内容不能为空");
 			}
 
-			forumCommentService.saveComment(param.getUserId(), param.getForumId(), param.getContent(), param.getCommentId());
+			forumCommentService.saveComment(userId, param.getForumId(), param.getContent(), param.getCommentId());
 
 			return toSuccess();
 		} catch (Exception e) {

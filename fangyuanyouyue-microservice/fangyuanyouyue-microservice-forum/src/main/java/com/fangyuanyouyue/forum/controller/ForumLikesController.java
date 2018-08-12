@@ -6,6 +6,8 @@ import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.forum.dto.ForumLikesDto;
 import com.fangyuanyouyue.forum.param.ForumParam;
 import com.fangyuanyouyue.forum.service.ForumLikesService;
+import com.fangyuanyouyue.forum.service.SchedualRedisService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -28,10 +30,12 @@ import java.util.List;
 public class ForumLikesController extends BaseController {
 	protected Logger log = Logger.getLogger(this.getClass());
 
+    @Autowired
+    private SchedualRedisService schedualRedisService;
 	@Autowired
 	private ForumLikesService forumLikesService;
 
-	@ApiOperation(value = "帖子点赞", notes = "根据id获取帖子点赞列表", response = BaseResp.class)
+	@ApiOperation(value = "帖子点赞列表", notes = "根据id获取帖子点赞列表", response = BaseResp.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "forumId", value = "帖子id", required = true, dataType = "int", paramType = "query"),
 			@ApiImplicitParam(name = "start", value = "起始条数", required = true, dataType = "int", paramType = "query"),
@@ -59,17 +63,29 @@ public class ForumLikesController extends BaseController {
 		}
 	}
 
-	@ApiOperation(value = "添加点赞", notes = "添加评论", response = BaseResp.class)
+	@ApiOperation(value = "添加点赞", notes = "添加帖子点赞", response = BaseResp.class)
 	@ApiImplicitParams({
-			@ApiImplicitParam(name = "forumId", value = "帖子id", required = true, dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "content", value = "评论内容", required = true, dataType = "String", paramType = "query"),
-			@ApiImplicitParam(name = "commentId", value = "被回复的评论id", required = false, dataType = "int", paramType = "query") })
+        @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+			@ApiImplicitParam(name = "forumId", value = "帖子id", required = true, dataType = "int", paramType = "query")
+			})
 	@PostMapping(value = "/add")
 	@ResponseBody
 	public BaseResp saveComment(ForumParam param) throws IOException {
 		try {
-			log.info("----》获取帖子评论《----");
+			log.info("----》添加点赞《----");
 			log.info("参数：" + param.toString());
+
+			if (param.getToken() == null) {
+				return toError("token不能为空");
+			}
+			
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            
+            if(userId!=null) {
+            	//TODO 暂时不需要处理
+            }
+			
+            
 			if (param.getForumId() == null) {
 				return toError("帖子ID不能为空");
 			}
@@ -77,7 +93,7 @@ public class ForumLikesController extends BaseController {
 				return toError("内容不能为空");
 			}
 
-			forumLikesService.saveLikes(param.getType(),param.getUserId(), param.getForumId());
+			forumLikesService.saveLikes(param.getType(),userId, param.getForumId());
 
 			return toSuccess();
 		} catch (Exception e) {

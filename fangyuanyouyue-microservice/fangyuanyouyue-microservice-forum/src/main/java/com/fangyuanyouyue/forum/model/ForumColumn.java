@@ -23,5 +23,11 @@ public class ForumColumn {
     private Date addTime;
 
     private Date updateTime;
+    
+    private Integer typeId;
+
+    private String typeName;
+    
+    private Integer isChosen;
 
 }
