@@ -24,11 +24,12 @@
     <result column="last_login_platform" jdbcType="INTEGER" property="lastLoginPlatform" />
     <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="is_reg_hx" jdbcType="INTEGER" property="isRegHx" />
   </resultMap>
   <sql id="Base_Column_List">
     id, phone, email, address, login_pwd, nick_name, head_img_url, bg_img_url, gender, 
     signature, contact, level, level_desc, reg_type, reg_platform, status, pwd_err_count, 
-    pay_pwd_err_count, last_login_time, last_login_platform, add_time, update_time
+    pay_pwd_err_count, last_login_time, last_login_platform, add_time, update_time,is_reg_hx
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -48,7 +49,7 @@
       level_desc, reg_type, reg_platform, 
       status, pwd_err_count, pay_pwd_err_count, 
       last_login_time, last_login_platform, add_time, 
-      update_time)
+      update_time,is_reg_hx)
     values (#{id,jdbcType=INTEGER}, #{phone,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
       #{address,jdbcType=VARCHAR}, #{loginPwd,jdbcType=VARCHAR}, #{nickName,jdbcType=VARCHAR}, 
       #{headImgUrl,jdbcType=VARCHAR}, #{bgImgUrl,jdbcType=VARCHAR}, #{gender,jdbcType=INTEGER}, 
@@ -56,7 +57,7 @@
       #{levelDesc,jdbcType=VARCHAR}, #{regType,jdbcType=INTEGER}, #{regPlatform,jdbcType=INTEGER}, 
       #{status,jdbcType=INTEGER}, #{pwdErrCount,jdbcType=INTEGER}, #{payPwdErrCount,jdbcType=INTEGER}, 
       #{lastLoginTime,jdbcType=TIMESTAMP}, #{lastLoginPlatform,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP})
+      #{updateTime,jdbcType=TIMESTAMP},#{isRegHx,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.fangyuanyouyue.user.model.UserInfo">
     insert into user_info
@@ -127,6 +128,9 @@
       <if test="updateTime != null">
         update_time,
       </if>
+      <if test="isRegHx != null">
+      	is_reg_hx
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -195,6 +199,10 @@
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="isRegHx != null">
+        #{isRegHx,jdbcType=INTEGER},
+      </if>
+      
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.user.model.UserInfo">
@@ -263,6 +271,9 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="isRegHx != null">
+        is_reg_hx = #{isRegHx,jdbcType=INTEGER},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -288,7 +299,9 @@
       last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},
       last_login_platform = #{lastLoginPlatform,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      is_reg_hx = #{isRegHx,jdbcType=INTEGER}
+      
     where id = #{id,jdbcType=INTEGER}
   </update>
   <select id="getUserByNickName" parameterType="String" resultMap="BaseResultMap">

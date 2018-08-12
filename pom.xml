@@ -198,26 +198,10 @@
 				<artifactId>bcprov-jdk15on</artifactId>
 				<version>1.60</version>
 			</dependency>
-			<!--视频截取-->
 			<dependency>
-				<groupId>org.bytedeco</groupId>
-				<artifactId>javacv</artifactId>
-				<version>1.4.1</version>
-			</dependency>
-			<dependency>
-				<groupId>org.bytedeco</groupId>
-				<artifactId>javacpp</artifactId>
-				<version>1.4.1</version>
-			</dependency>
-			<dependency>
-				<groupId>org.bytedeco.javacpp-presets</groupId>
-				<artifactId>opencv-platform</artifactId>
-				<version>3.4.1-1.4.1</version>
-			</dependency>
-			<dependency>
-				<groupId>org.bytedeco.javacpp-presets</groupId>
-				<artifactId>ffmpeg-platform</artifactId>
-				<version>3.4.2-1.4.1</version>
+				<groupId>com.easemob</groupId>
+				<artifactId>rest-java-sdk</artifactId>
+				<version>1.0.5</version>
 			</dependency>
 
 		</dependencies>

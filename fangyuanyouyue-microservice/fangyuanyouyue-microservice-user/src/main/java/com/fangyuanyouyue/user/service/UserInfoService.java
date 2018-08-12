@@ -181,4 +181,10 @@ public interface UserInfoService {
      * @throws ServiceException
      */
     WaitProcessDto myWaitProcess(Integer userId) throws ServiceException;
+    
+    /**
+     * 注册通讯账号
+     */
+    void registIMUser(UserInfo user) throws ServiceException;
+    
 }
