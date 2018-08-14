@@ -31,6 +31,10 @@ public class ForumCommentDto {
 
     private String addTime;
     
+    private Integer likesCount = 0;//点赞数量
+    
+    private Integer commentCount = 0;//被回复数量
+    
     public ForumCommentDto() {
     	
     }

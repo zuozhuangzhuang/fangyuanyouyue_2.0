@@ -16,7 +16,7 @@ public interface AppraisalLikesService {
      * @return
      * @throws ServiceException
      */
-    Long countLikes(Integer id) throws ServiceException;
+    Integer countLikes(Integer id) throws ServiceException;
     
 
     

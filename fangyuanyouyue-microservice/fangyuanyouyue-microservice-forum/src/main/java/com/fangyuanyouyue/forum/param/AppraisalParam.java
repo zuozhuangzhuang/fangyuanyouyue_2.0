@@ -37,4 +37,7 @@ public class AppraisalParam{
 	@ApiModelProperty(name = "keyword", value = "关键字搜索", dataType = "String",hidden = true)
 	private String keyword;//帖子内容
 
+	@ApiModelProperty(name = "content", value = "评论内容", dataType = "String",hidden = true)
+	private String content;
+
 }

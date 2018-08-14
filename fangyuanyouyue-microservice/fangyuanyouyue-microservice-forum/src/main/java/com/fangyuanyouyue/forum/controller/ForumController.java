@@ -40,7 +40,7 @@ public class ForumController extends BaseController {
 
     @ApiOperation(value = "帖子详情", notes = "根据id获取帖子详情",response = BaseResp.class)
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+        @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "string", paramType = "query"),
         @ApiImplicitParam(name = "forumId", value = "帖子id",required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/detail")

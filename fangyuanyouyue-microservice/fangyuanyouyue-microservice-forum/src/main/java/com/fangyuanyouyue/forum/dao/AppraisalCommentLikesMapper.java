@@ -14,4 +14,6 @@ public interface AppraisalCommentLikesMapper {
     int updateByPrimaryKeySelective(AppraisalCommentLikes record);
 
     int updateByPrimaryKey(AppraisalCommentLikes record);
+    
+    int countById(Integer commentId);
 }

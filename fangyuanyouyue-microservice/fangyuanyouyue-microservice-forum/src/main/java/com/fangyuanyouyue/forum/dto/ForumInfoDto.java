@@ -28,6 +28,8 @@ public class ForumInfoDto {
     private String title;//标题
 
     private String videoUrl;//视频地址url
+    
+    private String coverImgUrl;//视频封面图片
 
     private Integer videoLength;//视频长度，单位秒
 

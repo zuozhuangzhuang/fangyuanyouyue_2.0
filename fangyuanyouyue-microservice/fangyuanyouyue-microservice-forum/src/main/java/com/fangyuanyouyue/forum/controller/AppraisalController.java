@@ -15,12 +15,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.forum.dto.AppraisalCommentDto;
 import com.fangyuanyouyue.forum.dto.AppraisalDetailDto;
 import com.fangyuanyouyue.forum.param.AppraisalParam;
-import com.fangyuanyouyue.forum.param.ForumParam;
 import com.fangyuanyouyue.forum.service.AppraisalCommentLikesService;
 import com.fangyuanyouyue.forum.service.AppraisalCommentService;
 import com.fangyuanyouyue.forum.service.AppraisalDetailService;
+import com.fangyuanyouyue.forum.service.AppraisalLikesService;
 import com.fangyuanyouyue.forum.service.SchedualRedisService;
 
 import io.swagger.annotations.Api;
@@ -41,13 +42,15 @@ public class AppraisalController extends BaseController {
     private AppraisalCommentService appraisalCommentService;
     @Autowired
     private AppraisalCommentLikesService appraisalCommentLikesService;
+    @Autowired
+    private AppraisalLikesService appraisalLikesService;
     
     @Autowired
     private SchedualRedisService schedualRedisService;
 
     @ApiOperation(value = "全民鉴定详情", notes = "根据id获取全民鉴定详情",response = BaseResp.class)
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+        @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "string", paramType = "query"),
         @ApiImplicitParam(name = "forumId", value = "帖子id",required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/detail")
@@ -86,14 +89,14 @@ public class AppraisalController extends BaseController {
 
     @ApiOperation(value = "全民鉴定列表", notes = "获取全民鉴定列表大集合",response = BaseResp.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "用户id",required = false, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "keyword", value = "搜索关键字",required = false, dataType = "string", paramType = "query"),
+		@ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "keyword", value = "关键字",required = true, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/list")
     @ResponseBody
-    public BaseResp forumList(ForumParam param) throws IOException {
+    public BaseResp forumList(AppraisalParam param) throws IOException {
         try {
             log.info("----》获取全民鉴定列表《----");
             log.info("参数：" + param.toString());
@@ -104,6 +107,114 @@ public class AppraisalController extends BaseController {
             List<AppraisalDetailDto> dto = appraisalDetailService.getAppraisalList(param.getStart(), param.getLimit());
             
             return toSuccess(dto);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
+    
+
+    @ApiOperation(value = "全民鉴定评论列表", notes = "获取全民鉴定评论列表",response = BaseResp.class)
+    @ApiImplicitParams({ 
+    		@ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "appraisalId", value = "鉴定id",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/comment/list")
+    @ResponseBody
+    public BaseResp commentList(AppraisalParam param) throws IOException {
+        try {
+            log.info("----》获取全民鉴定评论列表《----");
+            log.info("参数：" + param.toString());
+
+            if(param.getAppraisalId()==null) {
+            	return toError("鉴定ID不能为空");
+            }
+            
+            if(param.getStart()==null||param.getLimit()==null) {
+            	return toError("分页参数不能为空");
+            }
+            
+            List<AppraisalCommentDto> dto = appraisalCommentService.getAppraisalCommentList(param.getAppraisalId(), param.getStart(), param.getLimit());
+            
+            return toSuccess(dto);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
+
+
+    @ApiOperation(value = "全民鉴定点赞", notes = "对全民鉴定点赞",response = BaseResp.class)
+    @ApiImplicitParams({ 
+    		@ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "appraisalId", value = "评论id",required = true, dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/likes")
+    @ResponseBody
+    public BaseResp likes(AppraisalParam param) throws IOException {
+        try {
+            log.info("----》对全民鉴定点赞《----");
+            log.info("参数：" + param.toString());
+
+			if (param.getToken() == null) {
+				return toError("token不能为空");
+			}
+			
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            
+            if(userId!=null) {
+            	//TODO 暂时不需要处理
+            }
+			
+            if(param.getAppraisalId()==null) {
+            	return toError("鉴定ID不能为空");
+            }
+            
+            appraisalLikesService.saveLikes(userId, param.getAppraisalId());
+            
+            return toSuccess();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
+
+
+
+    @ApiOperation(value = "全民鉴定评论点赞", notes = "对全民鉴定评论点赞",response = BaseResp.class)
+    @ApiImplicitParams({ 
+    		@ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "commentId", value = "评论id",required = true, dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/comment/likes")
+    @ResponseBody
+    public BaseResp commentLikes(AppraisalParam param) throws IOException {
+        try {
+            log.info("----》对全民鉴定评论点赞《----");
+            log.info("参数：" + param.toString());
+
+			if (param.getToken() == null) {
+				return toError("token不能为空");
+			}
+			
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            
+            if(userId!=null) {
+            	//TODO 暂时不需要处理
+            }
+			
+            if(param.getAppraisalId()==null) {
+            	return toError("鉴定ID不能为空");
+            }
+            
+            appraisalCommentLikesService.saveLikes(userId, param.getCommentId());
+            
+            return toSuccess();
         } catch (Exception e) {
             e.printStackTrace();
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");

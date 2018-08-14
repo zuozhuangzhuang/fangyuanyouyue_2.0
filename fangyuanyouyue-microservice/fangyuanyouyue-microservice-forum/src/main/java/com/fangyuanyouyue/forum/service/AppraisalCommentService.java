@@ -20,7 +20,7 @@ public interface AppraisalCommentService {
      * @return
      * @throws ServiceException
      */
-    Long countComment(Integer id) throws ServiceException;
+    Integer countComment(Integer id) throws ServiceException;
     
     /**
      * 获取全民鉴定的评论
@@ -36,6 +36,6 @@ public interface AppraisalCommentService {
      * 保存评论
      * @param param
      */
-    void saveComment(AppraisalParam param);
+    void saveComment(Integer userId,AppraisalParam param);
 
 }

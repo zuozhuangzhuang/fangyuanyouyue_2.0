@@ -16,7 +16,7 @@ public interface AppraisalCommentLikesService {
      * @return
      * @throws ServiceException
      */
-    Long countCommentLikes(Integer commentId) throws ServiceException;
+    Integer countCommentLikes(Integer commentId) throws ServiceException;
     
     /**
      * 保存点赞
