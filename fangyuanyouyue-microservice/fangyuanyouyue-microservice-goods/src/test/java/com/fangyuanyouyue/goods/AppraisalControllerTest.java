@@ -50,6 +50,7 @@ public class AppraisalControllerTest {
                 .param("description","我也有个大胆的想法")
                 .param("imgUrls","hhhhhhhh3")
                 .param("videoUrl","hhhhhhhh4")
+                .param("videoImg","hhhhhhhh5")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -80,7 +81,7 @@ public class AppraisalControllerTest {
         mvc.perform(MockMvcRequestBuilders.post("/appraisal/getAppraisal")
                 .param("token","10041FY1533753292042")
                 .param("start","0")
-                .param("limit","10")
+                .param("limit","20")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -110,7 +111,7 @@ public class AppraisalControllerTest {
     public void payAppraisal() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/appraisal/payAppraisal")
                 .param("token","10041FY1533753292042")
-                .param("orderId","26")
+                .param("orderId","62")
                 .param("payPwd","e10adc3949ba59abbe56e057f20f883e")
                 //支付方式 1支付宝 2微信 3余额支付
                 .param("type","3")

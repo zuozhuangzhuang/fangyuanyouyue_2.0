@@ -41,13 +41,15 @@ public class UserVipControllerTest {
      */
     @Test
 //    @Transactional
-    public void openMebber() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/userVip/openMebber")
-                .param("token","10025FY1533837647461")
+    public void updateMebber() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/userVip/updateMebber")
+                .param("token","10041FY1533753292042")
                 //会员等级 1铂金会员 2至尊会员
                 .param("vipLevel","2")
                 //会员类型 1一个月 2三个月 3一年会员
                 .param("vipType","3")
+                //类型 1开通 2续费
+                .param("type","2")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

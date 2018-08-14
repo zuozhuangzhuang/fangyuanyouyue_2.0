@@ -19,10 +19,11 @@ public interface AppraisalService {
      * @param description
      * @param imgUrls
      * @param videoUrl
+     * @param videoImg
      * @return
      * @throws ServiceException
      */
-    AppraisalOrderInfoDto addAppraisal(Integer userId, Integer[] goodsIds, String title, String description, String[] imgUrls, String videoUrl) throws ServiceException;
+    AppraisalOrderInfoDto addAppraisal(Integer userId, Integer[] goodsIds, String title, String description, String[] imgUrls, String videoUrl,String videoImg) throws ServiceException;
 
     /**
      * 取消鉴定，删除鉴定订单

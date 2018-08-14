@@ -70,4 +70,13 @@ public interface WalletService {
      * @throws ServiceException
      */
     void updateAppraisalCount(Integer userId,Integer count) throws ServiceException;
+
+    /**
+     * 修改信誉度
+     * @param userId
+     * @param credit
+     * @param type 1增加 2减少
+     * @throws ServiceException
+     */
+    void updateCredit(Integer userId,Long credit,Integer type) throws ServiceException;
 }

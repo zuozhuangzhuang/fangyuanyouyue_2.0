@@ -21,16 +21,17 @@ public class UserVip {
 
     private Date endTime;//会员过期时间
 
-    private Integer vipLevel;//会员等级
+    private Integer vipLevel;//会员等级 1铂金会员 2至尊会员
 
     private String levelDesc;//会员等级描述
 
-    private Integer vipType;//会员类型 1体验会员 2月会员 3年会员
+    private Integer vipType;//会员类型 1一个月 2三个月 3一年会员
 
-    private Integer status;//会员状态1已开通 2未开通
+    private Integer status;//会员状态 1已开通 2未开通
 
     private Date addTime;//添加时间
 
     private Date updateTime;//更新时间
 
+    private String vipNo;//会员号
 }

@@ -41,6 +41,8 @@ public class OrderServiceImpl implements OrderService{
     private OrderRefundMapper orderRefundMapper;
     @Autowired
     private CompanyMapper companyMapper;
+    @Autowired
+    private OrderCommentMapper orderCommentMapper;
 
     @Override
     public OrderDto saveOrderByCart(String token,String sellerString, Integer userId, Integer addressId) throws ServiceException {
@@ -299,7 +301,7 @@ public class OrderServiceImpl implements OrderService{
                 throw new ServiceException("订单状态异常！");
             }
             //更改总订单状态
-            orderInfo.setStatus(5);//状态 1待支付 2待发货 3待收货 4已完成 5已取消  7已申请退货
+            orderInfo.setStatus(5);//状态 1待支付 2待发货 3待收货 4已完成 5已取消
             orderPay.setStatus(5);
             orderInfoMapper.updateByPrimaryKey(orderInfo);
             orderPayMapper.updateByPrimaryKey(orderPay);
@@ -366,6 +368,12 @@ public class OrderServiceImpl implements OrderService{
             //处理卖家信息
             List<SellerDto> sellerDtos = getSellerDtos(orderDetailDtos);
             orderDto.setSellerDtos(sellerDtos);
+            if(orderInfo.getIsRefund() == 1){
+                //退货状态
+                OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderInfo.getId(), null);
+                orderDto.setReturnStatus(orderRefund.getStatus());
+                orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
+            }
             return orderDto;
         }else{
             throw new ServiceException("订单异常！");
@@ -416,6 +424,12 @@ public class OrderServiceImpl implements OrderService{
                 orderDto.setSellerDtos(sellerDtos);
                 orderDto.setOrderDetailDtos(orderDetailDtos);
                 orderDto.setNickName(user.getNickName());
+                if(orderDto.getIsRefund() == 1){
+                    //退货状态
+                    OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null);
+                    orderDto.setReturnStatus(orderRefund.getStatus());
+                    orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
+                }
             }
         }else if(type == 2){//我卖出的
             //卖家
@@ -440,6 +454,12 @@ public class OrderServiceImpl implements OrderService{
                 orderDto.setSellerDtos(sellerDtos);
                 orderDto.setOrderDetailDtos(orderDetailDtos);
                 orderDto.setNickName(user.getNickName());
+                if(orderDto.getIsRefund() == 1){
+                    //退货状态
+                    OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null);
+                    orderDto.setReturnStatus(orderRefund.getStatus());
+                    orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
+                }
             }
         }else{
             throw new ServiceException("类型异常！");
@@ -579,7 +599,7 @@ public class OrderServiceImpl implements OrderService{
                 }else{
                     throw new ServiceException("支付类型错误！");
                 }
-                //TODO 拆单
+                //拆单
                 if(orderInfo.getSellerId() == null){//订单为合并主订单，进行拆单
                     orderInfo.setIsResolve(1);//是否拆单 1是 2否
                     //获取子订单
@@ -625,7 +645,7 @@ public class OrderServiceImpl implements OrderService{
         }else{
             //状态 2待发货  7已申请退货
             List<OrderInfo> list1 = orderInfoMapper.getListByUserIdStatus(userId, null, null, 2);
-            List<OrderInfo> list2 = orderInfoMapper.getListByUserIdStatus(userId, null, null, 7);
+            List<OrderInfo> list2 = orderInfoMapper.getRefundOrder(userId, null, null, 2);
             for(OrderInfo orderInfo:list2){
                 //状态 1申请退货 2退货成功 3拒绝退货
                 OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderInfo.getId(), 1);
@@ -686,7 +706,7 @@ public class OrderServiceImpl implements OrderService{
                 orderInfoMapper.updateByPrimaryKey(orderInfo);
                 //卖家增加余额
                 schedualWalletService.updateBalance(orderInfo.getSellerId(),orderPay.getPayAmount(),1);
-                //TODO 卖家成交增加积分
+                //卖家成交增加积分
                 if(orderPay.getPayAmount().compareTo(new BigDecimal(2000)) <= 0){//2000以内+20分
                     schedualWalletService.updateScore(orderInfo.getSellerId(),20L,1);
                 }else{//2000以上+50分
@@ -700,5 +720,72 @@ public class OrderServiceImpl implements OrderService{
     public List<CompanyDto> companyList() throws ServiceException{
         List<Company> list = companyMapper.getList();
         return CompanyDto.toDtoList(list);
+    }
+
+
+    @Override
+    public void deleteOrder(Integer userId, Integer[] orderIds) throws ServiceException {
+        for(Integer orderId:orderIds){
+            OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderId);
+            if (orderInfo == null) {
+                throw new ServiceException("订单不存在！");
+            } else {
+                //状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除
+                if(orderInfo.getStatus().intValue() == 4 || orderInfo.getStatus().intValue() == 5){
+                    OrderPay orderPay = orderPayMapper.selectByOrderId(orderId);
+                    orderPay.setStatus(6);
+                    orderPayMapper.updateByPrimaryKey(orderPay);
+                    orderInfo.setStatus(6);
+                    orderInfoMapper.updateByPrimaryKey(orderInfo);
+                }else{
+                    throw new ServiceException("存在未完成订单，删除失败！");
+                }
+            }
+        }
+    }
+
+    @Override
+    public void evaluationOrder(Integer userId, Integer orderId, Integer goodsQuality, Integer serviceAttitude) throws ServiceException {
+        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderId);
+        if (orderInfo == null) {
+            throw new ServiceException("订单不存在！");
+        } else {
+            if(orderInfo.getUserId().intValue() != userId.intValue()){
+                throw new ServiceException("没有权限评论！");
+            }
+            //状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除
+            if (orderInfo.getStatus().intValue() == 4) {
+                OrderComment orderComment = orderCommentMapper.selectByOrder(orderId);
+                if(orderComment != null){
+                    throw new ServiceException("订单已评价");
+                }else{
+                    orderComment = new OrderComment();
+                    orderComment.setOrderId(orderId);
+                    orderComment.setGoodsQuality(goodsQuality);
+                    orderComment.setServiceAttitude(serviceAttitude);
+                    //根据分值判断status
+                    int start = goodsQuality+serviceAttitude;
+                    if(start<=3){
+                        //-300信誉度
+                        orderComment.setStatus(3);
+                        schedualWalletService.updateCredit(orderInfo.getSellerId(),300L,2);
+                    }else if(3 < start && start <= 6){
+                        //+300信誉度
+                        orderComment.setStatus(2);
+                        schedualWalletService.updateCredit(orderInfo.getSellerId(),300L,1);
+                    }else if(6 <= start && start <= 10){
+                        //+500信誉度
+                        orderComment.setStatus(1);
+                        schedualWalletService.updateCredit(orderInfo.getSellerId(),500L,1);
+                    }else{
+                        throw new ServiceException("分值错误！");
+                    }
+                    orderComment.setAddTime(DateStampUtils.getTimesteamp());
+                    orderCommentMapper.insert(orderComment);
+                }
+            }else{
+                throw new ServiceException("订单当前状态无法评价！");
+            }
+        }
     }
 }

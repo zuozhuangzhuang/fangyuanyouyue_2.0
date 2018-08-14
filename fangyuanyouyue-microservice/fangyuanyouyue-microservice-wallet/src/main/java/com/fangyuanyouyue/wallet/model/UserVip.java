@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.Date;
+
 /**
  * 用户会员信息表
  */
@@ -31,4 +32,6 @@ public class UserVip {
     private Date addTime;//添加时间
 
     private Date updateTime;//更新时间
+
+    private String vipNo;//会员号
 }

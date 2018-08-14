@@ -28,12 +28,12 @@ public class OrderDto {
 
     private BigDecimal totalAmount;//订单总额
 
-    private Integer status;//状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除 7已申请退货
+    private Integer status;//状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除
 
     //order_refund
     private Integer returnStatus;//退货状态 1申请退货 2退货成功 3拒绝退货
 
-    private String sellerReturnStatus;//卖家是否同意退货状态 null正常  1申请退货 2卖家直接同意退货 3卖家直接拒绝退货 4卖家48h不处理默认同意退货 5卖家72h小时不处理默认不同意退货
+    private Integer sellerReturnStatus;//卖家是否同意退货状态 null正常  1申请退货 2卖家直接同意退货 3卖家直接拒绝退货 4卖家48h不处理默认同意退货 5卖家72h小时不处理默认不同意退货
 
     //商品信息
     private List<OrderDetailDto> orderDetailDtos;//订单商品列表
@@ -45,6 +45,9 @@ public class OrderDto {
     //卖家信息
     private List<SellerDto> sellerDtos;//卖家列表
 
+
+    private Integer isRefund;//是否退货 1是 2否
+
     public OrderDto() {
     }
 
@@ -55,6 +58,7 @@ public class OrderDto {
         this.totalAmount = orderInfo.getAmount();
         this.status = orderInfo.getStatus();
         this.addTime = DateUtil.getFormatDate(orderInfo.getAddTime(), DateUtil.DATE_FORMT);
+        this.isRefund = orderInfo.getIsRefund();
     }
 
     public static ArrayList<OrderDto> toDtoList(List<OrderInfo> list) {

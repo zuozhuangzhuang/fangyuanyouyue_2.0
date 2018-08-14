@@ -27,7 +27,7 @@ public interface GoodsInfoMapper {
 
 
     /**
-     *分页获取商品/抢购列表
+     * 分页获取商品/抢购列表
      * @param userId
      * @param status
      * @param search
@@ -38,9 +38,9 @@ public interface GoodsInfoMapper {
      * @param start
      * @param limit
      * @param type
+     * @param goodsCategoryIds
      * @return
      */
-
     List<GoodsInfo> getGoodsList(@Param("userId") Integer userId, @Param("status") Integer status, @Param("search") String search,
                                  @Param("priceMin") BigDecimal priceMin, @Param("priceMax") BigDecimal priceMax,
                                  @Param("synthesize")Integer synthesize, @Param("quality")Integer quality,
@@ -52,7 +52,7 @@ public interface GoodsInfoMapper {
      * @param goodsIds
      * @return
      */
-    List<GoodsInfo> getGoodsByGoodsIds(@Param("goodsIds") Set<Integer> goodsIds, int pageNum, int pageSize);
+//    List<GoodsInfo> getGoodsByGoodsIds(@Param("goodsIds") Set<Integer> goodsIds, int pageNum, int pageSize);
 
     /**
      * 根据当前时间获取需要降价的抢购列表
@@ -66,6 +66,9 @@ public interface GoodsInfoMapper {
      * @param userId
      * @param collectType
      * @param type
+     * @param goodsId
+     * @param start
+     * @param limit
      * @return
      */
     List<GoodsInfo> selectMyCollectGoods(@Param("userId")Integer userId,@Param("collectType")Integer collectType,@Param("type")Integer type,@Param("goodsId")Integer goodsId,@Param("start")Integer start,@Param("limit")Integer limit);
@@ -73,6 +76,8 @@ public interface GoodsInfoMapper {
     /**
      * 根据商品所属分类列表获取商品列表
      * @param goodsCategoryIds
+     * @param start
+     * @param limit
      * @return
      */
     List<GoodsInfo> selectByCategoryIds(@Param("goodsCategoryIds")List<Integer> goodsCategoryIds,@Param("start")Integer start,@Param("limit")Integer limit);
@@ -101,6 +106,8 @@ public interface GoodsInfoMapper {
     /**
      * 根据用户ID获取商品列表
      * @param userId
+     * @param start
+     * @param limit
      * @return
      */
     List<GoodsInfo> selectGoodsByUserId(@Param("userId")Integer userId,@Param("start")Integer start,@Param("limit")Integer limit);

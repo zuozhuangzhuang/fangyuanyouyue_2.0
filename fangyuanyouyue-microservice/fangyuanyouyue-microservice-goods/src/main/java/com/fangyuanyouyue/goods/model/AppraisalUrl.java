@@ -19,7 +19,7 @@ public class AppraisalUrl {
 
     private String url;//图片/视频地址
 
-    private Integer type;//类型 1图片 2视频
+    private Integer type;//类型 1图片 2视频 3视频截图
 
     private Date addTime;//添加时间
 }

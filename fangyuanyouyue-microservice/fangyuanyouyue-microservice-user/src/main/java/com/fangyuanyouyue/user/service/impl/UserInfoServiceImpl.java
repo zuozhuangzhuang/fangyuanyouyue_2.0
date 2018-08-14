@@ -161,7 +161,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         userVipMapper.insert(userVip);
         //TODO 注册通讯账户
         registIMUser(user);
-        //TODO 调用钱包系统初始化接口
+        //调用钱包系统初始化接口
         UserWallet userWallet = new UserWallet();
         userWallet.setUserId(user.getId());
         userWallet.setBalance(new BigDecimal(0));
@@ -266,7 +266,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             //TODO 注册通讯账户
             registIMUser(user);
             
-            //TODO 调用钱包系统初始化接口
+            //调用钱包系统初始化接口
             UserWallet userWallet = new UserWallet();
             userWallet.setUserId(user.getId());
             userWallet.setBalance(new BigDecimal(0));
@@ -321,6 +321,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                     }
                 }
             }else{
+                userThirdParty = new UserThirdParty();
                 userThirdParty.setUserId(userInfo.getId());
                 userThirdParty.setType(type);
                 userThirdParty.setUnionId(unionId);
@@ -466,7 +467,6 @@ public class UserInfoServiceImpl implements UserInfoService {
             UserVip userVip = userVipMapper.getUserVipByUserId(user.getId());
 //            IdentityAuthApply identityAuthApply = identityAuthApplyMapper.selectByUserId(user.getId());
             UserDto userDto = new UserDto(token,user,userVip,userInfoExt);
-            //TODO 单独请求用户等级，还是返回到UserDto中
             UserWallet userWallet = userWalletMapper.selectByUserId(user.getId());
             if(userWallet == null){
                 throw new ServiceException("获取钱包失败！");
@@ -570,7 +570,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             userVipMapper.insert(userVip);
             //TODO 注册通讯账户
             registIMUser(user);
-            //TODO 调用钱包系统初始化接口
+            //调用钱包系统初始化接口
             UserWallet userWallet = new UserWallet();
             userWallet.setUserId(user.getId());
             userWallet.setBalance(new BigDecimal(0));

@@ -343,6 +343,7 @@
   <select id="getGoodsByGoodsIds" parameterType="Integer" resultMap="BaseResultMap">
     select * from goods_info
     <where>
+      status <![CDATA[ <> ]]> 5
       <foreach close=")" collection="goodsIds" item="id" open=" and id in(" separator=",">
         #{id,jdbcType=INTEGER}
       </foreach>
@@ -355,7 +356,7 @@
   <select id="selectMyCollectGoods" parameterType="Integer" resultMap="BaseResultMap">
     select a.* from goods_info a left join collect b on a.id=b.collect_id
     <where>
-      1=1
+      a.status <![CDATA[ <> ]]> 5
       <if test="collectType != null">
         and a.type = #{collectType,jdbcType=INTEGER}
       </if>
@@ -387,13 +388,13 @@
     <!--select b.auth_type from goods_info a,user_info_ext b where a.user_id=b.user_id and a.id = #{goodsId}-->
   <!--</select>-->
   <select id="getGoodsUserInfoExtAndVip" parameterType="Integer" resultType="Map">
-    select * from user_info_ext a,goods_info b,user_vip c where a.user_id = b.user_id and a.user_id = c.user_id and b.id = #{goodsId}
+    select * from user_info_ext a,goods_info b,user_vip c where a.user_id = b.user_id and a.user_id = c.user_id and b.id = #{goodsId} and b.status <![CDATA[ <> ]]> 5
   </select>
   <select id="getGoodsUserFansCount" parameterType="Integer" resultType="Integer">
-    select count(*) from user_fans where to_user_id = (select user_id from goods_info where goods_info.id = #{goodsId})
+    select count(*) from user_fans where to_user_id = (select user_id from goods_info where goods_info.id = #{goodsId} and status <![CDATA[ <> ]]> 5)
   </select>
   <select id="getGoodsUserCollectCount" parameterType="Integer" resultType="Integer">
-    select count(*) from user_fans where user_id = (select user_id from goods_info where goods_info.id = #{goodsId})
+    select count(*) from user_fans where user_id = (select user_id from goods_info where goods_info.id = #{goodsId} and status <![CDATA[ <> ]]> 5)
   </select>
   <select id="selectGoodsByUserId" parameterType="Integer" resultMap="BaseResultMap">
     select * from goods_info where user_id = #{userId} and status <![CDATA[ <> ]]> 5 order by update_time desc limit #{start},#{limit}

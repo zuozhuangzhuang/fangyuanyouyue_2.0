@@ -19,7 +19,7 @@ public class GoodsImg {
 
     private String imgUrl;//图片地址
 
-    private Integer type;//类型 1主图（展示在第一张的图片） 2次图
+    private Integer type;//类型 1主图（展示在第一张的图片） 2次图 3视频截图
 
     private Integer sort;//排序
 

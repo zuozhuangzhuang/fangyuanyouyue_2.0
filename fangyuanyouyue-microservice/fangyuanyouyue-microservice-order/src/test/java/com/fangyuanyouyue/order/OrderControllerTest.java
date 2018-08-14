@@ -189,4 +189,36 @@ public class OrderControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
+
+    /**
+     * 删除订单
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void deleteOrder() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/order/deleteOrder")
+                .param("token","10042FY1533767510392")
+                .param("orderIds","919")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 评价卖家
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void evaluationOrder() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/order/evaluationOrder")
+                .param("token","10042FY1533767510392")
+                .param("orderId","919")
+                .param("goodsQuality","3")
+                .param("serviceAttitude","2")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
 }

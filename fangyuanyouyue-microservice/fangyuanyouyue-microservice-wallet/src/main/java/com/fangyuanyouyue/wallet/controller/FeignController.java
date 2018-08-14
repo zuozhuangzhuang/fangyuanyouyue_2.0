@@ -87,6 +87,33 @@ public class FeignController extends BaseController{
         }
     }
 
+    @PostMapping(value = "/updateCredit")
+    @ResponseBody
+    public BaseResp updateCredit(WalletParam param) throws IOException {
+        try {
+            log.info("----》修改信誉度《----");
+            log.info("参数："+param.toString());
+            if(param.getUserId() == null){
+                return toError("用户ID不能为空！");
+            }
+            if(param.getCredit() == null){
+                return toError("修改信誉度数值错误！");
+            }
+            if(param.getType() == null){
+                return toError("类型错误！");
+            }
+            //修改信誉度
+            walletService.updateCredit(param.getUserId(),param.getCredit(),param.getType());
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
 
     @GetMapping(value = "/getAppraisalCount")
     @ResponseBody

@@ -59,4 +59,19 @@ public class OrderParam{
 
     @ApiModelProperty(name = "payType", value = "支付类型 1微信 2支付宝 3余额", dataType = "int",hidden = true)
     private Integer payType;//支付类型 1微信 2支付宝 3余额
+
+    @ApiModelProperty(name = "orderIds", value = "订单id数组", dataType = "int",hidden = true)
+    private Integer[] orderIds;//订单id数组
+
+    @ApiModelProperty(name = "goodsQuality", value = "商品质量 1一颗星 2~3~4~5~", dataType = "int",hidden = true)
+    private Integer goodsQuality;//商品质量 1一颗星 2~3~4~5~
+
+    @ApiModelProperty(name = "serviceAttitude", value = "服务质量 1一颗星 2~3~4~5~", dataType = "int",hidden = true)
+    private Integer serviceAttitude;//服务质量 1一颗星 2~3~4~5~
+
+    @ApiModelProperty(name = "reason", value = "退货理由", dataType = "String",hidden = true)
+    private String reason;//退货理由
+
+    @ApiModelProperty(name = "imgUrls", value = "图片路径数组", dataType = "String",hidden = true)
+    private String[] imgUrls;//图片路径数组
 }

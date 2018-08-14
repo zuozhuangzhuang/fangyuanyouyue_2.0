@@ -1,10 +1,8 @@
-package com.fangyuanyouyue.order.dao;
+package com.fangyuanyouyue.goods.dao;
 
-import com.fangyuanyouyue.order.model.OrderRefund;
+import com.fangyuanyouyue.goods.model.OrderRefund;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
 
 @Mapper
 public interface OrderRefundMapper {
@@ -21,10 +19,10 @@ public interface OrderRefundMapper {
     int updateByPrimaryKey(OrderRefund record);
 
     /**
-     * 根据订单ID和状态获取退货信息
+     * 获取退货详情
      * @param orderId
-     * @param status
      * @return
      */
-    OrderRefund selectByOrderIdStatus(@Param("orderId")Integer orderId, @Param("status")Integer status);
+    OrderRefund selectByUserIdOrderId(@Param("orderId")Integer orderId);
+
 }

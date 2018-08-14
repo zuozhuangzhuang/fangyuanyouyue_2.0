@@ -65,7 +65,7 @@ public class WalletController extends BaseController{
             if(param.getAmount()==null){
                 return toError("充值金额不能为空！");
             }
-            if(param.getPrice().compareTo(new BigDecimal(0)) < 0){
+            if(param.getAmount().compareTo(new BigDecimal(0)) < 0){
                 return toError("充值金额错误！");
             }
             if(param.getType() == null){

@@ -35,7 +35,7 @@ public class WalletServiceImpl implements WalletService{
     private UserVipMapper userVipMapper;
     @Autowired
     private UserRechargeDetailMapper userRechargeDetailMapper;
-   @Autowired
+    @Autowired
     private UserBalanceDetailMapper userBalanceDetailMapper;
 
     @Override
@@ -209,6 +209,21 @@ public class WalletServiceImpl implements WalletService{
                 userWallet.setAppraisalCount(userWallet.getAppraisalCount()-count);
                 userWalletMapper.updateByPrimaryKey(userWallet);
             }
+        }
+    }
+
+    @Override
+    public void updateCredit(Integer userId, Long credit, Integer type) throws ServiceException {
+        UserInfoExt userInfoExt = userInfoExtMapper.selectUserInfoExtByUserId(userId);
+        if (userInfoExt == null) {
+            throw new ServiceException("获取用户扩展信息失败！");
+        } else {
+            if(type == 1){//增加
+                userInfoExt.setCredit(userInfoExt.getCredit()+credit);
+            }else{
+                userInfoExt.setCredit(userInfoExt.getCredit()-credit);
+            }
+            userInfoExtMapper.updateByPrimaryKey(userInfoExt);
         }
     }
 }

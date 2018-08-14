@@ -1,9 +1,8 @@
-package com.fangyuanyouyue.order.model;
+package com.fangyuanyouyue.goods.model;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 /**
@@ -14,8 +13,6 @@ import java.util.Date;
 @ToString
 public class OrderRefund {
     private Integer id;//唯一自增ID
-
-    private Integer userId;//退货申请用户id
 
     private Integer orderId;//订单id
 
@@ -41,7 +38,5 @@ public class OrderRefund {
 
     private Date updateTime;//更新时间
 
-    private Integer sellerReturnStatus;//卖家是否同意退货状态 null正常  1申请退货 2卖家直接同意退货 3卖家直接拒绝退货 4卖家48h不处理默认同意退货 5卖家72h小时不处理默认不同意退货
-
-    private String refuseReason;//拒绝退货理由
+    private Integer sellerreturnstatus;//卖家是否同意退货状态 null正常  1申请退货 2卖家直接同意退货 3卖家直接拒绝退货 4卖家48h不处理默认同意退货 5卖家72h小时不处理默认不同意退货
 }

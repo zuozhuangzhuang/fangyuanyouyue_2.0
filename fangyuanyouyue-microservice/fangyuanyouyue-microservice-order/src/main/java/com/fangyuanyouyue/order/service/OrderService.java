@@ -103,4 +103,23 @@ public interface OrderService {
      * @throws ServiceException
      */
     List<CompanyDto> companyList() throws ServiceException;
+
+
+    /**
+     * 批量删除订单
+     * @param userId
+     * @param orderIds
+     * @throws ServiceException
+     */
+    void deleteOrder(Integer userId,Integer[] orderIds) throws ServiceException;
+
+    /**
+     * 评价卖家
+     * @param userId
+     * @param orderId
+     * @param goodsQuality
+     * @param serviceAttitude
+     * @throws ServiceException
+     */
+    void evaluationOrder(Integer userId,Integer orderId,Integer goodsQuality,Integer serviceAttitude) throws ServiceException;
 }

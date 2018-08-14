@@ -1,4 +1,4 @@
-package com.fangyuanyouyue.goods;
+package com.fangyuanyouyue.order;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,12 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = GoodsServiceApplication.class)
+@SpringBootTest(classes = OrderServiceApplication.class)
 @WebAppConfiguration
 @ContextConfiguration
 @Rollback
-public class BargainControllerTest {
-
+public class RefundControllerTest {
     @Autowired
     private WebApplicationContext context;
 
@@ -38,71 +37,58 @@ public class BargainControllerTest {
 
 
     /**
-     * 商品压价申请
+     * 退货申请
      * @throws Exception
      */
     @Test
 //    @Transactional
-    public void addBargain() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/bargain/addBargain")
-                .param("token","10036FY1533190696203")
-                .param("goodsId","85")
-                .param("price","800")
-                .param("reason","交个朋友")
-                .param("addressId","45")
-                .accept(MediaType.APPLICATION_JSON))
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
-    }
-
-
-    /**
-     * 处理压价
-     * @throws Exception
-     */
-    @Test
-//    @Transactional
-    public void updateBargain() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/bargain/updateBargain")
-                .param("token","10025FY1533144562288")
-                .param("goodsId","85")
-                .param("bargainId","15")
-                //状态 2同意 3拒绝 4取消
-                .param("status","2")
+    public void cancelOrder() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/refund/orderReturnToSeller")
+                .param("token","10042FY1533767510392")
+                .param("orderId","918")
+                .param("reason","坏的")
+//                .param("imgUrls","")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
 
     /**
-     * 我的压价列表
+     * 退货列表
      * @throws Exception
      */
     @Test
-    @Transactional
-    public void bargainList() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/bargain/bargainList")
-                .param("token","10041FY1533753292042")
+//    @Transactional
+    public void orderReturnList() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/refund/orderReturnList")
+                .param("token","10042FY1533767510392")
                 .param("start","0")
                 .param("limit","10")
-//                .param("search","")
+                //类型 1买家（我买下的） 2卖家（我卖出的）
+                .param("type","1")
+//                .param("imgUrls","")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
 
     /**
-     * 删除我的议价
+     * 退货列表
      * @throws Exception
      */
     @Test
 //    @Transactional
-    public void deleteBargain() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/bargain/deleteBargain")
-                .param("token","10041FY1533753292042")
-                .param("goodsIds","124,125")
+    public void handleReturns() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/refund/handleReturns")
+                .param("token","10045FY1534151532158")
+                .param("orderId","947")
+//                .param("reason","")
+                //处理状态 2同意 3拒绝
+                .param("status","2")
+//                .param("imgUrls","")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
+
 }

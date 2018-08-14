@@ -13,10 +13,11 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="seller_id" jdbcType="INTEGER" property="sellerId" />
     <result column="is_resolve" jdbcType="INTEGER" property="isResolve" />
+    <result column="is_refund" jdbcType="INTEGER" property="isRefund" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, main_order_id, order_no, amount, count, status, add_time, update_time, 
-    seller_id, is_resolve
+    seller_id, is_resolve, is_refund
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -32,11 +33,13 @@
     insert into order_info (id, user_id, main_order_id, 
       order_no, amount, count, 
       status, add_time, update_time, 
-      seller_id, is_resolve)
+      seller_id, is_resolve, is_refund
+      )
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{mainOrderId,jdbcType=INTEGER}, 
       #{orderNo,jdbcType=VARCHAR}, #{amount,jdbcType=DECIMAL}, #{count,jdbcType=INTEGER}, 
       #{status,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{sellerId,jdbcType=INTEGER}, #{isResolve,jdbcType=INTEGER})
+      #{sellerId,jdbcType=INTEGER}, #{isResolve,jdbcType=INTEGER}, #{isRefund,jdbcType=INTEGER}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.fangyuanyouyue.order.model.OrderInfo">
     insert into order_info
@@ -74,6 +77,9 @@
       <if test="isResolve != null">
         is_resolve,
       </if>
+      <if test="isRefund != null">
+        is_refund,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -108,6 +114,9 @@
       </if>
       <if test="isResolve != null">
         #{isResolve,jdbcType=INTEGER},
+      </if>
+      <if test="isRefund != null">
+        #{isRefund,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -144,6 +153,9 @@
       <if test="isResolve != null">
         is_resolve = #{isResolve,jdbcType=INTEGER},
       </if>
+      <if test="isRefund != null">
+        is_refund = #{isRefund,jdbcType=INTEGER},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -158,19 +170,23 @@
       add_time = #{addTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       seller_id = #{sellerId,jdbcType=INTEGER},
-      is_resolve = #{isResolve,jdbcType=INTEGER}
+      is_resolve = #{isResolve,jdbcType=INTEGER},
+      is_refund = #{isRefund,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
   <select id="getListByUserIdStatus" parameterType="Integer" resultMap="BaseResultMap">
     select * from order_info
     <where>
-      status <![CDATA[ <> ]]> 5 and is_resolve = 2
+      status <![CDATA[ <> ]]> 5 and status <![CDATA[ <> ]]> 6 and is_resolve = 2
       <if test="userId != null">
         and user_id = #{userId}
       </if>
-      <if test="status != null and status != 0">
-        and status = #{status}
+      <if test="status != null and status != 0 and status != 7">
+        and status = #{status} and is_refund = 2
+      </if>
+      <if test="status != null and status == 7">
+        and is_refund = 1
       </if>
     </where>
     order by add_time desc
@@ -183,7 +199,7 @@
   <select id="selectChildOrderByOrderId" parameterType="Integer" resultMap="BaseResultMap">
     select * from order_info
     <where>
-      1=1
+      status <![CDATA[ <> ]]> 5 and status <![CDATA[ <> ]]> 6 and is_refund = 2
       <if test="userId != null">
         and user_id = #{userId}
       </if>
@@ -196,7 +212,7 @@
   <select id="getOrderBySellerId" parameterType="Integer" resultMap="BaseResultMap">
     select * from order_info
     <where>
-      status <![CDATA[ <> ]]> 5
+      status <![CDATA[ <> ]]> 5 and status <![CDATA[ <> ]]> 6 and is_refund = 2
       <if test="sellerId != null">
         and seller_id = #{sellerId}
       </if>
@@ -210,7 +226,7 @@
   <select id="selectByGoodsId" parameterType="Integer" resultMap="BaseResultMap">
     select * from order_info
     <where>
-      status  <![CDATA[ <> ]]> 5 and  <![CDATA[ <> ]]> 6
+      status <![CDATA[ <> ]]> 5 and status <![CDATA[ <> ]]> 6 and is_refund = 2
       <if test="goodsId != null">
         and goods_id = #{goodsId}
       </if>
@@ -220,7 +236,7 @@
   <select id="getOrderByUserIdOrderId" parameterType="Integer" resultMap="BaseResultMap">
     select * from order_info
     <where>
-      1=1
+      status <![CDATA[ <> ]]> 6 and is_refund = 2
       <if test="userId != null">
         and user_id = #{userId}
       </if>
@@ -228,5 +244,22 @@
         and id = #{orderId}
       </if>
     </where>
+  </select>
+
+  <select id="getRefundOrder" parameterType="Integer" resultMap="BaseResultMap">
+    select * from order_info
+    <where>
+      is_refund = 1
+      <if test="userId != null and type == 1">
+        and user_id = #{userId}
+      </if>
+      <if test="userId != null and type == 2">
+        and seller_id = #{userId}
+      </if>
+    </where>
+    order by add_time desc
+    <if test="start != null and limit != null">
+      limit #{start},#{limit}
+    </if>
   </select>
 </mapper>

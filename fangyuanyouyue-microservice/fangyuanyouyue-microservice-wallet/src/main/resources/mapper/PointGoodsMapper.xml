@@ -36,7 +36,7 @@
     delete from point_goods
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.wallet.model.PointGoods" >
+  <insert id="insert" parameterType="com.fangyuanyouyue.wallet.model.PointGoods" useGeneratedKeys="true" keyProperty="id">
     insert into point_goods (id, name, type, 
       price, point, status, 
       cover_img_url, coupon_id, add_time, 

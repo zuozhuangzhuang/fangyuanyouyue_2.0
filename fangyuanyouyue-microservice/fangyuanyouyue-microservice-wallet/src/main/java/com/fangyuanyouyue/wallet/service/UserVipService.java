@@ -4,13 +4,14 @@ import com.fangyuanyouyue.base.exception.ServiceException;
 
 public interface UserVipService {
     /**
-     * 开通会员
+     * 开通/续费会员
      * @param userId
      * @param vipLevel
      * @param vipType
+     * @param type
      * @throws ServiceException
      */
-    void openMebber(Integer userId,Integer vipLevel,Integer vipType) throws ServiceException;
+    void updateMebber(Integer userId,Integer vipLevel,Integer vipType,Integer type) throws ServiceException;
 
 
 }

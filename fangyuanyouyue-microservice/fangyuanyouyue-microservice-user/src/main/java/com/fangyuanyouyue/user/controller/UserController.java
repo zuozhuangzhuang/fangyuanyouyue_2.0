@@ -60,13 +60,13 @@ public class UserController extends BaseController {
 
     @ApiOperation(value = "注册", notes = "(UserDto)注册",response = BaseResp.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "phone", value = "手机号",required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "loginPwd", value = "登录密码,MD5小写",required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "nickName", value = "昵称",required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "phone", value = "手机号",required = true, dataType = "String", paramType = "query",example = "1"),
+            @ApiImplicitParam(name = "loginPwd", value = "登录密码,MD5小写",required = true, dataType = "String", paramType = "query",example = "123456"),
+            @ApiImplicitParam(name = "nickName", value = "昵称",required = true, dataType = "String", paramType = "query",example = "测试用户"),
             @ApiImplicitParam(name = "headImgUrl", value = "头像图片路径", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "bgImgUrl", value = "背景图片路径", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "gender", value = "性别，1男 2女 0不确定", dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "regPlatform", value = "注册平台 1安卓 2iOS 3小程序", required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "regPlatform", value = "注册平台 1安卓 2iOS 3小程序", required = true, dataType = "int", paramType = "query",example = "1")
     })
     @PostMapping(value = "/regist")
     @ResponseBody
@@ -108,9 +108,9 @@ public class UserController extends BaseController {
 
     @ApiOperation(value = "用户登录", notes = "(UserDto)用户登录",response = BaseResp.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "phone", value = "手机号", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "loginPwd", value = "登录密码,MD5小写", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "loginPlatform", value = "登录平台 1安卓 2iOS 3小程序", required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "phone", value = "手机号", required = true, dataType = "String", paramType = "query",example = "1"),
+            @ApiImplicitParam(name = "loginPwd", value = "登录密码,MD5小写", required = true, dataType = "String", paramType = "query",example = "123456"),
+            @ApiImplicitParam(name = "loginPlatform", value = "登录平台 1安卓 2iOS 3小程序", required = true, dataType = "int", paramType = "query",example = "1")
     })
     @PostMapping(value = "/login")
     @ResponseBody
@@ -249,7 +249,7 @@ public class UserController extends BaseController {
             }
             //实名认证
             userInfoExtService.certification(param.getToken(),param.getName(),param.getIdentity(),param.getIdentityImgCoverUrl(),param.getIdentityImgBackUrl());
-            return toSuccess("实名认证成功");
+            return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());

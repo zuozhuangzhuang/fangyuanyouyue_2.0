@@ -40,7 +40,7 @@ public class AppraisalServiceImpl implements AppraisalService{
     private SchedualWalletService schedualWalletService;
 
     @Override
-    public AppraisalOrderInfoDto addAppraisal(Integer userId, Integer[] goodsIds, String title, String description, String[] imgUrls, String videoUrl) throws ServiceException {
+    public AppraisalOrderInfoDto addAppraisal(Integer userId, Integer[] goodsIds, String title, String description, String[] imgUrls, String videoUrl,String videoImg) throws ServiceException {
         //只有我要鉴定才可以用免费鉴定
         //生成订单
         //每次提交的鉴定生成一个订单，批量鉴定有多个订单详情
@@ -96,6 +96,9 @@ public class AppraisalServiceImpl implements AppraisalService{
                         }
                         for(GoodsImg goodsImg:imgsByGoodsId){//商品图片s
                             addAppraisalImg(goodsImg.getImgUrl(),goodsAppraisalDetail.getId(),1);
+                            if(goodsImg.getType().intValue() == 3){//视频截图图片
+                                addAppraisalImg(goodsImg.getImgUrl(),goodsAppraisalDetail.getId(),3);
+                            }
                         }
                         //订单总金额
                         amount = amount.add(goodsAppraisalDetail.getPrice());//原价
@@ -121,6 +124,7 @@ public class AppraisalServiceImpl implements AppraisalService{
             }
             goodsAppraisalDetail.setPrice(price);
             goodsAppraisalDetailMapper.insert(goodsAppraisalDetail);
+
             //鉴定图片表
             if(imgUrls != null){
                 for(String imgUrl:imgUrls){
@@ -129,6 +133,11 @@ public class AppraisalServiceImpl implements AppraisalService{
             }
             if(StringUtils.isNotEmpty(videoUrl)){
                 addAppraisalImg(videoUrl,goodsAppraisalDetail.getId(),2);
+                if(StringUtils.isNotEmpty(videoImg)){
+                    addAppraisalImg(videoImg,goodsAppraisalDetail.getId(),3);
+                }else{
+                    throw new ServiceException("视频封面图不能为空！");
+                }
             }
             //订单总金额
             amount = amount.add(price);//原价
@@ -199,6 +208,9 @@ public class AppraisalServiceImpl implements AppraisalService{
     public AppraisalDetailDto appraisalDetail(Integer userId, Integer detailId) throws ServiceException {
         //获取鉴定详情
         GoodsAppraisalDetail detail = goodsAppraisalDetailMapper.selectByPrimaryKey(detailId);
+        if(detail == null){
+            throw new ServiceException("鉴定详情不存在！");
+        }
         AppraisalDetailDto detailDto = new AppraisalDetailDto(detail);
         //获取鉴定图片列表
         List<AppraisalUrl> appraisalUrls = appraisalUrlMapper.selectListBuUserId(detail.getId());

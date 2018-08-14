@@ -61,4 +61,14 @@ public interface OrderInfoMapper {
      * @return
      */
     OrderInfo getOrderByUserIdOrderId(@Param("orderId")Integer orderId,@Param("userId")Integer userId);
+
+    /**
+     * 获取退货列表
+     * @param userId
+     * @param start
+     * @param limit
+     * @param type 1买家 2卖家
+     * @return
+     */
+    List<OrderInfo> getRefundOrder(@Param("userId")Integer userId, @Param("start")Integer start, @Param("limit")Integer limit, @Param("type")Integer type);
 }
