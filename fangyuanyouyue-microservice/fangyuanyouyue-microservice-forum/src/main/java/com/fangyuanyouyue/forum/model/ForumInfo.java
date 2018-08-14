@@ -10,37 +10,33 @@ import java.util.Date;
 @Setter
 @ToString
 public class ForumInfo {
-    private Integer id;
+    private Integer id;//唯一自增ID
 
-    private Integer userId;
+    private Integer userId;//发布用户id
 
-    private Integer columnId;
-    
-    private String title;
+    private String title;//标题
 
-    private String videoUrl;
+    private String videoUrl;//视频链接
 
-    private Integer videoLength;
+    private Integer videoLength;//视频长度
 
-    private String label;
+    private String label;//标签
 
-    private Integer sort;
+    private Integer sort;//排列优先级
 
-    private Integer type;
+    private Integer type;//帖子类型 1图文 2视频
 
-    private Integer status;
+    private Integer status;//状态 1显示 2隐藏
 
-    private Date addTime;
+    private Date addTime;//添加时间
 
-    private Date updateTime;
+    private Date updateTime;//更新时间
 
-    private String content;
-    
-    private String headImgUrl;
-    
-    private String nickName;
+    private Integer columnId;//专栏id
 
-    private Integer isChosen;
+    private Integer isChosen;//是否精选1是 2否
 
-    
+    private String videoImg;//视频封面图
+
+    private String content;//内容描述，富文本
 }

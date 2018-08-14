@@ -28,6 +28,19 @@ public interface ForumInfoService {
 	 * @throws ServiceException
 	 */
     List<ForumInfoDto> getForumList(Integer columnId,Integer userId, Integer type, String keyword,Integer start,Integer limit) throws ServiceException;
-    
-    
+
+	/**
+	 * 发布帖子/视频
+	 * @param userId
+	 * @param columnId
+	 * @param title
+	 * @param content
+	 * @param videoUrl
+	 * @param videoLength
+	 * @param videoImg
+	 * @param type
+	 * @param userIds
+	 * @throws ServiceException
+	 */
+    void addForum(Integer userId,Integer columnId,String title,String content,String videoUrl,Integer videoLength,String videoImg,Integer type,Integer[] userIds) throws ServiceException;
 }

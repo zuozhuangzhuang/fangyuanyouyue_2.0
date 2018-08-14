@@ -33,4 +33,13 @@ public interface UserInfoExtService {
      * @throws ServiceException
      */
     boolean verifyPayPwd(Integer userId,String payPwd) throws ServiceException;
+
+    /**
+     * 是否实名认证
+     * @param userId
+     * @return
+     * @throws ServiceException
+     */
+    boolean isAuth(Integer userId) throws ServiceException;
+
 }

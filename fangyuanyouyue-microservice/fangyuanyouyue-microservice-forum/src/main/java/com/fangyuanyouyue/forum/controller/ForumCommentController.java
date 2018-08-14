@@ -7,7 +7,6 @@ import com.fangyuanyouyue.forum.dto.ForumCommentDto;
 import com.fangyuanyouyue.forum.param.ForumParam;
 import com.fangyuanyouyue.forum.service.ForumCommentService;
 import com.fangyuanyouyue.forum.service.SchedualRedisService;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -15,15 +14,15 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping(value = "/comment")
 @Api(description = "论坛评论Controller")
 @RefreshScope
@@ -41,7 +40,7 @@ public class ForumCommentController extends BaseController {
 			@ApiImplicitParam(name = "forumId", value = "帖子id", required = true, dataType = "int", paramType = "query"),
 			@ApiImplicitParam(name = "start", value = "起始条数", required = true, dataType = "int", paramType = "query"),
 			@ApiImplicitParam(name = "limit", value = "每页条数", required = true, dataType = "int", paramType = "query") })
-	@PostMapping(value = "/list")
+	@PostMapping(value = "/commentList")
 	@ResponseBody
 	public BaseResp forumComment(ForumParam param) throws IOException {
 		try {
@@ -68,10 +67,11 @@ public class ForumCommentController extends BaseController {
 	@ApiOperation(value = "帖子二级评论列表", notes = "根据评论id获取评论列表", response = BaseResp.class)
 	@ApiImplicitParams({
         @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
-			@ApiImplicitParam(name = "commentId", value = "评论id", required = true, dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "start", value = "起始条数", required = true, dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "limit", value = "每页条数", required = true, dataType = "int", paramType = "query") })
-	@PostMapping(value = "/list")
+		@ApiImplicitParam(name = "commentId", value = "评论id", required = true, dataType = "int", paramType = "query"),
+		@ApiImplicitParam(name = "start", value = "起始条数", required = true, dataType = "int", paramType = "query"),
+		@ApiImplicitParam(name = "limit", value = "每页条数", required = true, dataType = "int", paramType = "query")
+	})
+	@PostMapping(value = "/replyList")
 	@ResponseBody
 	public BaseResp forumCommentComment(ForumParam param) throws IOException {
 		try {

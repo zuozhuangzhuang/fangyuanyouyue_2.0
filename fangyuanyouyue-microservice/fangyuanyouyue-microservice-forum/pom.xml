@@ -59,6 +59,7 @@
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger-ui</artifactId>
 		</dependency>
+
 		<!--jackson -->
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
@@ -96,6 +97,11 @@
 		<dependency>
 			<groupId>com.aliyun.oss</groupId>
 			<artifactId>aliyun-sdk-oss</artifactId>
+		</dependency>
+		<!--fastjson-->
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
 		<dependency>

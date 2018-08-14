@@ -1,7 +1,14 @@
 package com.fangyuanyouyue.forum.model;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.util.Date;
 
+@Getter
+@Setter
+@ToString
 public class AppraisalLikes {
     private Integer id;
 
@@ -10,36 +17,4 @@ public class AppraisalLikes {
     private Integer appraisalId;
 
     private Date addTime;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public Integer getAppraisalId() {
-        return appraisalId;
-    }
-
-    public void setAppraisalId(Integer appraisalId) {
-        this.appraisalId = appraisalId;
-    }
-
-    public Date getAddTime() {
-        return addTime;
-    }
-
-    public void setAddTime(Date addTime) {
-        this.addTime = addTime;
-    }
 }

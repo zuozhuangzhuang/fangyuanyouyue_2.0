@@ -16,34 +16,14 @@
   <sql id="Base_Column_List" >
     id, user_id, forum_id, comment_id, content, status, add_time, update_time
   </sql>
-  <select id="countAll" resultType="java.lang.Integer" >
-    select count(*) from forum_comment
-  </select>
-  <select id="countById" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
-    select count(*) from forum_comment where id = #{id,jdbcType=INTEGER}
-  </select>
+
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
     from forum_comment
     where id = #{id,jdbcType=INTEGER}
   </select>
-  <select id="selectByForumId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select 
-    a.*,b.nick_name,b.head_img_url
-    from forum_comment a,user_info b
-    where a.user_id=b.id and forum_id=#{forumId} 
-    order by id desc
-    limit #{start},#{limit}
-  </select>
-  <select id="selectByCommentId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select 
-    a.*,b.nick_name,b.head_img_url
-    from forum_comment a,user_info b
-    where a.user_id=b.id and comment_id=#{commentId}
-    order by id desc
-     limit #{start},#{limit}
-  </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from forum_comment
     where id = #{id,jdbcType=INTEGER}
@@ -149,4 +129,28 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+  <select id="countAll" resultType="java.lang.Integer" >
+    select count(*) from forum_comment
+  </select>
+  <select id="countById" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
+    select count(*) from forum_comment where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectByForumId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    a.*,b.nick_name,b.head_img_url
+    from forum_comment a,user_info b
+    where a.user_id=b.id and forum_id=#{forumId}
+    order by id desc
+    limit #{start},#{limit}
+  </select>
+  <select id="selectByCommentId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    a.*,b.nick_name,b.head_img_url
+    from forum_comment a,user_info b
+    where a.user_id=b.id and comment_id=#{commentId}
+    order by id desc
+    limit #{start},#{limit}
+  </select>
 </mapper>

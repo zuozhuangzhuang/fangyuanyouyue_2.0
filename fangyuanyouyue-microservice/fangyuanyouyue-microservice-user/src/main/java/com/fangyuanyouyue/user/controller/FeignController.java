@@ -182,4 +182,28 @@ public class FeignController  extends BaseController {
             return toError("系统繁忙，请稍后再试！");
         }
     }
+
+    @ApiOperation(value = "是否实名认证", notes = "是否实名认证",hidden = true)
+    @PostMapping(value = "/isAuth")
+    @ResponseBody
+    public BaseResp isAuth(Integer userId) throws IOException {
+        try {
+            log.info("----》是否实名认证《----");
+            if(userId == null){
+                return toError(ReCode.FAILD.getValue(),"用户ID不能为空！");
+            }
+            UserInfo userInfo = userInfoService.selectByPrimaryKey(userId);
+            if(userInfo==null){
+                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+            }
+            if(userInfo.getStatus() == 2){
+                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
+            }
+            boolean isAuth = userInfoExtService.isAuth(userId);
+            return toSuccess(isAuth);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
 }

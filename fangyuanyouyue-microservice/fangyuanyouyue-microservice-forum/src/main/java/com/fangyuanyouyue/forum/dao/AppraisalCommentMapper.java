@@ -1,7 +1,9 @@
 package com.fangyuanyouyue.forum.dao;
 
 import com.fangyuanyouyue.forum.model.AppraisalComment;
+import org.apache.ibatis.annotations.Mapper;
 
+@Mapper
 public interface AppraisalCommentMapper {
     int deleteByPrimaryKey(Integer id);
 

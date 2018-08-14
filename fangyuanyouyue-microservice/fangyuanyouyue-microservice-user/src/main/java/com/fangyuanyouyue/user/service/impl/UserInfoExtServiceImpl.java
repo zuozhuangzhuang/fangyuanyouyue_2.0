@@ -73,4 +73,16 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
         }
         return MD5Util.verify(MD5Util.MD5(payPwd),userInfoExt.getPayPwd());
     }
+
+    @Override
+    public boolean isAuth(Integer userId) throws ServiceException {
+        //根据用户ID获取实名认证申请信息
+        IdentityAuthApply identityAuthApply = identityAuthApplyMapper.selectByUserId(userId);
+        //已申请过 状态 1申请 2通过 3拒绝
+        if(identityAuthApply != null && identityAuthApply.getStatus() == 2) {
+            return true;
+        }else{
+            return false;
+        }
+    }
 }

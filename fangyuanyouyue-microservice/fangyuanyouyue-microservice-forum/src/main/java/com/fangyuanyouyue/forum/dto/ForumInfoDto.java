@@ -55,6 +55,7 @@ public class ForumInfoDto {
 
     public ForumInfoDto(ForumInfo forumInfo) {
         this.forumId = forumInfo.getId();
+        this.userId = forumInfo.getUserId();
         this.title = forumInfo.getTitle();
         this.content = forumInfo.getContent();
         this.videoLength = forumInfo.getVideoLength();
@@ -62,8 +63,6 @@ public class ForumInfoDto {
         this.addTime = DateUtil.getFormatDate(forumInfo.getAddTime(), DateUtil.DATE_FORMT);
         this.type = forumInfo.getType();
         this.status = forumInfo.getStatus();
-        this.nickName = forumInfo.getNickName();
-        this.headImgUrl = forumInfo.getHeadImgUrl();
     }
     
     public static List<ForumInfoDto> toDtoList(List<ForumInfo> list) {

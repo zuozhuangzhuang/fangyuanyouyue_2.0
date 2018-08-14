@@ -26,7 +26,7 @@ public class ForumParam{
 
 	//TODO 需要在API网关通过授权才能获取到userId
 	@ApiModelProperty(name = "userId", value = "用户id", dataType = "int",hidden = true)
-	private Integer userId;//帖子id
+	private Integer userId;//用户id
 	
 	@ApiModelProperty(name = "forumId", value = "帖子id", dataType = "int",hidden = true)
 	private Integer forumId;//帖子id
@@ -41,11 +41,26 @@ public class ForumParam{
 	private Integer columnId;//专栏ID
 
 	@ApiModelProperty(name = "commentId", value = "评论ID", dataType = "int",hidden = true)
-	private Integer commentId;//帖子内容
+	private Integer commentId;//评论ID
 
 	@ApiModelProperty(name = "keyword", value = "关键字搜索", dataType = "String",hidden = true)
-	private String keyword;//帖子内容
+	private String keyword;//关键字搜索
 
 	@ApiModelProperty(name = "searchType", value = "搜索类型", dataType = "String",hidden = true)
-	private Integer searchType;//帖子内容
+	private String searchType;//搜索类型
+
+	@ApiModelProperty(name = "videoUrl", value = "视频链接", dataType = "String",hidden = true)
+	private String videoUrl;//视频链接
+
+	@ApiModelProperty(name = "videoLength", value = "视频长度", dataType = "int",hidden = true)
+	private Integer videoLength;//视频长度
+
+	@ApiModelProperty(name = "videoImg", value = "视频封面图", dataType = "String",hidden = true)
+	private String videoImg;//视频封面图
+
+	@ApiModelProperty(name = "userIds", value = "邀请用户id数组", dataType = "int",hidden = true)
+	private Integer[] userIds;//邀请用户id数组
+
+	@ApiModelProperty(name = "typeId", value = "专栏分类id", dataType = "int",hidden = true)
+	private Integer typeId;//专栏分类id
 }

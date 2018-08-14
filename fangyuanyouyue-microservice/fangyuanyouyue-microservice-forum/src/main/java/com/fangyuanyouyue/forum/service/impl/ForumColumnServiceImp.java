@@ -2,6 +2,8 @@ package com.fangyuanyouyue.forum.service.impl;
 
 import java.util.List;
 
+import com.fangyuanyouyue.forum.dao.ForumColumnTypeMapper;
+import com.fangyuanyouyue.forum.model.ForumColumnType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,8 @@ public class ForumColumnServiceImp implements ForumColumnService {
 
     @Autowired
     private ForumColumnMapper forumColumnMapper;
+    @Autowired
+	private ForumColumnTypeMapper forumColumnTypeMapper;
 
 	@Override
 	public List<ForumColumnTypeDto> getColumnList(Integer start, Integer limit) throws ServiceException {
@@ -31,6 +35,9 @@ public class ForumColumnServiceImp implements ForumColumnService {
 		List<ForumColumn> list = forumColumnMapper.selectChosen(1);
 		return ForumColumnDto.toDtoList(list);
 	}
-    
 
+	@Override
+	public void addColumn(Integer userId, Integer typeId) throws ServiceException {
+		ForumColumnType forumColumnType = forumColumnTypeMapper.selectByPrimaryKey(typeId);
+	}
 }
