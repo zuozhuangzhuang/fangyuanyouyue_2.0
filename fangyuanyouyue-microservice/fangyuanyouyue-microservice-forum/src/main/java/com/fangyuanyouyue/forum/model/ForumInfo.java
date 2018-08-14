@@ -40,6 +40,7 @@ public class ForumInfo {
     
     private String nickName;
 
+    private Integer isChosen;
 
     
 }

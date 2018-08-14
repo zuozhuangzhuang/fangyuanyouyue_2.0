@@ -35,7 +35,7 @@ public class ForumCommentController extends BaseController {
 	@Autowired
 	private ForumCommentService forumCommentService;
 
-	@ApiOperation(value = "帖子评论", notes = "根据帖子id获取评论列表", response = BaseResp.class)
+	@ApiOperation(value = "帖子评论列表", notes = "根据帖子id获取评论列表", response = BaseResp.class)
 	@ApiImplicitParams({
         @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
 			@ApiImplicitParam(name = "forumId", value = "帖子id", required = true, dataType = "int", paramType = "query"),
@@ -64,6 +64,36 @@ public class ForumCommentController extends BaseController {
 		}
 	}
 
+
+	@ApiOperation(value = "帖子二级评论列表", notes = "根据评论id获取评论列表", response = BaseResp.class)
+	@ApiImplicitParams({
+        @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+			@ApiImplicitParam(name = "commentId", value = "评论id", required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "start", value = "起始条数", required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "limit", value = "每页条数", required = true, dataType = "int", paramType = "query") })
+	@PostMapping(value = "/list")
+	@ResponseBody
+	public BaseResp forumCommentComment(ForumParam param) throws IOException {
+		try {
+			log.info("----》获取帖子二级评论《----");
+			log.info("参数：" + param.toString());
+			if (param.getCommentId() == null) {
+				return toError("评论ID不能为空");
+			}
+			if (param.getStart() == null || param.getLimit() == null) {
+				return toError("分页参数不能为空");
+			}
+
+			List<ForumCommentDto> dto = forumCommentService.getCommentList(param.getForumId(), param.getStart(),
+					param.getLimit());
+
+			return toSuccess(dto);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return toError(ReCode.FAILD.getValue(), "系统繁忙，请稍后再试！");
+		}
+	}
+	
 	@ApiOperation(value = "添加评论", notes = "添加评论", response = BaseResp.class)
 	@ApiImplicitParams({
         @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),

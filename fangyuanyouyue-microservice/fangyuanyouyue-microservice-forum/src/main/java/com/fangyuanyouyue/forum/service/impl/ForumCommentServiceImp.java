@@ -39,12 +39,21 @@ public class ForumCommentServiceImp implements ForumCommentService {
 		model.setAddTime(new Date());
 		model.setContent(content);
 		model.setStatus(StatusEnum.STATUS_NORMAL.getValue());
+		model.setCommentId(commentId);
 		forumCommentMapper.insert(model);
 	}
 
 	@Override
 	public void deleteComment(Integer commentId) {
 		forumCommentMapper.deleteByPrimaryKey(commentId);
+	}
+
+	@Override
+	public List<ForumCommentDto> getCommentCommentList(Integer commentId, Integer start, Integer limit)
+			throws ServiceException {
+		
+		List<ForumComment> list = forumCommentMapper.selectByCommentId(commentId, start, limit);
+		return ForumCommentDto.toDtoList(list);
 	}
 
 }

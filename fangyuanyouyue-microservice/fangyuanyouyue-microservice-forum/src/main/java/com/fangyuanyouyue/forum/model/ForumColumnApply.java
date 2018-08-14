@@ -21,6 +21,16 @@ public class ForumColumnApply {
 
     private Date addTime;
 
+    private String name;
+
+    private String identity;
+
+    private String identityImgCover;
+
+    private String identityImgBack;
+
+    private String phone;
+
     public Integer getId() {
         return id;
     }
@@ -91,5 +101,45 @@ public class ForumColumnApply {
 
     public void setAddTime(Date addTime) {
         this.addTime = addTime;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name == null ? null : name.trim();
+    }
+
+    public String getIdentity() {
+        return identity;
+    }
+
+    public void setIdentity(String identity) {
+        this.identity = identity == null ? null : identity.trim();
+    }
+
+    public String getIdentityImgCover() {
+        return identityImgCover;
+    }
+
+    public void setIdentityImgCover(String identityImgCover) {
+        this.identityImgCover = identityImgCover == null ? null : identityImgCover.trim();
+    }
+
+    public String getIdentityImgBack() {
+        return identityImgBack;
+    }
+
+    public void setIdentityImgBack(String identityImgBack) {
+        this.identityImgBack = identityImgBack == null ? null : identityImgBack.trim();
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone == null ? null : phone.trim();
     }
 }
