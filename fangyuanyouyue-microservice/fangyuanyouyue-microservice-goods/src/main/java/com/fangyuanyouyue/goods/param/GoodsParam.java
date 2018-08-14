@@ -81,6 +81,9 @@ public class GoodsParam{
     @ApiModelProperty(name = "videoUrl", value = "视频路径", dataType = "String",hidden = true)
     private String videoUrl;//视频路径
 
+    @ApiModelProperty(name = "videoImg", value = "视频截图路径", dataType = "String",hidden = true)
+    private String videoImg;//视频截图路径
+
 
     //GoodsImg
     @ApiModelProperty(name = "goodsImgId", value = "商品图片表ID", dataType = "int",hidden = true)
@@ -222,5 +225,8 @@ public class GoodsParam{
 
     @ApiModelProperty(name = "payPwd", value = "支付密码", dataType = "String",hidden = true)
     private String payPwd;//支付密码
+
+    @ApiModelProperty(name = "userIds", value = "邀请用户id数组", dataType = "int",hidden = true)
+    private Integer[] userIds;//邀请用户id数组
 
 }

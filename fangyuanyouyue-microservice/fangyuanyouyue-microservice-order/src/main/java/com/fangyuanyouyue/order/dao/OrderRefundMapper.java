@@ -4,6 +4,8 @@ import com.fangyuanyouyue.order.model.OrderRefund;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 @Mapper
 public interface OrderRefundMapper {
     int deleteByPrimaryKey(Integer id);
@@ -24,5 +26,5 @@ public interface OrderRefundMapper {
      * @param status
      * @return
      */
-    OrderRefund selectByOrderIdStatus(@Param("orderId")Integer orderId,@Param("status")Integer status);
+    OrderRefund selectByOrderIdStatus(@Param("orderId")Integer orderId, @Param("status")Integer status);
 }

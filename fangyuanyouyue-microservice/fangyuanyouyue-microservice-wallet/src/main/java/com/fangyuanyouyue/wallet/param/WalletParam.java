@@ -49,13 +49,20 @@ public class WalletParam {
     @ApiModelProperty(name = "payType", value = "支付类型 1微信 2支付宝 3余额", dataType = "int",hidden = true)
     private Integer payType;//支付类型 1微信 2支付宝 3余额
 
-	@ApiModelProperty(name = "start", value = "起始页", dataType = "int",hidden = true)
-	private Integer start; // 起始页
+    @ApiModelProperty(name = "orderId", value = "订单ID", dataType = "int",hidden = true)
+    private Integer orderId;//订单ID
 
-	@ApiModelProperty(name = "limit", value = "限制页", dataType = "int",hidden = true)
-	private Integer limit; // 限制页
+    @ApiModelProperty(name = "start", value = "起始页", dataType = "int",hidden = true)
+    private Integer start; // 起始页
 
-	@ApiModelProperty(name = "goodsId", value = "商品id", dataType = "int",hidden = true)
-	private Integer goodsId; // 限制页
+    @ApiModelProperty(name = "limit", value = "限制页", dataType = "int",hidden = true)
+    private Integer limit; // 限制页
+
+    @ApiModelProperty(name = "goodsId", value = "商品id", dataType = "int",hidden = true)
+    private Integer goodsId; // 限制页
+
+    @ApiModelProperty(name = "credit", value = "信誉度", dataType = "long",hidden = true)
+    private Long credit; // 信誉度
+
 
 }

@@ -19,42 +19,86 @@ public class UserVipServiceImpl implements UserVipService{
     private UserVipMapper userVipMapper;
 
     @Override
-    public void openMebber(Integer userId, Integer vipLevel, Integer vipType) throws ServiceException {
+    public void updateMebber(Integer userId, Integer vipLevel, Integer vipType,Integer type) throws ServiceException {
         UserVip userVip = userVipMapper.selectByUserId(userId);
         if(userVip == null){
             throw new ServiceException("获取用户会员信息失败！");
         }else{
-            if(userVip.getStatus() == 1){//已开通
-                /**
-                 * TODO 已开通会员前端进行提示
-                 * 处理逻辑?
-                 */
-            }else{
-                //开始时间：当前时间
-                userVip.setStartTime(DateStampUtils.getTimesteamp());
-                //TODO 计算结束时间
-                switch (vipType){
-                    case 1://1 一月会员
-                        userVip.setEndTime(DateUtil.getDateAfterMonth(DateStampUtils.getTimesteamp(),1));
-                        break;
-                    case 2://2 三月会员
-                        userVip.setEndTime(DateUtil.getDateAfterMonth(DateStampUtils.getTimesteamp(),3));
-                        break;
-                    case 3://3 一年会员
-                        //TODO 送优惠券
-                        userVip.setEndTime(DateUtil.getDateAfterYear(DateStampUtils.getTimesteamp(),1));
-                        break;
-                }
-                userVip.setVipLevel(vipLevel);//会员等级 1铂金会员 2至尊会员
-                userVip.setLevelDesc(vipLevel == 1?"铂金会员":"至尊会员");
-                userVip.setVipType(vipType);//会员类型 1一个月 2三个月 3一年会员
-                userVip.setStatus(1);//会员状态 1已开通 2未开通
-                //TODO 生成NO.xxxx :年月日 基数与开通顺序的和，例：180912123457
-                userVipMapper.updateByPrimaryKey(userVip);
-            }
+            if(type == 1){//开通
+                if(userVip.getStatus() == 1){//已开通
+                    throw new ServiceException("已开通会员！");
+                }else{
+                    //开始时间：当前时间
+                    userVip.setStartTime(DateStampUtils.getTimesteamp());
+                    //计算结束时间
+                    switch (vipType){
+                        case 1://1 一月会员
+                            userVip.setEndTime(DateUtil.getDateAfterMonth(DateStampUtils.getTimesteamp(),1));
+                            break;
+                        case 2://2 三月会员
+                            userVip.setEndTime(DateUtil.getDateAfterMonth(DateStampUtils.getTimesteamp(),3));
+                            break;
+                        case 3://3 一年会员
+                            //TODO 送优惠券
+                            userVip.setEndTime(DateUtil.getDateAfterYear(DateStampUtils.getTimesteamp(),1));
+                            break;
+                    }
+                    userVip.setVipLevel(vipLevel);//会员等级 1铂金会员 2至尊会员
+                    userVip.setLevelDesc(vipLevel == 1?"铂金会员":"至尊会员");
+                    userVip.setVipType(vipType);//会员类型 1一个月 2三个月 3一年会员
+                    userVip.setStatus(1);//会员状态 1已开通 2未开通
+                    //TODO 生成NO.xxxx :年月日 基数与开通顺序的和，例：180912123457
+                    int no = 111111 + userVip.getId();
+                    String date = DateUtil.getFormatDate(DateStampUtils.getTimesteamp(),"yyMMdd");
+                    userVip.setVipNo(date + no);
 
+                }
+            }else{//续费
+                if(userVip.getVipLevel().intValue() == vipLevel){//续费相同等级会员
+                    //计算结束时间
+                    switch (vipType){
+                        case 1://1 一月会员
+                            userVip.setEndTime(DateUtil.getDateAfterMonth(userVip.getEndTime(),1));
+                            break;
+                        case 2://2 三月会员
+                            userVip.setEndTime(DateUtil.getDateAfterMonth(userVip.getEndTime(),3));
+                            break;
+                        case 3://3 一年会员
+                            //TODO 送优惠券
+                            userVip.setEndTime(DateUtil.getDateAfterYear(userVip.getEndTime(),1));
+                            break;
+                        default:
+                            throw new ServiceException("会员类型错误！");
+                    }
+                    userVip.setStatus(1);//会员状态 1已开通 2未开通
+                }else{
+                    //覆盖原会员信息
+                    //开始时间：当前时间
+                    userVip.setStartTime(DateStampUtils.getTimesteamp());
+                    //计算结束时间
+                    switch (vipType){
+                        case 1://1 一月会员
+                            userVip.setEndTime(DateUtil.getDateAfterMonth(DateStampUtils.getTimesteamp(),1));
+                            break;
+                        case 2://2 三月会员
+                            userVip.setEndTime(DateUtil.getDateAfterMonth(DateStampUtils.getTimesteamp(),3));
+                            break;
+                        case 3://3 一年会员
+                            //TODO 送优惠券
+                            userVip.setEndTime(DateUtil.getDateAfterYear(DateStampUtils.getTimesteamp(),1));
+                            break;
+                    }
+                    userVip.setVipLevel(vipLevel);//会员等级 1铂金会员 2至尊会员
+                    userVip.setLevelDesc(vipLevel == 1?"铂金会员":"至尊会员");
+                    userVip.setVipType(vipType);//会员类型 1一个月 2三个月 3一年会员
+                    userVip.setStatus(1);//会员状态 1已开通 2未开通
+                }
+            }
+            userVipMapper.updateByPrimaryKeySelective(userVip);
         }
     }
 
-
+    public static void main(String[] args) {
+        System.out.println(DateUtil.getFormatDate(DateStampUtils.getTimesteamp()));
+    }
 }

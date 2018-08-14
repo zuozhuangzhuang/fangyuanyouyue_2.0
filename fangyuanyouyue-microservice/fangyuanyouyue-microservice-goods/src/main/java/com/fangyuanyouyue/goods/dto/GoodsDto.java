@@ -61,6 +61,8 @@ public class GoodsDto {
 
     private String videoUrl;//视频路径
 
+    private String videoImg;//视频截图路径
+
     //GoodsCorrelation
     private List<GoodsCorrelationDto> goodsCorrelations;//商品分类
 
@@ -139,8 +141,11 @@ public class GoodsDto {
             List<GoodsImgDto> goodsImgDtos = GoodsImgDto.toDtoList(goodsImgs);
             this.goodsImgDtos = goodsImgDtos;
             for(GoodsImgDto goodsImgDto:goodsImgDtos){
-                if(goodsImgDto.getSort() == 1){
+                if(goodsImgDto.getType() == 1){
                     this.mainUrl = goodsImgDto.getImgUrl();
+                }
+                if(goodsImgDto.getType() == 3){
+                    this.videoImg = goodsImgDto.getImgUrl();
                 }
             }
         }

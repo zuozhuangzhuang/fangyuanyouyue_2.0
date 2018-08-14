@@ -31,4 +31,15 @@ public interface SchedualWalletService {
      */
     @RequestMapping(value = "/walletFeign/updateScore",method = RequestMethod.POST)
     String updateScore(@RequestParam(value = "userId") Integer userId,@RequestParam(value = "score") Long score,@RequestParam(value = "type") Integer type);
+
+    /**
+     * 修改信誉度
+     * @param userId
+     * @param credit
+     * @param type
+     * @return
+     */
+    @RequestMapping(value = "/walletFeign/updateCredit",method = RequestMethod.POST)
+    String updateCredit(@RequestParam(value = "userId") Integer userId,@RequestParam(value = "credit") Long credit,@RequestParam(value = "type") Integer type);
+
 }

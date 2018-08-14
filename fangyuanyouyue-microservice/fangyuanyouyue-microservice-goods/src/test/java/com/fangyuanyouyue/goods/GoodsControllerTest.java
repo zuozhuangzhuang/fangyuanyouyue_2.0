@@ -74,13 +74,13 @@ public class GoodsControllerTest {
      * @throws Exception
      */
     @Test
-    @Transactional
+//    @Transactional
     public void addGoods() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/goods/addGoods")
-                .param("token","10025FY1533144562288")
-                .param("goodsInfoName","我是商品")
+                .param("token","10041FY1533753292042")
+                .param("goodsInfoName","试一下视频截图路径")
                 .param("goodsCategoryIds","10,22")
-                .param("description","这是个商品，你爱信不信")
+                .param("description","试一下视频截图路径")
                 .param("price","1000")
                 .param("postage","10")
                 .param("label","1")
@@ -90,6 +90,8 @@ public class GoodsControllerTest {
                 .param("type","1")
                 .param("status","1")
                 .param("imgUrls","http://app.fangyuanyouyue.com/static/pic/default/001.jpg,http://app.fangyuanyouyue.com/static/pic/default/002.jpg")
+                .param("videoUrl","videoUrlllllllllllllll")
+                .param("videoImg","videoImggggggggggggggg")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -100,15 +102,16 @@ public class GoodsControllerTest {
      * @throws Exception
      */
     @Test
-    @Transactional
+//    @Transactional
     public void deleteGoods() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/goods/deleteGoods")
-                .param("token","10025FY1532974762055")
-                .param("goodsIds","1,2,3")
+                .param("token","10025FY1534118693031")
+                .param("goodsIds","86")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
+
     /**
      * 商品详情
      * @throws Exception
@@ -117,8 +120,8 @@ public class GoodsControllerTest {
     @Transactional
     public void goodsInfo() throws Exception {
         mvc.perform(MockMvcRequestBuilders.get("/goods/goodsInfo")
-                .param("token","10025FY1533317806918")
-                .param("goodsId","100")
+                .param("token","10042FY1533767510392")
+                .param("goodsId","175")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

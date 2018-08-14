@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(value = "order-service",fallback = SchedualOrderServiceImpl.class)
 @Component
 public interface SchedualOrderService {
-//    @RequestMapping(value = "/orderFeign/saveOrder",method = RequestMethod.POST)
-//    Boolean set(@RequestParam(value = "token") String token, @RequestParam(value = "goodsIds") Integer[] goodsIds);
+    @RequestMapping(value = "/orderFeign/getOrderStatus",method = RequestMethod.POST)
+    String getOrderStatus(@RequestParam(value = "userId") Integer userId, @RequestParam(value = "orderId") Integer orderId);
 
 }

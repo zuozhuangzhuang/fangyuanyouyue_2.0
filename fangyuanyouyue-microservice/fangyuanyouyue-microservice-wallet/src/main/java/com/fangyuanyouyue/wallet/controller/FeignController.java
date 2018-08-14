@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -76,6 +77,81 @@ public class FeignController extends BaseController{
             }
             //修改余额
             walletService.updateBalance(param.getUserId(),param.getAmount(),param.getType());
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
+    @PostMapping(value = "/updateCredit")
+    @ResponseBody
+    public BaseResp updateCredit(WalletParam param) throws IOException {
+        try {
+            log.info("----》修改信誉度《----");
+            log.info("参数："+param.toString());
+            if(param.getUserId() == null){
+                return toError("用户ID不能为空！");
+            }
+            if(param.getCredit() == null){
+                return toError("修改信誉度数值错误！");
+            }
+            if(param.getType() == null){
+                return toError("类型错误！");
+            }
+            //修改信誉度
+            walletService.updateCredit(param.getUserId(),param.getCredit(),param.getType());
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
+
+    @GetMapping(value = "/getAppraisalCount")
+    @ResponseBody
+    public BaseResp getAppraisalCount(Integer userId) throws IOException {
+        try {
+            log.info("----》获取免费鉴定次数《----");
+            log.info("参数：userId："+userId);
+            if(userId == null){
+                return toError("用户ID不能为空！");
+            }
+            //获取免费鉴定次数
+            Integer count = walletService.getAppraisalCount(userId);
+            return toSuccess(count);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
+
+
+    @PostMapping(value = "/updateAppraisalCount")
+    @ResponseBody
+    public BaseResp updateAppraisalCount(Integer userId,Integer count) throws IOException {
+        try {
+            log.info("----》修改剩余免费鉴定次数《----");
+            log.info("参数：userId："+userId);
+            if(userId == null){
+                return toError("用户ID不能为空！");
+            }
+            if(count == null){
+                return toError("修改数值不能为空！");
+            }
+            //修改剩余免费鉴定次数
+            walletService.updateAppraisalCount(userId,count);
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();

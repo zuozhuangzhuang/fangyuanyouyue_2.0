@@ -60,13 +60,13 @@ public class UserController extends BaseController {
 
     @ApiOperation(value = "注册", notes = "(UserDto)注册",response = BaseResp.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "phone", value = "手机号",required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "loginPwd", value = "登录密码,MD5小写",required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "nickName", value = "昵称",required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "phone", value = "手机号",required = true, dataType = "String", paramType = "query",example = "1"),
+            @ApiImplicitParam(name = "loginPwd", value = "登录密码,MD5小写",required = true, dataType = "String", paramType = "query",example = "123456"),
+            @ApiImplicitParam(name = "nickName", value = "昵称",required = true, dataType = "String", paramType = "query",example = "测试用户"),
             @ApiImplicitParam(name = "headImgUrl", value = "头像图片路径", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "bgImgUrl", value = "背景图片路径", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "gender", value = "性别，1男 2女 0不确定", dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "regPlatform", value = "注册平台 1安卓 2iOS 3小程序", required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "regPlatform", value = "注册平台 1安卓 2iOS 3小程序", required = true, dataType = "int", paramType = "query",example = "1")
     })
     @PostMapping(value = "/regist")
     @ResponseBody
@@ -108,9 +108,9 @@ public class UserController extends BaseController {
 
     @ApiOperation(value = "用户登录", notes = "(UserDto)用户登录",response = BaseResp.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "phone", value = "手机号", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "loginPwd", value = "登录密码,MD5小写", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "loginPlatform", value = "登录平台 1安卓 2iOS 3小程序", required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "phone", value = "手机号", required = true, dataType = "String", paramType = "query",example = "1"),
+            @ApiImplicitParam(name = "loginPwd", value = "登录密码,MD5小写", required = true, dataType = "String", paramType = "query",example = "123456"),
+            @ApiImplicitParam(name = "loginPlatform", value = "登录平台 1安卓 2iOS 3小程序", required = true, dataType = "int", paramType = "query",example = "1")
     })
     @PostMapping(value = "/login")
     @ResponseBody
@@ -249,7 +249,7 @@ public class UserController extends BaseController {
             }
             //实名认证
             userInfoExtService.certification(param.getToken(),param.getName(),param.getIdentity(),param.getIdentityImgCoverUrl(),param.getIdentityImgBackUrl());
-            return toSuccess("实名认证成功");
+            return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
@@ -565,7 +565,7 @@ public class UserController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "phone", value = "用户手机号", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "type", value = "验证码类型 0表示注册 1表示密码找回 2 表示支付密码相关 3验证旧手机，4绑定新手机 5店铺认证", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "验证码类型 0注册 1表找回密码 2 设置/修改支付密码 3验证旧手机，4绑定新手机 5店铺认证", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "unionId", value = "三方唯一识别号", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "thirdType", value = "类型 1微信 2QQ 3微博", dataType = "int", paramType = "query")
     })
@@ -592,6 +592,8 @@ public class UserController extends BaseController {
                 if(userInfo == null){
                     return toError(ReCode.FAILD.getValue(),"用户不存在，请注册！");
                 }
+            }else if(PhoneCodeEnum.TYPE_SET_PAY_PWD.getCode() == param.getType()){//2 设置支付密码
+
             }else if(PhoneCodeEnum.TYPE_OLD_PHONE.getCode() == param.getType()){//为3验证旧手机，给旧手机发验证码去验证
 //                if(userInfo != null){//已存在此手机号
 //                    //验证此手机是否存在其他识别号

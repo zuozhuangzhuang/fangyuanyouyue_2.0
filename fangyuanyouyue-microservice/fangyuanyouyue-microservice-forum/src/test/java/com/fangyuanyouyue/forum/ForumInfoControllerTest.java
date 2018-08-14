@@ -53,4 +53,30 @@ public class ForumInfoControllerTest {
     }
     
 
+    /**
+     * 发布视频
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void addForum() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/forum/addForum")
+        		.param("token", "10045FY1534183918247")
+        		.param("columnId", "4")
+        		.param("title", "这是一个帖子")
+        		.param("content", "这个帖子主要是为了测试一下发布帖子接口能不能用")
+//        		.param("title", "这是一个视频")
+//        		.param("content", "这个视频主要是为了测试一下发布视频接口能不能用")
+//        		.param("videoUrl", "123123123")
+//        		.param("videoLength", "300")
+//        		.param("videoImg", "123123123")
+                //帖子类型 1帖子 2视频
+        		.param("type", "1")
+//        		.param("userIds", "")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+
 }

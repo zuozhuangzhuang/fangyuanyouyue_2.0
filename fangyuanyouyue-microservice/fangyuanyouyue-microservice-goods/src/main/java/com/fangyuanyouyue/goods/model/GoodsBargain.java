@@ -31,4 +31,5 @@ public class GoodsBargain {
 
     private Integer addressId;//收货地址ID
 
+    private Integer isDelete;//是否删除 1是 2否
 }

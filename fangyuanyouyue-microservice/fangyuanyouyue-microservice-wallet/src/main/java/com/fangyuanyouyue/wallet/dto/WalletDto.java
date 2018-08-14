@@ -69,6 +69,8 @@ public class WalletDto {
 
     private Integer status;//会员状态1已开通 2未开通
 
+    private String vipNo;//会员号
+
 
     public WalletDto() {
     }
@@ -127,6 +129,7 @@ public class WalletDto {
             this.vipLevelDesc = userVip.getLevelDesc();
             this.vipType = userVip.getVipType();
             this.status = userVip.getStatus();
+            this.vipNo = userVip.getVipNo();
         }
     }
 

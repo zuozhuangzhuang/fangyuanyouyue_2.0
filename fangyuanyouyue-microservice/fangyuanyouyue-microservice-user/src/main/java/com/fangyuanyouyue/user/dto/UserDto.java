@@ -64,6 +64,7 @@ public class UserDto {
 
     private Integer isPayPwd;//是否设置支付密码 1是 2否
 
+    private Integer appraisalCount;//免费鉴定次数
 
     /**
      * ↓↓↓↓↓↓↓注释掉不需要返回的属性↓↓↓↓↓↓↓

@@ -6,6 +6,9 @@ import lombok.ToString;
 
 import java.util.Date;
 
+/**
+ * 用户信息表
+ */
 @Getter
 @Setter
 @ToString

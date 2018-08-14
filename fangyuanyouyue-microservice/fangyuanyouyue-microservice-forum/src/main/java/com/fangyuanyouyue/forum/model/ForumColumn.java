@@ -10,24 +10,22 @@ import java.util.Date;
 @Setter
 @ToString
 public class ForumColumn {
-    private Integer id;
+    private Integer id;//唯一自增ID
 
-    private Integer userId;
+    private Integer userId;//专栏主用户id
 
-    private String name;
+    private String name;//专栏名称
 
-    private String coverImgUrl;
+    private String coverImgUrl;//封面图片地址
 
-    private Integer fansCount;
+    private Integer fansCount;//粉丝数
 
-    private Date addTime;
+    private Date addTime;//添加时间
 
-    private Date updateTime;
-    
-    private Integer typeId;
+    private Date updateTime;//更新时间
 
-    private String typeName;
-    
-    private Integer isChosen;
+    private Integer isChosen;//是否精选1是 2否
+
+    private Integer typeId;//专栏分类id
 
 }

@@ -40,7 +40,8 @@ public class AppraisalServiceImpl implements AppraisalService{
     private SchedualWalletService schedualWalletService;
 
     @Override
-    public AppraisalOrderInfoDto addAppraisal(Integer userId, Integer[] goodsIds, String title, String description, String[] imgUrls, String videoUrl) throws ServiceException {
+    public AppraisalOrderInfoDto addAppraisal(Integer userId, Integer[] goodsIds, String title, String description, String[] imgUrls, String videoUrl,String videoImg) throws ServiceException {
+        //只有我要鉴定才可以用免费鉴定
         //生成订单
         //每次提交的鉴定生成一个订单，批量鉴定有多个订单详情
         AppraisalOrderInfo appraisalOrderInfo = new AppraisalOrderInfo();
@@ -70,14 +71,13 @@ public class AppraisalServiceImpl implements AppraisalService{
                     if(goodsInfo == null){
                         throw new ServiceException("鉴定列表中包含不存在或已下架商品！");
                     }else{
-
                         //生成鉴定和订单
                         goodsAppraisalDetail = new GoodsAppraisalDetail();
                         goodsAppraisalDetail.setUserId(userId);
                         goodsAppraisalDetail.setAddTime(DateStampUtils.getTimesteamp());
                         goodsAppraisalDetail.setOrderId(appraisalOrderInfo.getId());
                         goodsAppraisalDetail.setGoodsId(goodsId);
-                        goodsAppraisalDetail.setStatus(0);//状态 0申请 1真 2假 3存疑
+                        goodsAppraisalDetail.setStatus(4);//状态 0申请 1真 2假 3存疑 4待支付(在列表中不显示)
                         goodsAppraisalDetail.setDescription(goodsInfo.getDescription());
                         //TODO 根据鉴定费算法
                         BigDecimal price = new BigDecimal(10);
@@ -96,6 +96,9 @@ public class AppraisalServiceImpl implements AppraisalService{
                         }
                         for(GoodsImg goodsImg:imgsByGoodsId){//商品图片s
                             addAppraisalImg(goodsImg.getImgUrl(),goodsAppraisalDetail.getId(),1);
+                            if(goodsImg.getType().intValue() == 3){//视频截图图片
+                                addAppraisalImg(goodsImg.getImgUrl(),goodsAppraisalDetail.getId(),3);
+                            }
                         }
                         //订单总金额
                         amount = amount.add(goodsAppraisalDetail.getPrice());//原价
@@ -103,17 +106,25 @@ public class AppraisalServiceImpl implements AppraisalService{
                 }
             }
         }else{//用户提交图片或视频进行鉴定
+            //TODO 先查询用户免费鉴定次数，如果是 我要鉴定，且有免费鉴定次数，直接鉴定
+            Integer appraisalCount = JSONObject.parseObject(schedualWalletService.getAppraisalCount(userId)).getInteger("data");
             GoodsAppraisalDetail goodsAppraisalDetail = new GoodsAppraisalDetail();
             goodsAppraisalDetail.setUserId(userId);
             goodsAppraisalDetail.setAddTime(DateStampUtils.getTimesteamp());
             goodsAppraisalDetail.setOrderId(appraisalOrderInfo.getId());
-            goodsAppraisalDetail.setStatus(0);//状态 0申请 1真 2假 3存疑
             goodsAppraisalDetail.setType(3);//鉴定类型 1商家鉴定 2买家 3普通用户
             goodsAppraisalDetail.setDescription(description);
+            goodsAppraisalDetail.setStatus(4);//状态 0申请 1真 2假 3存疑 4待支付(在列表中不显示)
             //TODO 根据鉴定费算法
             BigDecimal price = new BigDecimal(10);//自己上传图片或视频收费10元
+            if(appraisalCount > 0){//免费鉴定
+                goodsAppraisalDetail.setStatus(0);
+                price = new BigDecimal(0);
+                JSONObject.parseObject(schedualWalletService.updateAppraisalCount(userId,1)).getInteger("data");
+            }
             goodsAppraisalDetail.setPrice(price);
             goodsAppraisalDetailMapper.insert(goodsAppraisalDetail);
+
             //鉴定图片表
             if(imgUrls != null){
                 for(String imgUrl:imgUrls){
@@ -122,6 +133,11 @@ public class AppraisalServiceImpl implements AppraisalService{
             }
             if(StringUtils.isNotEmpty(videoUrl)){
                 addAppraisalImg(videoUrl,goodsAppraisalDetail.getId(),2);
+                if(StringUtils.isNotEmpty(videoImg)){
+                    addAppraisalImg(videoImg,goodsAppraisalDetail.getId(),3);
+                }else{
+                    throw new ServiceException("视频封面图不能为空！");
+                }
             }
             //订单总金额
             amount = amount.add(price);//原价
@@ -158,7 +174,7 @@ public class AppraisalServiceImpl implements AppraisalService{
         if(appraisalOrderInfo == null){
             throw new ServiceException("获取鉴定信息失败！");
         }else{
-            List<GoodsAppraisalDetail> goodsAppraisalDetails = goodsAppraisalDetailMapper.selectListByUserId(userId,orderId,null,null);
+            List<GoodsAppraisalDetail> goodsAppraisalDetails = goodsAppraisalDetailMapper.selectListByUserId(userId,orderId,null,null,4);
             for(GoodsAppraisalDetail detail:goodsAppraisalDetails){
                 if(detail != null){
                     //删除鉴定详情
@@ -179,7 +195,7 @@ public class AppraisalServiceImpl implements AppraisalService{
     @Override
     public List<AppraisalDetailDto> getAppraisal(Integer userId, Integer start, Integer limit) throws ServiceException {
         //根据用户ID分页获取鉴定列表
-        List<GoodsAppraisalDetail> details = goodsAppraisalDetailMapper.selectListByUserId(userId,null,start*limit,limit);
+        List<GoodsAppraisalDetail> details = goodsAppraisalDetailMapper.selectListByUserId(userId,null,start*limit,limit,null);
         if(details == null){
             throw new ServiceException("获取鉴定信息失败！");
         }
@@ -192,6 +208,9 @@ public class AppraisalServiceImpl implements AppraisalService{
     public AppraisalDetailDto appraisalDetail(Integer userId, Integer detailId) throws ServiceException {
         //获取鉴定详情
         GoodsAppraisalDetail detail = goodsAppraisalDetailMapper.selectByPrimaryKey(detailId);
+        if(detail == null){
+            throw new ServiceException("鉴定详情不存在！");
+        }
         AppraisalDetailDto detailDto = new AppraisalDetailDto(detail);
         //获取鉴定图片列表
         List<AppraisalUrl> appraisalUrls = appraisalUrlMapper.selectListBuUserId(detail.getId());
@@ -207,11 +226,14 @@ public class AppraisalServiceImpl implements AppraisalService{
         if(orderInfo == null){
             throw new ServiceException("订单不存在！");
         }else{
+            StringBuffer payInfo = new StringBuffer();
             switch (type){
                 case 1://支付宝
-                    return "支付宝支付回调！";
+                    payInfo.append("支付宝支付回调！");
+                    break;
                 case 2://微信
-                    return "微信支付回调！";
+                    payInfo.append("微信支付回调！");
+                    break;
                 case 3://余额
                     //验证支付密码
                     Boolean verifyPayPwd = Boolean.valueOf(JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getString("data"));
@@ -221,10 +243,17 @@ public class AppraisalServiceImpl implements AppraisalService{
                         //调用wallet-service修改余额功能
                         schedualWalletService.updateBalance(userId,orderInfo.getAmount(),2);
                     }
-                    return "余额支付成功！";
+                    payInfo.append("余额支付成功！");
+                    break;
                 default:
                     throw new ServiceException("支付类型错误！");
             }
+            List<GoodsAppraisalDetail> listByOrderIdStatus = goodsAppraisalDetailMapper.getListByOrderIdStatus(orderId, 4);
+            for(GoodsAppraisalDetail detail:listByOrderIdStatus){
+                detail.setStatus(0);//支付后修改为申请中
+                goodsAppraisalDetailMapper.updateByPrimaryKey(detail);
+            }
+            return payInfo.toString();
         }
     }
 

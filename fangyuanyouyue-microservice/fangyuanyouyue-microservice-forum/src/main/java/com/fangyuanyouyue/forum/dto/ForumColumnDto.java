@@ -38,7 +38,6 @@ public class ForumColumnDto {
         this.coverImgUrl = forumInfo.getCoverImgUrl();
         this.fansCount = forumInfo.getFansCount();
         this.typeId = forumInfo.getTypeId();
-        this.typeName = forumInfo.getTypeName();
     }
     public static List<ForumColumnDto> toDtoList(List<ForumColumn> list) {
         if (list == null)

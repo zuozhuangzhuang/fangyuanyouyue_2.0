@@ -8,10 +8,10 @@ import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.goods.dto.*;
 import com.fangyuanyouyue.goods.model.BannerIndex;
 import com.fangyuanyouyue.goods.model.GoodsInfo;
+import com.fangyuanyouyue.goods.model.OrderInfo;
+import com.fangyuanyouyue.goods.model.OrderRefund;
 import com.fangyuanyouyue.goods.param.GoodsParam;
-import com.fangyuanyouyue.goods.service.GoodsInfoService;
-import com.fangyuanyouyue.goods.service.SchedualRedisService;
-import com.fangyuanyouyue.goods.service.SchedualUserService;
+import com.fangyuanyouyue.goods.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -36,11 +36,15 @@ public class GoodsController extends BaseController{
     @Autowired
     private GoodsInfoService goodsInfoService;
     @Autowired
-    private SchedualUserService schedualUserService;//调用其他service时用
+    private SchedualUserService schedualUserService;
     @Autowired
     protected RedisTemplate redisTemplate;
     @Autowired
     private SchedualRedisService schedualRedisService;
+    @Autowired
+    private OrderInfoService orderInfoService;
+    @Autowired
+    private SchedualOrderService schedualOrderService;
 
     @ApiOperation(value = "获取商品/抢购列表", notes = "(GoodsDto)根据start和limit获取分页后的商品/抢购，根据用户token获取买家相关商品/抢购列表，" +
             "根据userId获取卖家相关商品/抢购列表，根据search、synthesizer、priceMin、priceMax、quality、goodsCategoryIds对列表进行筛选，根据type进行区分商品和抢购",response = BaseResp.class)
@@ -101,7 +105,7 @@ public class GoodsController extends BaseController{
         }
     }
 
-    @ApiOperation(value = "发布商品/抢购", notes = "(GoodsDto)发布商品/抢购",response = BaseResp.class)
+    @ApiOperation(value = "发布商品/抢购", notes = "(void)发布商品/抢购",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true,dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "goodsInfoName", value = "商品名称", required = true, dataType = "String", paramType = "query"),
@@ -111,11 +115,13 @@ public class GoodsController extends BaseController{
             @ApiImplicitParam(name = "postage", value = "运费", required = true, dataType = "BigDecimal", paramType = "query"),
             @ApiImplicitParam(name = "label", value = "标签", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "floorPrice", value = "最低价", dataType = "BigDecimal", paramType = "query"),
-            @ApiImplicitParam(name = "intervalTime", value = "降价时间间隔", dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "intervalTime", value = "降价时间间隔，单位：秒", dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "markdown", value = "降价幅度", dataType = "BigDecimal", paramType = "query"),
             @ApiImplicitParam(name = "type", value = "类型 1普通商品 2抢购商品", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "imgUrls", value = "商品图片路径数组", required = true,allowMultiple = true,dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "videoUrl", value = "视频路径",dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "videoUrl", value = "视频路径",dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "videoImg", value = "视频截图路径",dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "userIds", value = "邀请用户id数组",allowMultiple = true,dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/addGoods")
     @ResponseBody
@@ -132,6 +138,10 @@ public class GoodsController extends BaseController{
             JSONObject jsonObject = JSONObject.parseObject(verifyUser);
             if((Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
+            }
+            //验证实名认证
+            if(JSONObject.parseObject(schedualUserService.isAuth(userId)).getBoolean("data") == false){
+                return toError(ReCode.FAILD.getValue(),"用户未实名认证！");
             }
             JSONObject user = JSONObject.parseObject(jsonObject.getString("data"));
             if(StringUtils.isEmpty(param.getGoodsInfoName())){
@@ -166,8 +176,8 @@ public class GoodsController extends BaseController{
                     return toError(ReCode.FAILD.getValue(),"降价幅度不能为空！");
                 }
             }
-            GoodsDto goodsDto = goodsInfoService.addGoods(userId,user.getString("nickName"),param);
-            return toSuccess(goodsDto);
+            goodsInfoService.addGoods(userId,user.getString("nickName"),param);
+            return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
@@ -180,7 +190,7 @@ public class GoodsController extends BaseController{
 
     @ApiOperation(value = "批量删除商品", notes = "(void)批量删除商品",response = BaseResp.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "token", value = "用户token", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "token", value = "用户token", dataType = "String", paramType = "query",example = ""),
             @ApiImplicitParam(name = "goodsIds", value = "商品id数组", required = true, allowMultiple = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/deleteGoods")
@@ -203,15 +213,20 @@ public class GoodsController extends BaseController{
                 return toError(ReCode.FAILD.getValue(),"商品ID不能为空！");
             }
             for(Integer goodsId:param.getGoodsIds()){
-                //依次查询商品是否有未完成订单，有订单则不能删
+                //TODO 1、商品是否存在订单 2、订单是否已完成或已取消 3、订单已退款：是否已完成退款、是否已拒绝退款
                 GoodsInfo goodsInfo = goodsInfoService.selectByPrimaryKey(goodsId);
                 if(goodsInfo.getStatus() == 2){
-                    return toError(ReCode.FAILD.getValue(),"商品【"+goodsInfo.getName()+"】存在未完成订单，请勿删除！");
+                    OrderInfo orderInfo = orderInfoService.selectOrderByGoodsId(userId,goodsId);
+                    //1、判断是否在退货 2、判断是否已完成、已取消
+                    OrderRefund orderRefund = orderInfoService.seletRefundByOrderId(orderInfo.getId());
+                    if((orderInfo.getStatus().intValue() != 4 && orderInfo.getStatus().intValue() != 5) || (orderRefund != null && orderRefund.getStatus() == 1) ){
+                        return toError(ReCode.FAILD.getValue(),"商品【"+goodsInfo.getName()+"】存在未完成订单，请勿删除！");
+                    }
                 }
             }
 
             //TODO 批量删除商品
-            goodsInfoService.deleteGoods(param.getGoodsIds());
+            goodsInfoService.deleteGoods(userId,param.getGoodsIds());
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();

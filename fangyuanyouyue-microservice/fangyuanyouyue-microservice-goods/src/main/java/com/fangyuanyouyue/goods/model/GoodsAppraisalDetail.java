@@ -21,7 +21,7 @@ public class GoodsAppraisalDetail {
 
     private String opinion;//鉴定观点
 
-    private Integer status;//状态 0申请 1真 2假 3存疑
+    private Integer status;//状态 0申请 1真 2假 3存疑 4待支付(在列表中不显示)
 
     private String title;//鉴定标题
 

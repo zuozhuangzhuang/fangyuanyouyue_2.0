@@ -3,6 +3,7 @@ package com.fangyuanyouyue.goods.dao;
 import com.fangyuanyouyue.goods.model.GoodsAppraisalDetail;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
 
@@ -35,7 +36,7 @@ public interface GoodsAppraisalDetailMapper {
      * @param userId
      * @return
      */
-    List<GoodsAppraisalDetail> selectListByUserId(@Param("userId") Integer userId,@Param("orderId")Integer orderId,@Param("start")Integer start,@Param("limit")Integer limit);
+    List<GoodsAppraisalDetail> selectListByUserId(@Param("userId") Integer userId,@Param("orderId")Integer orderId,@Param("start")Integer start,@Param("limit")Integer limit,@Param("status")Integer status);
 
     /**
      * 鉴定展示
@@ -44,5 +45,12 @@ public interface GoodsAppraisalDetailMapper {
      * @return
      */
     List<GoodsAppraisalDetail> getListByStatus(@Param("start")Integer start,@Param("limit")Integer limit);
+
+    /**
+     * 根据订单ID、status获取鉴定列表
+     * @param orderId
+     * @return
+     */
+    List<GoodsAppraisalDetail> getListByOrderIdStatus(@Param("orderId")Integer orderId,@Param("status")Integer status);
 
 }

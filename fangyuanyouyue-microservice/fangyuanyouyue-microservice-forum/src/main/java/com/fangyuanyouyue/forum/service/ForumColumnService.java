@@ -15,7 +15,6 @@ public interface ForumColumnService {
 
 	/**
 	 * 获取全部专栏
-	 * @param forumId
 	 * @param start
 	 * @param limit
 	 * @return
@@ -25,11 +24,16 @@ public interface ForumColumnService {
 
 	/**
 	 * 获取精选专栏
-	 * @param forumId
 	 * @return
 	 * @throws ServiceException
 	 */
     List<ForumColumnDto> getChosenColumnList() throws ServiceException;
- 
 
+	/**
+	 * 发布专栏
+	 * @param userId
+	 * @param typeId
+	 * @throws ServiceException
+	 */
+	void addColumn(Integer userId,Integer typeId) throws ServiceException;
 }

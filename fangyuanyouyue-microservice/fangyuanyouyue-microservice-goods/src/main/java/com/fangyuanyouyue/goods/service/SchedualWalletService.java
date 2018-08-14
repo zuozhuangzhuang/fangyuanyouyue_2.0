@@ -21,4 +21,22 @@ public interface SchedualWalletService {
      */
     @RequestMapping(value = "/walletFeign/updateBalance",method = RequestMethod.POST)
     String updateBalance(@RequestParam(value = "userId") Integer userId, @RequestParam(value = "amount") BigDecimal amount, @RequestParam(value = "type") Integer type);
+
+
+    /**
+     * 获取免费鉴定次数
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "/walletFeign/getAppraisalCount",method = RequestMethod.GET)
+    String getAppraisalCount(@RequestParam(value = "userId") Integer userId);
+
+    /**
+     * 修改剩余免费鉴定次数
+     * @param userId
+     * @param count
+     * @return
+     */
+    @RequestMapping(value = "/walletFeign/updateAppraisalCount",method = RequestMethod.POST)
+    String updateAppraisalCount(@RequestParam(value = "userId") Integer userId,@RequestParam(value = "count") Integer count);
 }

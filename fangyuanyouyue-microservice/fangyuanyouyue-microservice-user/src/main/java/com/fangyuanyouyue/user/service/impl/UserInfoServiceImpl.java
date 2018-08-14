@@ -161,7 +161,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         userVipMapper.insert(userVip);
         //TODO 注册通讯账户
         registIMUser(user);
-        //TODO 调用钱包系统初始化接口
+        //调用钱包系统初始化接口
         UserWallet userWallet = new UserWallet();
         userWallet.setUserId(user.getId());
         userWallet.setBalance(new BigDecimal(0));
@@ -169,6 +169,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         userWallet.setPoint(0L);//剩余积分
         userWallet.setScore(0L);//用户总积分
         userWallet.setAddTime(DateStampUtils.getTimesteamp());
+        userWallet.setAppraisalCount(1);//普通用户只有1次免费鉴定
         userWalletMapper.insert(userWallet);
         //初始化用户钱包
         UserDto userDto = setUserDtoByInfo(token,user);
@@ -265,7 +266,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             //TODO 注册通讯账户
             registIMUser(user);
             
-            //TODO 调用钱包系统初始化接口
+            //调用钱包系统初始化接口
             UserWallet userWallet = new UserWallet();
             userWallet.setUserId(user.getId());
             userWallet.setBalance(new BigDecimal(0));
@@ -273,6 +274,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             userWallet.setPoint(0L);
             userWallet.setScore(0L);//用户总积分
             userWallet.setAddTime(DateStampUtils.getTimesteamp());
+            userWallet.setAppraisalCount(1);//普通用户只有1次免费鉴定
             userWalletMapper.insert(userWallet);
             UserDto userDto = setUserDtoByInfo(token,user);
             return userDto;
@@ -319,6 +321,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                     }
                 }
             }else{
+                userThirdParty = new UserThirdParty();
                 userThirdParty.setUserId(userInfo.getId());
                 userThirdParty.setType(type);
                 userThirdParty.setUnionId(unionId);
@@ -464,7 +467,6 @@ public class UserInfoServiceImpl implements UserInfoService {
             UserVip userVip = userVipMapper.getUserVipByUserId(user.getId());
 //            IdentityAuthApply identityAuthApply = identityAuthApplyMapper.selectByUserId(user.getId());
             UserDto userDto = new UserDto(token,user,userVip,userInfoExt);
-            //TODO 单独请求用户等级，还是返回到UserDto中
             UserWallet userWallet = userWalletMapper.selectByUserId(user.getId());
             if(userWallet == null){
                 throw new ServiceException("获取钱包失败！");
@@ -491,6 +493,8 @@ public class UserInfoServiceImpl implements UserInfoService {
                 }else{
                     throw new ServiceException("积分错误！");
                 }
+                //免费鉴定次数
+                userDto.setAppraisalCount(userWallet.getAppraisalCount());
             }
             return userDto;
         }
@@ -566,7 +570,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             userVipMapper.insert(userVip);
             //TODO 注册通讯账户
             registIMUser(user);
-            //TODO 调用钱包系统初始化接口
+            //调用钱包系统初始化接口
             UserWallet userWallet = new UserWallet();
             userWallet.setUserId(user.getId());
             userWallet.setBalance(new BigDecimal(0));
@@ -574,6 +578,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             userWallet.setPoint(0L);
             userWallet.setScore(0L);//用户总积分
             userWallet.setAddTime(DateStampUtils.getTimesteamp());
+            userWallet.setAppraisalCount(1);//普通用户只有1次免费鉴定
             userWalletMapper.insert(userWallet);
             UserDto userDto = setUserDtoByInfo(token,user);
             return userDto;

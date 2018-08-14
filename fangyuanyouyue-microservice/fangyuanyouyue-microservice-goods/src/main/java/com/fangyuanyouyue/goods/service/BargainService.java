@@ -24,6 +24,9 @@ public interface BargainService {
      * 处理压价
      * @param userId
      * @param goodsId
+     * @param bargainId
+     * @param status 状态 2同意 3拒绝 4取消
+     * @return
      * @throws ServiceException
      */
     Integer updateBargain(Integer userId, Integer goodsId,Integer bargainId,Integer status) throws ServiceException;
@@ -33,10 +36,11 @@ public interface BargainService {
      * @param userId
      * @param start
      * @param limit
+     * @param search
      * @return
      * @throws ServiceException
      */
-    List<GoodsDto> bargainList(Integer userId, Integer start, Integer limit) throws ServiceException;
+    List<GoodsDto> bargainList(Integer userId, Integer start, Integer limit,String search) throws ServiceException;
 
     /**
      * 压价详情
@@ -56,4 +60,13 @@ public interface BargainService {
      * @throws ServiceException
      */
     Integer getProcess(Integer userId) throws ServiceException;
+
+    /**
+     * 删除我的议价
+     * @param userId
+     * @param goodsIds
+     * @return
+     * @throws ServiceException
+     */
+    void deleteBargain(Integer userId,Integer[] goodsIds) throws ServiceException;
 }

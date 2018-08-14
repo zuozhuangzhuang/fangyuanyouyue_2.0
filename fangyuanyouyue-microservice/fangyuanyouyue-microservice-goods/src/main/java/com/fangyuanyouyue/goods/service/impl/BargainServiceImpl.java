@@ -85,9 +85,9 @@ public class BargainServiceImpl implements BargainService{
                 }
                 goodsBargain.setStatus(1);//状态 1申请 2同意 3拒绝 4取消
                 goodsBargain.setAddTime(DateStampUtils.getTimesteamp());
+                goodsBargain.setIsDelete(2);//是否删除 1是 2否
                 //验证支付密码
-                // FIXME: 2018/8/9 客户端完成支付功能后取消注释
-                /*Boolean verifyPayPwd = Boolean.valueOf(JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getString("data"));
+                Boolean verifyPayPwd = Boolean.valueOf(JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getString("data"));
                 if(!verifyPayPwd){
                     throw new ServiceException("支付密码错误！");
                 }else{
@@ -95,9 +95,7 @@ public class BargainServiceImpl implements BargainService{
                     //调用wallet-service修改余额功能
                     schedualWalletService.updateBalance(userId, goodsBargain.getPrice(),2);
                     goodsBargainMapper.insert(goodsBargain);
-                }*/
-                schedualWalletService.updateBalance(userId, goodsBargain.getPrice(),2);
-                goodsBargainMapper.insert(goodsBargain);
+                }
                 //TODO 压价时环信发送信息到店家
             }
         }
@@ -240,9 +238,9 @@ public class BargainServiceImpl implements BargainService{
     }
 
     @Override
-    public List<GoodsDto> bargainList(Integer userId,Integer start,Integer limit) throws ServiceException {
+    public List<GoodsDto> bargainList(Integer userId,Integer start,Integer limit,String search) throws ServiceException {
         //根据申请议价用户ID获取此用户的所有压价申请，筛选出商品ID列表，遍历商品列表，根据商品ID和用户ID查询压价列表，存入商品dto中
-        List<Integer> goodsIdsByUserId = goodsBargainMapper.selectGoodsIdsByUserId(userId,start*limit,limit);
+        List<Integer> goodsIdsByUserId = goodsBargainMapper.selectGoodsIdsByUserId(userId,start*limit,limit,search);
         List<GoodsDto> goodsDtos = new ArrayList<>();
         for(Integer goodsId:goodsIdsByUserId){
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
@@ -348,5 +346,29 @@ public class BargainServiceImpl implements BargainService{
         //状态 1申请
         List<GoodsBargain> goodsIdsByUserId = goodsBargainMapper.selectAllByUserId(userId,1);
         return goodsIdsByUserId == null?0:goodsIdsByUserId.size();
+    }
+
+    @Override
+    public void deleteBargain(Integer userId, Integer[] goodsIds) throws ServiceException {
+        for(Integer goodsId:goodsIds){
+            GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
+            //取消用户在所选商品的议价信息
+            List<GoodsBargain> goodsBargains = goodsBargainMapper.selectByUserIdGoodsId(userId, goodsId, null);
+            if(goodsBargains == null || goodsBargains.size() == 0){
+                throw new ServiceException("议价信息不存在！");
+            }
+            for(GoodsBargain bargain:goodsBargains){
+                //删除商品内所有议价信息
+                if(bargain.getStatus() == 1){
+                    bargain.setStatus(4);
+                    //退回余额
+                    //调用wallet-service修改余额功能
+                    schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),1);
+                    updateBargain(userId,goodsId,bargain.getId(),4);
+                }
+                bargain.setIsDelete(1);//是否删除 1是 2否
+                goodsBargainMapper.updateByPrimaryKey(bargain);
+            }
+        }
     }
 }

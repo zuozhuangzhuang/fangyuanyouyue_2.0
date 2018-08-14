@@ -12,10 +12,11 @@
     <result column="status" jdbcType="INTEGER" property="status" />
     <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="vip_no" jdbcType="VARCHAR" property="vipNo" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, start_time, end_time, vip_level, level_desc, vip_type, status, add_time, 
-    update_time
+    update_time, vip_no
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -27,15 +28,15 @@
     delete from user_vip
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.wallet.model.UserVip">
+  <insert id="insert" parameterType="com.fangyuanyouyue.wallet.model.UserVip" useGeneratedKeys="true" keyProperty="id">
     insert into user_vip (id, user_id, start_time, 
       end_time, vip_level, level_desc, 
       vip_type, status, add_time, 
-      update_time)
+      update_time, vip_no)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{startTime,jdbcType=TIMESTAMP}, 
       #{endTime,jdbcType=TIMESTAMP}, #{vipLevel,jdbcType=INTEGER}, #{levelDesc,jdbcType=VARCHAR}, 
       #{vipType,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP})
+      #{updateTime,jdbcType=TIMESTAMP}, #{vipNo,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.fangyuanyouyue.wallet.model.UserVip">
     insert into user_vip
@@ -70,6 +71,9 @@
       <if test="updateTime != null">
         update_time,
       </if>
+      <if test="vipNo != null">
+        vip_no,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -101,6 +105,9 @@
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="vipNo != null">
+        #{vipNo,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -134,6 +141,9 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="vipNo != null">
+        vip_no = #{vipNo,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -147,7 +157,8 @@
       vip_type = #{vipType,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      vip_no = #{vipNo,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 

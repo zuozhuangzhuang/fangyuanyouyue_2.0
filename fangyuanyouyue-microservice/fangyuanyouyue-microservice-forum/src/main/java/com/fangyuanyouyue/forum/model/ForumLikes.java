@@ -6,21 +6,20 @@ import lombok.ToString;
 
 import java.util.Date;
 
+/**
+ * 论坛帖子点赞表
+ */
 @Getter
 @Setter
 @ToString
 public class ForumLikes {
-    private Integer id;
+    private Integer id;//
 
-    private Integer userId;
+    private Integer userId;//
 
-    private Integer forumId;
+    private Integer forumId;//
 
-    private Date addTime;
-    
-    private String headImgUrl;
-    
-    private String nickName;
+    private Date addTime;//
 
 
 }

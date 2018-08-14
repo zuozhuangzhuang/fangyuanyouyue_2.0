@@ -79,7 +79,6 @@
       add_time = #{addTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
-  
   <select id="countById" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
     select count(*) from appraisal_likes where appraisal_id = #{appraisalId,jdbcType=INTEGER}
   </select>

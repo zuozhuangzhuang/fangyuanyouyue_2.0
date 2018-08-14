@@ -29,4 +29,6 @@ public class UserWallet {
     private Date addTime;//添加时间
 
     private Date updateTime;//更新时间
+
+    private Integer appraisalCount;//免费鉴定次数
 }

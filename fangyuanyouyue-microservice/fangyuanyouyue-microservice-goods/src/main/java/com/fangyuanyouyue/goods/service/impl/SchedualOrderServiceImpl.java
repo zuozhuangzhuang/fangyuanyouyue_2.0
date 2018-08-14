@@ -5,8 +5,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SchedualOrderServiceImpl implements SchedualOrderService{
-//    @Override
-//    public Boolean set(String token, Integer[] goodsIds, Long expire) {
-//        return null;
-//    }
+    @Override
+    public String getOrderStatus(Integer userId, Integer orderId) {
+        return "获取订单状态失败！";
+    }
 }

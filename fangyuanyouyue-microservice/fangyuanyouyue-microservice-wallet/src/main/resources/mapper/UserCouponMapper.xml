@@ -22,7 +22,7 @@
     delete from user_coupon
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.wallet.model.UserCoupon" >
+  <insert id="insert" parameterType="com.fangyuanyouyue.wallet.model.UserCoupon" useGeneratedKeys="true" keyProperty="id">
     insert into user_coupon (id, user_id, coupon_id, 
       status, add_time, update_time
       )

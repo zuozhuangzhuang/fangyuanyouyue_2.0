@@ -48,5 +48,5 @@ public interface GoodsBargainMapper {
      * @param userId
      * @return
      */
-    List<Integer> selectGoodsIdsByUserId(@Param("userId")Integer userId,@Param("start")Integer start,@Param("limit")Integer limit);
+    List<Integer> selectGoodsIdsByUserId(@Param("userId")Integer userId,@Param("start")Integer start,@Param("limit")Integer limit,@Param("search")String search);
 }

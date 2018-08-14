@@ -53,7 +53,8 @@ public class AppraisalController extends BaseController{
             @ApiImplicitParam(name = "goodsIds", value = "商品ID数组", allowMultiple = true,dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "description", value = "描述",  dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "imgUrls", value = "图片地址数组",allowMultiple = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "videoUrl", value = "视频路径",dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "videoUrl", value = "视频路径",dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "videoImg", value = "视频截图路径",dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/addAppraisal")
     @ResponseBody
@@ -77,7 +78,7 @@ public class AppraisalController extends BaseController{
                 }
             }
             //申请鉴定，需要生成订单并返回订单信息
-            AppraisalOrderInfoDto appraisalOrderInfoDto = appraisalService.addAppraisal(userId, param.getGoodsIds(), param.getTitle(), param.getDescription(), param.getImgUrls(),param.getVideoUrl());
+            AppraisalOrderInfoDto appraisalOrderInfoDto = appraisalService.addAppraisal(userId, param.getGoodsIds(), param.getTitle(), param.getDescription(), param.getImgUrls(),param.getVideoUrl(),param.getVideoImg());
             return toSuccess(appraisalOrderInfoDto);
         } catch (ServiceException e) {
             e.printStackTrace();

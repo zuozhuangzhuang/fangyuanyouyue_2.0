@@ -20,12 +20,13 @@ public interface GoodsInfoService {
      * @throws ServiceException
      */
     String goodsMainImg(Integer goodsId) throws ServiceException;
+
     /**
      * 根据ID获取商品
      * @param id
      * @return
      */
-    GoodsInfo selectByPrimaryKey(Integer id);
+    GoodsInfo selectByPrimaryKey(Integer id) throws ServiceException;
 
     /**
      * 获取商品列表
@@ -40,14 +41,15 @@ public interface GoodsInfoService {
      * @return
      * @throws ServiceException
      */
-    GoodsDto addGoods(Integer userId,String nickName,GoodsParam param) throws ServiceException;
+    void addGoods(Integer userId,String nickName,GoodsParam param) throws ServiceException;
 
     /**
      * 批量删除商品
+     * @param userId
      * @param goodsIds
      * @throws ServiceException
      */
-    void deleteGoods(Integer[] goodsIds) throws ServiceException;
+    void deleteGoods(Integer userId,Integer[] goodsIds) throws ServiceException;
 
     /**
      * 编辑商品/抢购

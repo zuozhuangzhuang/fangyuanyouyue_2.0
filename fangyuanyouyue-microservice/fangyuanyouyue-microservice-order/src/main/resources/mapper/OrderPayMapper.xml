@@ -330,8 +330,9 @@
   <select id="selectByOrderId" parameterType="Integer" resultMap="BaseResultMap">
     select * from order_pay
     <where>
+      status <![CDATA[ <> ]]> 5 and status <![CDATA[ <> ]]> 6
       <if test="orderId != null">
-        order_id = #{orderId,jdbcType=INTEGER}
+        and order_id = #{orderId,jdbcType=INTEGER}
       </if>
     </where>
   </select>
