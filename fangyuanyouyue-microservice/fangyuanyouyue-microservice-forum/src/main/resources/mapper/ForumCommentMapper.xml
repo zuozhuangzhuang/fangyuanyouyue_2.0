@@ -16,12 +16,6 @@
   <sql id="Base_Column_List" >
     id, user_id, forum_id, comment_id, content, status, add_time, update_time
   </sql>
-  <select id="countAll" resultType="java.lang.Integer" >
-    select count(*) from forum_comment
-  </select>
-  <select id="countById" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
-    select count(*) from forum_comment where forum_id = #{forumId,jdbcType=INTEGER}
-  </select>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
