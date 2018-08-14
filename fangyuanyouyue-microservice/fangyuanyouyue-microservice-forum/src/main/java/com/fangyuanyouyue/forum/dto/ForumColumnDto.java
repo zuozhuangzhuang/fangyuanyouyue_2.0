@@ -16,10 +16,10 @@ import lombok.ToString;
 @ToString
 public class ForumColumnDto {
 
-    private Integer columnId;//帖子id
+    private Integer columnId;//专栏id
     
     private Integer typeId;//类型id
-    
+
     private String typeName;//类型名称
 
     private String name;//专栏名称

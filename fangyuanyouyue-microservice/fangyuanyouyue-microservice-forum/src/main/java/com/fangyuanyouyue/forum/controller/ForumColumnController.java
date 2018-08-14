@@ -74,10 +74,27 @@ public class ForumColumnController extends BaseController {
 		}
 	}
 
+
+	@ApiOperation(value = "获取专栏分类列表", notes = "获取专栏分类列表", response = BaseResp.class)
+	@PostMapping(value = "/getForumTypeList")
+	@ResponseBody
+	public BaseResp getForumTypeList() throws IOException {
+		try {
+			log.info("----》获取专栏分类列表《----");
+			//获取专栏分类列表
+			List<ForumColumnTypeDto> typeList = forumColumnService.getForumTypeList();
+			return toSuccess(typeList);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return toError(ReCode.FAILD.getValue(), "系统繁忙，请稍后再试！");
+		}
+	}
+
 	@ApiOperation(value = "申请专栏", notes = "申请专栏", response = BaseResp.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "token", value = "用户token",required = true, dataType = "String", paramType = "query"),
-			@ApiImplicitParam(name = "typeId", value = "专栏分类id",required = true, dataType = "int", paramType = "query")
+			@ApiImplicitParam(name = "typeId", value = "专栏分类id",required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "name", value = "专栏名称",required = true, dataType = "String", paramType = "query")
 	})
 	@PostMapping(value = "/addColumn")
 	@ResponseBody
@@ -102,8 +119,11 @@ public class ForumColumnController extends BaseController {
 			if(param.getTypeId() == null){
 				return toError(ReCode.FAILD.getValue(),"专栏分类id不能为空！");
 			}
+			if(StringUtils.isEmpty(param.getName())){
+				return toError(ReCode.FAILD.getValue(),"专栏名称不能为空！");
+            }
 			//TODO 申请专栏
-			forumColumnService.addColumn(userId,param.getTypeId());
+			forumColumnService.addColumn(userId,param.getTypeId(),param.getName());
 
 			return toSuccess();
 		} catch (Exception e) {

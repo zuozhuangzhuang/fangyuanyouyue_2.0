@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @ApiModel(value = "论坛相关参数")
 @Getter
 @Setter
@@ -37,7 +39,13 @@ public class AppraisalParam{
 	@ApiModelProperty(name = "keyword", value = "关键字搜索", dataType = "String",hidden = true)
 	private String keyword;//帖子内容
 
-	@ApiModelProperty(name = "content", value = "评论内容", dataType = "String",hidden = true)
-	private String content;
+	@ApiModelProperty(name = "bonus", value = "鉴定赏金", dataType = "BigDecimal",hidden = true)
+	private BigDecimal bonus;//鉴定赏金
+
+	@ApiModelProperty(name = "title", value = "标题", dataType = "String",hidden = true)
+	private String title;//标题
+
+	@ApiModelProperty(name = "content", value = "商品描述", dataType = "String",hidden = true)
+	private String content;//商品描述
 
 }

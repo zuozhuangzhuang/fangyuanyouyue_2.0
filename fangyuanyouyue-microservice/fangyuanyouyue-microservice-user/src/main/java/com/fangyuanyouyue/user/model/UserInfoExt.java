@@ -25,7 +25,7 @@ public class UserInfoExt {
 
     private Integer status;//实名登记状态 1已实名 2未实名
 
-    private Integer authType;//认证状态 1已认证 2未认证
+    private Integer authType;//认证状态 0申请中 1已认证 2未认证
 
     private Long credit;//信誉度
 

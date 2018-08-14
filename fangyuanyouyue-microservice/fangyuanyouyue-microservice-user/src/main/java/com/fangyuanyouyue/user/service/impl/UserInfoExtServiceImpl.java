@@ -85,4 +85,22 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
             return false;
         }
     }
+
+    @Override
+    public void authType(Integer userId) throws ServiceException {
+        UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(userId);
+        if(userInfoExt == null){
+            throw new ServiceException("用户扩展信息错误！");
+        }else{
+            //认证状态 0申请中 1已认证 2未认证
+            if(userInfoExt.getAuthType() == 1){
+                throw new ServiceException("您的官方认证已通过，请勿重复提交！");
+            }else if(userInfoExt.getAuthType() == 0){
+                throw new ServiceException("您已提交官方认证，请耐心等待！");
+            }else{
+                userInfoExt.setAuthType(0);
+                userInfoExtMapper.updateByPrimaryKey(userInfoExt);
+            }
+        }
+    }
 }

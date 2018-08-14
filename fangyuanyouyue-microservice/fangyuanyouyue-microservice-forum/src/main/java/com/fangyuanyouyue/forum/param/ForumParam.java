@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @ApiModel(value = "论坛相关参数")
 @Getter
 @Setter
@@ -63,4 +65,11 @@ public class ForumParam{
 
 	@ApiModelProperty(name = "typeId", value = "专栏分类id", dataType = "int",hidden = true)
 	private Integer typeId;//专栏分类id
+
+	@ApiModelProperty(name = "name", value = "专栏名称", dataType = "String",hidden = true)
+	private String name;//专栏名称
+
+	@ApiModelProperty(name = "coverImgUrl", value = "封面图片地址", dataType = "String",hidden = true)
+	private String coverImgUrl;//封面图片地址
+
 }

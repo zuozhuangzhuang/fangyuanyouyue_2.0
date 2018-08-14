@@ -14,7 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 @RunWith(SpringRunner.class)
@@ -22,7 +21,7 @@ import org.springframework.web.context.WebApplicationContext;
 @WebAppConfiguration
 @ContextConfiguration
 @Rollback
-public class ForumColumnControllerTest {
+public class AppraisalControllerTest {
     @Autowired
     private WebApplicationContext context;
 
@@ -36,48 +35,19 @@ public class ForumColumnControllerTest {
     }
 
     /**
-     * 获取全部专栏
-     * @throws Exception
-     */
-    @Test
-    @Transactional
-    public void columnList() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/column/list")
-                .accept(MediaType.APPLICATION_JSON))
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
-    }
-    
-
-    /**
-     * 获取推荐专栏
-     * @throws Exception
-     */
-    @Test
-    @Transactional
-    public void columnChosen() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/column/chosen")
-                .accept(MediaType.APPLICATION_JSON))
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
-    }
-
-    /**
-     * 发布专栏
+     * 发起鉴定
      * @throws Exception
      */
     @Test
 //    @Transactional
-    public void addColumn() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/column/addColumn")
+    public void addAppraisal() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/appraisal/addAppraisal")
                 .param("token", "10045FY1534183918247")
-                .param("typeId", "8")
-                .param("name", "女人都是大猪蹄子")
-
+                .param("bonus", "80")
+                .param("title", "说说女人")
+                .param("content", "女人都是大猪蹄子")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
-
-
 }

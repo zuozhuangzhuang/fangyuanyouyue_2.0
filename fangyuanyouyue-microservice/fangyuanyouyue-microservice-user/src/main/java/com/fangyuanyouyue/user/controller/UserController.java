@@ -565,7 +565,7 @@ public class UserController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "phone", value = "用户手机号", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "type", value = "验证码类型 0注册 1表找回密码 2 设置/修改支付密码 3验证旧手机，4绑定新手机 5店铺认证", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "验证码类型 0注册 1表找回密码 2 设置/修改支付密码 3验证旧手机，4绑定新手机 5店铺认证 6申请专栏", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "unionId", value = "三方唯一识别号", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "thirdType", value = "类型 1微信 2QQ 3微博", dataType = "int", paramType = "query")
     })
@@ -609,6 +609,8 @@ public class UserController extends BaseController {
 				/*if(count == 0){
 					return toError(ReCode.FAILD.getValue(),"此手机号尚未注册！");
 				}*/
+            }else if(PhoneCodeEnum.ADDFORUM.getCode() == param.getType()){//为6申请专栏
+
             }else{
 
             }
@@ -835,6 +837,35 @@ public class UserController extends BaseController {
             //获取待处理信息
             WaitProcessDto waitProcessDto = userInfoService.myWaitProcess(user.getId());
             return toSuccess(waitProcessDto);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "申请官方认证", notes = "（void）申请官方认证")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query")
+    })
+    @PostMapping(value = "/authType")
+    @ResponseBody
+    public BaseResp authType(UserParam param) throws IOException {
+        try {
+            log.info("----》申请官方认证《----");
+            log.info("参数："+param.toString());
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError(ReCode.FAILD.getValue(),"用户ID不能为空！");
+            }
+            UserInfo user=userInfoService.getUserByToken(param.getToken());
+            if(user==null){
+                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+            }
+            //申请官方认证
+            userInfoExtService.authType(user.getId());
+            return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());

@@ -3,6 +3,8 @@ package com.fangyuanyouyue.forum.controller;
 import java.io.IOException;
 import java.util.List;
 
+import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.forum.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +20,6 @@ import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.forum.dto.AppraisalCommentDto;
 import com.fangyuanyouyue.forum.dto.AppraisalDetailDto;
 import com.fangyuanyouyue.forum.param.AppraisalParam;
-import com.fangyuanyouyue.forum.service.AppraisalCommentLikesService;
-import com.fangyuanyouyue.forum.service.AppraisalCommentService;
-import com.fangyuanyouyue.forum.service.AppraisalDetailService;
-import com.fangyuanyouyue.forum.service.AppraisalLikesService;
-import com.fangyuanyouyue.forum.service.SchedualRedisService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -44,7 +41,9 @@ public class AppraisalController extends BaseController {
     private AppraisalCommentLikesService appraisalCommentLikesService;
     @Autowired
     private AppraisalLikesService appraisalLikesService;
-    
+
+    @Autowired
+    private SchedualUserService schedualUserService;
     @Autowired
     private SchedualRedisService schedualRedisService;
 
@@ -221,6 +220,46 @@ public class AppraisalController extends BaseController {
         }
     }
 
+
+    @ApiOperation(value = "发起鉴定", notes = "发起鉴定",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token",required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "bonus", value = "鉴定赏金",required = false, dataType = "BigDecimal", paramType = "query"),
+            @ApiImplicitParam(name = "title", value = "标题",required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "content", value = "商品描述", required = false, dataType = "String", paramType = "query")
+    })
+    @PostMapping(value = "/addAppraisal")
+    @ResponseBody
+    public BaseResp addAppraisal(AppraisalParam param) throws IOException {
+        try {
+            log.info("----》发起鉴定《----");
+            log.info("参数：" + param.toString());
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+            }
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            String verifyUser = schedualUserService.verifyUserById(userId);
+            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+            if((Integer)jsonObject.get("code") != 0){
+                return toError(jsonObject.getString("report"));
+            }
+            //验证实名认证
+            if(JSONObject.parseObject(schedualUserService.isAuth(userId)).getBoolean("data") == false){
+                return toError(ReCode.FAILD.getValue(),"用户未实名认证！");
+            }
+            if(StringUtils.isEmpty(param.getTitle())){
+                return toError(ReCode.FAILD.getValue(),"标题不能为空！");
+            }
+            //发起鉴定
+            appraisalDetailService.addAppraisal(userId,param.getBonus(),param.getTitle(),param.getContent());
+
+            return toSuccess();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
 
 
 }

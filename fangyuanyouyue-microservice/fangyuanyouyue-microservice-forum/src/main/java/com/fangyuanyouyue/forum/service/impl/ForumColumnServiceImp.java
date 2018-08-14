@@ -2,6 +2,7 @@ package com.fangyuanyouyue.forum.service.impl;
 
 import java.util.List;
 
+import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.forum.dao.ForumColumnTypeMapper;
 import com.fangyuanyouyue.forum.model.ForumColumnType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +37,27 @@ public class ForumColumnServiceImp implements ForumColumnService {
 		return ForumColumnDto.toDtoList(list);
 	}
 
+
 	@Override
-	public void addColumn(Integer userId, Integer typeId) throws ServiceException {
+	public List<ForumColumnTypeDto> getForumTypeList() throws ServiceException {
+		List<ForumColumnType> typeList = forumColumnTypeMapper.getAll();
+		return ForumColumnTypeDto.toDtoListByType(typeList);
+	}
+
+	@Override
+	public void addColumn(Integer userId, Integer typeId,String name) throws ServiceException {
 		ForumColumnType forumColumnType = forumColumnTypeMapper.selectByPrimaryKey(typeId);
+		if(forumColumnType == null){
+			throw new ServiceException("分类异常！");
+		}else{
+			ForumColumn forumColumn = new ForumColumn();
+			forumColumn.setUserId(userId);
+			forumColumn.setName(name);
+			forumColumn.setFansCount(0);
+			forumColumn.setAddTime(DateStampUtils.getTimesteamp());
+			forumColumn.setIsChosen(2);//是否精选1是 2否
+			forumColumn.setTypeId(typeId);
+			forumColumnMapper.insert(forumColumn);
+		}
 	}
 }

@@ -30,10 +30,18 @@ public interface ForumColumnService {
     List<ForumColumnDto> getChosenColumnList() throws ServiceException;
 
 	/**
+	 * 获取专栏分类列表
+	 * @return
+	 * @throws ServiceException
+	 */
+    List<ForumColumnTypeDto> getForumTypeList() throws ServiceException;
+
+	/**
 	 * 发布专栏
 	 * @param userId
 	 * @param typeId
+	 * @param name
 	 * @throws ServiceException
 	 */
-	void addColumn(Integer userId,Integer typeId) throws ServiceException;
+	void addColumn(Integer userId,Integer typeId,String name) throws ServiceException;
 }

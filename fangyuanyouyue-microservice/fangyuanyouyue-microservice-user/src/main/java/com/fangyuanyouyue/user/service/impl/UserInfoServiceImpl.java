@@ -148,7 +148,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         UserInfoExt userInfoExt = new UserInfoExt();
         userInfoExt.setUserId(user.getId());
         userInfoExt.setStatus(2);//实名登记状态 1已实名 2未实名
-        userInfoExt.setAuthType(2);//认证状态 1已认证 2未认证
+        userInfoExt.setAuthType(2);//认证状态 0申请中 1已认证 2未认证
         //TODO 信誉度待定
         userInfoExt.setCredit(100L);//信誉度
         userInfoExt.setAddTime(DateStampUtils.getTimesteamp());
@@ -252,7 +252,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             UserInfoExt userInfoExt = new UserInfoExt();
             userInfoExt.setUserId(user.getId());
             userInfoExt.setStatus(2);//实名登记状态 1已实名 2未实名
-            userInfoExt.setAuthType(2);//认证状态 1已认证 2未认证
+            userInfoExt.setAuthType(2);//认证状态 0申请中 1已认证 2未认证
             //TODO 信誉度待定
             userInfoExt.setCredit(100L);//信誉度
             userInfoExt.setAddTime(DateStampUtils.getTimesteamp());
@@ -557,7 +557,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             UserInfoExt userInfoExt = new UserInfoExt();
             userInfoExt.setUserId(user.getId());
             userInfoExt.setStatus(2);//实名登记状态 1已实名 2未实名
-            userInfoExt.setAuthType(2);//认证状态 1已认证 2未认证
+            userInfoExt.setAuthType(2);//认证状态 0申请中 1已认证 2未认证
             //TODO 信誉度待定
             userInfoExt.setCredit(100L);//信誉度
             userInfoExt.setAddTime(DateStampUtils.getTimesteamp());

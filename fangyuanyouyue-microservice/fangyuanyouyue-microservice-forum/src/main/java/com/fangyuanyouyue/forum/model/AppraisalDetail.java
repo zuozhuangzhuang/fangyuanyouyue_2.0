@@ -11,25 +11,25 @@ import java.util.Date;
 @Setter
 @ToString
 public class AppraisalDetail {
-    private Integer id;
+    private Integer id;//
 
-    private Integer userId;
+    private Integer userId;//用户id
 
-    private String title;
+    private String title;//标题
 
-    private BigDecimal bonus;
+    private BigDecimal bonus;//赏金
 
-    private String label;
+    private String label;//标签
 
-    private Integer sort;
+    private Integer sort;//排序
 
-    private Integer status;
+    private Integer status;//
 
-    private Date endTime;
+    private Date endTime;//结束时间
 
-    private Date updateTime;
+    private Date updateTime;//修改时间
 
-    private Date addTime;
+    private Date addTime;//添加时间
 
-    private String content;
+    private String content;//内容描述
 }

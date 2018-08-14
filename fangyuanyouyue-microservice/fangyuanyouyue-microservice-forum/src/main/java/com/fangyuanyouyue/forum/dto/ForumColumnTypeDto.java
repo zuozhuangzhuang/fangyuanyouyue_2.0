@@ -1,12 +1,13 @@
 package com.fangyuanyouyue.forum.dto;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
+import com.fangyuanyouyue.forum.model.ForumColumnType;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * 论坛专栏类型
@@ -16,17 +17,22 @@ import lombok.ToString;
 @ToString
 public class ForumColumnTypeDto {
 
-    private Integer typeId;//帖子id
+    private Integer typeId;//分类id
 
-    private String name;//专栏名称
+    private String name;//分类名称
 
-    private List<ForumColumnDto> forumColumnList;
+    private List<ForumColumnDto> forumColumnList;//专栏列表
 
 
     public ForumColumnTypeDto() {
     	
     }
-    
+
+    public ForumColumnTypeDto(ForumColumnType forumColumnType) {
+        this.typeId = forumColumnType.getId();
+        this.name = forumColumnType.getName();
+    }
+
     public static List<ForumColumnTypeDto> toDtoList(List<ForumColumnDto> list) {
        HashMap<Integer,ArrayList<ForumColumnDto>> map = new HashMap<Integer, ArrayList<ForumColumnDto>>();
        for(ForumColumnDto dto:list) {
@@ -34,7 +40,7 @@ public class ForumColumnTypeDto {
     		   ArrayList<ForumColumnDto> dtos = map.get(dto.getTypeId());
     		   dtos.add(dto);
     		   map.put(dto.getTypeId(), dtos);
-    		   
+
     	   }else {
     		   ArrayList<ForumColumnDto> dtos = new ArrayList<ForumColumnDto>();
     		   dtos.add(dto);
@@ -52,5 +58,15 @@ public class ForumColumnTypeDto {
        return dtos;
     }
 
+    public static List<ForumColumnTypeDto> toDtoListByType(List<ForumColumnType> list) {
+        if (list == null)
+            return null;
+        List<ForumColumnTypeDto> dtolist = new ArrayList<>();
+        for (ForumColumnType model : list) {
+            ForumColumnTypeDto dto = new ForumColumnTypeDto(model);
+            dtolist.add(dto);
+        }
+        return dtolist;
+    }
    
 }
