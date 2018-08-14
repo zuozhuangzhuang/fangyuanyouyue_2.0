@@ -1,31 +1,226 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.fangyuanyouyue.forum.dao.ForumColumnApplyMapper" >
-  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.forum.model.ForumColumnApply" >
-    <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="user_id" property="userId" jdbcType="INTEGER" />
-    <result column="type_id" property="typeId" jdbcType="INTEGER" />
-    <result column="cover_img_url" property="coverImgUrl" jdbcType="VARCHAR" />
-    <result column="column_name" property="columnName" jdbcType="VARCHAR" />
-    <result column="status" property="status" jdbcType="INTEGER" />
-    <result column="reason" property="reason" jdbcType="VARCHAR" />
-    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
-    <result column="add_time" property="addTime" jdbcType="TIMESTAMP" />
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangyuanyouyue.forum.dao.ForumColumnApplyMapper">
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.forum.model.ForumColumnApply">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="type_id" jdbcType="INTEGER" property="typeId" />
+    <result column="cover_img_url" jdbcType="VARCHAR" property="coverImgUrl" />
+    <result column="column_name" jdbcType="VARCHAR" property="columnName" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="reason" jdbcType="VARCHAR" property="reason" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="identity" jdbcType="VARCHAR" property="identity" />
+    <result column="identity_img_cover" jdbcType="VARCHAR" property="identityImgCover" />
+    <result column="identity_img_back" jdbcType="VARCHAR" property="identityImgBack" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
   </resultMap>
-  <sql id="Base_Column_List" >
-    id, user_id, type_id, cover_img_url, column_name, status, reason, update_time, add_time
+  <sql id="Base_Column_List">
+    id, user_id, type_id, cover_img_url, column_name, status, reason, update_time, add_time, 
+    name, identity, identity_img_cover, identity_img_back, phone
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from forum_column_apply
     where id = #{id,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from forum_column_apply
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ForumColumnApply" >
+  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ForumColumnApply">
+    insert into forum_column_apply (id, user_id, type_id, 
+      cover_img_url, column_name, status, 
+      reason, update_time, add_time, 
+      name, identity, identity_img_cover, 
+      identity_img_back, phone)
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{typeId,jdbcType=INTEGER}, 
+      #{coverImgUrl,jdbcType=VARCHAR}, #{columnName,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+      #{reason,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{addTime,jdbcType=TIMESTAMP}, 
+      #{name,jdbcType=VARCHAR}, #{identity,jdbcType=VARCHAR}, #{identityImgCover,jdbcType=VARCHAR}, 
+      #{identityImgBack,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.forum.model.ForumColumnApply">
+    insert into forum_column_apply
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="typeId != null">
+        type_id,
+      </if>
+      <if test="coverImgUrl != null">
+        cover_img_url,
+      </if>
+      <if test="columnName != null">
+        column_name,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="reason != null">
+        reason,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="addTime != null">
+        add_time,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="identity != null">
+        identity,
+      </if>
+      <if test="identityImgCover != null">
+        identity_img_cover,
+      </if>
+      <if test="identityImgBack != null">
+        identity_img_back,
+      </if>
+      <if test="phone != null">
+        phone,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="typeId != null">
+        #{typeId,jdbcType=INTEGER},
+      </if>
+      <if test="coverImgUrl != null">
+        #{coverImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="columnName != null">
+        #{columnName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="reason != null">
+        #{reason,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="addTime != null">
+        #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="identity != null">
+        #{identity,jdbcType=VARCHAR},
+      </if>
+      <if test="identityImgCover != null">
+        #{identityImgCover,jdbcType=VARCHAR},
+      </if>
+      <if test="identityImgBack != null">
+        #{identityImgBack,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        #{phone,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.forum.model.ForumColumnApply">
+    update forum_column_apply
+    <set>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="typeId != null">
+        type_id = #{typeId,jdbcType=INTEGER},
+      </if>
+      <if test="coverImgUrl != null">
+        cover_img_url = #{coverImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="columnName != null">
+        column_name = #{columnName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="reason != null">
+        reason = #{reason,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="addTime != null">
+        add_time = #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="identity != null">
+        identity = #{identity,jdbcType=VARCHAR},
+      </if>
+      <if test="identityImgCover != null">
+        identity_img_cover = #{identityImgCover,jdbcType=VARCHAR},
+      </if>
+      <if test="identityImgBack != null">
+        identity_img_back = #{identityImgBack,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.forum.model.ForumColumnApply">
+    update forum_column_apply
+    set user_id = #{userId,jdbcType=INTEGER},
+      type_id = #{typeId,jdbcType=INTEGER},
+      cover_img_url = #{coverImgUrl,jdbcType=VARCHAR},
+      column_name = #{columnName,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      reason = #{reason,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      add_time = #{addTime,jdbcType=TIMESTAMP},
+      name = #{name,jdbcType=VARCHAR},
+      identity = #{identity,jdbcType=VARCHAR},
+      identity_img_cover = #{identityImgCover,jdbcType=VARCHAR},
+      identity_img_back = #{identityImgBack,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.forum.model.ForumColumnApply">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="type_id" jdbcType="INTEGER" property="typeId" />
+    <result column="cover_img_url" jdbcType="VARCHAR" property="coverImgUrl" />
+    <result column="column_name" jdbcType="VARCHAR" property="columnName" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="reason" jdbcType="VARCHAR" property="reason" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, user_id, type_id, cover_img_url, column_name, status, reason, update_time, add_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from forum_column_apply
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from forum_column_apply
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ForumColumnApply">
     insert into forum_column_apply (id, user_id, type_id, 
       cover_img_url, column_name, status, 
       reason, update_time, add_time
@@ -35,98 +230,98 @@
       #{reason,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{addTime,jdbcType=TIMESTAMP}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.forum.model.ForumColumnApply" >
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.forum.model.ForumColumnApply">
     insert into forum_column_apply
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         id,
       </if>
-      <if test="userId != null" >
+      <if test="userId != null">
         user_id,
       </if>
-      <if test="typeId != null" >
+      <if test="typeId != null">
         type_id,
       </if>
-      <if test="coverImgUrl != null" >
+      <if test="coverImgUrl != null">
         cover_img_url,
       </if>
-      <if test="columnName != null" >
+      <if test="columnName != null">
         column_name,
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         status,
       </if>
-      <if test="reason != null" >
+      <if test="reason != null">
         reason,
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         update_time,
       </if>
-      <if test="addTime != null" >
+      <if test="addTime != null">
         add_time,
       </if>
     </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         #{id,jdbcType=INTEGER},
       </if>
-      <if test="userId != null" >
+      <if test="userId != null">
         #{userId,jdbcType=INTEGER},
       </if>
-      <if test="typeId != null" >
+      <if test="typeId != null">
         #{typeId,jdbcType=INTEGER},
       </if>
-      <if test="coverImgUrl != null" >
+      <if test="coverImgUrl != null">
         #{coverImgUrl,jdbcType=VARCHAR},
       </if>
-      <if test="columnName != null" >
+      <if test="columnName != null">
         #{columnName,jdbcType=VARCHAR},
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         #{status,jdbcType=INTEGER},
       </if>
-      <if test="reason != null" >
+      <if test="reason != null">
         #{reason,jdbcType=VARCHAR},
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="addTime != null" >
+      <if test="addTime != null">
         #{addTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.forum.model.ForumColumnApply" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.forum.model.ForumColumnApply">
     update forum_column_apply
-    <set >
-      <if test="userId != null" >
+    <set>
+      <if test="userId != null">
         user_id = #{userId,jdbcType=INTEGER},
       </if>
-      <if test="typeId != null" >
+      <if test="typeId != null">
         type_id = #{typeId,jdbcType=INTEGER},
       </if>
-      <if test="coverImgUrl != null" >
+      <if test="coverImgUrl != null">
         cover_img_url = #{coverImgUrl,jdbcType=VARCHAR},
       </if>
-      <if test="columnName != null" >
+      <if test="columnName != null">
         column_name = #{columnName,jdbcType=VARCHAR},
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         status = #{status,jdbcType=INTEGER},
       </if>
-      <if test="reason != null" >
+      <if test="reason != null">
         reason = #{reason,jdbcType=VARCHAR},
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="addTime != null" >
+      <if test="addTime != null">
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.forum.model.ForumColumnApply" >
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.forum.model.ForumColumnApply">
     update forum_column_apply
     set user_id = #{userId,jdbcType=INTEGER},
       type_id = #{typeId,jdbcType=INTEGER},

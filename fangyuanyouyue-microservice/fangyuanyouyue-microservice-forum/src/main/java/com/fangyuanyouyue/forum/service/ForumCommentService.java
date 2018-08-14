@@ -22,6 +22,16 @@ public interface ForumCommentService {
 	 */
     List<ForumCommentDto> getCommentList(Integer forumId,Integer start,Integer limit) throws ServiceException;
     
+	/**
+	 * 获取评论列表
+	 * @param forumId
+	 * @param start
+	 * @param limit
+	 * @return
+	 * @throws ServiceException
+	 */
+    List<ForumCommentDto> getCommentCommentList(Integer commentId,Integer start,Integer limit) throws ServiceException;
+    
     /**
      * 计算评论数量
      * @param forumId
