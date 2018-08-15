@@ -36,7 +36,7 @@ public class ForumCommentController extends BaseController {
 
 	@ApiOperation(value = "帖子评论列表", notes = "根据帖子id获取评论列表", response = BaseResp.class)
 	@ApiImplicitParams({
-        @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+        @ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "String", paramType = "query"),
 			@ApiImplicitParam(name = "forumId", value = "帖子id", required = true, dataType = "int", paramType = "query"),
 			@ApiImplicitParam(name = "start", value = "起始条数", required = true, dataType = "int", paramType = "query"),
 			@ApiImplicitParam(name = "limit", value = "每页条数", required = true, dataType = "int", paramType = "query") })
@@ -66,7 +66,7 @@ public class ForumCommentController extends BaseController {
 
 	@ApiOperation(value = "帖子二级评论列表", notes = "根据评论id获取评论列表", response = BaseResp.class)
 	@ApiImplicitParams({
-        @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+        @ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "String", paramType = "query"),
 		@ApiImplicitParam(name = "commentId", value = "评论id", required = true, dataType = "int", paramType = "query"),
 		@ApiImplicitParam(name = "start", value = "起始条数", required = true, dataType = "int", paramType = "query"),
 		@ApiImplicitParam(name = "limit", value = "每页条数", required = true, dataType = "int", paramType = "query")
