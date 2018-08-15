@@ -258,7 +258,7 @@
       and a.user_id = #{userId}
     </if>
     <if test="keyword != null" >
-      and a.title like #{keyword}
+      and a.title like "%"#{keyword}"%"
     </if>
     limit #{start},#{limit}
   </select>
