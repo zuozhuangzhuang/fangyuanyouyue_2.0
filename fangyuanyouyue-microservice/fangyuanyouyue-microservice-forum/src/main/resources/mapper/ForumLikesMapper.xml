@@ -32,7 +32,7 @@
     delete from forum_likes
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ForumLikes" >
+  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ForumLikes" useGeneratedKeys="true" keyProperty="id">
     insert into forum_likes (id, user_id, forum_id, 
       add_time)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{forumId,jdbcType=INTEGER}, 

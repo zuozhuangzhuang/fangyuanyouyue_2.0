@@ -31,7 +31,7 @@
     delete from forum_column_apply
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ForumColumnApply">
+  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ForumColumnApply" useGeneratedKeys="true" keyProperty="id">
     insert into forum_column_apply (id, user_id, type_id, 
       cover_img_url, column_name, status, 
       reason, update_time, add_time, 

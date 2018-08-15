@@ -60,7 +60,7 @@ public class UserDto {
 
     private Integer authType;//认证状态 1已认证 2未认证
 
-    private Integer extStatus;//实名登记状态 1已实名 2未实名
+    private Integer extStatus;//实名登记状态 0申请中 1已实名 2未实名
 
     private Integer isPayPwd;//是否设置支付密码 1是 2否
 

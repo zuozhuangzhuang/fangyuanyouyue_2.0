@@ -24,5 +24,14 @@ public interface ForumColumnMapper {
     List<ForumColumn> selectPage(@Param("start")Integer start,@Param("limit")Integer limit);
 
     List<ForumColumn> selectChosen(@Param("isChosen")Integer isChosen);
-    
+
+    /**
+     * 获取用户收藏的专栏列表
+     * @param userId
+     * @param start
+     * @param limit
+     * @param collectType
+     * @return
+     */
+    List<ForumColumn> selectCollectList(@Param("userId")Integer userId,@Param("start")Integer start,@Param("limit")Integer limit,@Param("collectType")Integer collectType);
 }

@@ -3,6 +3,7 @@ package com.fangyuanyouyue.forum.service.impl;
 import java.util.Date;
 import java.util.List;
 
+import com.fangyuanyouyue.base.util.DateStampUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,7 @@ public class ForumCommentServiceImp implements ForumCommentService {
 
 	@Override
 	public List<ForumCommentDto> getCommentList(Integer forumId, Integer start, Integer limit) throws ServiceException {
-		List<ForumComment> list = forumCommentMapper.selectByForumId(forumId, start, limit);
+		List<ForumComment> list = forumCommentMapper.selectByForumId(forumId, start*limit, limit);
 		return ForumCommentDto.toDtoList(list);
 	}
 

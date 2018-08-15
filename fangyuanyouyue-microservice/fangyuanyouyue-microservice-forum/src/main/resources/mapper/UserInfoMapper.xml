@@ -40,7 +40,7 @@
     delete from user_info
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.UserInfo" >
+  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.UserInfo" useGeneratedKeys="true" keyProperty="id">
     insert into user_info (id, phone, email, 
       address, login_pwd, nick_name, 
       head_img_url, bg_img_url, gender, 

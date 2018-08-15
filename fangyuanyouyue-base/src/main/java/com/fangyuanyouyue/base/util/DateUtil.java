@@ -61,8 +61,19 @@ public class DateUtil {
 		}
 		return l;
 	}
-	
 
+	/**
+	 * 得到n天后的日期
+	 * @param date
+	 * @param day
+	 * @return
+	 */
+	public static Date getDateAfterDay(Date date, int day) {
+		Calendar now = Calendar.getInstance();
+		now.setTime(date);
+ 		now.set(Calendar.DATE, now.get(Calendar.DATE) + day);
+	 	return now.getTime();
+	}
 	/**
 	 * 得到n年后的日期
 	 * 

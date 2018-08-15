@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-@ApiModel(value = "论坛相关参数")
+import java.math.BigDecimal;
+
+@ApiModel(value = "鉴定相关参数")
 @Getter
 @Setter
 @ToString
@@ -18,8 +20,8 @@ public class AppraisalParam{
 	@ApiModelProperty(name = "limit", value = "限制页", dataType = "int",hidden = true)
 	private Integer limit; // 限制页
 
-    @ApiModelProperty(name = "token", value = "用户token", dataType = "String",hidden = true)
-    private String token;//用户token
+	@ApiModelProperty(name = "token", value = "用户token", dataType = "String",hidden = true)
+	private String token;//用户token
 
 	@ApiModelProperty(name = "type", value = "类型", dataType = "int",hidden = true)
 	private Integer type;//类型
@@ -37,7 +39,16 @@ public class AppraisalParam{
 	@ApiModelProperty(name = "keyword", value = "关键字搜索", dataType = "String",hidden = true)
 	private String keyword;//帖子内容
 
-	@ApiModelProperty(name = "content", value = "评论内容", dataType = "String",hidden = true)
-	private String content;
+	@ApiModelProperty(name = "bonus", value = "鉴定赏金", dataType = "BigDecimal",hidden = true)
+	private BigDecimal bonus;//鉴定赏金
+
+	@ApiModelProperty(name = "title", value = "标题", dataType = "String",hidden = true)
+	private String title;//标题
+
+	@ApiModelProperty(name = "content", value = "商品描述", dataType = "String",hidden = true)
+	private String content;//商品描述
+
+	@ApiModelProperty(name = "imgUrls", value = "图片数组", dataType = "String",hidden = true)
+	private String[] imgUrls;//图片数组
 
 }

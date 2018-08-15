@@ -42,4 +42,10 @@ public interface UserInfoExtService {
      */
     boolean isAuth(Integer userId) throws ServiceException;
 
+    /**
+     * 申请官方认证
+     * @param userId
+     * @throws ServiceException
+     */
+    void authType(Integer userId) throws ServiceException;
 }

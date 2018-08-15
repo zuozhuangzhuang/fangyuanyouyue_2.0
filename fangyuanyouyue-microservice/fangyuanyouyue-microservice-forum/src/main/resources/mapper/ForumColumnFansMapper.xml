@@ -20,7 +20,7 @@
     delete from forum_column_fans
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ForumColumnFans" >
+  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ForumColumnFans" useGeneratedKeys="true" keyProperty="id">
     insert into forum_column_fans (id, user_id, column_id, 
       add_time)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{columnId,jdbcType=INTEGER}, 

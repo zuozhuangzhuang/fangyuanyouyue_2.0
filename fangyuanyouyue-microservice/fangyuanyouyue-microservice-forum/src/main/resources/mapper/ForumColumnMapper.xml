@@ -25,7 +25,7 @@
     delete from forum_column
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ForumColumn">
+  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ForumColumn" useGeneratedKeys="true" keyProperty="id">
     insert into forum_column (id, user_id, name,
       cover_img_url, fans_count, add_time,
       update_time, is_chosen, type_id)
@@ -148,5 +148,22 @@
     *
     from forum_column 
     where is_chosen = #{isChosen,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectCollectList" parameterType="Integer" resultMap="BaseResultMap">
+    select a.* from forum_column a,collect b
+    <where>
+      a.id = b.collect_id
+      <if test="userId != null">
+        and b.user_id = #{userId}
+      </if>
+      <if test="collectType != null">
+        and b.collect_type = #{collectType}
+      </if>
+    </where>
+    order by b.add_time desc
+    <if test="start != null and limit != null">
+      limit #{start},#{limit}
+    </if>
   </select>
 </mapper>

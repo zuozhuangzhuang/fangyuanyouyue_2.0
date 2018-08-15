@@ -85,4 +85,20 @@ public class WalletControllerTest {
                 .andReturn();
     }
 
+    /**
+     * 修改支付密码
+     * @throws Exception
+     */
+    @Test
+    @Transactional
+    public void updatePayPwd() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/wallet/updatePayPwd")
+                .param("token","10045FY1534236594430")
+                .param("payPwd","123456")
+                .param("newPwd","654321")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
 }

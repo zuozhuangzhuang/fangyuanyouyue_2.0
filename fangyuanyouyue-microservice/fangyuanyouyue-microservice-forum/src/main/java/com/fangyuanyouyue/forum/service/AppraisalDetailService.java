@@ -1,5 +1,6 @@
 package com.fangyuanyouyue.forum.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
@@ -30,4 +31,14 @@ public interface AppraisalDetailService {
      */
     List<AppraisalDetailDto> getAppraisalList(Integer start,Integer limit) throws ServiceException;
 
+    /**
+     * 发起鉴定
+     * @param userId
+     * @param bonus
+     * @param title
+     * @param content
+     * @param imgUrls
+     * @throws ServiceException
+     */
+    void addAppraisal(Integer userId, BigDecimal bonus,String title,String content,String[] imgUrls) throws ServiceException;
 }

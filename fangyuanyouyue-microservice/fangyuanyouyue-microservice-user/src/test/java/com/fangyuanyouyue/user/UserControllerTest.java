@@ -303,8 +303,8 @@ public class UserControllerTest {
     public void verifyCode() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/user/verifyCode")
                 //验证码
-                .param("code","1")
-                .param("phone","18103966056")
+                .param("code","8870")
+                .param("phone","18103966057")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

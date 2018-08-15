@@ -20,7 +20,7 @@
     delete from appraisal_likes
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.AppraisalLikes">
+  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.AppraisalLikes" useGeneratedKeys="true" keyProperty="id">
     insert into appraisal_likes (id, user_id, appraisal_id, 
       add_time)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{appraisalId,jdbcType=INTEGER}, 

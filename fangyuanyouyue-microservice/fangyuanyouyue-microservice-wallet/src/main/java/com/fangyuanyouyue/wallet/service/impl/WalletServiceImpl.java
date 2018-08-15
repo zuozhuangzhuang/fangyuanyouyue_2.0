@@ -2,6 +2,7 @@ package com.fangyuanyouyue.wallet.service.impl;
 
 import java.math.BigDecimal;
 
+import com.fangyuanyouyue.base.enums.ReCode;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -225,5 +226,15 @@ public class WalletServiceImpl implements WalletService{
             }
             userInfoExtMapper.updateByPrimaryKey(userInfoExt);
         }
+    }
+
+    @Override
+    public void updatePayPwd(Integer userId, String payPwd, String newPwd) throws ServiceException {
+        UserInfoExt userInfoExt = userInfoExtMapper.selectUserInfoExtByUserId(userId);
+        //判断旧密码是否正确
+        if(!MD5Util.verify(MD5Util.MD5(payPwd),userInfoExt.getPayPwd())){
+            throw new ServiceException("旧密码不正确！");
+        }
+        userInfoExt.setPayPwd(MD5Util.generate(MD5Util.MD5(newPwd)));
     }
 }

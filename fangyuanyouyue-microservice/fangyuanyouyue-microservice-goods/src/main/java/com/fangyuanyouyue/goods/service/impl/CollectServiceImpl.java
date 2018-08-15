@@ -55,7 +55,7 @@ public class CollectServiceImpl implements CollectService{
     private SchedualUserService schedualUserService;//调用其他service时用
 
     @Override
-    public void collectGoods(Integer userId, Integer[] collectIds, Integer collectType, Integer type,Integer status) throws ServiceException {
+    public void collect(Integer userId, Integer[] collectIds, Integer collectType, Integer type,Integer status) throws ServiceException {
         for(Integer collectId:collectIds){
             Collect collect = collectMapper.selectByCollectId(userId,collectId, type);
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(collectId);

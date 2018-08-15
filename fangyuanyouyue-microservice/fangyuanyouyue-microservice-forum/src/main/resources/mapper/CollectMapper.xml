@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.fangyuanyouyue.goods.dao.CollectMapper" >
-  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.goods.model.Collect" >
+<mapper namespace="com.fangyuanyouyue.forum.dao.CollectMapper" >
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.forum.model.Collect" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="user_id" property="userId" jdbcType="INTEGER" />
     <result column="collect_id" property="collectId" jdbcType="INTEGER" />
@@ -14,7 +14,7 @@
     id, user_id, collect_id, collect_type, type, add_time, update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select
+    select 
     <include refid="Base_Column_List" />
     from collect
     where id = #{id,jdbcType=INTEGER}
@@ -23,7 +23,7 @@
     delete from collect
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.goods.model.Collect" useGeneratedKeys="true" keyProperty="id">
+  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.Collect" useGeneratedKeys="true" keyProperty="id">
     insert into collect (id, user_id, collect_id, 
       collect_type, type, add_time, 
       update_time)
@@ -31,7 +31,7 @@
       #{collectType,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.goods.model.Collect" >
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.forum.model.Collect" >
     insert into collect
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -80,7 +80,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.goods.model.Collect" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.forum.model.Collect" >
     update collect
     <set >
       <if test="userId != null" >
@@ -104,7 +104,7 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.goods.model.Collect" >
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.forum.model.Collect" >
     update collect
     set user_id = #{userId,jdbcType=INTEGER},
       collect_id = #{collectId,jdbcType=INTEGER},
@@ -114,21 +114,7 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <select id="selectByCollectId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from collect
-    <where>
-      1 = 1
-      <if test="userId != null">
-        and user_id = #{userId}
-      </if>
-      <if test="collectId != null">
-        and collect_id = #{collectId}
-      </if>
-      <if test="type != null">
-        and type = #{type}
-      </if>
-    </where>
-  </select>
+
 
   <select id="selectByCollectIdType" parameterType="Integer" resultMap="BaseResultMap">
     select * from collect
@@ -142,9 +128,6 @@
       </if>
       <if test="collectType != null">
         and collect_type = #{collectType}
-      </if>
-      <if test="type != null">
-        and type = #{type}
       </if>
     </where>
   </select>

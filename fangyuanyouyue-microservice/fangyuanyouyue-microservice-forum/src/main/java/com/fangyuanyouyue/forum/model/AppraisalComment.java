@@ -10,17 +10,17 @@ import java.util.Date;
 @Setter
 @ToString
 public class AppraisalComment {
-    private Integer id;
+    private Integer id;//鉴定评论id
 
-    private Integer userId;
+    private Integer userId;//评论用户id
 
-    private Integer appraisalId;
+    private Integer appraisalId;//鉴定id
 
-    private Integer viewpoint;
+    private Integer viewpoint;//评论观点
 
-    private String content;
+    private String content;//评论内容
 
-    private String pic1;
+    private String pic1;//图片1
 
     private String pic2;
 
@@ -32,11 +32,11 @@ public class AppraisalComment {
 
     private String pic6;
 
-    private Integer isWinner;
+    private Integer isWinner;//观点是否获胜
 
-    private Integer status;
+    private Integer status;//状态
 
-    private Date addTime;
+    private Date addTime;//添加时间
 
-    private Date updateTime;
+    private Date updateTime;//修改时间
 }

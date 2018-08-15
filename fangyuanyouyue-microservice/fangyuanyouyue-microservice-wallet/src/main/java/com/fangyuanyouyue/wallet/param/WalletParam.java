@@ -65,4 +65,6 @@ public class WalletParam {
     private Long credit; // 信誉度
 
 
+    @ApiModelProperty(name = "newPwd", value = "新密码", dataType = "String",hidden = true)
+    private String newPwd;//新密码
 }
