@@ -52,9 +52,9 @@ public class ForumController extends BaseController {
             log.info("----》获取帖子详情《----");
             log.info("参数：" + param.toString());
             //验证用户
-            if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
-            }
+            //if(StringUtils.isEmpty(param.getToken())){
+              //  return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+            //}
             //Integer userId = (Integer)schedualRedisService.get(param.getToken());
             
             //if(userId!=null) {

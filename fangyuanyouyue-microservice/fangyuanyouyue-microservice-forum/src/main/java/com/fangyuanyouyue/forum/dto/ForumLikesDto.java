@@ -34,8 +34,12 @@ public class ForumLikesDto {
     }
 
     public ForumLikesDto(ForumLikes model) {
+    	this.likesId = model.getId();
         this.forumId = model.getForumId();
         this.addTime = DateUtil.getFormatDate(model.getAddTime(), DateUtil.DATE_FORMT);
+        this.nickName = model.getNickName();
+        this.headImgUrl = model.getHeadImgUrl();
+        this.userId = model.getUserId();
     }
     public static List<ForumLikesDto> toDtoList(List<ForumLikes> list) {
         if (list == null)

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.forum.constants.StatusEnum;
 import com.fangyuanyouyue.forum.model.ForumInfo;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,13 +44,17 @@ public class ForumInfoDto {
 
     private String content;//帖子内容
     
-    private List<String> imgs;//帖子图片，最多9张
+   // private List<String> imgs;//帖子图片，最多9张
     
-    private Long commentCount;//评论数量
+    private Integer commentCount = 0;//评论数量
     
-    private Long likesCount;//点赞数量
+    private Integer likesCount = 0;//点赞数量
 
-    private Long viewCount;//浏览数量
+    private Integer viewCount = 0;//浏览数量
+    
+    private Integer isCollect = StatusEnum.NO.getValue(); //是否收藏
+    
+    private Integer isLikes = StatusEnum.NO.getValue(); //是否点赞
     
     public ForumInfoDto() {
     	

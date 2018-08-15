@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.forum.constants.StatusEnum;
 import com.fangyuanyouyue.forum.model.ForumComment;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,6 +35,8 @@ public class ForumCommentDto {
     private Integer likesCount = 0;//点赞数量
     
     private Integer commentCount = 0;//被回复数量
+    
+    private Integer isLikes = StatusEnum.NO.getValue(); //是否点赞
     
     public ForumCommentDto() {
     	

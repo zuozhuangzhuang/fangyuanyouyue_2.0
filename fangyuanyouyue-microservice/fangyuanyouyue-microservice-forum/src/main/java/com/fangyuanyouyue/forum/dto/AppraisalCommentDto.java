@@ -1,11 +1,10 @@
 package com.fangyuanyouyue.forum.dto;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import com.fangyuanyouyue.forum.model.AppraisalComment;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -21,6 +20,10 @@ public class AppraisalCommentDto {
     private Integer commentId;
 
     private Integer userId;
+    
+    private String nickName;//作者昵称
+    
+    private String headImgUrl;//作者头像
 
     private Integer appraisalId;
 
@@ -40,13 +43,13 @@ public class AppraisalCommentDto {
 
     private String pic6;
 
-    private Integer isWinner;
+    private Integer isWinner; //是否赢了
+    
+    private Integer isLikes; //是否点赞
+    
+    private Integer likesCount; //同意次数
 
-    private Integer status;
-
-    private Date addTime;
-
-    private Date updateTime;
+    private String addTime;
 
     public AppraisalCommentDto() {
     	

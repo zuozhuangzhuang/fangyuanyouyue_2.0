@@ -39,10 +39,10 @@ public class ForumInfoServiceImp implements ForumInfoService {
 		if(forumInfo!=null) {
 			ForumInfoDto dto = new ForumInfoDto(forumInfo);
 			//计算点赞数
-			long likesCount = forumLikesService.countLikes(id);
+			Integer	 likesCount = forumLikesService.countLikes(id);
 			dto.setLikesCount(likesCount);
 			//计算评论数
-			long commentCount = forumCommentService.countComment(id);
+			Integer commentCount = forumCommentService.countComment(id);
 			dto.setCommentCount(commentCount);
 
 			//TODO 如果不是视频，需要找到图片

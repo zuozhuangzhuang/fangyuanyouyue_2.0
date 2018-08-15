@@ -83,13 +83,9 @@ public class ForumLikesController extends BaseController {
             if(userId!=null) {
             	//TODO 暂时不需要处理
             }
-			
             
 			if (param.getForumId() == null) {
 				return toError("帖子ID不能为空");
-			}
-			if (param.getContent() == null) {
-				return toError("内容不能为空");
 			}
 
 			forumLikesService.saveLikes(param.getType(),userId, param.getForumId());

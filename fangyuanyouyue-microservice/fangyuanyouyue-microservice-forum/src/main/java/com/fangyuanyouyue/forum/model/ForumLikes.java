@@ -20,6 +20,10 @@ public class ForumLikes {
     private Integer forumId;//
 
     private Date addTime;//
+    
+    private String nickName;
+    
+    private String headImgUrl;
 
 
 }
