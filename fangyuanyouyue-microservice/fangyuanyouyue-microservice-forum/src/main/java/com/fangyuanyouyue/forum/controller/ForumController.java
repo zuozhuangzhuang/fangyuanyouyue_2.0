@@ -81,8 +81,8 @@ public class ForumController extends BaseController {
 
     @ApiOperation(value = "帖子/视频列表", notes = "获取帖子列表大集合",response = BaseResp.class)
     @ApiImplicitParams({
+        @ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "columnId", value = "专栏id",required = false, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "userId", value = "用户id",required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "keyword", value = "搜索关键字",required = false, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "searchType", value = "搜索类型1古物圈子 2专栏精选 ",required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "type", value = "帖子类型1帖子 2视频",required = false, dataType = "int", paramType = "query"),

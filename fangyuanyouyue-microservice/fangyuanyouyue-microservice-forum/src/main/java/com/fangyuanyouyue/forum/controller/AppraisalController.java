@@ -49,7 +49,7 @@ public class AppraisalController extends BaseController {
 
     @ApiOperation(value = "全民鉴定详情", notes = "根据id获取全民鉴定详情",response = BaseResp.class)
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "string", paramType = "query"),
+        @ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "string", paramType = "query"),
         @ApiImplicitParam(name = "forumId", value = "帖子id",required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/detail")
@@ -187,7 +187,7 @@ public class AppraisalController extends BaseController {
 
     @ApiOperation(value = "全民鉴定评论点赞", notes = "对全民鉴定评论点赞",response = BaseResp.class)
     @ApiImplicitParams({ 
-    		@ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "String", paramType = "query"),
+    		@ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "commentId", value = "评论id",required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/comment/likes")
