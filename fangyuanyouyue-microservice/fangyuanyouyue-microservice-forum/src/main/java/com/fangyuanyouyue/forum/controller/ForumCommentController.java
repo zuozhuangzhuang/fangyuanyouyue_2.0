@@ -96,10 +96,10 @@ public class ForumCommentController extends BaseController {
 	
 	@ApiOperation(value = "添加评论", notes = "添加评论", response = BaseResp.class)
 	@ApiImplicitParams({
-        @ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "String", paramType = "query"),
-			@ApiImplicitParam(name = "forumId", value = "帖子id", required = true, dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "content", value = "评论内容", required = true, dataType = "String", paramType = "query"),
-			@ApiImplicitParam(name = "commentId", value = "被回复的评论id", required = false, dataType = "int", paramType = "query") })
+        @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+		@ApiImplicitParam(name = "forumId", value = "帖子id", required = true, dataType = "int", paramType = "query"),
+		@ApiImplicitParam(name = "content", value = "评论内容", required = true, dataType = "String", paramType = "query"),
+		@ApiImplicitParam(name = "commentId", value = "被回复的评论id", required = false, dataType = "int", paramType = "query") })
 	@PostMapping(value = "/add")
 	@ResponseBody
 	public BaseResp saveComment(ForumParam param) throws IOException {

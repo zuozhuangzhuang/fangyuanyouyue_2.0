@@ -10,24 +10,24 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * 点赞
+ * 点赞DTO
  */
 @Getter
 @Setter
 @ToString
 public class ForumLikesDto {
 
-    private Integer likesId;
+    private Integer likesId;//自增id
 
-    private Integer userId;
+    private Integer userId;//用户id
     
-    private String nickName;
+    private String nickName;//用户昵称
     
-    private String headImgUrl;
+    private String headImgUrl;//用户头像地址
 
-    private Integer forumId;
+    private Integer forumId;//帖子id
 
-    private String addTime;
+    private String addTime;//添加时间
     
     public ForumLikesDto() {
     	

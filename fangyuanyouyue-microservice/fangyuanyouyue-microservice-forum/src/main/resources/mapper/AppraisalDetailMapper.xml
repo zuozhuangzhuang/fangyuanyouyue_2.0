@@ -34,7 +34,7 @@
     delete from appraisal_detail
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.AppraisalDetail">
+  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.AppraisalDetail" useGeneratedKeys="true" keyProperty="id">
     insert into appraisal_detail (id, user_id, title, 
       bonus, label, sort, 
       status, end_time, update_time, 
@@ -180,4 +180,21 @@
       add_time = #{addTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectCollectList" parameterType="Integer" resultMap="BaseResultMap">
+    select a.* from appraisal_detail a,collect b
+    <where>
+      a.id = b.collect_id
+      <if test="userId != null">
+        and b.user_id = #{userId}
+      </if>
+      <if test="collectType != null">
+      and b.collect_type = #{collectType}
+    </if>
+    </where>
+    order by b.add_time desc
+    <if test="start != null and limit != null">
+      limit #{start},#{limit}
+    </if>
+  </select>
 </mapper>

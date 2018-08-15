@@ -650,7 +650,7 @@ public class UserController extends BaseController {
                 return toError(ReCode.FAILD.getValue(),"验证码不能为空！");
             }
             //TODO 从缓存获取
-            String code = (String) schedualRedisService.get(param.getPhone());
+            String code = String.valueOf(schedualRedisService.get(param.getPhone()));
             log.info("验证码:1."+code+" 2."+param.getCode());
             if(StringUtils.isEmpty(code) || !code.equals(param.getCode())){
                 return toError(ReCode.FAILD.getValue(),"验证码错误！");

@@ -39,7 +39,7 @@
     delete from forum_info
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ForumInfo">
+  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ForumInfo" useGeneratedKeys="true" keyProperty="id">
     insert into forum_info (id, user_id, title, 
       video_url, video_length, label, 
       sort, type, status, 
@@ -261,5 +261,22 @@
       and a.title like #{keyword}
     </if>
     limit #{start},#{limit}
+  </select>
+
+  <select id="selectCollectList" parameterType="Integer" resultMap="BaseResultMap">
+    select a.* from forum_info a,collect b
+    <where>
+      a.id = b.collect_id
+      <if test="userId != null">
+        and b.user_id = #{userId}
+      </if>
+      <if test="collectType != null">
+        and b.collect_type = #{collectType}
+      </if>
+    </where>
+    order by b.add_time desc
+    <if test="start != null and limit != null">
+      limit #{start},#{limit}
+    </if>
   </select>
 </mapper>

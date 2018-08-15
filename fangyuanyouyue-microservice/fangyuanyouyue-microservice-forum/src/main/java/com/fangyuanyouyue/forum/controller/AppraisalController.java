@@ -25,8 +25,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @RequestMapping(value = "/appraisal")
 @Api(description = "全民鉴定Controller")
 @RefreshScope
@@ -88,8 +89,8 @@ public class AppraisalController extends BaseController {
 
     @ApiOperation(value = "全民鉴定列表", notes = "获取全民鉴定列表大集合",response = BaseResp.class)
     @ApiImplicitParams({
-		@ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "string", paramType = "query"),
-            @ApiImplicitParam(name = "keyword", value = "关键字",required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "keyword", value = "关键字",required = false, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query")
     })
@@ -102,7 +103,7 @@ public class AppraisalController extends BaseController {
             if(param.getStart()==null||param.getLimit()==null) {
             	return toError("分页参数不能为空");
             }
-            
+
             List<AppraisalDetailDto> dto = appraisalDetailService.getAppraisalList(param.getStart(), param.getLimit());
             
             return toSuccess(dto);
@@ -149,7 +150,7 @@ public class AppraisalController extends BaseController {
 
     @ApiOperation(value = "全民鉴定点赞", notes = "对全民鉴定点赞",response = BaseResp.class)
     @ApiImplicitParams({ 
-    		@ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "String", paramType = "query"),
+    		@ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "appraisalId", value = "评论id",required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/likes")
@@ -226,7 +227,8 @@ public class AppraisalController extends BaseController {
             @ApiImplicitParam(name = "token", value = "用户token",required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "bonus", value = "鉴定赏金",required = false, dataType = "BigDecimal", paramType = "query"),
             @ApiImplicitParam(name = "title", value = "标题",required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "content", value = "商品描述", required = false, dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "content", value = "商品描述", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "imgUrls", value = "图片数组", allowMultiple = true,required = true, dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/addAppraisal")
     @ResponseBody
@@ -251,8 +253,11 @@ public class AppraisalController extends BaseController {
             if(StringUtils.isEmpty(param.getTitle())){
                 return toError(ReCode.FAILD.getValue(),"标题不能为空！");
             }
+            if(param.getImgUrls() == null || param.getImgUrls().length < 1){
+                return toError(ReCode.FAILD.getValue(),"请至少包含一张图片！");
+            }
             //发起鉴定
-            appraisalDetailService.addAppraisal(userId,param.getBonus(),param.getTitle(),param.getContent());
+            appraisalDetailService.addAppraisal(userId,param.getBonus(),param.getTitle(),param.getContent(),param.getImgUrls());
 
             return toSuccess();
         } catch (Exception e) {

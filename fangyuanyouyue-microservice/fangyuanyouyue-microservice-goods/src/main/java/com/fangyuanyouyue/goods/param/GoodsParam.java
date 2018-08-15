@@ -197,8 +197,8 @@ public class GoodsParam{
 
 
     //Collect
-    @ApiModelProperty(name = "collectId", value = "收藏对象ID", dataType = "int",hidden = true)
-    private Integer[] collectId;//收藏对象ID
+    @ApiModelProperty(name = "collectIds", value = "收藏对象ID数组", dataType = "int",hidden = true)
+    private Integer[] collectIds;//收藏对象ID数组
 
     @ApiModelProperty(name = "collectType", value = "关注/收藏类型 1商品 2抢购 3视频 4专栏 5鉴赏", dataType = "int",hidden = true)
     private Integer collectType;//关注/收藏类型 1商品 2抢购 3视频 4专栏 5鉴赏

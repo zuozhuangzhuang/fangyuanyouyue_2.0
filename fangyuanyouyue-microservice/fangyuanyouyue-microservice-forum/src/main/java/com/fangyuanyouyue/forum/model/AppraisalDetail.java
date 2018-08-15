@@ -23,7 +23,7 @@ public class AppraisalDetail {
 
     private Integer sort;//排序
 
-    private Integer status;//
+    private Integer status;//状态 1显示 2隐藏
 
     private Date endTime;//结束时间
 

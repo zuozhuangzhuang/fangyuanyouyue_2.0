@@ -1,34 +1,37 @@
 package com.fangyuanyouyue.forum.dto;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
+import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.forum.model.AppraisalComment;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * banner
+ * 鉴定评论dto
  */
 @Getter
 @Setter
 @ToString
 public class AppraisalCommentDto {
 
-    private Integer commentId;
+    private Integer commentId;//评论id
 
-    private Integer userId;
+    private Integer userId;//评论用户id
 
-    private Integer appraisalId;
+    private String nickName;//昵称
 
-    private Integer viewpoint;
+    private String headImgUrl;//头像
 
-    private String content;
+    private Integer appraisalId;//鉴定id
 
-    private String pic1;
+    private Integer viewpoint;//评论观点
+
+    private String content;//评论内容
+
+    private String pic1;//图片1
 
     private String pic2;
 
@@ -40,21 +43,33 @@ public class AppraisalCommentDto {
 
     private String pic6;
 
-    private Integer isWinner;
+    private Integer isWinner;//观点是否获胜
 
-    private Integer status;
+    private Integer status;//状态
 
-    private Date addTime;
+    private String addTime;//添加时间
 
-    private Date updateTime;
+    private String updateTime;//修改时间
 
-    public AppraisalCommentDto() {
-    	
+
+    public AppraisalCommentDto(AppraisalComment comment) {
+        this.commentId = comment.getId();
+        this.userId = comment.getUserId();
+        this.appraisalId = comment.getAppraisalId();
+        this.viewpoint = comment.getViewpoint();
+        this.content = comment.getContent();
+        this.pic1 = comment.getPic1();
+        this.pic2 = comment.getPic2();
+        this.pic3 = comment.getPic3();
+        this.pic4 = comment.getPic4();
+        this.pic5 = comment.getPic5();
+        this.pic6 = comment.getPic6();
+        this.isWinner = comment.getIsWinner();
+        this.status = comment.getStatus();
+        this.addTime = DateUtil.getFormatDate(comment.getUpdateTime(), DateUtil.DATE_FORMT);
+        this.updateTime = DateUtil.getFormatDate(comment.getAddTime(), DateUtil.DATE_FORMT);
     }
 
-    public AppraisalCommentDto(AppraisalComment model) {
-       
-    }
     public static List<AppraisalCommentDto> toDtoList(List<AppraisalComment> list) {
         if (list == null)
             return null;

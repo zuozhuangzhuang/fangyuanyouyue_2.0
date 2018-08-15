@@ -8,7 +8,7 @@ import lombok.ToString;
 
 import java.math.BigDecimal;
 
-@ApiModel(value = "论坛相关参数")
+@ApiModel(value = "鉴定相关参数")
 @Getter
 @Setter
 @ToString
@@ -20,8 +20,8 @@ public class AppraisalParam{
 	@ApiModelProperty(name = "limit", value = "限制页", dataType = "int",hidden = true)
 	private Integer limit; // 限制页
 
-    @ApiModelProperty(name = "token", value = "用户token", dataType = "String",hidden = true)
-    private String token;//用户token
+	@ApiModelProperty(name = "token", value = "用户token", dataType = "String",hidden = true)
+	private String token;//用户token
 
 	@ApiModelProperty(name = "type", value = "类型", dataType = "int",hidden = true)
 	private Integer type;//类型
@@ -47,5 +47,8 @@ public class AppraisalParam{
 
 	@ApiModelProperty(name = "content", value = "商品描述", dataType = "String",hidden = true)
 	private String content;//商品描述
+
+	@ApiModelProperty(name = "imgUrls", value = "图片数组", dataType = "String",hidden = true)
+	private String[] imgUrls;//图片数组
 
 }

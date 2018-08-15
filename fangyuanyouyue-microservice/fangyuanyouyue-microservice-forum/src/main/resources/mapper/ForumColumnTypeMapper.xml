@@ -21,7 +21,7 @@
     delete from forum_column_type
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ForumColumnType" >
+  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ForumColumnType" useGeneratedKeys="true" keyProperty="id">
     insert into forum_column_type (id, name, sort, 
       add_time, update_time)
     values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER}, 

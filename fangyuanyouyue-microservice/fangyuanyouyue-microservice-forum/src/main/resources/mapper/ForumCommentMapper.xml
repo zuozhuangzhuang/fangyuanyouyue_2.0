@@ -27,7 +27,7 @@
     delete from forum_comment
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ForumComment" >
+  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ForumComment" useGeneratedKeys="true" keyProperty="id">
     insert into forum_comment (id, user_id, forum_id, 
       comment_id, content, status, 
       add_time, update_time)

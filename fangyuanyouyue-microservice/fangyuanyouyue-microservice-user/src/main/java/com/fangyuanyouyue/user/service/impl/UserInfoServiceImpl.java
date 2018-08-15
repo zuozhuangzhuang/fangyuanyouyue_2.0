@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import feign.RetryableException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -469,7 +470,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             UserDto userDto = new UserDto(token,user,userVip,userInfoExt);
             UserWallet userWallet = userWalletMapper.selectByUserId(user.getId());
             if(userWallet == null){
-                throw new ServiceException("获取钱包失败！");
+                throw new ServiceException("获取用户信息失败！");
             }else{
                 long score = userWallet.getScore();
                 if(0 <= score && score < 500){//Lv1
@@ -743,11 +744,15 @@ public class UserInfoServiceImpl implements UserInfoService {
 
 	@Override
 	public void registIMUser(UserInfo user) throws ServiceException {
-		//判断用户是否已经注册环信
-		if(user.getIsRegHx()==null||user.getIsRegHx()==StatusEnum.NO.getCode()) {
-	        schedualMessageService.easemobRegist(user.getId().toString(), MD5Util.MD5("xiaofangyuan"+user.getId().toString()));
-			user.setIsRegHx(StatusEnum.YES.getCode());
-			userInfoMapper.updateByPrimaryKey(user);
-		}
+        try {
+            //判断用户是否已经注册环信
+            if(user.getIsRegHx()==null||user.getIsRegHx()==StatusEnum.NO.getCode()) {
+                schedualMessageService.easemobRegist(user.getId().toString(), MD5Util.MD5("xiaofangyuan"+user.getId().toString()));
+                user.setIsRegHx(StatusEnum.YES.getCode());
+                userInfoMapper.updateByPrimaryKey(user);
+            }
+        }catch (RetryableException e){
+            throw new ServiceException("调用信息系统失败！");
+        }
 	}
 }

@@ -19,17 +19,17 @@ public class ForumCommentDto {
 
     private Integer commentId;//评论ID
 
-    private Integer userId;
+    private Integer userId;//用户id
     
-    private String nickName;
+    private String nickName;//昵称
     
-    private String headImgUrl;
+    private String headImgUrl;//头像
 
-    private Integer forumId;
+    private Integer forumId;//帖子id
 
-    private String content;
+    private String content;//内容
 
-    private String addTime;
+    private String addTime;//添加时间
     
     private Integer likesCount = 0;//点赞数量
     

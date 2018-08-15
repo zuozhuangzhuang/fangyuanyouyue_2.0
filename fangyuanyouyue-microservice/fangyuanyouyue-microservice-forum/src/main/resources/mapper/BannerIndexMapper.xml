@@ -31,7 +31,7 @@
     delete from banner_index
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.BannerIndex" >
+  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.BannerIndex" useGeneratedKeys="true" keyProperty="id">
     insert into banner_index (id, business_id, jump_type, 
       type, title, img_url, 
       sort, status, add_time, 

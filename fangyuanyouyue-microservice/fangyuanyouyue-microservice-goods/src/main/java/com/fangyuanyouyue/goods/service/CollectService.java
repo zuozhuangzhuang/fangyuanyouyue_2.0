@@ -9,13 +9,13 @@ public interface CollectService {
     /**
      * 收藏/关注或取消
      * @param userId
-     * @param collectId
+     * @param collectIds
      * @param collectType
      * @param type
      * @param status
      * @throws ServiceException
      */
-    void collectGoods(Integer userId,Integer[] collectId,Integer collectType,Integer type,Integer status) throws ServiceException;
+    void collect(Integer userId,Integer[] collectIds,Integer collectType,Integer type,Integer status) throws ServiceException;
 
     /**
      * 我的收藏/关注列表 (商品、抢购)

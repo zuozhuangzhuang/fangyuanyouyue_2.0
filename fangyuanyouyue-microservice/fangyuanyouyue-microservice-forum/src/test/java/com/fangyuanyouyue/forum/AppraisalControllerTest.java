@@ -43,9 +43,10 @@ public class AppraisalControllerTest {
     public void addAppraisal() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/appraisal/addAppraisal")
                 .param("token", "10045FY1534183918247")
-                .param("bonus", "80")
-                .param("title", "说说女人")
-                .param("content", "女人都是大猪蹄子")
+                .param("bonus", "10")
+                .param("title", "来看看这个咸丰")
+                .param("content", "刚入手一枚好看的钱，大家帮我看看是真的还是假的")
+                .param("imgUrls", "123,124,125")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

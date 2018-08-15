@@ -32,7 +32,7 @@
     delete from appraisal_comment
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.AppraisalComment">
+  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.AppraisalComment" useGeneratedKeys="true" keyProperty="id">
     insert into appraisal_comment (id, user_id, appraisal_id, 
       viewpoint, content, pic1, 
       pic2, pic3, pic4, pic5, 
