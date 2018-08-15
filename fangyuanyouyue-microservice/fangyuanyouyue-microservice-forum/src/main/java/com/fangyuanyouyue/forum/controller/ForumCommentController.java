@@ -84,7 +84,7 @@ public class ForumCommentController extends BaseController {
 				return toError("分页参数不能为空");
 			}
 
-			List<ForumCommentDto> dto = forumCommentService.getCommentList(param.getForumId(), param.getStart(),
+			List<ForumCommentDto> dto = forumCommentService.getCommentCommentList(param.getCommentId(), param.getStart(),
 					param.getLimit());
 
 			return toSuccess(dto);

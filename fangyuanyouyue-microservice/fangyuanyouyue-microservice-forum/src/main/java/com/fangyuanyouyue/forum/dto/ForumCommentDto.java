@@ -49,6 +49,7 @@ public class ForumCommentDto {
         this.addTime = DateUtil.getFormatDate(model.getAddTime(), DateUtil.DATE_FORMT);
         this.headImgUrl = model.getHeadImgUrl();
         this.nickName = model.getNickName();
+        this.userId = model.getUserId();
     }
     public static List<ForumCommentDto> toDtoList(List<ForumComment> list) {
         if (list == null)

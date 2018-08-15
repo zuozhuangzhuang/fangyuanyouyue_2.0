@@ -42,8 +42,6 @@ public class AppraisalDetailDto {
     
     private String endTime;//结束时间
 
-    private String updateTime;//修改时间
-
     private String content;
     
     private Integer commentCount = 0;//评论数量
@@ -74,7 +72,6 @@ public class AppraisalDetailDto {
         this.sort = detail.getSort();
         this.status = detail.getStatus();
         this.endTime = DateUtil.getFormatDate(detail.getEndTime(), DateUtil.DATE_FORMT_YEAR);
-        this.updateTime = DateUtil.getFormatDate(detail.getUpdateTime(), DateUtil.DATE_FORMT_YEAR);
         this.addTime = DateUtil.getFormatDate(detail.getAddTime(), DateUtil.DATE_FORMT_YEAR);
         this.content = detail.getContent();
     }

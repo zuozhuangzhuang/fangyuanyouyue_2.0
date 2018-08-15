@@ -1,7 +1,10 @@
 package com.fangyuanyouyue.forum.dao;
 
+import org.apache.ibatis.annotations.Mapper;
+
 import com.fangyuanyouyue.forum.model.ForumCommentLikes;
 
+@Mapper
 public interface ForumCommentLikesMapper {
     int deleteByPrimaryKey(Integer id);
 
@@ -14,4 +17,7 @@ public interface ForumCommentLikesMapper {
     int updateByPrimaryKeySelective(ForumCommentLikes record);
 
     int updateByPrimaryKey(ForumCommentLikes record);
+
+    int countById(Integer commentId);
+    
 }

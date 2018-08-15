@@ -1,7 +1,10 @@
 package com.fangyuanyouyue.forum.dao;
 
+import org.apache.ibatis.annotations.Mapper;
+
 import com.fangyuanyouyue.forum.model.ForumPv;
 
+@Mapper
 public interface ForumPvMapper {
     int deleteByPrimaryKey(Integer id);
 

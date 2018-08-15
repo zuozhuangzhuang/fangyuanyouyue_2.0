@@ -30,7 +30,7 @@ public class ForumInfoDto {
 
     private String videoUrl;//视频地址url
     
-    private String coverImgUrl;//视频封面图片
+    private String videoImg;//视频封面图片
 
     private Integer videoLength;//视频长度，单位秒
 
@@ -70,6 +70,9 @@ public class ForumInfoDto {
         this.addTime = DateUtil.getFormatDate(forumInfo.getAddTime(), DateUtil.DATE_FORMT);
         this.type = forumInfo.getType();
         this.status = forumInfo.getStatus();
+        this.videoImg = forumInfo.getVideoImg();
+        this.nickName = forumInfo.getNickName();
+        this.headImgUrl = forumInfo.getHeadImgUrl();
     }
     
     public static List<ForumInfoDto> toDtoList(List<ForumInfo> list) {

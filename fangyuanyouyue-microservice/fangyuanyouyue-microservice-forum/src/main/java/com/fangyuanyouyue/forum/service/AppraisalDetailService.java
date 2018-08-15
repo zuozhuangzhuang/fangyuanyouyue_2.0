@@ -29,7 +29,7 @@ public interface AppraisalDetailService {
      * @return
      * @throws ServiceException
      */
-    List<AppraisalDetailDto> getAppraisalList(Integer start,Integer limit) throws ServiceException;
+    List<AppraisalDetailDto> getAppraisalList(Integer userId,String keyword,Integer start,Integer limit) throws ServiceException;
 
     /**
      * 发起鉴定

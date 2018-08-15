@@ -1,6 +1,8 @@
 package com.fangyuanyouyue.forum.dao;
 
 import com.fangyuanyouyue.forum.model.AppraisalDetail;
+import com.fangyuanyouyue.forum.model.ForumInfo;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -21,6 +23,10 @@ public interface AppraisalDetailMapper {
     int updateByPrimaryKeyWithBLOBs(AppraisalDetail record);
 
     int updateByPrimaryKey(AppraisalDetail record);
+    
+
+    List<AppraisalDetail> selectList(@Param("userId")Integer userId,@Param("keyword")String keyword,@Param("start")Integer start,@Param("limit")Integer limit);
+
 
     /**
      * 获取用户收藏的鉴定列表

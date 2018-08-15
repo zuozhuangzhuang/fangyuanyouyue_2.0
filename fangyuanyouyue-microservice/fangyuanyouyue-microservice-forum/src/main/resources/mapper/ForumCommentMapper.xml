@@ -141,6 +141,7 @@
     a.*,b.nick_name,b.head_img_url
     from forum_comment a,user_info b
     where a.user_id=b.id and forum_id=#{forumId}
+    and a.comment_id is null
     order by id desc
     limit #{start},#{limit}
   </select>
@@ -148,7 +149,7 @@
     select
     a.*,b.nick_name,b.head_img_url
     from forum_comment a,user_info b
-    where a.user_id=b.id and comment_id=#{commentId}
+    where a.user_id=b.id and a.comment_id=#{commentId}
     order by id desc
     limit #{start},#{limit}
   </select>
