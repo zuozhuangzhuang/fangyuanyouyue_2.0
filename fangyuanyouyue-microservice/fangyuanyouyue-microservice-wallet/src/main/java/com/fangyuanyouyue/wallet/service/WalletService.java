@@ -79,4 +79,13 @@ public interface WalletService {
      * @throws ServiceException
      */
     void updateCredit(Integer userId,Long credit,Integer type) throws ServiceException;
+
+    /**
+     * 修改支付密码
+     * @param userId
+     * @param payPwd
+     * @param newPwd
+     * @throws ServiceException
+     */
+    void updatePayPwd(Integer userId,String payPwd,String newPwd) throws ServiceException;
 }

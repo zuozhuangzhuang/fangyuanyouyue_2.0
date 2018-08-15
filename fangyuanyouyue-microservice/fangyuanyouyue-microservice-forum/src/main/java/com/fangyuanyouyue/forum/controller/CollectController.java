@@ -123,7 +123,7 @@ public class CollectController extends BaseController {
             if(param.getLimit() == null || param.getLimit() < 1){
                 return toError(ReCode.FAILD.getValue(),"每页个数错误！");
             }
-            List dtos = collectService.collectList(userId, param.getCollectType(),param.getStart(),param.getLimit());;
+            List dtos = collectService.collectList(userId, param.getCollectType(),param.getStart(),param.getLimit());
             return toSuccess(dtos);
         } catch (ServiceException e) {
             e.printStackTrace();

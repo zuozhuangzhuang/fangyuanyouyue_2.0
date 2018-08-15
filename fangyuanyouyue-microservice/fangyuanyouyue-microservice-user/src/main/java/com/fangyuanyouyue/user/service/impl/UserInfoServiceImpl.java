@@ -752,7 +752,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 userInfoMapper.updateByPrimaryKey(user);
             }
         }catch (RetryableException e){
-            throw new ServiceException("调用信息系统失败！");
+            throw new ServiceException("连接超时！");
         }
 	}
 }
