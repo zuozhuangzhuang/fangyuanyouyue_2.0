@@ -35,5 +35,5 @@ public class OrderInfo {
 
     private Integer isResolve;//是否拆单 1是 2否
 
-    private Integer isRefund;//是否退货 1是 2否
+    private Integer isRefund = 2;//是否退货 1是 2否
 }
