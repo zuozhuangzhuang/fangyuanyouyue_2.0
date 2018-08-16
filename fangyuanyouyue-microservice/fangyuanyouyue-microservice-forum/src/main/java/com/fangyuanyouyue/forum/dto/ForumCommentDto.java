@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.forum.constants.StatusEnum;
 import com.fangyuanyouyue.forum.model.ForumComment;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,6 +36,8 @@ public class ForumCommentDto {
     
     private Integer commentCount = 0;//被回复数量
     
+    private Integer isLikes = StatusEnum.NO.getValue(); //是否点赞
+    
     public ForumCommentDto() {
     	
     }
@@ -46,6 +49,7 @@ public class ForumCommentDto {
         this.addTime = DateUtil.getFormatDate(model.getAddTime(), DateUtil.DATE_FORMT);
         this.headImgUrl = model.getHeadImgUrl();
         this.nickName = model.getNickName();
+        this.userId = model.getUserId();
     }
     public static List<ForumCommentDto> toDtoList(List<ForumComment> list) {
         if (list == null)

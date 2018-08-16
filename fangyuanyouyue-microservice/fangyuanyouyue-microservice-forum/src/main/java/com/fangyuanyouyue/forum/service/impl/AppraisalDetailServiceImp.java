@@ -3,18 +3,18 @@ package com.fangyuanyouyue.forum.service.impl;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.fangyuanyouyue.base.util.DateStampUtils;
-import com.fangyuanyouyue.base.util.DateUtil;
-import com.fangyuanyouyue.forum.dao.AppraisalDetailMapper;
-import com.fangyuanyouyue.forum.dao.AppraisalImgMapper;
-import com.fangyuanyouyue.forum.model.AppraisalDetail;
-import com.fangyuanyouyue.forum.model.AppraisalImg;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.base.util.DateStampUtils;
+import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.forum.dao.AppraisalDetailMapper;
+import com.fangyuanyouyue.forum.dao.AppraisalImgMapper;
 import com.fangyuanyouyue.forum.dto.AppraisalDetailDto;
+import com.fangyuanyouyue.forum.model.AppraisalDetail;
+import com.fangyuanyouyue.forum.model.AppraisalImg;
 import com.fangyuanyouyue.forum.service.AppraisalDetailService;
 
 
@@ -28,18 +28,18 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 
 	@Override
 	public AppraisalDetailDto getAppraisalDetail(Integer id) throws ServiceException {
-		// TODO Auto-generated method stub
-		return null;
+		AppraisalDetail model = appraisalDetailMapper.selectByPrimaryKey(id);
+		return new AppraisalDetailDto(model);
 	}
 
 	@Override
-	public List<AppraisalDetailDto> getAppraisalList(Integer start, Integer limit) throws ServiceException {
-		// TODO Auto-generated method stub
-		return null;
+	public List<AppraisalDetailDto> getAppraisalList(Integer userId,String keyword,Integer start, Integer limit) throws ServiceException {
+		List<AppraisalDetail> list = appraisalDetailMapper.selectList(userId, keyword, start, limit);
+		return AppraisalDetailDto.toDtoList(list);
 	}
 
 	@Override
-	public void addAppraisal(Integer userId, BigDecimal bonus, String title, String content,String[] imgUrls) throws ServiceException {
+	public void addAppraisal(Integer userId, BigDecimal bonus, String title, String content,String[] imgUrls,Integer[] userIds) throws ServiceException {
 		AppraisalDetail appraisalDetail = new AppraisalDetail();
 		appraisalDetail.setUserId(userId);
 		appraisalDetail.setTitle(title);
@@ -61,6 +61,10 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 			appraisalImg.setAppraisalId(appraisalDetail.getId());
 			appraisalImg.setAddTime(DateStampUtils.getTimesteamp());
 			appraisalImgMapper.insert(appraisalImg);
+		}
+		//TODO 邀请我：用户“用户昵称”发起全民鉴定【全名鉴定名称】时邀请了您！点击此处前往查看吧
+		for(Integer toUserId:userIds){
+
 		}
 	}
 	

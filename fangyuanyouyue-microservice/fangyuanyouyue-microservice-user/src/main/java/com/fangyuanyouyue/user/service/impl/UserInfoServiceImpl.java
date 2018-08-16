@@ -692,6 +692,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                     while(iterator.hasNext()){
                         iterator.remove();
                     }
+                    //TODO 新增粉丝：用户“用户昵称”已关注了您！
                 }else if(type == 1){//取消关注
                     if(userFans == null){
                         throw new ServiceException("未关注，取消关注失败！");
@@ -755,4 +756,12 @@ public class UserInfoServiceImpl implements UserInfoService {
             throw new ServiceException("连接超时！");
         }
 	}
+
+    @Override
+    public List<ShopDto> getUserByName(String search,Integer start,Integer limit) throws ServiceException {
+        //个人店铺排序：1.会员等级 2.认证店铺 3.信誉度 4.发布商品时间
+        List<Map<String, Object>> userByName = userInfoMapper.getUserByName(search, start * limit, limit);
+        List<ShopDto> shopDtos = ShopDto.toDtoList(userByName);
+        return shopDtos;
+    }
 }

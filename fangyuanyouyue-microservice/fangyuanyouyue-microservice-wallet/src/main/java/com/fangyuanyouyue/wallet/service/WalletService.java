@@ -3,6 +3,7 @@ package com.fangyuanyouyue.wallet.service;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.wallet.dto.BonusPoolDto;
 import com.fangyuanyouyue.wallet.dto.WalletDto;
+import com.fangyuanyouyue.wallet.dto.WechatPayDto;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -88,4 +89,19 @@ public interface WalletService {
      * @throws ServiceException
      */
     void updatePayPwd(Integer userId,String payPwd,String newPwd) throws ServiceException;
+
+    /**
+     * 微信支付
+     * @param orderId
+     * @throws ServiceException
+     */
+    WechatPayDto orderPayByWechat(Integer orderId, String orderNo, BigDecimal price) throws Exception;
+
+    /**
+     * 支付宝支付
+     * @param orderId
+     * @return
+     * @throws ServiceException
+     */
+    WechatPayDto orderPayByALi(Integer orderId) throws ServiceException;
 }

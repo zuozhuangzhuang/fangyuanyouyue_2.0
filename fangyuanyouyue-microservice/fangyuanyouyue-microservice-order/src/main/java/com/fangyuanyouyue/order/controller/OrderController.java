@@ -509,6 +509,43 @@ public class OrderController extends BaseController{
         }
     }
 
+
+    @ApiOperation(value = "提醒发货", notes = "(void)提醒发货")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orderId", value = "订单id",required = true, dataType = "String", paramType = "query")
+    })
+    @PostMapping(value = "/reminder")
+    @ResponseBody
+    public BaseResp reminder(OrderParam param) throws IOException {
+        try {
+            log.info("----》提醒发货《----");
+            log.info("参数："+param.toString());
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+            }
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            String verifyUser = schedualUserService.verifyUserById(userId);
+            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+            if((Integer)jsonObject.get("code") != 0){
+                return toError(jsonObject.getString("report"));
+            }
+            if(param.getOrderId() == null){
+                return toError(ReCode.FAILD.getValue(),"订单id不能为空！");
+            }
+            //提醒发货
+            orderService.reminder(userId,param.getOrderId());
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
 //
 //    @ApiOperation(value = "物流公司", notes = "()物流公司")
 //    @ApiImplicitParams({

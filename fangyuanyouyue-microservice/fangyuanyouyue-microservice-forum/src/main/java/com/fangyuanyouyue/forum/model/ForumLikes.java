@@ -1,10 +1,10 @@
 package com.fangyuanyouyue.forum.model;
 
+import java.util.Date;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.Date;
 
 /**
  * 论坛帖子点赞表
@@ -19,6 +19,9 @@ public class ForumLikes {
 
     private Integer forumId;//帖子id
 
+    private String nickName;
+    
+    private String headImgUrl;
     private Date addTime;//添加时间
 
 

@@ -29,7 +29,7 @@ public interface AppraisalDetailService {
      * @return
      * @throws ServiceException
      */
-    List<AppraisalDetailDto> getAppraisalList(Integer start,Integer limit) throws ServiceException;
+    List<AppraisalDetailDto> getAppraisalList(Integer userId,String keyword,Integer start,Integer limit) throws ServiceException;
 
     /**
      * 发起鉴定
@@ -38,7 +38,8 @@ public interface AppraisalDetailService {
      * @param title
      * @param content
      * @param imgUrls
+     * @param userIds
      * @throws ServiceException
      */
-    void addAppraisal(Integer userId, BigDecimal bonus,String title,String content,String[] imgUrls) throws ServiceException;
+    void addAppraisal(Integer userId, BigDecimal bonus,String title,String content,String[] imgUrls,Integer[] userIds) throws ServiceException;
 }

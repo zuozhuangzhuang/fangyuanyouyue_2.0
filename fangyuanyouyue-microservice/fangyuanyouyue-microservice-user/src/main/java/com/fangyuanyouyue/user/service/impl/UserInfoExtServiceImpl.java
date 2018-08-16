@@ -54,6 +54,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
             identityAuthApply.setAddTime(DateStampUtils.getTimesteamp());
             identityAuthApplyMapper.insert(identityAuthApply);
         }
+        //TODO 系统消息：您的实名认证申请已提交，将于1个工作日内完成审核，请注意消息通知
     }
 
     @Override
@@ -102,5 +103,6 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
                 userInfoExtMapper.updateByPrimaryKey(userInfoExt);
             }
         }
+        //TODO 系统消息：您的认证店铺申请已提交，将于5个工作日内完成审核，请注意消息通知
     }
 }

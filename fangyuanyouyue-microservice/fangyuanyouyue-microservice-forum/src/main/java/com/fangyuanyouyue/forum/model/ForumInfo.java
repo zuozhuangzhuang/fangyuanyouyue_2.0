@@ -39,4 +39,8 @@ public class ForumInfo {
     private String videoImg;//视频封面图
 
     private String content;//内容描述，富文本
+    
+    private String nickName;
+    
+    private String headImgUrl;
 }

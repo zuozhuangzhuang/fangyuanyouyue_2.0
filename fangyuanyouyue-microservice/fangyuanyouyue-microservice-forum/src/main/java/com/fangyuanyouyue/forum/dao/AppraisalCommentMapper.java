@@ -1,7 +1,11 @@
 package com.fangyuanyouyue.forum.dao;
 
-import com.fangyuanyouyue.forum.model.AppraisalComment;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import com.fangyuanyouyue.forum.model.AppraisalComment;
 
 @Mapper
 public interface AppraisalCommentMapper {
@@ -18,4 +22,7 @@ public interface AppraisalCommentMapper {
     int updateByPrimaryKey(AppraisalComment record);
     
     int countById(Integer appraisalId);
+
+    List<AppraisalComment> selectByAppraisalId(@Param("appraisalId")Integer appraisalId,@Param("start")Integer start,@Param("limit")Integer limit);
+
 }

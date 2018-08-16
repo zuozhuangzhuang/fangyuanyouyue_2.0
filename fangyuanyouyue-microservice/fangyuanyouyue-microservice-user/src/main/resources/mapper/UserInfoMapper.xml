@@ -320,4 +320,12 @@
     </if>
     order by c.vip_level desc,c.vip_type desc,b.auth_type limit #{start},#{limit}
   </select>
+
+  <select id="getUserByName" parameterType="String" resultType="Map">
+    select a.*,b.*,c.* from user_info a,user_info_ext b,user_vip c where a.id = b.user_id and a.id = c.user_id
+    <if test="nickName != null">
+      and a.nick_name like "%"#{nickName,jdbcType=VARCHAR}"%"
+    </if>
+    order by c.vip_level desc,c.vip_type desc,b.auth_type limit #{start},#{limit}
+  </select>
 </mapper>

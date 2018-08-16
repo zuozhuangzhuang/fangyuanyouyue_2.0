@@ -197,4 +197,17 @@
       limit #{start},#{limit}
     </if>
   </select>
+  <select id="selectList" resultMap="BaseResultMap" >
+    select
+    a.*,b.nick_name,b.head_img_url
+    from appraisal_detail a,user_info b
+    where a.user_id=b.id
+    <if test="userId != null" >
+      and a.user_id = #{userId}
+    </if>
+    <if test="keyword != null" >
+      and a.title like "%"#{keyword}"%"
+    </if>
+    limit #{start},#{limit}
+  </select>
 </mapper>

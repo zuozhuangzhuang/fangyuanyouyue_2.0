@@ -186,5 +186,14 @@ public interface UserInfoService {
      * 注册通讯账号
      */
     void registIMUser(UserInfo user) throws ServiceException;
-    
+
+    /**
+     * 根据用户名获取用户列表
+     * @param search
+     * @param start
+     * @param limit
+     * @return
+     * @throws ServiceException
+     */
+    List<ShopDto> getUserByName(String search,Integer start,Integer limit) throws ServiceException;
 }

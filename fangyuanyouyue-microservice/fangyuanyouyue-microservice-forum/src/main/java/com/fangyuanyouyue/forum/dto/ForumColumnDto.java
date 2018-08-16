@@ -26,7 +26,7 @@ public class ForumColumnDto {
 
     private String coverImgUrl;//封面图
 
-    private Integer fansCount;//粉丝数量
+    private Integer fansCount = 0;//粉丝数量
 
     public ForumColumnDto() {
     	

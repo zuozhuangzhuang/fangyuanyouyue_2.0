@@ -3,29 +3,33 @@ package com.fangyuanyouyue.forum.controller;
 import java.io.IOException;
 import java.util.List;
 
-import com.alibaba.fastjson.JSONObject;
-import com.fangyuanyouyue.forum.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.forum.dto.AppraisalCommentDto;
 import com.fangyuanyouyue.forum.dto.AppraisalDetailDto;
 import com.fangyuanyouyue.forum.param.AppraisalParam;
+import com.fangyuanyouyue.forum.service.AppraisalCommentLikesService;
+import com.fangyuanyouyue.forum.service.AppraisalCommentService;
+import com.fangyuanyouyue.forum.service.AppraisalDetailService;
+import com.fangyuanyouyue.forum.service.AppraisalLikesService;
+import com.fangyuanyouyue.forum.service.SchedualRedisService;
+import com.fangyuanyouyue.forum.service.SchedualUserService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/appraisal")
@@ -51,7 +55,7 @@ public class AppraisalController extends BaseController {
     @ApiOperation(value = "全民鉴定详情", notes = "根据id获取全民鉴定详情",response = BaseResp.class)
     @ApiImplicitParams({
         @ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "string", paramType = "query"),
-        @ApiImplicitParam(name = "forumId", value = "帖子id",required = true, dataType = "int", paramType = "query")
+        @ApiImplicitParam(name = "appraisalId", value = "帖子id",required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/detail")
     @ResponseBody
@@ -60,9 +64,9 @@ public class AppraisalController extends BaseController {
             log.info("----》获取全民鉴定详情《----");
             log.info("参数：" + param.toString());
             //验证用户
-            if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
-            }
+            //if(StringUtils.isEmpty(param.getToken())){
+            //    return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+            //}
             //Integer userId = (Integer)schedualRedisService.get(param.getToken());
             
             //if(userId!=null) {
@@ -104,7 +108,7 @@ public class AppraisalController extends BaseController {
             	return toError("分页参数不能为空");
             }
 
-            List<AppraisalDetailDto> dto = appraisalDetailService.getAppraisalList(param.getStart(), param.getLimit());
+            List<AppraisalDetailDto> dto = appraisalDetailService.getAppraisalList(param.getUserId(),param.getKeyword(),param.getStart(), param.getLimit());
             
             return toSuccess(dto);
         } catch (Exception e) {
@@ -151,7 +155,7 @@ public class AppraisalController extends BaseController {
     @ApiOperation(value = "全民鉴定点赞", notes = "对全民鉴定点赞",response = BaseResp.class)
     @ApiImplicitParams({ 
     		@ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "appraisalId", value = "评论id",required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "appraisalId", value = "鉴定id",required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/likes")
     @ResponseBody
@@ -208,8 +212,8 @@ public class AppraisalController extends BaseController {
             	//TODO 暂时不需要处理
             }
 			
-            if(param.getAppraisalId()==null) {
-            	return toError("鉴定ID不能为空");
+            if(param.getCommentId()==null) {
+            	return toError("评论ID不能为空");
             }
             
             appraisalCommentLikesService.saveLikes(userId, param.getCommentId());
@@ -228,7 +232,8 @@ public class AppraisalController extends BaseController {
             @ApiImplicitParam(name = "bonus", value = "鉴定赏金",required = false, dataType = "BigDecimal", paramType = "query"),
             @ApiImplicitParam(name = "title", value = "标题",required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "content", value = "商品描述", required = false, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "imgUrls", value = "图片数组", allowMultiple = true,required = true, dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "imgUrls", value = "图片数组", allowMultiple = true,required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "userIds", value = "邀请用户id数组", allowMultiple = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/addAppraisal")
     @ResponseBody
@@ -257,7 +262,7 @@ public class AppraisalController extends BaseController {
                 return toError(ReCode.FAILD.getValue(),"请至少包含一张图片！");
             }
             //发起鉴定
-            appraisalDetailService.addAppraisal(userId,param.getBonus(),param.getTitle(),param.getContent(),param.getImgUrls());
+            appraisalDetailService.addAppraisal(userId,param.getBonus(),param.getTitle(),param.getContent(),param.getImgUrls(),param.getUserIds());
 
             return toSuccess();
         } catch (Exception e) {

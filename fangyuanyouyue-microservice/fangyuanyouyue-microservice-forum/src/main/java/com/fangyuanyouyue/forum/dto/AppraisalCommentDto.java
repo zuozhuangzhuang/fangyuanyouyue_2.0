@@ -1,13 +1,14 @@
 package com.fangyuanyouyue.forum.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.forum.model.AppraisalComment;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 鉴定评论dto
@@ -19,11 +20,11 @@ public class AppraisalCommentDto {
 
     private Integer commentId;//评论id
 
-    private Integer userId;//评论用户id
-
-    private String nickName;//昵称
-
-    private String headImgUrl;//头像
+    private Integer userId;
+    
+    private String nickName;//作者昵称
+    
+    private String headImgUrl;//作者头像
 
     private Integer appraisalId;//鉴定id
 
@@ -43,7 +44,11 @@ public class AppraisalCommentDto {
 
     private String pic6;
 
-    private Integer isWinner;//观点是否获胜
+    private Integer isWinner; //是否赢了 1是 2否
+    
+    private Integer isLikes; //是否点赞 1是 2否
+    
+    private Integer likesCount; //同意次数
 
     private Integer status;//状态
 

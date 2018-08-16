@@ -107,7 +107,31 @@
 			<version>1.16.18</version>
 			<scope>provided</scope>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.alipay.api/k12-alipay-sdk -->
+		<!--支付宝-->
+		<dependency>
+			<groupId>com.alipay.api</groupId>
+			<artifactId>k12-alipay-sdk</artifactId>
+			<version>0.0.1-beta</version>
+		</dependency>
+
 	</dependencies>
+
+	<developers>
+		<developer>
+			<name>wxpay</name>
+			<email></email>
+			<url>https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=11_1</url>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>The BSD 3-Clause License</name>
+			<url>https://opensource.org/licenses/BSD-3-Clause</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
 	<build>
 		<plugins>

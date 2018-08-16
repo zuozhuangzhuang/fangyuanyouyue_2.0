@@ -16,6 +16,8 @@
     <result column="column_id" jdbcType="INTEGER" property="columnId" />
     <result column="is_chosen" jdbcType="INTEGER" property="isChosen" />
     <result column="video_img" jdbcType="VARCHAR" property="videoImg" />
+    <result column="nick_name" jdbcType="INTEGER" property="nickName" />
+    <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.forum.model.ForumInfo">
     <result column="content" jdbcType="LONGVARCHAR" property="content" />

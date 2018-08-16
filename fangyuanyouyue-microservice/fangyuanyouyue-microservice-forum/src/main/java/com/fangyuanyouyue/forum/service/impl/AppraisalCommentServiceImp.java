@@ -29,8 +29,8 @@ public class AppraisalCommentServiceImp implements AppraisalCommentService {
 	@Override
 	public List<AppraisalCommentDto> getAppraisalCommentList(Integer appraisalId, Integer start, Integer limit)
 			throws ServiceException {
-		// TODO Auto-generated method stub
-		return null;
+		List<AppraisalComment> list = appraisalCommentMapper.selectByAppraisalId(appraisalId, start, limit);
+		return AppraisalCommentDto.toDtoList(list);
 	}
 
 	@Override

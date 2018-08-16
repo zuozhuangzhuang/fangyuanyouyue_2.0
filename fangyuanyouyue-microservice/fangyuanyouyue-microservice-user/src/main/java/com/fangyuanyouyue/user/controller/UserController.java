@@ -649,7 +649,7 @@ public class UserController extends BaseController {
             if(StringUtils.isEmpty(param.getCode())){
                 return toError(ReCode.FAILD.getValue(),"验证码不能为空！");
             }
-            //TODO 从缓存获取
+            //从缓存获取
             String code = String.valueOf(schedualRedisService.get(param.getPhone()));
             log.info("验证码:1."+code+" 2."+param.getCode());
             if(StringUtils.isEmpty(code) || !code.equals(param.getCode())){
@@ -866,6 +866,39 @@ public class UserController extends BaseController {
             //申请官方认证
             userInfoExtService.authType(user.getId());
             return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "根据用户名获取用户列表", notes = "（ShopDto）根据用户名获取用户列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "search", value = "查询内容", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "start", value = "分页start", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "分页limit", required = true, dataType = "int", paramType = "query")
+    })
+    @GetMapping(value = "/getUserByName")
+    @ResponseBody
+    public BaseResp getUserByName(UserParam param) throws IOException {
+        try {
+            log.info("----》根据用户名获取用户列表《----");
+            log.info("参数："+param.toString());
+            if(StringUtils.isEmpty(param.getSearch())){
+                return toError(ReCode.FAILD.getValue(),"查询内容不能为空！");
+            }
+            if(param.getStart() == null || param.getStart() < 0){
+                return toError(ReCode.FAILD.getValue(),"起始页数错误！");
+            }
+            if(param.getLimit() == null || param.getLimit() < 1){
+                return toError(ReCode.FAILD.getValue(),"每页个数错误！");
+            }
+            //根据用户名获取用户列表
+            List<ShopDto> userByName = userInfoService.getUserByName(param.getSearch(),param.getStart(),param.getLimit());
+            return toSuccess(userByName);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());

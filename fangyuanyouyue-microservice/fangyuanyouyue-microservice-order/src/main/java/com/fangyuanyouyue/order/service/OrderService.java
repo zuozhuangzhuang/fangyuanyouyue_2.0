@@ -122,4 +122,12 @@ public interface OrderService {
      * @throws ServiceException
      */
     void evaluationOrder(Integer userId,Integer orderId,Integer goodsQuality,Integer serviceAttitude) throws ServiceException;
+
+    /**
+     * 提醒发货
+     * @param userId
+     * @param orderId
+     * @throws ServiceException
+     */
+    void reminder(Integer userId,Integer orderId) throws ServiceException;
 }

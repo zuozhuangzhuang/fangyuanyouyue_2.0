@@ -395,5 +395,23 @@ public class UserControllerTest {
 
 
 
+    /**
+     * 根据用户名获取用户列表
+     * @throws Exception
+     */
+    @Test
+    @Transactional
+    public void getUserByName() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/user/getUserByName")
+                .param("search","")
+                .param("start","0")
+                .param("limit","20")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+
+
 
 }

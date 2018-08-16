@@ -128,6 +128,7 @@ public class OrderServiceImpl implements OrderService{
         orderDto.setOrderDetailDtos(orderDetailDtos);
         orderDto.setSellerDtos(sellerDtos);
         orderDto.setNickName(user.getNickName());
+        //TODO 交易消息：恭喜您！您的商品【大头三年原光】、【xxx】、【xx】已有人下单，点击此处查看订单
         return orderDto;
     }
 
@@ -560,6 +561,8 @@ public class OrderServiceImpl implements OrderService{
         orderDto.setOrderDetailDtos(orderDetailDtos);
         orderDto.setSellerDtos(sellerDtos);
         orderDto.setNickName(user.getNickName());
+        //TODO 交易消息：恭喜您！您的商品【大头三年原光】已有人下单，点击此处查看订单
+        // 交易消息：恭喜您！您的抢购【大头三年原光】已有人下单，点击此处查看订单
         return orderDto;
 
     }
@@ -621,7 +624,8 @@ public class OrderServiceImpl implements OrderService{
                 orderPay.setPayTime(DateStampUtils.getTimesteamp());
                 orderPay.setStatus(2);
                 orderPayMapper.updateByPrimaryKey(orderPay);
-                //TODO 通知卖家去发货
+                //TODO 交易信息：恭喜您！您的商品【大头三年原光】已被买下，点击此处查看订单
+                //交易信息：恭喜您！您的抢购【大头三年原光】已被买下，点击此处查看订单
                 return "余额支付成功";
             }
         }
@@ -786,6 +790,17 @@ public class OrderServiceImpl implements OrderService{
             }else{
                 throw new ServiceException("订单当前状态无法评价！");
             }
+        }
+    }
+
+    @Override
+    public void reminder(Integer userId, Integer orderId) throws ServiceException {
+        OrderInfo order = orderInfoMapper.getOrderByUserIdOrderId(orderId, userId);
+        if(order != null && order.getStatus() == 2){
+            List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(order.getId());
+
+            //TODO 给卖家发送信息 您的商品【商品名称】、【xxx】、【xx】买家提醒您发货，点击此处查看订单
+//            schedualGoodsService.goodsInfo()
         }
     }
 }
