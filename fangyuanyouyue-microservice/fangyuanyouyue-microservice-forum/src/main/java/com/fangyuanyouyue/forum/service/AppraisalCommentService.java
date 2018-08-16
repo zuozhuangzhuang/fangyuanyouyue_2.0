@@ -20,7 +20,16 @@ public interface AppraisalCommentService {
      * @return
      * @throws ServiceException
      */
-    Integer countComment(Integer id) throws ServiceException;
+    Integer countComment(Integer appraisalId) throws ServiceException;
+
+    /**
+     * 看真看假
+     * @param id
+     * @return
+     * @throws ServiceException
+     */
+    Integer countComment(Integer appraisalId,Integer viewpoint) throws ServiceException;
+    
     
     /**
      * 获取全民鉴定的评论

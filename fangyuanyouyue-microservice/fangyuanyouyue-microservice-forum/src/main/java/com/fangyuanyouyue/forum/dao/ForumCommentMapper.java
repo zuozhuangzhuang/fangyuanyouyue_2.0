@@ -24,6 +24,8 @@ public interface ForumCommentMapper {
     
     int countById(Integer forumId);
     
+    int countByCommentId(Integer commentId);
+    
     List<ForumComment> selectByForumId(@Param("forumId")Integer forumId,@Param("start")Integer start,@Param("limit")Integer limit);
 
     List<ForumComment> selectByCommentId(@Param("commentId")Integer commentId,@Param("start")Integer start,@Param("limit")Integer limit);

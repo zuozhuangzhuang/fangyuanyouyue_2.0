@@ -17,4 +17,8 @@ public interface ForumPvMapper {
     int updateByPrimaryKeySelective(ForumPv record);
 
     int updateByPrimaryKey(ForumPv record);
+
+    int countById(Integer forumId);
+
+    int countByUserId(Integer forumId,Integer userId);
 }

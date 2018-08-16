@@ -17,4 +17,9 @@ public interface AppraisalPvMapper {
     int updateByPrimaryKeySelective(AppraisalPv record);
 
     int updateByPrimaryKey(AppraisalPv record);
+
+    int countById(Integer appraisalId);
+    
+    int countByUserId(Integer appraisalId,Integer userId);
+    
 }

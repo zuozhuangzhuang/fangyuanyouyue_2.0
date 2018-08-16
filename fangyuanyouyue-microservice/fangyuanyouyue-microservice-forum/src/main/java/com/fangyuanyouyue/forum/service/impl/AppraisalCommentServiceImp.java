@@ -40,6 +40,14 @@ public class AppraisalCommentServiceImp implements AppraisalCommentService {
 		model.setAppraisalId(param.getAppraisalId());
 		model.setContent(param.getContent());
 		model.setUserId(userId);
+		model.setViewpoint(param.getViewpoint());
+		appraisalCommentMapper.insert(model);
+	}
+
+	@Override
+	public Integer countComment(Integer appraisalId, Integer viewpoint) throws ServiceException {
+
+		return appraisalCommentMapper.countByViewPoint(appraisalId, viewpoint);
 	}
 
    

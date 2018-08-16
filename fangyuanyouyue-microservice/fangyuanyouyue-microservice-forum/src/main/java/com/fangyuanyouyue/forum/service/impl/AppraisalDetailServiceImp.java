@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.forum.service.impl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.forum.constants.StatusEnum;
 import com.fangyuanyouyue.forum.dao.AppraisalDetailMapper;
 import com.fangyuanyouyue.forum.dao.AppraisalImgMapper;
 import com.fangyuanyouyue.forum.dto.AppraisalDetailDto;
@@ -25,17 +27,57 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 	private AppraisalDetailMapper appraisalDetailMapper;
 	@Autowired
 	private AppraisalImgMapper appraisalImgMapper;
+	@Autowired
+	private AppraisalCommentServiceImp appraisalCommentServiceImp;
+	@Autowired
+	private AppraisalLikesServiceImp appraisalLikesServiceImp;
+	@Autowired
+	private AppraisalPvServiceImp appraisalPvServiceImp;
 
 	@Override
-	public AppraisalDetailDto getAppraisalDetail(Integer id) throws ServiceException {
-		AppraisalDetail model = appraisalDetailMapper.selectByPrimaryKey(id);
-		return new AppraisalDetailDto(model);
+	public AppraisalDetailDto getAppraisalDetail(Integer userId,Integer appraisalId) throws ServiceException {
+		AppraisalDetail model = appraisalDetailMapper.selectByPrimaryKey(appraisalId);
+		AppraisalDetailDto dto = new AppraisalDetailDto(model);
+		
+		Integer commentCount = appraisalCommentServiceImp.countComment(appraisalId);
+		dto.setCommentCount(commentCount);
+		
+		Integer likesCount = appraisalLikesServiceImp.countLikes(appraisalId);
+		dto.setLikesCount(likesCount);
+		
+		Integer viewCount = appraisalPvServiceImp.countPv(appraisalId);
+		dto.setViewCount(viewCount);
+		
+		Integer truthCount = appraisalCommentServiceImp.countComment(appraisalId,StatusEnum.YES.getValue());
+		Integer untruthCount = appraisalCommentServiceImp.countComment(appraisalId,StatusEnum.NO.getValue());
+		dto.setTruthCount(truthCount);
+		dto.setUntruthCount(untruthCount);
+		
+		if(userId!=null) {
+			//TODO 需要判断
+			dto.setIsCollect(StatusEnum.NO.getValue());
+			dto.setIsFans(StatusEnum.NO.getValue());
+			dto.setIsLikes(StatusEnum.NO.getValue());
+		}
+		
+		return dto;
 	}
 
 	@Override
 	public List<AppraisalDetailDto> getAppraisalList(Integer userId,String keyword,Integer start, Integer limit) throws ServiceException {
 		List<AppraisalDetail> list = appraisalDetailMapper.selectList(userId, keyword, start, limit);
-		return AppraisalDetailDto.toDtoList(list);
+		List<AppraisalDetailDto> dtos = new ArrayList<AppraisalDetailDto>();
+		for(AppraisalDetail model:list) {
+			AppraisalDetailDto dto = new AppraisalDetailDto(model);
+			Integer commentCount = appraisalCommentServiceImp.countComment(model.getId());
+			dto.setCommentCount(commentCount);
+			
+			Integer likesCount = appraisalLikesServiceImp.countLikes(model.getId());
+			dto.setLikesCount(likesCount);
+			
+			dtos.add(dto);
+		}
+		return dtos;
 	}
 
 	@Override

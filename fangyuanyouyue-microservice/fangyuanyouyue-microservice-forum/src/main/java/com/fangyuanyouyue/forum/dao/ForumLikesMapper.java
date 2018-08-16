@@ -22,5 +22,8 @@ public interface ForumLikesMapper {
 
     int countById(Integer forumId);
 
+    int countByUserId(Integer forumId,Integer userId);
+    
+
     List<ForumLikes> selectByForumId(@Param("forumId")Integer forumId,@Param("start")Integer start,@Param("limit")Integer limit);
 }

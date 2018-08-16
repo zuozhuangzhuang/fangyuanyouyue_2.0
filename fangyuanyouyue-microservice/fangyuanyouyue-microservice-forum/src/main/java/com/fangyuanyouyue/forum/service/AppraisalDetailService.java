@@ -20,7 +20,7 @@ public interface AppraisalDetailService {
      * @return
      * @throws ServiceException
      */
-    AppraisalDetailDto getAppraisalDetail(Integer id) throws ServiceException;
+    AppraisalDetailDto getAppraisalDetail(Integer userId,Integer appraisalId) throws ServiceException;
     
     /**
      * 获取全民鉴定列表

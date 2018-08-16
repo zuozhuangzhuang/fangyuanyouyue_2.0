@@ -55,17 +55,16 @@ public class ForumController extends BaseController {
             //if(StringUtils.isEmpty(param.getToken())){
               //  return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
             //}
-            //Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            
-            //if(userId!=null) {
-            	//TODO 暂时不需要处理
-            //}
-            
+            Integer userId = null;
+            if(param.getToken()!=null) {
+            	userId = (Integer)schedualRedisService.get(param.getToken());
+                
+            }
             
             if(param.getForumId()==null) {
             	return toError("帖子ID不能为空");
             }
-            ForumInfoDto dto = forumInfoService.getForumInfoById(param.getForumId());
+            ForumInfoDto dto = forumInfoService.getForumInfoById(param.getForumId(),userId);
             
             if(dto==null) {
             	return toError("找不到帖子");
@@ -98,8 +97,12 @@ public class ForumController extends BaseController {
             if(param.getStart()==null||param.getLimit()==null) {
             	return toError("分页参数不能为空");
             }
-            
-            List<ForumInfoDto> dto = forumInfoService.getForumList(param.getColumnId(),param.getUserId(),param.getType(),param.getKeyword(),param.getStart(),param.getLimit());
+            Integer userId = null;
+            if(param.getToken()!=null) {
+            	userId = (Integer)schedualRedisService.get(param.getToken());
+                
+            }
+            List<ForumInfoDto> dto = forumInfoService.getForumList(param.getColumnId(),userId,param.getType(),param.getKeyword(),param.getStart(),param.getLimit());
             
             return toSuccess(dto);
         } catch (Exception e) {

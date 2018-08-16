@@ -52,8 +52,13 @@ public class ForumCommentController extends BaseController {
 			if (param.getStart() == null || param.getLimit() == null) {
 				return toError("分页参数不能为空");
 			}
+			Integer userId = null;
+            if(param.getToken()!=null) {
+            	userId = (Integer)schedualRedisService.get(param.getToken());
+                
+            }
 
-			List<ForumCommentDto> dto = forumCommentService.getCommentList(param.getForumId(), param.getStart(),
+			List<ForumCommentDto> dto = forumCommentService.getCommentList(userId,param.getForumId(), param.getStart(),
 					param.getLimit());
 
 			return toSuccess(dto);
@@ -83,8 +88,13 @@ public class ForumCommentController extends BaseController {
 			if (param.getStart() == null || param.getLimit() == null) {
 				return toError("分页参数不能为空");
 			}
+			Integer userId = null;
+            if(param.getToken()!=null) {
+            	userId = (Integer)schedualRedisService.get(param.getToken());
+                
+            }
 
-			List<ForumCommentDto> dto = forumCommentService.getCommentCommentList(param.getCommentId(), param.getStart(),
+			List<ForumCommentDto> dto = forumCommentService.getCommentCommentList(userId,param.getCommentId(), param.getStart(),
 					param.getLimit());
 
 			return toSuccess(dto);

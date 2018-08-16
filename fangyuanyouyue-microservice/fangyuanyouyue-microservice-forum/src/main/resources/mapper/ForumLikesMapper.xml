@@ -91,4 +91,8 @@
       add_time = #{addTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+  
+  <select id="countByUserId" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
+    select count(*) from forum_likes where forum_id = #{forumId,jdbcType=INTEGER} and user_id = #{userId,jdbcType=INTEGER}
+  </select>
 </mapper>

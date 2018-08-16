@@ -1,21 +1,23 @@
 package com.fangyuanyouyue.forum.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.fangyuanyouyue.base.util.DateStampUtils;
-import com.fangyuanyouyue.forum.dao.ForumColumnMapper;
-import com.fangyuanyouyue.forum.model.ForumColumn;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.base.util.DateStampUtils;
+import com.fangyuanyouyue.forum.dao.ForumColumnMapper;
 import com.fangyuanyouyue.forum.dao.ForumInfoMapper;
 import com.fangyuanyouyue.forum.dto.ForumInfoDto;
+import com.fangyuanyouyue.forum.model.ForumColumn;
 import com.fangyuanyouyue.forum.model.ForumInfo;
 import com.fangyuanyouyue.forum.service.ForumCommentService;
 import com.fangyuanyouyue.forum.service.ForumInfoService;
 import com.fangyuanyouyue.forum.service.ForumLikesService;
+import com.fangyuanyouyue.forum.service.ForumPvService;
 
 
 @Service(value = "forumInfoService")
@@ -30,23 +32,33 @@ public class ForumInfoServiceImp implements ForumInfoService {
 	private ForumLikesService forumLikesService;
 	@Autowired
 	private ForumColumnMapper forumColumnMapper;
+	@Autowired
+	private ForumPvService forumPvService;
 
 	@Override
-	public ForumInfoDto getForumInfoById(Integer id) throws ServiceException {
+	public ForumInfoDto getForumInfoById(Integer forumId,Integer userId) throws ServiceException {
 
-		ForumInfo forumInfo = forumInfoMapper.selectDetailByPrimaryKey(id);
+		ForumInfo forumInfo = forumInfoMapper.selectDetailByPrimaryKey(forumId);
 
 		if(forumInfo!=null) {
 			ForumInfoDto dto = new ForumInfoDto(forumInfo);
 			//计算点赞数
-			Integer	 likesCount = forumLikesService.countLikes(id);
+			Integer	 likesCount = forumLikesService.countLikes(forumId);
 			dto.setLikesCount(likesCount);
+			
 			//计算评论数
-			Integer commentCount = forumCommentService.countComment(id);
+			Integer commentCount = forumCommentService.countComment(forumId);
 			dto.setCommentCount(commentCount);
+			
+			//增加浏览记录
+			if(userId!=null) {
 
-			//TODO 如果不是视频，需要找到图片
+				forumPvService.savePv(userId, forumId);
+			}
 
+			Integer pvCount = forumPvService.countPv(forumId);
+			dto.setViewCount(pvCount);
+			
 			return dto;
 		}
 
@@ -57,8 +69,24 @@ public class ForumInfoServiceImp implements ForumInfoService {
 	public List<ForumInfoDto> getForumList(Integer columnId,Integer userId, Integer type, String keyword, Integer start, Integer limit)
 			throws ServiceException {
 		List<ForumInfo> list = forumInfoMapper.selectList(columnId,userId,type,keyword, start, limit);
+		List<ForumInfoDto> dtos = new ArrayList<ForumInfoDto>();
+		for(ForumInfo info:list) {
+			ForumInfoDto dto = new ForumInfoDto(info);
+			//计算点赞数
+			Integer	 likesCount = forumLikesService.countLikes(info.getId());
+			dto.setLikesCount(likesCount);
+			
+			//计算评论数
+			Integer commentCount = forumCommentService.countComment(info.getId());
+			dto.setCommentCount(commentCount);
 
-		return ForumInfoDto.toDtoList(list);
+			//浏览量
+			Integer pvCount = forumPvService.countPv(info.getId());
+			dto.setViewCount(pvCount);
+			dtos.add(dto);
+		}
+
+		return dtos;
 	}
 
 	@Override

@@ -19,4 +19,7 @@ public interface AppraisalLikesMapper {
     
     int countById(Integer appraisalId);
     
+    int countByUserId(Integer appraisalId,Integer userId);
+    
+    
 }
