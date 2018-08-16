@@ -17,6 +17,9 @@ import java.util.Date;
 public class UserParam{
 	//公用
 
+	@ApiModelProperty(name = "search", value = "查询内容", dataType = "String",hidden = true)
+	private String search; //查询内容
+
 	@ApiModelProperty(name = "userId", value = "用户ID", dataType = "int",hidden = true)
 	private Integer userId; //用户ID
 

@@ -253,6 +253,7 @@ public class AppraisalServiceImpl implements AppraisalService{
                 detail.setStatus(0);//支付后修改为申请中
                 goodsAppraisalDetailMapper.updateByPrimaryKey(detail);
             }
+            //TODO 系统消息：您的鉴定申请已提交，专家将于两个工作日内给出答复，请注意消息通知
             return payInfo.toString();
         }
     }

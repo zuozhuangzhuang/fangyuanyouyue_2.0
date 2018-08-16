@@ -44,9 +44,9 @@ public class AppraisalCommentDto {
 
     private String pic6;
 
-    private Integer isWinner; //是否赢了
+    private Integer isWinner; //是否赢了 1是 2否
     
-    private Integer isLikes; //是否点赞
+    private Integer isLikes; //是否点赞 1是 2否
     
     private Integer likesCount; //同意次数
 

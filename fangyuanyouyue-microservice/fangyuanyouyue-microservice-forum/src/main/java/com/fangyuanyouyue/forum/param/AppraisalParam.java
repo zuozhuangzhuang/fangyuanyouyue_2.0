@@ -51,4 +51,7 @@ public class AppraisalParam{
 	@ApiModelProperty(name = "imgUrls", value = "图片数组", dataType = "String",hidden = true)
 	private String[] imgUrls;//图片数组
 
+	@ApiModelProperty(name = "userIds", value = "邀请用户id数组", dataType = "int",hidden = true)
+	private Integer[] userIds;//邀请用户id数组
+
 }

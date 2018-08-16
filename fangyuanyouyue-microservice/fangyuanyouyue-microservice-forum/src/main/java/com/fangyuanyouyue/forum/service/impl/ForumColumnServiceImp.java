@@ -59,5 +59,6 @@ public class ForumColumnServiceImp implements ForumColumnService {
 			forumColumn.setTypeId(typeId);
 			forumColumnMapper.insert(forumColumn);
 		}
+		//TODO 系统消息：您的【专栏名称】专栏申请已提交，将于3个工作日内完成审核，请注意消息通知
 	}
 }

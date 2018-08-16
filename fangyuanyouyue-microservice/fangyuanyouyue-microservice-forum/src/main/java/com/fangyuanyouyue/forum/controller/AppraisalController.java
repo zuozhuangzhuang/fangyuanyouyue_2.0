@@ -232,7 +232,8 @@ public class AppraisalController extends BaseController {
             @ApiImplicitParam(name = "bonus", value = "鉴定赏金",required = false, dataType = "BigDecimal", paramType = "query"),
             @ApiImplicitParam(name = "title", value = "标题",required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "content", value = "商品描述", required = false, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "imgUrls", value = "图片数组", allowMultiple = true,required = true, dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "imgUrls", value = "图片数组", allowMultiple = true,required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "userIds", value = "邀请用户id数组", allowMultiple = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/addAppraisal")
     @ResponseBody
@@ -261,7 +262,7 @@ public class AppraisalController extends BaseController {
                 return toError(ReCode.FAILD.getValue(),"请至少包含一张图片！");
             }
             //发起鉴定
-            appraisalDetailService.addAppraisal(userId,param.getBonus(),param.getTitle(),param.getContent(),param.getImgUrls());
+            appraisalDetailService.addAppraisal(userId,param.getBonus(),param.getTitle(),param.getContent(),param.getImgUrls(),param.getUserIds());
 
             return toSuccess();
         } catch (Exception e) {

@@ -77,9 +77,7 @@ public class ForumLikesController extends BaseController {
 			if (param.getToken() == null) {
 				return toError("token不能为空");
 			}
-			
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            
             if(userId!=null) {
             	//TODO 暂时不需要处理
             }

@@ -42,7 +42,7 @@ public class AppraisalDetailDto {
     
     private String endTime;//结束时间
 
-    private String content;
+    private String content;//内容
     
     private Integer commentCount = 0;//评论数量
     
@@ -54,9 +54,9 @@ public class AppraisalDetailDto {
     
     private Integer untruthCount = 0; //看假数量
     
-    private Integer isCollect = StatusEnum.NO.getValue(); //是否收藏
+    private Integer isCollect = StatusEnum.NO.getValue(); //是否收藏 1是 2否
     
-    private Integer isLikes = StatusEnum.NO.getValue(); //是否点赞
+    private Integer isLikes = StatusEnum.NO.getValue(); //是否点赞 1是 2否
 
     public AppraisalDetailDto() {
     	

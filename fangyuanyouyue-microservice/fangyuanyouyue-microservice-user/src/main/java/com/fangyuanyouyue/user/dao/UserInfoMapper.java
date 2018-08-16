@@ -33,4 +33,13 @@ public interface UserInfoMapper {
      * @return
      */
     List<Map<String,Object>> shopList(@Param("nickName") String nickName,@Param("start") Integer start,@Param("limit") Integer limit,@Param("authType")Integer authType);
+
+    /**
+     * 根据用户名获取用户列表
+     * @param nickName
+     * @param start
+     * @param limit
+     * @return
+     */
+    List<Map<String,Object>> getUserByName(@Param("nickName") String nickName,@Param("start") Integer start,@Param("limit") Integer limit);
 }

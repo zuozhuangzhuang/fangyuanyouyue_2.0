@@ -42,6 +42,8 @@ public class ForumCommentServiceImp implements ForumCommentService {
 		model.setStatus(StatusEnum.STATUS_NORMAL.getValue());
 		model.setCommentId(commentId);
 		forumCommentMapper.insert(model);
+		//TODO 社交消息：您的帖子【帖子标题】有新的评论，点击此处前往查看吧
+		//社交消息：您的视频【视频标题】有新的评论，点击此处前往查看吧
 	}
 
 	@Override

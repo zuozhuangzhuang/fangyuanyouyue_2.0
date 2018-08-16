@@ -113,10 +113,11 @@ public class ForumCommentController extends BaseController {
 			
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             
-            if(userId!=null) {
+            if(userId==null) {
             	//TODO 暂时不需要处理
+				return toError("用户ID不能为空");
             }
-			
+
 			if (param.getForumId() == null) {
 				return toError("帖子ID不能为空");
 			}

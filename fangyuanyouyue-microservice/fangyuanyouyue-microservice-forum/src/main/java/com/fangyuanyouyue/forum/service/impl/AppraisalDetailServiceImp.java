@@ -39,7 +39,7 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 	}
 
 	@Override
-	public void addAppraisal(Integer userId, BigDecimal bonus, String title, String content,String[] imgUrls) throws ServiceException {
+	public void addAppraisal(Integer userId, BigDecimal bonus, String title, String content,String[] imgUrls,Integer[] userIds) throws ServiceException {
 		AppraisalDetail appraisalDetail = new AppraisalDetail();
 		appraisalDetail.setUserId(userId);
 		appraisalDetail.setTitle(title);
@@ -61,6 +61,10 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 			appraisalImg.setAppraisalId(appraisalDetail.getId());
 			appraisalImg.setAddTime(DateStampUtils.getTimesteamp());
 			appraisalImgMapper.insert(appraisalImg);
+		}
+		//TODO 邀请我：用户“用户昵称”发起全民鉴定【全名鉴定名称】时邀请了您！点击此处前往查看吧
+		for(Integer toUserId:userIds){
+
 		}
 	}
 	

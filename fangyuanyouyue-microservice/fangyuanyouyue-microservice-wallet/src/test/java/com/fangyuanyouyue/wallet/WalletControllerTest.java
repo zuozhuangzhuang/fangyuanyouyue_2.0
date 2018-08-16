@@ -1,5 +1,6 @@
 package com.fangyuanyouyue.wallet;
 
+import com.fangyuanyouyue.base.util.MD5Util;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,6 +17,11 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = WalletServiceApplication.class)

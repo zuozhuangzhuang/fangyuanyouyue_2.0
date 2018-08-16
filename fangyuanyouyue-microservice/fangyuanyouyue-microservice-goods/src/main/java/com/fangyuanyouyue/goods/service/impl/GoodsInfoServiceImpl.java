@@ -182,7 +182,8 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 saveGoodsPicOne(goodsInfo.getId(),param.getImgUrls()[i],2,i+1);
             }
         }
-        //TODO 给被邀请的用户发送信息
+        //TODO 给被邀请的用户发送信息 邀请我：用户“用户昵称”上传商品【商品名称】时邀请了您！点击此处前往查看吧
+        //邀请我：用户“用户昵称”上传抢购【抢购名称】时邀请了您！点击此处前往查看吧
         if(param.getUserIds() != null && param.getUserIds().length > 0){
             for(Integer toUserId:param.getUserIds()){
 

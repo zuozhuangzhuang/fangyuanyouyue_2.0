@@ -38,7 +38,8 @@ public interface AppraisalDetailService {
      * @param title
      * @param content
      * @param imgUrls
+     * @param userIds
      * @throws ServiceException
      */
-    void addAppraisal(Integer userId, BigDecimal bonus,String title,String content,String[] imgUrls) throws ServiceException;
+    void addAppraisal(Integer userId, BigDecimal bonus,String title,String content,String[] imgUrls,Integer[] userIds) throws ServiceException;
 }

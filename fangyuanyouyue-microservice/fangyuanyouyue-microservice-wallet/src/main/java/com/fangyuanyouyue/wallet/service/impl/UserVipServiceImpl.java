@@ -51,7 +51,7 @@ public class UserVipServiceImpl implements UserVipService{
                     int no = 111111 + userVip.getId();
                     String date = DateUtil.getFormatDate(DateStampUtils.getTimesteamp(),"yyMMdd");
                     userVip.setVipNo(date + no);
-
+                    //TODO 系统消息：恭喜您，您开通的1个月/3个月/1年 铂金/至尊 会员已生效，即刻起享受会员专属特权！
                 }
             }else{//续费
                 if(userVip.getVipLevel().intValue() == vipLevel){//续费相同等级会员

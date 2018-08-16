@@ -6,6 +6,9 @@ import lombok.ToString;
 
 import java.util.Date;
 
+/**
+ * 鉴定评论
+ */
 @Getter
 @Setter
 @ToString
@@ -32,7 +35,7 @@ public class AppraisalComment {
 
     private String pic6;
 
-    private Integer isWinner;//观点是否获胜
+    private Integer isWinner;//观点是否获胜 1是 2否
 
     private Integer status;//状态
 

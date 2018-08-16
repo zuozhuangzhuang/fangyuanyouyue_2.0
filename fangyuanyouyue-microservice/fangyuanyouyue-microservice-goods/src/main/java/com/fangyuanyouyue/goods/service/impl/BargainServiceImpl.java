@@ -96,7 +96,8 @@ public class BargainServiceImpl implements BargainService{
                     schedualWalletService.updateBalance(userId, goodsBargain.getPrice(),2);
                     goodsBargainMapper.insert(goodsBargain);
                 }
-                //TODO 压价时环信发送信息到店家
+                //TODO 议价：恭喜您！您的商品【商品名称】有新的议价，点击此处查看详情
+
             }
         }
     }
@@ -206,17 +207,20 @@ public class BargainServiceImpl implements BargainService{
                     //修改商品的状态为已售出
                     goodsInfo.setStatus(2);//状态  1出售中 2已售出 5删除
                     goodsInfoMapper.updateByPrimaryKey(goodsInfo);
+                    //TODO 议价：恭喜您！您对商品【商品名称】的议价卖家已同意，点击此处查看订单详情
                     //如果卖家同意议价，就拒绝此商品剩余的申请中议价
                     List<GoodsBargain> goodsBargains = goodsBargainMapper.selectAllByGoodsId(goodsId,1);//状态 1申请 2同意 3拒绝 4取消
                     for(GoodsBargain bargain:goodsBargains){
                         bargain.setStatus(3);
                         goodsBargainMapper.updateByPrimaryKey(bargain);
+                        //TODO 议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
                     }
                     orderId = orderInfo.getId();
                 }else if(status.intValue() == 3){
                     //退回余额
                     //调用wallet-service修改余额功能
                     schedualWalletService.updateBalance(goodsBargain.getUserId(), goodsBargain.getPrice(),1);
+                    //TODO 议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
                 }else{
                     throw new ServiceException("状态异常！");
                 }

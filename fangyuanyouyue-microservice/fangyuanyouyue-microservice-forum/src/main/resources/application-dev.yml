@@ -2,7 +2,8 @@ eureka:
   client:
     serviceUrl:
 #     服务注册中心的地址
-      defaultZone: http://localhost:8761/eureka/
+#      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://192.168.1.66:8761/eureka/
 spring:
   application:
   #   服务与服务之间相互调用一般都是根据这个name
@@ -10,12 +11,12 @@ spring:
   datasource:
       name: test
 #     末尾useSSL=true：ssl是一种加密技术在客户端连接数据库的中间做了加密，TCP/IP层中
-#      url: jdbc:mysql://127.0.0.1:3306/xiaofangyuan?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=true
-      url: jdbc:mysql://rm-wz92a6yw952x0zgxnfo.mysql.rds.aliyuncs.com:3306/xiaofangyuan?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true
-#      username: root
+      url: jdbc:mysql://127.0.0.1:3306/xiaofangyuan?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=true
+#      url: jdbc:mysql://rm-wz92a6yw952x0zgxnfo.mysql.rds.aliyuncs.com:3306/xiaofangyuan?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true
       username: root
-      password: Xiaofangyuan123
-#      password: 123456
+#      username: root
+#      password: Xiaofangyuan123
+      password: 123456
       # 使用druid数据源
       type: com.alibaba.druid.pool.DruidDataSource
       driver-class-name: com.mysql.jdbc.Driver

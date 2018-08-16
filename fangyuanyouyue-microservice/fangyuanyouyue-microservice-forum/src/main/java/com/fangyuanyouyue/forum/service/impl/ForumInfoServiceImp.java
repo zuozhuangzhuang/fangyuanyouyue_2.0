@@ -81,6 +81,7 @@ public class ForumInfoServiceImp implements ForumInfoService {
 				}else{
 					forumInfo.setColumnId(columnId);
 				}
+				//TODO 社交消息：您的专栏【专栏标题】有新的帖子，点击此处前往查看吧
 			}
 		}else if(type == 2){//视频
 			if(StringUtils.isEmpty(videoUrl) || StringUtils.isEmpty(videoImg) || videoLength == null){
@@ -94,7 +95,8 @@ public class ForumInfoServiceImp implements ForumInfoService {
 		}
 		forumInfoMapper.insert(forumInfo);
 		if(userIds != null && userIds.length > 0){
-			//TODO 发送通知邀请用户
+			//TODO 发送通知邀请用户 邀请我：用户“用户昵称”上传帖子【帖子名称】时邀请了您！点击此处前往查看吧
+			//邀请我：用户“用户昵称”上传视频【视频名称】时邀请了您！点击此处前往查看吧
 			for(Integer toUserId:userIds){
 
 			}
