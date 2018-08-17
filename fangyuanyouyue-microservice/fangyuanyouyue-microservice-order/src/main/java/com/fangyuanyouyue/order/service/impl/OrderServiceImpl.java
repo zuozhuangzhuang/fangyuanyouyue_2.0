@@ -413,8 +413,10 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public List<OrderDto> myOrderList(Integer userId, Integer start, Integer limit, Integer type, Integer status) throws ServiceException {
         ArrayList<OrderDto> orderDtos;
-        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
+
         if(type == 1){//我买下的
+            //买家
+            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
             //获取所有未拆单的订单
             List<OrderInfo> listByUserIdTypeStatus = orderInfoMapper.getListByUserIdStatus(userId, start * limit, limit, status);
             orderDtos = OrderDto.toDtoList(listByUserIdTypeStatus);
@@ -444,26 +446,29 @@ public class OrderServiceImpl implements OrderService{
             }
         }else if(type == 2){//我卖出的
             //卖家
+            UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
             //根据卖家ID获取订单列表
             List<OrderInfo> orderBySellerId = orderInfoMapper.getOrderBySellerId(userId, start * limit, limit, status);
             orderDtos = OrderDto.toDtoList(orderBySellerId);
+            //卖家信息DTO
+            List<SellerDto> sellerDtos = new ArrayList<>();
+            SellerDto sellerDto = new SellerDto();
+            sellerDto.setSellerHeadImgUrl(seller.getHeadImgUrl());
+            sellerDto.setSellerId(seller.getId());
+            sellerDto.setSellerName(seller.getNickName());
+            sellerDtos.add(sellerDto);
             for(OrderDto orderDto:orderDtos){//获取订单详情列表
                 List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
                 ArrayList<OrderDetailDto> orderDetailDtos = OrderDetailDto.toDtoList(orderDetails, orderDto.getStatus());
 
-                //卖家信息DTO
-                List<SellerDto> sellerDtos = new ArrayList<>();
-                SellerDto sellerDto = new SellerDto();
-                sellerDto.setSellerHeadImgUrl(user.getHeadImgUrl());
-                sellerDto.setSellerId(user.getId());
-                sellerDto.setSellerName(user.getNickName());
-                sellerDtos.add(sellerDto);
                 //订单支付表
                 OrderPay orderPay = orderPayMapper.selectByOrderId(orderDto.getOrderId());
                 OrderPayDto orderPayDto = new OrderPayDto(orderPay);
                 orderDto.setOrderPayDto(orderPayDto);
                 orderDto.setSellerDtos(sellerDtos);
                 orderDto.setOrderDetailDtos(orderDetailDtos);
+                //买家
+                UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(orderDto.getUserId())).getString("data")), UserInfo.class);
                 orderDto.setNickName(user.getNickName());
                 if(orderDto.getIsRefund() == 1){
                     //退货状态
