@@ -22,4 +22,12 @@ public interface ForumCommentLikesMapper {
     int countById(Integer commentId);
 
     int countByUserId(@Param("commentId") Integer commentId, @Param("userId") Integer userId);
+
+    /**
+     * 根据用户id和评论id获取点赞信息
+     * @param userId
+     * @param commentId
+     * @return
+     */
+    ForumCommentLikes selectByUserIdCommentId(@Param("userId")Integer userId,@Param("commentId")Integer commentId);
 }

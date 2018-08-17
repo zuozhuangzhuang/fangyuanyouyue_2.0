@@ -166,4 +166,8 @@
       limit #{start},#{limit}
     </if>
   </select>
+
+  <select id="selectByUserId" parameterType="Integer" resultMap="BaseResultMap">
+    select * from forum_column where user_id = #{userId}
+  </select>
 </mapper>

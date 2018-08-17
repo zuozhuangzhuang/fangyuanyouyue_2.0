@@ -274,7 +274,7 @@ public class OrderController extends BaseController{
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "orderId", value = "订单ID", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "payType", value = "支付方式  1微信 2支付宝 3余额", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "payPwd", value = "支付密码", required = true, dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "payPwd", value = "支付密码", required = false, dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/getOrderPay")
     @ResponseBody

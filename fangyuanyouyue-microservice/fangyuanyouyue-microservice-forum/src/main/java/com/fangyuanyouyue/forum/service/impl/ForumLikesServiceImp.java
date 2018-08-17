@@ -25,27 +25,33 @@ public class ForumLikesServiceImp implements ForumLikesService {
 
 	@Override
 	public List<ForumLikesDto> getLikesList(Integer forumId, Integer start, Integer limit) throws ServiceException {
-		List<ForumLikes> list = forumLikesMapper.selectByForumId(forumId, start, limit);
+		List<ForumLikes> list = forumLikesMapper.selectByForumId(forumId, start*limit, limit);
 		return ForumLikesDto.toDtoList(list);
 	}
 
 	@Override
 	public void saveLikes(Integer type, Integer userId, Integer forumId) throws ServiceException{
 		ForumLikes model = forumLikesMapper.selectByForumIdUserId(forumId,userId);
-		if(model != null){
-		    throw new ServiceException("您已点赞，请勿重复点赞！");
-        }else{
-            model = new ForumLikes();
-            model.setUserId(userId);
-            model.setForumId(forumId);
-            model.setAddTime(new Date());
-            forumLikesMapper.insert(model);
-        }
+		if(type == 1){
+			if(model != null){
+				throw new ServiceException("您已点赞，请勿重复点赞！");
+			}else{
+				model = new ForumLikes();
+				model.setUserId(userId);
+				model.setForumId(forumId);
+				model.setAddTime(new Date());
+				forumLikesMapper.insert(model);
+			}
+		}else if(type == 2){
+			if(model == null){
+				throw new ServiceException("未点赞，请先点赞！");
+			}else{
+				forumLikesMapper.deleteByPrimaryKey(model.getId());
+			}
+		}else{
+			throw new ServiceException("类型错误！");
+		}
+
 	}
 
-	@Override
-	public ForumLikesDto selectByForumIdUserId(Integer forumId, Integer userId) throws ServiceException {
-        ForumLikes forumLikes = forumLikesMapper.selectByForumIdUserId(forumId, userId);
-        return forumLikes == null?null:new ForumLikesDto(forumLikes);
-	}
 }

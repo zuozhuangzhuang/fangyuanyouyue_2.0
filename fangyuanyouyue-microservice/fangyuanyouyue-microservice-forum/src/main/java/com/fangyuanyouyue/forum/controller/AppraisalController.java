@@ -72,10 +72,7 @@ public class AppraisalController extends BaseController {
                 if((Integer)jsonObject.get("code") != 0){
                     return toError(jsonObject.getString("report"));
                 }
-
             }
-            
-            
             if(param.getAppraisalId()==null) {
             	return toError("鉴定ID不能为空");
             }
@@ -101,19 +98,28 @@ public class AppraisalController extends BaseController {
             @ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "keyword", value = "关键字",required = false, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1我参与的 2我发起的(为空则是普通列表)",required = false, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/list")
     @ResponseBody
-    public BaseResp forumList(AppraisalParam param) throws IOException {
+    public BaseResp appraisalList(AppraisalParam param) throws IOException {
         try {
             log.info("----》获取全民鉴定列表《----");
             log.info("参数：" + param.toString());
             if(param.getStart()==null||param.getLimit()==null) {
             	return toError("分页参数不能为空");
             }
-
-            List<AppraisalDetailDto> dto = appraisalDetailService.getAppraisalList(param.getUserId(),param.getKeyword(),param.getStart(), param.getLimit());
+            Integer userId = null;
+            if(param.getToken()!=null) {
+                userId = (Integer)schedualRedisService.get(param.getToken());
+                String verifyUser = schedualUserService.verifyUserById(userId);
+                JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+                if((Integer)jsonObject.get("code") != 0){
+                    return toError(jsonObject.getString("report"));
+                }
+            }
+            List<AppraisalDetailDto> dto = appraisalDetailService.getAppraisalList(userId,param.getKeyword(),param.getStart(), param.getLimit(),param.getType());
             
             return toSuccess(dto);
         } catch (ServiceException e) {
@@ -175,7 +181,8 @@ public class AppraisalController extends BaseController {
     @ApiOperation(value = "全民鉴定点赞", notes = "对全民鉴定点赞",response = BaseResp.class)
     @ApiImplicitParams({ 
     		@ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "appraisalId", value = "鉴定id",required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "appraisalId", value = "鉴定id",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1点赞 2取消点赞",required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/likes")
     @ResponseBody
@@ -199,7 +206,7 @@ public class AppraisalController extends BaseController {
             	return toError("鉴定ID不能为空");
             }
             
-            appraisalLikesService.saveLikes(userId, param.getAppraisalId());
+            appraisalLikesService.saveLikes(userId, param.getAppraisalId(),param.getType());
             
             return toSuccess();
         } catch (ServiceException e) {
@@ -217,7 +224,8 @@ public class AppraisalController extends BaseController {
     @ApiOperation(value = "全民鉴定评论点赞", notes = "对全民鉴定评论点赞",response = BaseResp.class)
     @ApiImplicitParams({ 
     		@ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "commentId", value = "评论id",required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "commentId", value = "评论id",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1点赞 2取消点赞",required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/comment/likes")
     @ResponseBody
@@ -245,7 +253,7 @@ public class AppraisalController extends BaseController {
             	return toError("评论ID不能为空");
             }
             
-            appraisalCommentLikesService.saveLikes(userId, param.getCommentId());
+            appraisalCommentLikesService.saveLikes(userId, param.getCommentId(),param.getType());
             
             return toSuccess();
         } catch (ServiceException e) {

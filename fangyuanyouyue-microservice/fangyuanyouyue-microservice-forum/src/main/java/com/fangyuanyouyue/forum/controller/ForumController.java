@@ -54,9 +54,6 @@ public class ForumController extends BaseController {
             log.info("----》获取帖子详情《----");
             log.info("参数：" + param.toString());
             //验证用户
-            //if(StringUtils.isEmpty(param.getToken())){
-              //  return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
-            //}
             Integer userId = null;
             if(StringUtils.isNotEmpty(param.getToken())) {
                 userId = (Integer)schedualRedisService.get(param.getToken());
@@ -71,10 +68,6 @@ public class ForumController extends BaseController {
             	return toError("帖子ID不能为空");
             }
             ForumInfoDto dto = forumInfoService.getForumInfoById(param.getForumId(),userId);
-            
-            if(dto==null) {
-            	return toError("找不到帖子");
-            }
 
             return toSuccess(dto);
         } catch (ServiceException e) {
@@ -120,7 +113,7 @@ public class ForumController extends BaseController {
                 }
             }
             if(param.getType() == null){
-            	return toError(StatusEnum.NO.getValue(),"类型不能为空");
+            	return toError("类型不能为空");
             }
             List<ForumInfoDto> dto = forumInfoService.getForumList(param.getColumnId(),userId,param.getType(),param.getKeyword(),param.getStart(),param.getLimit(),param.getListType());
             
@@ -130,7 +123,7 @@ public class ForumController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -178,7 +171,7 @@ public class ForumController extends BaseController {
             if(StringUtils.isEmpty(param.getContent())){
                 return toError(ReCode.FAILD.getValue(),"内容不能为空！");
             }
-            //TODO 发布视频、发布帖子
+            //发布视频、发布帖子
             forumInfoService.addForum(userId,param.getColumnId(),param.getTitle(),param.getContent(),param.getVideoUrl(),param.getVideoLength(),param.getVideoImg(),param.getType(),param.getUserIds());
 
             return toSuccess();

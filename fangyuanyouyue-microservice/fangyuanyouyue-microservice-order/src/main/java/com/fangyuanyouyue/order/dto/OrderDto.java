@@ -46,7 +46,9 @@ public class OrderDto {
     private List<SellerDto> sellerDtos;//卖家列表
 
 
-    private Integer isRefund;//是否退货 1是 2否
+    private Integer isRefund;//是否已退货 1是 2否
+
+    private Integer isEvaluation = 2;//是否已评价 1是 2否
 
     public OrderDto() {
     }

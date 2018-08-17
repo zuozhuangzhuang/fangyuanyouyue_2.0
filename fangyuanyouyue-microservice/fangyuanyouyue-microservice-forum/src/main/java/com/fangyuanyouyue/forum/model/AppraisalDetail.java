@@ -34,4 +34,8 @@ public class AppraisalDetail {
     private String content;//内容描述
 
     private Integer pvCount;//浏览量基数
+
+    private String headImgUrl;//用户头像
+
+    private String nickName;//用户昵称
 }

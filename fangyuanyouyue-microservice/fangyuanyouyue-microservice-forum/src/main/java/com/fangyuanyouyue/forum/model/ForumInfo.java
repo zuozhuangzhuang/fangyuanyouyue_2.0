@@ -6,6 +6,9 @@ import lombok.ToString;
 
 import java.util.Date;
 
+/**
+ * 帖子/视频表
+ */
 @Getter
 @Setter
 @ToString

@@ -24,7 +24,8 @@ public interface ForumCommentService {
     
 	/**
 	 * 获取评论列表
-	 * @param forumId
+	 * @param userId
+	 * @param commentId
 	 * @param start
 	 * @param limit
 	 * @return
@@ -48,10 +49,5 @@ public interface ForumCommentService {
      */
     void saveComment(Integer userId,Integer forumId,String content,Integer commentId) throws ServiceException;
     
-    /**
-     * 删除评论
-     * @param commentId
-     */
-    void deleteComment(Integer commentId) throws ServiceException;
 
 }

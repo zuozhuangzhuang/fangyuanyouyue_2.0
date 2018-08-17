@@ -20,7 +20,7 @@
     delete from forum_comment_likes
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ForumCommentLikes" >
+  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ForumCommentLikes"  useGeneratedKeys="true" keyProperty="id">
     insert into forum_comment_likes (id, user_id, comment_id, 
       add_time)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{commentId,jdbcType=INTEGER}, 
@@ -86,5 +86,8 @@
   <select id="countByUserId" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
     select count(*) from forum_comment_likes where comment_id = #{commentId,jdbcType=INTEGER} and user_id = #{userId,jdbcType=INTEGER}
   </select>
-  
+
+  <select id="selectByUserIdCommentId" parameterType="Integer" resultMap="BaseResultMap">
+    select * from forum_comment_likes where user_id = #{userId} and comment_id = #{commentId}
+  </select>
 </mapper>

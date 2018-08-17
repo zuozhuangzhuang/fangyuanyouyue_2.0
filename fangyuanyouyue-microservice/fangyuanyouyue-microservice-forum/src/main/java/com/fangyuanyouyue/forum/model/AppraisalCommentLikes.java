@@ -6,15 +6,18 @@ import lombok.ToString;
 
 import java.util.Date;
 
+/**
+ * 鉴定评论点赞
+ */
 @Getter
 @Setter
 @ToString
 public class AppraisalCommentLikes {
     private Integer id;
 
-    private Integer userId;
+    private Integer userId;//点赞用户id
 
-    private Integer commentId;
+    private Integer commentId;//评论id
 
-    private Date addTime;
+    private Date addTime;//添加时间
 }

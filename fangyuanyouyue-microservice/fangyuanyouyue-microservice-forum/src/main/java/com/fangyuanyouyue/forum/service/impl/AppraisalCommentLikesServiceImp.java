@@ -23,15 +23,29 @@ public class AppraisalCommentLikesServiceImp implements AppraisalCommentLikesSer
 	}
 
 	@Override
-	public void saveLikes(Integer userId, Integer commentId) throws ServiceException {
-		
-		AppraisalCommentLikes model = new AppraisalCommentLikes();
-		model.setAddTime(new Date());
-		model.setCommentId(commentId);
-		model.setUserId(userId);
-		
-		appraisalCommentLikesMapper.insert(model);
-		
+	public void saveLikes(Integer userId, Integer commentId,Integer type) throws ServiceException {
+        AppraisalCommentLikes appraisalCommentLikes = appraisalCommentLikesMapper.selectByCommentIdUserId(commentId, userId);
+        if(type == 1){
+            if(appraisalCommentLikes != null){
+                throw new ServiceException("您已点赞，请勿重复点赞！");
+            }else{
+                appraisalCommentLikes = new AppraisalCommentLikes();
+                appraisalCommentLikes.setAddTime(new Date());
+                appraisalCommentLikes.setCommentId(commentId);
+                appraisalCommentLikes.setUserId(userId);
+
+                appraisalCommentLikesMapper.insert(appraisalCommentLikes);
+            }
+		}else if(type == 2){
+            if(appraisalCommentLikes == null){
+                throw new ServiceException("未点赞，请先点赞！");
+            }else{
+                appraisalCommentLikesMapper.deleteByPrimaryKey(appraisalCommentLikes.getId());
+            }
+		}else{
+			throw new ServiceException("类型错误！");
+		}
+
 	}
 
    

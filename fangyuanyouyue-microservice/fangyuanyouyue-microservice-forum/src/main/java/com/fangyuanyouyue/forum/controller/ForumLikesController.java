@@ -59,8 +59,7 @@ public class ForumLikesController extends BaseController {
 				return toError("分页参数不能为空");
 			}
 
-			List<ForumLikesDto> dto = forumLikesService.getLikesList(param.getForumId(), param.getStart(),
-					param.getLimit());
+			List<ForumLikesDto> dto = forumLikesService.getLikesList(param.getForumId(), param.getStart(),param.getLimit());
 
 			return toSuccess(dto);
         } catch (ServiceException e) {
@@ -72,16 +71,17 @@ public class ForumLikesController extends BaseController {
 		}
 	}
 
-	@ApiOperation(value = "添加点赞", notes = "添加帖子点赞", response = BaseResp.class)
+	@ApiOperation(value = "帖子点赞", notes = "添加帖子点赞", response = BaseResp.class)
 	@ApiImplicitParams({
         @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "string", paramType = "query"),
-			@ApiImplicitParam(name = "forumId", value = "帖子id", required = true, dataType = "int", paramType = "query")
+			@ApiImplicitParam(name = "forumId", value = "帖子id", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1点赞 2取消点赞",required = true, dataType = "int", paramType = "query")
 			})
 	@PostMapping(value = "/add")
 	@ResponseBody
-	public BaseResp saveComment(ForumParam param) throws IOException {
+	public BaseResp saveLikes(ForumParam param) throws IOException {
 		try {
-            log.info("----》添加点赞《----");
+            log.info("----》帖子点赞《----");
             log.info("参数：" + param.toString());
 
             //验证用户

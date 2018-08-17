@@ -6,28 +6,30 @@ import lombok.ToString;
 
 import java.util.Date;
 
+/**
+ * 轮播图
+ */
 @Getter
 @Setter
 @ToString
 public class BannerIndex {
-    private Integer id;
+    private Integer id;//唯一自增ID
 
-    private Integer businessId;
+    private Integer businessId;//业务ID:商品ID/用户ID
 
-    private Integer jumpType;
+    private Integer jumpType;//跳转类型,0:商品 1：个人
 
-    private Integer type;
+    private Integer type;//业务类型,0:商品 1：个人
 
-    private String title;
+    private String title;//描述标题
 
-    private String imgUrl;
+    private String imgUrl;//图片地址
 
-    private Integer sort;
+    private Integer sort;//排序，由低到高
 
-    private Integer status;
+    private Integer status;//是否下架，0未下架 1下架
 
-    private Date addTime;
+    private Date addTime;//添加时间
 
-    private Date updateTime;
-
+    private Date updateTime;//更新时间
 }

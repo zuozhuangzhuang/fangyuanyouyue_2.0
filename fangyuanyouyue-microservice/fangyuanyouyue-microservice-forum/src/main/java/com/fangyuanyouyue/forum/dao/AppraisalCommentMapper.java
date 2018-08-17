@@ -35,9 +35,10 @@ public interface AppraisalCommentMapper {
     List<AppraisalComment> selectByAppraisalId(@Param("appraisalId")Integer appraisalId,@Param("start")Integer start,@Param("limit")Integer limit);
 
     /**
-     * 根据用户id获取评论，每个用户只能发布一次评论
+     * 根据用户id和鉴定id获取评论
      * @param userId
+     * @param appraisalId
      * @return
      */
-    AppraisalComment selectByUserId(@Param("userId")Integer userId);
+    AppraisalComment selectByAppraisalIdUserId(@Param("userId")Integer userId,@Param("appraisalId")Integer appraisalId);
 }

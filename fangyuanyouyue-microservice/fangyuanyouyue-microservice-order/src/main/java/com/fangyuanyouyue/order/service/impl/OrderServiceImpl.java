@@ -375,6 +375,11 @@ public class OrderServiceImpl implements OrderService{
                 orderDto.setReturnStatus(orderRefund.getStatus());
                 orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
             }
+            //是否评价
+            OrderComment orderComment = orderCommentMapper.selectByOrder(orderId);
+            if(orderComment != null){
+                orderDto.setIsEvaluation(1);
+            }
             return orderDto;
         }else{
             throw new ServiceException("订单异常！");
@@ -430,6 +435,11 @@ public class OrderServiceImpl implements OrderService{
                     OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null);
                     orderDto.setReturnStatus(orderRefund.getStatus());
                     orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
+                }
+                //是否评价
+                OrderComment orderComment = orderCommentMapper.selectByOrder(orderDto.getOrderId());
+                if(orderComment != null){
+                    orderDto.setIsEvaluation(1);
                 }
             }
         }else if(type == 2){//我卖出的
@@ -584,8 +594,9 @@ public class OrderServiceImpl implements OrderService{
                 }
 
                 if(payType.intValue() == 1){//微信
-                    orderPay.setPayNo("");
-                    return "微信支付回调";
+                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderPay.getPayAmount())).getString("data")), WechatPayDto.class);
+                    orderPay.setPayNo(wechatPayDto.getNonceStr());
+                    return wechatPayDto.toString();
                 }else if(payType.intValue() == 2){//支付宝
                     orderPay.setPayNo("");
                     return "支付宝支付回调";

@@ -79,8 +79,9 @@ public class ForumInfoServiceImp implements ForumInfoService {
 			Integer pvCount = forumPvService.countPv(forumId);
 			dto.setViewCount(pvCount+forumInfo.getPvCount());
 			return dto;
+		}else{
+			throw new ServiceException("获取信息失败！");
 		}
-		return null;
 	}
 
 	@Override

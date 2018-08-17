@@ -62,6 +62,13 @@ public class AppraisalDetailDto {
 
     private List<String> headImgUrls;//参与鉴定列表，最多五个，按照热度排序
 
+    private List<AppraisalImgDto> imgDtos;//鉴定图片列表
+
+    //以下为我参与的、我发起的中包含数据
+    private Integer viewpoint;//评论观点 1看真 2看假
+
+    private Integer isWinner = 2; //是否赢了 1是 2否
+
     public AppraisalDetailDto() {
     	
     }
@@ -75,9 +82,11 @@ public class AppraisalDetailDto {
         this.label = detail.getLabel();
         this.sort = detail.getSort();
         this.status = detail.getStatus();
-        this.endTime = DateUtil.getFormatDate(detail.getEndTime(), DateUtil.DATE_FORMT_YEAR);
-        this.addTime = DateUtil.getFormatDate(detail.getAddTime(), DateUtil.DATE_FORMT_YEAR);
+        this.endTime = DateUtil.getFormatDate(detail.getEndTime(), DateUtil.DATE_FORMT);
+        this.addTime = DateUtil.getFormatDate(detail.getAddTime(), DateUtil.DATE_FORMT);
         this.content = detail.getContent();
+        this.nickName = detail.getNickName();
+        this.headImgUrl = detail.getHeadImgUrl();
     }
 
     public static List<AppraisalDetailDto> toDtoList(List<AppraisalDetail> list) {

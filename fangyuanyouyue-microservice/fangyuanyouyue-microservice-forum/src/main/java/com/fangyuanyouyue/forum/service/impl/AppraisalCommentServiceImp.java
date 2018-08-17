@@ -60,8 +60,8 @@ public class AppraisalCommentServiceImp implements AppraisalCommentService {
 
 	@Override
 	public void saveComment(Integer userId,AppraisalParam param) throws ServiceException{
-		AppraisalComment model = appraisalCommentMapper.selectByUserId(userId);
-		if(model != null){
+		AppraisalComment model = appraisalCommentMapper.selectByAppraisalIdUserId(userId,param.getAppraisalId());
+		if(model == null){
 			model = new AppraisalComment();
 			model.setUserId(userId);
 			model.setAppraisalId(param.getAppraisalId());
@@ -72,7 +72,7 @@ public class AppraisalCommentServiceImp implements AppraisalCommentService {
 			if(param.getUserIds() != null && param.getUserIds().length > 0){
 				//TODO 邀请我：用户“用户昵称”参与全民鉴定【全民鉴定名称】时邀请了您！点击此处前往查看吧
 				UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
-				AppraisalDetail appraisalDetail = appraisalDetailMapper.selectByPrimaryKey(param.getAppraisalId());
+				AppraisalDetail appraisalDetail = appraisalDetailMapper.selectDetailByPrimaryKey(param.getAppraisalId());
 				for(Integer toUserId:param.getUserIds()){
 					UserInfo toUser = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(toUserId)).getString("data")), UserInfo.class);
 					System.out.println("用户“"+user.getNickName()+"”参与全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了“"+toUser.getNickName()+"“！");

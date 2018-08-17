@@ -5,15 +5,10 @@ import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.forum.constants.StatusEnum;
-import com.fangyuanyouyue.forum.dao.AppraisalDetailMapper;
-import com.fangyuanyouyue.forum.dao.AppraisalImgMapper;
-import com.fangyuanyouyue.forum.dao.AppraisalLikesMapper;
-import com.fangyuanyouyue.forum.dao.CollectMapper;
+import com.fangyuanyouyue.forum.dao.*;
 import com.fangyuanyouyue.forum.dto.AppraisalDetailDto;
-import com.fangyuanyouyue.forum.model.AppraisalDetail;
-import com.fangyuanyouyue.forum.model.AppraisalImg;
-import com.fangyuanyouyue.forum.model.AppraisalLikes;
-import com.fangyuanyouyue.forum.model.Collect;
+import com.fangyuanyouyue.forum.dto.AppraisalImgDto;
+import com.fangyuanyouyue.forum.model.*;
 import com.fangyuanyouyue.forum.service.AppraisalDetailService;
 import com.fangyuanyouyue.forum.service.SchedualUserService;
 import org.apache.commons.lang.StringUtils;
@@ -44,11 +39,13 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 	private SchedualUserService schedualUserService;
 	@Autowired
 	private AppraisalLikesMapper appraisalLikesMapper;
+	@Autowired
+	AppraisalCommentMapper appraisalCommentMapper;
 
 
 	@Override
 	public AppraisalDetailDto getAppraisalDetail(Integer userId,Integer appraisalId) throws ServiceException {
-		AppraisalDetail model = appraisalDetailMapper.selectByPrimaryKey(appraisalId);
+		AppraisalDetail model = appraisalDetailMapper.selectDetailByPrimaryKey(appraisalId);
 		AppraisalDetailDto dto = new AppraisalDetailDto(model);
 		//评论数量
 		Integer commentCount = appraisalCommentServiceImp.countComment(appraisalId);
@@ -87,14 +84,38 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 			//浏览量
 			Integer pvCount = appraisalPvServiceImp.countPv(appraisalId);
 			dto.setViewCount(pvCount+model.getPvCount());
+			AppraisalComment comment = appraisalCommentMapper.selectByAppraisalIdUserId(userId, appraisalId);
+			if(comment != null){
+				//用户观点
+				dto.setViewpoint(comment.getViewpoint());
+				//是否获胜
+				dto.setIsWinner(comment.getIsWinner());
+			}
 		}
-
+		//鉴定图片列表
+		List<AppraisalImg> appraisalImgs = appraisalImgMapper.selectListByAppraisal(appraisalId);
+		dto.setImgDtos(AppraisalImgDto.toDtoList(appraisalImgs));
 		return dto;
 	}
 
 	@Override
-	public List<AppraisalDetailDto> getAppraisalList(Integer userId,String keyword,Integer start, Integer limit) throws ServiceException {
-		List<AppraisalDetail> list = appraisalDetailMapper.selectList(userId, keyword, start, limit);
+	public List<AppraisalDetailDto> getAppraisalList(Integer userId,String keyword,Integer start, Integer limit,Integer type) throws ServiceException {
+		List<AppraisalDetail> list;
+		if(type == null){
+			list = appraisalDetailMapper.selectMyList(null, keyword, start, limit);
+		}else{
+			if(userId == null){
+				throw new ServiceException("用户id不能为空！");
+			}
+			if(type == 1){
+				list = appraisalDetailMapper.selectListWithMe(userId, keyword, start, limit);
+			}else if(type == 2){
+				//userId 不为空：我的全民鉴定列表
+				list = appraisalDetailMapper.selectMyList(userId, keyword, start, limit);
+			}else{
+				throw new ServiceException("类型错误！");
+			}
+		}
 		List<AppraisalDetailDto> dtos = new ArrayList<>();
 		//列表不需要返回点赞数、浏览量、评论量
 		for(AppraisalDetail model:list) {
@@ -104,10 +125,25 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 			if(collect != null){
 				dto.setIsCollect(StatusEnum.YES.getValue());
 			}
-			//TODO 参与鉴定用户头像列表
+			//参与鉴定用户头像列表
 			List<String> headImgUrls = new ArrayList<>();
-
+			List<AppraisalComment> appraisalComments = appraisalCommentMapper.selectByAppraisalId(userId, 0, 5);
+			if(appraisalComments != null && appraisalComments.size() > 0){
+				for(AppraisalComment comment:appraisalComments){
+					headImgUrls.add(comment.getHeadImgUrl());
+				}
+			}
 			dto.setHeadImgUrls(headImgUrls);
+			//鉴定图片列表
+			List<AppraisalImg> appraisalImgs = appraisalImgMapper.selectListByAppraisal(model.getId());
+			dto.setImgDtos(AppraisalImgDto.toDtoList(appraisalImgs));
+			AppraisalComment comment = appraisalCommentMapper.selectByAppraisalIdUserId(userId,model.getId());
+			if(comment != null){
+				//用户观点
+				dto.setViewpoint(comment.getViewpoint());
+				//是否获胜
+				dto.setIsWinner(comment.getIsWinner());
+			}
 			dtos.add(dto);
 		}
 		return dtos;
@@ -139,8 +175,10 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 			appraisalImgMapper.insert(appraisalImg);
 		}
 		//TODO 邀请我：用户“用户昵称”发起全民鉴定【全名鉴定名称】时邀请了您！点击此处前往查看吧
-		for(Integer toUserId:userIds){
+		if(userIds != null && userIds.length > 0){
+			for(Integer toUserId:userIds){
 
+			}
 		}
 	}
 	

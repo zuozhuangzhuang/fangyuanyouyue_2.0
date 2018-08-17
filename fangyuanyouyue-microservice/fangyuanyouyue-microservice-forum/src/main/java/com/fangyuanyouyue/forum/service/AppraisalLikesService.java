@@ -24,8 +24,9 @@ public interface AppraisalLikesService {
      * 保存点赞
      * @param userId
      * @param appraisalId
+     * @param type
      * @throws ServiceException
      */
-    void saveLikes(Integer userId,Integer appraisalId) throws ServiceException;
+    void saveLikes(Integer userId,Integer appraisalId,Integer type) throws ServiceException;
 
 }

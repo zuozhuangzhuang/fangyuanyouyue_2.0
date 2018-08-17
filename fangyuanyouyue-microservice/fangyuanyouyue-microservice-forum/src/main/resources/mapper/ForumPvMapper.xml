@@ -21,7 +21,7 @@
     delete from forum_pv
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ForumPv" >
+  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ForumPv" useGeneratedKeys="true" keyProperty="id">
     insert into forum_pv (id, user_id, forum_id, 
       add_time, column_id)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{forumId,jdbcType=INTEGER}, 

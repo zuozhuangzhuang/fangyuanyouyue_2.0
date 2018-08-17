@@ -21,4 +21,9 @@ public class SchedualWalletServiceImpl implements SchedualWalletService{
     public String updateCredit(Integer userId, Long credit, Integer type) {
         return "修改信誉度失败！";
     }
+
+    @Override
+    public String orderPayByWechat(String orderNo, BigDecimal price) {
+        return "微信支付失败！";
+    }
 }

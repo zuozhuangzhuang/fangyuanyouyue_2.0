@@ -22,6 +22,7 @@ public class ForumLikes {
     private String nickName;
     
     private String headImgUrl;
+
     private Date addTime;//添加时间
 
 

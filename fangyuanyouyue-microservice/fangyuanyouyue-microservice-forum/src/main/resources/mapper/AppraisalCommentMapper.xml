@@ -226,8 +226,8 @@
     limit #{start},#{limit}
   </select>
 
-  <select id="selectByUserId" parameterType="Integer" resultMap="BaseResultMap">
-    select a.*,b.nick_name,b.head_img_url from appraisal_comment a,user_info b where a.user_id = b.id user_id = #{userId}
+  <select id="selectByAppraisalIdUserId" parameterType="Integer" resultMap="BaseResultMap">
+    select a.*,b.nick_name,b.head_img_url from appraisal_comment a,user_info b where a.user_id = b.id and user_id = #{userId} and appraisal_id = #{appraisalId}
   </select>
 
 

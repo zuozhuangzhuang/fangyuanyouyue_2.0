@@ -24,12 +24,15 @@ public interface AppraisalDetailService {
     
     /**
      * 获取全民鉴定列表
+     * @param userId
+     * @param keyword
      * @param start
      * @param limit
+     * @param type
      * @return
      * @throws ServiceException
      */
-    List<AppraisalDetailDto> getAppraisalList(Integer userId,String keyword,Integer start,Integer limit) throws ServiceException;
+    List<AppraisalDetailDto> getAppraisalList(Integer userId,String keyword,Integer start,Integer limit,Integer type) throws ServiceException;
 
     /**
      * 发起鉴定

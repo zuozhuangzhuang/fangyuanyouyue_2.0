@@ -7,7 +7,7 @@ import lombok.ToString;
 import java.util.Date;
 
 /**
- *
+ * 专栏
  */
 @Getter
 @Setter
@@ -15,29 +15,19 @@ import java.util.Date;
 public class ForumColumnApply {
     private Integer id;
 
-    private Integer userId;
+    private Integer userId;//
 
-    private Integer typeId;
+    private Integer typeId;//
 
-    private String coverImgUrl;
+    private String coverImgUrl;//
 
-    private String columnName;
+    private String columnName;//
 
-    private Integer status;
+    private Integer status;//
 
-    private String reason;
+    private String reason;//
 
-    private Date updateTime;
+    private Date updateTime;//
 
-    private Date addTime;
-
-    private String name;
-
-    private String identity;
-
-    private String identityImgCover;
-
-    private String identityImgBack;
-
-    private String phone;
+    private Date addTime;//
 }

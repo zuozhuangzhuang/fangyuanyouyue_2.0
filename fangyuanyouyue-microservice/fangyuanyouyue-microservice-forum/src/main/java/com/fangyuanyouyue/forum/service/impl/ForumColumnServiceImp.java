@@ -50,14 +50,19 @@ public class ForumColumnServiceImp implements ForumColumnService {
 		if(forumColumnType == null){
 			throw new ServiceException("分类异常！");
 		}else{
-			ForumColumn forumColumn = new ForumColumn();
-			forumColumn.setUserId(userId);
-			forumColumn.setName(name);
-			forumColumn.setFansCount(0);
-			forumColumn.setAddTime(DateStampUtils.getTimesteamp());
-			forumColumn.setIsChosen(2);//是否精选1是 2否
-			forumColumn.setTypeId(typeId);
-			forumColumnMapper.insert(forumColumn);
+			ForumColumn forumColumn = forumColumnMapper.selectByUserId(userId);
+			if(forumColumn != null){
+				throw new ServiceException("每位用户只能申请一个专栏！");
+			}else{
+				forumColumn = new ForumColumn();
+				forumColumn.setUserId(userId);
+				forumColumn.setName(name);
+				forumColumn.setFansCount(0);
+				forumColumn.setAddTime(DateStampUtils.getTimesteamp());
+				forumColumn.setIsChosen(2);//是否精选1是 2否
+				forumColumn.setTypeId(typeId);
+				forumColumnMapper.insert(forumColumn);
+			}
 		}
 		//TODO 系统消息：您的【专栏名称】专栏申请已提交，将于3个工作日内完成审核，请注意消息通知
 	}

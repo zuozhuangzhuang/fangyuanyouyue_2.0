@@ -7,6 +7,7 @@ import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.forum.dto.ForumCommentDto;
 import com.fangyuanyouyue.forum.param.ForumParam;
+import com.fangyuanyouyue.forum.service.ForumCommentLikesService;
 import com.fangyuanyouyue.forum.service.ForumCommentService;
 import com.fangyuanyouyue.forum.service.SchedualRedisService;
 import com.fangyuanyouyue.forum.service.SchedualUserService;
@@ -39,6 +40,8 @@ public class ForumCommentController extends BaseController {
 	private ForumCommentService forumCommentService;
 	@Autowired
 	private SchedualUserService schedualUserService;
+	@Autowired
+	private ForumCommentLikesService forumCommentLikesService;
 
 	@ApiOperation(value = "帖子评论列表", notes = "根据帖子id获取评论列表", response = BaseResp.class)
 	@ApiImplicitParams({
@@ -138,10 +141,6 @@ public class ForumCommentController extends BaseController {
 			log.info("----》添加评论《----");
 			log.info("参数：" + param.toString());
 
-			if (param.getToken() == null) {
-				return toError("token不能为空");
-			}
-
 			//验证用户
 			if(StringUtils.isEmpty(param.getToken())){
 				return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
@@ -171,4 +170,47 @@ public class ForumCommentController extends BaseController {
 			return toError(ReCode.FAILD.getValue(), "系统繁忙，请稍后再试！");
 		}
 	}
+
+
+	@ApiOperation(value = "帖子评论点赞", notes = "对帖子评论点赞",response = BaseResp.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+			@ApiImplicitParam(name = "commentId", value = "评论id",required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "type", value = "类型 1点赞 2取消点赞",required = true, dataType = "int", paramType = "query")
+	})
+	@PostMapping(value = "/comment/likes")
+	@ResponseBody
+	public BaseResp commentLikes(ForumParam param) throws IOException {
+		try {
+			log.info("----》对帖子评论点赞《----");
+			log.info("参数：" + param.toString());
+
+			//验证用户
+			if(StringUtils.isEmpty(param.getToken())){
+				return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+			}
+			Integer userId = (Integer)schedualRedisService.get(param.getToken());
+			String verifyUser = schedualUserService.verifyUserById(userId);
+			JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+			if((Integer)jsonObject.get("code") != 0){
+				return toError(jsonObject.getString("report"));
+			}
+			if(param.getCommentId() == null){
+				return toError("评论id不能为空");
+			}
+			if(param.getType() == null){
+				return toError("类型不能为空");
+			}
+			forumCommentLikesService.saveLikes(userId, param.getCommentId(),param.getType());
+			return toSuccess();
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			return toError(e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+		}
+	}
+
+
 }

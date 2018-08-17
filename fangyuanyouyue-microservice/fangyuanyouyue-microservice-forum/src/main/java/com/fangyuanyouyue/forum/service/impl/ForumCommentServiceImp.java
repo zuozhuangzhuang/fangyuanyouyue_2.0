@@ -31,7 +31,7 @@ public class ForumCommentServiceImp implements ForumCommentService {
 	@Override
 	public List<ForumCommentDto> getCommentList(Integer userId,Integer forumId, Integer start, Integer limit) throws ServiceException {
 		List<ForumComment> list = forumCommentMapper.selectByForumId(forumId, start, limit);
-		List<ForumCommentDto> dtos = new ArrayList<ForumCommentDto>();
+		List<ForumCommentDto> dtos = new ArrayList<>();
 		for(ForumComment model:list) {
 			ForumCommentDto dto = new ForumCommentDto(model);
 
@@ -41,10 +41,8 @@ public class ForumCommentServiceImp implements ForumCommentService {
 			Integer commentCount = forumCommentMapper.countByCommentId(dto.getCommentId());
 			dto.setCommentCount(commentCount);
 
-			dto.setIsLikes(StatusEnum.NO.getValue());
 			if(userId!=null) {
 				if(forumCommentLikesMapper.countByUserId(dto.getCommentId(), userId)>0) {
-
 					dto.setIsLikes(StatusEnum.YES.getValue());
 				}
 			}
@@ -69,27 +67,21 @@ public class ForumCommentServiceImp implements ForumCommentService {
 		//社交消息：您的视频【视频标题】有新的评论，点击此处前往查看吧
 	}
 
-	@Override
-	public void deleteComment(Integer commentId) {
-		forumCommentMapper.deleteByPrimaryKey(commentId);
-	}
 
 	@Override
 	public List<ForumCommentDto> getCommentCommentList(Integer userId,Integer commentId, Integer start, Integer limit)
 			throws ServiceException {
 		
 		List<ForumComment> list = forumCommentMapper.selectByCommentId(commentId, start, limit);
-		List<ForumCommentDto> dtos = new ArrayList<ForumCommentDto>();
+		List<ForumCommentDto> dtos = new ArrayList<>();
 		for(ForumComment model:list) {
 			ForumCommentDto dto = new ForumCommentDto(model);
 
 			Integer likesCount = forumCommentLikesMapper.countById(dto.getCommentId());
 			dto.setLikesCount(likesCount);
 
-			dto.setIsLikes(StatusEnum.NO.getValue());
 			if(userId!=null) {
 				if(forumCommentLikesMapper.countByUserId(dto.getCommentId(), userId)>0) {
-
 					dto.setIsLikes(StatusEnum.YES.getValue());
 				}
 			}

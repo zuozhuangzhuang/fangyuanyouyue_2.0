@@ -11,7 +11,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * 评论
+ * 帖子视频评论
  */
 @Getter
 @Setter

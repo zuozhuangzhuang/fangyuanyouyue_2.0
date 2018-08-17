@@ -13,6 +13,8 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
     <result column="pv_count" jdbcType="INTEGER" property="pvCount" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+    <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.forum.model.AppraisalDetail">
     <result column="content" jdbcType="LONGVARCHAR" property="content" />
@@ -215,7 +217,7 @@
       limit #{start},#{limit}
     </if>
   </select>
-  <select id="selectList" resultMap="BaseResultMap">
+  <select id="selectMyList" parameterType="Integer" resultMap="BaseResultMap">
     select
     a.*,b.nick_name,b.head_img_url
     from appraisal_detail a,user_info b
@@ -226,6 +228,27 @@
     <if test="keyword != null">
       and a.title like "%"#{keyword}"%"
     </if>
-    limit #{start},#{limit}
+    order by a.add_time desc limit #{start},#{limit}
+  </select>
+
+  <select id="selectListWithMe" parameterType="Integer" resultMap="BaseResultMap">
+    select
+    a.*,b.nick_name,b.head_img_url
+    from appraisal_detail a,user_info b,appraisal_comment c
+    where a.user_id=b.id and a.id = c.appraisal_id
+    <if test="userId != null">
+      and c.user_id = #{userId}
+    </if>
+    <if test="keyword != null">
+      and (a.title like "%"#{keyword}"%" or a.content like "%"#{keyword}"%" or (a.user_id in (select id from user_info)))
+    </if>
+    order by a.add_time desc limit #{start},#{limit}
+  </select>
+
+  <select id="selectDetailByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    a.*,b.nick_name,b.head_img_url
+    from appraisal_detail a,user_info b
+    where a.user_id=b.id and a.id = #{id,jdbcType=INTEGER}
   </select>
 </mapper>

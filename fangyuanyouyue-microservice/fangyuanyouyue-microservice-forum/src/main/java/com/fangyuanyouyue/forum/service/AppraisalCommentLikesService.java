@@ -12,7 +12,7 @@ public interface AppraisalCommentLikesService {
  
     /**
      * 获取评论点赞数量
-     * @param id
+     * @param commentId
      * @return
      * @throws ServiceException
      */
@@ -22,8 +22,9 @@ public interface AppraisalCommentLikesService {
      * 保存点赞
      * @param userId
      * @param commentId
+     * @param type
      * @throws ServiceException
      */
-    void saveLikes(Integer userId,Integer commentId) throws ServiceException;
+    void saveLikes(Integer userId,Integer commentId,Integer type) throws ServiceException;
 
 }

@@ -6,16 +6,19 @@ import lombok.ToString;
 
 import java.util.Date;
 
+/**
+ * 专栏粉丝
+ */
 @Getter
 @Setter
 @ToString
 public class ForumColumnFans {
     private Integer id;
 
-    private Integer userId;
+    private Integer userId;//用户id
 
-    private Integer columnId;
+    private Integer columnId;//专栏id
 
-    private Date addTime;
+    private Date addTime;//添加时间
 
 }
