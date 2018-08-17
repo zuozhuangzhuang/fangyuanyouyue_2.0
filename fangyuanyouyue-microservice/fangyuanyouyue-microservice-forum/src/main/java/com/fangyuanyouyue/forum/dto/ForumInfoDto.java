@@ -56,6 +56,8 @@ public class ForumInfoDto {
     
     private Integer isLikes = StatusEnum.NO.getValue(); //是否点赞
     
+    private Integer isFans = StatusEnum.NO.getValue(); //是否关注作者
+    
     public ForumInfoDto() {
     	
     }

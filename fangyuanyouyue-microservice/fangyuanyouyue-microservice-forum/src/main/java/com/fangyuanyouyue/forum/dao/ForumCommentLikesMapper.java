@@ -19,5 +19,6 @@ public interface ForumCommentLikesMapper {
     int updateByPrimaryKey(ForumCommentLikes record);
 
     int countById(Integer commentId);
-    
+
+    int countByUserId(Integer commentId,Integer userId);
 }

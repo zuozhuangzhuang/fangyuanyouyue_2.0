@@ -58,6 +58,8 @@ public class AppraisalDetailDto {
     
     private Integer isLikes = StatusEnum.NO.getValue(); //是否点赞 1是 2否
 
+    private Integer isFans = StatusEnum.NO.getValue(); //是否关注作者
+
     public AppraisalDetailDto() {
     	
     }

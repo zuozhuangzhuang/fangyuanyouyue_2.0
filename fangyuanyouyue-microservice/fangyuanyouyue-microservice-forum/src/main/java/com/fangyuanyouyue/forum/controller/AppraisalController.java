@@ -67,17 +67,17 @@ public class AppraisalController extends BaseController {
             //if(StringUtils.isEmpty(param.getToken())){
             //    return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
             //}
-            //Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            
-            //if(userId!=null) {
-            	//TODO 暂时不需要处理
-            //}
+			Integer userId = null;
+            if(param.getToken()!=null) {
+            	userId = (Integer)schedualRedisService.get(param.getToken());
+
+            }
             
             
             if(param.getAppraisalId()==null) {
             	return toError("鉴定ID不能为空");
             }
-            AppraisalDetailDto dto = appraisalDetailService.getAppraisalDetail(param.getAppraisalId());
+            AppraisalDetailDto dto = appraisalDetailService.getAppraisalDetail(userId,param.getAppraisalId());
             
             if(dto==null) {
             	return toError("找不到该鉴定");

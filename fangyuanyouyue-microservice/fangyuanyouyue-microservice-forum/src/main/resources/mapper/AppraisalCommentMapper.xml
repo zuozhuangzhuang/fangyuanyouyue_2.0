@@ -211,6 +211,10 @@
     select count(*) from appraisal_comment where appraisal_id = #{appraisalId,jdbcType=INTEGER}
   </select>
   
+  <select id="countByViewPoint" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
+    select count(*) from appraisal_comment where appraisal_id = #{appraisalId,jdbcType=INTEGER} and viewpoint = #{viewpoint,jdbcType=INTEGER}
+  </select>
+  
   <select id="selectByAppraisalId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select
     a.*,b.nick_name,b.head_img_url

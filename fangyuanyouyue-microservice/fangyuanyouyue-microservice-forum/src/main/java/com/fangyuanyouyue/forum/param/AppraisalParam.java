@@ -33,6 +33,9 @@ public class AppraisalParam{
 	@ApiModelProperty(name = "appraisalId", value = "全民鉴定id", dataType = "int",hidden = true)
 	private Integer appraisalId;//鉴定id
 
+	@ApiModelProperty(name = "viewpoint", value = "看法，1看真 2看假", dataType = "int",hidden = true)
+	private Integer viewpoint;
+
 	@ApiModelProperty(name = "commentId", value = "评论id", dataType = "int",hidden = true)
 	private Integer commentId;//评论id
 

@@ -23,6 +23,8 @@ public interface AppraisalCommentMapper {
     
     int countById(Integer appraisalId);
 
+    int countByViewPoint(Integer appraisalId,Integer viewpoint);
+    
     List<AppraisalComment> selectByAppraisalId(@Param("appraisalId")Integer appraisalId,@Param("start")Integer start,@Param("limit")Integer limit);
 
 }

@@ -17,7 +17,7 @@ public interface ForumInfoService {
 	 * @param id
 	 * @return
 	 */
-	ForumInfoDto getForumInfoById(Integer id) throws ServiceException;
+	ForumInfoDto getForumInfoById(Integer id,Integer userId) throws ServiceException;
 
 	/**
 	 * 获取帖子列表

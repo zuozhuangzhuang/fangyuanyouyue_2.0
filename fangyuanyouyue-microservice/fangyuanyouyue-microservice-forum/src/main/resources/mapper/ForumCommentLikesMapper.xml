@@ -82,4 +82,9 @@
   <select id="countById" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
     select count(*) from forum_comment_likes where comment_id = #{commentId,jdbcType=INTEGER}
   </select>
+  
+  <select id="countByUserId" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
+    select count(*) from forum_comment_likes where comment_id = #{commentId,jdbcType=INTEGER} and user_id = #{userId,jdbcType=INTEGER}
+  </select>
+  
 </mapper>

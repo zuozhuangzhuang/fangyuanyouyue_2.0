@@ -20,7 +20,7 @@ public interface ForumCommentService {
 	 * @return
 	 * @throws ServiceException
 	 */
-    List<ForumCommentDto> getCommentList(Integer forumId,Integer start,Integer limit) throws ServiceException;
+    List<ForumCommentDto> getCommentList(Integer userId,Integer forumId,Integer start,Integer limit) throws ServiceException;
     
 	/**
 	 * 获取评论列表
@@ -30,7 +30,7 @@ public interface ForumCommentService {
 	 * @return
 	 * @throws ServiceException
 	 */
-    List<ForumCommentDto> getCommentCommentList(Integer commentId,Integer start,Integer limit) throws ServiceException;
+    List<ForumCommentDto> getCommentCommentList(Integer userId,Integer commentId,Integer start,Integer limit) throws ServiceException;
     
     /**
      * 计算评论数量

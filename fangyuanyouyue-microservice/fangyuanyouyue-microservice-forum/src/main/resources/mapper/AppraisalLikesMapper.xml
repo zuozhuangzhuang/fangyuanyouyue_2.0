@@ -82,4 +82,8 @@
   <select id="countById" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
     select count(*) from appraisal_likes where appraisal_id = #{appraisalId,jdbcType=INTEGER}
   </select>
+  
+  <select id="countByUserId" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
+    select count(*) from appraisal_pv where appraisal_id = #{appraisalId,jdbcType=INTEGER} and user_id = #{userId,jdbcType=INTEGER}
+  </select>
 </mapper>
