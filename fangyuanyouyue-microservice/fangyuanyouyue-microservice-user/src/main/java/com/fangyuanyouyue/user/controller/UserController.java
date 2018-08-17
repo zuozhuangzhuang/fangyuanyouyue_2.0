@@ -274,7 +274,8 @@ public class UserController extends BaseController {
             @ApiImplicitParam(name = "contact", value = "联系电话", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "identity", value = "身份证号码", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "name", value = "真实姓名", dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "payPwd", value = "支付密码，md5加密，32位小写字母", dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "payPwd", value = "支付密码，md5加密，32位小写字母", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "loginPwd", value = "登录密码，md5加密，32位小写字母", dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/modify")
     @ResponseBody
@@ -650,7 +651,8 @@ public class UserController extends BaseController {
                 return toError(ReCode.FAILD.getValue(),"验证码不能为空！");
             }
             //从缓存获取
-            String code = String.valueOf(schedualRedisService.get(param.getPhone()));
+            // FIXME: 2018/8/17 验证码以0开头时验证异常 Leading zeroes not allowed
+            String code = schedualRedisService.get(param.getPhone()).toString();
             log.info("验证码:1."+code+" 2."+param.getCode());
             if(StringUtils.isEmpty(code) || !code.equals(param.getCode())){
                 return toError(ReCode.FAILD.getValue(),"验证码错误！");

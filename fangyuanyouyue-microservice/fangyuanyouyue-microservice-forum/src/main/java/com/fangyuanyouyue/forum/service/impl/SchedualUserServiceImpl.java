@@ -34,4 +34,9 @@ public class SchedualUserServiceImpl implements SchedualUserService{
     public String isAuth(Integer userId) {
         return "验证实名认证失败！";
     }
+
+    @Override
+    public String isFans(Integer userId, Integer toUserId) {
+        return "查看是否关注失败！";
+    }
 }

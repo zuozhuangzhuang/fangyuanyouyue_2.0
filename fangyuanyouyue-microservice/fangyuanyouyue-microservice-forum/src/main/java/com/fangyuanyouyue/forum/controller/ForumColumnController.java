@@ -4,6 +4,7 @@
  import com.fangyuanyouyue.base.BaseController;
  import com.fangyuanyouyue.base.BaseResp;
  import com.fangyuanyouyue.base.enums.ReCode;
+ import com.fangyuanyouyue.base.exception.ServiceException;
  import com.fangyuanyouyue.forum.dto.ForumColumnDto;
  import com.fangyuanyouyue.forum.dto.ForumColumnTypeDto;
  import com.fangyuanyouyue.forum.param.ForumParam;
@@ -51,6 +52,9 @@ public class ForumColumnController extends BaseController {
 			List<ForumColumnTypeDto> dto = forumColumnService.getColumnList(0,1000);
 
 			return toSuccess(dto);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			return toError(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return toError(ReCode.FAILD.getValue(), "系统繁忙，请稍后再试！");
@@ -68,6 +72,9 @@ public class ForumColumnController extends BaseController {
 			List<ForumColumnDto> dto = forumColumnService.getChosenColumnList();
 
 			return toSuccess(dto);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			return toError(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return toError(ReCode.FAILD.getValue(), "系统繁忙，请稍后再试！");
@@ -84,6 +91,9 @@ public class ForumColumnController extends BaseController {
 			//获取专栏分类列表
 			List<ForumColumnTypeDto> typeList = forumColumnService.getForumTypeList();
 			return toSuccess(typeList);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			return toError(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return toError(ReCode.FAILD.getValue(), "系统繁忙，请稍后再试！");
@@ -126,6 +136,9 @@ public class ForumColumnController extends BaseController {
 			forumColumnService.addColumn(userId,param.getTypeId(),param.getName());
 
 			return toSuccess();
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			return toError(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return toError(ReCode.FAILD.getValue(), "系统繁忙，请稍后再试！");

@@ -319,14 +319,13 @@ public class WalletServiceImpl implements WalletService{
     }
 
     @Override
-    public WechatPayDto orderPayByWechat(Integer orderId, String orderNo, BigDecimal price) throws Exception {
+    public WechatPayDto orderPayByWechat(String orderNo, BigDecimal price) throws Exception {
 
         SortedMap<Object, Object> parameters = PayCommonUtil.getWXPrePayID(); // 获取预付单，此处已做封装，需要工具类
         parameters.put("body", "小方圆-微信在线支付");
         parameters.put("spbill_create_ip", "127.0.0.1");
-        parameters.put("out_trade_no", "20150806125346");
-        parameters.put("total_fee", "1"); // 测试时，每次支付一分钱，微信支付所传的金额是以分为单位的，因此实际开发中需要x100
-        // parameters.put("total_fee", orders.getOrderAmount()*100+""); // 上线后，将此代码放开
+        parameters.put("out_trade_no", orderNo);
+        parameters.put("total_fee", price.multiply(new BigDecimal(100))); // 测试时，每次支付一分钱，微信支付所传的金额是以分为单位的，因此实际开发中需要x100
 
         // 设置签名
         String sign = PayCommonUtil.createSign("UTF-8", parameters);
@@ -338,9 +337,10 @@ public class WalletServiceImpl implements WalletService{
         // 调用统一下单接口
         String result = PayCommonUtil.httpsRequest("https://api.mch.weixin.qq.com/pay/unifiedorder", "POST", requestXML);
         System.out.println("调用统一下单接口：" + result);
-        SortedMap<Object, Object> parMap = PayCommonUtil.startWXPay(result);
-        System.out.println("最终的map是：" + parMap.toString());
-        return null;
+        WechatPayDto wechatPayDto = PayCommonUtil.startWXPay(result);
+        System.out.println("最终的结果是：" + wechatPayDto.toString());
+
+        return wechatPayDto;
     }
 
     @Override

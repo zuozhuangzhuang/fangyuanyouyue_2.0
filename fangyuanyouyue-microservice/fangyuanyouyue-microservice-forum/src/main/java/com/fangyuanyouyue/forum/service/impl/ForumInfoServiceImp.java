@@ -1,23 +1,23 @@
 package com.fangyuanyouyue.forum.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.base.util.DateStampUtils;
+import com.fangyuanyouyue.forum.constants.StatusEnum;
+import com.fangyuanyouyue.forum.dao.CollectMapper;
+import com.fangyuanyouyue.forum.dao.ForumColumnMapper;
+import com.fangyuanyouyue.forum.dao.ForumInfoMapper;
+import com.fangyuanyouyue.forum.dao.ForumLikesMapper;
+import com.fangyuanyouyue.forum.dto.ForumInfoDto;
+import com.fangyuanyouyue.forum.dto.ForumLikesDto;
+import com.fangyuanyouyue.forum.model.*;
+import com.fangyuanyouyue.forum.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.base.util.DateStampUtils;
-import com.fangyuanyouyue.forum.dao.ForumColumnMapper;
-import com.fangyuanyouyue.forum.dao.ForumInfoMapper;
-import com.fangyuanyouyue.forum.dto.ForumInfoDto;
-import com.fangyuanyouyue.forum.model.ForumColumn;
-import com.fangyuanyouyue.forum.model.ForumInfo;
-import com.fangyuanyouyue.forum.service.ForumCommentService;
-import com.fangyuanyouyue.forum.service.ForumInfoService;
-import com.fangyuanyouyue.forum.service.ForumLikesService;
-import com.fangyuanyouyue.forum.service.ForumPvService;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Service(value = "forumInfoService")
@@ -34,6 +34,12 @@ public class ForumInfoServiceImp implements ForumInfoService {
 	private ForumColumnMapper forumColumnMapper;
 	@Autowired
 	private ForumPvService forumPvService;
+	@Autowired
+	private SchedualUserService schedualUserService;
+	@Autowired
+	private CollectMapper collectMapper;
+	@Autowired
+	private ForumLikesMapper forumLikesMapper;
 
 	@Override
 	public ForumInfoDto getForumInfoById(Integer forumId,Integer userId) throws ServiceException {
@@ -52,40 +58,65 @@ public class ForumInfoServiceImp implements ForumInfoService {
 
 			//增加浏览记录
 			if(userId!=null) {
-
-				forumPvService.savePv(userId, forumId);
+				forumPvService.savePv(userId, forumId,forumInfo.getColumnId());
+				//是否点赞
+				ForumLikes forumLikes = forumLikesMapper.selectByForumIdUserId(dto.getForumId(), userId);
+				if(forumLikes != null){
+					dto.setIsLikes(StatusEnum.YES.getValue());
+				}
+				//是否收藏
+				Collect collect = collectMapper.selectByCollectIdType(userId, forumId, forumInfo.getType() == 2?3:4);
+				if(collect != null){
+					dto.setIsCollect(StatusEnum.YES.getValue());
+				}
+				//是否关注作者
+				boolean isFans = JSONObject.parseObject(schedualUserService.isFans(userId,forumInfo.getUserId())).getBoolean("data");
+				if(isFans){
+					dto.setIsFans(StatusEnum.YES.getValue());
+				}
 			}
-
+			//浏览量
 			Integer pvCount = forumPvService.countPv(forumId);
-			dto.setViewCount(pvCount);
-
+			dto.setViewCount(pvCount+forumInfo.getPvCount());
 			return dto;
 		}
-
 		return null;
 	}
 
 	@Override
-	public List<ForumInfoDto> getForumList(Integer columnId,Integer userId, Integer type, String keyword, Integer start, Integer limit)
-			throws ServiceException {
-		List<ForumInfo> list = forumInfoMapper.selectList(columnId,userId,type,keyword, start, limit);
-		List<ForumInfoDto> dtos = new ArrayList<ForumInfoDto>();
-		for(ForumInfo info:list) {
+	public List<ForumInfoDto> getForumList(Integer columnId,Integer userId, Integer type, String keyword, Integer start, Integer limit,Integer listType) throws ServiceException {
+		List list;
+		if(listType.intValue() == 1){
+			//普通列表，需要判断是否点赞/收藏
+			list = forumInfoMapper.selectList(columnId,null,type,keyword, start*limit, limit);
+		}else if(listType.intValue() == 2){
+			//我的xx列表
+			list = forumInfoMapper.selectList(columnId,userId,type,keyword, start*limit, limit);
+		}else{
+			throw new ServiceException("列表类型错误！");
+		}
+		List<ForumInfoDto> dtos = new ArrayList<>();
+		for(ForumInfo info:(List<ForumInfo>)list) {
 			ForumInfoDto dto = new ForumInfoDto(info);
 			//计算点赞数
-			Integer	 likesCount = forumLikesService.countLikes(info.getId());
+			Integer likesCount = forumLikesService.countLikes(info.getId());
 			dto.setLikesCount(likesCount);
 
 			//计算评论数
 			Integer commentCount = forumCommentService.countComment(info.getId());
 			dto.setCommentCount(commentCount);
-
+			if(listType.intValue() == 1){
+				//是否点赞
+				ForumLikes forumLikes = forumLikesMapper.selectByForumIdUserId(dto.getForumId(), userId);
+				if(forumLikes != null){
+					dto.setIsLikes(StatusEnum.YES.getValue());
+				}
+			}
 			//浏览量
 			Integer pvCount = forumPvService.countPv(info.getId());
-			dto.setViewCount(pvCount);
+			dto.setViewCount(pvCount+info.getPvCount());
 			dtos.add(dto);
 		}
-
 		return dtos;
 	}
 
@@ -121,12 +152,22 @@ public class ForumInfoServiceImp implements ForumInfoService {
 		}else{
 			throw new ServiceException("类型错误！");
 		}
+		forumInfo.setPvCount(0);
 		forumInfoMapper.insert(forumInfo);
 		if(userIds != null && userIds.length > 0){
 			//TODO 发送通知邀请用户 邀请我：用户“用户昵称”上传帖子【帖子名称】时邀请了您！点击此处前往查看吧
 			//邀请我：用户“用户昵称”上传视频【视频名称】时邀请了您！点击此处前往查看吧
-			for(Integer toUserId:userIds){
-
+			UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
+			if(type == 1){
+				for(Integer toUserId:userIds){
+					UserInfo toUser = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(toUserId)).getString("data")), UserInfo.class);
+					System.out.println("用户“"+user.getNickName()+"”上传帖子【"+forumInfo.getTitle()+"】时邀请了“"+toUser.getNickName()+"“！");
+				}
+			}else{
+				for(Integer toUserId:userIds){
+					UserInfo toUser = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(toUserId)).getString("data")), UserInfo.class);
+					System.out.println("用户“"+user.getNickName()+"”上传视频【"+forumInfo.getTitle()+"】时邀请了“"+toUser.getNickName()+"“！");
+				}
 			}
 		}
 	}

@@ -48,4 +48,13 @@ public interface UserInfoExtService {
      * @throws ServiceException
      */
     void authType(Integer userId) throws ServiceException;
+
+    /**
+     * A是否关注用户B
+     * @param userId
+     * @param toUserId
+     * @return
+     * @throws ServiceException
+     */
+    boolean isFans(Integer userId,Integer toUserId) throws ServiceException;
 }

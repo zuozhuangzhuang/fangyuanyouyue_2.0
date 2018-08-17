@@ -16,7 +16,8 @@
     <result column="column_id" jdbcType="INTEGER" property="columnId" />
     <result column="is_chosen" jdbcType="INTEGER" property="isChosen" />
     <result column="video_img" jdbcType="VARCHAR" property="videoImg" />
-    <result column="nick_name" jdbcType="INTEGER" property="nickName" />
+    <result column="pv_count" jdbcType="INTEGER" property="pvCount" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
     <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.forum.model.ForumInfo">
@@ -24,7 +25,7 @@
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, title, video_url, video_length, label, sort, type, status, add_time, 
-    update_time, column_id, is_chosen, video_img
+    update_time, column_id, is_chosen, video_img, pv_count
   </sql>
   <sql id="Blob_Column_List">
     content
@@ -46,14 +47,14 @@
       video_url, video_length, label, 
       sort, type, status, 
       add_time, update_time, column_id, 
-      is_chosen, video_img, content
-      )
+      is_chosen, video_img, pv_count, 
+      content)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, 
       #{videoUrl,jdbcType=VARCHAR}, #{videoLength,jdbcType=INTEGER}, #{label,jdbcType=VARCHAR}, 
       #{sort,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
       #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{columnId,jdbcType=INTEGER}, 
-      #{isChosen,jdbcType=INTEGER}, #{videoImg,jdbcType=VARCHAR}, #{content,jdbcType=LONGVARCHAR}
-      )
+      #{isChosen,jdbcType=INTEGER}, #{videoImg,jdbcType=VARCHAR}, #{pvCount,jdbcType=INTEGER}, 
+      #{content,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.fangyuanyouyue.forum.model.ForumInfo">
     insert into forum_info
@@ -99,6 +100,9 @@
       </if>
       <if test="videoImg != null">
         video_img,
+      </if>
+      <if test="pvCount != null">
+        pv_count,
       </if>
       <if test="content != null">
         content,
@@ -147,6 +151,9 @@
       <if test="videoImg != null">
         #{videoImg,jdbcType=VARCHAR},
       </if>
+      <if test="pvCount != null">
+        #{pvCount,jdbcType=INTEGER},
+      </if>
       <if test="content != null">
         #{content,jdbcType=LONGVARCHAR},
       </if>
@@ -194,6 +201,9 @@
       <if test="videoImg != null">
         video_img = #{videoImg,jdbcType=VARCHAR},
       </if>
+      <if test="pvCount != null">
+        pv_count = #{pvCount,jdbcType=INTEGER},
+      </if>
       <if test="content != null">
         content = #{content,jdbcType=LONGVARCHAR},
       </if>
@@ -215,6 +225,7 @@
       column_id = #{columnId,jdbcType=INTEGER},
       is_chosen = #{isChosen,jdbcType=INTEGER},
       video_img = #{videoImg,jdbcType=VARCHAR},
+      pv_count = #{pvCount,jdbcType=INTEGER},
       content = #{content,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -232,36 +243,37 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       column_id = #{columnId,jdbcType=INTEGER},
       is_chosen = #{isChosen,jdbcType=INTEGER},
-      video_img = #{videoImg,jdbcType=VARCHAR}
+      video_img = #{videoImg,jdbcType=VARCHAR},
+      pv_count = #{pvCount,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
 
-
-  <select id="selectDetailByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  <select id="selectDetailByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select
     a.*,b.nick_name,b.head_img_url
     from forum_info a,user_info b
     where a.user_id=b.id and a.id = #{id,jdbcType=INTEGER}
   </select>
 
-  <select id="selectList" resultMap="BaseResultMap" >
+  <select id="selectList" resultMap="BaseResultMap">
     select
     a.*,b.nick_name,b.head_img_url
     from forum_info a,user_info b
     where a.user_id=b.id
-    <if test="columnId != null" >
+    <if test="columnId != null">
       and a.column_id = #{columnId}
     </if>
-    <if test="type != null" >
+    <if test="type != null">
       and a.type = #{type}
     </if>
-    <if test="userId != null" >
+    <if test="userId != null">
       and a.user_id = #{userId}
     </if>
-    <if test="keyword != null" >
+    <if test="keyword != null">
       and a.title like "%"#{keyword}"%"
     </if>
+    order by a.update_time desc
     limit #{start},#{limit}
   </select>
 
@@ -272,8 +284,14 @@
       <if test="userId != null">
         and b.user_id = #{userId}
       </if>
+      <if test="type != null">
+        and a.type = #{type}
+      </if>
       <if test="collectType != null">
         and b.collect_type = #{collectType}
+      </if>
+      <if test="search != null">
+        and (a.title like "%"#{search}"%" or a.content like "%"#{search}"%" or a.user_id in (select id from user_info where nick_name like "%"#{search}"%"))
       </if>
     </where>
     order by b.add_time desc
@@ -281,4 +299,5 @@
       limit #{start},#{limit}
     </if>
   </select>
+
 </mapper>

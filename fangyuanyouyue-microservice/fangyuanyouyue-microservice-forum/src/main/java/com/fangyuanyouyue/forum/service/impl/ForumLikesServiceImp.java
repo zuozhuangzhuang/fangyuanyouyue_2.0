@@ -30,12 +30,22 @@ public class ForumLikesServiceImp implements ForumLikesService {
 	}
 
 	@Override
-	public void saveLikes(Integer type, Integer userId, Integer forumId) {
-		ForumLikes model = new ForumLikes();
-		model.setUserId(userId);
-		model.setForumId(forumId);
-		model.setAddTime(new Date());
-		forumLikesMapper.insert(model);
+	public void saveLikes(Integer type, Integer userId, Integer forumId) throws ServiceException{
+		ForumLikes model = forumLikesMapper.selectByForumIdUserId(forumId,userId);
+		if(model != null){
+		    throw new ServiceException("您已点赞，请勿重复点赞！");
+        }else{
+            model = new ForumLikes();
+            model.setUserId(userId);
+            model.setForumId(forumId);
+            model.setAddTime(new Date());
+            forumLikesMapper.insert(model);
+        }
 	}
 
+	@Override
+	public ForumLikesDto selectByForumIdUserId(Integer forumId, Integer userId) throws ServiceException {
+        ForumLikes forumLikes = forumLikesMapper.selectByForumIdUserId(forumId, userId);
+        return forumLikes == null?null:new ForumLikesDto(forumLikes);
+	}
 }

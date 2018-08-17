@@ -34,4 +34,7 @@ public class CollectParam {
     @ApiModelProperty(name = "collectType", value = "收藏类型 3视频 4专栏 5鉴赏", dataType = "int",hidden = true)
     private Integer collectType;//收藏类型 3视频 4专栏 5鉴赏
 
+    @ApiModelProperty(name = "search", value = "搜索内容", dataType = "String",hidden = true)
+    private String search;//搜索内容
+
 }

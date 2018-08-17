@@ -22,33 +22,33 @@ public class AppraisalCommentDto {
 
     private Integer userId;
     
-    private String nickName;//作者昵称
+    private String nickName;//评论作者昵称
     
-    private String headImgUrl;//作者头像
+    private String headImgUrl;//评论作者头像
 
     private Integer appraisalId;//鉴定id
 
-    private Integer viewpoint;//评论观点
+    private Integer viewpoint;//评论观点 1看真 2看假
 
     private String content;//评论内容
 
-    private String pic1;//图片1
+//    private String pic1;//图片1（弃用）
+//
+//    private String pic2;
+//
+//    private String pic3;
+//
+//    private String pic4;
+//
+//    private String pic5;
+//
+//    private String pic6;
 
-    private String pic2;
-
-    private String pic3;
-
-    private String pic4;
-
-    private String pic5;
-
-    private String pic6;
-
-    private Integer isWinner; //是否赢了 1是 2否
+    private Integer isWinner = 2; //是否赢了 1是 2否
     
-    private Integer isLikes; //是否点赞 1是 2否
+    private Integer isLikes = 2; //是否点赞 1是 2否
     
-    private Integer likesCount; //同意次数
+    private Integer likesCount; //同意数
 
     private Integer status;//状态
 
@@ -63,16 +63,18 @@ public class AppraisalCommentDto {
         this.appraisalId = comment.getAppraisalId();
         this.viewpoint = comment.getViewpoint();
         this.content = comment.getContent();
-        this.pic1 = comment.getPic1();
-        this.pic2 = comment.getPic2();
-        this.pic3 = comment.getPic3();
-        this.pic4 = comment.getPic4();
-        this.pic5 = comment.getPic5();
-        this.pic6 = comment.getPic6();
+//        this.pic1 = comment.getPic1();
+//        this.pic2 = comment.getPic2();
+//        this.pic3 = comment.getPic3();
+//        this.pic4 = comment.getPic4();
+//        this.pic5 = comment.getPic5();
+//        this.pic6 = comment.getPic6();
         this.isWinner = comment.getIsWinner();
         this.status = comment.getStatus();
         this.addTime = DateUtil.getFormatDate(comment.getUpdateTime(), DateUtil.DATE_FORMT);
         this.updateTime = DateUtil.getFormatDate(comment.getAddTime(), DateUtil.DATE_FORMT);
+        this.nickName = comment.getNickName();
+        this.headImgUrl = comment.getHeadImgUrl();
     }
 
     public static List<AppraisalCommentDto> toDtoList(List<AppraisalComment> list) {

@@ -39,8 +39,10 @@ public class ForumInfo {
     private String videoImg;//视频封面图
 
     private String content;//内容描述，富文本
-    
-    private String nickName;
-    
-    private String headImgUrl;
+
+    private String nickName;//用户昵称
+
+    private String headImgUrl;//用户头像
+
+    private Integer pvCount;//帖子浏览量基数，展示浏览量为基数＋浏览量个数
 }

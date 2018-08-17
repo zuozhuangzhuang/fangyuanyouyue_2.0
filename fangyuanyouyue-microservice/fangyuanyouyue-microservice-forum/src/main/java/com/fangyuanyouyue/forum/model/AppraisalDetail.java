@@ -32,4 +32,6 @@ public class AppraisalDetail {
     private Date addTime;//添加时间
 
     private String content;//内容描述
+
+    private Integer pvCount;//浏览量基数
 }

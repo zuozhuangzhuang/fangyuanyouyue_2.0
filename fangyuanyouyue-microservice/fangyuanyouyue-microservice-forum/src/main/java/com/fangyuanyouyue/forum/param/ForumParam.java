@@ -72,4 +72,7 @@ public class ForumParam{
 	@ApiModelProperty(name = "coverImgUrl", value = "封面图片地址", dataType = "String",hidden = true)
 	private String coverImgUrl;//封面图片地址
 
+	@ApiModelProperty(name = "listType", value = "列表类型 1普通列表 2我的帖子/视频列表", dataType = "int",hidden = true)
+	private Integer listType;//列表类型 1普通列表 2我的帖子/视频列表
+
 }

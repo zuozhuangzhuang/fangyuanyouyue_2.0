@@ -12,12 +12,14 @@
     <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
+    <result column="pv_count" jdbcType="INTEGER" property="pvCount" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.forum.model.AppraisalDetail">
     <result column="content" jdbcType="LONGVARCHAR" property="content" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, user_id, title, bonus, label, sort, status, end_time, update_time, add_time
+    id, user_id, title, bonus, label, sort, status, end_time, update_time, add_time, 
+    pv_count
   </sql>
   <sql id="Blob_Column_List">
     content
@@ -34,15 +36,17 @@
     delete from appraisal_detail
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.AppraisalDetail" useGeneratedKeys="true" keyProperty="id">
+  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.AppraisalDetail" useGeneratedKeys="true" keyProperty="id" >
     insert into appraisal_detail (id, user_id, title, 
       bonus, label, sort, 
       status, end_time, update_time, 
-      add_time, content)
+      add_time, pv_count, content
+      )
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, 
       #{bonus,jdbcType=DECIMAL}, #{label,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER}, 
       #{status,jdbcType=INTEGER}, #{endTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{addTime,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR})
+      #{addTime,jdbcType=TIMESTAMP}, #{pvCount,jdbcType=INTEGER}, #{content,jdbcType=LONGVARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.fangyuanyouyue.forum.model.AppraisalDetail">
     insert into appraisal_detail
@@ -76,6 +80,9 @@
       </if>
       <if test="addTime != null">
         add_time,
+      </if>
+      <if test="pvCount != null">
+        pv_count,
       </if>
       <if test="content != null">
         content,
@@ -112,6 +119,9 @@
       <if test="addTime != null">
         #{addTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="pvCount != null">
+        #{pvCount,jdbcType=INTEGER},
+      </if>
       <if test="content != null">
         #{content,jdbcType=LONGVARCHAR},
       </if>
@@ -147,6 +157,9 @@
       <if test="addTime != null">
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="pvCount != null">
+        pv_count = #{pvCount,jdbcType=INTEGER},
+      </if>
       <if test="content != null">
         content = #{content,jdbcType=LONGVARCHAR},
       </if>
@@ -164,6 +177,7 @@
       end_time = #{endTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       add_time = #{addTime,jdbcType=TIMESTAMP},
+      pv_count = #{pvCount,jdbcType=INTEGER},
       content = #{content,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -177,7 +191,8 @@
       status = #{status,jdbcType=INTEGER},
       end_time = #{endTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      add_time = #{addTime,jdbcType=TIMESTAMP}
+      add_time = #{addTime,jdbcType=TIMESTAMP},
+      pv_count = #{pvCount,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
@@ -197,15 +212,15 @@
       limit #{start},#{limit}
     </if>
   </select>
-  <select id="selectList" resultMap="BaseResultMap" >
+  <select id="selectList" resultMap="BaseResultMap">
     select
     a.*,b.nick_name,b.head_img_url
     from appraisal_detail a,user_info b
     where a.user_id=b.id
-    <if test="userId != null" >
+    <if test="userId != null">
       and a.user_id = #{userId}
     </if>
-    <if test="keyword != null" >
+    <if test="keyword != null">
       and a.title like "%"#{keyword}"%"
     </if>
     limit #{start},#{limit}

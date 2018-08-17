@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 鉴定订单表DTO
@@ -30,6 +31,8 @@ public class AppraisalOrderInfoDto {
     private String addTime;//添加时间
 
     private String updateTime;//更新时间
+
+    private List<String> goodsNames;//商品名称
 
     public AppraisalOrderInfoDto() {
     }

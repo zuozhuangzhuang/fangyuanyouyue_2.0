@@ -92,10 +92,11 @@ public interface WalletService {
 
     /**
      * 微信支付
-     * @param orderId
+     * @param orderNo
+     * @param price
      * @throws ServiceException
      */
-    WechatPayDto orderPayByWechat(Integer orderId, String orderNo, BigDecimal price) throws Exception;
+    WechatPayDto orderPayByWechat( String orderNo, BigDecimal price) throws Exception;
 
     /**
      * 支付宝支付

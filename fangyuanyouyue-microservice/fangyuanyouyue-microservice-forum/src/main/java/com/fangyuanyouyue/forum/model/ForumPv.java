@@ -2,16 +2,19 @@ package com.fangyuanyouyue.forum.model;
 
 import java.util.Date;
 
+/**
+ * 论坛帖子浏览表
+ */
 public class ForumPv {
-    private Integer id;
+    private Integer id;//
 
-    private Integer userId;
+    private Integer userId;//用户id
 
-    private Integer forumId;
+    private Integer forumId;//帖子id
 
-    private Date addTime;
+    private Date addTime;//添加时间
 
-    private Integer columnId;
+    private Integer columnId;//专栏id
 
     public Integer getId() {
         return id;

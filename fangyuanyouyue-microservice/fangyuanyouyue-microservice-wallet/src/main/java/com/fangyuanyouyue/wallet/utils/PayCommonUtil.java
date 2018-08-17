@@ -32,7 +32,10 @@ import javax.servlet.http.HttpServletRequest;
 import com.alibaba.fastjson.JSONObject;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
+import com.fangyuanyouyue.base.util.DateStampUtils;
+import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.base.util.MD5Util;
+import com.fangyuanyouyue.wallet.dto.WechatPayDto;
 import com.fangyuanyouyue.wallet.utils.WechatUtil.TrustManagerUtil;
 import com.fangyuanyouyue.wallet.utils.WechatUtil.WXPayUtil;
 
@@ -69,7 +72,7 @@ public class PayCommonUtil {
     /**
      * 再次签名，支付
      */
-    public static SortedMap<Object, Object> startWXPay(String result){
+    public static WechatPayDto startWXPay(String result){
         try{
             Map<String, String> map = WXPayUtil.xmlToMap(result);
             SortedMap<Object, Object> parameterMap = new TreeMap<Object, Object>();
@@ -82,7 +85,15 @@ public class PayCommonUtil {
             parameterMap.put("timestamp", Long.parseLong(String.valueOf(System.currentTimeMillis()).toString().substring(0, 10)));
             String sign = PayCommonUtil.createSign("UTF-8", parameterMap);
             parameterMap.put("sign", sign);
-            return parameterMap;
+            WechatPayDto wechatPayDto = new WechatPayDto();
+            wechatPayDto.setAppId("wx306dfd8f2342f051");
+            wechatPayDto.setPartnerId("1418798002");
+            wechatPayDto.setPrepayId(map.get("prepay_id"));
+            wechatPayDto.setPackageValue("Sign=WXPay");
+            wechatPayDto.setNonceStr(PayCommonUtil.CreateNoncestr());
+            wechatPayDto.setTimeStamp(DateUtil.getFormatDate(new Date()));
+            wechatPayDto.setSign(sign);
+            return wechatPayDto;
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -178,8 +189,8 @@ public class PayCommonUtil {
         while (it.hasNext())
         {
             Map.Entry entry = (Map.Entry) it.next();
-            String k = (String) entry.getKey();
-            String v = (String) entry.getValue();
+            String k = String.valueOf(entry.getKey());
+            String v = String.valueOf(entry.getValue());
             if ("attach".equalsIgnoreCase(k) || "body".equalsIgnoreCase(k))
             {
                 sb.append("<" + k + ">" + "<![CDATA[" + v + "]]></" + k + ">");

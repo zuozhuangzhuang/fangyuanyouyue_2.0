@@ -3,6 +3,7 @@ package com.fangyuanyouyue.forum.controller;
 import java.io.IOException;
 import java.util.List;
 
+import com.fangyuanyouyue.base.exception.ServiceException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,13 +64,14 @@ public class AppraisalController extends BaseController {
         try {
             log.info("----》获取全民鉴定详情《----");
             log.info("参数：" + param.toString());
-            //验证用户
-            //if(StringUtils.isEmpty(param.getToken())){
-            //    return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
-            //}
 			Integer userId = null;
             if(param.getToken()!=null) {
-            	userId = (Integer)schedualRedisService.get(param.getToken());
+                userId = (Integer)schedualRedisService.get(param.getToken());
+                String verifyUser = schedualUserService.verifyUserById(userId);
+                JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+                if((Integer)jsonObject.get("code") != 0){
+                    return toError(jsonObject.getString("report"));
+                }
 
             }
             
@@ -84,6 +86,9 @@ public class AppraisalController extends BaseController {
             }
             
             return toSuccess(dto);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
@@ -111,6 +116,9 @@ public class AppraisalController extends BaseController {
             List<AppraisalDetailDto> dto = appraisalDetailService.getAppraisalList(param.getUserId(),param.getKeyword(),param.getStart(), param.getLimit());
             
             return toSuccess(dto);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
@@ -140,10 +148,22 @@ public class AppraisalController extends BaseController {
             if(param.getStart()==null||param.getLimit()==null) {
             	return toError("分页参数不能为空");
             }
+            Integer userId = null;
+            if(StringUtils.isNotEmpty(param.getToken())) {
+                userId = (Integer)schedualRedisService.get(param.getToken());
+                String verifyUser = schedualUserService.verifyUserById(userId);
+                JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+                if((Integer)jsonObject.get("code") != 0){
+                    return toError(jsonObject.getString("report"));
+                }
+
+            }
+            List<AppraisalCommentDto> dtos = appraisalCommentService.getAppraisalCommentList(userId,param.getAppraisalId(), param.getStart(), param.getLimit());
             
-            List<AppraisalCommentDto> dto = appraisalCommentService.getAppraisalCommentList(param.getAppraisalId(), param.getStart(), param.getLimit());
-            
-            return toSuccess(dto);
+            return toSuccess(dtos);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
@@ -164,14 +184,15 @@ public class AppraisalController extends BaseController {
             log.info("----》对全民鉴定点赞《----");
             log.info("参数：" + param.toString());
 
-			if (param.getToken() == null) {
-				return toError("token不能为空");
-			}
-			
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+            }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            
-            if(userId!=null) {
-            	//TODO 暂时不需要处理
+            String verifyUser = schedualUserService.verifyUserById(userId);
+            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+            if((Integer)jsonObject.get("code") != 0){
+                return toError(jsonObject.getString("report"));
             }
 			
             if(param.getAppraisalId()==null) {
@@ -181,6 +202,9 @@ public class AppraisalController extends BaseController {
             appraisalLikesService.saveLikes(userId, param.getAppraisalId());
             
             return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
@@ -205,11 +229,16 @@ public class AppraisalController extends BaseController {
 			if (param.getToken() == null) {
 				return toError("token不能为空");
 			}
-			
+
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+            }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            
-            if(userId!=null) {
-            	//TODO 暂时不需要处理
+            String verifyUser = schedualUserService.verifyUserById(userId);
+            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+            if((Integer)jsonObject.get("code") != 0){
+                return toError(jsonObject.getString("report"));
             }
 			
             if(param.getCommentId()==null) {
@@ -219,6 +248,9 @@ public class AppraisalController extends BaseController {
             appraisalCommentLikesService.saveLikes(userId, param.getCommentId());
             
             return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
@@ -265,6 +297,53 @@ public class AppraisalController extends BaseController {
             appraisalDetailService.addAppraisal(userId,param.getBonus(),param.getTitle(),param.getContent(),param.getImgUrls(),param.getUserIds());
 
             return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
+
+
+    @ApiOperation(value = "添加评论", notes = "添加评论",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token",required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "appraisalId", value = "鉴定id",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "viewpoint", value = "评论观点 1看真 2看假",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "content", value = "我的看法", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "userIds", value = "邀请用户数组", allowMultiple = true,required = false, dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/saveComment")
+    @ResponseBody
+    public BaseResp saveComment(AppraisalParam param) throws IOException {
+        try {
+            log.info("----》添加评论《----");
+            log.info("参数：" + param.toString());
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+            }
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            String verifyUser = schedualUserService.verifyUserById(userId);
+            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+            if((Integer)jsonObject.get("code") != 0){
+                return toError(jsonObject.getString("report"));
+            }
+            if(param.getViewpoint() == null){
+                return toError(ReCode.FAILD.getValue(),"评论观点不能为空！");
+            }
+            if(StringUtils.isEmpty(param.getContent())){
+                return toError(ReCode.FAILD.getValue(),"看法不能为空！");
+            }
+            //添加评论
+            appraisalCommentService.saveComment(userId,param);
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");

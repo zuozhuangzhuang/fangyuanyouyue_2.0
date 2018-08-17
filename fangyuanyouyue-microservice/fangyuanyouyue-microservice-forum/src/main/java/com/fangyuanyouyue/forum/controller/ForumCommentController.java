@@ -1,16 +1,20 @@
 package com.fangyuanyouyue.forum.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.forum.dto.ForumCommentDto;
 import com.fangyuanyouyue.forum.param.ForumParam;
 import com.fangyuanyouyue.forum.service.ForumCommentService;
 import com.fangyuanyouyue.forum.service.SchedualRedisService;
+import com.fangyuanyouyue.forum.service.SchedualUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -33,6 +37,8 @@ public class ForumCommentController extends BaseController {
     private SchedualRedisService schedualRedisService;
 	@Autowired
 	private ForumCommentService forumCommentService;
+	@Autowired
+	private SchedualUserService schedualUserService;
 
 	@ApiOperation(value = "帖子评论列表", notes = "根据帖子id获取评论列表", response = BaseResp.class)
 	@ApiImplicitParams({
@@ -54,7 +60,12 @@ public class ForumCommentController extends BaseController {
 			}
 			Integer userId = null;
             if(param.getToken()!=null) {
-            	userId = (Integer)schedualRedisService.get(param.getToken());
+				userId = (Integer)schedualRedisService.get(param.getToken());
+				String verifyUser = schedualUserService.verifyUserById(userId);
+				JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+				if((Integer)jsonObject.get("code") != 0){
+					return toError(jsonObject.getString("report"));
+				}
 
             }
 
@@ -62,6 +73,9 @@ public class ForumCommentController extends BaseController {
 					param.getLimit());
 
 			return toSuccess(dto);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			return toError(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return toError(ReCode.FAILD.getValue(), "系统繁忙，请稍后再试！");
@@ -90,14 +104,21 @@ public class ForumCommentController extends BaseController {
 			}
 			Integer userId = null;
             if(param.getToken()!=null) {
-            	userId = (Integer)schedualRedisService.get(param.getToken());
-
+				userId = (Integer)schedualRedisService.get(param.getToken());
+				String verifyUser = schedualUserService.verifyUserById(userId);
+				JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+				if((Integer)jsonObject.get("code") != 0){
+					return toError(jsonObject.getString("report"));
+				}
             }
 
 			List<ForumCommentDto> dto = forumCommentService.getCommentCommentList(userId,param.getCommentId(), param.getStart(),
 					param.getLimit());
 
 			return toSuccess(dto);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			return toError(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return toError(ReCode.FAILD.getValue(), "系统繁忙，请稍后再试！");
@@ -120,13 +141,17 @@ public class ForumCommentController extends BaseController {
 			if (param.getToken() == null) {
 				return toError("token不能为空");
 			}
-			
-            Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            
-            if(userId==null) {
-            	//TODO 暂时不需要处理
-				return toError("用户ID不能为空");
-            }
+
+			//验证用户
+			if(StringUtils.isEmpty(param.getToken())){
+				return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+			}
+			Integer userId = (Integer)schedualRedisService.get(param.getToken());
+			String verifyUser = schedualUserService.verifyUserById(userId);
+			JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+			if((Integer)jsonObject.get("code") != 0){
+				return toError(jsonObject.getString("report"));
+			}
 
 			if (param.getForumId() == null) {
 				return toError("帖子ID不能为空");
@@ -138,6 +163,9 @@ public class ForumCommentController extends BaseController {
 			forumCommentService.saveComment(userId, param.getForumId(), param.getContent(), param.getCommentId());
 
 			return toSuccess();
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			return toError(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return toError(ReCode.FAILD.getValue(), "系统繁忙，请稍后再试！");

@@ -389,6 +389,13 @@ public class UserInfoServiceImpl implements UserInfoService {
             if(StringUtils.isNotEmpty(param.getUserAddress())){
                 userInfo.setAddress(param.getUserAddress());
             }
+            if(StringUtils.isNotEmpty(param.getLoginPwd())){
+                if(StringUtils.isNotEmpty(userInfo.getLoginPwd())){
+                    throw new ServiceException("您已设置过登录密码！");
+                }else{
+                    userInfo.setLoginPwd(MD5Util.generate(MD5Util.MD5(param.getLoginPwd())));
+                }
+            }
             userInfoMapper.updateByPrimaryKey(userInfo);
             //用户扩展信息表
             UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(userInfo.getId());
@@ -512,7 +519,9 @@ public class UserInfoServiceImpl implements UserInfoService {
         if(userInfo == null){
             throw new ServiceException("用户不存在！");
         }else{
-//            if(MD5Util.getMD5String(newPwd).equals(userInfo.getLoginPwd())){
+            if(StringUtils.isEmpty(userInfo.getLoginPwd())){
+                throw new ServiceException("用户登录密码为空！");
+            }
             if(MD5Util.verify(MD5Util.MD5(newPwd),userInfo.getLoginPwd())){
                 throw new ServiceException("不能和旧密码相同！");
             }else{

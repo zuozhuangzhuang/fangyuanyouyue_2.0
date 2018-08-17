@@ -14,22 +14,25 @@ import com.fangyuanyouyue.forum.service.ForumPvService;
 public class ForumPvServiceImp implements ForumPvService {
 	
 	@Autowired
-	private ForumPvMapper ForumPvsMapper;
+	private ForumPvMapper forumPvsMapper;
+
 
 	@Override
 	public Integer countPv(Integer forumId) {
-		return ForumPvsMapper.countById(forumId);
+		return forumPvsMapper.countById(forumId);
 	}
 
 	@Override
-	public void savePv(Integer userId, Integer forumId) {
-		ForumPv model = new ForumPv();
-		model.setAddTime(new Date());
-		model.setUserId(userId);
-		model.setForumId(forumId);
-		
-		ForumPvsMapper.insert(model);
-		
+	public void savePv(Integer userId, Integer forumId,Integer columnId) {
+		ForumPv model = forumPvsMapper.selectByUserIdColumnId(userId,forumId);
+		if(model == null){
+			model = new ForumPv();
+			model.setAddTime(new Date());
+			model.setUserId(userId);
+			model.setForumId(forumId);
+			model.setColumnId(columnId);
+			forumPvsMapper.insert(model);
+		}
 	}
 
    

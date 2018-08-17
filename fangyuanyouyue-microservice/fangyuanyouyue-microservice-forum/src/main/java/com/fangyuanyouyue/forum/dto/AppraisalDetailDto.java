@@ -58,7 +58,9 @@ public class AppraisalDetailDto {
     
     private Integer isLikes = StatusEnum.NO.getValue(); //是否点赞 1是 2否
 
-    private Integer isFans = StatusEnum.NO.getValue(); //是否关注作者
+//    private Integer isFans = StatusEnum.NO.getValue(); //是否关注作者
+
+    private List<String> headImgUrls;//参与鉴定列表，最多五个，按照热度排序
 
     public AppraisalDetailDto() {
     	

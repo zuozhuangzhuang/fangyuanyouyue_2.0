@@ -1,6 +1,8 @@
 package com.fangyuanyouyue.user.service.impl;
 
 import com.fangyuanyouyue.base.util.MD5Util;
+import com.fangyuanyouyue.user.dao.UserFansMapper;
+import com.fangyuanyouyue.user.model.UserFans;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +26,9 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
     @Autowired
     private UserInfoExtMapper userInfoExtMapper;
     @Autowired
-    protected UserInfoService userInfoService;
+    private UserInfoService userInfoService;
+    @Autowired
+    private UserFansMapper userFans;
 
     @Override
     public void certification(String token, String name, String identity, String identityImgCoverUrl, String identityImgBackUrl) throws ServiceException {
@@ -77,10 +81,11 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
 
     @Override
     public boolean isAuth(Integer userId) throws ServiceException {
+        UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(userId);
         //根据用户ID获取实名认证申请信息
         IdentityAuthApply identityAuthApply = identityAuthApplyMapper.selectByUserId(userId);
         //已申请过 状态 1申请 2通过 3拒绝
-        if(identityAuthApply != null && identityAuthApply.getStatus() == 2) {
+        if(identityAuthApply != null && identityAuthApply.getStatus() == 2 && userInfoExt.getStatus().intValue() == 1) {
             return true;
         }else{
             return false;
@@ -104,5 +109,11 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
             }
         }
         //TODO 系统消息：您的认证店铺申请已提交，将于5个工作日内完成审核，请注意消息通知
+    }
+
+    @Override
+    public boolean isFans(Integer userId, Integer toUserId) throws ServiceException {
+        UserFans userFans = this.userFans.selectByUserIdToUserId(userId, toUserId);
+        return userFans != null;
     }
 }

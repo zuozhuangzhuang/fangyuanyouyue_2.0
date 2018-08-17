@@ -26,4 +26,12 @@ public interface ForumLikesMapper {
     
 
     List<ForumLikes> selectByForumId(@Param("forumId")Integer forumId,@Param("start")Integer start,@Param("limit")Integer limit);
+
+    /**
+     * 根据用户id和帖子\视频id获取点赞信息
+     * @param forumId
+     * @param userId
+     * @return
+     */
+    ForumLikes selectByForumIdUserId(@Param("forumId")Integer forumId,@Param("userId")Integer userId);
 }

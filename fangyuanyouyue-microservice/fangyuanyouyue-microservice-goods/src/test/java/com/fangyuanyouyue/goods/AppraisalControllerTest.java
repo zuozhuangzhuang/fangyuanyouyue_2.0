@@ -43,7 +43,7 @@ public class AppraisalControllerTest {
 //    @Transactional
     public void addAppraisal() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/appraisal/addAppraisal")
-                .param("token","10041FY1533753292042")
+                .param("token","10045FY1534451510951")
 //                .param("token","10025FY1533837647461")
 //                .param("goodsIds","1,2")
                 //描述

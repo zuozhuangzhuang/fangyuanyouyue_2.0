@@ -28,5 +28,8 @@ public interface SchedualUserService {
     @RequestMapping(value = "/userFeign/isAuth",method = RequestMethod.POST)
     String isAuth(@RequestParam(value = "userId") Integer userId);
 
+    @RequestMapping(value = "/userFeign/isFans",method = RequestMethod.POST)
+    String isFans(@RequestParam(value = "userId") Integer userId,@RequestParam(value = "toUserId") Integer toUserId);
+
 
 }

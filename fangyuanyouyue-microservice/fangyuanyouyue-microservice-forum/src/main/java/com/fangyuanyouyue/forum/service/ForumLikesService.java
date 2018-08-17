@@ -35,6 +35,14 @@ public interface ForumLikesService {
      * @param forumId
      * @param type
      */
-    void saveLikes(Integer type,Integer userId,Integer forumId);
+    void saveLikes(Integer type,Integer userId,Integer forumId) throws ServiceException;
 
+	/**
+	 * 根据用户id和帖子\视频id获取点赞信息
+	 * @param forumId
+	 * @param userId
+	 * @return
+	 * @throws ServiceException
+	 */
+    ForumLikesDto selectByForumIdUserId(Integer forumId,Integer userId) throws ServiceException;
 }

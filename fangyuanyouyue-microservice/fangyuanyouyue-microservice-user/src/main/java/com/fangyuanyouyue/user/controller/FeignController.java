@@ -206,4 +206,32 @@ public class FeignController  extends BaseController {
             return toError("系统繁忙，请稍后再试！");
         }
     }
+
+    @ApiOperation(value = "A是否关注用户B", notes = "A是否关注用户B",hidden = true)
+    @PostMapping(value = "/isFans")
+    @ResponseBody
+    public BaseResp isFans(Integer userId,Integer toUserId) throws IOException {
+        try {
+            log.info("----》A是否关注用户B《----");
+            log.info("参数：userId:"+userId+",toUserId:"+toUserId);
+            if(userId == null){
+                return toError(ReCode.FAILD.getValue(),"用户ID不能为空！");
+            }
+            if(toUserId == null){
+                return toError(ReCode.FAILD.getValue(),"被关注用户ID不能为空！");
+            }
+            UserInfo userA = userInfoService.selectByPrimaryKey(userId);
+            if(userA==null){
+                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+            }
+            if(userA.getStatus() == 2){
+                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
+            }
+            boolean isFans = userInfoExtService.isFans(userId,toUserId);
+            return toSuccess(isFans);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
 }

@@ -5,8 +5,6 @@ import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.forum.dto.AppraisalDetailDto;
-import com.fangyuanyouyue.forum.dto.ForumColumnDto;
 import com.fangyuanyouyue.forum.param.CollectParam;
 import com.fangyuanyouyue.forum.service.*;
 import io.swagger.annotations.Api;
@@ -52,7 +50,7 @@ public class CollectController extends BaseController {
             @ApiImplicitParam(name = "token", value = "用户token", required = true,dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "collectId", value = "收藏对象ID", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "status", value = "状态 1收藏 2取消收藏", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "collectType", value = "收藏类型 3视频 4专栏 5鉴定", required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "collectType", value = "收藏类型 3视频 4帖子 5鉴定", required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/collect")
     @ResponseBody
@@ -94,15 +92,16 @@ public class CollectController extends BaseController {
     @ApiOperation(value = "我的收藏列表 (视频、专栏、鉴定)", notes = "(Object)获取我收藏的专栏、视频、鉴定",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true,dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "collectType", value = "关注/收藏类型  3视频 4专栏 5鉴定", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "collectType", value = "关注/收藏类型  3视频 4帖子 5鉴定", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "search", value = "搜索内容", required = false, dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/collectList")
     @ResponseBody
     public BaseResp collectList(CollectParam param) throws IOException {
         try {
-            log.info("----》我的收藏列表 (视频、专栏、鉴定)《----");
+            log.info("----》我的收藏列表 (视频、帖子、鉴定)《----");
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
@@ -123,7 +122,7 @@ public class CollectController extends BaseController {
             if(param.getLimit() == null || param.getLimit() < 1){
                 return toError(ReCode.FAILD.getValue(),"每页个数错误！");
             }
-            List dtos = collectService.collectList(userId, param.getCollectType(),param.getStart(),param.getLimit());
+            List dtos = collectService.collectList(userId, param.getCollectType(),param.getStart(),param.getLimit(),param.getSearch());
             return toSuccess(dtos);
         } catch (ServiceException e) {
             e.printStackTrace();
@@ -133,4 +132,6 @@ public class CollectController extends BaseController {
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
         }
     }
+
+
 }

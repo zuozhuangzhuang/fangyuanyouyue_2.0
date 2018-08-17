@@ -1,7 +1,9 @@
 package com.fangyuanyouyue.forum.dao;
 
 import com.fangyuanyouyue.forum.model.AppraisalLikes;
+import com.fangyuanyouyue.forum.model.ForumLikes;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface AppraisalLikesMapper {
@@ -20,6 +22,12 @@ public interface AppraisalLikesMapper {
     int countById(Integer appraisalId);
     
     int countByUserId(Integer appraisalId,Integer userId);
-    
-    
+
+    /**
+     * 根据用户id和鉴定id获取点赞信息
+     * @param appraisalId
+     * @param userId
+     * @return
+     */
+    AppraisalLikes selectByAppraisalIdUserId(@Param("appraisalId")Integer appraisalId, @Param("userId")Integer userId);
 }

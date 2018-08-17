@@ -62,9 +62,11 @@ public class UserDto {
 
     private Integer extStatus;//实名登记状态 0申请中 1已实名 2未实名
 
-    private Integer isPayPwd;//是否设置支付密码 1是 2否
+    private Integer isPayPwd;//是否已设置支付密码 1是 2否
 
     private Integer appraisalCount;//免费鉴定次数
+
+    private Integer isLoginPwd;//是否已设置登录密码 1是 2否
 
     /**
      * ↓↓↓↓↓↓↓注释掉不需要返回的属性↓↓↓↓↓↓↓
@@ -137,6 +139,7 @@ public class UserDto {
             this.signature = userInfo.getSignature();
             this.contact = userInfo.getContact();
             this.level = userInfo.getLevel();
+            this.isLoginPwd = userInfo.getLoginPwd() == null?2:1;
 //            this.levelDesc = userInfo.getLevelDesc();
         }
         //UserInfoExt

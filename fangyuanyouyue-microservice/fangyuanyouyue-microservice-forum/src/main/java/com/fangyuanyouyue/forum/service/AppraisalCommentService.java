@@ -33,18 +33,19 @@ public interface AppraisalCommentService {
     
     /**
      * 获取全民鉴定的评论
+     * @param userId
      * @param appraisalId
      * @param start
      * @param limit
      * @return
      * @throws ServiceException
      */
-    List<AppraisalCommentDto> getAppraisalCommentList(Integer appraisalId,Integer start,Integer limit) throws ServiceException;
+    List<AppraisalCommentDto> getAppraisalCommentList(Integer userId,Integer appraisalId,Integer start,Integer limit) throws ServiceException;
     
     /**
      * 保存评论
      * @param param
      */
-    void saveComment(Integer userId,AppraisalParam param);
+    void saveComment(Integer userId,AppraisalParam param) throws ServiceException;
 
 }

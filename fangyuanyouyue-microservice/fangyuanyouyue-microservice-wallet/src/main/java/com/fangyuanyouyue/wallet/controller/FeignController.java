@@ -4,6 +4,7 @@ import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.wallet.dto.WechatPayDto;
 import com.fangyuanyouyue.wallet.param.WalletParam;
 import com.fangyuanyouyue.wallet.service.SchedualRedisService;
 import com.fangyuanyouyue.wallet.service.SchedualUserService;
@@ -12,6 +13,7 @@ import com.fangyuanyouyue.wallet.utils.PayCommonUtil;
 import com.fangyuanyouyue.wallet.utils.PropertyUtil;
 import com.fangyuanyouyue.wallet.utils.WechatUtil.WXPayUtil;
 import io.swagger.annotations.Api;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -172,16 +174,19 @@ public class FeignController extends BaseController{
 
     @PostMapping(value = "/orderPayByWechat")
     @ResponseBody
-    public BaseResp orderPayByWechat(Integer orderId, String orderNo, BigDecimal price) throws IOException {
+    public BaseResp orderPayByWechat(String orderNo, BigDecimal price) throws IOException {
         try {
             log.info("----》微信支付《----");
-            log.info("参数：orderId："+orderId);
-            if(orderId == null){
-                return toError("订单ID不能为空！");
+            log.info("参数：orderNo："+orderNo+",price:"+price);
+            if(StringUtils.isEmpty(orderNo)){
+                return toError("订单号不能为空！");
+            }
+            if(price == null || price.compareTo(new BigDecimal(0))<=0){
+                return toError("订单金额异常！");
             }
             //微信支付
-            walletService.orderPayByWechat(orderId,orderNo,price);
-            return toSuccess();
+            WechatPayDto wechatPayDto = walletService.orderPayByWechat(orderNo, price);
+            return toSuccess(wechatPayDto);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());

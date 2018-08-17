@@ -60,6 +60,7 @@ public class AppraisalServiceImpl implements AppraisalService{
         }
         appraisalOrderInfo.setAddTime(DateStampUtils.getTimesteamp());
         appraisalOrderInfoMapper.insert(appraisalOrderInfo);
+        List<String> goodsNames = new ArrayList<>();
         //用来存放订单详情DTO列表
         if(goodsIds != null && goodsIds.length != 0){//用户对商品提交鉴定
             for(Integer goodsId:goodsIds){
@@ -102,6 +103,7 @@ public class AppraisalServiceImpl implements AppraisalService{
                         }
                         //订单总金额
                         amount = amount.add(goodsAppraisalDetail.getPrice());//原价
+                        goodsNames.add(goodsInfo.getName());
                     }
                 }
             }
@@ -141,11 +143,13 @@ public class AppraisalServiceImpl implements AppraisalService{
             }
             //订单总金额
             amount = amount.add(price);//原价
+            goodsNames.add("我要鉴定");
         }
 
         appraisalOrderInfo.setAmount(amount);
         appraisalOrderInfoMapper.updateByPrimaryKey(appraisalOrderInfo);
         AppraisalOrderInfoDto appraisalOrderInfoDto = new AppraisalOrderInfoDto(appraisalOrderInfo);
+        appraisalOrderInfoDto.setGoodsNames(goodsNames);
         //TODO 用户需要支付对应的资金才可以鉴定成功
         return appraisalOrderInfoDto;
     }

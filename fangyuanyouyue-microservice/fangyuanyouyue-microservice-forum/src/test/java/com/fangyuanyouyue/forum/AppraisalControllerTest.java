@@ -51,4 +51,38 @@ public class AppraisalControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
+
+    /**
+     * 添加评论
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void saveComment() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/appraisal/saveComment")
+                .param("token", "10045FY1534183918247")
+                .param("bonus", "10")
+                .param("title", "来看看这个咸丰")
+                .param("content", "刚入手一枚好看的钱，大家帮我看看是真的还是假的")
+                .param("imgUrls", "123,124,125")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+    /**
+     * 全民鉴定评论列表
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void commentList() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/appraisal/comment/list")
+                .param("token", "10045FY1534451510951")
+                .param("appraisalId", "1")
+                .param("start", "0")
+                .param("limit", "10")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
 }
