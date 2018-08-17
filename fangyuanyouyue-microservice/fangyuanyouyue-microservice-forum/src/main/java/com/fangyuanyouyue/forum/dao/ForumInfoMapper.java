@@ -33,6 +33,7 @@ public interface ForumInfoMapper {
      * @param start
      * @param limit
      * @param collectType
+     * @param search
      * @return
      */
     List<ForumInfo> selectCollectList(@Param("userId")Integer userId,@Param("start")Integer start,@Param("limit")Integer limit,@Param("collectType")Integer collectType,@Param("type")Integer type,@Param("search")String search);

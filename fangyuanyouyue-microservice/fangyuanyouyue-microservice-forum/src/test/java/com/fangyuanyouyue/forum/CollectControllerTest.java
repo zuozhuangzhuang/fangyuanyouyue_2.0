@@ -87,6 +87,7 @@ public class CollectControllerTest {
                 .param("collectType","4")
                 .param("start","0")
                 .param("limit","10")
+                .param("search","测试")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -100,11 +101,12 @@ public class CollectControllerTest {
 //    @Transactional
     public void collectAppraisalList() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/collect/collectList")
-                .param("token","10045FY1534236594430")
+                .param("token","10045FY1534451510951")
                 //关注/收藏类型  3视频 4专栏 5鉴定
                 .param("collectType","5")
                 .param("start","0")
                 .param("limit","10")
+                .param("search","来一下啊啊啊啊啊")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

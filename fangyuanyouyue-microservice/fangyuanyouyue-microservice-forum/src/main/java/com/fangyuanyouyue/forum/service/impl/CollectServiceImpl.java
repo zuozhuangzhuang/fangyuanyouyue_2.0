@@ -106,7 +106,7 @@ public class CollectServiceImpl implements CollectService{
                 }
             }
         }else if(collectType.intValue() == 5){
-            List<AppraisalDetail> appraisalDetails = appraisalDetailMapper.selectCollectList(userId, start * limit, limit,collectType);
+            List<AppraisalDetail> appraisalDetails = appraisalDetailMapper.selectCollectList(userId, start * limit, limit,collectType,search);
             dtos = AppraisalDetailDto.toDtoList(appraisalDetails);
         }else{
             throw new ServiceException("收藏类型错误！");
