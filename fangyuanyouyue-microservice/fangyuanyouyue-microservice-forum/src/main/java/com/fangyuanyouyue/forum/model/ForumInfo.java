@@ -27,7 +27,7 @@ public class ForumInfo {
 
     private Integer sort;//排列优先级
 
-    private Integer type;//帖子类型 1图文 2视频
+    private Integer type;//帖子类型 1帖子 2视频
 
     private Integer status;//状态 1显示 2隐藏
 

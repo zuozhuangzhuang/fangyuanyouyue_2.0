@@ -40,7 +40,7 @@ public class FileUploadController extends BaseController {
             log.info("----》图片上传《----");
             log.info("参数：" + param.toString());
             if(param.getImgFile() == null){
-                return toError(ReCode.FAILD.getValue(),"图片为空");
+                return toError("图片为空");
             }
             String name = param.getImgFile().getOriginalFilename().toLowerCase();
             if(!(name.endsWith("jpeg") || name.endsWith("png")
@@ -55,7 +55,7 @@ public class FileUploadController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -70,7 +70,7 @@ public class FileUploadController extends BaseController {
             log.info("----》视频上传《----");
             log.info("参数：" + param.toString());
             if(param.getVideoFile() == null){
-                return toError(ReCode.FAILD.getValue(),"文件为空");
+                return toError("文件为空");
             }
             //视频上传
             String url= fileUploadService.uploadVideo(param.getVideoFile());
@@ -80,7 +80,7 @@ public class FileUploadController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 }

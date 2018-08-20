@@ -9,6 +9,7 @@ import com.fangyuanyouyue.forum.dao.AppraisalCommentLikesMapper;
 import com.fangyuanyouyue.forum.dao.AppraisalDetailMapper;
 import com.fangyuanyouyue.forum.model.*;
 import com.fangyuanyouyue.forum.service.AppraisalCommentLikesService;
+import com.fangyuanyouyue.forum.service.SchedualMessageService;
 import com.fangyuanyouyue.forum.service.SchedualUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,8 @@ public class AppraisalCommentServiceImp implements AppraisalCommentService {
 	private AppraisalCommentLikesService appraisalCommentLikesService;
 	@Autowired
 	private AppraisalCommentLikesMapper appraisalCommentLikesMapper;
+	@Autowired
+	private SchedualMessageService schedualMessageService;
 
 
 	@Override
@@ -70,12 +73,12 @@ public class AppraisalCommentServiceImp implements AppraisalCommentService {
 			model.setAddTime(new Date());
 			appraisalCommentMapper.insert(model);
 			if(param.getUserIds() != null && param.getUserIds().length > 0){
-				//TODO 邀请我：用户“用户昵称”参与全民鉴定【全民鉴定名称】时邀请了您！点击此处前往查看吧
+				//邀请我：用户“用户昵称”参与全民鉴定【全民鉴定名称】时邀请了您！点击此处前往查看吧
 				UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
 				AppraisalDetail appraisalDetail = appraisalDetailMapper.selectDetailByPrimaryKey(param.getAppraisalId());
 				for(Integer toUserId:param.getUserIds()){
-					UserInfo toUser = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(toUserId)).getString("data")), UserInfo.class);
-					System.out.println("用户“"+user.getNickName()+"”参与全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了“"+toUser.getNickName()+"“！");
+					schedualMessageService.easemobMessage(toUserId.toString(),
+							"用户“"+user.getNickName()+"”参与全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧","7",appraisalDetail.getId().toString());
 				}
 			}
 		}else{

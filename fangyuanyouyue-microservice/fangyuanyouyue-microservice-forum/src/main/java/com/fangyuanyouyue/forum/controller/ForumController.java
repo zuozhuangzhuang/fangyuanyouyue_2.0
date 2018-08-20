@@ -42,7 +42,7 @@ public class ForumController extends BaseController {
     @Autowired
     private SchedualUserService schedualUserService;
 
-    @ApiOperation(value = "帖子详情", notes = "根据id获取帖子详情",response = BaseResp.class)
+    @ApiOperation(value = "帖子详情", notes = "（ForumInfoDto）根据id获取帖子详情",response = BaseResp.class)
     @ApiImplicitParams({
         @ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "string", paramType = "query"),
         @ApiImplicitParam(name = "forumId", value = "帖子id",required = true, dataType = "int", paramType = "query")
@@ -75,18 +75,18 @@ public class ForumController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
 
-    @ApiOperation(value = "帖子/视频列表", notes = "获取帖子列表大集合",response = BaseResp.class)
+    @ApiOperation(value = "帖子/视频列表", notes = "（ForumInfoDto）获取帖子列表大集合",response = BaseResp.class)
     @ApiImplicitParams({
         @ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "string", paramType = "query"),
         @ApiImplicitParam(name = "columnId", value = "专栏id",required = false, dataType = "int", paramType = "query"),
         @ApiImplicitParam(name = "keyword", value = "搜索关键字",required = false, dataType = "string", paramType = "query"),
-        @ApiImplicitParam(name = "searchType", value = "搜索类型1古物圈子 2专栏精选 ",required = false, dataType = "int", paramType = "query"),
-        @ApiImplicitParam(name = "type", value = "帖子类型1帖子 2视频",required = true, dataType = "int", paramType = "query"),
+        @ApiImplicitParam(name = "searchType", value = "搜索类型 1古物圈子 2专栏精选 ",required = false, dataType = "int", paramType = "query"),
+        @ApiImplicitParam(name = "type", value = "帖子类型1帖子 2视频",required = false, dataType = "int", paramType = "query"),
         @ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
         @ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query"),
         @ApiImplicitParam(name = "listType", value = "列表类型 1普通列表 2我的帖子/视频列表", required = true, dataType = "int", paramType = "query")
@@ -97,8 +97,8 @@ public class ForumController extends BaseController {
         try {
             log.info("----》获取帖子列表《----");
             log.info("参数：" + param.toString());
-            if(param.getStart()==null||param.getLimit()==null) {
-            	return toError("分页参数不能为空");
+            if(param.getStart()==null || param.getStart() < 0 || param.getLimit()==null || param.getLimit() < 1) {
+            	return toError("分页参数异常");
             }
             if(param.getListType() == null){
             	return toError("列表类型不能为空");
@@ -113,9 +113,11 @@ public class ForumController extends BaseController {
                 }
             }
             if(param.getType() == null){
-            	return toError("类型不能为空");
+                if(param.getSearchType() != 1){
+            	    return toError("类型异常！");
+                }
             }
-            List<ForumInfoDto> dto = forumInfoService.getForumList(param.getColumnId(),userId,param.getType(),param.getKeyword(),param.getStart(),param.getLimit(),param.getListType());
+            List<ForumInfoDto> dto = forumInfoService.getForumList(param.getColumnId(),userId,param.getType(),param.getKeyword(),param.getStart(),param.getLimit(),param.getListType(),param.getSearchType());
             
             return toSuccess(dto);
         } catch (ServiceException e) {
@@ -150,7 +152,7 @@ public class ForumController extends BaseController {
             log.info("参数：" + param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -160,16 +162,16 @@ public class ForumController extends BaseController {
             }
             //验证实名认证
             if(JSONObject.parseObject(schedualUserService.isAuth(userId)).getBoolean("data") == false){
-                return toError(ReCode.FAILD.getValue(),"用户未实名认证！");
+                return toError("用户未实名认证！");
             }
             if(param.getType() == null){
-                return toError(ReCode.FAILD.getValue(),"类型不能为空！");
+                return toError("类型不能为空！");
             }
             if(StringUtils.isEmpty(param.getTitle())){
-                return toError(ReCode.FAILD.getValue(),"标题不能为空！");
+                return toError("标题不能为空！");
             }
             if(StringUtils.isEmpty(param.getContent())){
-                return toError(ReCode.FAILD.getValue(),"内容不能为空！");
+                return toError("内容不能为空！");
             }
             //发布视频、发布帖子
             forumInfoService.addForum(userId,param.getColumnId(),param.getTitle(),param.getContent(),param.getVideoUrl(),param.getVideoLength(),param.getVideoImg(),param.getType(),param.getUserIds());
@@ -180,7 +182,7 @@ public class ForumController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 

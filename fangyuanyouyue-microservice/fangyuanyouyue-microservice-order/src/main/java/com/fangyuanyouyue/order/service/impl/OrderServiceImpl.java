@@ -7,7 +7,7 @@ import com.alibaba.fastjson.JSONException;
 import com.fangyuanyouyue.order.dao.*;
 import com.fangyuanyouyue.order.dto.*;
 import com.fangyuanyouyue.order.model.*;
-import com.fangyuanyouyue.order.service.SchedualWalletService;
+import com.fangyuanyouyue.order.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,9 +17,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.IdGenerator;
-import com.fangyuanyouyue.order.service.OrderService;
-import com.fangyuanyouyue.order.service.SchedualGoodsService;
-import com.fangyuanyouyue.order.service.SchedualUserService;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service(value = "orderService")
@@ -43,6 +40,8 @@ public class OrderServiceImpl implements OrderService{
     private CompanyMapper companyMapper;
     @Autowired
     private OrderCommentMapper orderCommentMapper;
+    @Autowired
+    private SchedualMessageService schedualMessageService;
 
     @Override
     public OrderDto saveOrderByCart(String token,String sellerString, Integer userId, Integer addressId) throws ServiceException {
@@ -121,14 +120,17 @@ public class OrderServiceImpl implements OrderService{
         orderPay.setAddTime(DateStampUtils.getTimesteamp());
         orderPayMapper.insert(orderPay);
         //生成子订单，在总订单中加入价格和邮费，实际支付价格
-        List<OrderDetailDto> orderDetailDtos = separatesOrder(orderInfo, orderPay, addOrderDtos);
+        StringBuffer goodsName = new StringBuffer();
+        List<OrderDetailDto> orderDetailDtos = separatesOrder(orderInfo, orderPay, addOrderDtos,goodsName);
         OrderDto orderDto = new OrderDto(orderInfo);
         OrderPayDto orderPayDto = new OrderPayDto(orderPay);
         orderDto.setOrderPayDto(orderPayDto);
         orderDto.setOrderDetailDtos(orderDetailDtos);
         orderDto.setSellerDtos(sellerDtos);
         orderDto.setNickName(user.getNickName());
-        //TODO 交易消息：恭喜您！您的商品【大头三年原光】、【xxx】、【xx】已有人下单，点击此处查看订单
+        //交易消息：恭喜您！您的商品【大头三年原光】、【xxx】、【xx】已有人下单，点击此处查看订单
+        schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
+                        "恭喜您！您的商品"+goodsName.toString()+"已有人下单，点击此处查看订单","3",orderInfo.getId().toString());
         return orderDto;
     }
 
@@ -139,7 +141,7 @@ public class OrderServiceImpl implements OrderService{
      * @param addOrderDstos 提供每个店铺及店铺商品列表
      * @return
      */
-    private List<OrderDetailDto> separatesOrder(OrderInfo mainOrder,OrderPay mainOrderPay,List<AddOrderDto> addOrderDstos) throws ServiceException{
+    private List<OrderDetailDto> separatesOrder(OrderInfo mainOrder,OrderPay mainOrderPay,List<AddOrderDto> addOrderDstos,StringBuffer goodsName) throws ServiceException{
         if(addOrderDstos.size() == 0){
             return null;
         }
@@ -161,6 +163,7 @@ public class OrderServiceImpl implements OrderService{
                 }
                 count++;
                 goodsList.add(goods.getId());
+                goodsName.append("【"+goods.getName()+"】");
             }
         }
         BigDecimal mainAmount = new BigDecimal(0);//原价，初始为0
@@ -386,6 +389,11 @@ public class OrderServiceImpl implements OrderService{
         }
     }
 
+    /**
+     * 封装卖家信息
+     * @param orderDetailDtos
+     * @return
+     */
     private List<SellerDto> getSellerDtos(ArrayList<OrderDetailDto> orderDetailDtos) {
         //卖家信息DTO
         List<SellerDto> sellerDtos = new ArrayList<>();
@@ -576,8 +584,10 @@ public class OrderServiceImpl implements OrderService{
         orderDto.setOrderDetailDtos(orderDetailDtos);
         orderDto.setSellerDtos(sellerDtos);
         orderDto.setNickName(user.getNickName());
-        //TODO 交易消息：恭喜您！您的商品【大头三年原光】已有人下单，点击此处查看订单
+        //交易消息：恭喜您！您的商品【大头三年原光】已有人下单，点击此处查看订单
         // 交易消息：恭喜您！您的抢购【大头三年原光】已有人下单，点击此处查看订单
+        schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
+                "恭喜您！您的"+(goods.getType()==1?"商品【":"抢购【")+goods.getName()+"】已有人下单，点击此处查看订单","3",orderInfo.getId().toString());
         return orderDto;
 
     }
@@ -597,19 +607,31 @@ public class OrderServiceImpl implements OrderService{
                 if(orderPay == null){
                     throw new ServiceException("订单支付信息异常！");
                 }
+                //获取商品名字列表
+                List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderId);
+                StringBuffer goodsName = new StringBuffer();
+                boolean isAuction = false;
+                for(OrderDetail detail:orderDetails){
+                    GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
+                    isAuction = goodsInfo.getType() == 2?true:false;
+                    goodsName.append("【"+goodsInfo.getName()+"】");
+                }
+
 
                 if(payType.intValue() == 1){//微信
                     WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderPay.getPayAmount())).getString("data")), WechatPayDto.class);
-                    orderPay.setPayNo(wechatPayDto.getNonceStr());
+                    orderPay.setPayNo(wechatPayDto.getSign());
+                    //TODO 支付回调成功后给卖家发送消息
                     return wechatPayDto.toString();
                 }else if(payType.intValue() == 2){//支付宝
                     orderPay.setPayNo("");
+                    //TODO 支付回调成功后给卖家发送消息
                     return "支付宝支付回调";
                 }else if(payType.intValue() == 3){//余额
                     //验证支付密码
                     Boolean verifyPayPwd = Boolean.valueOf(JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getString("data"));
                     if(!verifyPayPwd){
-                        //TODO userInfo修改支付密码错误次数
+                        //TODO userInfo支付密码错误次数
                         throw new ServiceException("支付密码错误！");
                     }else{
                         //调用wallet-service修改余额功能
@@ -640,8 +662,10 @@ public class OrderServiceImpl implements OrderService{
                 orderPay.setPayTime(DateStampUtils.getTimesteamp());
                 orderPay.setStatus(2);
                 orderPayMapper.updateByPrimaryKey(orderPay);
-                //TODO 交易信息：恭喜您！您的商品【大头三年原光】已被买下，点击此处查看订单
+                //交易信息：恭喜您！您的商品【大头三年原光】已被买下，点击此处查看订单
                 //交易信息：恭喜您！您的抢购【大头三年原光】已被买下，点击此处查看订单
+                schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
+                        "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单","3",orderId.toString());
                 return "余额支付成功";
             }
         }
@@ -742,7 +766,6 @@ public class OrderServiceImpl implements OrderService{
         return CompanyDto.toDtoList(list);
     }
 
-
     @Override
     public void deleteOrder(Integer userId, Integer[] orderIds) throws ServiceException {
         for(Integer orderId:orderIds){
@@ -815,8 +838,44 @@ public class OrderServiceImpl implements OrderService{
         if(order != null && order.getStatus() == 2){
             List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(order.getId());
 
-            //TODO 给卖家发送信息 您的商品【商品名称】、【xxx】、【xx】买家提醒您发货，点击此处查看订单
-//            schedualGoodsService.goodsInfo()
+            //给卖家发送信息 您的商品【商品名称】、【xxx】、【xx】买家提醒您发货，点击此处查看订单
+            //获取商品名字列表
+            StringBuffer goodsName = new StringBuffer();
+            boolean isAuction = false;
+            for(OrderDetail detail:orderDetails){
+                GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
+                isAuction = goodsInfo.getType() == 2?true:false;
+                goodsName.append("【"+goodsInfo.getName()+"】");
+            }
+            schedualMessageService.easemobMessage(order.getSellerId().toString(),
+                    "您的"+(isAuction?"抢购":"商品")+goodsName+"买家提醒您发货，点击此处查看订单","3",orderId.toString());
+        }
+    }
+
+    @Override
+    public boolean updateOrder(String orderNo, Integer status) throws ServiceException {
+        OrderInfo orderInfo = orderInfoMapper.selectByOrderNo(orderNo);
+        if(orderInfo == null){
+            throw new ServiceException("订单不存在！");
+        }else{
+            if(orderInfo.getStatus() != 0){
+                throw new ServiceException("订单状态错误！");
+            }else{
+                orderInfo.setStatus(1);
+                orderInfoMapper.updateByPrimaryKeySelective(orderInfo);
+                //获取商品名字列表
+                List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderInfo.getId());
+                StringBuffer goodsName = new StringBuffer();
+                boolean isAuction = false;
+                for(OrderDetail detail:orderDetails){
+                    GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
+                    isAuction = goodsInfo.getType() == 2?true:false;
+                    goodsName.append("【"+goodsInfo.getName()+"】");
+                }
+                schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
+                        "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单","3",orderInfo.getId().toString());
+                return true;
+            }
         }
     }
 }

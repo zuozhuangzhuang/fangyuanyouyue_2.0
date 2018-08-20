@@ -65,7 +65,7 @@ public class AppraisalDetailDto {
     private List<AppraisalImgDto> imgDtos;//鉴定图片列表
 
     //以下为我参与的、我发起的中包含数据
-    private Integer viewpoint;//评论观点 1看真 2看假
+    private Integer viewpoint;//评论观点 1看真 2看假（如果为null则未登录或未发表看法，提交评论需先判断为null方可）
 
     private Integer isWinner = 2; //是否赢了 1是 2否
 

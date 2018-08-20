@@ -55,26 +55,26 @@ public class AddressController extends BaseController{
             log.info("----》添加收货地址《----");
             log.info("参数："+param.toString());
             if(StringUtils.isEmpty(param.getReceiverName())){
-                return toError(ReCode.FAILD.getValue(),"收货人不能为空！");
+                return toError("收货人不能为空！");
             }
             if(StringUtils.isEmpty(param.getReceiverPhone())){
-                return toError(ReCode.FAILD.getValue(),"联系电话不能为空！");
+                return toError("联系电话不能为空！");
             }
             if(StringUtils.isEmpty(param.getProvince()) || StringUtils.isEmpty(param.getCity()) || StringUtils.isEmpty(param.getArea())){
-                return toError(ReCode.FAILD.getValue(),"省市区不能为空！");
+                return toError("省市区不能为空！");
             }
             if(StringUtils.isEmpty(param.getAddress())){
-                return toError(ReCode.FAILD.getValue(),"详细收货地址不能为空！");
+                return toError("详细收货地址不能为空！");
             }
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+                return toError("登录超时，请重新登录！");
             }
             if(user.getStatus() == 2){
-                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
+                return toError("您的账号已被冻结，请联系管理员！");
             }
             //添加收货地址
             List<UserAddressDto> userAddressDtos = userAddressInfoService.addAddress(param.getToken(),param.getReceiverName(),param.getReceiverPhone(),param.getProvince(),param.getCity(),param.getArea(),param.getAddress(),param.getPostCode(),param.getType());
@@ -84,7 +84,7 @@ public class AddressController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -107,29 +107,29 @@ public class AddressController extends BaseController{
             log.info("----》修改收货地址《----");
             log.info("参数："+param.toString());
             if(param.getAddressId()==null || param.getAddressId().intValue()==0){
-                return toError(ReCode.FAILD.getValue(),"收货地址ID不能为空！");
+                return toError("收货地址ID不能为空！");
             }
             if(StringUtils.isEmpty(param.getReceiverName())){
-                return toError(ReCode.FAILD.getValue(),"收货人不能为空！");
+                return toError("收货人不能为空！");
             }
             if(StringUtils.isEmpty(param.getReceiverPhone())){
-                return toError(ReCode.FAILD.getValue(),"联系电话不能为空！");
+                return toError("联系电话不能为空！");
             }
             if(StringUtils.isEmpty(param.getProvince()) || StringUtils.isEmpty(param.getCity()) || StringUtils.isEmpty(param.getArea())){
-                return toError(ReCode.FAILD.getValue(),"省市区不能为空！");
+                return toError("省市区不能为空！");
             }
             if(StringUtils.isEmpty(param.getAddress())){
-                return toError(ReCode.FAILD.getValue(),"详细收货地址不能为空！");
+                return toError("详细收货地址不能为空！");
             }
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+                return toError("登录超时，请重新登录！");
             }
             if(user.getStatus() == 2){
-                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
+                return toError("您的账号已被冻结，请联系管理员！");
             }
             //修改收货地址
             userAddressInfoService.updateAddress(param.getToken(),param.getAddressId(),param.getReceiverName(),param.getReceiverPhone(),param.getProvince(),param.getCity(),param.getArea(),param.getAddress(),param.getPostCode(),param.getType());
@@ -139,7 +139,7 @@ public class AddressController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -155,17 +155,17 @@ public class AddressController extends BaseController{
             log.info("----》删除收货地址《----");
             log.info("参数："+param.toString());
             if(param.getAddressId()==null){
-                return toError(ReCode.FAILD.getValue(),"收货地址ID不能为空！");
+                return toError("收货地址ID不能为空！");
             }
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+                return toError("登录超时，请重新登录！");
             }
             if(user.getStatus() == 2){
-                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
+                return toError("您的账号已被冻结，请联系管理员！");
             }
             //删除收货地址
             List<UserAddressDto> userAddressDtos = userAddressInfoService.deleteAddress(param.getToken(),param.getAddressId());
@@ -175,7 +175,7 @@ public class AddressController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -191,14 +191,14 @@ public class AddressController extends BaseController{
             log.info("----》获取收货地址列表《----");
             log.info("参数："+param.toString());
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user == null){
-                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+                return toError("登录超时，请重新登录！");
             }
             if(user.getStatus() == 2){
-                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
+                return toError("您的账号已被冻结，请联系管理员！");
             }
             //获取收货地址列表
             List<UserAddressDto> userAddressDtos = userAddressInfoService.getAddressList(param.getToken(),param.getAddressId());
@@ -208,7 +208,7 @@ public class AddressController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -226,14 +226,14 @@ public class AddressController extends BaseController{
             log.info("----》设置默认收货地址《----");
             log.info("参数："+param.toString());
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             UserInfo user = userInfoService.getUserByToken(param.getToken());
             if(user == null){
-                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+                return toError("登录超时，请重新登录！");
             }
             if(user.getStatus() == 2){
-                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
+                return toError("您的账号已被冻结，请联系管理员！");
             }
             //设置默认收货地址
             userAddressInfoService.defaultAddress(param.getToken(),param.getAddressId());
@@ -243,7 +243,7 @@ public class AddressController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -259,14 +259,14 @@ public class AddressController extends BaseController{
             log.info("----》获取默认地址《----");
             log.info("参数："+param.toString());
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user == null){
-                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+                return toError("登录超时，请重新登录！");
             }
             if(user.getStatus() == 2){
-                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
+                return toError("您的账号已被冻结，请联系管理员！");
             }
             //获取默认地址
             UserAddressDto defaultAddress = userAddressInfoService.getDefaultAddress(param.getToken());
@@ -276,7 +276,7 @@ public class AddressController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 

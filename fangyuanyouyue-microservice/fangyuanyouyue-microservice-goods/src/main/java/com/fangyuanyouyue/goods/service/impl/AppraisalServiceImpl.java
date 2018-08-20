@@ -10,6 +10,7 @@ import com.fangyuanyouyue.goods.dto.AppraisalOrderInfoDto;
 import com.fangyuanyouyue.goods.dto.AppraisalUrlDto;
 import com.fangyuanyouyue.goods.model.*;
 import com.fangyuanyouyue.goods.service.AppraisalService;
+import com.fangyuanyouyue.goods.service.SchedualMessageService;
 import com.fangyuanyouyue.goods.service.SchedualUserService;
 import com.fangyuanyouyue.goods.service.SchedualWalletService;
 import org.apache.commons.lang.StringUtils;
@@ -38,6 +39,8 @@ public class AppraisalServiceImpl implements AppraisalService{
     private GoodsImgMapper goodsImgMapper;
     @Autowired
     private SchedualWalletService schedualWalletService;
+    @Autowired
+    private SchedualMessageService schedualMessageService;
 
     @Override
     public AppraisalOrderInfoDto addAppraisal(Integer userId, Integer[] goodsIds, String title, String description, String[] imgUrls, String videoUrl,String videoImg) throws ServiceException {
@@ -257,7 +260,9 @@ public class AppraisalServiceImpl implements AppraisalService{
                 detail.setStatus(0);//支付后修改为申请中
                 goodsAppraisalDetailMapper.updateByPrimaryKey(detail);
             }
-            //TODO 系统消息：您的鉴定申请已提交，专家将于两个工作日内给出答复，请注意消息通知
+            //系统消息：您的鉴定申请已提交，专家将于两个工作日内给出答复，请注意消息通知
+            schedualMessageService.easemobMessage(userId.toString(),
+                    "您的鉴定申请已提交，专家将于两个工作日内给出答复，请注意消息通知","1","");
             return payInfo.toString();
         }
     }

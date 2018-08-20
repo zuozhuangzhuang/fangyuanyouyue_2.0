@@ -53,7 +53,7 @@ public class AppraisalController extends BaseController {
     @Autowired
     private SchedualRedisService schedualRedisService;
 
-    @ApiOperation(value = "全民鉴定详情", notes = "根据id获取全民鉴定详情",response = BaseResp.class)
+    @ApiOperation(value = "全民鉴定详情", notes = "（AppraisalDetailDto）根据id获取全民鉴定详情",response = BaseResp.class)
     @ApiImplicitParams({
         @ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "string", paramType = "query"),
         @ApiImplicitParam(name = "appraisalId", value = "帖子id",required = true, dataType = "int", paramType = "query")
@@ -88,12 +88,12 @@ public class AppraisalController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
 
-    @ApiOperation(value = "全民鉴定列表", notes = "获取全民鉴定列表大集合",response = BaseResp.class)
+    @ApiOperation(value = "全民鉴定列表", notes = "（AppraisalDetailDto）获取全民鉴定列表大集合",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "keyword", value = "关键字",required = false, dataType = "string", paramType = "query"),
@@ -127,13 +127,13 @@ public class AppraisalController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
     
 
-    @ApiOperation(value = "全民鉴定评论列表", notes = "获取全民鉴定评论列表",response = BaseResp.class)
+    @ApiOperation(value = "全民鉴定评论列表", notes = "（AppraisalCommentDto）获取全民鉴定评论列表",response = BaseResp.class)
     @ApiImplicitParams({ 
     		@ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "appraisalId", value = "鉴定id",required = true, dataType = "int", paramType = "query"),
@@ -172,7 +172,7 @@ public class AppraisalController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -193,7 +193,7 @@ public class AppraisalController extends BaseController {
 
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -214,7 +214,7 @@ public class AppraisalController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -240,7 +240,7 @@ public class AppraisalController extends BaseController {
 
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -261,7 +261,7 @@ public class AppraisalController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -283,7 +283,7 @@ public class AppraisalController extends BaseController {
             log.info("参数：" + param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -293,13 +293,13 @@ public class AppraisalController extends BaseController {
             }
             //验证实名认证
             if(JSONObject.parseObject(schedualUserService.isAuth(userId)).getBoolean("data") == false){
-                return toError(ReCode.FAILD.getValue(),"用户未实名认证！");
+                return toError("用户未实名认证！");
             }
             if(StringUtils.isEmpty(param.getTitle())){
-                return toError(ReCode.FAILD.getValue(),"标题不能为空！");
+                return toError("标题不能为空！");
             }
             if(param.getImgUrls() == null || param.getImgUrls().length < 1){
-                return toError(ReCode.FAILD.getValue(),"请至少包含一张图片！");
+                return toError("请至少包含一张图片！");
             }
             //发起鉴定
             appraisalDetailService.addAppraisal(userId,param.getBonus(),param.getTitle(),param.getContent(),param.getImgUrls(),param.getUserIds());
@@ -310,7 +310,7 @@ public class AppraisalController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -332,7 +332,7 @@ public class AppraisalController extends BaseController {
             log.info("参数：" + param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -340,11 +340,14 @@ public class AppraisalController extends BaseController {
             if((Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
+            if(param.getAppraisalId() == null){
+                return toError("鉴定id不能为空！");
+            }
             if(param.getViewpoint() == null){
-                return toError(ReCode.FAILD.getValue(),"评论观点不能为空！");
+                return toError("评论观点不能为空！");
             }
             if(StringUtils.isEmpty(param.getContent())){
-                return toError(ReCode.FAILD.getValue(),"看法不能为空！");
+                return toError("看法不能为空！");
             }
             //添加评论
             appraisalCommentService.saveComment(userId,param);
@@ -354,7 +357,48 @@ public class AppraisalController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+
+    @ApiOperation(value = "邀请好友", notes = "邀请好友",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token",required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "appraisalId", value = "鉴定id",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "userIds", value = "邀请用户数组", allowMultiple = true,required = false, dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/invite")
+    @ResponseBody
+    public BaseResp invite(AppraisalParam param) throws IOException {
+        try {
+            log.info("----》邀请好友《----");
+            log.info("参数：" + param.toString());
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError("用户token不能为空！");
+            }
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            String verifyUser = schedualUserService.verifyUserById(userId);
+            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+            if((Integer)jsonObject.get("code") != 0){
+                return toError(jsonObject.getString("report"));
+            }
+            if(param.getAppraisalId() == null){
+                return toError("鉴定id不能为空！");
+            }
+            if(param.getUserIds() == null || param.getUserIds().length < 1){
+                return toError("邀请用户不能为空！");
+            }
+            //邀请好友
+            appraisalDetailService.invite(userId,param.getAppraisalId(),param.getUserIds());
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 

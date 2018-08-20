@@ -64,10 +64,10 @@ public class CommentController extends BaseController{
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             if(param.getGoodsId() == null){
-                return toError(ReCode.FAILD.getValue(),"商品id不能为空！");
+                return toError("商品id不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -76,7 +76,7 @@ public class CommentController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getImg1Url() == null && StringUtils.isEmpty(param.getContent())){
-                return toError(ReCode.FAILD.getValue(),"内容不能为空！");
+                return toError("内容不能为空！");
             }
             param.setUserId(userId);
 
@@ -87,7 +87,7 @@ public class CommentController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -105,7 +105,7 @@ public class CommentController extends BaseController{
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -114,10 +114,10 @@ public class CommentController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getCommentId() == null){
-                return toError(ReCode.FAILD.getValue(),"评论id不能为空！");
+                return toError("评论id不能为空！");
             }
             if(param.getType() == null){
-                return toError(ReCode.FAILD.getValue(),"类型不能为空！");
+                return toError("类型不能为空！");
             }
             commentService.commentLikes(userId,param.getCommentId(),param.getType());
             if(param.getType().intValue() == 1){
@@ -125,14 +125,14 @@ public class CommentController extends BaseController{
             }else if(param.getType().intValue() == 2){
                 return toSuccess("取消点赞成功！");
             }else{
-                return toError(ReCode.FAILD.getValue(),"类型异常！");
+                return toError("类型异常！");
             }
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -160,10 +160,10 @@ public class CommentController extends BaseController{
                 param.setUserId(userId);
             }
             if(param.getGoodsId() == null){
-                return toError(ReCode.FAILD.getValue(),"商品id不能为空！");
+                return toError("商品id不能为空！");
             }
             if(param.getStart() == null || param.getStart().intValue() < 0 || param.getLimit() == null || param.getLimit() < 1){
-                return toError(ReCode.FAILD.getValue(),"分页参数异常！");
+                return toError("分页参数异常！");
             }
             List<GoodsCommentDto> comments = commentService.getComments(param.getUserId(),param.getGoodsId(),param.getStart(),param.getLimit());
             return toSuccess(comments);
@@ -172,7 +172,7 @@ public class CommentController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -192,7 +192,7 @@ public class CommentController extends BaseController{
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -201,10 +201,10 @@ public class CommentController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getType() == null){
-                return toError(ReCode.FAILD.getValue(),"类型不能为空！");
+                return toError("类型不能为空！");
             }
             if(param.getStart() == null || param.getStart().intValue() < 0 || param.getLimit() == null || param.getLimit() < 1){
-                return toError(ReCode.FAILD.getValue(),"分页参数异常！");
+                return toError("分页参数异常！");
             }
             //（商品/抢购）我的评论
             List<GoodsCommentDto> myComments = commentService.myComments(userId,param.getType(),param.getStart(),param.getLimit());
@@ -214,7 +214,7 @@ public class CommentController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -232,7 +232,7 @@ public class CommentController extends BaseController{
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -241,7 +241,7 @@ public class CommentController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getCommentIds() == null || param.getCommentIds().length < 1){
-                return toError(ReCode.FAILD.getValue(),"评论id不能为空！");
+                return toError("评论id不能为空！");
             }
             commentService.deleteComment(param.getCommentIds());
             return toSuccess("删除评论成功！");
@@ -250,7 +250,7 @@ public class CommentController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 

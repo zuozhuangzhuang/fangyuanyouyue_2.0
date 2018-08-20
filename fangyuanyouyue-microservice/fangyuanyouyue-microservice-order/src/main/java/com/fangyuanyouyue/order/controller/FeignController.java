@@ -29,7 +29,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping(value = "/orderFeign")
-//@Api(description = "订单系统外部调用Controller",hidden = true)
+@Api(description = "订单系统外部调用Controller",hidden = true)
 @RefreshScope
 public class FeignController extends BaseController{
     protected Logger log = Logger.getLogger(this.getClass());
@@ -45,7 +45,7 @@ public class FeignController extends BaseController{
     private SchedualRedisService schedualRedisService;
 
 
-    @ApiOperation(value = "获取待处理订单", notes = "(OrderDto)生成订单",response = BaseResp.class)
+    @ApiOperation(value = "获取待处理订单", notes = "(OrderDto)生成订单",response = BaseResp.class,hidden = true)
     @PostMapping(value = "/getProcess")
     @ResponseBody
     public BaseResp getProcess(Integer userId,Integer type) throws IOException {
@@ -55,14 +55,42 @@ public class FeignController extends BaseController{
             //参数判断
             //验证用户
             if(userId == null){
-                return toError(ReCode.FAILD.getValue(),"用户id不能为空！");
+                return toError("用户id不能为空！");
             }
             if(type == null){
-                return toError(ReCode.FAILD.getValue(),"类型不能为空！");
+                return toError("类型不能为空！");
             }
             //下单商品
             Integer count = orderService.getProcess(userId,type);
             return toSuccess(count);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "修改订单状态", notes = "(void)修改订单状态",response = BaseResp.class,hidden = true)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "orderNo", value = "订单id", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除",required = true, dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/updateOrder")
+    @ResponseBody
+    public BaseResp updateOrder(String orderNo,Integer status) throws IOException {
+        try {
+            log.info("----》修改订单状态《----");
+            log.info("参数：orderNo："+orderNo+",type："+status);
+            if(StringUtils.isEmpty(orderNo)){
+                return toError("订单号不能为空！");
+            }
+            if(status == null){
+                return toError("状态不能为空！");
+            }
+            boolean b = orderService.updateOrder(orderNo, status);
+            return toSuccess(b);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());

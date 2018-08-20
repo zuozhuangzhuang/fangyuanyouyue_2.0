@@ -28,10 +28,12 @@ public interface ForumInfoService {
 	 * @param start
 	 * @param limit
 	 * @param listType
+	 * @param searchType
 	 * @return
 	 * @throws ServiceException
 	 */
-    List<ForumInfoDto> getForumList(Integer columnId,Integer userId, Integer type, String keyword,Integer start,Integer limit,Integer listType) throws ServiceException;
+    List<ForumInfoDto> getForumList(Integer columnId,Integer userId, Integer type, String keyword,Integer start,Integer limit,Integer listType,Integer searchType)
+			throws ServiceException;
 
 	/**
 	 * 发布帖子/视频

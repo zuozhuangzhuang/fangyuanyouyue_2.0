@@ -73,10 +73,10 @@ public class OrderController extends BaseController{
             }
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             if(param.getSellerList() == null){
-                return toError(ReCode.FAILD.getValue(),"下单信息不能为空！");
+                return toError("下单信息不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -113,7 +113,7 @@ public class OrderController extends BaseController{
             }
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -152,7 +152,7 @@ public class OrderController extends BaseController{
             }
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -189,7 +189,7 @@ public class OrderController extends BaseController{
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -198,10 +198,10 @@ public class OrderController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getStart() == null || param.getStart() < 0){
-                return toError(ReCode.FAILD.getValue(),"起始页数错误！");
+                return toError("起始页数错误！");
             }
             if(param.getLimit() == null || param.getLimit() < 1){
-                return toError(ReCode.FAILD.getValue(),"每页个数错误！");
+                return toError("每页个数错误！");
             }
             if(param.getType() == null){
                 return toError("类型不能为空！");
@@ -244,7 +244,7 @@ public class OrderController extends BaseController{
             }
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -284,7 +284,7 @@ public class OrderController extends BaseController{
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -297,9 +297,6 @@ public class OrderController extends BaseController{
             }
             if(param.getPayType()==null){
                 return toError("支付类型不能为空！");
-            }
-            if(param.getPayPwd() == null){
-                return toError("支付密码不能为空！");
             }
             //TODO 订单支付
             String payInfo = orderService.getOrderPay(userId, param.getOrderId(), param.getPayType(), param.getPayPwd());
@@ -329,7 +326,7 @@ public class OrderController extends BaseController{
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -371,7 +368,7 @@ public class OrderController extends BaseController{
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -407,7 +404,7 @@ public class OrderController extends BaseController{
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -441,7 +438,7 @@ public class OrderController extends BaseController{
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -480,7 +477,7 @@ public class OrderController extends BaseController{
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -489,13 +486,13 @@ public class OrderController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getOrderId() == null){
-                return toError(ReCode.FAILD.getValue(),"订单id不能为空！");
+                return toError("订单id不能为空！");
             }
             if(param.getGoodsQuality() == null){
-                return toError(ReCode.FAILD.getValue(),"商品质量不能为空！");
+                return toError("商品质量不能为空！");
             }
             if(param.getServiceAttitude() == null){
-                return toError(ReCode.FAILD.getValue(),"服务质量不能为空！");
+                return toError("服务质量不能为空！");
             }
             //评价卖家
             orderService.evaluationOrder(userId,param.getOrderId(),param.getGoodsQuality(),param.getServiceAttitude());
@@ -523,7 +520,7 @@ public class OrderController extends BaseController{
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -532,7 +529,7 @@ public class OrderController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getOrderId() == null){
-                return toError(ReCode.FAILD.getValue(),"订单id不能为空！");
+                return toError("订单id不能为空！");
             }
             //提醒发货
             orderService.reminder(userId,param.getOrderId());
@@ -559,7 +556,7 @@ public class OrderController extends BaseController{
 //            log.info("参数："+param.toString());
 //            //验证用户
 //            if(StringUtils.isEmpty(param.getToken())){
-//                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+//                return toError("用户token不能为空！");
 //            }
 //            Integer userId = (Integer)schedualRedisService.get(param.getToken());
 //            String verifyUser = schedualUserService.verifyUserById(userId);

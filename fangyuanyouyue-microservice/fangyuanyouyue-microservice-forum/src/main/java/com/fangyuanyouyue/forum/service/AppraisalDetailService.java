@@ -16,7 +16,8 @@ public interface AppraisalDetailService {
  
     /**
      * 获取全民鉴定详情
-     * @param id
+     * @param userId
+     * @param appraisalId
      * @return
      * @throws ServiceException
      */
@@ -45,4 +46,13 @@ public interface AppraisalDetailService {
      * @throws ServiceException
      */
     void addAppraisal(Integer userId, BigDecimal bonus,String title,String content,String[] imgUrls,Integer[] userIds) throws ServiceException;
+
+    /**
+     * 鉴定内邀请好友
+     * @param userId
+     * @param appraisalId
+     * @param userIds
+     * @throws ServiceException
+     */
+    void invite(Integer userId,Integer appraisalId,Integer[] userIds) throws ServiceException;
 }

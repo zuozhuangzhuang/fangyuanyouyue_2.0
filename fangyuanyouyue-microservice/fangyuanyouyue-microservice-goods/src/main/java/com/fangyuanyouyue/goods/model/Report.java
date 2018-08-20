@@ -7,17 +7,17 @@ import lombok.ToString;
 import java.util.Date;
 
 /**
- * 商品举报表
+ * 举报表
  */
 @Getter
 @Setter
 @ToString
-public class ReportGoods {
+public class Report {
     private Integer id;//唯一自增ID
 
     private String reason;//举报原因
 
-    private Integer goodsId;//商品id
+    private Integer businessId;
 
     private Integer userId;//用户id
 
@@ -25,4 +25,5 @@ public class ReportGoods {
 
     private Date updateTime;//更新时间
 
+    private Integer type;//举报类型 1商品\抢购 2视频 3帖子 4全民鉴定 5用户
 }

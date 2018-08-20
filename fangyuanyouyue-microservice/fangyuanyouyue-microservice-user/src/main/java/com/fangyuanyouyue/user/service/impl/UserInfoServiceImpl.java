@@ -160,7 +160,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         userVip.setStatus(2);//会员状态1已开通 2未开通
         userVip.setAddTime(DateStampUtils.getTimesteamp());
         userVipMapper.insert(userVip);
-        //TODO 注册通讯账户
+        //注册通讯账户
         registIMUser(user);
         //调用钱包系统初始化接口
         UserWallet userWallet = new UserWallet();
@@ -202,10 +202,9 @@ public class UserInfoServiceImpl implements UserInfoService {
                 userInfoMapper.updateByPrimaryKey(user);
                 //设置用户token到Redis
                 String token = setToken("",user.getId());
-                //TODO 注册通讯账户
+                //注册通讯账户
                 registIMUser(user);
                 
-                //TODO 获取用户的相关信息：好友列表
                 UserDto userDto = setUserDtoByInfo(token,user);
                 return userDto;
             }
@@ -264,7 +263,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             userVip.setStatus(2);//会员状态1已开通 2未开通
             userVip.setAddTime(DateStampUtils.getTimesteamp());
             userVipMapper.insert(userVip);
-            //TODO 注册通讯账户
+            //注册通讯账户
             registIMUser(user);
             
             //调用钱包系统初始化接口
@@ -578,7 +577,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             userVip.setStatus(2);//会员状态 1已开通 2未开通
             userVip.setAddTime(DateStampUtils.getTimesteamp());
             userVipMapper.insert(userVip);
-            //TODO 注册通讯账户
+            //注册通讯账户
             registIMUser(user);
             //调用钱包系统初始化接口
             UserWallet userWallet = new UserWallet();
@@ -701,7 +700,9 @@ public class UserInfoServiceImpl implements UserInfoService {
                     while(iterator.hasNext()){
                         iterator.remove();
                     }
-                    //TODO 新增粉丝：用户“用户昵称”已关注了您！
+                    //新增粉丝：用户“用户昵称”已关注了您！
+                    schedualMessageService.easemobMessage(toUserId.toString(),
+                            "用户“"+userInfo.getNickName()+"”已关注了您！","1","");
                 }else if(type == 1){//取消关注
                     if(userFans == null){
                         throw new ServiceException("未关注，取消关注失败！");

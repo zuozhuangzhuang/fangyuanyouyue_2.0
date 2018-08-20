@@ -75,24 +75,24 @@ public class UserController extends BaseController {
             log.info("----》注册《----");
             log.info("参数：" + param.toString());
             if(param.getRegPlatform() == null){
-                return toError(ReCode.FAILD.getValue(),"注册平台不能为空！");
+                return toError("注册平台不能为空！");
             }
             if (StringUtils.isEmpty(param.getPhone())) {
-                return toError(ReCode.FAILD.getValue(),"手机号码不能为空！");
+                return toError("手机号码不能为空！");
             }
             if (StringUtils.isEmpty(param.getLoginPwd())) {
-                return toError(ReCode.FAILD.getValue(),"登录密码不能为空！");
+                return toError("登录密码不能为空！");
             }
             if (StringUtils.isEmpty(param.getNickName())) {
-                return toError(ReCode.FAILD.getValue(),"用户昵称不能为空！");
+                return toError("用户昵称不能为空！");
             }
             UserInfo userInfoByName = userInfoService.getUserByNickName(param.getNickName());
             if(userInfoByName != null){
-                return toError(ReCode.FAILD.getValue(),"用户昵称已存在！");
+                return toError("用户昵称已存在！");
             }
             UserInfo userInfo = userInfoService.getUserByPhone(param.getPhone());
             if (userInfo != null) {
-                return toError(ReCode.FAILD.getValue(),"手机号码已被注册！");
+                return toError("手机号码已被注册！");
             }
             //注册
             UserDto userDto = userInfoService.regist(param);
@@ -102,7 +102,7 @@ public class UserController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -119,13 +119,13 @@ public class UserController extends BaseController {
             log.info("----》用户登录《----");
             log.info("参数：" + param.toString());
             if (StringUtils.isEmpty(param.getPhone())) {
-                return toError(ReCode.FAILD.getValue(),"手机号码不能为空！");
+                return toError("手机号码不能为空！");
             }
             if (StringUtils.isEmpty(param.getLoginPwd())) {
-                return toError(ReCode.FAILD.getValue(),"密码不能为空！");
+                return toError("密码不能为空！");
             }
             if(param.getLoginPlatform() == null){
-                return toError(ReCode.FAILD.getValue(),"登录平台不能为空！");
+                return toError("登录平台不能为空！");
             }
             //MD5加密
 //            param.setLoginPwd(MD5Util.generate(MD5Util.MD5(param.getLoginPwd())));
@@ -137,7 +137,7 @@ public class UserController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -158,10 +158,10 @@ public class UserController extends BaseController {
             log.info("----》APP三方注册/登录《----");
             log.info("参数："+param.toString());
             if(StringUtils.isEmpty(param.getUnionId())){
-                return toError(ReCode.FAILD.getValue(),"第三方唯一ID不能为空！");
+                return toError("第三方唯一ID不能为空！");
             }
             if(param.getType() == null){
-                return toError(ReCode.FAILD.getValue(),"三方类型不能为空！");
+                return toError("三方类型不能为空！");
             }
             //APP三方注册/登录
             param.setRegType(1);//注册来源 1app 2微信小程序
@@ -172,7 +172,7 @@ public class UserController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -189,18 +189,18 @@ public class UserController extends BaseController {
             log.info("----》三方绑定《----");
             log.info("参数："+param.toString());
             if(StringUtils.isEmpty(param.getUnionId())){
-                return toError(ReCode.FAILD.getValue(),"三方识别号不能为空！");
+                return toError("三方识别号不能为空！");
             }
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             //验证用户
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+                return toError("登录超时，请重新登录！");
             }
             if(user.getStatus() == 2){
-                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
+                return toError("您的账号已被冻结，请联系管理员！");
             }
             //三方绑定
             //三方绑定是为了将微信号与手机号绑定到一个账户，如果用户用手机号注册过，又用微信号登录了第二个账号，将没有绑定功能，而是合并账号，以手机号为主，
@@ -212,7 +212,7 @@ public class UserController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -232,20 +232,20 @@ public class UserController extends BaseController {
             log.info("----》实名认证《----");
             log.info("参数："+param.toString());
             if(StringUtils.isEmpty(param.getName())){
-                return toError(ReCode.FAILD.getValue(),"用户真实姓名不能为空！");
+                return toError("用户真实姓名不能为空！");
             }
             if(StringUtils.isEmpty(param.getIdentity())){
-                return toError(ReCode.FAILD.getValue(),"用户身份照号码不能为空！");
+                return toError("用户身份照号码不能为空！");
             }
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+                return toError("登录超时，请重新登录！");
             }
             if(user.getStatus() == 2){
-                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
+                return toError("您的账号已被冻结，请联系管理员！");
             }
             //实名认证
             userInfoExtService.certification(param.getToken(),param.getName(),param.getIdentity(),param.getIdentityImgCoverUrl(),param.getIdentityImgBackUrl());
@@ -255,7 +255,7 @@ public class UserController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -284,27 +284,27 @@ public class UserController extends BaseController {
             log.info("----》完善资料《----");
             log.info("参数："+param.toString());
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+                return toError("登录超时，请重新登录！");
             }
             if(user.getStatus() == 2){
-                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
+                return toError("您的账号已被冻结，请联系管理员！");
             }
             //手机号不可以重复
             if(StringUtils.isNotEmpty(param.getPhone())){
                 UserInfo userByPhone = userInfoService.getUserByPhone(param.getPhone());
                 if(userByPhone != null){
-                    return toError(ReCode.FAILD.getValue(),"此手机号已被注册！");
+                    return toError("此手机号已被注册！");
                 }
             }
             //用户昵称不可以重复
             if(StringUtils.isNotEmpty(param.getNickName())){
                 UserInfo userByNickName = userInfoService.getUserByNickName(param.getNickName());
                 if(userByNickName != null){
-                    return toError(ReCode.FAILD.getValue(),"昵称已存在！");
+                    return toError("昵称已存在！");
                 }
                 if(!param.getNickName().equals(user.getNickName())) {//用户修改了昵称
                     //TODO 昵称筛选
@@ -321,7 +321,7 @@ public class UserController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -337,10 +337,10 @@ public class UserController extends BaseController {
             log.info("----》找回密码《----");
             log.info("参数："+param.getPhone()+"---"+param.getNewPwd());
             if(param.getPhone() == null){
-                return toError(ReCode.FAILD.getValue(),"用户手机不能为空！");
+                return toError("用户手机不能为空！");
             }
             if(StringUtils.isEmpty(param.getNewPwd())){
-                return toError(ReCode.FAILD.getValue(),"新密码不能为空！");
+                return toError("新密码不能为空！");
             }
             //找回密码
             userInfoService.resetPwd(param.getPhone(),param.getNewPwd());
@@ -350,7 +350,7 @@ public class UserController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -367,21 +367,21 @@ public class UserController extends BaseController {
             log.info("----》修改密码《----");
             log.info("参数："+param.toString());
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+                return toError("登录超时，请重新登录！");
             }
             if(user.getStatus() == 2){
-                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
+                return toError("您的账号已被冻结，请联系管理员！");
             }
             if(StringUtils.isEmpty(user.getPhone())){
-                return toError(ReCode.FAILD.getValue(),"第三方用户不可修改密码！");
+                return toError("第三方用户不可修改密码！");
             }
             //判断旧密码是否正确
             if(!MD5Util.verify(MD5Util.MD5(param.getLoginPwd()),user.getLoginPwd())){
-                return toError(ReCode.FAILD.getValue(),"旧密码不正确！");
+                return toError("旧密码不正确！");
             }
             //修改密码
             userInfoService.updatePwd(param.getToken(),param.getNewPwd());
@@ -391,7 +391,7 @@ public class UserController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -407,26 +407,26 @@ public class UserController extends BaseController {
             log.info("----》修改绑定手机《----");
             log.info("参数："+param.toString());
             if(StringUtils.isEmpty(param.getPhone())){
-                return toError(ReCode.FAILD.getValue(),"新的手机号码不能为空！");
+                return toError("新的手机号码不能为空！");
             }
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user == null){
-                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+                return toError("登录超时，请重新登录！");
             }
             if(user.getStatus() == 2){
-                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
+                return toError("您的账号已被冻结，请联系管理员！");
             }
             if(user.getPhone() != null && !user.getPhone().equals("")){
                 if(user.getPhone().equals(param.getPhone())){
-                    return toError(ReCode.FAILD.getValue(),"不能与旧手机号相同！");
+                    return toError("不能与旧手机号相同！");
                 }
             }
             UserInfo oldUser = userInfoService.getUserByPhone(param.getPhone());
             if(oldUser != null){
-                return toError(ReCode.FAILD.getValue(),"该手机已被其他帐号绑定，请不要重复绑定！");
+                return toError("该手机已被其他帐号绑定，请不要重复绑定！");
             }
             //修改绑定手机
             UserDto userDto = userInfoService.updatePhone(param.getToken(),param.getPhone());
@@ -436,7 +436,7 @@ public class UserController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -452,17 +452,17 @@ public class UserController extends BaseController {
             log.info("----》合并账号《----");
             log.info("参数："+param.toString());
             if(StringUtils.isEmpty(param.getPhone())){
-                return toError(ReCode.FAILD.getValue(),"手机号码不能为空！");
+                return toError("手机号码不能为空！");
             }
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user == null){
-                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+                return toError("登录超时，请重新登录！");
             }
             if(user.getStatus() == 2){
-                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
+                return toError("您的账号已被冻结，请联系管理员！");
             }
             //TODO 合并账号,一定是从三方账号发起请求
             UserDto userDto = userInfoService.accountMerge(param.getToken(),param.getPhone());
@@ -472,7 +472,7 @@ public class UserController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -505,7 +505,7 @@ public class UserController extends BaseController {
                 //解析从微信服务器获得的openid和session_key;
                 WeChatSession weChatSession = JSONObject.parseObject(sessionData,WeChatSession.class);
                 if(weChatSession == null){
-                    return toError(ReCode.FAILD.getValue(),"页面授权失败！");
+                    return toError("页面授权失败！");
                 }
                 //微信用户在此小程序的识别号
                 String openid = weChatSession.getOpenid();
@@ -536,11 +536,11 @@ public class UserController extends BaseController {
                             UserDto userDto = userInfoService.miniLogin(param,openid,session_key);
                             return toSuccess(userDto);
                         }else{
-                            return toError(ReCode.FAILD.getValue(),"解密异常!");
+                            return toError("解密异常!");
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
-                        return toError(ReCode.FAILD.getValue(),"解密异常!检查解密数据！");
+                        return toError("解密异常!检查解密数据！");
                     }
                 }else{
                     //获取到unionId，注册/登录
@@ -550,14 +550,14 @@ public class UserController extends BaseController {
                     return toSuccess(userDto);
                 }
             }else{
-                return toError(ReCode.FAILD.getValue(),"页面授权失败！");
+                return toError("页面授权失败！");
             }
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -577,21 +577,21 @@ public class UserController extends BaseController {
             log.info("----》发送验证码《----");
             log.info("参数："+param.toString());
             if(StringUtils.isEmpty(param.getPhone())){
-                return toError(ReCode.FAILD.getValue(),"手机号码不能为空！");
+                return toError("手机号码不能为空！");
             }
             if(param.getType() == null){
-                return toError(ReCode.FAILD.getValue(),"类型不能为空！");
+                return toError("类型不能为空！");
             }
             //验证用户
             //根据手机号获取用户，如果存在，则说明为旧手机号,调用user-service
             UserInfo userInfo=userInfoService.getUserByPhone(param.getPhone());
             if(PhoneCodeEnum.TYPE_REGIST.getCode() == param.getType()){//使用手机号注册新用户
                 if(userInfo != null){
-                    return toError(ReCode.FAILD.getValue(),"此手机号已被注册！");
+                    return toError("此手机号已被注册！");
                 }
             }else if(PhoneCodeEnum.TYPE_FINDPWD.getCode() == param.getType()){//为1 找回密码
                 if(userInfo == null){
-                    return toError(ReCode.FAILD.getValue(),"用户不存在，请注册！");
+                    return toError("用户不存在，请注册！");
                 }
             }else if(PhoneCodeEnum.TYPE_SET_PAY_PWD.getCode() == param.getType()){//2 设置支付密码
 
@@ -604,11 +604,11 @@ public class UserController extends BaseController {
 //                }
             }else if(PhoneCodeEnum.TYPE_NEW_PHONE.getCode() == param.getType()){//为4绑定新手机
                 if(userInfo != null){
-                    return toError(ReCode.FAILD.getValue(),"此手机号已被注册！");
+                    return toError("此手机号已被注册！");
                 }
             }else if(PhoneCodeEnum.TYPE_AUTH.getCode() == param.getType()){//为5认证店铺
 				/*if(count == 0){
-					return toError(ReCode.FAILD.getValue(),"此手机号尚未注册！");
+					return toError("此手机号尚未注册！");
 				}*/
             }else if(PhoneCodeEnum.ADDFORUM.getCode() == param.getType()){//为6申请专栏
 
@@ -628,7 +628,7 @@ public class UserController extends BaseController {
             return toSuccess("发送验证码成功");
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -645,23 +645,23 @@ public class UserController extends BaseController {
             log.info("----》验证验证码《----");
             log.info("参数："+param.toString());
             if(StringUtils.isEmpty(param.getPhone())){
-                return toError(ReCode.FAILD.getValue(),"手机号码不能为空！");
+                return toError("手机号码不能为空！");
             }
             if(StringUtils.isEmpty(param.getCode())){
-                return toError(ReCode.FAILD.getValue(),"验证码不能为空！");
+                return toError("验证码不能为空！");
             }
             //从缓存获取
             // FIXME: 2018/8/17 验证码以0开头时验证异常 Leading zeroes not allowed
             String code = schedualRedisService.get(param.getPhone()).toString();
             log.info("验证码:1."+code+" 2."+param.getCode());
             if(StringUtils.isEmpty(code) || !code.equals(param.getCode())){
-                return toError(ReCode.FAILD.getValue(),"验证码错误！");
+                return toError("验证码错误！");
             }
 
             return toSuccess("验证验证码成功");
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -679,10 +679,10 @@ public class UserController extends BaseController {
             log.info("----》获取个人店铺列表《----");
             log.info("参数："+param.toString());
             if(param.getStart() == null || param.getStart() < 0){
-                return toError(ReCode.FAILD.getValue(),"起始页数错误！");
+                return toError("起始页数错误！");
             }
             if(param.getLimit() == null || param.getLimit() < 1){
-                return toError(ReCode.FAILD.getValue(),"每页个数错误！");
+                return toError("每页个数错误！");
             }
 
             List<ShopDto> shopDtos = userInfoService.shopList(param.getNickName(),param.getType(), param.getStart(), param.getLimit(),param.getAuthType());
@@ -692,7 +692,7 @@ public class UserController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -709,15 +709,15 @@ public class UserController extends BaseController {
             log.info("----》获取用户信息《----");
             log.info("参数："+param.toString());
             if(param.getUserId() == null){
-                return toError(ReCode.FAILD.getValue(),"用户ID不能为空！");
+                return toError("用户ID不能为空！");
             }
             if(StringUtils.isNotEmpty(param.getToken())) {//验证用户
                 UserInfo user=userInfoService.getUserByToken(param.getToken());
                 if(user==null){
-                    return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+                    return toError("登录超时，请重新登录！");
                 }
                 if(user.getStatus() == 2){
-                    return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
+                    return toError("您的账号已被冻结，请联系管理员！");
                 }
             }
             UserDto userDto = userInfoService.userInfo(param.getToken(),param.getUserId());
@@ -727,7 +727,7 @@ public class UserController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -744,20 +744,20 @@ public class UserController extends BaseController {
             log.info("----》添加关注/取消关注《----");
             log.info("参数："+param.toString());
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+                return toError("登录超时，请重新登录！");
             }
             if(user.getStatus() == 2){
-                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
+                return toError("您的账号已被冻结，请联系管理员！");
             }
             if(user.getId() == param.getToUserId()){
-                return toError(ReCode.FAILD.getValue(),"不能关注自己");
+                return toError("不能关注自己");
             }
             if(param.getToUserId() == null){
-                return toError(ReCode.FAILD.getValue(),"被关注人不能为空！");
+                return toError("被关注人不能为空！");
             }
             
             //添加/取消关注
@@ -772,7 +772,7 @@ public class UserController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -792,19 +792,19 @@ public class UserController extends BaseController {
             log.info("参数："+param.toString());
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+                return toError("登录超时，请重新登录！");
             }
             if(user.getStatus() == 2){
-                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
+                return toError("您的账号已被冻结，请联系管理员！");
             }
             if(param.getStart() == null || param.getStart() < 0){
-                return toError(ReCode.FAILD.getValue(),"起始页数错误！");
+                return toError("起始页数错误！");
             }
             if(param.getLimit() == null || param.getLimit() < 1){
-                return toError(ReCode.FAILD.getValue(),"每页个数错误！");
+                return toError("每页个数错误！");
             }
             if(param.getType() == null){
-                return toError(ReCode.FAILD.getValue(),"类型不能为空！");
+                return toError("类型不能为空！");
             }
             //我的关注/我的粉丝
             List<UserFansDto> userFansDtos = userInfoService.myFansOrFollows(user.getId(), param.getType(),param.getStart(), param.getLimit());
@@ -814,7 +814,7 @@ public class UserController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -830,11 +830,11 @@ public class UserController extends BaseController {
             log.info("----》获取待处理信息《----");
             log.info("参数："+param.toString());
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户ID不能为空！");
+                return toError("用户ID不能为空！");
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+                return toError("登录超时，请重新登录！");
             }
             //获取待处理信息
             WaitProcessDto waitProcessDto = userInfoService.myWaitProcess(user.getId());
@@ -844,7 +844,7 @@ public class UserController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -859,11 +859,11 @@ public class UserController extends BaseController {
             log.info("----》申请官方认证《----");
             log.info("参数："+param.toString());
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户ID不能为空！");
+                return toError("用户ID不能为空！");
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+                return toError("登录超时，请重新登录！");
             }
             //申请官方认证
             userInfoExtService.authType(user.getId());
@@ -873,7 +873,7 @@ public class UserController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -890,13 +890,13 @@ public class UserController extends BaseController {
             log.info("----》根据用户名获取用户列表《----");
             log.info("参数："+param.toString());
             if(StringUtils.isEmpty(param.getSearch())){
-                return toError(ReCode.FAILD.getValue(),"查询内容不能为空！");
+                return toError("查询内容不能为空！");
             }
             if(param.getStart() == null || param.getStart() < 0){
-                return toError(ReCode.FAILD.getValue(),"起始页数错误！");
+                return toError("起始页数错误！");
             }
             if(param.getLimit() == null || param.getLimit() < 1){
-                return toError(ReCode.FAILD.getValue(),"每页个数错误！");
+                return toError("每页个数错误！");
             }
             //根据用户名获取用户列表
             List<ShopDto> userByName = userInfoService.getUserByName(param.getSearch(),param.getStart(),param.getLimit());
@@ -906,7 +906,7 @@ public class UserController extends BaseController {
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 

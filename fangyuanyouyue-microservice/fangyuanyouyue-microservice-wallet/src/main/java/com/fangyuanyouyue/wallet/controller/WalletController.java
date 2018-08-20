@@ -54,7 +54,7 @@ public class WalletController extends BaseController{
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -79,7 +79,7 @@ public class WalletController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -101,7 +101,7 @@ public class WalletController extends BaseController{
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -132,7 +132,7 @@ public class WalletController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -149,7 +149,7 @@ public class WalletController extends BaseController{
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -165,7 +165,7 @@ public class WalletController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -184,7 +184,7 @@ public class WalletController extends BaseController{
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -193,10 +193,10 @@ public class WalletController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(StringUtils.isEmpty(param.getPayPwd())){
-                return toError(ReCode.FAILD.getValue(),"旧支付密码不能为空！");
+                return toError("旧支付密码不能为空！");
             }
             if(StringUtils.isEmpty(param.getNewPwd())){
-                return toError(ReCode.FAILD.getValue(),"新支付密码不能为空！");
+                return toError("新支付密码不能为空！");
             }
             //修改支付密码
             walletService.updatePayPwd(userId,param.getPayPwd(),param.getNewPwd());
@@ -206,7 +206,7 @@ public class WalletController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -227,7 +227,7 @@ public class WalletController extends BaseController{
 //            log.info("参数："+param.toString());
 //            //验证用户
 //            if(StringUtils.isEmpty(param.getToken())){
-//                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+//                return toError("用户token不能为空！");
 //            }
 //            Integer userId = (Integer)schedualRedisService.get(param.getToken());
 //            String verifyUser = schedualUserService.verifyUserById(userId);
@@ -258,7 +258,7 @@ public class WalletController extends BaseController{
 //            return toError(e.getMessage());
 //        } catch (Exception e) {
 //            e.printStackTrace();
-//            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+//            return toError("系统繁忙，请稍后再试！");
 //        }
 //    }
 

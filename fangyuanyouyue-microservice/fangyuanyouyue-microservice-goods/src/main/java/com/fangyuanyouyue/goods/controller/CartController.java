@@ -58,7 +58,7 @@ public class CartController extends BaseController{
             log.info("参数：" + param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -75,7 +75,7 @@ public class CartController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -92,7 +92,7 @@ public class CartController extends BaseController{
             log.info("参数：" + param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -108,7 +108,7 @@ public class CartController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -127,7 +127,7 @@ public class CartController extends BaseController{
             log.info("参数：" + param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -136,7 +136,7 @@ public class CartController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getCartDetailIds() == null || param.getCartDetailIds().length == 0){
-                return toError(ReCode.FAILD.getValue(),"购物车详情id不能为空！");
+                return toError("购物车详情id不能为空！");
             }
             //移出购物车
             cartService.cartRemove(param.getCartDetailIds());
@@ -146,7 +146,7 @@ public class CartController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -166,7 +166,7 @@ public class CartController extends BaseController{
             log.info("参数：" + param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -175,10 +175,10 @@ public class CartController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getStart() == null || param.getStart() < 0){
-                return toError(ReCode.FAILD.getValue(),"起始页数错误！");
+                return toError("起始页数错误！");
             }
             if(param.getLimit() == null || param.getLimit() < 1){
-                return toError(ReCode.FAILD.getValue(),"每页个数错误！");
+                return toError("每页个数错误！");
             }
             //精选
             List<GoodsDto> goodsDtos = cartService.choice(userId,param.getStart(),param.getLimit());
@@ -188,7 +188,7 @@ public class CartController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 

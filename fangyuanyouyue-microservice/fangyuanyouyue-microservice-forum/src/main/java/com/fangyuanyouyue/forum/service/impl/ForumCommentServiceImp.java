@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.fangyuanyouyue.forum.dao.ForumInfoMapper;
+import com.fangyuanyouyue.forum.model.ForumInfo;
+import com.fangyuanyouyue.forum.service.SchedualMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +26,10 @@ public class ForumCommentServiceImp implements ForumCommentService {
     private ForumCommentMapper forumCommentMapper;
     @Autowired
     private ForumCommentLikesMapper forumCommentLikesMapper;
+    @Autowired
+	private SchedualMessageService schedualMessageService;
+    @Autowired
+	private ForumInfoMapper forumInfoMapper;
 
 	public Integer countComment(Integer forumId) {
 		return forumCommentMapper.countById(forumId);
@@ -63,8 +70,17 @@ public class ForumCommentServiceImp implements ForumCommentService {
 		model.setStatus(StatusEnum.STATUS_NORMAL.getValue());
 		model.setCommentId(commentId);
 		forumCommentMapper.insert(model);
-		//TODO 社交消息：您的帖子【帖子标题】有新的评论，点击此处前往查看吧
+		//社交消息：您的帖子【帖子标题】有新的评论，点击此处前往查看吧
 		//社交消息：您的视频【视频标题】有新的评论，点击此处前往查看吧
+		ForumInfo forumInfo = forumInfoMapper.selectByPrimaryKey(forumId);
+		if(forumInfo.getType() == 1){
+			schedualMessageService.easemobMessage(forumInfo.getUserId().toString(),
+					"您的帖子【"+forumInfo.getTitle()+"】有新的评论，点击此处前往查看吧","9",forumId.toString());
+
+		}else{
+			schedualMessageService.easemobMessage(forumInfo.getUserId().toString(),
+					"您的视频【"+forumInfo.getTitle()+"】有新的评论，点击此处前往查看吧","10",forumId.toString());
+		}
 	}
 
 

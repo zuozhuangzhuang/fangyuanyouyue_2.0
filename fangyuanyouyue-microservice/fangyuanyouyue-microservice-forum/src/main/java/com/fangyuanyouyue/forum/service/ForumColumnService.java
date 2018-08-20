@@ -24,10 +24,12 @@ public interface ForumColumnService {
 
 	/**
 	 * 获取精选专栏
+	 * @param start
+	 * @param limit
 	 * @return
 	 * @throws ServiceException
 	 */
-    List<ForumColumnDto> getChosenColumnList() throws ServiceException;
+    List<ForumColumnDto> getChosenColumnList(Integer start,Integer limit) throws ServiceException;
 
 	/**
 	 * 获取专栏分类列表

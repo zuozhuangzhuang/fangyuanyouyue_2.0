@@ -43,7 +43,7 @@ public class ForumCommentController extends BaseController {
 	@Autowired
 	private ForumCommentLikesService forumCommentLikesService;
 
-	@ApiOperation(value = "帖子评论列表", notes = "根据帖子id获取评论列表", response = BaseResp.class)
+	@ApiOperation(value = "帖子评论列表", notes = "（ForumCommentDto）根据帖子id获取评论列表", response = BaseResp.class)
 	@ApiImplicitParams({
         @ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "String", paramType = "query"),
 			@ApiImplicitParam(name = "forumId", value = "帖子id", required = true, dataType = "int", paramType = "query"),
@@ -69,7 +69,6 @@ public class ForumCommentController extends BaseController {
 				if((Integer)jsonObject.get("code") != 0){
 					return toError(jsonObject.getString("report"));
 				}
-
             }
 
 			List<ForumCommentDto> dto = forumCommentService.getCommentList(userId,param.getForumId(), param.getStart(),
@@ -81,12 +80,12 @@ public class ForumCommentController extends BaseController {
 			return toError(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
-			return toError(ReCode.FAILD.getValue(), "系统繁忙，请稍后再试！");
+			return toError( "系统繁忙，请稍后再试！");
 		}
 	}
 
 
-	@ApiOperation(value = "帖子二级评论列表", notes = "根据评论id获取评论列表", response = BaseResp.class)
+	@ApiOperation(value = "帖子二级评论列表", notes = "（ForumCommentDto）根据评论id获取评论列表", response = BaseResp.class)
 	@ApiImplicitParams({
         @ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "String", paramType = "query"),
 		@ApiImplicitParam(name = "commentId", value = "评论id", required = true, dataType = "int", paramType = "query"),
@@ -124,7 +123,7 @@ public class ForumCommentController extends BaseController {
 			return toError(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
-			return toError(ReCode.FAILD.getValue(), "系统繁忙，请稍后再试！");
+			return toError( "系统繁忙，请稍后再试！");
 		}
 	}
 	
@@ -143,7 +142,7 @@ public class ForumCommentController extends BaseController {
 
 			//验证用户
 			if(StringUtils.isEmpty(param.getToken())){
-				return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+				return toError("用户token不能为空！");
 			}
 			Integer userId = (Integer)schedualRedisService.get(param.getToken());
 			String verifyUser = schedualUserService.verifyUserById(userId);
@@ -167,7 +166,7 @@ public class ForumCommentController extends BaseController {
 			return toError(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
-			return toError(ReCode.FAILD.getValue(), "系统繁忙，请稍后再试！");
+			return toError( "系统繁忙，请稍后再试！");
 		}
 	}
 
@@ -187,7 +186,7 @@ public class ForumCommentController extends BaseController {
 
 			//验证用户
 			if(StringUtils.isEmpty(param.getToken())){
-				return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+				return toError("用户token不能为空！");
 			}
 			Integer userId = (Integer)schedualRedisService.get(param.getToken());
 			String verifyUser = schedualUserService.verifyUserById(userId);
@@ -201,14 +200,14 @@ public class ForumCommentController extends BaseController {
 			if(param.getType() == null){
 				return toError("类型不能为空");
 			}
-			forumCommentLikesService.saveLikes(userId, param.getCommentId(),param.getType());
+			forumCommentLikesService.saveLikes(param.getType(),userId ,param.getCommentId());
 			return toSuccess();
 		} catch (ServiceException e) {
 			e.printStackTrace();
 			return toError(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
-			return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+			return toError("系统繁忙，请稍后再试！");
 		}
 	}
 

@@ -64,7 +64,7 @@ public class AppraisalController extends BaseController{
             log.info("参数：" + param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -74,7 +74,7 @@ public class AppraisalController extends BaseController{
             }
             if(param.getGoodsIds() == null || param.getGoodsIds().length < 1){
                 if(param.getImgUrls() == null && param.getVideoUrl() == null){
-                    toError(ReCode.FAILD.getValue(),"至少包含一张图片或一段视频！");
+                    toError("至少包含一张图片或一段视频！");
                 }
             }
             //申请鉴定，需要生成订单并返回订单信息
@@ -85,7 +85,7 @@ public class AppraisalController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -103,7 +103,7 @@ public class AppraisalController extends BaseController{
             log.info("参数：" + param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -112,7 +112,7 @@ public class AppraisalController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getOrderId() == null){
-                toError(ReCode.FAILD.getValue(),"订单ID不能为空！");
+                toError("订单ID不能为空！");
             }
             //取消鉴定，删除订单及详情
             appraisalService.cancelAppraisal(userId,param.getOrderId());
@@ -122,7 +122,7 @@ public class AppraisalController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -143,7 +143,7 @@ public class AppraisalController extends BaseController{
             log.info("参数：" + param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -152,10 +152,10 @@ public class AppraisalController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getStart() == null || param.getStart() < 0){
-                return toError(ReCode.FAILD.getValue(),"起始页数错误！");
+                return toError("起始页数错误！");
             }
             if(param.getLimit() == null || param.getLimit() < 1){
-                return toError(ReCode.FAILD.getValue(),"每页个数错误！");
+                return toError("每页个数错误！");
             }
             //鉴定查询
             List<AppraisalDetailDto> appraisals = appraisalService.getAppraisal(userId,param.getStart(),param.getLimit());
@@ -165,7 +165,7 @@ public class AppraisalController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -184,7 +184,7 @@ public class AppraisalController extends BaseController{
             log.info("参数：" + param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -193,7 +193,7 @@ public class AppraisalController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getDetailId() == null){
-                return toError(ReCode.FAILD.getValue(),"鉴定详情ID不能为空！");
+                return toError("鉴定详情ID不能为空！");
             }
             //鉴定结果
             AppraisalDetailDto appraisal = appraisalService.appraisalDetail(userId,param.getDetailId());
@@ -203,7 +203,7 @@ public class AppraisalController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -225,7 +225,7 @@ public class AppraisalController extends BaseController{
             log.info("参数：" + param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -234,10 +234,10 @@ public class AppraisalController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getOrderId() == null){
-                toError(ReCode.FAILD.getValue(),"订单ID不能为空！");
+                toError("订单ID不能为空！");
             }
             if(StringUtils.isEmpty(param.getPayPwd())){
-                toError(ReCode.FAILD.getValue(),"支付密码不能为空！");
+                toError("支付密码不能为空！");
             }
             if(param.getType()==null){
                 return toError("支付类型不能为空！");
@@ -250,7 +250,7 @@ public class AppraisalController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -269,10 +269,10 @@ public class AppraisalController extends BaseController{
             log.info("----》鉴定展示《----");
             log.info("参数：" + param.toString());
             if(param.getStart() == null || param.getStart() < 0){
-                return toError(ReCode.FAILD.getValue(),"起始页数错误！");
+                return toError("起始页数错误！");
             }
             if(param.getLimit() == null || param.getLimit() < 1){
-                return toError(ReCode.FAILD.getValue(),"每页个数错误！");
+                return toError("每页个数错误！");
             }
             //鉴定展示
             List<AppraisalDetailDto> appraisals = appraisalService.getAllAppraisal(param.getStart(),param.getLimit());
@@ -282,7 +282,7 @@ public class AppraisalController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 

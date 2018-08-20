@@ -3,6 +3,7 @@ package com.fangyuanyouyue.user.service.impl;
 import com.fangyuanyouyue.base.util.MD5Util;
 import com.fangyuanyouyue.user.dao.UserFansMapper;
 import com.fangyuanyouyue.user.model.UserFans;
+import com.fangyuanyouyue.user.service.SchedualMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,8 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
     private UserInfoService userInfoService;
     @Autowired
     private UserFansMapper userFans;
+    @Autowired
+    private SchedualMessageService schedualMessageService;
 
     @Override
     public void certification(String token, String name, String identity, String identityImgCoverUrl, String identityImgBackUrl) throws ServiceException {
@@ -58,7 +61,9 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
             identityAuthApply.setAddTime(DateStampUtils.getTimesteamp());
             identityAuthApplyMapper.insert(identityAuthApply);
         }
-        //TODO 系统消息：您的实名认证申请已提交，将于1个工作日内完成审核，请注意消息通知
+        //系统消息：您的实名认证申请已提交，将于1个工作日内完成审核，请注意消息通知
+        schedualMessageService.easemobMessage(userInfo.getId().toString(),
+                "您的实名认证申请已提交，将于1个工作日内完成审核，请注意消息通知","1","");
     }
 
     @Override
@@ -108,7 +113,8 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
                 userInfoExtMapper.updateByPrimaryKey(userInfoExt);
             }
         }
-        //TODO 系统消息：您的认证店铺申请已提交，将于5个工作日内完成审核，请注意消息通知
+        //系统消息：您的认证店铺申请已提交，将于5个工作日内完成审核，请注意消息通知
+        schedualMessageService.easemobMessage(userId.toString(),"您的认证店铺申请已提交，将于5个工作日内完成审核，请注意消息通知","1","");
     }
 
     @Override

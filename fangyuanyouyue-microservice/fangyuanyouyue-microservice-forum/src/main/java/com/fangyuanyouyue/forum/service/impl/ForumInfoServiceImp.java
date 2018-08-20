@@ -40,6 +40,8 @@ public class ForumInfoServiceImp implements ForumInfoService {
 	private CollectMapper collectMapper;
 	@Autowired
 	private ForumLikesMapper forumLikesMapper;
+	@Autowired
+	private SchedualMessageService schedualMessageService;
 
 	@Override
 	public ForumInfoDto getForumInfoById(Integer forumId,Integer userId) throws ServiceException {
@@ -85,19 +87,22 @@ public class ForumInfoServiceImp implements ForumInfoService {
 	}
 
 	@Override
-	public List<ForumInfoDto> getForumList(Integer columnId,Integer userId, Integer type, String keyword, Integer start, Integer limit,Integer listType) throws ServiceException {
-		List list;
+	public List<ForumInfoDto> getForumList(Integer columnId,Integer userId, Integer type, String keyword, Integer start, Integer limit,Integer listType,Integer searchType) throws ServiceException {
+		List<ForumInfo> list;
 		if(listType.intValue() == 1){
 			//普通列表，需要判断是否点赞/收藏
-			list = forumInfoMapper.selectList(columnId,null,type,keyword, start*limit, limit);
+			list = forumInfoMapper.selectList(columnId,null,type,keyword, start*limit, limit,searchType);
 		}else if(listType.intValue() == 2){
+			if(userId == null){
+				throw new ServiceException("用户信息为空！");
+			}
 			//我的xx列表
-			list = forumInfoMapper.selectList(columnId,userId,type,keyword, start*limit, limit);
+			list = forumInfoMapper.selectList(columnId,userId,type,keyword, start*limit, limit,searchType);
 		}else{
 			throw new ServiceException("列表类型错误！");
 		}
 		List<ForumInfoDto> dtos = new ArrayList<>();
-		for(ForumInfo info:(List<ForumInfo>)list) {
+		for(ForumInfo info:list) {
 			ForumInfoDto dto = new ForumInfoDto(info);
 			//计算点赞数
 			Integer likesCount = forumLikesService.countLikes(info.getId());
@@ -141,7 +146,9 @@ public class ForumInfoServiceImp implements ForumInfoService {
 				}else{
 					forumInfo.setColumnId(columnId);
 				}
-				//TODO 社交消息：您的专栏【专栏标题】有新的帖子，点击此处前往查看吧
+				//社交消息：您的专栏【专栏标题】有新的帖子，点击此处前往查看吧
+				schedualMessageService.easemobMessage(forumColumn.getUserId().toString(),
+						"您的专栏【"+forumColumn.getName()+"】有新的帖子，点击此处前往查看吧","5",forumInfo.getId().toString());
 			}
 		}else if(type == 2){//视频
 			if(StringUtils.isEmpty(videoUrl) || StringUtils.isEmpty(videoImg) || videoLength == null){
@@ -156,19 +163,12 @@ public class ForumInfoServiceImp implements ForumInfoService {
 		forumInfo.setPvCount(0);
 		forumInfoMapper.insert(forumInfo);
 		if(userIds != null && userIds.length > 0){
-			//TODO 发送通知邀请用户 邀请我：用户“用户昵称”上传帖子【帖子名称】时邀请了您！点击此处前往查看吧
+			//邀请我：用户“用户昵称”上传帖子【帖子名称】时邀请了您！点击此处前往查看吧
 			//邀请我：用户“用户昵称”上传视频【视频名称】时邀请了您！点击此处前往查看吧
 			UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
-			if(type == 1){
-				for(Integer toUserId:userIds){
-					UserInfo toUser = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(toUserId)).getString("data")), UserInfo.class);
-					System.out.println("用户“"+user.getNickName()+"”上传帖子【"+forumInfo.getTitle()+"】时邀请了“"+toUser.getNickName()+"“！");
-				}
-			}else{
-				for(Integer toUserId:userIds){
-					UserInfo toUser = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(toUserId)).getString("data")), UserInfo.class);
-					System.out.println("用户“"+user.getNickName()+"”上传视频【"+forumInfo.getTitle()+"】时邀请了“"+toUser.getNickName()+"“！");
-				}
+			for(Integer toUserId:userIds){
+				schedualMessageService.easemobMessage(toUserId.toString(),
+						"用户“"+user.getNickName()+"”上传"+(forumInfo.getType()==1?"帖子【":"视频【")+forumInfo.getTitle()+"】时邀请了您！点击此处前往查看吧",forumInfo.getType()==1?"5":"4",forumInfo.getId().toString());
 			}
 		}
 	}

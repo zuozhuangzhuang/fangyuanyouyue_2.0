@@ -5,6 +5,7 @@ import java.util.List;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.forum.dao.ForumColumnTypeMapper;
 import com.fangyuanyouyue.forum.model.ForumColumnType;
+import com.fangyuanyouyue.forum.service.SchedualMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,17 +24,19 @@ public class ForumColumnServiceImp implements ForumColumnService {
     private ForumColumnMapper forumColumnMapper;
     @Autowired
 	private ForumColumnTypeMapper forumColumnTypeMapper;
+    @Autowired
+	private SchedualMessageService schedualMessageService;
 
 	@Override
 	public List<ForumColumnTypeDto> getColumnList(Integer start, Integer limit) throws ServiceException {
-		List<ForumColumn> list = forumColumnMapper.selectPage(start, limit);
+		List<ForumColumn> list = forumColumnMapper.selectPage(start*limit, limit);
 		List<ForumColumnDto> dtos = ForumColumnDto.toDtoList(list);
 		return ForumColumnTypeDto.toDtoList(dtos);
 	}
 
 	@Override
-	public List<ForumColumnDto> getChosenColumnList() throws ServiceException {
-		List<ForumColumn> list = forumColumnMapper.selectChosen(1);
+	public List<ForumColumnDto> getChosenColumnList(Integer start,Integer limit) throws ServiceException {
+		List<ForumColumn> list = forumColumnMapper.selectChosen(start*limit,limit,1);
 		return ForumColumnDto.toDtoList(list);
 	}
 
@@ -64,6 +67,8 @@ public class ForumColumnServiceImp implements ForumColumnService {
 				forumColumnMapper.insert(forumColumn);
 			}
 		}
-		//TODO 系统消息：您的【专栏名称】专栏申请已提交，将于3个工作日内完成审核，请注意消息通知
+		//系统消息：您的【专栏名称】专栏申请已提交，将于3个工作日内完成审核，请注意消息通知
+		schedualMessageService.easemobMessage(userId.toString(),
+				"您的【"+name+"】专栏申请已提交，将于3个工作日内完成审核，请注意消息通知","1","");
 	}
 }

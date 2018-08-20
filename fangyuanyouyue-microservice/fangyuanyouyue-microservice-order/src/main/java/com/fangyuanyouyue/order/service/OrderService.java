@@ -130,4 +130,12 @@ public interface OrderService {
      * @throws ServiceException
      */
     void reminder(Integer userId,Integer orderId) throws ServiceException;
+
+    /**
+     * 修改订单状态
+     * @param orderNo
+     * @param status
+     * @throws ServiceException
+     */
+    boolean updateOrder(String orderNo,Integer status) throws ServiceException;
 }

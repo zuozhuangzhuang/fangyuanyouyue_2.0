@@ -229,4 +229,9 @@ public class GoodsParam{
     @ApiModelProperty(name = "userIds", value = "邀请用户id数组", dataType = "int",hidden = true)
     private Integer[] userIds;//邀请用户id数组
 
+
+    @ApiModelProperty(name = "businessType", value = "业务类型 1商品详情、2抢购详情、3帖子详情、4全民鉴定详情、5视频详情、6专栏", dataType = "int",hidden = true)
+    private Integer businessType;//业务类型 1商品详情、2抢购详情、3帖子详情、4全民鉴定详情、5视频详情、6专栏
+
+
 }

@@ -41,7 +41,11 @@ public class ForumColumnController extends BaseController {
 	@Autowired
 	private SchedualRedisService schedualRedisService;
 
-	@ApiOperation(value = "专栏", notes = "获取全部专栏", response = BaseResp.class)
+	@ApiOperation(value = "专栏列表", notes = "（ForumColumnTypeDto）获取全部专栏", response = BaseResp.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query")
+	})
 	@PostMapping(value = "/list")
 	@ResponseBody
 	public BaseResp forumColumn(ForumParam param) throws IOException {
@@ -49,7 +53,10 @@ public class ForumColumnController extends BaseController {
 			log.info("----》获取全部专栏《----");
 			log.info("参数：" + param.toString());
 
-			List<ForumColumnTypeDto> dto = forumColumnService.getColumnList(0,1000);
+			if(param.getStart()==null || param.getStart() < 0 ||param.getLimit()==null || param.getLimit() < 1) {
+				return toError("分页参数错误");
+			}
+			List<ForumColumnTypeDto> dto = forumColumnService.getColumnList(param.getStart(),param.getLimit());
 
 			return toSuccess(dto);
 		} catch (ServiceException e) {
@@ -57,11 +64,15 @@ public class ForumColumnController extends BaseController {
 			return toError(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
-			return toError(ReCode.FAILD.getValue(), "系统繁忙，请稍后再试！");
+			return toError("系统繁忙，请稍后再试！");
 		}
 	}
 
 	@ApiOperation(value = "精选专栏", notes = "获取精选专栏", response = BaseResp.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query")
+	})
 	@PostMapping(value = "/chosen")
 	@ResponseBody
 	public BaseResp chosenColumn(ForumParam param) throws IOException {
@@ -69,7 +80,10 @@ public class ForumColumnController extends BaseController {
 			log.info("----》获取精选的专栏《----");
 			log.info("参数：" + param.toString());
 
-			List<ForumColumnDto> dto = forumColumnService.getChosenColumnList();
+			if(param.getStart()==null || param.getStart() < 0 ||param.getLimit()==null || param.getLimit() < 1) {
+				return toError("分页参数错误");
+			}
+			List<ForumColumnDto> dto = forumColumnService.getChosenColumnList(param.getStart(),param.getLimit());
 
 			return toSuccess(dto);
 		} catch (ServiceException e) {
@@ -77,12 +91,12 @@ public class ForumColumnController extends BaseController {
 			return toError(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
-			return toError(ReCode.FAILD.getValue(), "系统繁忙，请稍后再试！");
+			return toError("系统繁忙，请稍后再试！");
 		}
 	}
 
 
-	@ApiOperation(value = "获取专栏分类列表", notes = "获取专栏分类列表", response = BaseResp.class)
+	@ApiOperation(value = "获取专栏分类列表", notes = "（ForumColumnTypeDto）获取专栏分类列表", response = BaseResp.class)
 	@PostMapping(value = "/getForumTypeList")
 	@ResponseBody
 	public BaseResp getForumTypeList() throws IOException {
@@ -96,7 +110,7 @@ public class ForumColumnController extends BaseController {
 			return toError(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
-			return toError(ReCode.FAILD.getValue(), "系统繁忙，请稍后再试！");
+			return toError("系统繁忙，请稍后再试！");
 		}
 	}
 
@@ -114,7 +128,7 @@ public class ForumColumnController extends BaseController {
 			log.info("参数：" + param.toString());
 			//验证用户
 			if(StringUtils.isEmpty(param.getToken())){
-				return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+				return toError("用户token不能为空！");
 			}
 			Integer userId = (Integer)schedualRedisService.get(param.getToken());
 			String verifyUser = schedualUserService.verifyUserById(userId);
@@ -124,13 +138,13 @@ public class ForumColumnController extends BaseController {
 			}
 			//验证实名认证
 			if(JSONObject.parseObject(schedualUserService.isAuth(userId)).getBoolean("data") == false){
-				return toError(ReCode.FAILD.getValue(),"用户未实名认证！");
+				return toError("用户未实名认证！");
 			}
 			if(param.getTypeId() == null){
-				return toError(ReCode.FAILD.getValue(),"专栏分类id不能为空！");
+				return toError("专栏分类id不能为空！");
 			}
 			if(StringUtils.isEmpty(param.getName())){
-				return toError(ReCode.FAILD.getValue(),"专栏名称不能为空！");
+				return toError("专栏名称不能为空！");
             }
 			//TODO 申请专栏
 			forumColumnService.addColumn(userId,param.getTypeId(),param.getName());
@@ -141,7 +155,7 @@ public class ForumColumnController extends BaseController {
 			return toError(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
-			return toError(ReCode.FAILD.getValue(), "系统繁忙，请稍后再试！");
+			return toError("系统繁忙，请稍后再试！");
 		}
 	}
 }

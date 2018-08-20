@@ -23,7 +23,7 @@ public interface ForumColumnMapper {
     
     List<ForumColumn> selectPage(@Param("start")Integer start,@Param("limit")Integer limit);
 
-    List<ForumColumn> selectChosen(@Param("isChosen")Integer isChosen);
+    List<ForumColumn> selectChosen(@Param("start")Integer start,@Param("limit")Integer limit,@Param("isChosen")Integer isChosen);
 
     /**
      * 根据用户id获取专栏，每个用户只能有一个专栏

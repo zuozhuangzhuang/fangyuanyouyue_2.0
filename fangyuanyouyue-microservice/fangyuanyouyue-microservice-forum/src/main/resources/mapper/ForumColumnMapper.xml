@@ -11,6 +11,7 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="is_chosen" jdbcType="INTEGER" property="isChosen" />
     <result column="type_id" jdbcType="INTEGER" property="typeId" />
+    <result column="type_name" jdbcType="VARCHAR" property="typeName" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, name, cover_img_url, fans_count, add_time, update_time, is_chosen, type_id
@@ -141,13 +142,18 @@
   <select id="selectPage" resultMap="BaseResultMap">
     select 
     a.*,b.name as type_name
-    from forum_column a,forum_column_type b where a.type_id=b.id order by b.sort limit #{start},#{limit}
+    from forum_column a,forum_column_type b where a.type_id=b.id order by b.sort
+    <if test="start != null and limit != null">
+    limit #{start},#{limit}
+    </if>
   </select>
   <select id="selectChosen" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select 
-    *
-    from forum_column 
-    where is_chosen = #{isChosen,jdbcType=INTEGER}
+    select
+    a.*,b.name as type_name
+    from forum_column a,forum_column_type b where a.type_id=b.id and is_chosen = #{isChosen,jdbcType=INTEGER}
+    <if test="start != null and limit != null">
+      limit #{start},#{limit}
+    </if>
   </select>
 
   <select id="selectCollectList" parameterType="Integer" resultMap="BaseResultMap">

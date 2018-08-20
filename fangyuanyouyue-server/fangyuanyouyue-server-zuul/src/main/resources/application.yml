@@ -22,6 +22,7 @@ spring:
     multipart:
       max-file-size: 1024MB
       max-request-size: 10240MB
+      enabled: true
 #zuul.routes.api-a.sensitiveHeaders="*"\
 zuul:
   host:

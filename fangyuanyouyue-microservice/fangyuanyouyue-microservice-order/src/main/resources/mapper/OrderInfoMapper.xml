@@ -262,4 +262,8 @@
       limit #{start},#{limit}
     </if>
   </select>
+
+  <select id="selectByOrderNo" parameterType="String" resultMap="BaseResultMap">
+    select * from order_info where order_no = #{orderNo}
+  </select>
 </mapper>

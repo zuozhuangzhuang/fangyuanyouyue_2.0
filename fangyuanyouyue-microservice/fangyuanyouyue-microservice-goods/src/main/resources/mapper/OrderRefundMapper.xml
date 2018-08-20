@@ -43,7 +43,7 @@
       #{status,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
       #{sellerreturnstatus,jdbcType=INTEGER})
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.goods.model.OrderRefund" >
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.goods.model.OrderRefund" useGeneratedKeys="true" keyProperty="id">
     insert into order_refund
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >

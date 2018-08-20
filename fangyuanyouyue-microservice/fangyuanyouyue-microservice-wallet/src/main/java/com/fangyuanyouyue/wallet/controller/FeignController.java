@@ -1,11 +1,14 @@
 package com.fangyuanyouyue.wallet.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.wallet.dto.WechatPayDto;
+import com.fangyuanyouyue.wallet.model.WxPayResult;
 import com.fangyuanyouyue.wallet.param.WalletParam;
+import com.fangyuanyouyue.wallet.service.SchedualOrderService;
 import com.fangyuanyouyue.wallet.service.SchedualRedisService;
 import com.fangyuanyouyue.wallet.service.SchedualUserService;
 import com.fangyuanyouyue.wallet.service.WalletService;
@@ -36,12 +39,18 @@ import java.util.*;
 @RefreshScope
 public class FeignController extends BaseController{
     protected Logger log = Logger.getLogger(this.getClass());
+
+    protected Logger alipayLoglog = Logger.getLogger("alipayLog");
+    protected Logger wechatLog = Logger.getLogger("wechatLog");
     @Autowired
     private WalletService walletService;
     @Autowired
     private SchedualUserService schedualUserService;
     @Autowired
     private SchedualRedisService schedualRedisService;
+    @Autowired
+    private SchedualOrderService schedualOrderService;
+
 
     @PostMapping(value = "/updateScore")
     @ResponseBody
@@ -66,7 +75,7 @@ public class FeignController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -93,7 +102,7 @@ public class FeignController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -120,7 +129,7 @@ public class FeignController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -142,7 +151,7 @@ public class FeignController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -168,7 +177,7 @@ public class FeignController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -192,9 +201,10 @@ public class FeignController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
+
     @PostMapping(value = "/orderPayByALi")
     @ResponseBody
     public BaseResp orderPayByALi(Integer orderId) throws IOException {
@@ -212,7 +222,7 @@ public class FeignController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -221,98 +231,82 @@ public class FeignController extends BaseController{
     @ResponseBody
     public BaseResp wechatpay(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-            log.info("----》微信回调《----");
-//            log.info("参数：orderId："+orderId);
-            String result = PayCommonUtil.reciverWx(request); // 接收到异步的参数
-            Map<String, String> m = new HashMap<>();// 解析xml成map
-            if (m != null && !"".equals(m))
-            {
-                m = WXPayUtil.xmlToMap(result);
-            }
-            // 过滤空 设置 TreeMap
-            SortedMap<Object, Object> packageParams = new TreeMap<>();
-            Iterator it = m.keySet().iterator();
-            while (it.hasNext())
-            {
-                String parameter = (String) it.next();
-                String parameterValue = m.get(parameter);
-                String v = "";
-                if (null != parameterValue)
-                {
-                    v = parameterValue.trim();
-                }
-                packageParams.put(parameter, v);
-            }
-            // 判断签名是否正确
+            wechatLog.info("微信支付小方圆回调数据开始");
+
+
+            //示例报文
+            //		String xml = "<xml><appid><![CDATA[wxb4dc385f953b356e]]></appid><bank_type><![CDATA[CCB_CREDIT]]></bank_type><cash_fee><![CDATA[1]]></cash_fee><fee_type><![CDATA[CNY]]></fee_type><is_subscribe><![CDATA[Y]]></is_subscribe><mch_id><![CDATA[1228442802]]></mch_id><nonce_str><![CDATA[1002477130]]></nonce_str><openid><![CDATA[o-HREuJzRr3moMvv990VdfnQ8x4k]]></openid><out_trade_no><![CDATA[1000000000051249]]></out_trade_no><result_code><![CDATA[SUCCESS]]></result_code><return_code><![CDATA[SUCCESS]]></return_code><sign><![CDATA[1269E03E43F2B8C388A414EDAE185CEE]]></sign><time_end><![CDATA[20150324100405]]></time_end><total_fee>1</total_fee><trade_type><![CDATA[JSAPI]]></trade_type><transaction_id><![CDATA[1009530574201503240036299496]]></transaction_id></xml>";
             String resXml = "";
-            if (PayCommonUtil.isTenpaySign("UTF-8", packageParams))
-            {
-                if ("SUCCESS".equals((String) packageParams.get("return_code")))
-                {
-                    // 如果返回成功
-                    String mch_id = (String) packageParams.get("mch_id"); // 商户号
-                    String out_trade_no = (String) packageParams.get("out_trade_no"); // 商户订单号
-                    String total_fee = (String) packageParams.get("total_fee");
-                    // String transaction_id = (String)
-                    // packageParams.get("transaction_id"); // 微信支付订单号
-                    // 查询订单 根据订单号查询订单
-                    String orderId = out_trade_no.substring(0, out_trade_no.length() - PayCommonUtil.TIME.length());
-//                    Orders orders = ordersMapper.selectByPrimaryKey(Integer.parseInt(orderId));
-
-                    // 验证商户ID 和 价格 以防止篡改金额
-                    if (PropertyUtil.getInstance().getProperty("WxPay.mchid").equals(mch_id)
-//                            && orders != null
-                        // &&
-                        // total_fee.trim().toString().equals(orders.getOrderAmount())
-                        // // 实际项目中将此注释删掉，以保证支付金额相等
-                            )
-                    {
-                        /** 这里是我项目里的消费状态
-                         * 1.待付款=0 2.付款完成=1
-                         * 3.消费成功=2
-                         * 4.取消=-1
-                         * 5.发起退款=-2
-                         * 6.退款成功=-3
-                         * 7.退款失败=3（由于商户拒绝退款或其他原因导致退款失败）
-                         */
-//                        insertWxNotice(packageParams);
-//                        orders.setPayWay("1"); // 变更支付方式为wx
-//                        orders.setOrderState("1"); // 订单状态为已付款
-//
-//                        ordersMapper.updateByPrimaryKeySelective(orders); // 变更数据库中该订单状态
-                        // ordersMapper.updatePayStatus(Integer.parseInt(orderId));
-                        resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"
-                                + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
-                    } else
-                    {
-                        resXml = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>"
-                                + "<return_msg><![CDATA[参数错误]]></return_msg>" + "</xml> ";
-                    }
-                } else // 如果微信返回支付失败，将错误信息返回给微信
-                {
-                    resXml = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>"
-                            + "<return_msg><![CDATA[交易失败]]></return_msg>" + "</xml> ";
+            String inputLine;
+            String notityXml = "";
+            try {
+                while ((inputLine = request.getReader().readLine()) != null) {
+                    notityXml += inputLine;
                 }
-            } else
-            {
-                resXml = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>"
-                        + "<return_msg><![CDATA[通知签名验证失败]]></return_msg>" + "</xml> ";
+                request.getReader().close();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
-            // 处理业务完毕，将业务结果通知给微信
-            // ------------------------------
-            BufferedOutputStream out = new BufferedOutputStream(response.getOutputStream());
-            out.write(resXml.getBytes());
-            out.flush();
-            out.close();
-//            walletService.wechatpay();
-            return toSuccess();
+            wechatLog.info("接收到的报文：" + notityXml);
+
+
+//			Map m = parseXmlToList2(notityXml);
+            Map m = WXPayUtil.xmlToMap(notityXml);
+            WxPayResult wpr = new WxPayResult();
+            if(m != null){
+                wpr.setAppid(m.get("appid").toString());
+                wpr.setBankType(m.get("bank_type").toString());
+                wpr.setCashFee(m.get("cash_fee").toString());
+                //wpr.setFeeType(m.get("fee_type").toString());
+                //wpr.setIsSubscribe(m.get("is_subscribe").toString());
+                wpr.setMchId(m.get("mch_id").toString());
+                wpr.setNonceStr(m.get("nonce_str").toString());
+                wpr.setOpenid(m.get("openid").toString());
+                wpr.setOutTradeNo(m.get("out_trade_no").toString());
+                wpr.setResultCode(m.get("result_code").toString());
+                wpr.setReturnCode(m.get("return_code")==null?"":m.get("return_code").toString());
+                wpr.setSign(m.get("sign").toString());
+                wpr.setTimeEnd(m.get("time_end").toString());
+                wpr.setTotalFee(m.get("total_fee").toString());
+                wpr.setTradeType(m.get("trade_type").toString());
+                wpr.setTransactionId(m.get("transaction_id").toString());
+            }
+            wechatLog.info("返回信息："+wpr.toString());
+            if("SUCCESS".equals(wpr.getResultCode())){
+                //支付成功,修改订单状态
+                boolean result = JSONObject.parseObject(schedualOrderService.updateOrder(wpr.getOutTradeNo(),2)).getBoolean("data");
+                wechatLog.info("支付成功！");
+
+                if(result){
+                    resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"
+                            + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
+
+                    wechatLog.info("处理成功！");
+                }else{
+                    resXml = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>"
+                            + "<return_msg><![CDATA[FAILD]]></return_msg>" + "</xml> ";
+
+                    wechatLog.info("处理失败！");
+                }
+
+
+            }else{
+                resXml = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>"
+                        + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
+                wechatLog.info("支付失败！");
+            }
+
+            wechatLog.info("微信支付回调结束");
+
+
+            return toSuccess(resXml);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 

@@ -38,8 +38,6 @@ public class GoodsController extends BaseController{
     @Autowired
     private SchedualUserService schedualUserService;
     @Autowired
-    protected RedisTemplate redisTemplate;
-    @Autowired
     private SchedualRedisService schedualRedisService;
     @Autowired
     private OrderInfoService orderInfoService;
@@ -69,10 +67,10 @@ public class GoodsController extends BaseController{
             log.info("----》获取商品列表《----");
             log.info("参数：" + param.toString());
             if(param.getStart() == null || param.getStart() < 0){
-                return toError(ReCode.FAILD.getValue(),"起始页数错误！");
+                return toError("起始页数错误！");
             }
             if(param.getLimit() == null || param.getLimit() < 1){
-                return toError(ReCode.FAILD.getValue(),"每页个数错误！");
+                return toError("每页个数错误！");
             }
             if(StringUtils.isNotEmpty(param.getToken())){//我的商品验证用户
                 //根据用户token获取userId
@@ -85,12 +83,12 @@ public class GoodsController extends BaseController{
                 param.setUserId(userId);
             }else{
                 if(param.getQuality() != null && param.getQuality() == 4){//我的关注，要求登录授权
-                    return toError(ReCode.FAILD.getValue(),"未登录，无法获取我的关注！");
+                    return toError("未登录，无法获取我的关注！");
                 }
             }
             if(param.getQuality() != null && param.getQuality() == 5){
                 if(param.getType() != 2){
-                    return toError(ReCode.FAILD.getValue(),"只有抢购可选已完成！");
+                    return toError("只有抢购可选已完成！");
                 }
             }
             //获取商品列表
@@ -101,7 +99,7 @@ public class GoodsController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -131,7 +129,7 @@ public class GoodsController extends BaseController{
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -141,39 +139,39 @@ public class GoodsController extends BaseController{
             }
             //验证实名认证
             if(JSONObject.parseObject(schedualUserService.isAuth(userId)).getBoolean("data") == false){
-                return toError(ReCode.FAILD.getValue(),"用户未实名认证！");
+                return toError("用户未实名认证！");
             }
             JSONObject user = JSONObject.parseObject(jsonObject.getString("data"));
             if(StringUtils.isEmpty(param.getGoodsInfoName())){
-                return toError(ReCode.FAILD.getValue(),"标题不能为空！");
+                return toError("标题不能为空！");
             }
             if(param.getGoodsCategoryIds().length<1){
-                return toError(ReCode.FAILD.getValue(),"所属分类不能为空！");
+                return toError("所属分类不能为空！");
             }
             if(StringUtils.isEmpty(param.getDescription())){
-                return toError(ReCode.FAILD.getValue(),"商品描述不能为空！");
+                return toError("商品描述不能为空！");
             }
             if(param.getPrice()==null){
-                return toError(ReCode.FAILD.getValue(),"价格不能为空！");
+                return toError("价格不能为空！");
             }
             if(param.getPostage() == null){
-                return  toError(ReCode.FAILD.getValue(),"商品运费不能为空！");
+                return  toError("商品运费不能为空！");
             }
             if(param.getType() == null){
-                return  toError(ReCode.FAILD.getValue(),"商品类型不能为空！");
+                return  toError("商品类型不能为空！");
             }
             if(param.getImgUrls() == null || param.getImgUrls().length == 0){
-                return toError(ReCode.FAILD.getValue(),"请至少上传一张图片！");
+                return toError("请至少上传一张图片！");
             }
             if(param.getType() == 2){//抢购
                 if(param.getFloorPrice() == null){
-                    return toError(ReCode.FAILD.getValue(),"最低价不能为空！");
+                    return toError("最低价不能为空！");
                 }
                 if(param.getIntervalTime() == null){
-                    return toError(ReCode.FAILD.getValue(),"降价时间间隔不能为空！");
+                    return toError("降价时间间隔不能为空！");
                 }
                 if(param.getMarkdown() == null){
-                    return toError(ReCode.FAILD.getValue(),"降价幅度不能为空！");
+                    return toError("降价幅度不能为空！");
                 }
             }
             goodsInfoService.addGoods(userId,user.getString("nickName"),param);
@@ -183,7 +181,7 @@ public class GoodsController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -201,7 +199,7 @@ public class GoodsController extends BaseController{
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -210,7 +208,7 @@ public class GoodsController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getGoodsIds() != null && param.getGoodsIds().length<1){
-                return toError(ReCode.FAILD.getValue(),"商品ID不能为空！");
+                return toError("商品ID不能为空！");
             }
             for(Integer goodsId:param.getGoodsIds()){
                 //TODO 1、商品是否存在订单 2、订单是否已完成或已取消 3、订单已退款：是否已完成退款、是否已拒绝退款
@@ -220,7 +218,7 @@ public class GoodsController extends BaseController{
                     //1、判断是否在退货 2、判断是否已完成、已取消
                     OrderRefund orderRefund = orderInfoService.seletRefundByOrderId(orderInfo.getId());
                     if((orderInfo.getStatus().intValue() != 4 && orderInfo.getStatus().intValue() != 5) || (orderRefund != null && orderRefund.getStatus() == 1) ){
-                        return toError(ReCode.FAILD.getValue(),"商品【"+goodsInfo.getName()+"】存在未完成订单，请勿删除！");
+                        return toError("商品【"+goodsInfo.getName()+"】存在未完成订单，请勿删除！");
                     }
                 }
             }
@@ -233,7 +231,7 @@ public class GoodsController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -262,7 +260,7 @@ public class GoodsController extends BaseController{
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -277,7 +275,7 @@ public class GoodsController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -295,7 +293,7 @@ public class GoodsController extends BaseController{
             log.info("参数："+param.toString());
 
             if(param.getGoodsId() == null){
-                return toError(ReCode.FAILD.getValue(),"商品id不能为空！");
+                return toError("商品id不能为空！");
             }
             GoodsDto goodsDto;
             if(StringUtils.isNotEmpty(param.getToken())){//商品详情验证用户
@@ -320,7 +318,7 @@ public class GoodsController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -336,7 +334,7 @@ public class GoodsController extends BaseController{
             return toSuccess(categoryDtos);
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -354,13 +352,13 @@ public class GoodsController extends BaseController{
             log.info("----》同类推荐《----");
             log.info("参数："+param.toString());
             if(param.getGoodsId() == null){
-                return toError(ReCode.FAILD.getValue(),"商品id不能为空！");
+                return toError("商品id不能为空！");
             }
             if(param.getStart() == null || param.getLimit() < 0){
-                return toError(ReCode.FAILD.getValue(),"起始页数错误！");
+                return toError("起始页数错误！");
             }
             if(param.getLimit() == null || param.getLimit() < 1){
-                return toError(ReCode.FAILD.getValue(),"每页个数错误！");
+                return toError("每页个数错误！");
             }
             //同类推荐
             List<GoodsDto> goodsDtos = goodsInfoService.similarGoods(param.getGoodsId(),param.getStart(),param.getLimit());
@@ -371,7 +369,7 @@ public class GoodsController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -380,7 +378,7 @@ public class GoodsController extends BaseController{
     //获取首页轮播图
     @ApiOperation(value = "获取首页轮播图", notes = "(BannerIndexDto)获取首页轮播图",response = BaseResp.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "轮播图类型", required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "type", value = "类型 1首页 2商城", required = true, dataType = "int", paramType = "query")
     })
     @GetMapping(value = "/getBanner")
     @ResponseBody
@@ -389,14 +387,14 @@ public class GoodsController extends BaseController{
             log.info("----》获取首页轮播图《----");
             //获取首页轮播图
             if(param.getType() == null){
-                return toError(ReCode.FAILD.getValue(),"轮播图类型不能为空！");
+                return toError("轮播图类型不能为空！");
             }
             List<BannerIndexDto> banners = goodsInfoService.getBanner(param.getType());
 
             return toSuccess(banners);
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -404,12 +402,13 @@ public class GoodsController extends BaseController{
     @ApiOperation(value = "新增首页轮播图", notes = "(BannerIndex)新增首页轮播图",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "businessId", value = "业务ID:商品ID/用户ID", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "jumpType", value = "跳转类型,0:商品 1：个人", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "type", value = "业务类型,0:商品 1：个人", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "jumpType", value = "跳转类型 1页面 2链接 3图片（businessId为空）", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "businessType", value = "业务类型 1商品详情、2抢购详情、3帖子详情、4全民鉴定详情、5视频详情、6专栏", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1首页 2商城", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "title", value = "描述标题", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "imgUrl", value = "图片地址", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "sort", value = "排序", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "status", value = "是否下架，0未下架 1下架", required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "status", value = "是否展示，1展示 2不展示", required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/addBanner")
     @ResponseBody
@@ -418,16 +417,16 @@ public class GoodsController extends BaseController{
             log.info("----》新增首页轮播图《----");
             log.info("参数："+param.toString());
             if(StringUtils.isEmpty(param.getImgUrl())){
-                return toError(ReCode.FAILD.getValue(),"图片地址不能为空！");
+                return toError("图片地址不能为空！");
             }
             if(param.getBusinessId() == null){
-                return toError(ReCode.FAILD.getValue(),"业务ID不能为空！");
+                return toError("业务ID不能为空！");
             }
             if(param.getType() == null){
-                return toError(ReCode.FAILD.getValue(),"业务类型不能为空！");
+                return toError("业务类型不能为空！");
             }
             if(param.getJumpType() == null){
-                return toError(ReCode.FAILD.getValue(),"跳转类型不能为空！");
+                return toError("跳转类型不能为空！");
 
             }
             //新增首页轮播图
@@ -439,7 +438,7 @@ public class GoodsController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -462,19 +461,19 @@ public class GoodsController extends BaseController{
             log.info("----》修改首页轮播图《----");
             log.info("参数：" + param.toString());
             if (param.getBannerIndexId() == null) {
-                return toError(ReCode.FAILD.getValue(), "轮播图ID不能为空！");
+                return toError( "轮播图ID不能为空！");
             }
             if (StringUtils.isEmpty(param.getImgUrl())) {
-                return toError(ReCode.FAILD.getValue(), "图片地址不能为空！");
+                return toError( "图片地址不能为空！");
             }
             if (param.getBusinessId() == null) {
-                return toError(ReCode.FAILD.getValue(), "业务ID不能为空！");
+                return toError( "业务ID不能为空！");
             }
             if (param.getType() == null) {
-                return toError(ReCode.FAILD.getValue(), "业务类型不能为空！");
+                return toError( "业务类型不能为空！");
             }
             if (param.getJumpType() == null) {
-                return toError(ReCode.FAILD.getValue(), "跳转类型不能为空！");
+                return toError( "跳转类型不能为空！");
 
             }
             //修改首页轮播图
@@ -486,7 +485,7 @@ public class GoodsController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -506,7 +505,7 @@ public class GoodsController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -526,7 +525,7 @@ public class GoodsController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -546,45 +545,11 @@ public class GoodsController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
 
-    //举报商品
-    @ApiOperation(value = "举报商品", notes = "(void)举报商品",response = BaseResp.class)
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "goodsId", value = "商品ID", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "reason", value = "举报原因", required = true, dataType = "String", paramType = "query")
-    })
-    @PostMapping(value = "/reportGoods")
-    @ResponseBody
-    public BaseResp reportGoods(GoodsParam param) throws IOException{
-        try {
-            log.info("----》举报商品《----");
-            log.info("参数：" + param.toString());
-            //验证用户
-            if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
-            }
-            Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            String verifyUser = schedualUserService.verifyUserById(userId);
-            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if((Integer)jsonObject.get("code") != 0){
-                return toError(jsonObject.getString("report"));
-            }
-            //举报商品
-            goodsInfoService.reportGoods(userId,param.getGoodsId(),param.getReason());
-            return toSuccess();
-        } catch (ServiceException e) {
-            e.printStackTrace();
-            return toError(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
-        }
-    }
 
     //我拍下的商品
 //
@@ -621,7 +586,7 @@ public class GoodsController extends BaseController{
 //            return toResult(result);
 //        } catch (Exception e) {
 //            e.printStackTrace();
-//            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+//            return toError("系统繁忙，请稍后再试！");
 //        }
 //    }
 //    //我的收藏
@@ -657,7 +622,7 @@ public class GoodsController extends BaseController{
 //            return toResult(result);
 //        } catch (Exception e) {
 //            e.printStackTrace();
-//            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+//            return toError("系统繁忙，请稍后再试！");
 //        }
 //    }
 //    //他的商品
@@ -693,7 +658,7 @@ public class GoodsController extends BaseController{
 //            return toResult(result);
 //        } catch (Exception e) {
 //            e.printStackTrace();
-//            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+//            return toError("系统繁忙，请稍后再试！");
 //        }
 //    }
 //    //商品鉴定申请
@@ -718,10 +683,10 @@ public class GoodsController extends BaseController{
 //            }
 ////            AUser user=userService.getByToken(param.getToken());
 ////            if(user==null){
-////                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+////                return toError("登录超时，请重新登录！");
 ////            }
 ////            if(StringUtils.isNotEmpty(user.getStatus()) && "1".equals(user.getStatus())){
-////                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
+////                return toError("您的账号已被冻结，请联系管理员！");
 ////            }
 //            if(StringUtils.isEmpty(param.getContent())){
 //                return toError("商品介绍不能为空!");
@@ -732,7 +697,7 @@ public class GoodsController extends BaseController{
 //            return toResult(result);
 //        } catch (Exception e) {
 //            e.printStackTrace();
-//            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+//            return toError("系统繁忙，请稍后再试！");
 //        }
 //    }
 //    //我的鉴定列表
@@ -767,7 +732,7 @@ public class GoodsController extends BaseController{
 //            return toResult(result);
 //        } catch (Exception e) {
 //            e.printStackTrace();
-//            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+//            return toError("系统繁忙，请稍后再试！");
 //        }
 //    }
 //
@@ -798,10 +763,10 @@ public class GoodsController extends BaseController{
 //
 ////            AUser user=userService.getByToken(param.getToken());
 ////            if(user==null){
-////                return toError(ReCode.FAILD.getValue(),"登录超时，请重新登录！");
+////                return toError("登录超时，请重新登录！");
 ////            }
 ////            if(StringUtils.isNotEmpty(user.getStatus()) && "1".equals(user.getStatus())){
-////                return toError(ReCode.FAILD.getValue(),"您的账号已被冻结，请联系管理员！");
+////                return toError("您的账号已被冻结，请联系管理员！");
 ////            }
 ////            AGoods goods=goodsService.get(param.getGoodsId());
 ////            if(goods==null){
@@ -813,7 +778,7 @@ public class GoodsController extends BaseController{
 //            return toResult(result);
 //        } catch (Exception e) {
 //            e.printStackTrace();
-//            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+//            return toError("系统繁忙，请稍后再试！");
 //        }
 //    }
 

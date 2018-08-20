@@ -44,11 +44,11 @@ public class OrderControllerTest {
     public void saveOrderByCart() throws Exception {
         String a = "[{\"sellerId\":16,\"addOrderDetailDtos\":[{\"goodsId\":2,\"couponId\":10}]}]";
         String b = "[{\"sellerId\":25,\"addOrderDetailDtos\":[{\"goodsId\":101},{\"goodsId\":102}]},{\"sellerId\":24,\"addOrderDetailDtos\":[{\"goodsId\":33}]}]";
+        String c = "[{\"sellerId\":39,\"addOrderDetailDtos\":[{\"goodsId\":140},{\"goodsId\":141},{\"goodsId\":142}]}]";
         mvc.perform(MockMvcRequestBuilders.post("/order/saveOrderByCart")
-                .param("token","10036FY1533354566271")
-                .param("sellerList",b)
-                .param("addressId","45")
-                .param("type","1")
+                .param("token","10045FY1534556954408")
+                .param("sellerList",c)
+                .param("addressId","58")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

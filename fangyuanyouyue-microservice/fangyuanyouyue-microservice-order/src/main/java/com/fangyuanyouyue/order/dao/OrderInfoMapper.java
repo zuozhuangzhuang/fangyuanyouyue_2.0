@@ -71,4 +71,11 @@ public interface OrderInfoMapper {
      * @return
      */
     List<OrderInfo> getRefundOrder(@Param("userId")Integer userId, @Param("start")Integer start, @Param("limit")Integer limit, @Param("type")Integer type);
+
+    /**
+     * 根据订单号获取订单
+     * @param orderNo
+     * @return
+     */
+    OrderInfo selectByOrderNo(@Param("orderNo")String orderNo);
 }

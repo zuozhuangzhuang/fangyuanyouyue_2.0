@@ -9,6 +9,7 @@ import com.fangyuanyouyue.goods.model.*;
 import com.fangyuanyouyue.goods.param.GoodsParam;
 import com.fangyuanyouyue.goods.service.BargainService;
 import com.fangyuanyouyue.goods.service.GoodsInfoService;
+import com.fangyuanyouyue.goods.service.SchedualMessageService;
 import com.fangyuanyouyue.goods.service.SchedualUserService;
 import com.github.pagehelper.PageHelper;
 import org.apache.commons.lang.StringUtils;
@@ -44,8 +45,6 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     @Autowired
     private SchedualUserService schedualUserService;//调用其他service时用
     @Autowired
-    private ReportGoodsMapper reportGoodsMapper;
-    @Autowired
     private CommentLikesMapper commentLikesMapper;
     @Autowired
     private GoodsBargainMapper goodsBargainMapper;
@@ -55,6 +54,8 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     private OrderDetailMapper orderDetailMapper;
     @Autowired
     private BargainService bargainService;
+    @Autowired
+    private SchedualMessageService schedualMessageService;
 
     @Override
     public GoodsInfo selectByPrimaryKey(Integer id) throws ServiceException{
@@ -182,11 +183,13 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 saveGoodsPicOne(goodsInfo.getId(),param.getImgUrls()[i],2,i+1);
             }
         }
-        //TODO 给被邀请的用户发送信息 邀请我：用户“用户昵称”上传商品【商品名称】时邀请了您！点击此处前往查看吧
+        //给被邀请的用户发送信息 邀请我：用户“用户昵称”上传商品【商品名称】时邀请了您！点击此处前往查看吧
         //邀请我：用户“用户昵称”上传抢购【抢购名称】时邀请了您！点击此处前往查看吧
+        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
         if(param.getUserIds() != null && param.getUserIds().length > 0){
             for(Integer toUserId:param.getUserIds()){
-
+                schedualMessageService.easemobMessage(toUserId.toString(),
+                        "用户“"+user.getNickName()+"”上传"+(goodsInfo.getType()==1?"商品【":"抢购【")+goodsInfo.getName()+"】时邀请了您！点击此处前往查看吧","2",goodsInfo.getId().toString());
             }
         }
 //        return setDtoByGoodsInfo(null,goodsInfo);
@@ -262,8 +265,6 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
 
     @Override
     public void deleteGoods(Integer userId,Integer[] goodsIds) throws ServiceException {
-        //TODO 如果商品存在用户议价，取消所有议价并返还用户余额？
-        //TODO 删除商品所有评论？
         //批量修改商品状态为删除
         for(Integer goodsId:goodsIds){
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
@@ -274,6 +275,9 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 List<GoodsBargain> goodsBargains = goodsBargainMapper.selectAllByGoodsId(goodsId,1);//状态 1申请 2同意 3拒绝 4取消
                 for(GoodsBargain bargain:goodsBargains){
                     bargainService.updateBargain(userId,goodsId,bargain.getId(),3);
+                    //议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
+                    schedualMessageService.easemobMessage(bargain.getUserId().toString(),
+                            "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情","2",bargain.getGoodsId().toString());
                 }
                 goodsInfo.setStatus(5);//状态 普通商品 1出售中 2已售出 5删除
                 goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
@@ -481,6 +485,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         bannerIndex.setBusinessId(param.getBusinessId());
         bannerIndex.setImgUrl(param.getImgUrl());
         bannerIndex.setJumpType(param.getJumpType());
+        bannerIndex.setBusinessType(param.getBusinessType());
         if(StringUtils.isNotEmpty(param.getTitle())){
             bannerIndex.setTitle(param.getTitle());
         }
@@ -502,6 +507,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             bannerIndex.setBusinessId(param.getBusinessId());
             bannerIndex.setImgUrl(param.getImgUrl());
             bannerIndex.setJumpType(param.getJumpType());
+            bannerIndex.setBusinessType(param.getBusinessType());
             if(StringUtils.isNotEmpty(param.getTitle())){
                 bannerIndex.setTitle(param.getTitle());
             }
@@ -569,24 +575,25 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         }
     }
 
-    @Override
-    public void reportGoods(Integer userId, Integer goodsId, String reason) throws ServiceException {
-        GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
-        if(goodsInfo == null){
-            throw new ServiceException("获取商品失败！");
-        }else{
-            //判断商品状态
-            ReportGoods reportGoods = reportGoodsMapper.selectByUserIdGoodsId(userId,goodsId);
-            if(reportGoods != null){
-                throw new ServiceException("您已举报过此商品！");
-            }else{
-                reportGoods = new ReportGoods();
-                reportGoods.setAddTime(DateStampUtils.getTimesteamp());
-                reportGoods.setGoodsId(goodsId);
-                reportGoods.setReason(reason);
-                reportGoods.setUserId(userId);
-                reportGoodsMapper.insert(reportGoods);
-            }
-        }
-    }
+//    @Override
+//    public void report(Integer userId, Integer businessId, String reason,Integer type) throws ServiceException {
+//        GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId,type);
+//
+//        if(goodsInfo == null){
+//            throw new ServiceException("获取商品失败！");
+//        }else{
+//            //判断商品状态
+//            ReportGoods reportGoods = reportGoodsMapper.selectByUserIdGoodsId(userId,goodsId);
+//            if(reportGoods != null){
+//                throw new ServiceException("您已举报过此商品！");
+//            }else{
+//                reportGoods = new ReportGoods();
+//                reportGoods.setAddTime(DateStampUtils.getTimesteamp());
+//                reportGoods.setGoodsId(goodsId);
+//                reportGoods.setReason(reason);
+//                reportGoods.setUserId(userId);
+//                reportGoodsMapper.insert(reportGoods);
+//            }
+//        }
+//    }
 }

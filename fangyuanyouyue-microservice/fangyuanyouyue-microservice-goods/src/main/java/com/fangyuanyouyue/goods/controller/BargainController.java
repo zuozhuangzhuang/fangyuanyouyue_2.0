@@ -61,7 +61,7 @@ public class BargainController extends BaseController{
             log.info("参数：" + param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -70,16 +70,16 @@ public class BargainController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getGoodsId() == null){
-                return toError(ReCode.FAILD.getValue(),"商品ID不能为空！");
+                return toError("商品ID不能为空！");
             }
             if(param.getPrice() == null){
-                return toError(ReCode.FAILD.getValue(),"出价钱不能为空！");
+                return toError("出价钱不能为空！");
             }
             if(param.getAddressId() == null){
-                return toError(ReCode.FAILD.getValue(),"收货地址不能为空！");
+                return toError("收货地址不能为空！");
             }
             if(StringUtils.isEmpty(param.getPayPwd())){
-                return toError(ReCode.FAILD.getValue(),"支付密码不能为空！");
+                return toError("支付密码不能为空！");
             }
             //TODO 申请商品压价
             bargainService.addBargain(userId,param.getGoodsId(),param.getPrice(),param.getReason(),param.getAddressId(),param.getPayPwd());
@@ -89,7 +89,7 @@ public class BargainController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -109,7 +109,7 @@ public class BargainController extends BaseController{
             log.info("参数：" + param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -118,13 +118,13 @@ public class BargainController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getGoodsId() == null){
-                return toError(ReCode.FAILD.getValue(),"商品ID不能为空！");
+                return toError("商品ID不能为空！");
             }
             if(param.getBargainId() == null){
-                return toError(ReCode.FAILD.getValue(),"压价详情ID不能为空！");
+                return toError("压价详情ID不能为空！");
             }
             if(param.getStatus() == null){
-                return toError(ReCode.FAILD.getValue(),"状态不能为空！");
+                return toError("状态不能为空！");
             }
             //处理压价
             Integer orderId = bargainService.updateBargain(userId, param.getGoodsId(), param.getBargainId(), param.getStatus());
@@ -134,7 +134,7 @@ public class BargainController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -153,7 +153,7 @@ public class BargainController extends BaseController{
             log.info("参数：" + param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -162,7 +162,7 @@ public class BargainController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getStart() == null || param.getStart().intValue() < 0 || param.getLimit() == null || param.getLimit() < 1){
-                return toError(ReCode.FAILD.getValue(),"分页参数异常！");
+                return toError("分页参数异常！");
             }
             //TODO 我的压价列表
             List<GoodsDto> goodsDtos = bargainService.bargainList(userId,param.getStart(),param.getLimit(),param.getSearch());
@@ -172,7 +172,7 @@ public class BargainController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -189,7 +189,7 @@ public class BargainController extends BaseController{
             log.info("参数：" + param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -198,7 +198,7 @@ public class BargainController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getGoodsIds() == null || param.getGoodsIds().length < 1){
-                return toError(ReCode.FAILD.getValue(),"商品id不能为空！");
+                return toError("商品id不能为空！");
             }
             //TODO 删除我的议价
             bargainService.deleteBargain(userId,param.getGoodsIds());
@@ -208,7 +208,7 @@ public class BargainController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -225,7 +225,7 @@ public class BargainController extends BaseController{
 //            log.info("参数：" + param.toString());
 //            //验证用户
 //            if(StringUtils.isEmpty(param.getToken())){
-//                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+//                return toError("用户token不能为空！");
 //            }
 //            Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
 //            String verifyUser = schedualUserService.verifyUserById(userId);
@@ -235,7 +235,7 @@ public class BargainController extends BaseController{
 //            }
 //            redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
 //            if(param.getGoodsId() == null){
-//                return toError(ReCode.FAILD.getValue(),"商品ID不能为空！");
+//                return toError("商品ID不能为空！");
 //            }
 //            //TODO 压价详情
 //            GoodsBargain goodsBargain = bargainService.bargainDetail(userId, param.getBargainId(), param.getGoodsId());
@@ -246,7 +246,7 @@ public class BargainController extends BaseController{
 //            return toError(e.getMessage());
 //        } catch (Exception e) {
 //            e.printStackTrace();
-//            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+//            return toError("系统繁忙，请稍后再试！");
 //        }
 //    }
 

@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.math.BigDecimal;
-
 @ApiModel(value = "论坛相关参数")
 @Getter
 @Setter
@@ -48,8 +46,8 @@ public class ForumParam{
 	@ApiModelProperty(name = "keyword", value = "关键字搜索", dataType = "String",hidden = true)
 	private String keyword;//关键字搜索
 
-	@ApiModelProperty(name = "searchType", value = "搜索类型", dataType = "String",hidden = true)
-	private String searchType;//搜索类型
+	@ApiModelProperty(name = "searchType", value = "搜索类型", dataType = "int",hidden = true)
+	private Integer searchType;//搜索类型
 
 	@ApiModelProperty(name = "videoUrl", value = "视频链接", dataType = "String",hidden = true)
 	private String videoUrl;//视频链接

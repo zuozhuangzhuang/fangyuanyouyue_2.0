@@ -25,7 +25,8 @@ public interface ForumInfoMapper {
 
     int updateByPrimaryKey(ForumInfo record);
 
-    List<ForumInfo> selectList(@Param("columnId")Integer columnId,@Param("userId")Integer userId,@Param("type")Integer type,@Param("keyword")String keyword,@Param("start")Integer start,@Param("limit")Integer limit);
+    List<ForumInfo> selectList(@Param("columnId")Integer columnId,@Param("userId")Integer userId,@Param("type")Integer type,
+                               @Param("keyword")String keyword,@Param("start")Integer start,@Param("limit")Integer limit,@Param("searchType")Integer searchType);
 
     /**
      * 获取用户收藏的视频列表

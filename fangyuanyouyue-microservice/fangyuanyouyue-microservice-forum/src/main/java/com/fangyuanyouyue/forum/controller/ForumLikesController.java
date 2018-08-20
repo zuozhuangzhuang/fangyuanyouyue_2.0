@@ -40,7 +40,7 @@ public class ForumLikesController extends BaseController {
 	@Autowired
     private SchedualUserService schedualUserService;
 
-	@ApiOperation(value = "帖子点赞列表", notes = "根据id获取帖子点赞列表", response = BaseResp.class)
+	@ApiOperation(value = "帖子点赞列表", notes = "（ForumLikesDto）根据id获取帖子点赞列表", response = BaseResp.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "forumId", value = "帖子id", required = true, dataType = "int", paramType = "query"),
 			@ApiImplicitParam(name = "start", value = "起始条数", required = true, dataType = "int", paramType = "query"),
@@ -55,7 +55,7 @@ public class ForumLikesController extends BaseController {
 			if (param.getForumId() == null) {
 				return toError("帖子ID不能为空");
 			}
-			if (param.getStart() == null || param.getLimit() == null) {
+			if (param.getStart() == null || param.getStart() < 0 || param.getLimit() == null || param.getLimit() < 1) {
 				return toError("分页参数不能为空");
 			}
 
@@ -67,7 +67,7 @@ public class ForumLikesController extends BaseController {
             return toError(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
-			return toError(ReCode.FAILD.getValue(), "系统繁忙，请稍后再试！");
+			return toError("系统繁忙，请稍后再试！");
 		}
 	}
 
@@ -86,7 +86,7 @@ public class ForumLikesController extends BaseController {
 
             //验证用户
             if (StringUtils.isEmpty(param.getToken())) {
-                return toError(ReCode.FAILD.getValue(), "用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer) schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -98,7 +98,9 @@ public class ForumLikesController extends BaseController {
             if (param.getForumId() == null) {
                 return toError("帖子ID不能为空");
             }
-
+            if(param.getType() == null){
+                return toError("类型不能为空");
+            }
             forumLikesService.saveLikes(param.getType(), userId, param.getForumId());
 
             return toSuccess();
@@ -107,7 +109,7 @@ public class ForumLikesController extends BaseController {
             return toError(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
-			return toError(ReCode.FAILD.getValue(), "系统繁忙，请稍后再试！");
+			return toError("系统繁忙，请稍后再试！");
 		}
 	}
 }

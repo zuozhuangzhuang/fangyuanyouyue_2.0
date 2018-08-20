@@ -10,6 +10,7 @@ import com.fangyuanyouyue.forum.dto.AppraisalDetailDto;
 import com.fangyuanyouyue.forum.dto.AppraisalImgDto;
 import com.fangyuanyouyue.forum.model.*;
 import com.fangyuanyouyue.forum.service.AppraisalDetailService;
+import com.fangyuanyouyue.forum.service.SchedualMessageService;
 import com.fangyuanyouyue.forum.service.SchedualUserService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+
+import static javafx.scene.input.KeyCode.I;
 
 
 @Service(value = "appraisalDetailService")
@@ -41,6 +44,8 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 	private AppraisalLikesMapper appraisalLikesMapper;
 	@Autowired
 	AppraisalCommentMapper appraisalCommentMapper;
+	@Autowired
+	private SchedualMessageService schedualMessageService;
 
 
 	@Override
@@ -127,7 +132,7 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 			}
 			//参与鉴定用户头像列表
 			List<String> headImgUrls = new ArrayList<>();
-			List<AppraisalComment> appraisalComments = appraisalCommentMapper.selectByAppraisalId(userId, 0, 5);
+			List<AppraisalComment> appraisalComments = appraisalCommentMapper.selectByAppraisalId(model.getId(), 0, 5);
 			if(appraisalComments != null && appraisalComments.size() > 0){
 				for(AppraisalComment comment:appraisalComments){
 					headImgUrls.add(comment.getHeadImgUrl());
@@ -174,12 +179,26 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 			appraisalImg.setAddTime(DateStampUtils.getTimesteamp());
 			appraisalImgMapper.insert(appraisalImg);
 		}
-		//TODO 邀请我：用户“用户昵称”发起全民鉴定【全名鉴定名称】时邀请了您！点击此处前往查看吧
+		//邀请我：用户“用户昵称”发起全民鉴定【全名鉴定名称】时邀请了您！点击此处前往查看吧
+		UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
 		if(userIds != null && userIds.length > 0){
 			for(Integer toUserId:userIds){
-
+				schedualMessageService.easemobMessage(toUserId.toString(),
+						"用户“"+user.getNickName()+"”发起全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧","7",appraisalDetail.getId().toString());
 			}
 		}
 	}
-	
+
+	@Override
+	public void invite(Integer userId,Integer appraisalId, Integer[] userIds) throws ServiceException {
+		AppraisalDetail appraisalDetail = appraisalDetailMapper.selectByPrimaryKey(appraisalId);
+		//邀请我：用户“用户昵称”发起全民鉴定【全名鉴定名称】时邀请了您！点击此处前往查看吧
+		UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
+		if(userIds != null && userIds.length > 0){
+			for(Integer toUserId:userIds){
+				schedualMessageService.easemobMessage(toUserId.toString(),
+						"用户“"+user.getNickName()+"”看到全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧","7",appraisalDetail.getId().toString());
+			}
+		}
+	}
 }

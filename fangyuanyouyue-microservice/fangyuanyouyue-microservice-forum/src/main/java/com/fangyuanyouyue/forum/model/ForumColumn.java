@@ -31,4 +31,6 @@ public class ForumColumn {
 
     private Integer typeId;//专栏分类id
 
+    private String typeName;//专栏分类名称
+
 }
