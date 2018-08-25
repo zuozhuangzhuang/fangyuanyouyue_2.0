@@ -235,15 +235,15 @@ public class AppraisalServiceImpl implements AppraisalService{
         }else{
             StringBuffer payInfo = new StringBuffer();
             switch (type){
-                case 1://支付宝
-                    payInfo.append("支付宝支付回调！");
-                    break;
-                case 2://微信
+                case 1://TODO 微信
                     payInfo.append("微信支付回调！");
+                    break;
+                case 2://TODO 支付宝
+                    payInfo.append("支付宝支付回调！");
                     break;
                 case 3://余额
                     //验证支付密码
-                    Boolean verifyPayPwd = Boolean.valueOf(JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getString("data"));
+                    Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
                     if(!verifyPayPwd){
                         throw new ServiceException("支付密码错误！");
                     }else{
@@ -262,7 +262,7 @@ public class AppraisalServiceImpl implements AppraisalService{
             }
             //系统消息：您的鉴定申请已提交，专家将于两个工作日内给出答复，请注意消息通知
             schedualMessageService.easemobMessage(userId.toString(),
-                    "您的鉴定申请已提交，专家将于两个工作日内给出答复，请注意消息通知","1","");
+                    "您的鉴定申请已提交，专家将于两个工作日内给出答复，请注意消息通知","1","1","");
             return payInfo.toString();
         }
     }

@@ -12,6 +12,7 @@ import com.fangyuanyouyue.forum.model.*;
 import com.fangyuanyouyue.forum.service.AppraisalDetailService;
 import com.fangyuanyouyue.forum.service.SchedualMessageService;
 import com.fangyuanyouyue.forum.service.SchedualUserService;
+import com.fangyuanyouyue.forum.service.SchedualWalletService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,6 +47,8 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 	AppraisalCommentMapper appraisalCommentMapper;
 	@Autowired
 	private SchedualMessageService schedualMessageService;
+	@Autowired
+	private SchedualWalletService schedualWalletService;
 
 
 	@Override
@@ -125,10 +128,12 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 		//列表不需要返回点赞数、浏览量、评论量
 		for(AppraisalDetail model:list) {
 			AppraisalDetailDto dto = new AppraisalDetailDto(model);
-			//是否收藏
-			Collect collect = collectMapper.selectByCollectIdType(userId, model.getId(), 5);
-			if(collect != null){
-				dto.setIsCollect(StatusEnum.YES.getValue());
+			if(userId != null){
+				//是否收藏
+				Collect collect = collectMapper.selectByCollectIdType(userId, model.getId(), 5);
+				if(collect != null){
+					dto.setIsCollect(StatusEnum.YES.getValue());
+				}
 			}
 			//参与鉴定用户头像列表
 			List<String> headImgUrls = new ArrayList<>();
@@ -155,22 +160,72 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 	}
 
 	@Override
-	public void addAppraisal(Integer userId, BigDecimal bonus, String title, String content,String[] imgUrls,Integer[] userIds) throws ServiceException {
+	public String addAppraisal(Integer userId, BigDecimal bonus, String title, String content,String[] imgUrls,Integer[] userIds,Integer payType,String payPwd) throws ServiceException {
 		AppraisalDetail appraisalDetail = new AppraisalDetail();
 		appraisalDetail.setUserId(userId);
 		appraisalDetail.setTitle(title);
 		if(StringUtils.isNotEmpty(content)){
 			appraisalDetail.setContent(content);
 		}
-		if(bonus != null && bonus.compareTo(new BigDecimal(0)) > 0){
+		StringBuffer payInfo = new StringBuffer();
+		if(bonus != null){
 			appraisalDetail.setBonus(bonus);
+			//支付
+			if(payType.intValue() == 1){//TODO 微信,如果回调失败就不做处理，成功就在回调接口中继续生成全民鉴定
+				payInfo.append("微信支付回调！");
+			}else if(payType.intValue() == 2){//TODO 支付宝,如果回调失败就不做处理，成功就在回调接口中继续生成全民鉴定
+				payInfo.append("支付宝支付回调！");
+			}else if(payType.intValue() == 3){//余额
+				//验证支付密码
+				Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
+				if(!verifyPayPwd){
+					throw new ServiceException("支付密码错误！");
+				}else{
+					//调用wallet-service修改余额功能
+					schedualWalletService.updateBalance(userId,bonus,2);
+				}
+				payInfo.append("余额支付成功！");
+				appraisalDetail.setStatus(1);//状态 1进行中 2结束
+				//结束时间为7天后
+				appraisalDetail.setEndTime(DateUtil.getDateAfterDay(DateStampUtils.getTimesteamp(),7));
+				appraisalDetail.setAddTime(DateStampUtils.getTimesteamp());
+				appraisalDetail.setPvCount(0);
+				appraisalDetailMapper.insert(appraisalDetail);
+				//存储图片
+				insertAppraisalImg(imgUrls, appraisalDetail);
+				//邀请我：用户“用户昵称”发起全民鉴定【全名鉴定名称】时邀请了您！点击此处前往查看吧
+				UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
+				if(userIds != null && userIds.length > 0){
+					for(Integer toUserId:userIds){
+						schedualMessageService.easemobMessage(toUserId.toString(),
+								"用户“"+user.getNickName()+"”发起全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧","7","5",appraisalDetail.getId().toString());
+					}
+				}
+			}else{
+				throw new ServiceException("支付类型错误！");
+			}
+		}else{
+			appraisalDetail.setStatus(1);//状态 1进行中 2结束
+			//结束时间为7天后
+			appraisalDetail.setEndTime(DateUtil.getDateAfterDay(DateStampUtils.getTimesteamp(),7));
+			appraisalDetail.setAddTime(DateStampUtils.getTimesteamp());
+			appraisalDetail.setPvCount(0);
+			appraisalDetailMapper.insert(appraisalDetail);
+			//存储图片
+			insertAppraisalImg(imgUrls, appraisalDetail);
+			//邀请我：用户“用户昵称”发起全民鉴定【全名鉴定名称】时邀请了您！点击此处前往查看吧
+			UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
+			if(userIds != null && userIds.length > 0){
+				for(Integer toUserId:userIds){
+					schedualMessageService.easemobMessage(toUserId.toString(),
+							"用户“"+user.getNickName()+"”发起全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧","7","5",appraisalDetail.getId().toString());
+				}
+			}
 		}
-		appraisalDetail.setStatus(1);//状态 1显示 2隐藏
-		//结束时间为7天后
-		appraisalDetail.setEndTime(DateUtil.getDateAfterDay(DateStampUtils.getTimesteamp(),7));
-		appraisalDetail.setAddTime(DateStampUtils.getTimesteamp());
-		appraisalDetail.setPvCount(0);
-		appraisalDetailMapper.insert(appraisalDetail);
+		return payInfo.toString();
+	}
+
+	private void insertAppraisalImg(String[] imgUrls, AppraisalDetail appraisalDetail) {
 		for(String imgUrl:imgUrls){
 			//存储图片
 			AppraisalImg appraisalImg = new AppraisalImg();
@@ -178,14 +233,6 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 			appraisalImg.setAppraisalId(appraisalDetail.getId());
 			appraisalImg.setAddTime(DateStampUtils.getTimesteamp());
 			appraisalImgMapper.insert(appraisalImg);
-		}
-		//邀请我：用户“用户昵称”发起全民鉴定【全名鉴定名称】时邀请了您！点击此处前往查看吧
-		UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
-		if(userIds != null && userIds.length > 0){
-			for(Integer toUserId:userIds){
-				schedualMessageService.easemobMessage(toUserId.toString(),
-						"用户“"+user.getNickName()+"”发起全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧","7",appraisalDetail.getId().toString());
-			}
 		}
 	}
 
@@ -197,7 +244,7 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 		if(userIds != null && userIds.length > 0){
 			for(Integer toUserId:userIds){
 				schedualMessageService.easemobMessage(toUserId.toString(),
-						"用户“"+user.getNickName()+"”看到全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧","7",appraisalDetail.getId().toString());
+						"用户“"+user.getNickName()+"”看到全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧","7","5",appraisalDetail.getId().toString());
 			}
 		}
 	}

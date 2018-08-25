@@ -19,9 +19,9 @@ public class ForumLikes {
 
     private Integer forumId;//帖子id
 
-    private String nickName;
+    private String nickName;//用户昵称
     
-    private String headImgUrl;
+    private String headImgUrl;//用户头像
 
     private Date addTime;//添加时间
 

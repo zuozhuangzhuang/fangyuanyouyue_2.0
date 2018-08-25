@@ -176,4 +176,9 @@
   <select id="selectByUserId" parameterType="Integer" resultMap="BaseResultMap">
     select * from forum_column where user_id = #{userId}
   </select>
+
+  <select id="selectByName" parameterType="String" resultMap="BaseResultMap">
+    select * from forum_column where name = #{name}
+  </select>
+
 </mapper>

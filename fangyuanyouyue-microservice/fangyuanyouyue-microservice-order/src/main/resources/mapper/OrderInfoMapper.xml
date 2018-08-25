@@ -178,7 +178,7 @@
   <select id="getListByUserIdStatus" parameterType="Integer" resultMap="BaseResultMap">
     select * from order_info
     <where>
-      status <![CDATA[ <> ]]> 5 and status <![CDATA[ <> ]]> 6 and is_resolve = 2
+      status <![CDATA[ <> ]]> 6 and is_resolve = 2
       <if test="userId != null">
         and user_id = #{userId}
       </if>
@@ -212,7 +212,7 @@
   <select id="getOrderBySellerId" parameterType="Integer" resultMap="BaseResultMap">
     select * from order_info
     <where>
-      status <![CDATA[ <> ]]> 5 and status <![CDATA[ <> ]]> 6 and is_refund = 2
+      status <![CDATA[ <> ]]> 6 and is_refund = 2
       <if test="sellerId != null">
         and seller_id = #{sellerId}
       </if>
@@ -223,15 +223,6 @@
     order by add_time desc limit #{start},#{limit}
   </select>
 
-  <select id="selectByGoodsId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from order_info
-    <where>
-      status <![CDATA[ <> ]]> 5 and status <![CDATA[ <> ]]> 6 and is_refund = 2
-      <if test="goodsId != null">
-        and goods_id = #{goodsId}
-      </if>
-    </where>
-  </select>
 
   <select id="getOrderByUserIdOrderId" parameterType="Integer" resultMap="BaseResultMap">
     select * from order_info
@@ -265,5 +256,9 @@
 
   <select id="selectByOrderNo" parameterType="String" resultMap="BaseResultMap">
     select * from order_info where order_no = #{orderNo}
+  </select>
+
+  <select id="selectByStatus" parameterType="Integer" resultMap="BaseResultMap">
+    select * from order_info where status = #{status} and is_resolve = 2
   </select>
 </mapper>

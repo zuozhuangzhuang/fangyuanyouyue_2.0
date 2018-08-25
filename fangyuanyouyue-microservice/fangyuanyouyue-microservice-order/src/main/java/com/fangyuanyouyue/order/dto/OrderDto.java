@@ -50,6 +50,7 @@ public class OrderDto {
 
     private Integer isEvaluation = 2;//是否已评价 1是 2否
 
+    //TODO 待付款时间，剩余收货时间，退货待处理时间，物流号，物流公司编号
     public OrderDto() {
     }
 

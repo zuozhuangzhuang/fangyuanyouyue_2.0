@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 
+import com.fangyuanyouyue.wallet.dao.*;
 import com.fangyuanyouyue.wallet.dto.WechatPayDto;
+import com.fangyuanyouyue.wallet.model.*;
 import com.fangyuanyouyue.wallet.utils.PayCommonUtil;
 import com.fangyuanyouyue.wallet.utils.PropertyUtil;
 import com.fangyuanyouyue.wallet.utils.WechatUtil.MyWechatConfig;
@@ -20,18 +22,7 @@ import org.springframework.stereotype.Service;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.MD5Util;
-import com.fangyuanyouyue.wallet.dao.ConfinedUserMapper;
-import com.fangyuanyouyue.wallet.dao.UserBalanceDetailMapper;
-import com.fangyuanyouyue.wallet.dao.UserInfoExtMapper;
-import com.fangyuanyouyue.wallet.dao.UserRechargeDetailMapper;
-import com.fangyuanyouyue.wallet.dao.UserVipMapper;
-import com.fangyuanyouyue.wallet.dao.UserWalletMapper;
 import com.fangyuanyouyue.wallet.dto.WalletDto;
-import com.fangyuanyouyue.wallet.model.ConfinedUser;
-import com.fangyuanyouyue.wallet.model.UserInfoExt;
-import com.fangyuanyouyue.wallet.model.UserRechargeDetail;
-import com.fangyuanyouyue.wallet.model.UserVip;
-import com.fangyuanyouyue.wallet.model.UserWallet;
 import com.fangyuanyouyue.wallet.service.WalletService;
 
 @Service(value = "walletService")
@@ -50,6 +41,8 @@ public class WalletServiceImpl implements WalletService{
     private UserRechargeDetailMapper userRechargeDetailMapper;
     @Autowired
     private UserBalanceDetailMapper userBalanceDetailMapper;
+    @Autowired
+    private UserInfoMapper userInfoMapper;
 
     @Override
     public void recharge(Integer userId, BigDecimal amount, Integer type) throws ServiceException {
@@ -159,6 +152,10 @@ public class WalletServiceImpl implements WalletService{
             if(type == 1){//增加积分 同时增加总积分和积分余额
                 userWallet.setScore(userWallet.getScore()+score);
                 userWallet.setPoint(userWallet.getPoint()+score);
+                //修改用户等级
+                UserInfo info = userInfoMapper.selectByPrimaryKey(userId);
+                //积分等级，计算总积分
+                setUserLevel(userWallet.getScore(), info);
             }else{//减少积分
                 Long updateScore = userWallet.getPoint()-score;
                 //修改积分后的用户积分余额
@@ -170,6 +167,44 @@ public class WalletServiceImpl implements WalletService{
                 userWallet.setPoint(updateScore);
             }
             userWalletMapper.updateByPrimaryKey(userWallet);
+        }
+    }
+
+    /**
+     * 根据用户积分设置用户等级
+     * @param score
+     * @param info
+     */
+    static void setUserLevel(Long score, UserInfo info) {
+        if(score != null) {
+            if (0 <= score && score < 500) {//Lv1
+                info.setLevel(1);
+                info.setLevelDesc("升级还需" + (500 - score) + "积分");
+            } else if (500 <= score && score < 3000) {//Lv2
+                info.setLevel(2);
+                info.setLevelDesc("升级还需" + (3000 - score) + "积分");
+            } else if (3000 <= score && score < 10000) {//Lv3
+                info.setLevel(3);
+                info.setLevelDesc("升级还需" + (10000 - score) + "积分");
+            } else if (10000 <= score && score < 30000) {//Lv4
+                info.setLevel(4);
+                info.setLevelDesc("升级还需" + (30000 - score) + "积分");
+            } else if (30000 <= score && score < 80000) {//Lv5
+                info.setLevel(5);
+                info.setLevelDesc("升级还需" + (80000 - score) + "积分");
+            } else if (80000 <= score && score < 200000) {//Lv6
+                info.setLevel(6);
+                info.setLevelDesc("升级还需" + (200000 - score) + "积分");
+            } else if (200000 <= score && score < 600000) {//Lv7
+                info.setLevel(7);
+                info.setLevelDesc("升级还需" + (600000 - score) + "积分");
+            } else if (600000 <= score && score < 1000000) {//Lv8
+                info.setLevel(8);
+                info.setLevelDesc("升级还需" + (1000000 - score) + "积分");
+            } else if (1000000 <= score) {//Lv9
+                info.setLevel(9);
+                info.setLevelDesc("您已升至满级！");
+            }
         }
     }
 
@@ -294,8 +329,6 @@ public class WalletServiceImpl implements WalletService{
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
-
-
 
 //        SortedMap<Object, Object> parameters = PayCommonUtil.getWXPrePayID(); // 获取预付单，此处已做封装，需要工具类
 //        parameters.put("body", "小方圆-微信在线支付");

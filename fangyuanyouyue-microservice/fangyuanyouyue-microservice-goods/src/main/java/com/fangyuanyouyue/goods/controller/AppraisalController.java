@@ -3,7 +3,6 @@ package com.fangyuanyouyue.goods.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
-import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.goods.dto.AppraisalDetailDto;
 import com.fangyuanyouyue.goods.dto.AppraisalOrderInfoDto;
@@ -21,7 +20,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -36,8 +34,6 @@ public class AppraisalController extends BaseController{
     @Autowired
     private SchedualUserService schedualUserService;//调用其他service时用
     @Autowired
-    protected RedisTemplate redisTemplate;
-    @Autowired
     private CartService cartService;
     @Autowired
     private AppraisalService appraisalService;
@@ -45,7 +41,7 @@ public class AppraisalController extends BaseController{
     private SchedualRedisService schedualRedisService;
 
 
-    @ApiOperation(value = "申请鉴定", notes = "(AppraisalOrderInfoDto)申请鉴定分为四种情况：1.卖家对自己商品进行鉴定，可显示到商品详情中 " +
+    @ApiOperation(value = "申请官方鉴定", notes = "(AppraisalOrderInfoDto)申请鉴定分为四种情况：1.卖家对自己商品进行鉴定，可显示到商品详情中 " +
             "2.买家对别人的商品进行鉴定，只能自己看到 3.用户上传图片鉴定图片中的物品 " +
             "4.官方认证店铺中的所有商品都是已鉴定",response = BaseResp.class)
     @ApiImplicitParams({
@@ -60,7 +56,7 @@ public class AppraisalController extends BaseController{
     @ResponseBody
     public BaseResp addAppraisal(GoodsParam param) throws IOException {
         try {
-            log.info("----》申请鉴定《----");
+            log.info("----》申请官方鉴定《----");
             log.info("参数：" + param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
@@ -213,8 +209,8 @@ public class AppraisalController extends BaseController{
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "orderId", value = "订单ID",required = true,dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "payPwd", value = "支付密码",required = true,dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "type", value = "支付方式 1支付宝 2微信 3余额支付", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "payType", value = "支付方式 1微信 2支付宝 3余额", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "payPwd", value = "支付密码", dataType = "String", paramType = "query")
 
     })
     @PostMapping(value = "/payAppraisal")
@@ -239,11 +235,11 @@ public class AppraisalController extends BaseController{
             if(StringUtils.isEmpty(param.getPayPwd())){
                 toError("支付密码不能为空！");
             }
-            if(param.getType()==null){
+            if(param.getPayType()==null){
                 return toError("支付类型不能为空！");
             }
             //鉴定支付
-            String payInfo = appraisalService.payAppraisal(userId, param.getOrderId(), param.getType(), param.getPayPwd());
+            String payInfo = appraisalService.payAppraisal(userId, param.getOrderId(), param.getPayType(), param.getPayPwd());
             return toSuccess(payInfo);
         } catch (ServiceException e) {
             e.printStackTrace();

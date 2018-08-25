@@ -64,4 +64,5 @@ public class OrderPay {
 
     private String area;//区域
 
+    private Date sendTime;//发货时间
 }

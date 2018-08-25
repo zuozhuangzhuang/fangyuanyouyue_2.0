@@ -103,7 +103,7 @@ public class RefundServiceImpl implements RefundService{
                     isAuction = goodsInfo.getType() == 2?true:false;
                 }
                 schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
-                        "您的"+(isAuction?"抢购":"商品")+goodsName+"买家已申请退货，点击此处处理一下吧","3",orderId.toString());
+                        "您的"+(isAuction?"抢购":"商品")+goodsName+"买家已申请退货，点击此处处理一下吧","3","2",orderId.toString());
             }else{
                 throw new ServiceException("订单无法退货！");
             }
@@ -167,7 +167,18 @@ public class RefundServiceImpl implements RefundService{
                     orderRefundMapper.updateByPrimaryKeySelective(orderRefund);
                     //修改余额
                     schedualWalletService.updateBalance(orderInfo.getUserId(),orderPay.getPayAmount(),1);
-                    //TODO 退货：您对商品/抢购【商品名称】申请的退货卖家已同意，货款已退回您的余额。点击此处查看您的余额吧
+                    //退货：您对商品/抢购【商品名称】申请的退货卖家已同意，货款已退回您的余额。点击此处查看您的余额吧
+                    List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderId);
+                    StringBuffer goodsName = new StringBuffer();
+                    boolean isAuction = false;
+                    for(OrderDetail detail:orderDetails){
+                        //获取商品、抢购信息
+                        GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
+                        goodsName.append("【"+goodsInfo.getName()+"】");
+                        isAuction = goodsInfo.getType() == 2?true:false;
+                    }
+                    schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
+                            "您对"+(isAuction?"抢购":"商品")+goodsName+"申请的退货卖家已同意，货款已退回您的余额。点击此处查看您的余额吧","13","2","");
                 }else{//拒绝
                     //订单状态不变
                     orderRefund.setStatus(3);

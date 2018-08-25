@@ -66,7 +66,7 @@ public class CommentServiceImpl implements CommentService{
         //社交消息：您的抢购【抢购名称】有新的评论，点击此处前往查看吧
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(param.getGoodsId());
         schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
-                "您的"+(goodsInfo.getType() == 1?"商品【":"抢购【")+goodsInfo.getName()+"】有新的评论，点击此处前往查看吧","8",goodsComment.getId().toString());
+                "您的"+(goodsInfo.getType() == 1?"商品【":"抢购【")+goodsInfo.getName()+"】有新的评论，点击此处前往查看吧","8","3",goodsComment.getId().toString());
         return goodsComment.getId();
     }
 
@@ -159,6 +159,9 @@ public class CommentServiceImpl implements CommentService{
         while(it.hasNext()){
             GoodsCommentDto goodsCommentDto = it.next();
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsCommentDto.getGoodsId());
+            if(goodsInfo == null){
+                throw new ServiceException("商品信息异常！");
+            }
             if(goodsInfo.getType().intValue() != type.intValue()){
                 it.remove();
                 continue;

@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.forum.controller;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
@@ -47,7 +48,6 @@ public class AppraisalController extends BaseController {
     private AppraisalCommentLikesService appraisalCommentLikesService;
     @Autowired
     private AppraisalLikesService appraisalLikesService;
-
     @Autowired
     private SchedualUserService schedualUserService;
     @Autowired
@@ -266,20 +266,22 @@ public class AppraisalController extends BaseController {
     }
 
 
-    @ApiOperation(value = "发起鉴定", notes = "发起鉴定",response = BaseResp.class)
+    @ApiOperation(value = "发起全民鉴定", notes = "发起鉴定",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token",required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "bonus", value = "鉴定赏金",required = false, dataType = "BigDecimal", paramType = "query"),
             @ApiImplicitParam(name = "title", value = "标题",required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "content", value = "商品描述", required = false, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "imgUrls", value = "图片数组", allowMultiple = true,required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "userIds", value = "邀请用户id数组", allowMultiple = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "userIds", value = "邀请用户id数组", allowMultiple = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "payType", value = "支付方式  1微信 2支付宝 3余额", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "payPwd", value = "支付密码", required = false, dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/addAppraisal")
     @ResponseBody
     public BaseResp addAppraisal(AppraisalParam param) throws IOException {
         try {
-            log.info("----》发起鉴定《----");
+            log.info("----》发起全民鉴定《----");
             log.info("参数：" + param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
@@ -301,10 +303,18 @@ public class AppraisalController extends BaseController {
             if(param.getImgUrls() == null || param.getImgUrls().length < 1){
                 return toError("请至少包含一张图片！");
             }
+            if(param.getBonus() != null){
+                if(param.getBonus().compareTo(new BigDecimal(0)) < 0){
+                    return toError("赏金金额错误!");
+                }
+                if(param.getPayType() == null){
+                    return toError("支付类型不能为空!");
+                }
+            }
             //发起鉴定
-            appraisalDetailService.addAppraisal(userId,param.getBonus(),param.getTitle(),param.getContent(),param.getImgUrls(),param.getUserIds());
+            String info = appraisalDetailService.addAppraisal(userId, param.getBonus(), param.getTitle(), param.getContent(), param.getImgUrls(), param.getUserIds(), param.getPayType(),param.getPayPwd());
 
-            return toSuccess();
+            return toSuccess(info);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());

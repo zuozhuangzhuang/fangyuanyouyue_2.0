@@ -36,7 +36,7 @@ public class AppraisalDetailDto {
 
     private Integer sort;//排序
 
-    private Integer status;//状态 1显示 2隐藏
+    private Integer status;//状态 1进行中 2结束
 
     private String addTime; //发布日期
     
@@ -91,7 +91,7 @@ public class AppraisalDetailDto {
 
     public static List<AppraisalDetailDto> toDtoList(List<AppraisalDetail> list) {
         if (list == null)
-            return null;
+            return new ArrayList<>();
         List<AppraisalDetailDto> dtolist = new ArrayList<>();
         for (AppraisalDetail model : list) {
             AppraisalDetailDto dto = new AppraisalDetailDto(model);

@@ -4,6 +4,7 @@ import com.fangyuanyouyue.forum.model.AppraisalDetail;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -60,4 +61,12 @@ public interface AppraisalDetailMapper {
      * @return
      */
     AppraisalDetail selectDetailByPrimaryKey(Integer id);
+
+    /**
+     * 根据状态和结束时间获取鉴定列表
+     * @param status
+     * @param endTime
+     * @return
+     */
+    List<AppraisalDetail> selectByStatusEndTime(@Param("status")Integer status, @Param("endTime")Date endTime);
 }

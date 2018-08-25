@@ -6,6 +6,7 @@ import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.forum.dto.ForumCommentDto;
+import com.fangyuanyouyue.forum.dto.MyForumCommentDto;
 import com.fangyuanyouyue.forum.param.ForumParam;
 import com.fangyuanyouyue.forum.service.ForumCommentLikesService;
 import com.fangyuanyouyue.forum.service.ForumCommentService;
@@ -127,7 +128,7 @@ public class ForumCommentController extends BaseController {
 		}
 	}
 	
-	@ApiOperation(value = "添加评论", notes = "添加评论", response = BaseResp.class)
+	@ApiOperation(value = "添加评论", notes = "(ForumCommentDto)添加评论", response = BaseResp.class)
 	@ApiImplicitParams({
         @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
 		@ApiImplicitParam(name = "forumId", value = "帖子id", required = true, dataType = "int", paramType = "query"),
@@ -158,9 +159,9 @@ public class ForumCommentController extends BaseController {
 				return toError("内容不能为空");
 			}
 
-			forumCommentService.saveComment(userId, param.getForumId(), param.getContent(), param.getCommentId());
+			ForumCommentDto forumCommentDto = forumCommentService.saveComment(userId, param.getForumId(), param.getContent(), param.getCommentId());
 
-			return toSuccess();
+			return toSuccess(forumCommentDto);
 		} catch (ServiceException e) {
 			e.printStackTrace();
 			return toError(e.getMessage());
@@ -208,6 +209,50 @@ public class ForumCommentController extends BaseController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return toError("系统繁忙，请稍后再试！");
+		}
+	}
+
+
+	@ApiOperation(value = "我的帖子、视频评论列表", notes = "（ForumCommentDto、AppraisalCommentDto）我的帖子、视频评论列表", response = BaseResp.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+			@ApiImplicitParam(name = "start", value = "起始条数", required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "limit", value = "每页条数", required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "type", value = "类型 1帖子 2视频", required = true, dataType = "int", paramType = "query")
+	})
+	@PostMapping(value = "/myComments")
+	@ResponseBody
+	public BaseResp myComments(ForumParam param) throws IOException {
+		try {
+			log.info("----》我的帖子、视频评论列表《----");
+			log.info("参数：" + param.toString());
+
+			//验证用户
+			if(StringUtils.isEmpty(param.getToken())){
+				return toError("用户token不能为空！");
+			}
+			Integer userId = (Integer)schedualRedisService.get(param.getToken());
+			String verifyUser = schedualUserService.verifyUserById(userId);
+			JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+			if((Integer)jsonObject.get("code") != 0){
+				return toError(jsonObject.getString("report"));
+			}
+			if (param.getStart() == null || param.getLimit() == null) {
+				return toError("分页参数不能为空");
+			}
+			if(param.getType() == null){
+				return toError("类型不能为空");
+			}
+
+			List<MyForumCommentDto> dtos = forumCommentService.myComments(userId, param.getStart(),param.getLimit(),param.getType());
+
+			return toSuccess(dtos);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			return toError(e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return toError( "系统繁忙，请稍后再试！");
 		}
 	}
 

@@ -1,5 +1,6 @@
 package com.fangyuanyouyue.order.dao;
 
+import com.fangyuanyouyue.order.model.GoodsInfo;
 import com.fangyuanyouyue.order.model.OrderInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -47,12 +48,6 @@ public interface OrderInfoMapper {
      */
     List<OrderInfo> selectChildOrderByOrderId(@Param("userId")Integer userId,@Param("mainOrderId")Integer mainOrderId);
 
-    /**
-     * 根据商品ID获取进行中的订单
-     * @param goodsId
-     * @return
-     */
-    OrderInfo selectByGoodsId(@Param("goodsId")Integer goodsId);
 
     /**
      * 根据用户ID、订单ID获取订单信息
@@ -78,4 +73,11 @@ public interface OrderInfoMapper {
      * @return
      */
     OrderInfo selectByOrderNo(@Param("orderNo")String orderNo);
+
+    /**
+     * 根据状态获取订单列表
+     * @param status
+     * @return
+     */
+    List<OrderInfo> selectByStatus(@Param("status")Integer status);
 }

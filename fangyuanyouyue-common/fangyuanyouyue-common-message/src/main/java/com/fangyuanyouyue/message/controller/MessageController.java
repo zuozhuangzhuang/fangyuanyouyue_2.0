@@ -98,7 +98,8 @@ public class MessageController extends BaseController{
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "userName", value = "环信账号", required = true, dataType = "string", paramType = "query"),
 			@ApiImplicitParam(name = "content", value = "消息内容", required = true, dataType = "string", paramType = "query"),
-			@ApiImplicitParam(name = "type", value = "消息类型", required = true, dataType = "string", paramType = "query"),
+			@ApiImplicitParam(name = "type", value = "消息类型 1系统消息 2交易消息 3社交消息 4新增粉丝 5邀请我", required = true, dataType = "string", paramType = "query"),
+			@ApiImplicitParam(name = "jumpType", value = "跳转类型", required = true, dataType = "string", paramType = "query"),
 			@ApiImplicitParam(name = "businessId", value = "业务ID，如订单消息的订单ID", required = true, dataType = "string", paramType = "query")
 //			@ApiImplicitParam(name = "nickName", value = "昵称", required = true, dataType = "string", paramType = "query"),
 //			@ApiImplicitParam(name = "headImgUrl", value = "头像url", required = true, dataType = "string", paramType = "query")
@@ -120,6 +121,7 @@ public class MessageController extends BaseController{
             ext.put("nickName", "小方圆官方");//默认为系统
             ext.put("headImgUrl",param.getHeadImgUrl());//默认为系统头像
             ext.put("type",param.getType());
+            ext.put("jumpType",param.getJumpType());
             ext.put("businessId",param.getBusinessId());
             /*
             from        :来源
@@ -129,11 +131,11 @@ public class MessageController extends BaseController{
             ext         :额外信息
              */
             msg.from("system").target(userName).targetType("users").msg(msgContent).ext(ext);
-            System.out.println("msg:"+new GsonBuilder().create().toJson(msg));
+//            System.out.println("msg:"+new GsonBuilder().create().toJson(msg));
             Object result = easemobSendMessage.sendMessage(msg);
             //TODO 判断消息是否成功
             
-    		log.info("判断消息是否成功------:"+result);
+//    		log.info("判断消息是否成功------:"+result);
 
             return toSuccess(result);
         } catch (Exception e) {

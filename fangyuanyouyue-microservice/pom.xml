@@ -23,6 +23,8 @@
 		<module>fangyuanyouyue-microservice-goods</module>
 		<module>fangyuanyouyue-microservice-forum</module>
 		<module>fangyuanyouyue-microservice-order</module>
+		<module>fangyuanyouyue-microservice-timer</module>
+		<module>fangyuanyouyue-microservice-payment</module>
 	</modules>
 	
 </project>

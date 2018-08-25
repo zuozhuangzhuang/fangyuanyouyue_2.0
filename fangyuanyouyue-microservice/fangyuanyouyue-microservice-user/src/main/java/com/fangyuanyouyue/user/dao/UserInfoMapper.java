@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.user.dao;
 
 import com.fangyuanyouyue.user.model.UserInfo;
+import org.apache.catalina.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

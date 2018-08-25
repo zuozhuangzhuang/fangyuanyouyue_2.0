@@ -43,9 +43,11 @@ public interface AppraisalDetailService {
      * @param content
      * @param imgUrls
      * @param userIds
+     * @param payType
+     * @param payPwd
      * @throws ServiceException
      */
-    void addAppraisal(Integer userId, BigDecimal bonus,String title,String content,String[] imgUrls,Integer[] userIds) throws ServiceException;
+    String addAppraisal(Integer userId, BigDecimal bonus,String title,String content,String[] imgUrls,Integer[] userIds,Integer payType,String payPwd) throws ServiceException;
 
     /**
      * 鉴定内邀请好友

@@ -55,7 +55,7 @@ public class AppraisalCommentServiceImp implements AppraisalCommentService {
 				dto.setIsLikes(StatusEnum.YES.getValue());
 			}
 			//点赞数量
-			Integer likesCount = appraisalCommentLikesService.countCommentLikes(appraisalId);
+			Integer likesCount = appraisalCommentLikesService.countCommentLikes(dto.getCommentId());
 			dto.setLikesCount(likesCount);
 		}
 		return dtos;
@@ -78,7 +78,7 @@ public class AppraisalCommentServiceImp implements AppraisalCommentService {
 				AppraisalDetail appraisalDetail = appraisalDetailMapper.selectDetailByPrimaryKey(param.getAppraisalId());
 				for(Integer toUserId:param.getUserIds()){
 					schedualMessageService.easemobMessage(toUserId.toString(),
-							"用户“"+user.getNickName()+"”参与全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧","7",appraisalDetail.getId().toString());
+							"用户“"+user.getNickName()+"”参与全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧","7","5",appraisalDetail.getId().toString());
 				}
 			}
 		}else{

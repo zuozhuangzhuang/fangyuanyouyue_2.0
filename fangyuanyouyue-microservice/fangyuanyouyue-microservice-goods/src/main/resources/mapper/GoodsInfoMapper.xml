@@ -399,4 +399,8 @@
   <select id="selectGoodsByUserId" parameterType="Integer" resultMap="BaseResultMap">
     select * from goods_info where user_id = #{userId} and status <![CDATA[ <> ]]> 5 order by update_time desc limit #{start},#{limit}
   </select>
+
+  <select id="selectListByTypeStatus" parameterType="Integer" resultMap="BaseResultMap">
+    select * from goods_info where type = #{type} and status = #{status}
+  </select>
 </mapper>

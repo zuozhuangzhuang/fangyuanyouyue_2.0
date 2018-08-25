@@ -118,7 +118,9 @@ public class ForumColumnController extends BaseController {
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "token", value = "用户token",required = true, dataType = "String", paramType = "query"),
 			@ApiImplicitParam(name = "typeId", value = "专栏分类id",required = true, dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "name", value = "专栏名称",required = true, dataType = "String", paramType = "query")
+			@ApiImplicitParam(name = "name", value = "专栏名称",required = true, dataType = "String", paramType = "query"),
+			@ApiImplicitParam(name = "payType", value = "支付方式  1微信 2支付宝 3余额",required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "payPwd", value = "支付密码", dataType = "String", paramType = "query")
 	})
 	@PostMapping(value = "/addColumn")
 	@ResponseBody
@@ -146,8 +148,8 @@ public class ForumColumnController extends BaseController {
 			if(StringUtils.isEmpty(param.getName())){
 				return toError("专栏名称不能为空！");
             }
-			//TODO 申请专栏
-			forumColumnService.addColumn(userId,param.getTypeId(),param.getName());
+			//申请专栏
+			forumColumnService.addColumn(userId,param.getTypeId(),param.getName(),param.getPayType(),param.getPayPwd());
 
 			return toSuccess();
 		} catch (ServiceException e) {
@@ -158,4 +160,5 @@ public class ForumColumnController extends BaseController {
 			return toError("系统繁忙，请稍后再试！");
 		}
 	}
+
 }

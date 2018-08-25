@@ -56,6 +56,8 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     private BargainService bargainService;
     @Autowired
     private SchedualMessageService schedualMessageService;
+    @Autowired
+    private GoodsIntervalHistoryMapper goodsIntervalHistoryMapper;
 
     @Override
     public GoodsInfo selectByPrimaryKey(Integer id) throws ServiceException{
@@ -151,7 +153,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         }
         goodsInfo.setType(param.getType());
         goodsInfo.setStatus(1);//状态 1出售中 2 已售出 5删除
-        if(StringUtils.isNotEmpty(param.getVideoUrl()) && StringUtils.isNotEmpty(param.getVideoImg())){
+        if(StringUtils.isNotEmpty(param.getVideoUrl())){
             goodsInfo.setVideoUrl(param.getVideoUrl());
         }
         goodsInfo.setAddTime(DateStampUtils.getTimesteamp());
@@ -189,7 +191,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         if(param.getUserIds() != null && param.getUserIds().length > 0){
             for(Integer toUserId:param.getUserIds()){
                 schedualMessageService.easemobMessage(toUserId.toString(),
-                        "用户“"+user.getNickName()+"”上传"+(goodsInfo.getType()==1?"商品【":"抢购【")+goodsInfo.getName()+"】时邀请了您！点击此处前往查看吧","2",goodsInfo.getId().toString());
+                        "用户“"+user.getNickName()+"”上传"+(goodsInfo.getType()==1?"商品【":"抢购【")+goodsInfo.getName()+"】时邀请了您！点击此处前往查看吧","2","5",goodsInfo.getId().toString());
             }
         }
 //        return setDtoByGoodsInfo(null,goodsInfo);
@@ -205,6 +207,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         if(goodsInfo == null){
             throw new ServiceException("获取商品失败！");
         }else{
+
             List<GoodsImg> goodsImgs = goodsImgMapper.getImgsByGoodsId(goodsInfo.getId());
             String mainImgUrl = null;
             for(GoodsImg goodsImg:goodsImgs){
@@ -242,6 +245,11 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(goodsInfo.getUserId())).getString("data")), UserInfo.class);
             GoodsDto goodsDto = new GoodsDto(user,goodsInfo,goodsImgs,goodsCorrelations,goodsCommentDtos);
             goodsDto.setCommentCount(goodsCommentMapper.selectCount(goodsInfo.getId()));
+            if(goodsInfo.getType() == 2){
+                //只去最近三次降价记录
+                List<GoodsIntervalHistory> historyList = goodsIntervalHistoryMapper.selectByGoodsId(goodsInfo.getId(),0,3);
+                goodsDto.setHistoryDtos(GoodsIntervalHistoryDto.toDtoList(historyList));
+            }
             return goodsDto;
         }
     }
@@ -277,7 +285,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                     bargainService.updateBargain(userId,goodsId,bargain.getId(),3);
                     //议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
                     schedualMessageService.easemobMessage(bargain.getUserId().toString(),
-                            "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情","2",bargain.getGoodsId().toString());
+                            "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情","2","2",bargain.getGoodsId().toString());
                 }
                 goodsInfo.setStatus(5);//状态 普通商品 1出售中 2已售出 5删除
                 goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
@@ -386,7 +394,21 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         if(goodsUserInfoExtAndVip != null){
             goodsDto.setAuthType((Integer)goodsUserInfoExtAndVip.get("auth_type"));
             goodsDto.setVipLevel((Integer)goodsUserInfoExtAndVip.get("vip_level"));
-            goodsDto.setCredit((Long)goodsUserInfoExtAndVip.get("credit"));
+            Long credit = (Long)goodsUserInfoExtAndVip.get("credit");
+            goodsDto.setCredit(credit);
+            if(credit != null){
+                if(credit < -100){//差
+                    goodsDto.setCreditLevel(1);
+                }else if(-100 <= credit && credit < 1000){//低
+                    goodsDto.setCreditLevel(2);
+                }else if(1000 <= credit && credit < 10000){//中
+                    goodsDto.setCreditLevel(3);
+                }else if(10000 <= credit && credit < 500000){//高
+                    goodsDto.setCreditLevel(4);
+                }else if(500000 <= credit){//优
+                    goodsDto.setCreditLevel(5);
+                }
+            }
         }
         //卖家信息
         //粉丝数
@@ -439,7 +461,21 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         if(goodsUserInfoExtAndVip != null){
             goodsDto.setAuthType((Integer)goodsUserInfoExtAndVip.get("auth_type"));
             goodsDto.setVipLevel((Integer)goodsUserInfoExtAndVip.get("vip_level"));
-            goodsDto.setCredit((Long)goodsUserInfoExtAndVip.get("credit"));
+            Long credit = (Long)goodsUserInfoExtAndVip.get("credit");
+            goodsDto.setCredit(credit);
+            if(credit != null){
+                if(credit < -100){//差
+                    goodsDto.setCreditLevel(1);
+                }else if(-100 <= credit && credit < 1000){//低
+                    goodsDto.setCreditLevel(2);
+                }else if(1000 <= credit && credit < 10000){//中
+                    goodsDto.setCreditLevel(3);
+                }else if(10000 <= credit && credit < 500000){//高
+                    goodsDto.setCreditLevel(4);
+                }else if(500000 <= credit){//优
+                    goodsDto.setCreditLevel(5);
+                }
+            }
         }
         //卖家信息
         //粉丝数

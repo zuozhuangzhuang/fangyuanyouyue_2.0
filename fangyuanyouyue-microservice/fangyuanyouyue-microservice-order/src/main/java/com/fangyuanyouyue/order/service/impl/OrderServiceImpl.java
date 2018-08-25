@@ -120,17 +120,13 @@ public class OrderServiceImpl implements OrderService{
         orderPay.setAddTime(DateStampUtils.getTimesteamp());
         orderPayMapper.insert(orderPay);
         //生成子订单，在总订单中加入价格和邮费，实际支付价格
-        StringBuffer goodsName = new StringBuffer();
-        List<OrderDetailDto> orderDetailDtos = separatesOrder(orderInfo, orderPay, addOrderDtos,goodsName);
+        List<OrderDetailDto> orderDetailDtos = separatesOrder(orderInfo, orderPay, addOrderDtos);
         OrderDto orderDto = new OrderDto(orderInfo);
         OrderPayDto orderPayDto = new OrderPayDto(orderPay);
         orderDto.setOrderPayDto(orderPayDto);
         orderDto.setOrderDetailDtos(orderDetailDtos);
         orderDto.setSellerDtos(sellerDtos);
         orderDto.setNickName(user.getNickName());
-        //交易消息：恭喜您！您的商品【大头三年原光】、【xxx】、【xx】已有人下单，点击此处查看订单
-        schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
-                        "恭喜您！您的商品"+goodsName.toString()+"已有人下单，点击此处查看订单","3",orderInfo.getId().toString());
         return orderDto;
     }
 
@@ -141,7 +137,7 @@ public class OrderServiceImpl implements OrderService{
      * @param addOrderDstos 提供每个店铺及店铺商品列表
      * @return
      */
-    private List<OrderDetailDto> separatesOrder(OrderInfo mainOrder,OrderPay mainOrderPay,List<AddOrderDto> addOrderDstos,StringBuffer goodsName) throws ServiceException{
+    private List<OrderDetailDto> separatesOrder(OrderInfo mainOrder,OrderPay mainOrderPay,List<AddOrderDto> addOrderDstos) throws ServiceException{
         if(addOrderDstos.size() == 0){
             return null;
         }
@@ -163,7 +159,6 @@ public class OrderServiceImpl implements OrderService{
                 }
                 count++;
                 goodsList.add(goods.getId());
-                goodsName.append("【"+goods.getName()+"】");
             }
         }
         BigDecimal mainAmount = new BigDecimal(0);//原价，初始为0
@@ -224,6 +219,9 @@ public class OrderServiceImpl implements OrderService{
             List<AddOrderDetailDto> addOrderDetailDtos = addOrderDto.getAddOrderDetailDtos();
             //订单详情，出现在这里的商品都是正常的商品，不再做判断
             BigDecimal freight = new BigDecimal(0);//邮费，初始为0
+
+            //每个卖家的商品
+            StringBuffer goodsName = new StringBuffer();
             for(AddOrderDetailDto addOrderDetailDto:addOrderDetailDtos){
                 GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(addOrderDetailDto.getGoodsId())).getString("data")),GoodsInfo.class);
                 //计算总订单总金额
@@ -263,6 +261,7 @@ public class OrderServiceImpl implements OrderService{
                 payAmount = payAmount.add(orderDetail.getPayAmount());//实际支付
                 OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail,orderInfo.getStatus());
                 orderDetailDtos.add(orderDetailDto);
+                goodsName.append("【"+goods.getName()+"】");
             }
             mainAmount = mainAmount.add(amount);
             mainPayAmount = mainPayAmount.add(payAmount);
@@ -277,6 +276,10 @@ public class OrderServiceImpl implements OrderService{
             orderPay.setPayAmount(payAmount);//实际支付
             orderPay.setFreight(payFreight);//总邮费
             orderPayMapper.updateByPrimaryKey(orderPay);
+
+            //交易消息：恭喜您！您的商品【大头三年原光】、【xxx】、【xx】已有人下单，点击此处查看订单
+            schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
+                    "恭喜您！您的商品"+goodsName.toString()+"已有人下单，点击此处查看订单","3","2",orderInfo.getId().toString());
         }
         //删除买家购物车内此商品信息:goodsFeign/cartRemove
         Integer[] goodsIds = new Integer[goodsList.size()];
@@ -320,16 +323,35 @@ public class OrderServiceImpl implements OrderService{
                     pay.setStatus(5);
                     orderInfoMapper.updateByPrimaryKey(info);
                     orderPayMapper.updateByPrimaryKey(pay);
-                    //TODO 给卖家发消息：订单已取消
-                    Integer sellerId = info.getSellerId();
+                    //给卖家发消息：您的商品【名称】买家已取消订单
+                    List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(info.getId());
+                    StringBuffer goodsName = new StringBuffer();
+                    boolean isAuction = false;//是否是抢购
+                    for(OrderDetail detail:orderDetails){
+                        GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(
+                                schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
+                        isAuction = goodsInfo.getType() == 2?true:false;
+                        goodsName.append("【"+goodsInfo.getName()+"】");
+                    }
+                    schedualMessageService.easemobMessage(info.getSellerId().toString(),
+                            "您的"+(isAuction?"抢购":"商品")+goodsName+"买家已取消订单","3","2",info.getId().toString());
                 }
             }
             //获取此订单内所有商品，更改商品状态为出售中
             List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderId);
+            StringBuffer goodsName = new StringBuffer();
+            boolean isAuction = false;
             for(OrderDetail orderDetail:orderDetails){
                 schedualGoodsService.updateGoodsStatus(orderDetail.getGoodsId(),1);//状态 1出售中 2已售出 5删除
+                GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(
+                        schedualGoodsService.goodsInfo(orderDetail.getGoodsId())).getString("data")), GoodsInfo.class);
+
+                isAuction = goodsInfo.getType() == 2?true:false;
+                goodsName.append("【"+goodsInfo.getName()+"】");
             }
-            //TODO 给买家发送信息：订单已取消
+            //给买家发送信息：您未支付的商品【名称】已取消订单
+            schedualMessageService.easemobMessage(userId.toString(),
+                    "您未支付的"+(isAuction?"抢购":"商品")+goodsName+"已取消订单","3","2",orderInfo.getId().toString());
         }else{
             throw new ServiceException("订单异常！");
         }
@@ -587,7 +609,7 @@ public class OrderServiceImpl implements OrderService{
         //交易消息：恭喜您！您的商品【大头三年原光】已有人下单，点击此处查看订单
         // 交易消息：恭喜您！您的抢购【大头三年原光】已有人下单，点击此处查看订单
         schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
-                "恭喜您！您的"+(goods.getType()==1?"商品【":"抢购【")+goods.getName()+"】已有人下单，点击此处查看订单","3",orderInfo.getId().toString());
+                "恭喜您！您的"+(goods.getType()==1?"商品【":"抢购【")+goods.getName()+"】已有人下单，点击此处查看订单","3","2",orderInfo.getId().toString());
         return orderDto;
 
     }
@@ -617,56 +639,58 @@ public class OrderServiceImpl implements OrderService{
                     goodsName.append("【"+goodsInfo.getName()+"】");
                 }
 
-
+                StringBuffer info = new StringBuffer();
                 if(payType.intValue() == 1){//微信
                     WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderPay.getPayAmount())).getString("data")), WechatPayDto.class);
                     orderPay.setPayNo(wechatPayDto.getSign());
-                    //TODO 支付回调成功后给卖家发送消息
-                    return wechatPayDto.toString();
+                    //TODO 微信，失败不做处理，成功继续拆单生成订单
+                    info.append(wechatPayDto.toString());
                 }else if(payType.intValue() == 2){//支付宝
                     orderPay.setPayNo("");
-                    //TODO 支付回调成功后给卖家发送消息
-                    return "支付宝支付回调";
+                    //TODO 支付宝，失败不做处理，成功继续拆单生成订单
+                    info.append("支付宝支付回调");
                 }else if(payType.intValue() == 3){//余额
                     //验证支付密码
-                    Boolean verifyPayPwd = Boolean.valueOf(JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getString("data"));
+                    Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
                     if(!verifyPayPwd){
                         //TODO userInfo支付密码错误次数
                         throw new ServiceException("支付密码错误！");
                     }else{
                         //调用wallet-service修改余额功能
                         schedualWalletService.updateBalance(userId, orderPay.getPayAmount(),2);
+                        //拆单
+                        if(orderInfo.getSellerId() == null){//订单为合并主订单，进行拆单
+                            orderInfo.setIsResolve(1);//是否拆单 1是 2否
+                            //获取子订单
+                            List<OrderInfo> orderInfos = orderInfoMapper.selectChildOrderByOrderId(userId, orderId);
+                            for(OrderInfo childOrder:orderInfos){
+                                childOrder.setIsResolve(2);
+                                childOrder.setStatus(2);
+                                orderInfoMapper.updateByPrimaryKey(childOrder);
+                                OrderPay pay = orderPayMapper.selectByOrderId(childOrder.getId());
+                                pay.setPayType(payType);
+                                pay.setPayTime(DateStampUtils.getTimesteamp());
+                                pay.setStatus(2);
+                                orderPayMapper.updateByPrimaryKey(pay);
+                            }
+                        }
+                        orderInfo.setStatus(2);
+                        orderInfoMapper.updateByPrimaryKey(orderInfo);
+                        orderPay.setPayType(payType);
+                        orderPay.setPayTime(DateStampUtils.getTimesteamp());
+                        orderPay.setStatus(2);
+                        orderPayMapper.updateByPrimaryKey(orderPay);
+                        //交易信息：恭喜您！您的商品【大头三年原光】已被买下，点击此处查看订单
+                        //交易信息：恭喜您！您的抢购【大头三年原光】已被买下，点击此处查看订单
+                        schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
+                                "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单","3","2",orderId.toString());
+                        info.append("余额支付成功！");
                     }
                 }else{
                     throw new ServiceException("支付类型错误！");
                 }
-                //拆单
-                if(orderInfo.getSellerId() == null){//订单为合并主订单，进行拆单
-                    orderInfo.setIsResolve(1);//是否拆单 1是 2否
-                    //获取子订单
-                    List<OrderInfo> orderInfos = orderInfoMapper.selectChildOrderByOrderId(userId, orderId);
-                    for(OrderInfo childOrder:orderInfos){
-                        childOrder.setIsResolve(2);
-                        childOrder.setStatus(2);
-                        orderInfoMapper.updateByPrimaryKey(childOrder);
-                        OrderPay pay = orderPayMapper.selectByOrderId(childOrder.getId());
-                        pay.setPayType(payType);
-                        pay.setPayTime(DateStampUtils.getTimesteamp());
-                        pay.setStatus(2);
-                        orderPayMapper.updateByPrimaryKey(pay);
-                    }
-                }
-                orderInfo.setStatus(2);
-                orderInfoMapper.updateByPrimaryKey(orderInfo);
-                orderPay.setPayType(payType);
-                orderPay.setPayTime(DateStampUtils.getTimesteamp());
-                orderPay.setStatus(2);
-                orderPayMapper.updateByPrimaryKey(orderPay);
-                //交易信息：恭喜您！您的商品【大头三年原光】已被买下，点击此处查看订单
-                //交易信息：恭喜您！您的抢购【大头三年原光】已被买下，点击此处查看订单
-                schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
-                        "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单","3",orderId.toString());
-                return "余额支付成功";
+
+                return info.toString();
             }
         }
     }
@@ -722,6 +746,7 @@ public class OrderServiceImpl implements OrderService{
                 orderPay.setLogisticCompany(company.getName());
                 orderPay.setLogisticCode(number);
                 orderPay.setStatus(3);
+                orderPay.setSendTime(new Date());
                 orderPayMapper.updateByPrimaryKey(orderPay);
                 orderInfo.setStatus(3);
                 orderInfoMapper.updateByPrimaryKey(orderInfo);
@@ -848,7 +873,7 @@ public class OrderServiceImpl implements OrderService{
                 goodsName.append("【"+goodsInfo.getName()+"】");
             }
             schedualMessageService.easemobMessage(order.getSellerId().toString(),
-                    "您的"+(isAuction?"抢购":"商品")+goodsName+"买家提醒您发货，点击此处查看订单","3",orderId.toString());
+                    "您的"+(isAuction?"抢购":"商品")+goodsName+"买家提醒您发货，点击此处查看订单","3","2",orderId.toString());
         }
     }
 
@@ -873,7 +898,7 @@ public class OrderServiceImpl implements OrderService{
                     goodsName.append("【"+goodsInfo.getName()+"】");
                 }
                 schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
-                        "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单","3",orderInfo.getId().toString());
+                        "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单","3","2",orderInfo.getId().toString());
                 return true;
             }
         }

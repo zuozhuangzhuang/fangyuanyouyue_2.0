@@ -5,6 +5,7 @@ import java.util.List;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.forum.dto.ForumColumnDto;
 import com.fangyuanyouyue.forum.dto.ForumColumnTypeDto;
+import com.fangyuanyouyue.forum.model.ForumColumnApply;
 
 /**
  * 专栏接口
@@ -43,7 +44,30 @@ public interface ForumColumnService {
 	 * @param userId
 	 * @param typeId
 	 * @param name
+	 * @param payType
+	 * @param payPwd
 	 * @throws ServiceException
 	 */
-	void addColumn(Integer userId,Integer typeId,String name) throws ServiceException;
+	void addColumn(Integer userId,Integer typeId,String name,Integer payType,String payPwd) throws ServiceException;
+
+	/**
+	 * 处理专栏申请
+	 * @param userId
+	 * @param applyId
+	 * @param status
+	 * @param coverImgUrl
+	 * @param reason
+	 * @throws ServiceException
+	 */
+	void handle(Integer userId,Integer applyId,Integer status,String coverImgUrl,String reason) throws ServiceException;
+
+	/**
+	 * 专栏申请列表
+	 * @param start
+	 * @param limit
+	 * @param keyword
+	 * @return
+	 * @throws ServiceException
+	 */
+	List<ForumColumnApply> applyList(Integer start, Integer limit, String keyword) throws ServiceException;
 }

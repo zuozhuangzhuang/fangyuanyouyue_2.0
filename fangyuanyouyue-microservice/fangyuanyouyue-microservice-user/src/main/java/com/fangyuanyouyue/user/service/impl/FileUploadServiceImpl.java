@@ -68,8 +68,6 @@ public class FileUploadServiceImpl implements FileUploadService{
         }catch(Exception e){
             e.printStackTrace();
         }
-        //TODO 视频截取图片
-//        VideoUtil.fetchPic();
         return fileUrl;
     }
 

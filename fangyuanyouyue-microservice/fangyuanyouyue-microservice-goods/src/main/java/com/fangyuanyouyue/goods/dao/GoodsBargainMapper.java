@@ -49,4 +49,11 @@ public interface GoodsBargainMapper {
      * @return
      */
     List<Integer> selectGoodsIdsByUserId(@Param("userId")Integer userId,@Param("start")Integer start,@Param("limit")Integer limit,@Param("search")String search);
+
+    /**
+     * 根据状态获取议价列表
+     * @param status
+     * @return
+     */
+    List<GoodsBargain> selectByStatus(@Param("status")Integer status);
 }

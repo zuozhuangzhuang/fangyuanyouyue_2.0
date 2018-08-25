@@ -51,6 +51,7 @@ public class BargainController extends BaseController{
             @ApiImplicitParam(name = "price", value = "出价钱", required = true, dataType = "BigDecimal", paramType = "query"),
             @ApiImplicitParam(name = "reason", value = "议价理由", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "addressId", value = "收货地址id",required = true, dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "payType", value = "支付方式  1微信 2支付宝 3余额", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "payPwd", value = "支付密码",required = true, dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/addBargain")
@@ -78,11 +79,12 @@ public class BargainController extends BaseController{
             if(param.getAddressId() == null){
                 return toError("收货地址不能为空！");
             }
-            if(StringUtils.isEmpty(param.getPayPwd())){
+            if(param.getPayPwd() == null){
                 return toError("支付密码不能为空！");
             }
-            //TODO 申请商品压价
-            bargainService.addBargain(userId,param.getGoodsId(),param.getPrice(),param.getReason(),param.getAddressId(),param.getPayPwd());
+            //申请商品压价
+//            String s = bargainService.addBargain(userId, param.getGoodsId(), param.getPrice(), param.getReason(), param.getAddressId(), param.getPayPwd(), param.getPayType());
+            bargainService.addBargain(userId, param.getGoodsId(), param.getPrice(), param.getReason(), param.getAddressId(), param.getPayPwd(), param.getPayType());
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
@@ -164,7 +166,7 @@ public class BargainController extends BaseController{
             if(param.getStart() == null || param.getStart().intValue() < 0 || param.getLimit() == null || param.getLimit() < 1){
                 return toError("分页参数异常！");
             }
-            //TODO 我的压价列表
+            //我的压价列表
             List<GoodsDto> goodsDtos = bargainService.bargainList(userId,param.getStart(),param.getLimit(),param.getSearch());
             return toSuccess(goodsDtos);
         } catch (ServiceException e) {
@@ -200,7 +202,7 @@ public class BargainController extends BaseController{
             if(param.getGoodsIds() == null || param.getGoodsIds().length < 1){
                 return toError("商品id不能为空！");
             }
-            //TODO 删除我的议价
+            //删除我的议价
             bargainService.deleteBargain(userId,param.getGoodsIds());
             return toSuccess();
         } catch (ServiceException e) {
@@ -212,42 +214,5 @@ public class BargainController extends BaseController{
         }
     }
 
-//    @ApiOperation(value = "压价详情", notes = "",response = BaseResp.class)
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
-//            @ApiImplicitParam(name = "goodsId", value = "商品ID",required = true,dataType = "int", paramType = "query")
-//    })
-//    @PostMapping(value = "/bargainDetail")
-//    @ResponseBody
-//    public String bargainDetail(GoodsParam param) throws IOException {
-//        try {
-//            log.info("----》压价详情《----");
-//            log.info("参数：" + param.toString());
-//            //验证用户
-//            if(StringUtils.isEmpty(param.getToken())){
-//                return toError("用户token不能为空！");
-//            }
-//            Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
-//            String verifyUser = schedualUserService.verifyUserById(userId);
-//            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-//            if((Integer)jsonObject.get("code") != 0){
-//                return toError(jsonObject.getString("report"));
-//            }
-//            redisTemplate.expire(param.getToken(),7, TimeUnit.DAYS);
-//            if(param.getGoodsId() == null){
-//                return toError("商品ID不能为空！");
-//            }
-//            //TODO 压价详情
-//            GoodsBargain goodsBargain = bargainService.bargainDetail(userId, param.getBargainId(), param.getGoodsId());
-////            bargainService.addBargain(userId,param.getGoodsId(),param.getPrice(),param.getReason());
-//            return toSuccess( "获取压价详情成功！");
-//        } catch (ServiceException e) {
-//            e.printStackTrace();
-//            return toError(e.getMessage());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return toError("系统繁忙，请稍后再试！");
-//        }
-//    }
 
 }

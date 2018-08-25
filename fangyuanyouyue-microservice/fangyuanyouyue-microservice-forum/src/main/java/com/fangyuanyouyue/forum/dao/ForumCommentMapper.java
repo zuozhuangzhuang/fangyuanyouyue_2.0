@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.forum.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -29,5 +30,13 @@ public interface ForumCommentMapper {
     List<ForumComment> selectByForumId(@Param("forumId")Integer forumId,@Param("start")Integer start,@Param("limit")Integer limit);
 
     List<ForumComment> selectByCommentId(@Param("commentId")Integer commentId,@Param("start")Integer start,@Param("limit")Integer limit);
-    
+
+    /**
+     * 获取我的评论列表
+     * @param userId
+     * @param start
+     * @param limit
+     * @return
+     */
+    List<Map> selectByUserId(@Param("userId")Integer userId, @Param("start")Integer start, @Param("limit")Integer limit, @Param("type")Integer type);
 }

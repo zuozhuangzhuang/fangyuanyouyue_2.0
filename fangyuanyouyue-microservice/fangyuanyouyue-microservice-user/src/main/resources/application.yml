@@ -35,10 +35,6 @@ mapper:
   mappers:  com.fangyuanyouyue.user.dao
   not-empty: false
   identity: MYSQL
-# 打印sql
-logging:
-  level:
-    com.fangyuanyouyue.user: DEBUG
 #pagehelper
 pagehelper:
     helperDialect: mysql
@@ -46,3 +42,6 @@ pagehelper:
     supportMethodsArguments: true
     params: count=countSql
     returnPageInfo: check
+ribbon:
+  ReadTimeout: 60000
+  ConnectTimeout: 60000

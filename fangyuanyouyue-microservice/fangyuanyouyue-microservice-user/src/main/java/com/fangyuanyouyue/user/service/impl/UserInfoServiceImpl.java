@@ -95,17 +95,6 @@ public class UserInfoServiceImpl implements UserInfoService {
         //覆盖原来的
         schedualRedisService.set(token, userId.toString(), 7*24*60*60l);
         schedualRedisService.set(userId.toString(), token, 7*24*60*60l);
-        
-        //redisTemplate.opsForValue().set(token,userId);
-       // redisTemplate.expire(token,7,TimeUnit.DAYS);
-        
-       // if(redisTemplate.opsForValue().get(userId) != null){
-            //更新userId:token的value，同时使旧token失效
-       //     redisTemplate.opsForValue().set(redisTemplate.opsForValue().get(userId),null);
-       // }
-        //存入userId:token，用来在更新token时确保旧token失效，时效7天
-       // schedualRedisService.set(userId,token);
-       // redisTemplate.expire(userId,7,TimeUnit.DAYS);
         return token;
     }
     
@@ -296,11 +285,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public UserDto thirdBind(String token,String unionId,Integer type) throws ServiceException {
-        //Integer userId = (Integer)redisTemplate.opsForValue().get(token);
-        //redisTemplate.expire(token,7,TimeUnit.DAYS);
         //根据用户ID获取用户，生成新的三方登陆信息
-        //UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
-        
     	UserInfo userInfo = getUserByToken(token);
         
         if(userInfo == null){
@@ -342,20 +327,12 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public void updatePwd(String token, String newPwd) throws ServiceException {
-        //Integer userId = (Integer)redisTemplate.opsForValue().get(token);
-       // redisTemplate.expire(token,7,TimeUnit.DAYS);
-       // UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
-
     	UserInfo userInfo = getUserByToken(token);
         updatePwd(newPwd, userInfo);
     }
 
     @Override
     public UserDto modify(UserParam param) throws ServiceException {
-       // Integer userId = (Integer)redisTemplate.opsForValue().get(param.getToken());
-       // redisTemplate.expire(param.getToken(),7,TimeUnit.DAYS);
-        //UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
-
     	UserInfo userInfo = getUserByToken(param.getToken());
         if(userInfo == null){
             throw new ServiceException("用户不存在！");
@@ -702,7 +679,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                     }
                     //新增粉丝：用户“用户昵称”已关注了您！
                     schedualMessageService.easemobMessage(toUserId.toString(),
-                            "用户“"+userInfo.getNickName()+"”已关注了您！","1","");
+                            "用户“"+userInfo.getNickName()+"”已关注了您！","1","4","");
                 }else if(type == 1){//取消关注
                     if(userFans == null){
                         throw new ServiceException("未关注，取消关注失败！");

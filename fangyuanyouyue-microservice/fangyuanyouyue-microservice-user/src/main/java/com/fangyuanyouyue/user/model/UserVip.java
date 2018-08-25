@@ -34,4 +34,6 @@ public class UserVip {
     private Date updateTime;//更新时间
 
     private String vipNo;//会员号
+
+    private Integer isSendMessage;//是否发送7天后到期信息 1是 2否
 }

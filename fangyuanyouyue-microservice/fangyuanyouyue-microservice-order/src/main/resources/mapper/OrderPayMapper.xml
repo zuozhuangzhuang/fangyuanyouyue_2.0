@@ -15,7 +15,7 @@
     <result column="count" jdbcType="INTEGER" property="count" />
     <result column="pay_type" jdbcType="INTEGER" property="payType" />
     <result column="pay_no" jdbcType="VARCHAR" property="payNo" />
-    <result column="pay_time" jdbcType="VARCHAR" property="payTime" />
+    <result column="pay_time" jdbcType="TIMESTAMP" property="payTime" />
     <result column="send_type" jdbcType="INTEGER" property="sendType" />
     <result column="logistic_status" jdbcType="INTEGER" property="logisticStatus" />
     <result column="logistic_code" jdbcType="VARCHAR" property="logisticCode" />
@@ -27,12 +27,13 @@
     <result column="province" jdbcType="VARCHAR" property="province" />
     <result column="city" jdbcType="VARCHAR" property="city" />
     <result column="area" jdbcType="VARCHAR" property="area" />
+    <result column="send_time" jdbcType="TIMESTAMP" property="sendTime" />
   </resultMap>
   <sql id="Base_Column_List">
     id, order_id, receiver_name, receiver_phone, address, post_code, order_no, amount, 
     pay_amount, freight, count, pay_type, pay_no, pay_time, send_type, logistic_status, 
     logistic_code, logistic_company, remarks, status, add_time, update_time, province, 
-    city, area
+    city, area, send_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -53,16 +54,16 @@
       logistic_status, logistic_code, logistic_company, 
       remarks, status, add_time, 
       update_time, province, city, 
-      area)
+      area, send_time)
     values (#{id,jdbcType=INTEGER}, #{orderId,jdbcType=INTEGER}, #{receiverName,jdbcType=VARCHAR}, 
       #{receiverPhone,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{postCode,jdbcType=VARCHAR}, 
       #{orderNo,jdbcType=VARCHAR}, #{amount,jdbcType=DECIMAL}, #{payAmount,jdbcType=DECIMAL}, 
       #{freight,jdbcType=DECIMAL}, #{count,jdbcType=INTEGER}, #{payType,jdbcType=INTEGER}, 
-      #{payNo,jdbcType=VARCHAR}, #{payTime,jdbcType=VARCHAR}, #{sendType,jdbcType=INTEGER}, 
+      #{payNo,jdbcType=VARCHAR}, #{payTime,jdbcType=TIMESTAMP}, #{sendType,jdbcType=INTEGER}, 
       #{logisticStatus,jdbcType=INTEGER}, #{logisticCode,jdbcType=VARCHAR}, #{logisticCompany,jdbcType=VARCHAR}, 
       #{remarks,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP}, #{province,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR}, 
-      #{area,jdbcType=VARCHAR})
+      #{area,jdbcType=VARCHAR}, #{sendTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.fangyuanyouyue.order.model.OrderPay">
     insert into order_pay
@@ -142,6 +143,9 @@
       <if test="area != null">
         area,
       </if>
+      <if test="sendTime != null">
+        send_time,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -184,7 +188,7 @@
         #{payNo,jdbcType=VARCHAR},
       </if>
       <if test="payTime != null">
-        #{payTime,jdbcType=VARCHAR},
+        #{payTime,jdbcType=TIMESTAMP},
       </if>
       <if test="sendType != null">
         #{sendType,jdbcType=INTEGER},
@@ -218,6 +222,9 @@
       </if>
       <if test="area != null">
         #{area,jdbcType=VARCHAR},
+      </if>
+      <if test="sendTime != null">
+        #{sendTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -261,7 +268,7 @@
         pay_no = #{payNo,jdbcType=VARCHAR},
       </if>
       <if test="payTime != null">
-        pay_time = #{payTime,jdbcType=VARCHAR},
+        pay_time = #{payTime,jdbcType=TIMESTAMP},
       </if>
       <if test="sendType != null">
         send_type = #{sendType,jdbcType=INTEGER},
@@ -296,6 +303,9 @@
       <if test="area != null">
         area = #{area,jdbcType=VARCHAR},
       </if>
+      <if test="sendTime != null">
+        send_time = #{sendTime,jdbcType=TIMESTAMP},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -313,7 +323,7 @@
       count = #{count,jdbcType=INTEGER},
       pay_type = #{payType,jdbcType=INTEGER},
       pay_no = #{payNo,jdbcType=VARCHAR},
-      pay_time = #{payTime,jdbcType=VARCHAR},
+      pay_time = #{payTime,jdbcType=TIMESTAMP},
       send_type = #{sendType,jdbcType=INTEGER},
       logistic_status = #{logisticStatus,jdbcType=INTEGER},
       logistic_code = #{logisticCode,jdbcType=VARCHAR},
@@ -324,16 +334,22 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       province = #{province,jdbcType=VARCHAR},
       city = #{city,jdbcType=VARCHAR},
-      area = #{area,jdbcType=VARCHAR}
+      area = #{area,jdbcType=VARCHAR},
+      send_time = #{sendTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
   <select id="selectByOrderId" parameterType="Integer" resultMap="BaseResultMap">
     select * from order_pay
     <where>
-      status <![CDATA[ <> ]]> 5 and status <![CDATA[ <> ]]> 6
+      status <![CDATA[ <> ]]> 6
       <if test="orderId != null">
         and order_id = #{orderId,jdbcType=INTEGER}
       </if>
     </where>
+  </select>
+
+  <select id="selectByStatus" resultMap="BaseResultMap">
+    select * from order_pay where status = #{status} and send_time <![CDATA[ < ]]> #{sendTime}
   </select>
 </mapper>

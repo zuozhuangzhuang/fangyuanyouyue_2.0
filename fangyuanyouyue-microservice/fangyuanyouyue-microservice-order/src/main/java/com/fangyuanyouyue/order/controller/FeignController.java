@@ -19,7 +19,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -37,8 +36,6 @@ public class FeignController extends BaseController{
     private SchedualUserService schedualUserService;
     @Autowired
     private SchedualGoodsService schedualGoodsService;
-    @Autowired
-    protected RedisTemplate redisTemplate;
     @Autowired
     private OrderService orderService;
     @Autowired

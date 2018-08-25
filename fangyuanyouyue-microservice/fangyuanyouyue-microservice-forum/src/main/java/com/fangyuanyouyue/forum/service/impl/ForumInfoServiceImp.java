@@ -93,9 +93,9 @@ public class ForumInfoServiceImp implements ForumInfoService {
 			//普通列表，需要判断是否点赞/收藏
 			list = forumInfoMapper.selectList(columnId,null,type,keyword, start*limit, limit,searchType);
 		}else if(listType.intValue() == 2){
-			if(userId == null){
-				throw new ServiceException("用户信息为空！");
-			}
+//			if(userId == null){
+//				throw new ServiceException("用户信息为空！");
+//			}
 			//我的xx列表
 			list = forumInfoMapper.selectList(columnId,userId,type,keyword, start*limit, limit,searchType);
 		}else{
@@ -146,9 +146,11 @@ public class ForumInfoServiceImp implements ForumInfoService {
 				}else{
 					forumInfo.setColumnId(columnId);
 				}
+				forumInfo.setPvCount(0);
+				forumInfoMapper.insert(forumInfo);
 				//社交消息：您的专栏【专栏标题】有新的帖子，点击此处前往查看吧
 				schedualMessageService.easemobMessage(forumColumn.getUserId().toString(),
-						"您的专栏【"+forumColumn.getName()+"】有新的帖子，点击此处前往查看吧","5",forumInfo.getId().toString());
+						"您的专栏【"+forumColumn.getName()+"】有新的帖子，点击此处前往查看吧","5","3",forumInfo.getId().toString());
 			}
 		}else if(type == 2){//视频
 			if(StringUtils.isEmpty(videoUrl) || StringUtils.isEmpty(videoImg) || videoLength == null){
@@ -157,18 +159,18 @@ public class ForumInfoServiceImp implements ForumInfoService {
 			forumInfo.setVideoUrl(videoUrl);
 			forumInfo.setVideoLength(videoLength);
 			forumInfo.setVideoImg(videoImg);
+			forumInfo.setPvCount(0);
+			forumInfoMapper.insert(forumInfo);
 		}else{
 			throw new ServiceException("类型错误！");
 		}
-		forumInfo.setPvCount(0);
-		forumInfoMapper.insert(forumInfo);
 		if(userIds != null && userIds.length > 0){
 			//邀请我：用户“用户昵称”上传帖子【帖子名称】时邀请了您！点击此处前往查看吧
 			//邀请我：用户“用户昵称”上传视频【视频名称】时邀请了您！点击此处前往查看吧
 			UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
 			for(Integer toUserId:userIds){
 				schedualMessageService.easemobMessage(toUserId.toString(),
-						"用户“"+user.getNickName()+"”上传"+(forumInfo.getType()==1?"帖子【":"视频【")+forumInfo.getTitle()+"】时邀请了您！点击此处前往查看吧",forumInfo.getType()==1?"5":"4",forumInfo.getId().toString());
+						"用户“"+user.getNickName()+"”上传"+(forumInfo.getType()==1?"帖子【":"视频【")+forumInfo.getTitle()+"】时邀请了您！点击此处前往查看吧",forumInfo.getType()==1?"5":"4","5",forumInfo.getId().toString());
 			}
 		}
 	}

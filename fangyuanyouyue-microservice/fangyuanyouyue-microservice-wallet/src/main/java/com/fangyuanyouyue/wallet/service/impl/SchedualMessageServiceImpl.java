@@ -17,7 +17,7 @@ public class SchedualMessageServiceImpl implements SchedualMessageService {
 	}
 
 	@Override
-	public String easemobMessage(String userName, String content, String type, String businessId) {
+	public String easemobMessage(String userName, String content, String type,String jumpType, String businessId) {
         return "发送环信消息失败！";
 	}
 

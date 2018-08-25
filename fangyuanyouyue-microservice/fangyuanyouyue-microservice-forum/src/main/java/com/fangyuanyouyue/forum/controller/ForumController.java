@@ -36,7 +36,6 @@ public class ForumController extends BaseController {
     
     @Autowired
     private ForumInfoService forumInfoService;
-    
     @Autowired
     private SchedualRedisService schedualRedisService;
     @Autowired
@@ -113,7 +112,7 @@ public class ForumController extends BaseController {
                 }
             }
             if(param.getType() == null){
-                if(param.getSearchType() != 1){
+                if(param.getSearchType() != null && param.getSearchType() != 1){
             	    return toError("类型异常！");
                 }
             }

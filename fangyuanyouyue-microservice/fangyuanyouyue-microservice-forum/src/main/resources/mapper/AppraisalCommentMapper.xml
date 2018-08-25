@@ -223,12 +223,12 @@
     from appraisal_comment a,user_info b
     where a.user_id=b.id and appraisal_id=#{appraisalId}
     order by (select count(id) from appraisal_comment_likes where comment_id = a.id) desc,a.add_time desc
+    <if test="start != null and limit != null">
     limit #{start},#{limit}
+    </if>
   </select>
 
   <select id="selectByAppraisalIdUserId" parameterType="Integer" resultMap="BaseResultMap">
     select a.*,b.nick_name,b.head_img_url from appraisal_comment a,user_info b where a.user_id = b.id and user_id = #{userId} and appraisal_id = #{appraisalId}
   </select>
-
-
 </mapper>

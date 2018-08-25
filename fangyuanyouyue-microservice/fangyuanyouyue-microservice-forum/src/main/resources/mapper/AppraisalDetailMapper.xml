@@ -199,9 +199,9 @@
   </update>
 
   <select id="selectCollectList" parameterType="Integer" resultMap="BaseResultMap">
-    select a.* from appraisal_detail a,collect b
+    select a.*,c.nick_name,c.head_img_url from appraisal_detail a,collect b,user_info c
     <where>
-      a.id = b.collect_id
+      a.id = b.collect_id and a.user_id = c.id
       <if test="userId != null">
         and b.user_id = #{userId}
       </if>
@@ -251,4 +251,9 @@
     from appraisal_detail a,user_info b
     where a.user_id=b.id and a.id = #{id,jdbcType=INTEGER}
   </select>
+
+  <select id="selectByStatusEndTime" resultMap="BaseResultMap">
+    select * from appraisal_detail where status = #{status} and end_time <![CDATA[ < ]]> #{endTime}
+  </select>
+
 </mapper>

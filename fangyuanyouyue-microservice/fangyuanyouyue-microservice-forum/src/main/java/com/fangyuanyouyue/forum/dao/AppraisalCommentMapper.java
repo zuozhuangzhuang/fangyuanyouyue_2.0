@@ -41,4 +41,11 @@ public interface AppraisalCommentMapper {
      * @return
      */
     AppraisalComment selectByAppraisalIdUserId(@Param("userId")Integer userId,@Param("appraisalId")Integer appraisalId);
+
+    /**
+     * 根据鉴定id获取评论中点赞数最多的评论
+     * @param appraisalId
+     * @return
+     */
+    Integer selectMostLikesCommentIdByAppraisalId(@Param("appraisalId")Integer appraisalId);
 }

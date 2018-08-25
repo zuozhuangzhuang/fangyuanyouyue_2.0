@@ -24,6 +24,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -110,7 +111,7 @@ public class GoodsController extends BaseController{
             @ApiImplicitParam(name = "goodsCategoryIds", value = "商品分类数组（同一商品可多种分类）", required = true,allowMultiple = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "description", value = "商品描述(详情)", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "price", value = "商品价格", required = true, dataType = "BigDecimal", paramType = "query"),
-            @ApiImplicitParam(name = "postage", value = "运费", required = true, dataType = "BigDecimal", paramType = "query"),
+            @ApiImplicitParam(name = "postage", value = "运费", required = false, dataType = "BigDecimal", paramType = "query"),
             @ApiImplicitParam(name = "label", value = "标签", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "floorPrice", value = "最低价", dataType = "BigDecimal", paramType = "query"),
             @ApiImplicitParam(name = "intervalTime", value = "降价时间间隔，单位：秒", dataType = "int", paramType = "query"),
@@ -154,8 +155,8 @@ public class GoodsController extends BaseController{
             if(param.getPrice()==null){
                 return toError("价格不能为空！");
             }
-            if(param.getPostage() == null){
-                return  toError("商品运费不能为空！");
+            if(param.getPrice().compareTo(new BigDecimal(0))<0){
+                return toError("价格不能低于0元！");
             }
             if(param.getType() == null){
                 return  toError("商品类型不能为空！");
@@ -167,11 +168,20 @@ public class GoodsController extends BaseController{
                 if(param.getFloorPrice() == null){
                     return toError("最低价不能为空！");
                 }
+                if(param.getFloorPrice().compareTo(param.getPrice())>0){
+                    return toError("最低价不能大于原价！");
+                }
                 if(param.getIntervalTime() == null){
                     return toError("降价时间间隔不能为空！");
                 }
+                if(param.getIntervalTime() < 60){
+                    return toError("降价时间间隔不得低于60秒！");
+                }
                 if(param.getMarkdown() == null){
                     return toError("降价幅度不能为空！");
+                }
+                if(param.getMarkdown().compareTo(param.getPrice()) > 0){
+                    return toError("降价幅度不能大于原价！");
                 }
             }
             goodsInfoService.addGoods(userId,user.getString("nickName"),param);

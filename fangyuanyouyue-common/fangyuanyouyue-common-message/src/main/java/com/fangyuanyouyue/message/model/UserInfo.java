@@ -35,7 +35,7 @@ public class UserInfo {
 
     private String contact;//联系电话
 
-    private Integer level;//用户等级 TODO 定时器更新用户等级
+    private Integer level;//用户等级
 
     private String levelDesc;//等级描述
 

@@ -64,7 +64,7 @@ public class PayCommonUtil {
         parameters.put("mch_id","1418798002");
         parameters.put("nonce_str", PayCommonUtil.CreateNoncestr());
         parameters.put("fee_type", "CNY");
-        parameters.put("notify_url", "http://test.fangyuanyouyue.com/Auction/notify/wechatpay");//微信异步回调处理
+        parameters.put("notify_url", "");//微信异步回调处理
         parameters.put("trade_type", "APP");
         return parameters;
     }

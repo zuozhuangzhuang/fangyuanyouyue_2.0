@@ -73,4 +73,18 @@ public class ForumParam{
 	@ApiModelProperty(name = "listType", value = "列表类型 1普通列表 2我的帖子/视频列表", dataType = "int",hidden = true)
 	private Integer listType;//列表类型 1普通列表 2我的帖子/视频列表
 
+	@ApiModelProperty(name = "payType", value = "支付类型 1微信 2支付宝 3余额", dataType = "int",hidden = true)
+	private Integer payType;//支付类型 1微信 2支付宝 3余额
+
+	@ApiModelProperty(name = "payPwd", value = "支付密码", dataType = "String",hidden = true)
+	private String payPwd;//支付密码
+
+	@ApiModelProperty(name = "applyId", value = "专栏申请id", dataType = "int",hidden = true)
+	private Integer applyId;//专栏申请id
+
+	@ApiModelProperty(name = "status", value = "状态", dataType = "int",hidden = true)
+	private Integer status;//状态
+
+	@ApiModelProperty(name = "reason", value = "拒绝理由", dataType = "String",hidden = true)
+	private String reason;//拒绝理由
 }

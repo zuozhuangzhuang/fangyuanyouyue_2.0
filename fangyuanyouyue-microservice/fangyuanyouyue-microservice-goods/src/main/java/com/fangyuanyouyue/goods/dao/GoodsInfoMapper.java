@@ -111,4 +111,12 @@ public interface GoodsInfoMapper {
      * @return
      */
     List<GoodsInfo> selectGoodsByUserId(@Param("userId")Integer userId,@Param("start")Integer start,@Param("limit")Integer limit);
+
+    /**
+     * 根据类型和状态获取列表
+     * @param type
+     * @param status
+     * @return
+     */
+    List<GoodsInfo> selectListByTypeStatus(@Param("type")Integer type,@Param("status")Integer status);
 }

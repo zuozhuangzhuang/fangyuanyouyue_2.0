@@ -4,10 +4,12 @@ eureka:
     serviceUrl:
 #      defaultZone: http://localhost:8761/eureka/
       defaultZone: http://192.168.1.66:8761/eureka/
-
 ribbon:
   ReadTimeout: 60000
   SocketTimeout: 60000
+  ConnectTimeout: 60000
+  eurake:
+    enable: true
 #服务的端口
 server:
   port: 8769
@@ -51,10 +53,10 @@ zuul:
     order-service:
       path: /order/**
       serviceId: order-service
-#支付系统
-    payment-service:
-      path: /payment/**
-      serviceId: payment-service
+##支付系统
+#    payment-service:
+#      path: /payment/**
+#      serviceId: payment-service
 #钱包系统
     wallet-service:
       path: /wallet/**
@@ -63,4 +65,8 @@ zuul:
     user-service:
       path: /user/**
       serviceId: user-service
+#定时器系统
+    timer-service:
+      path: /timer/**
+      serviceId: timer-service
   sensitive-headers: "*"

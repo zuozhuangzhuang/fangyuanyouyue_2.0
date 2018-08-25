@@ -4,6 +4,9 @@ import com.fangyuanyouyue.wallet.model.UserVip;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
+import java.util.List;
+
 @Mapper
 public interface UserVipMapper {
     int deleteByPrimaryKey(Integer id);
@@ -24,4 +27,11 @@ public interface UserVipMapper {
      * @return
      */
     UserVip selectByUserId(@Param("userId")Integer userId);
+
+    /**
+     * 获取该结束的会员列表
+     * @param endTime
+     * @return
+     */
+    List<UserVip> selectByEndTime(@Param("endTime")Date endTime);
 }
