@@ -27,9 +27,10 @@ public interface OrderInfoMapper {
      * @param start
      * @param limit
      * @param status
+     * @param search 商品名、描述包含此字段的订单
      * @return
      */
-    List<OrderInfo> getListByUserIdStatus(@Param("userId")Integer userId, @Param("start") Integer start, @Param("limit")Integer limit, @Param("status")Integer status);
+    List<OrderInfo> getListByUserIdStatus(@Param("userId")Integer userId, @Param("start") Integer start, @Param("limit")Integer limit, @Param("status")Integer status,@Param("search")String search);
 
     /**
      * 根据卖家获取已拆单订单列表
@@ -37,9 +38,10 @@ public interface OrderInfoMapper {
      * @param start
      * @param limit
      * @param status
+     * @param search 商品名、描述包含此字段的订单
      * @return
      */
-    List<OrderInfo> getOrderBySellerId(@Param("sellerId")Integer sellerId, @Param("start") Integer start, @Param("limit")Integer limit, @Param("status")Integer status);
+    List<OrderInfo> getOrderBySellerId(@Param("sellerId")Integer sellerId, @Param("start") Integer start, @Param("limit")Integer limit, @Param("status")Integer status,@Param("search")String search);
 
     /**
      * 获取总订单的子订单

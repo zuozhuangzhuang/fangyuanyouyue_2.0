@@ -22,8 +22,9 @@ public interface CollectService {
      * @param userId
      * @param collectType
      * @param type
+     * @param search
      * @return
      * @throws ServiceException
      */
-    List<GoodsDto> collectList(Integer userId, Integer collectType, Integer type,Integer start,Integer limit) throws ServiceException;
+    List<GoodsDto> collectList(Integer userId, Integer collectType, Integer type,Integer start,Integer limit,String search) throws ServiceException;
 }

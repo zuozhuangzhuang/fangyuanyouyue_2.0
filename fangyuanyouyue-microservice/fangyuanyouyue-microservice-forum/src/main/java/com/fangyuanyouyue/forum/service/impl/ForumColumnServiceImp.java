@@ -1,28 +1,30 @@
 package com.fangyuanyouyue.forum.service.impl;
 
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-
 import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.dto.WechatPayDto;
+import com.fangyuanyouyue.base.enums.NotifyUrl;
+import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
-import com.fangyuanyouyue.forum.dao.ForumColumnApplyMapper;
-import com.fangyuanyouyue.forum.dao.ForumColumnTypeMapper;
+import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.base.util.IdGenerator;
+import com.fangyuanyouyue.forum.dao.*;
+import com.fangyuanyouyue.forum.dto.ForumColumnDto;
+import com.fangyuanyouyue.forum.dto.ForumColumnTypeDto;
+import com.fangyuanyouyue.forum.dto.ForumInfoDto;
+import com.fangyuanyouyue.forum.dto.MyColumnDto;
+import com.fangyuanyouyue.forum.model.ColumnOrder;
+import com.fangyuanyouyue.forum.model.ForumColumn;
 import com.fangyuanyouyue.forum.model.ForumColumnApply;
 import com.fangyuanyouyue.forum.model.ForumColumnType;
-import com.fangyuanyouyue.forum.service.SchedualMessageService;
-import com.fangyuanyouyue.forum.service.SchedualUserService;
-import com.fangyuanyouyue.forum.service.SchedualWalletService;
+import com.fangyuanyouyue.forum.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.forum.dao.ForumColumnMapper;
-import com.fangyuanyouyue.forum.dto.ForumColumnDto;
-import com.fangyuanyouyue.forum.dto.ForumColumnTypeDto;
-import com.fangyuanyouyue.forum.model.ForumColumn;
-import com.fangyuanyouyue.forum.service.ForumColumnService;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
 
 
 @Service(value = "forumColumnService")
@@ -40,6 +42,12 @@ public class ForumColumnServiceImp implements ForumColumnService {
 	private SchedualWalletService schedualWalletService;
     @Autowired
 	private ForumColumnApplyMapper forumColumnApplyMapper;
+    @Autowired
+	private ColumnOrderMapper columnOrderMapper;
+    @Autowired
+	private ForumInfoService forumInfoService;
+    @Autowired
+	private ForumPvMapper forumPvMapper;
 
 	@Override
 	public List<ForumColumnTypeDto> getColumnList(Integer start, Integer limit) throws ServiceException {
@@ -62,7 +70,7 @@ public class ForumColumnServiceImp implements ForumColumnService {
 	}
 
 	@Override
-	public void addColumn(Integer userId, Integer typeId,String name,Integer payType,String payPwd) throws ServiceException {
+	public Object addColumn(Integer userId, Integer typeId,String name,Integer payType,String payPwd) throws ServiceException {
 		//如果已申请的用户超过50人，就必须要存在payType，前50人申请不需要支付
 		//name已存在的申请时返回
 		if(forumColumnMapper.selectByName(name)!=null){
@@ -76,42 +84,73 @@ public class ForumColumnServiceImp implements ForumColumnService {
 			if(forumColumn != null){
 				throw new ServiceException("每位用户只能申请一个专栏！");
 			}else{
+				ColumnOrder columnOrder = new ColumnOrder();
+				columnOrder.setAmount(new BigDecimal(200));
+				columnOrder.setUserId(userId);
+				columnOrder.setStatus(1);//状态 1待支付 2已完成 3已删除
+				columnOrder.setAddTime(DateStampUtils.getTimesteamp());
+				columnOrder.setTypeId(typeId);
+				columnOrder.setName(name);
+				//订单号
+				final IdGenerator idg = IdGenerator.INSTANCE;
+				String id = idg.nextId();
+				columnOrder.setOrderNo(id);
+				columnOrderMapper.insert(columnOrder);
+
 				StringBuffer payInfo = new StringBuffer();
-				switch (payType){
-					case 1://TODO 微信，回调失败不做操作，成功就在回调接口中继续申请栏主
-						payInfo.append("微信支付回调！");
-						break;
-					case 2://TODO 支付宝，回调失败不做操作，成功就在回调接口中继续申请栏主
-						payInfo.append("支付宝支付回调！");
-						break;
-					case 3://余额
-						//验证支付密码
-						Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
-						if(!verifyPayPwd){
-							throw new ServiceException("支付密码错误！");
-						}else{
-							//调用wallet-service修改余额功能,成为栏主200元/人
-							schedualWalletService.updateBalance(userId,new BigDecimal(200),2);
+				//支付
+				if(payType.intValue() == 1){//TODO 微信,如果回调失败就不做处理，成功就在回调接口中继续生成全民鉴定
+					WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.column_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+					return wechatPayDto;
+				}else if(payType.intValue() == 2){//TODO 支付宝,如果回调失败就不做处理，成功就在回调接口中继续生成全民鉴定
+					String info = JSONObject.parseObject(schedualWalletService.orderPayByWechat(columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.column_alipay_notify.getNotifUrl())).getString("data");
+					payInfo.append(info);
+				}else if(payType.intValue() == 3) {//余额
+					//验证支付密码
+					Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
+					if (!verifyPayPwd) {
+						throw new ServiceException("支付密码错误！");
+					} else {
+						//调用wallet-service修改余额功能,成为栏主200元/人
+						BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, new BigDecimal(200), 2)), BaseResp.class);
+						if (baseResp.getCode() == 1) {
+							throw new ServiceException(baseResp.getReport().toString());
 						}
-						payInfo.append("余额支付成功！");
-
-						ForumColumnApply forumColumnApply = new ForumColumnApply();
-						forumColumnApply.setUserId(userId);
-						forumColumnApply.setTypeId(typeId);
-						forumColumnApply.setColumnName(name);
-						forumColumnApply.setStatus(0);//状态 0申请中 1通过 2未通过
-						forumColumnApply.setAddTime(DateStampUtils.getTimesteamp());
-						forumColumnApplyMapper.insert(forumColumnApply);
-						//在后台管理同意后添加到
-
-						//系统消息：您的【专栏名称】专栏申请已提交，将于3个工作日内完成审核，请注意消息通知
-						schedualMessageService.easemobMessage(userId.toString(),
-								"您的【"+name+"】专栏申请已提交，将于3个工作日内完成审核，请注意消息通知","1","1","");
-						break;
-					default:
+					}
+					payInfo.append("余额支付成功！");
+					//生成申请记录
+					applyColumn(columnOrder.getOrderNo(), null, 3);
+				}else{
 						throw new ServiceException("支付类型错误！");
 				}
+				return payInfo.toString();
 			}
+		}
+	}
+
+
+	@Override
+	public boolean applyColumn(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException{
+		try{
+			//获取订单
+			ColumnOrder columnOrder = columnOrderMapper.selectByOrderNo(orderNo);
+			//专栏申请
+			ForumColumnApply forumColumnApply = new ForumColumnApply();
+			forumColumnApply.setUserId(columnOrder.getUserId());
+			forumColumnApply.setTypeId(columnOrder.getTypeId());
+			forumColumnApply.setColumnName(columnOrder.getName());
+			forumColumnApply.setStatus(0);//状态 0申请中 1通过 2未通过
+			forumColumnApply.setAddTime(DateStampUtils.getTimesteamp());
+			forumColumnApplyMapper.insert(forumColumnApply);
+			//修改订单状态
+			columnOrder.setStatus(2);
+			columnOrderMapper.updateByPrimaryKey(columnOrder);
+			//系统消息：您的【专栏名称】专栏申请已提交，将于3个工作日内完成审核，请注意消息通知
+			schedualMessageService.easemobMessage(columnOrder.getUserId().toString(),
+					"您的【"+columnOrder.getName()+"】专栏申请已提交，将于3个工作日内完成审核，请注意消息通知","1","1","");
+			return true;
+		}catch (Exception e){
+			throw e;
 		}
 	}
 
@@ -160,7 +199,26 @@ public class ForumColumnServiceImp implements ForumColumnService {
 
 	@Override
 	public List<ForumColumnApply> applyList(Integer start, Integer limit, String keyword) throws ServiceException {
-
+		//TODO 专栏申请列表
 		return null;
 	}
+
+	@Override
+	public MyColumnDto myColumn(Integer userId,Integer start,Integer limit) throws ServiceException {
+		//获取专栏
+		ForumColumn forumColumn = forumColumnMapper.selectByUserId(userId);
+		if(forumColumn == null){
+			throw new ServiceException("未找到专栏！");
+		}
+		MyColumnDto myColumnDto = new MyColumnDto();
+		List<ForumInfoDto> forumList = forumInfoService.getForumList(forumColumn.getId(), null, 1, null, start, limit, 1, null);
+		Date date = DateUtil.getTimestamp(DateUtil.getCurrentTime(),DateUtil.DATE_FORMT_YEAR);
+		Integer countByColumnId = forumPvMapper.getCountByColumnId(forumColumn.getId(), date);
+		myColumnDto.setColumnId(forumColumn.getId());
+		myColumnDto.setName(forumColumn.getName());
+		myColumnDto.setTodayPvCount(countByColumnId);
+		myColumnDto.setForumList(forumList);
+		return myColumnDto;
+	}
+
 }

@@ -5,6 +5,8 @@ import org.apache.ibatis.annotations.Mapper;
 import com.fangyuanyouyue.forum.model.ForumPv;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
+
 @Mapper
 public interface ForumPvMapper {
     int deleteByPrimaryKey(Integer id);
@@ -30,4 +32,11 @@ public interface ForumPvMapper {
      * @return
      */
     ForumPv selectByUserIdColumnId(@Param("userId")Integer userId,@Param("forumId")Integer forumId);
+
+    /**
+     * 根据专栏id获取访问量
+     * @param columnId
+     * @return
+     */
+    Integer getCountByColumnId(@Param("columnId")Integer columnId,@Param("date")Date date);
 }

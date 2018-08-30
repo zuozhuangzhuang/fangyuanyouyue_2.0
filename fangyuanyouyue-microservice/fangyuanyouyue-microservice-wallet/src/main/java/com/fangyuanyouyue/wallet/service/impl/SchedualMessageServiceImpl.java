@@ -2,8 +2,10 @@ package com.fangyuanyouyue.wallet.service.impl;
 
 import com.fangyuanyouyue.wallet.service.SchedualMessageService;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@Transactional
 public class SchedualMessageServiceImpl implements SchedualMessageService {
 
     @Override

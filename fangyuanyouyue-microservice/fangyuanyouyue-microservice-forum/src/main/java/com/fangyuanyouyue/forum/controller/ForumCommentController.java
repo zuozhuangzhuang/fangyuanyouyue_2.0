@@ -213,7 +213,7 @@ public class ForumCommentController extends BaseController {
 	}
 
 
-	@ApiOperation(value = "我的帖子、视频评论列表", notes = "（ForumCommentDto、AppraisalCommentDto）我的帖子、视频评论列表", response = BaseResp.class)
+	@ApiOperation(value = "我的帖子、视频评论列表", notes = "（MyForumCommentDto）我的帖子、视频评论列表", response = BaseResp.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
 			@ApiImplicitParam(name = "start", value = "起始条数", required = true, dataType = "int", paramType = "query"),

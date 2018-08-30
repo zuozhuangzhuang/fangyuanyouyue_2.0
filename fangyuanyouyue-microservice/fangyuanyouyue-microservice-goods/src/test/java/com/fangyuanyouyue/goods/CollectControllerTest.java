@@ -67,11 +67,14 @@ public class CollectControllerTest {
     @Transactional
     public void collectList() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/collect/collectList")
-                .param("token","10025FY1533144562288")
+                .param("token","10025FY1535401039317")
                 //类型 1关注 2收藏
-                .param("type","1")
+                .param("type","2")
                 //关注/收藏类型 1商品 2抢购（只有抢购可以关注）
-                .param("collectType","2")
+                .param("collectType","1")
+                .param("start","0")
+                .param("limit","10")
+                .param("search","铁甲小宝2")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

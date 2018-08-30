@@ -69,32 +69,4 @@ public class FeignController extends BaseController{
         }
     }
 
-    @ApiOperation(value = "修改订单状态", notes = "(void)修改订单状态",response = BaseResp.class,hidden = true)
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "orderNo", value = "订单id", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "status", value = "状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除",required = true, dataType = "int", paramType = "query")
-    })
-    @PostMapping(value = "/updateOrder")
-    @ResponseBody
-    public BaseResp updateOrder(String orderNo,Integer status) throws IOException {
-        try {
-            log.info("----》修改订单状态《----");
-            log.info("参数：orderNo："+orderNo+",type："+status);
-            if(StringUtils.isEmpty(orderNo)){
-                return toError("订单号不能为空！");
-            }
-            if(status == null){
-                return toError("状态不能为空！");
-            }
-            boolean b = orderService.updateOrder(orderNo, status);
-            return toSuccess(b);
-        } catch (ServiceException e) {
-            e.printStackTrace();
-            return toError(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return toError("系统繁忙，请稍后再试！");
-        }
-    }
-
 }

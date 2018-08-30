@@ -1,12 +1,10 @@
 package com.fangyuanyouyue.wallet.service;
 
+import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.wallet.dto.BonusPoolDto;
 import com.fangyuanyouyue.wallet.dto.WalletDto;
-import com.fangyuanyouyue.wallet.dto.WechatPayDto;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 /**
  * 钱包操作接口
@@ -19,7 +17,7 @@ public interface WalletService {
      * @param type
      * @throws ServiceException
      */
-    void recharge(Integer userId, BigDecimal price,Integer type) throws ServiceException;
+    Object recharge(Integer userId, BigDecimal price,Integer type) throws Exception;
 
     /**
      * 提现
@@ -54,7 +52,7 @@ public interface WalletService {
      * @param type 1充值 2消费
      * @throws ServiceException
      */
-    void updateBalance(Integer userId,BigDecimal amount,Integer type) throws ServiceException;
+    boolean updateBalance(Integer userId,BigDecimal amount,Integer type) throws ServiceException;
 
     /**
      * 查询免费鉴定次数
@@ -94,15 +92,18 @@ public interface WalletService {
      * 微信支付
      * @param orderNo
      * @param price
+     * @param notifyUrl
      * @throws ServiceException
      */
-    WechatPayDto orderPayByWechat( String orderNo, BigDecimal price) throws Exception;
+    WechatPayDto orderPayByWechat(String orderNo, BigDecimal price,String notifyUrl) throws Exception;
 
     /**
      * 支付宝支付
-     * @param orderId
+     * @param orderNo
+     * @param price
+     * @param notifyUrl
      * @return
      * @throws ServiceException
      */
-    WechatPayDto orderPayByALi(Integer orderId) throws ServiceException;
+    String orderPayByALi(String orderNo, BigDecimal price,String notifyUrl) throws Exception;
 }

@@ -103,10 +103,15 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
   <select id="getCorrelationsByGoodsId" parameterType="Integer" resultMap="BaseResultMap">
     select * from goods_correlation where goods_id = #{goodsId,jdbcType=INTEGER}
   </select>
   <select id="selectCategoryIdByGoodsId" parameterType="Integer" resultType="Integer">
     select goods_category_id from goods_correlation where goods_id = #{goodsId,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectCorrekationsByGoodsIdCategoryId" parameterType="Integer" resultMap="BaseResultMap">
+    select * from goods_correlation where goods_id = #{goodsId} and goods_category_id = #{categoryId}
   </select>
 </mapper>

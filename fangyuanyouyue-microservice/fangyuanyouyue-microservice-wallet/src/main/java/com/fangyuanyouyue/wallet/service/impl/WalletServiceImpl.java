@@ -1,33 +1,29 @@
 package com.fangyuanyouyue.wallet.service.impl;
 
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedMap;
-
+import com.fangyuanyouyue.base.dto.WechatPayDto;
+import com.fangyuanyouyue.base.enums.NotifyUrl;
+import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.base.util.DateStampUtils;
+import com.fangyuanyouyue.base.util.IdGenerator;
+import com.fangyuanyouyue.base.util.MD5Util;
+import com.fangyuanyouyue.base.util.WechatUtil.PayCommonUtil;
+import com.fangyuanyouyue.base.util.alipay.util.GenOrderUtil;
 import com.fangyuanyouyue.wallet.dao.*;
-import com.fangyuanyouyue.wallet.dto.WechatPayDto;
+import com.fangyuanyouyue.wallet.dto.WalletDto;
 import com.fangyuanyouyue.wallet.model.*;
-import com.fangyuanyouyue.wallet.utils.PayCommonUtil;
-import com.fangyuanyouyue.wallet.utils.PropertyUtil;
-import com.fangyuanyouyue.wallet.utils.WechatUtil.MyWechatConfig;
-import com.fangyuanyouyue.wallet.utils.WechatUtil.WXPay;
-import com.fangyuanyouyue.wallet.utils.WechatUtil.WXPayUtil;
+import com.fangyuanyouyue.wallet.service.WalletService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.base.util.DateStampUtils;
-import com.fangyuanyouyue.base.util.MD5Util;
-import com.fangyuanyouyue.wallet.dto.WalletDto;
-import com.fangyuanyouyue.wallet.service.WalletService;
+import java.math.BigDecimal;
+import java.util.SortedMap;
 
 @Service(value = "walletService")
+@Transactional
 public class WalletServiceImpl implements WalletService{
-    protected Logger log = Logger.getLogger(this.getClass());
 
     @Autowired
     private UserWalletMapper userWalletMapper;
@@ -45,28 +41,38 @@ public class WalletServiceImpl implements WalletService{
     private UserInfoMapper userInfoMapper;
 
     @Override
-    public void recharge(Integer userId, BigDecimal amount, Integer type) throws ServiceException {
+    public Object recharge(Integer userId, BigDecimal amount, Integer type) throws Exception {
         UserWallet userWallet = userWalletMapper.selectByUserId(userId);
         if(userWallet == null){
             throw new ServiceException("获取钱包失败！");
-        }
-        if(type.intValue() == 1){
-            //微信
-        }else if(type.intValue() == 2){
-            //支付宝
-        }else{
-            throw new ServiceException("充值类型错误！");
         }
         //用户充值明细
         UserRechargeDetail userRechargeDetail = new UserRechargeDetail();
         userRechargeDetail.setUserId(userId);
         userRechargeDetail.setAmount(amount);
         userRechargeDetail.setPayType(type);
-        userRechargeDetail.setPayNo("");
+        //订单号
+        final IdGenerator idg = IdGenerator.INSTANCE;
+        String id = idg.nextId();
+        userRechargeDetail.setPayNo(id);
         userRechargeDetail.setAddTime(DateStampUtils.getTimesteamp());
         userRechargeDetailMapper.insert(userRechargeDetail);
+        if(type.intValue() == 1){
+            //微信
+            WechatPayDto wechatPayDto = orderPayByWechat(userRechargeDetail.getPayNo(), userRechargeDetail.getAmount(), NotifyUrl.recharge_wechat_notify.getNotifUrl());
+            return wechatPayDto;
+        }else if(type.intValue() == 2){
+            //支付宝
+            String aliPay = orderPayByALi(userRechargeDetail.getPayNo(), userRechargeDetail.getAmount(), NotifyUrl.recharge_alipay_notify.getNotifUrl());
+            return aliPay;
+        }else if(type.intValue() == 3){
+            //小程序
+            return null;
+        }else{
+            throw new ServiceException("充值类型错误！");
+        }
         //扣除余额 1充值 2消费 payType 1微信 2支付宝 3余额
-        updateBalance(userId,amount,1);
+//        updateBalance(userId,amount,1);
     }
 
     @Override
@@ -209,7 +215,7 @@ public class WalletServiceImpl implements WalletService{
     }
 
     @Override
-    public void updateBalance(Integer userId, BigDecimal amount,Integer type) throws ServiceException {
+    public boolean updateBalance(Integer userId, BigDecimal amount,Integer type) throws ServiceException {
         //获取用户钱包信息
         UserWallet userWallet = userWalletMapper.selectByUserId(userId);
         if(userWallet == null){
@@ -232,6 +238,7 @@ public class WalletServiceImpl implements WalletService{
                 throw new ServiceException("类型错误！");
             }
             userWalletMapper.updateByPrimaryKey(userWallet);
+            return true;
         }
     }
 
@@ -352,9 +359,9 @@ public class WalletServiceImpl implements WalletService{
     }
 
     @Override
-    public WechatPayDto orderPayByWechat(String orderNo, BigDecimal price) throws Exception {
+    public WechatPayDto orderPayByWechat(String orderNo, BigDecimal price,String notifyUrl) throws Exception {
 
-        SortedMap<Object, Object> parameters = PayCommonUtil.getWXPrePayID(); // 获取预付单，此处已做封装，需要工具类
+        SortedMap<Object, Object> parameters = PayCommonUtil.getWXPrePayID(notifyUrl); // 获取预付单，此处已做封装，需要工具类
         parameters.put("body", "小方圆-微信在线支付");
         parameters.put("spbill_create_ip", "127.0.0.1");
         parameters.put("out_trade_no", orderNo);
@@ -377,7 +384,10 @@ public class WalletServiceImpl implements WalletService{
     }
 
     @Override
-    public WechatPayDto orderPayByALi(Integer orderId) throws ServiceException {
-        return null;
+    public String orderPayByALi(String orderNo, BigDecimal price,String notifyUrl) throws Exception {
+        GenOrderUtil util = new GenOrderUtil();
+        String orderInfo="";
+        orderInfo = util.getOrder(orderNo, "小方圆下单",  "小方圆下单", notifyUrl, price);
+        return orderInfo;
     }
 }

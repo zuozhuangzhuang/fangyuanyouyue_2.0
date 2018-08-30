@@ -10,8 +10,10 @@ import com.fangyuanyouyue.wallet.dao.PointGoodsMapper;
 import com.fangyuanyouyue.wallet.dto.PointGoodsDto;
 import com.fangyuanyouyue.wallet.model.PointGoods;
 import com.fangyuanyouyue.wallet.service.PointGoodsService;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service(value = "pointGoodsService")
+@Transactional
 public class PointGoodsServiceImp implements PointGoodsService{
 
     @Autowired

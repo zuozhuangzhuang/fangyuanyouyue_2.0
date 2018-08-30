@@ -40,12 +40,15 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
         if(userInfo == null){
             throw new ServiceException("用户不存在！");
         }
+        UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(userInfo.getId());
         //根据用户ID获取实名认证申请信息
         IdentityAuthApply identityAuthApply = identityAuthApplyMapper.selectByUserId(userInfo.getId());
-        if(identityAuthApply != null){//已申请过 状态 1申请 2通过 3拒绝(这里不查询拒绝的情况）
-            if(identityAuthApply.getStatus() == 1){
+        if(identityAuthApply != null){
+            //identityAuthApply:已申请过 状态 1申请 2通过 3拒绝(这里不查询拒绝的情况）
+            //userInfoExt 实名登记状态 1已实名 2未实名
+            if(identityAuthApply.getStatus() == 1 && userInfoExt.getStatus() != null && userInfoExt.getStatus() == 2){
                 throw new ServiceException("您已提交过实名认证，请耐心等待！");
-            }else if(identityAuthApply.getStatus() == 2){
+            }else if(identityAuthApply.getStatus() == 2 && userInfoExt.getStatus() != null && userInfoExt.getStatus() == 1){
                 throw new ServiceException("您的实名认证已通过，请勿重复提交！");
             }
         }else{
@@ -60,6 +63,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
             identityAuthApply.setStatus(1);//状态 1申请 2通过 3拒绝
             identityAuthApply.setAddTime(DateStampUtils.getTimesteamp());
             identityAuthApplyMapper.insert(identityAuthApply);
+            userInfoExt.setStatus(2);
         }
         //系统消息：您的实名认证申请已提交，将于1个工作日内完成审核，请注意消息通知
         schedualMessageService.easemobMessage(userInfo.getId().toString(),

@@ -176,20 +176,23 @@
   </update>
 
   <select id="getListByUserIdStatus" parameterType="Integer" resultMap="BaseResultMap">
-    select * from order_info
+    select a.* from order_info a,order_detail b
     <where>
-      status <![CDATA[ <> ]]> 6 and is_resolve = 2
+      a.id = b.order_id and a.status <![CDATA[ <> ]]> 6 and a.is_resolve = 2
       <if test="userId != null">
-        and user_id = #{userId}
+        and a.user_id = #{userId}
       </if>
       <if test="status != null and status != 0 and status != 7">
-        and status = #{status} and is_refund = 2
+        and a.status = #{status} and a.is_refund = 2
       </if>
       <if test="status != null and status == 7">
-        and is_refund = 1
+        and a.is_refund = 1
+      </if>
+      <if test="search != null and search != ''">
+        and b.goods_id in (select id from goods_info where name like "%"#{search}"%" or description like "%"#{search}"%")
       </if>
     </where>
-    order by add_time desc
+    order by a.add_time desc
     <if test="start != null and limit != null">
       limit #{start},#{limit}
     </if>
@@ -199,7 +202,7 @@
   <select id="selectChildOrderByOrderId" parameterType="Integer" resultMap="BaseResultMap">
     select * from order_info
     <where>
-      status <![CDATA[ <> ]]> 5 and status <![CDATA[ <> ]]> 6 and is_refund = 2
+      status <![CDATA[ <> ]]> 5 and status <![CDATA[ <> ]]> 6 and is_resolve = 2
       <if test="userId != null">
         and user_id = #{userId}
       </if>
@@ -210,24 +213,27 @@
   </select>
 
   <select id="getOrderBySellerId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from order_info
+    select a.* from order_info a,order_detail b
     <where>
-      status <![CDATA[ <> ]]> 6 and is_refund = 2
+      a.id = b.order_id and a.status <![CDATA[ <> ]]> 6 and a.is_resolve = 2
       <if test="sellerId != null">
-        and seller_id = #{sellerId}
+        and a.seller_id = #{sellerId}
       </if>
       <if test="status != null and status != 0">
-        and status = #{status}
+        and a.status = #{status}
+      </if>
+      <if test="search != null and search != ''">
+        and b.goods_id in (select id from goods_info where name like "%"#{search}"%" or description like "%"#{search}"%")
       </if>
     </where>
-    order by add_time desc limit #{start},#{limit}
+    order by a.add_time desc limit #{start},#{limit}
   </select>
 
 
   <select id="getOrderByUserIdOrderId" parameterType="Integer" resultMap="BaseResultMap">
     select * from order_info
     <where>
-      status <![CDATA[ <> ]]> 6 and is_refund = 2
+      status <![CDATA[ <> ]]> 6 and is_resolve = 2
       <if test="userId != null">
         and user_id = #{userId}
       </if>
@@ -255,7 +261,7 @@
   </select>
 
   <select id="selectByOrderNo" parameterType="String" resultMap="BaseResultMap">
-    select * from order_info where order_no = #{orderNo}
+    select * from order_info where order_no = #{orderNo} and status = 1
   </select>
 
   <select id="selectByStatus" parameterType="Integer" resultMap="BaseResultMap">

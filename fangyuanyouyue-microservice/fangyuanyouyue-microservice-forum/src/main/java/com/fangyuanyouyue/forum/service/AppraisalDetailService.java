@@ -47,7 +47,7 @@ public interface AppraisalDetailService {
      * @param payPwd
      * @throws ServiceException
      */
-    String addAppraisal(Integer userId, BigDecimal bonus,String title,String content,String[] imgUrls,Integer[] userIds,Integer payType,String payPwd) throws ServiceException;
+    Object addAppraisal(Integer userId, BigDecimal bonus,String title,String content,String[] imgUrls,Integer[] userIds,Integer payType,String payPwd) throws ServiceException;
 
     /**
      * 鉴定内邀请好友
@@ -57,4 +57,14 @@ public interface AppraisalDetailService {
      * @throws ServiceException
      */
     void invite(Integer userId,Integer appraisalId,Integer[] userIds) throws ServiceException;
+
+    /**
+     * 根据订单号继续发布鉴定
+     * @param orderNo
+     * @param thirdOrderNo
+     * @param payType
+     * @return
+     * @throws ServiceException
+     */
+    boolean applyAppraisal(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException;
 }

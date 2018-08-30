@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -145,7 +146,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         goodsInfo.setName(param.getGoodsInfoName());
         goodsInfo.setDescription(param.getDescription());
         goodsInfo.setPrice(param.getPrice());
-        goodsInfo.setPostage(param.getPostage());
+        goodsInfo.setPostage(param.getPostage()==null?new BigDecimal(0):param.getPostage());
         //排序：是否置顶
 //        goodsInfo.setSort(param.getSort());
         if(StringUtils.isNotEmpty(param.getLabel())){
@@ -174,6 +175,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             goodsCorrelation.setGoodsId(goodsInfo.getId());
             goodsCorrelation.setAddTime(DateStampUtils.getTimesteamp());
             goodsCorrelation.setGoodsCategoryId(param.getGoodsCategoryIds()[i]);
+            goodsCorrelation.setCategoryParentId(goodsCategoryMapper.selectParentId(param.getGoodsCategoryIds()[i]));
             goodsCorrelationMapper.insert(goodsCorrelation);
         }
         //商品图片表 goods_img
@@ -331,7 +333,16 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             if(StringUtils.isNotEmpty(param.getVideoUrl())){
                 goodsInfo.setVideoUrl(param.getVideoUrl());
             }
-
+            //TODO 商品分类修改+商品父级分类修改
+            //初始化商品分类关联表
+            for(int i=0;i<param.getGoodsCategoryIds().length;i++){
+                GoodsCorrelation goodsCorrelation = goodsCorrelationMapper.selectCorrekationsByGoodsIdCategoryId(param.getGoodsCategoryIds()[i],goodsInfo.getId());
+                goodsCorrelation.setGoodsId(goodsInfo.getId());
+                goodsCorrelation.setAddTime(DateStampUtils.getTimesteamp());
+                goodsCorrelation.setGoodsCategoryId(param.getGoodsCategoryIds()[i]);
+                goodsCorrelation.setCategoryParentId(goodsCategoryMapper.selectParentId(param.getGoodsCategoryIds()[i]));
+                goodsCorrelationMapper.insert(goodsCorrelation);
+            }
             //删除旧商品图片信息
             goodsImgMapper.deleteByGoodsId(goodsInfo.getId());
             //新增商品图片信息
@@ -359,7 +370,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     @Override
     public GoodsDto goodsInfoByToken(Integer goodsId, Integer userId) throws ServiceException {
         //获取收藏表信息获取商品集合（存在多条此商品重复信息）
-        List<GoodsInfo> goodsInfos = goodsInfoMapper.selectMyCollectGoods(userId, null, null, goodsId,null,null);
+        List<GoodsInfo> goodsInfos = goodsInfoMapper.selectMyCollectGoods(userId, null, null, goodsId,null,null,null);
         GoodsInfo goodsInfo;
         GoodsDto goodsDto;
         //是否收藏/关注 1未关注未收藏（商品/抢购） 2已关注未收藏(抢购) 3未关注已收藏（商品/抢购） 4已关注已收藏(抢购)
@@ -371,7 +382,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 goodsDto.setIsCollect(4);
             }else{
                 //只有一条收藏数据——判断是收藏还是关注
-                Collect collect = collectMapper.selectByCollectId(userId,goodsId, null);
+                Collect collect = collectMapper.selectByCollectId(userId,goodsId, null,null);
                 if(collect == null){
                     throw new ServiceException("获取收藏信息失败！");
                 }

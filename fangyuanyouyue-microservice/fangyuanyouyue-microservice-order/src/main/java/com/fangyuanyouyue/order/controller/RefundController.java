@@ -89,7 +89,7 @@ public class RefundController extends BaseController{
     }
 
 
-    @ApiOperation(value = "退货详情", notes = "(void)退货详情")
+    @ApiOperation(value = "退货详情", notes = "(OrderRefundDto)退货详情")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "orderId", value = "订单id",required = true, dataType = "int", paramType = "query")

@@ -169,10 +169,11 @@ public interface UserInfoService {
      * @param userId
      * @param start
      * @param limit
+     * @param search
      * @return
      * @throws ServiceException
      */
-    List<UserFansDto> myFansOrFollows(Integer userId,Integer type,Integer start,Integer limit) throws ServiceException;
+    List<UserFansDto> myFansOrFollows(Integer userId,Integer type,Integer start,Integer limit,String search) throws ServiceException;
 
     /**
      * 获取待处理信息

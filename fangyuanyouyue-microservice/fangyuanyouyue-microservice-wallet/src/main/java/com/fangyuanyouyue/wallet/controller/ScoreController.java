@@ -103,7 +103,7 @@ public class ScoreController extends BaseController{
     }
 
 
-    @ApiOperation(value = "积分商品列表", notes = "获取积分商城列表",response = BaseResp.class)
+    @ApiOperation(value = "积分商品列表", notes = "(PointGoodsDto)获取积分商城列表",response = BaseResp.class)
     @ApiImplicitParams({
         @ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
         @ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query")

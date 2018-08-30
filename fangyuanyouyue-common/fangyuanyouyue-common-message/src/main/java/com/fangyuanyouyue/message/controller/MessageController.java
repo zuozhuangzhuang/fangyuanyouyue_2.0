@@ -112,29 +112,52 @@ public class MessageController extends BaseController{
             log.info("----》环信发送普通消息《----");
             log.info("参数："+param.toString());
 //            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(Integer.valueOf(param.getUserName()))).getString("data")), UserInfo.class);
+            String headImgUrl = "http://pic.baike.soso.com/p/20120419/20120419170638-1137484758.jpg";
+            String nickName;
+            String from;
+            if(param.getJumpType().equals("1")){
+                nickName = "系统消息";
+                from = "65";
+//                headImgUrl = "";
+            }else if(param.getJumpType().equals("2")){
+                nickName = "交易消息";
+                from = "66";
+//                headImgUrl = "";
+            }else if(param.getJumpType().equals("3")){
+                nickName = "社交消息";
+                from = "67";
+//                headImgUrl = "";
+            }else if(param.getJumpType().equals("4")){
+                nickName = "新增粉丝";
+                from = "68";
+//                headImgUrl = "";
+            }else{
+                nickName = "邀请我";
+                from = "69";
+//                headImgUrl = "";
+            }
             Msg msg = new Msg();
             MsgContent msgContent = new MsgContent();
             msgContent.type(MsgContent.TypeEnum.TXT).msg(param.getContent());
             UserName userName = new UserName();
             userName.add(param.getUserName());
             Map<String,Object> ext = new HashMap<>();
-            ext.put("nickName", "小方圆官方");//默认为系统
-            ext.put("headImgUrl",param.getHeadImgUrl());//默认为系统头像
-            ext.put("type",param.getType());
+            ext.put("nickName", nickName);//默认为系统
+            ext.put("headImgUrl",headImgUrl);//默认为系统头像
             ext.put("jumpType",param.getJumpType());
             ext.put("businessId",param.getBusinessId());
             /*
-            from        :来源
-            target      :目标
-            targetType  :目标类型
-            msg         :信息内容
-            ext         :额外信息
+                from        :来源
+                target      :目标
+                targetType  :目标类型
+                msg         :信息内容
+                ext         :额外信息
              */
-            msg.from("system").target(userName).targetType("users").msg(msgContent).ext(ext);
-//            System.out.println("msg:"+new GsonBuilder().create().toJson(msg));
+            msg.from(from).target(userName).targetType("users").msg(msgContent).ext(ext);
+            System.out.println("msg:"+new GsonBuilder().create().toJson(msg));
             Object result = easemobSendMessage.sendMessage(msg);
             //TODO 判断消息是否成功
-            
+
 //    		log.info("判断消息是否成功------:"+result);
 
             return toSuccess(result);

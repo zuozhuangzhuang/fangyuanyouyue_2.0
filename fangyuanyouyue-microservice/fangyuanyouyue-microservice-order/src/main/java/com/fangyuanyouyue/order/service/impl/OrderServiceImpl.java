@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import com.alibaba.fastjson.JSONException;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.dto.WechatPayDto;
+import com.fangyuanyouyue.base.enums.NotifyUrl;
 import com.fangyuanyouyue.order.dao.*;
 import com.fangyuanyouyue.order.dto.*;
 import com.fangyuanyouyue.order.model.*;
@@ -441,14 +444,15 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    public List<OrderDto> myOrderList(Integer userId, Integer start, Integer limit, Integer type, Integer status) throws ServiceException {
+    public List<OrderDto> myOrderList(Integer userId, Integer start, Integer limit, Integer type, Integer status,String search) throws ServiceException {
         ArrayList<OrderDto> orderDtos;
 
         if(type == 1){//我买下的
             //买家
             UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
             //获取所有未拆单的订单
-            List<OrderInfo> listByUserIdTypeStatus = orderInfoMapper.getListByUserIdStatus(userId, start * limit, limit, status);
+            //TODO 增加搜索功能
+            List<OrderInfo> listByUserIdTypeStatus = orderInfoMapper.getListByUserIdStatus(userId, start * limit, limit, status,search);
             orderDtos = OrderDto.toDtoList(listByUserIdTypeStatus);
             for(OrderDto orderDto:orderDtos){//获取订单详情列表
                 List<OrderDetail> orderDetails = orderDetailMapper.selectByMainOrderId(orderDto.getOrderId());
@@ -478,7 +482,7 @@ public class OrderServiceImpl implements OrderService{
             //卖家
             UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
             //根据卖家ID获取订单列表
-            List<OrderInfo> orderBySellerId = orderInfoMapper.getOrderBySellerId(userId, start * limit, limit, status);
+            List<OrderInfo> orderBySellerId = orderInfoMapper.getOrderBySellerId(userId, start * limit, limit, status,search);
             orderDtos = OrderDto.toDtoList(orderBySellerId);
             //卖家信息DTO
             List<SellerDto> sellerDtos = new ArrayList<>();
@@ -550,8 +554,11 @@ public class OrderServiceImpl implements OrderService{
         orderInfo.setOrderNo("1"+id);
 
         BigDecimal amount = goods.getPrice();//原价
-        BigDecimal payAmount = goods.getPrice().add(goods.getPostage());//实际支付金额
-        BigDecimal payFreight = goods.getPostage();//总邮费
+        BigDecimal payAmount = goods.getPrice();
+        if(goods.getPostage() != null){
+            payAmount = payAmount.add(goods.getPostage());//实际支付金额
+        }
+        BigDecimal payFreight = goods.getPostage()==null?new BigDecimal(0):goods.getPostage();//总邮费
         orderInfo.setAmount(amount);
         orderInfo.setCount(1);//商品数量，初始为0
         orderInfo.setStatus(1);//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
@@ -615,7 +622,7 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    public String getOrderPay(Integer userId, Integer orderId, Integer payType, String payPwd) throws ServiceException {
+    public Object getOrderPay(Integer userId, Integer orderId, Integer payType, String payPwd) throws ServiceException {
         //只有买家能调用订单支付接口，直接根据orderId查询订单
         OrderInfo orderInfo = orderInfoMapper.getOrderByUserIdOrderId(orderId,userId);
         if(orderInfo == null){
@@ -639,16 +646,16 @@ public class OrderServiceImpl implements OrderService{
                     goodsName.append("【"+goodsInfo.getName()+"】");
                 }
 
-                StringBuffer info = new StringBuffer();
+                StringBuffer payInfo = new StringBuffer();
                 if(payType.intValue() == 1){//微信
-                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderPay.getPayAmount())).getString("data")), WechatPayDto.class);
+                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderPay.getPayAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.appraisal_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
                     orderPay.setPayNo(wechatPayDto.getSign());
-                    //TODO 微信，失败不做处理，成功继续拆单生成订单
-                    info.append(wechatPayDto.toString());
+                    //微信，失败不做处理，成功继续拆单生成订单
+                    return wechatPayDto;
                 }else if(payType.intValue() == 2){//支付宝
-                    orderPay.setPayNo("");
                     //TODO 支付宝，失败不做处理，成功继续拆单生成订单
-                    info.append("支付宝支付回调");
+                    String info = JSONObject.parseObject(schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderInfo.getAmount(),NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.order_alipay_notify.getNotifUrl())).getString("data");
+                    payInfo.append(info);
                 }else if(payType.intValue() == 3){//余额
                     //验证支付密码
                     Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
@@ -657,7 +664,10 @@ public class OrderServiceImpl implements OrderService{
                         throw new ServiceException("支付密码错误！");
                     }else{
                         //调用wallet-service修改余额功能
-                        schedualWalletService.updateBalance(userId, orderPay.getPayAmount(),2);
+                        BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, orderPay.getPayAmount(), 2)), BaseResp.class);
+                        if(baseResp.getCode() == 1){
+                            throw new ServiceException(baseResp.getReport().toString());
+                        }
                         //拆单
                         if(orderInfo.getSellerId() == null){//订单为合并主订单，进行拆单
                             orderInfo.setIsResolve(1);//是否拆单 1是 2否
@@ -684,13 +694,13 @@ public class OrderServiceImpl implements OrderService{
                         //交易信息：恭喜您！您的抢购【大头三年原光】已被买下，点击此处查看订单
                         schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
                                 "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单","3","2",orderId.toString());
-                        info.append("余额支付成功！");
+                        payInfo.append("余额支付成功！");
                     }
                 }else{
                     throw new ServiceException("支付类型错误！");
                 }
 
-                return info.toString();
+                return payInfo.toString();
             }
         }
     }
@@ -707,12 +717,12 @@ public class OrderServiceImpl implements OrderService{
         Integer count = 0;
         if(type.intValue() == 1){
             //状态 1待支付 3待收货
-            List<OrderInfo> list1 = orderInfoMapper.getListByUserIdStatus(userId, null, null, 1);
-            List<OrderInfo> list2 = orderInfoMapper.getListByUserIdStatus(userId, null, null, 3);
+            List<OrderInfo> list1 = orderInfoMapper.getListByUserIdStatus(userId, null, null, 1,null);
+            List<OrderInfo> list2 = orderInfoMapper.getListByUserIdStatus(userId, null, null, 3,null);
             count = (list1 == null?0:list1.size())+(list2 == null?0:list2.size());
         }else{
             //状态 2待发货  7已申请退货
-            List<OrderInfo> list1 = orderInfoMapper.getListByUserIdStatus(userId, null, null, 2);
+            List<OrderInfo> list1 = orderInfoMapper.getListByUserIdStatus(userId, null, null, 2,null);
             List<OrderInfo> list2 = orderInfoMapper.getRefundOrder(userId, null, null, 2);
             for(OrderInfo orderInfo:list2){
                 //状态 1申请退货 2退货成功 3拒绝退货
@@ -774,7 +784,10 @@ public class OrderServiceImpl implements OrderService{
                 orderInfo.setStatus(4);
                 orderInfoMapper.updateByPrimaryKey(orderInfo);
                 //卖家增加余额
-                schedualWalletService.updateBalance(orderInfo.getSellerId(),orderPay.getPayAmount(),1);
+                BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(orderInfo.getSellerId(),orderPay.getPayAmount(),1)), BaseResp.class);
+                if(baseResp.getCode() == 1){
+                    throw new ServiceException(baseResp.getReport().toString());
+                }
                 //卖家成交增加积分
                 if(orderPay.getPayAmount().compareTo(new BigDecimal(2000)) <= 0){//2000以内+20分
                     schedualWalletService.updateScore(orderInfo.getSellerId(),20L,1);
@@ -874,19 +887,21 @@ public class OrderServiceImpl implements OrderService{
             }
             schedualMessageService.easemobMessage(order.getSellerId().toString(),
                     "您的"+(isAuction?"抢购":"商品")+goodsName+"买家提醒您发货，点击此处查看订单","3","2",orderId.toString());
+        }else{
+            throw new ServiceException("订单状态错误！");
         }
     }
 
     @Override
-    public boolean updateOrder(String orderNo, Integer status) throws ServiceException {
+    public boolean updateOrder(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException {
         OrderInfo orderInfo = orderInfoMapper.selectByOrderNo(orderNo);
         if(orderInfo == null){
             throw new ServiceException("订单不存在！");
         }else{
-            if(orderInfo.getStatus() != 0){
+            if(orderInfo.getStatus() != 1){
                 throw new ServiceException("订单状态错误！");
             }else{
-                orderInfo.setStatus(1);
+                orderInfo.setStatus(2);
                 orderInfoMapper.updateByPrimaryKeySelective(orderInfo);
                 //获取商品名字列表
                 List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderInfo.getId());

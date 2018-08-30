@@ -101,4 +101,8 @@
   <select id="selectByUserIdColumnId" parameterType="Integer" resultMap="BaseResultMap">
     select * from forum_pv where user_id = #{userId} and forum_id = #{forumId}
   </select>
+
+  <select id="getCountByColumnId" resultType="Integer">
+    select count(*) from forum_pv where column_id = #{columnId} and add_time <![CDATA[ >= ]]> #{date}
+  </select>
 </mapper>

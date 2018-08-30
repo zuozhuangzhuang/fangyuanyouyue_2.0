@@ -97,7 +97,8 @@ public class CollectController extends BaseController{
             @ApiImplicitParam(name = "type", value = "类型 1关注 2收藏", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "collectType", value = "关注/收藏类型 1商品 2抢购（只有抢购可以关注）", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "search", value = "搜索字段", dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/collectList")
     @ResponseBody
@@ -130,7 +131,7 @@ public class CollectController extends BaseController{
             if(param.getLimit() == null || param.getLimit() < 1){
                 return toError("每页个数错误！");
             }
-            List<GoodsDto> goodsDtos = collectService.collectList(userId, param.getCollectType(), param.getType(),param.getStart(),param.getLimit());
+            List<GoodsDto> goodsDtos = collectService.collectList(userId, param.getCollectType(), param.getType(),param.getStart(),param.getLimit(),param.getSearch());
             return toSuccess(goodsDtos);
         } catch (ServiceException e) {
             e.printStackTrace();

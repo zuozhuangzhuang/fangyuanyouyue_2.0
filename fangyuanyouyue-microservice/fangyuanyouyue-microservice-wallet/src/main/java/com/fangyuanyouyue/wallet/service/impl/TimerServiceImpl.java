@@ -12,11 +12,13 @@ import com.fangyuanyouyue.wallet.service.TimerService;
 import com.fangyuanyouyue.wallet.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 
 @Service(value = "timerService")
+@Transactional
 public class TimerServiceImpl implements TimerService{
     @Autowired
     private UserWalletMapper userWalletMapper;

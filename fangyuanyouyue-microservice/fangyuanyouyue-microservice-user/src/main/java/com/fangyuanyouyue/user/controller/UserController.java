@@ -652,6 +652,9 @@ public class UserController extends BaseController {
             }
             //从缓存获取
             // FIXME: 2018/8/17 验证码以0开头时验证异常 Leading zeroes not allowed
+            if(schedualRedisService.get(param.getPhone()) == null){
+                return toError("验证码已失效，请重新获取验证码！");
+            }
             String code = schedualRedisService.get(param.getPhone()).toString();
             log.info("验证码:1."+code+" 2."+param.getCode());
             if(StringUtils.isEmpty(code) || !code.equals(param.getCode())){
@@ -782,7 +785,8 @@ public class UserController extends BaseController {
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "type", value = "类型 1我的关注 2我的粉丝", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "start", value = "分页start", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "limit", value = "分页limit", required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "limit", value = "分页limit", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "search", value = "搜索条件",required = false, dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/myFansOrFollows")
     @ResponseBody
@@ -807,7 +811,7 @@ public class UserController extends BaseController {
                 return toError("类型不能为空！");
             }
             //我的关注/我的粉丝
-            List<UserFansDto> userFansDtos = userInfoService.myFansOrFollows(user.getId(), param.getType(),param.getStart(), param.getLimit());
+            List<UserFansDto> userFansDtos = userInfoService.myFansOrFollows(user.getId(), param.getType(),param.getStart(), param.getLimit(),param.getSearch());
             return toSuccess(userFansDtos);
         } catch (ServiceException e) {
             e.printStackTrace();

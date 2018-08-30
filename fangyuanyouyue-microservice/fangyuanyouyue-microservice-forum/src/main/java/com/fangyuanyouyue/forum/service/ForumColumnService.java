@@ -5,6 +5,7 @@ import java.util.List;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.forum.dto.ForumColumnDto;
 import com.fangyuanyouyue.forum.dto.ForumColumnTypeDto;
+import com.fangyuanyouyue.forum.dto.MyColumnDto;
 import com.fangyuanyouyue.forum.model.ForumColumnApply;
 
 /**
@@ -48,7 +49,7 @@ public interface ForumColumnService {
 	 * @param payPwd
 	 * @throws ServiceException
 	 */
-	void addColumn(Integer userId,Integer typeId,String name,Integer payType,String payPwd) throws ServiceException;
+	Object addColumn(Integer userId,Integer typeId,String name,Integer payType,String payPwd) throws ServiceException;
 
 	/**
 	 * 处理专栏申请
@@ -70,4 +71,24 @@ public interface ForumColumnService {
 	 * @throws ServiceException
 	 */
 	List<ForumColumnApply> applyList(Integer start, Integer limit, String keyword) throws ServiceException;
+
+	/**
+	 * 生成申请记录
+	 * @param orderNo
+	 * @param thirdOrderNo
+	 * @param payType
+	 * @return
+	 * @throws ServiceException
+	 */
+	boolean applyColumn(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException;
+
+	/**
+	 * 我是栏主
+	 * @param userId
+	 * @param start
+	 * @param limit
+	 * @return
+	 * @throws ServiceException
+	 */
+	MyColumnDto myColumn(Integer userId,Integer start,Integer limit) throws ServiceException;
 }

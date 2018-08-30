@@ -1,6 +1,9 @@
 package com.fangyuanyouyue.goods.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.dto.WechatPayDto;
+import com.fangyuanyouyue.base.enums.NotifyUrl;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.IdGenerator;
@@ -227,43 +230,58 @@ public class AppraisalServiceImpl implements AppraisalService{
     }
 
     @Override
-    public String payAppraisal(Integer userId, Integer orderId, Integer type, String payPwd) throws ServiceException {
+    public Object payAppraisal(Integer userId, Integer orderId, Integer payType, String payPwd) throws ServiceException {
         //只有买家能调用订单支付接口，直接根据orderId查询订单
         AppraisalOrderInfo orderInfo = appraisalOrderInfoMapper.selectByPrimaryKey(orderId);
         if(orderInfo == null){
             throw new ServiceException("订单不存在！");
         }else{
             StringBuffer payInfo = new StringBuffer();
-            switch (type){
-                case 1://TODO 微信
-                    payInfo.append("微信支付回调！");
-                    break;
-                case 2://TODO 支付宝
-                    payInfo.append("支付宝支付回调！");
-                    break;
-                case 3://余额
-                    //验证支付密码
-                    Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
-                    if(!verifyPayPwd){
-                        throw new ServiceException("支付密码错误！");
-                    }else{
-                        //调用wallet-service修改余额功能
-                        schedualWalletService.updateBalance(userId,orderInfo.getAmount(),2);
+            if(payType.intValue() == 1){//TODO 微信,如果回调失败就不做处理，成功就在回调接口中继续订单支付
+                WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderInfo.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.appraisal_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+                return wechatPayDto;
+            }else if(payType.intValue() == 2){//TODO 支付宝,如果回调失败就不做处理，成功就在回调接口中继续订单支付
+                String info = JSONObject.parseObject(schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderInfo.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.appraisal_alipay_notify.getNotifUrl())).getString("data");
+                payInfo.append(info);
+            }else if(payType.intValue() == 3) {//余额
+                //验证支付密码
+                Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
+                if (!verifyPayPwd) {
+                    throw new ServiceException("支付密码错误！");
+                } else {
+                    //调用wallet-service修改余额功能
+                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, orderInfo.getAmount(), 2)), BaseResp.class);
+                    if(baseResp.getCode() == 1){
+                        throw new ServiceException(baseResp.getReport().toString());
                     }
-                    payInfo.append("余额支付成功！");
-                    break;
-                default:
+                }
+                //订单支付成功
+                updateOrder(orderInfo.getOrderNo(),null,3);
+                payInfo.append("余额支付成功！");
+            }else{
                     throw new ServiceException("支付类型错误！");
             }
-            List<GoodsAppraisalDetail> listByOrderIdStatus = goodsAppraisalDetailMapper.getListByOrderIdStatus(orderId, 4);
+
+            return payInfo.toString();
+        }
+    }
+
+    @Override
+    public boolean updateOrder(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException{
+        try{
+            AppraisalOrderInfo appraisalOrderInfo = appraisalOrderInfoMapper.selectByOrderNo(orderNo);
+            List<GoodsAppraisalDetail> listByOrderIdStatus = goodsAppraisalDetailMapper.getListByOrderIdStatus(appraisalOrderInfo.getId(), 4);
             for(GoodsAppraisalDetail detail:listByOrderIdStatus){
                 detail.setStatus(0);//支付后修改为申请中
                 goodsAppraisalDetailMapper.updateByPrimaryKey(detail);
             }
             //系统消息：您的鉴定申请已提交，专家将于两个工作日内给出答复，请注意消息通知
-            schedualMessageService.easemobMessage(userId.toString(),
+            schedualMessageService.easemobMessage(appraisalOrderInfo.getUserId().toString(),
                     "您的鉴定申请已提交，专家将于两个工作日内给出答复，请注意消息通知","1","1","");
-            return payInfo.toString();
+
+            return true;
+        } catch (Exception e){
+            throw new ServiceException("官方鉴定申请失败！");
         }
     }
 

@@ -74,4 +74,7 @@ public class OrderParam{
 
     @ApiModelProperty(name = "imgUrls", value = "图片路径数组", dataType = "String",hidden = true)
     private String[] imgUrls;//图片路径数组
+
+    @ApiModelProperty(name = "search", value = "搜索条件", dataType = "String",hidden = true)
+    private String search;//搜索条件
 }

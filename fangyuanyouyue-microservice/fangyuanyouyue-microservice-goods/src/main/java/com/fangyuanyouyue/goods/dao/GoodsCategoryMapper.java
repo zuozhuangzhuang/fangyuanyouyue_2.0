@@ -3,6 +3,7 @@ package com.fangyuanyouyue.goods.dao;
 import com.fangyuanyouyue.goods.model.GoodsCategory;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -45,4 +46,11 @@ public interface GoodsCategoryMapper {
      * @return
      */
     List<GoodsCategory> getHotCategaryList();
+
+    /**
+     * 根据分类id获取父级分类id
+     * @param categoryId
+     * @return
+     */
+    Integer selectParentId(@Param("categoryId")Integer categoryId);
 }

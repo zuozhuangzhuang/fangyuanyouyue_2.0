@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.order.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.order.dao.*;
@@ -114,7 +115,10 @@ public class TimerServiceImpl implements TimerService{
                 orderInfo.setStatus(4);
                 orderInfoMapper.updateByPrimaryKey(orderInfo);
                 //卖家增加余额
-                schedualWalletService.updateBalance(orderInfo.getSellerId(),orderPay.getPayAmount(),1);
+                BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(orderInfo.getSellerId(),orderPay.getPayAmount(),1)), BaseResp.class);
+                if(baseResp.getCode() == 1){
+                    throw new ServiceException(baseResp.getReport().toString());
+                }
                 //卖家成交增加积分
                 if(orderPay.getPayAmount().compareTo(new BigDecimal(2000)) <= 0){//2000以内+20分
                     schedualWalletService.updateScore(orderInfo.getSellerId(),20L,1);

@@ -31,7 +31,7 @@ public class TimerController extends BaseController {
     @Autowired
     private SchedualForumService schedualForumService;
 
-    @Scheduled(cron="0/5 * *  * * ? ")
+    @Scheduled(cron="0 * *  * * ? ")
     public BaseResp depreciate() throws IOException {
         try {
             log.info("----》抢购降价《----");

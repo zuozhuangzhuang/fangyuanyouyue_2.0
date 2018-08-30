@@ -2,6 +2,7 @@ package com.fangyuanyouyue.goods.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.IdGenerator;
@@ -111,7 +112,10 @@ public class BargainServiceImpl implements BargainService{
                     }else{
                         //压价时扣除用户余额，如果余额不足就不可以议价
                         //调用wallet-service修改余额功能
-                        schedualWalletService.updateBalance(userId, goodsBargain.getPrice(),2);
+                        BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, goodsBargain.getPrice(), 2)), BaseResp.class);
+                        if(baseResp.getCode() == 1){
+                            throw new ServiceException(baseResp.getReport().toString());
+                        }
                         goodsBargainMapper.insert(goodsBargain);
 //                        info.append("余额支付成功");
                         //议价：恭喜您！您的商品【商品名称】有新的议价，点击此处查看详情
@@ -249,7 +253,10 @@ public class BargainServiceImpl implements BargainService{
                 }else if(status.intValue() == 3){
                     //退回余额
                     //调用wallet-service修改余额功能
-                    schedualWalletService.updateBalance(goodsBargain.getUserId(), goodsBargain.getPrice(),1);
+                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(goodsBargain.getUserId(), goodsBargain.getPrice(),1)), BaseResp.class);
+                    if(baseResp.getCode() == 1){
+                        throw new ServiceException(baseResp.getReport().toString());
+                    }
                     //议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
                     schedualMessageService.easemobMessage(goodsBargain.getUserId().toString(),
                             "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情","2","2",goodsBargain.getGoodsId().toString());
@@ -263,7 +270,10 @@ public class BargainServiceImpl implements BargainService{
                 }
                 //退回余额
                 //调用wallet-service修改余额功能
-                schedualWalletService.updateBalance(goodsBargain.getUserId(), goodsBargain.getPrice(),1);
+                BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(goodsBargain.getUserId(), goodsBargain.getPrice(),1)), BaseResp.class);
+                if(baseResp.getCode() == 1){
+                    throw new ServiceException(baseResp.getReport().toString());
+                }
             }else{
                 throw new ServiceException("压价信息异常！");
             }
@@ -399,7 +409,10 @@ public class BargainServiceImpl implements BargainService{
                     bargain.setStatus(4);
                     //退回余额
                     //调用wallet-service修改余额功能
-                    schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),1);
+                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),1)), BaseResp.class);
+                    if(baseResp.getCode() == 1){
+                        throw new ServiceException(baseResp.getReport().toString());
+                    }
                     updateBargain(userId,goodsId,bargain.getId(),4);
                 }
                 bargain.setIsDelete(1);//是否删除 1是 2否

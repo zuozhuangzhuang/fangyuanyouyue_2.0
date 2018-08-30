@@ -43,8 +43,7 @@ public class WalletController extends BaseController{
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "amount", value = "充值金额",  required = true,dataType = "BigDecimal", paramType = "query"),
-            //TODO 3公众号微信 和 1微信支付 有啥区别
-            @ApiImplicitParam(name = "type", value = "充值方式 1微信 2支付宝（3公众号微信）",required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "type", value = "充值方式 1微信 2支付宝 3小程序微信",required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/recharge")
     @ResponseBody
@@ -72,8 +71,8 @@ public class WalletController extends BaseController{
                 return toError("充值方式不能为空！");
             }
             //TODO 充值
-            walletService.recharge(userId,param.getAmount(),param.getType());
-            return toSuccess();
+            Object payInfo = walletService.recharge(userId, param.getAmount(), param.getType());
+            return toSuccess(payInfo);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());

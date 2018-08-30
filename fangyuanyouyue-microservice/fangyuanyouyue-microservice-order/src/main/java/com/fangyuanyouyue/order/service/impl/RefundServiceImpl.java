@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.order.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
@@ -166,7 +167,10 @@ public class RefundServiceImpl implements RefundService{
                     orderInfoMapper.updateByPrimaryKeySelective(orderInfo);
                     orderRefundMapper.updateByPrimaryKeySelective(orderRefund);
                     //修改余额
-                    schedualWalletService.updateBalance(orderInfo.getUserId(),orderPay.getPayAmount(),1);
+                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(orderInfo.getUserId(),orderPay.getPayAmount(),1)), BaseResp.class);
+                    if(baseResp.getCode() == 1){
+                        throw new ServiceException(baseResp.getReport().toString());
+                    }
                     //退货：您对商品/抢购【商品名称】申请的退货卖家已同意，货款已退回您的余额。点击此处查看您的余额吧
                     List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderId);
                     StringBuffer goodsName = new StringBuffer();

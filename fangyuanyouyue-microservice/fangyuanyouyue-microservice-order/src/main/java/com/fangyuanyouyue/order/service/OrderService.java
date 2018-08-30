@@ -42,10 +42,11 @@ public interface OrderService {
      * @param limit
      * @param type
      * @param status
+     * @param search
      * @return
      * @throws ServiceException
      */
-    List<OrderDto> myOrderList(Integer userId, Integer start,Integer limit,Integer type,Integer status) throws ServiceException;
+    List<OrderDto> myOrderList(Integer userId, Integer start,Integer limit,Integer type,Integer status,String search) throws ServiceException;
 
     /**
      * 商品/抢购直接下单
@@ -68,7 +69,7 @@ public interface OrderService {
      * @return
      * @throws ServiceException
      */
-    String getOrderPay(Integer userId,Integer orderId,Integer payType,String payPwd) throws ServiceException;
+    Object getOrderPay(Integer userId,Integer orderId,Integer payType,String payPwd) throws ServiceException;
 
     /**
      * 获取统计数据
@@ -134,8 +135,10 @@ public interface OrderService {
     /**
      * 修改订单状态
      * @param orderNo
-     * @param status
+     * @param thirdOrderNo
+     * @param payType
+     * @return
      * @throws ServiceException
      */
-    boolean updateOrder(String orderNo,Integer status) throws ServiceException;
+    boolean updateOrder(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException;
 }

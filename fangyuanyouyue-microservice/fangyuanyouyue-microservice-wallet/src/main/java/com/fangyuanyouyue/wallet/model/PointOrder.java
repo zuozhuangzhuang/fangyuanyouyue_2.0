@@ -1,147 +1,44 @@
 package com.fangyuanyouyue.wallet.model;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.math.BigDecimal;
 import java.util.Date;
-
+/**
+ * 积分订单表
+ */
+@Getter
+@Setter
+@ToString
 public class PointOrder {
     private Integer id;
 
-    private Integer userId;
+    private Integer userId;//用户id
 
-    private String orderNo;
+    private String orderNo;//订单号
 
-    private Integer goodsId;
+    private Integer goodsId;//商品ID
 
-    private String goodsName;
+    private String goodsName;//商品标题
 
-    private Date addTime;
+    private Date addTime;//添加时间
 
-    private Date updateTime;
+    private Date updateTime;//更新时间
 
-    private String mainImgUrl;
+    private String mainImgUrl;//商品主图路径
 
-    private BigDecimal amount;
+    private BigDecimal amount;//商品原价
 
-    private BigDecimal freight;
+    private BigDecimal freight;//运送费
 
-    private BigDecimal payAmount;
+    private BigDecimal payAmount;//实际支付金额
 
-    private Long point;
+    private Long point;//所需的积分
 
-    private Integer type;
+    private Integer type;//类型 1虚拟 2实物
 
-    private String description;
+    private String description;//商品描述
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-
-    public String getOrderNo() {
-		return orderNo;
-	}
-
-	public void setOrderNo(String orderNo) {
-		this.orderNo = orderNo;
-	}
-
-	public Integer getGoodsId() {
-        return goodsId;
-    }
-
-    public void setGoodsId(Integer goodsId) {
-        this.goodsId = goodsId;
-    }
-
-    public String getGoodsName() {
-        return goodsName;
-    }
-
-    public void setGoodsName(String goodsName) {
-        this.goodsName = goodsName == null ? null : goodsName.trim();
-    }
-
-    public Date getAddTime() {
-        return addTime;
-    }
-
-    public void setAddTime(Date addTime) {
-        this.addTime = addTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getMainImgUrl() {
-        return mainImgUrl;
-    }
-
-    public void setMainImgUrl(String mainImgUrl) {
-        this.mainImgUrl = mainImgUrl == null ? null : mainImgUrl.trim();
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public BigDecimal getFreight() {
-        return freight;
-    }
-
-    public void setFreight(BigDecimal freight) {
-        this.freight = freight;
-    }
-
-    public BigDecimal getPayAmount() {
-        return payAmount;
-    }
-
-    public void setPayAmount(BigDecimal payAmount) {
-        this.payAmount = payAmount;
-    }
-
-    public Long getPoint() {
-        return point;
-    }
-
-    public void setPoint(Long point) {
-        this.point = point;
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description == null ? null : description.trim();
-    }
 }

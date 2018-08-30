@@ -99,6 +99,7 @@ public class OrderControllerTest {
                 .param("type","1")
                 //订单状态 0全部 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
                 .param("status","0")
+                .param("search","卡")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

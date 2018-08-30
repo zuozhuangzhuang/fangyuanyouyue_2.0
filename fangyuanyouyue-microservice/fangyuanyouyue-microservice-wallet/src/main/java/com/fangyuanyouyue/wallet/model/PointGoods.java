@@ -1,115 +1,37 @@
 package com.fangyuanyouyue.wallet.model;
 
-import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
+import java.util.Date;
+/**
+ * 积分商品表
+ */
+@Getter
+@Setter
+@ToString
 public class PointGoods {
     private Integer id;
 
-    private String name;
+    private String name;//积分商品名称
 
-    private Integer type;
+    private Integer type;//商品类型 1虚拟 2实物
 
-    private Integer price;
+    private Integer price;//价格
 
-    private Long point;
+    private Long point;//所需积分
 
-    private Integer status;
+    private Integer status;//商品状态 1上架中 2已下架
 
-    private String coverImgUrl;
+    private String coverImgUrl;//封面图片URL
 
-    private Integer couponId;
+    private Integer couponId;//优惠券ID
 
-    private Date addTime;
+    private Date addTime;//添加时间
 
-    private Date updateTime;
+    private Date updateTime;//修改时间
 
-    private String description;
+    private String description;//描述
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name == null ? null : name.trim();
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
-    }
-
-    public Integer getPrice() {
-        return price;
-    }
-
-    public void setPrice(Integer price) {
-        this.price = price;
-    }
-
-    public Long getPoint() {
-        return point;
-    }
-
-    public void setPoint(Long point) {
-        this.point = point;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public String getCoverImgUrl() {
-        return coverImgUrl;
-    }
-
-    public void setCoverImgUrl(String coverImgUrl) {
-        this.coverImgUrl = coverImgUrl == null ? null : coverImgUrl.trim();
-    }
-
-    public Integer getCouponId() {
-        return couponId;
-    }
-
-    public void setCouponId(Integer couponId) {
-        this.couponId = couponId;
-    }
-
-    public Date getAddTime() {
-        return addTime;
-    }
-
-    public void setAddTime(Date addTime) {
-        this.addTime = addTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description == null ? null : description.trim();
-    }
 }

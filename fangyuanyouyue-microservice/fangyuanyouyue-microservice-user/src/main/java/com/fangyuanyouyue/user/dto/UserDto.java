@@ -58,7 +58,7 @@ public class UserDto {
 
     private Integer creditLevel;//信誉度等级 1差 2低 3中 4高 5优
 
-    private Integer authType;//认证状态 1已认证 2未认证
+    private Integer authType;//认证状态 0申请中 1已认证 2未认证
 
     private Integer extStatus;//实名登记状态 0申请中 1已实名 2未实名
 

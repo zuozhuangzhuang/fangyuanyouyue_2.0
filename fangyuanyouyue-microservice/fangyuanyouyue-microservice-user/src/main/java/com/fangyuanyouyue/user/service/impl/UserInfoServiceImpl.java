@@ -339,7 +339,13 @@ public class UserInfoServiceImpl implements UserInfoService {
         }else{
             //用户信息
             if(StringUtils.isNotEmpty(param.getPhone())){
+                if(StringUtils.isEmpty(userInfo.getLoginPwd()) && StringUtils.isEmpty(param.getLoginPwd())){
+                    throw new ServiceException("登录密码不能为空！");
+                }
                 userInfo.setPhone(param.getPhone());
+                if(StringUtils.isNotEmpty(param.getLoginPwd())){
+                    userInfo.setLoginPwd(MD5Util.generate(MD5Util.MD5(param.getLoginPwd())));
+                }
             }
             if(StringUtils.isNotEmpty(param.getEmail())){
                 userInfo.setEmail(param.getEmail());
@@ -365,13 +371,6 @@ public class UserInfoServiceImpl implements UserInfoService {
             if(StringUtils.isNotEmpty(param.getUserAddress())){
                 userInfo.setAddress(param.getUserAddress());
             }
-            if(StringUtils.isNotEmpty(param.getLoginPwd())){
-                if(StringUtils.isNotEmpty(userInfo.getLoginPwd())){
-                    throw new ServiceException("您已设置过登录密码！");
-                }else{
-                    userInfo.setLoginPwd(MD5Util.generate(MD5Util.MD5(param.getLoginPwd())));
-                }
-            }
             userInfoMapper.updateByPrimaryKey(userInfo);
             //用户扩展信息表
             UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(userInfo.getId());
@@ -396,10 +395,6 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public UserDto updatePhone(String token, String phone) throws ServiceException {
-        //Integer userId = (Integer)redisTemplate.opsForValue().get(token);
-        //redisTemplate.expire(token,7,TimeUnit.DAYS);
-        //UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
-
     	UserInfo userInfo = getUserByToken(token);
         if(userInfo == null){
             throw new ServiceException("用户不存在！");
@@ -413,9 +408,6 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public UserDto accountMerge(String token, String phone) throws ServiceException {
-        //Integer userId = (Integer)redisTemplate.opsForValue().get(token);
-        //redisTemplate.expire(token,7,TimeUnit.DAYS);
-        //UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
     	UserInfo userInfo = getUserByToken(token);
         if(userInfo == null){
             throw new ServiceException("第三方用户不存在！");
@@ -479,6 +471,8 @@ public class UserInfoServiceImpl implements UserInfoService {
                 }
                 //免费鉴定次数
                 userDto.setAppraisalCount(userWallet.getAppraisalCount());
+                userDto.setFansCount(userFansMapper.fansCount(user.getId()));
+                userDto.setCollectCount(userFansMapper.collectCount(user.getId()));
             }
             return userDto;
         }
@@ -694,13 +688,13 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public List<UserFansDto> myFansOrFollows(Integer userId,Integer type,Integer start,Integer limit) throws ServiceException {
+    public List<UserFansDto> myFansOrFollows(Integer userId,Integer type,Integer start,Integer limit,String search) throws ServiceException {
         UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
         if(userInfo == null){
             throw new ServiceException("用户不存在！");
         }else{
             //分页获取粉丝列表/关注列表
-            List<Map<String, Object>> maps = userFansMapper.myFansOrFollows(userId,type,start*limit, limit);
+            List<Map<String, Object>> maps = userFansMapper.myFansOrFollows(userId,type,start*limit, limit,search);
             List<UserFansDto> userFollowsDtos = UserFansDto.toDtoList(maps);
             return userFollowsDtos;
         }

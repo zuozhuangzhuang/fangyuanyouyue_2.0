@@ -1,5 +1,7 @@
 package com.fangyuanyouyue.goods.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.goods.dao.*;
@@ -142,7 +144,10 @@ public class TimerServiceImpl implements TimerService{
                     goodsBargainMapper.updateByPrimaryKey(bargain);
                     //退回余额
                     //调用wallet-service修改余额功能
-                    schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),1);
+                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),1)), BaseResp.class);
+                    if(baseResp.getCode() == 1){
+                        throw new ServiceException(baseResp.getReport().toString());
+                    }
                     //议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
                     GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(bargain.getGoodsId());
                     schedualMessageService.easemobMessage(bargain.getUserId().toString(),

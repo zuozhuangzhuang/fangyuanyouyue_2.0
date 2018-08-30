@@ -61,7 +61,7 @@ public interface AppraisalService {
      * @return
      * @throws ServiceException
      */
-    String payAppraisal(Integer userId,Integer orderId,Integer type,String payPwd) throws ServiceException;
+    Object payAppraisal(Integer userId,Integer orderId,Integer type,String payPwd) throws ServiceException;
 
     /**
      * 鉴定展示
@@ -71,4 +71,14 @@ public interface AppraisalService {
      * @throws ServiceException
      */
     List<AppraisalDetailDto> getAllAppraisal(Integer start,Integer limit) throws ServiceException;
+
+    /**
+     * 修改订单祖状态
+     * @param orderNo
+     * @param thirdOrderNo
+     * @param payType
+     * @return
+     * @throws ServiceException
+     */
+    boolean updateOrder(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException;
 }

@@ -107,11 +107,15 @@ public class ForumInfoServiceImp implements ForumInfoService {
 			//计算点赞数
 			Integer likesCount = forumLikesService.countLikes(info.getId());
 			dto.setLikesCount(likesCount);
-
 			//计算评论数
 			Integer commentCount = forumCommentService.countComment(info.getId());
 			dto.setCommentCount(commentCount);
-			if(listType.intValue() == 1){
+			if(userId != null){
+				//是否收藏
+				Collect collect = collectMapper.selectByCollectIdType(userId, info.getId(), info.getType() == 2?3:4);
+				if(collect != null){
+					dto.setIsCollect(StatusEnum.YES.getValue());
+				}
 				//是否点赞
 				ForumLikes forumLikes = forumLikesMapper.selectByForumIdUserId(dto.getForumId(), userId);
 				if(forumLikes != null){
@@ -137,7 +141,7 @@ public class ForumInfoServiceImp implements ForumInfoService {
 		forumInfo.setAddTime(DateStampUtils.getTimesteamp());
 		if(type == 1){//帖子
 			//获取专栏
-			if(columnId == null){
+		 	if(columnId == null){
 				throw new ServiceException("专栏id为空！");
 			}else{
 				ForumColumn forumColumn = forumColumnMapper.selectByPrimaryKey(columnId);

@@ -4,7 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fangyuanyouyue.wallet.model.PointGoods;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
+/**
+ * 积分商城DTO
+ */
+@Getter
+@Setter
+@ToString
 public class PointGoodsDto {
 	
     private Integer goodsId;
@@ -36,45 +45,4 @@ public class PointGoodsDto {
         }
         return dtolist;
     }
-
-	public Integer getGoodsId() {
-		return goodsId;
-	}
-
-	public void setGoodsId(Integer goodsId) {
-		this.goodsId = goodsId;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Long getPoint() {
-		return point;
-	}
-
-	public void setPoint(Long point) {
-		this.point = point;
-	}
-
-	public String getCoverImgUrl() {
-		return coverImgUrl;
-	}
-
-	public void setCoverImgUrl(String coverImgUrl) {
-		this.coverImgUrl = coverImgUrl;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
 }

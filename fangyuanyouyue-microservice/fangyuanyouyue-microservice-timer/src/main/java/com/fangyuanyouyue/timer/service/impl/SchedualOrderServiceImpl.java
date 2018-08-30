@@ -5,10 +5,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SchedualOrderServiceImpl implements SchedualOrderService{
-    @Override
-    public String updateOrder(String orderNo, Integer status) {
-        return "修改订单状态失败！";
-    }
 
     @Override
     public String cancelOrder() {

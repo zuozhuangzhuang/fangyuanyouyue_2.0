@@ -1,9 +1,13 @@
 package com.fangyuanyouyue.forum.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.dto.WechatPayDto;
+import com.fangyuanyouyue.base.enums.NotifyUrl;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.base.util.IdGenerator;
 import com.fangyuanyouyue.forum.constants.StatusEnum;
 import com.fangyuanyouyue.forum.dao.*;
 import com.fangyuanyouyue.forum.dto.AppraisalDetailDto;
@@ -49,6 +53,8 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 	private SchedualMessageService schedualMessageService;
 	@Autowired
 	private SchedualWalletService schedualWalletService;
+	@Autowired
+	private ArgueOrderMapper argueOrderMapper;
 
 
 	@Override
@@ -160,21 +166,51 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 	}
 
 	@Override
-	public String addAppraisal(Integer userId, BigDecimal bonus, String title, String content,String[] imgUrls,Integer[] userIds,Integer payType,String payPwd) throws ServiceException {
-		AppraisalDetail appraisalDetail = new AppraisalDetail();
-		appraisalDetail.setUserId(userId);
-		appraisalDetail.setTitle(title);
-		if(StringUtils.isNotEmpty(content)){
-			appraisalDetail.setContent(content);
-		}
+	public Object addAppraisal(Integer userId, BigDecimal bonus, String title, String content,String[] imgUrls,Integer[] userIds,Integer payType,String payPwd) throws ServiceException {
+
 		StringBuffer payInfo = new StringBuffer();
 		if(bonus != null){
-			appraisalDetail.setBonus(bonus);
+			//生成订单
+			ArgueOrder argueOrder = new ArgueOrder();
+			argueOrder.setUserId(userId);
+			//订单号
+			final IdGenerator idg = IdGenerator.INSTANCE;
+			String id = idg.nextId();
+			argueOrder.setOrderNo(id);
+			argueOrder.setAmount(bonus);
+			argueOrder.setStatus(1);
+			argueOrder.setAddTime(DateStampUtils.getTimesteamp());
+			argueOrder.setTitle(title);
+			argueOrder.setContent(content);
+			StringBuffer toUsers = new StringBuffer();
+			if(userIds != null && userIds.length > 0){
+				for(Integer toUser:userIds){
+					if(toUser.intValue() == userIds[userIds.length-1].intValue()){
+						toUsers.append(toUser);
+					}else{
+						toUsers.append(toUser+",");
+					}
+				}
+			}
+			StringBuffer imgs = new StringBuffer();
+			for(String imgUrl:imgUrls){
+				if(imgUrl.equals(imgUrls[imgUrls.length-1])){
+					imgs.append(imgUrl);
+				}else{
+					imgs.append(imgUrl+",");
+				}
+			}
+			argueOrder.setImgUrls(imgs.toString());
+			argueOrder.setToUsers(toUsers.toString());
+			argueOrderMapper.insert(argueOrder);
+
 			//支付
 			if(payType.intValue() == 1){//TODO 微信,如果回调失败就不做处理，成功就在回调接口中继续生成全民鉴定
-				payInfo.append("微信支付回调！");
+				WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(argueOrder.getOrderNo(), argueOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.argue_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+				return wechatPayDto;
 			}else if(payType.intValue() == 2){//TODO 支付宝,如果回调失败就不做处理，成功就在回调接口中继续生成全民鉴定
-				payInfo.append("支付宝支付回调！");
+				String info = JSONObject.parseObject(schedualWalletService.orderPayByWechat(argueOrder.getOrderNo(), argueOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.argue_alipay_notify.getNotifUrl())).getString("data");
+				payInfo.append(info);
 			}else if(payType.intValue() == 3){//余额
 				//验证支付密码
 				Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
@@ -182,29 +218,25 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 					throw new ServiceException("支付密码错误！");
 				}else{
 					//调用wallet-service修改余额功能
-					schedualWalletService.updateBalance(userId,bonus,2);
-				}
+//					schedualWalletService.updateBalance(userId,bonus,2);
+					BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, bonus, 2)), BaseResp.class);
+					if(baseResp.getCode() == 1){
+						throw new ServiceException(baseResp.getReport().toString());
+					}				}
 				payInfo.append("余额支付成功！");
-				appraisalDetail.setStatus(1);//状态 1进行中 2结束
-				//结束时间为7天后
-				appraisalDetail.setEndTime(DateUtil.getDateAfterDay(DateStampUtils.getTimesteamp(),7));
-				appraisalDetail.setAddTime(DateStampUtils.getTimesteamp());
-				appraisalDetail.setPvCount(0);
-				appraisalDetailMapper.insert(appraisalDetail);
-				//存储图片
-				insertAppraisalImg(imgUrls, appraisalDetail);
-				//邀请我：用户“用户昵称”发起全民鉴定【全名鉴定名称】时邀请了您！点击此处前往查看吧
-				UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
-				if(userIds != null && userIds.length > 0){
-					for(Integer toUserId:userIds){
-						schedualMessageService.easemobMessage(toUserId.toString(),
-								"用户“"+user.getNickName()+"”发起全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧","7","5",appraisalDetail.getId().toString());
-					}
-				}
+				//生成全民鉴定信息
+				applyAppraisal(argueOrder.getOrderNo(),null,3);
 			}else{
 				throw new ServiceException("支付类型错误！");
 			}
 		}else{
+
+			AppraisalDetail appraisalDetail = new AppraisalDetail();
+			appraisalDetail.setUserId(userId);
+			appraisalDetail.setTitle(title);
+			if(StringUtils.isNotEmpty(content)){
+				appraisalDetail.setContent(content);
+			}
 			appraisalDetail.setStatus(1);//状态 1进行中 2结束
 			//结束时间为7天后
 			appraisalDetail.setEndTime(DateUtil.getDateAfterDay(DateStampUtils.getTimesteamp(),7));
@@ -237,6 +269,39 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 	}
 
 	@Override
+	public boolean applyAppraisal(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException{
+		//获取订单
+		ArgueOrder argueOrder = argueOrderMapper.selectByOrderNo(orderNo);
+		//生成全民鉴定
+		AppraisalDetail appraisalDetail = new AppraisalDetail();
+		appraisalDetail.setBonus(argueOrder.getAmount());
+		appraisalDetail.setUserId(argueOrder.getUserId());
+		appraisalDetail.setTitle(argueOrder.getTitle());
+		appraisalDetail.setContent(argueOrder.getContent());
+		appraisalDetail.setStatus(1);//状态 1进行中 2结束
+		//结束时间为7天后
+		appraisalDetail.setEndTime(DateUtil.getDateAfterDay(DateStampUtils.getTimesteamp(),7));
+		appraisalDetail.setAddTime(DateStampUtils.getTimesteamp());
+		appraisalDetail.setPvCount(0);
+		appraisalDetailMapper.insert(appraisalDetail);
+		//存储图片
+		String[] imgUrls = argueOrder.getImgUrls().split(",");
+		insertAppraisalImg(imgUrls, appraisalDetail);
+		String[] userInds = argueOrder.getToUsers().split(",");
+		//邀请我：用户“用户昵称”发起全民鉴定【全名鉴定名称】时邀请了您！点击此处前往查看吧
+		UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(argueOrder.getUserId())).getString("data")), UserInfo.class);
+		if(userInds != null && userInds.length > 0){
+			for(String toUserId:userInds){
+				schedualMessageService.easemobMessage(toUserId,
+						"用户“"+user.getNickName()+"”发起全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧","7","5",appraisalDetail.getId().toString());
+			}
+		}
+		argueOrder.setStatus(2);
+		argueOrderMapper.updateByPrimaryKey(argueOrder);
+		return true;
+	}
+
+	@Override
 	public void invite(Integer userId,Integer appraisalId, Integer[] userIds) throws ServiceException {
 		AppraisalDetail appraisalDetail = appraisalDetailMapper.selectByPrimaryKey(appraisalId);
 		//邀请我：用户“用户昵称”发起全民鉴定【全名鉴定名称】时邀请了您！点击此处前往查看吧
@@ -248,4 +313,5 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 			}
 		}
 	}
+
 }

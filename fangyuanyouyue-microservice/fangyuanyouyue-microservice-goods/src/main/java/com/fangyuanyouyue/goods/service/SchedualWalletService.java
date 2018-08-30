@@ -39,4 +39,23 @@ public interface SchedualWalletService {
      */
     @RequestMapping(value = "/walletFeign/updateAppraisalCount",method = RequestMethod.POST)
     String updateAppraisalCount(@RequestParam(value = "userId") Integer userId,@RequestParam(value = "count") Integer count);
+
+    /**
+     * 微信支付
+     * @param orderNo
+     * @param price
+     * @return
+     */
+    @RequestMapping(value = "/walletFeign/orderPayByWechat",method = RequestMethod.POST)
+    String orderPayByWechat(@RequestParam(value = "orderNo") String orderNo, @RequestParam(value = "price") BigDecimal price,@RequestParam(value = "notifyUrl") String notifyUrl);
+
+    /**
+     * 支付宝支付
+     * @param orderNo
+     * @param price
+     * @return
+     */
+    @RequestMapping(value = "/walletFeign/orderPayByALi",method = RequestMethod.POST)
+    String orderPayByALi(@RequestParam(value = "orderNo") String orderNo,@RequestParam(value = "price") BigDecimal price,@RequestParam(value = "notifyUrl") String notifyUrl);
+
 }

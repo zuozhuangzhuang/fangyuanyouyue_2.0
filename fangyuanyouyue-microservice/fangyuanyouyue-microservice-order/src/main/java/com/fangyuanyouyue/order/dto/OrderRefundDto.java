@@ -45,7 +45,7 @@ public class OrderRefundDto {
 
     private String updateTime;//更新时间
 
-    private String endTime;//剩余处理时间
+    private Long endTime;//剩余处理时间
 
     public OrderRefundDto() {
     }
@@ -67,6 +67,6 @@ public class OrderRefundDto {
         this.refuseReason = refund.getRefuseReason();
         this.addTime =  DateUtil.getFormatDate(refund.getAddTime(), DateUtil.DATE_FORMT);
         this.updateTime = DateUtil.getFormatDate(refund.getUpdateTime(), DateUtil.DATE_FORMT);
-        this.endTime = DateUtil.getFormatDate(refund.getEndTime(), DateUtil.DATE_FORMT);
+        this.endTime = refund.getEndTime().getTime();
     }
 }

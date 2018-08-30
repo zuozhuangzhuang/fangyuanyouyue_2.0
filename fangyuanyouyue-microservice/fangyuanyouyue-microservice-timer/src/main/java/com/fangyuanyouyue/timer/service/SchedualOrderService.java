@@ -11,14 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Component
 public interface SchedualOrderService {
 
-    /**
-     * 修改订单状态
-     * @param orderNo
-     * @param status
-     * @return
-     */
-    @RequestMapping(value = "/orderFeign/updateOrder",method = RequestMethod.POST)
-    String updateOrder(@RequestParam(value = "orderNo") String orderNo, @RequestParam(value = "status") Integer status);
 
     /**
      * 自动取消订单

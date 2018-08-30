@@ -1,5 +1,7 @@
 package com.fangyuanyouyue.forum.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.forum.constants.StatusEnum;
 import com.fangyuanyouyue.forum.dao.*;
@@ -57,7 +59,12 @@ public class TimerServiceImpl implements TimerService{
                         comment.setIsWinner(StatusEnum.YES.getValue());
                         appraisalCommentMapper.updateByPrimaryKey(comment);
                         //胜者增加余额
-                        schedualWalletService.updateBalance(comment.getUserId(),detail.getBonus(),1);
+                        if(detail.getBonus() != null){
+                            BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(comment.getUserId(),detail.getBonus(),1)), BaseResp.class);
+                            if(baseResp.getCode() == 1){
+                                throw new ServiceException(baseResp.getReport().toString());
+                            }
+                        }
                         //恭喜您！您参与的全民鉴定【名称】，您获得了最高票数！点击查看最终结果吧~
                         schedualMessageService.easemobMessage(detail.getUserId().toString(),
                                 "恭喜您！您参与的全民鉴定【"+detail.getTitle()+"】，您获得了最高票数！点击查看最终结果吧~","7","1",detail.getId().toString());

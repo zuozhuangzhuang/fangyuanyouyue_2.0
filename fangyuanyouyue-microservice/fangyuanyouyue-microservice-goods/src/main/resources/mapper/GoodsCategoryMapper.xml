@@ -172,4 +172,8 @@
   <select id="getHotCategaryList" resultMap="BaseResultMap">
     select * from goods_category where type = 2 order by id limit 0,10
   </select>
+
+  <select id="selectParentId" parameterType="Integer" resultType="Integer">
+    select parent_id from goods_category where id = #{categoryId}
+  </select>
 </mapper>
