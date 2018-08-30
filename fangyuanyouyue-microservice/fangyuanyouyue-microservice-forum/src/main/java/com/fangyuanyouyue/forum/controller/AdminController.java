@@ -51,7 +51,7 @@ public class AdminController extends BaseController {
             if(param.getStart()==null || param.getStart() < 0 ||param.getLimit()==null || param.getLimit() < 1) {
                 return toError("分页参数错误");
             }
-			//专栏申请列表
+			//TODO 专栏申请列表
 			forumColumnService.applyList(param.getStart(),param.getLimit(),param.getKeyword());
 
 			return toSuccess();
