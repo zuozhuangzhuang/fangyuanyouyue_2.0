@@ -24,8 +24,9 @@ public interface ForumColumnApplyMapper {
      * 获取专栏申请列表
      * @param start
      * @param limit
-     * @param search
+     * @param keyword
+     * @param status
      * @return
      */
-    List<ForumColumnApply> selectApplyList(@Param("start")Integer start,@Param("limit")Integer limit,@Param("keyword")String keyword);
+    List<ForumColumnApply> selectApplyList(@Param("start")Integer start,@Param("limit")Integer limit,@Param("keyword")String keyword,@Param("status")Integer status);
 }

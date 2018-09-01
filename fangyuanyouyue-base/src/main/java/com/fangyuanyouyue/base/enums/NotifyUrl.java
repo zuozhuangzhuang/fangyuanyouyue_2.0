@@ -23,9 +23,11 @@ public enum NotifyUrl {
 //    专栏
     column_wechat_notify("/forum/column/notify/wechat"),
 //    会员订单
-    vip_wechat_notify("/wallet/vip/notify/wechat"),
+    vip_wechat_notify("/wallet/userVip/notify/wechat"),
 //    充值订单
 recharge_wechat_notify("/wallet/wallet/notify/wechat"),
+//    官方认证
+auth_wechat_notify("/user/user/notify/wechat"),
 
 //    支付宝回调接口
 //    商品议价
@@ -39,9 +41,11 @@ recharge_wechat_notify("/wallet/wallet/notify/wechat"),
 //    专栏
     column_alipay_notify("/forum/column/notify/alipay"),
 //    会员订单
-    vip_alipay_notify("/wallet/vip/notify/alipay"),
+    vip_alipay_notify("/wallet/userVip/notify/alipay"),
     //    充值订单
-    recharge_alipay_notify("/wallet/wallet/notify/alipay");
+    recharge_alipay_notify("/wallet/wallet/notify/alipay"),
+//    官方认证
+    auth_alipay_notify("/user/user/notify/alipay");
 
     private final String notifUrl;
 

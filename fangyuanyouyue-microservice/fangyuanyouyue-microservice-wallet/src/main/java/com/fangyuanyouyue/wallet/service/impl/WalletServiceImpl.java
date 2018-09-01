@@ -4,21 +4,26 @@ import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
+import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.base.util.IdGenerator;
 import com.fangyuanyouyue.base.util.MD5Util;
 import com.fangyuanyouyue.base.util.WechatUtil.PayCommonUtil;
 import com.fangyuanyouyue.base.util.alipay.util.GenOrderUtil;
 import com.fangyuanyouyue.wallet.dao.*;
+import com.fangyuanyouyue.wallet.dto.BillMonthDto;
+import com.fangyuanyouyue.wallet.dto.UserBalanceDto;
 import com.fangyuanyouyue.wallet.dto.WalletDto;
 import com.fangyuanyouyue.wallet.model.*;
 import com.fangyuanyouyue.wallet.service.WalletService;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.SortedMap;
 
 @Service(value = "walletService")
@@ -39,6 +44,8 @@ public class WalletServiceImpl implements WalletService{
     private UserBalanceDetailMapper userBalanceDetailMapper;
     @Autowired
     private UserInfoMapper userInfoMapper;
+    @Autowired
+    private UserWithdrawMapper userWithdrawMapper;
 
     @Override
     public Object recharge(Integer userId, BigDecimal amount, Integer type) throws Exception {
@@ -56,7 +63,9 @@ public class WalletServiceImpl implements WalletService{
         String id = idg.nextId();
         userRechargeDetail.setPayNo(id);
         userRechargeDetail.setAddTime(DateStampUtils.getTimesteamp());
+        userRechargeDetail.setStatus(1);
         userRechargeDetailMapper.insert(userRechargeDetail);
+
         if(type.intValue() == 1){
             //微信
             WechatPayDto wechatPayDto = orderPayByWechat(userRechargeDetail.getPayNo(), userRechargeDetail.getAmount(), NotifyUrl.recharge_wechat_notify.getNotifUrl());
@@ -71,19 +80,24 @@ public class WalletServiceImpl implements WalletService{
         }else{
             throw new ServiceException("充值类型错误！");
         }
-        //扣除余额 1充值 2消费 payType 1微信 2支付宝 3余额
-//        updateBalance(userId,amount,1);
     }
 
     @Override
     public void withdrawDeposit(Integer userId, BigDecimal amount, Integer type, String account, String realName, String payPwd) throws ServiceException {
+
         //获取被限制的用户（代理不可以余额提现）
         ConfinedUser confinedUser = confinedUserMapper.selectByUserIdStatus(userId, 0);
         if(confinedUser != null){
             throw new ServiceException("此用户被限制使用余额提现！");
         }
+        UserWithdraw userWithdraw = new UserWithdraw();
+        userWithdraw.setUserId(userId);
+        userWithdraw.setAmount(amount);
+        userWithdraw.setPayType(type);
+        userWithdraw.setStatus(1);
+
         UserInfoExt userInfoExt = userInfoExtMapper.selectUserInfoExtByUserId(userId);
-        if(type != 1){//提现方式 0支付宝 1微信
+        if(type != 1){//提现方式 1微信 2支付宝
             if(StringUtils.isEmpty(payPwd)){
                 throw new ServiceException("支付密码为空！");
             }
@@ -93,7 +107,16 @@ public class WalletServiceImpl implements WalletService{
             if(MD5Util.verify(userInfoExt.getPayPwd(),MD5Util.MD5(payPwd)) == false){
                 throw new ServiceException("支付密码错误！");
             }
+            userWithdraw.setAccount(account);
+            userWithdraw.setRealName(realName);
+        }else{
+            //TODO 微信提现需要用户绑定微信账号
+
+            userWithdraw.setAccount("用户unionID");
         }
+
+        userWithdrawMapper.insert(userWithdraw);
+
         //TODO 根据用户会员等级扣除不同手续费
         UserVip userVip = userVipMapper.selectByUserId(userId);
         Integer vipLevel = userVip.getVipLevel();//会员等级
@@ -238,6 +261,7 @@ public class WalletServiceImpl implements WalletService{
                 throw new ServiceException("类型错误！");
             }
             userWalletMapper.updateByPrimaryKey(userWallet);
+            //TODO 新增用户账单信息(加一个title参数，访问修改余额接口时传递订单名称)
             return true;
         }
     }
@@ -290,6 +314,7 @@ public class WalletServiceImpl implements WalletService{
             throw new ServiceException("旧密码不正确！");
         }
         userInfoExt.setPayPwd(MD5Util.generate(MD5Util.MD5(newPwd)));
+        userInfoExtMapper.updateByPrimaryKeySelective(userInfoExt);
     }
 
 
@@ -321,12 +346,12 @@ public class WalletServiceImpl implements WalletService{
 //        Map<String, String> data = new HashMap<>();
 //        data.put("appid",config.getAppID());
 //        data.put("mch_id",config.getMchID());
-//        data.put("nonce_str", "5K8264ILTKCH16CQ2502SI8ZNMTM67VS");
-//        data.put("sign", "C380BEC2BFD727A4B6845133519F3AD6");
+//        data.put("nonce_str", PayCommonUtil.CreateNoncestr());
+//        data.put("sign", WXPayUtil.generateSignature(data,"key=ShenZhenShiXiaoFangYuan123456789"));
 //        data.put("body", "小方圆-微信在线支付");
-//        data.put("out_trade_no", "20150806125346");
+//        data.put("out_trade_no", "20150806125346121");
 //        data.put("total_fee", "1");
-//        data.put("spbill_create_ip", "192.168.1.6");
+//        data.put("spbill_create_ip", "127.0.0.1");
 //        data.put("trade_type", "APP");
 //        data.put("fee_type", "CNY");
 //
@@ -337,25 +362,25 @@ public class WalletServiceImpl implements WalletService{
 //            e.printStackTrace();
 //        }
 
-//        SortedMap<Object, Object> parameters = PayCommonUtil.getWXPrePayID(); // 获取预付单，此处已做封装，需要工具类
-//        parameters.put("body", "小方圆-微信在线支付");
-//        parameters.put("spbill_create_ip", "127.0.0.1");
-//        parameters.put("out_trade_no", "20150806125346");
-//        parameters.put("total_fee", "1"); // 测试时，每次支付一分钱，微信支付所传的金额是以分为单位的，因此实际开发中需要x100
-//        // parameters.put("total_fee", orders.getOrderAmount()*100+""); // 上线后，将此代码放开
-//
-//        // 设置签名
-//        String sign = PayCommonUtil.createSign("UTF-8", parameters);
-//        parameters.put("sign", sign);
-//        // 封装请求参数结束
-//
-//        String requestXML = PayCommonUtil.getRequestXml(parameters); // 获取xml结果
-//        System.out.println("封装请求参数是：" + requestXML);
-//        // 调用统一下单接口
-//        String result = PayCommonUtil.httpsRequest("https://api.mch.weixin.qq.com/pay/unifiedorder", "POST", requestXML);
-//        System.out.println("调用统一下单接口：" + result);
-//        SortedMap<Object, Object> parMap = PayCommonUtil.startWXPay(result);
-//        System.out.println("最终的map是：" + parMap.toString());
+        SortedMap<Object, Object> parameters = PayCommonUtil.getWXPrePayID("1234"); // 获取预付单，此处已做封装，需要工具类
+        parameters.put("body", "小方圆-微信在线支付");
+        parameters.put("spbill_create_ip", "127.0.0.1");
+        parameters.put("out_trade_no", "2015080612534612");
+        parameters.put("total_fee", "1"); // 测试时，每次支付一分钱，微信支付所传的金额是以分为单位的，因此实际开发中需要x100
+        // parameters.put("total_fee", orders.getOrderAmount()*100+""); // 上线后，将此代码放开
+
+        // 设置签名
+        String sign = PayCommonUtil.createSign("UTF-8", parameters);
+        parameters.put("sign", sign);
+        // 封装请求参数结束
+
+        String requestXML = PayCommonUtil.getRequestXml(parameters); // 获取xml结果
+        System.out.println("封装请求参数是：" + requestXML);
+        // 调用统一下单接口
+        String result = PayCommonUtil.httpsRequest("https://api.mch.weixin.qq.com/pay/unifiedorder", "POST", requestXML);
+        System.out.println("调用统一下单接口：" + result);
+        WechatPayDto parMap = PayCommonUtil.startWXPay(result);
+        System.out.println("最终的map是：" + parMap.toString());
     }
 
     @Override
@@ -365,7 +390,8 @@ public class WalletServiceImpl implements WalletService{
         parameters.put("body", "小方圆-微信在线支付");
         parameters.put("spbill_create_ip", "127.0.0.1");
         parameters.put("out_trade_no", orderNo);
-        parameters.put("total_fee", price.multiply(new BigDecimal(100))); // 测试时，每次支付一分钱，微信支付所传的金额是以分为单位的，因此实际开发中需要x100
+        parameters.put("total_fee", price.intValue()*100); // 测试时，每次支付一分钱，微信支付所传的金额是以分为单位的，因此实际开发中需要x100
+
 
         // 设置签名
         String sign = PayCommonUtil.createSign("UTF-8", parameters);
@@ -389,5 +415,65 @@ public class WalletServiceImpl implements WalletService{
         String orderInfo="";
         orderInfo = util.getOrder(orderNo, "小方圆下单",  "小方圆下单", notifyUrl, price);
         return orderInfo;
+    }
+
+    @Override
+    public List<UserBalanceDto> billList(Integer userId, Integer start, Integer limit, Integer type, String date) throws ServiceException {
+//        List<BillMonthDto> billMonthDtos = new ArrayList<>();
+        //按月份筛选余额账单列表
+        Date searchDate = new Date();
+        if(StringUtils.isNotEmpty(date)){
+            searchDate = DateUtil.getTimestamp(date,DateUtil.DATE_FORMT_MONTH);
+        }
+        List<UserBalanceDetail> userBalanceDetails = userBalanceDetailMapper.selectByUserIdType(userId, start * limit, limit, type, searchDate);
+        List<UserBalanceDto> dtoList = UserBalanceDto.toDtoList(userBalanceDetails);
+        for(UserBalanceDto dto:dtoList){
+            UserInfo info = userInfoMapper.selectByPrimaryKey(dto.getSellerId());
+            //对当前用户来说只有别人的头像
+
+            //1收入 2支出
+            dto.setImgUrl(info.getHeadImgUrl());
+        }
+//        BillMonthDto billMonthDto = new BillMonthDto();
+        return dtoList;
+    }
+
+
+    @Override
+    public UserBalanceDto billDetail(Integer userId, String orderNo) throws ServiceException {
+        UserBalanceDetail userBalanceDetail = userBalanceDetailMapper.selectByUserIdOrderNo(userId,orderNo);
+        if(userBalanceDetail == null){
+            throw new ServiceException("未找到订单!");
+        }
+        UserBalanceDto userBalanceDto = new UserBalanceDto(userBalanceDetail);
+        UserInfo info = userInfoMapper.selectByPrimaryKey(userBalanceDetail.getSellerId());
+        //对当前用户来说只有别人的头像
+
+        //1收入 2支出
+
+        userBalanceDto.setImgUrl(info.getHeadImgUrl());
+        return userBalanceDto;
+    }
+
+    @Override
+    public void addUserBalance(Integer userId, BigDecimal amount, Integer payType, Integer type, String orderNo, String title,Integer sellerId) throws ServiceException {
+        //TODO 确认下单后生成用户和平台收支表信息
+        UserWallet userWallet = userWalletMapper.selectByUserId(userId);
+
+        UserBalanceDetail userBalance = new UserBalanceDetail();
+        userBalance.setUserId(userId);
+        userBalance.setAmount(amount);
+
+    }
+
+    @Override
+    public boolean updateOrder(String orderNo, String thirdOrderNo, Integer payType) throws ServiceException {
+        //获取订单
+        UserRechargeDetail userRechargeDetail = userRechargeDetailMapper.selectByOrderNo(orderNo);
+        userRechargeDetail.setStatus(2);
+        userRechargeDetailMapper.updateByPrimaryKeySelective(userRechargeDetail);
+        //充值
+        updateBalance(userRechargeDetail.getUserId(),userRechargeDetail.getAmount(),1);
+        return true;
     }
 }

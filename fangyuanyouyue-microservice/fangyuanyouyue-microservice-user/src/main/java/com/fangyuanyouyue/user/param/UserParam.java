@@ -107,7 +107,7 @@ public class UserParam{
 	private String identity;//身份证号码
 
 	@ApiModelProperty(name = "payPwd", value = "支付密码，md5加密，32位小写字母", dataType = "String",hidden = true)
-	private String payPwd;//支付密码，明文6位，MD5小写
+	private String payPwd;//支付密码，MD5小写
 
 	@ApiModelProperty(name = "identityImgCoverUrl", value = "身份证封面图路径", dataType = "String",hidden = true)
 	private String identityImgCoverUrl;//身份证封面图
@@ -171,4 +171,7 @@ public class UserParam{
 
 	@ApiModelProperty(name = "authType", value = "认证状态 1已认证 2未认证", dataType = "int",hidden = true)
 	private Integer authType;//认证状态 1已认证 2未认证
+
+	@ApiModelProperty(name = "payType", value = "支付方式 1微信 2支付宝 3余额", dataType = "int",hidden = true)
+	private Integer payType;//支付方式 1微信 2支付宝 3余额
 }

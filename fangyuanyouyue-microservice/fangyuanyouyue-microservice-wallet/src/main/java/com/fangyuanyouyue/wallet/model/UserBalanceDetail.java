@@ -28,8 +28,17 @@ public class UserBalanceDetail {
 
     private Integer type;//收支类型 1收入 2支出
 
-    private Date addTime;//添加时间
+    private Date addTime;//支付时间
 
     private Date updateTime;//更新时间
 
+    private String title;//订单标题
+
+    private String orderNo;//订单号
+
+    private Integer orderType;//订单类型 1商品、抢购 2官方鉴定 3商品议价 4全民鉴定 5申请专栏 6充值 7开通、续费会员
+
+    private Integer sellerId;//卖家id
+
+    private Integer buyerId;//买家id
 }

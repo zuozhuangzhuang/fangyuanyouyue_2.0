@@ -52,7 +52,7 @@ public class UserVipController extends BaseController{
     @Autowired
     private UserVipService userVipService;
 
-    @ApiOperation(value = "开通/续费会员", notes = "(void)开通/续费会员",response = BaseResp.class)
+    @ApiOperation(value = "开通/续费会员", notes = "(Object)开通/续费会员",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "vipLevel", value = "会员等级 1铂金会员 2至尊会员",required = true, dataType = "int", paramType = "query"),
@@ -61,9 +61,9 @@ public class UserVipController extends BaseController{
             @ApiImplicitParam(name = "payType", value = "支付方式  1微信 2支付宝 3余额", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "payPwd", value = "支付密码", dataType = "String", paramType = "query")
     })
-    @PostMapping(value = "/updateMebber")
+    @PostMapping(value = "/updateMember")
     @ResponseBody
-    public BaseResp updateMebber(WalletParam param) throws IOException {
+    public BaseResp updateMember(WalletParam param) throws IOException {
         try {
             log.info("----》开通/续费会员《----");
             log.info("参数："+param.toString());
@@ -107,7 +107,7 @@ public class UserVipController extends BaseController{
     }
 
 
-    @ApiOperation(value = "申请官方鉴赏回调接口", notes = "申请官方鉴赏", response = BaseResp.class,hidden = true)
+//    @ApiOperation(value = "充值回调接口", notes = "充值微信回调", response = BaseResp.class,hidden = true)
     @PostMapping(value = "/notify/wechat")
     @ResponseBody
     public BaseResp notify(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -155,7 +155,7 @@ public class UserVipController extends BaseController{
             }
             wechatLog.info("返回信息："+wpr.toString());
             if("SUCCESS".equals(wpr.getResultCode())){
-                //支付成功,修改订单状态
+                //支付成功,修改充值订单状态
                 boolean result = userVipService.updateOrder(wpr.getOutTradeNo(),wpr.getTransactionId(),1);
 
                 wechatLog.info("支付成功！");
@@ -191,8 +191,7 @@ public class UserVipController extends BaseController{
         }
     }
 
-    //TODO 支付宝回调
-    @ApiOperation(value = "申请官方鉴赏支付宝回调接口", notes = "支付宝回调", response = BaseResp.class,hidden = true)
+//    @ApiOperation(value = "充值支付宝回调接口", notes = "充值支付宝回调", response = BaseResp.class,hidden = true)
     @RequestMapping(value = "/notify/alipay", method = RequestMethod.POST)
     @ResponseBody
     public String orderNotify(HttpServletRequest request) throws IOException {

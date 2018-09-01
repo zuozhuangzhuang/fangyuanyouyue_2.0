@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.fangyuanyouyue.wallet.dao.UserRechargeDetailMapper">
-  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.wallet.model.UserRechargeDetail">
+<mapper namespace="com.fangyuanyouyue.user.dao.UserAuthOrderMapper">
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.user.model.UserAuthOrder">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="order_no" jdbcType="VARCHAR" property="orderNo" />
     <result column="amount" jdbcType="DECIMAL" property="amount" />
-    <result column="pay_type" jdbcType="INTEGER" property="payType" />
-    <result column="pay_no" jdbcType="VARCHAR" property="payNo" />
+    <result column="status" jdbcType="INTEGER" property="status" />
     <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, user_id, amount, pay_type, pay_no, add_time, update_time, status
+    id, user_id, order_no, amount, status, add_time, update_time, title
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from user_recharge_detail
+    from user_auth_order
     where id = #{id,jdbcType=INTEGER}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-    delete from user_recharge_detail
+    delete from user_auth_order
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.wallet.model.UserRechargeDetail" useGeneratedKeys="true" keyProperty="id">
-    insert into user_recharge_detail (id, user_id, amount, 
-      pay_type, pay_no, add_time, 
-      update_time, status)
-    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{amount,jdbcType=DECIMAL}, 
-      #{payType,jdbcType=INTEGER}, #{payNo,jdbcType=VARCHAR}, #{addTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER})
+  <insert id="insert" parameterType="com.fangyuanyouyue.user.model.UserAuthOrder" useGeneratedKeys="true" keyProperty="id">
+    insert into user_auth_order (id, user_id, order_no, 
+      amount, status, add_time, 
+      update_time, title)
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{orderNo,jdbcType=VARCHAR}, 
+      #{amount,jdbcType=DECIMAL}, #{status,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{title,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.wallet.model.UserRechargeDetail" useGeneratedKeys="true" keyProperty="id">
-    insert into user_recharge_detail
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.user.model.UserAuthOrder" useGeneratedKeys="true" keyProperty="id">
+    insert into user_auth_order
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
         id,
@@ -41,14 +41,14 @@
       <if test="userId != null">
         user_id,
       </if>
+      <if test="orderNo != null">
+        order_no,
+      </if>
       <if test="amount != null">
         amount,
       </if>
-      <if test="payType != null">
-        pay_type,
-      </if>
-      <if test="payNo != null">
-        pay_no,
+      <if test="status != null">
+        status,
       </if>
       <if test="addTime != null">
         add_time,
@@ -56,8 +56,8 @@
       <if test="updateTime != null">
         update_time,
       </if>
-      <if test="status != null">
-        status,
+      <if test="title != null">
+        title,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -67,14 +67,14 @@
       <if test="userId != null">
         #{userId,jdbcType=INTEGER},
       </if>
+      <if test="orderNo != null">
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
       <if test="amount != null">
         #{amount,jdbcType=DECIMAL},
       </if>
-      <if test="payType != null">
-        #{payType,jdbcType=INTEGER},
-      </if>
-      <if test="payNo != null">
-        #{payNo,jdbcType=VARCHAR},
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
       </if>
       <if test="addTime != null">
         #{addTime,jdbcType=TIMESTAMP},
@@ -82,25 +82,25 @@
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="status != null">
-        #{status,jdbcType=INTEGER},
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.wallet.model.UserRechargeDetail">
-    update user_recharge_detail
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.user.model.UserAuthOrder">
+    update user_auth_order
     <set>
       <if test="userId != null">
         user_id = #{userId,jdbcType=INTEGER},
       </if>
+      <if test="orderNo != null">
+        order_no = #{orderNo,jdbcType=VARCHAR},
+      </if>
       <if test="amount != null">
         amount = #{amount,jdbcType=DECIMAL},
       </if>
-      <if test="payType != null">
-        pay_type = #{payType,jdbcType=INTEGER},
-      </if>
-      <if test="payNo != null">
-        pay_no = #{payNo,jdbcType=VARCHAR},
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
       </if>
       <if test="addTime != null">
         add_time = #{addTime,jdbcType=TIMESTAMP},
@@ -108,25 +108,25 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="status != null">
-        status = #{status,jdbcType=INTEGER},
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.wallet.model.UserRechargeDetail">
-    update user_recharge_detail
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.user.model.UserAuthOrder">
+    update user_auth_order
     set user_id = #{userId,jdbcType=INTEGER},
+      order_no = #{orderNo,jdbcType=VARCHAR},
       amount = #{amount,jdbcType=DECIMAL},
-      pay_type = #{payType,jdbcType=INTEGER},
-      pay_no = #{payNo,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      status = #{status,jdbcType=INTEGER}
+      title = #{title,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
   <select id="selectByOrderNo" parameterType="String" resultMap="BaseResultMap">
-    select * from user_recharge_detail where pay_no = #{orderNo}
+    select * from user_auth_order where order_no = #{orderNo}
   </select>
 </mapper>

@@ -52,7 +52,7 @@ public class MyWechatConfig extends WXPayConfig {
 
             @Override
             public DomainInfo getDomain(WXPayConfig config) {
-                return new DomainInfo("192.168.1.66",false);
+                return new DomainInfo("test.fangyuanyouyue.com",true);
             }
         };
     }

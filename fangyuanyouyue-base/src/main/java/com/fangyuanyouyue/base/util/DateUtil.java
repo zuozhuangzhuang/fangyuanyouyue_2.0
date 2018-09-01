@@ -15,6 +15,7 @@ import java.util.Date;
 public class DateUtil {
 	public static final String DATE_FORMT="yyyy-MM-dd HH:mm:ss";
 	public static final String DATE_FORMT_YEAR="yyyy-MM-dd";
+	public static final String DATE_FORMT_MONTH="yyyy-MM";
 	private static Calendar calendar = Calendar.getInstance();
 
 	/**

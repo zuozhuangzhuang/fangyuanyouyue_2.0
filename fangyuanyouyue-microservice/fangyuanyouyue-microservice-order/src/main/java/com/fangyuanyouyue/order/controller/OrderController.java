@@ -267,7 +267,7 @@ public class OrderController extends BaseController{
     }
 
 
-    @ApiOperation(value = "订单支付", notes = "(OrderDto)订单支付")
+    @ApiOperation(value = "订单支付", notes = "(WechatPatDto、String)订单支付")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "orderId", value = "订单ID", required = true, dataType = "int", paramType = "query"),

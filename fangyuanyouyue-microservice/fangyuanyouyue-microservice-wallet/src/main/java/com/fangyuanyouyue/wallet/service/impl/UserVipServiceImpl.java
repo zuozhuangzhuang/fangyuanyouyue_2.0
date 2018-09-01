@@ -130,7 +130,6 @@ public class UserVipServiceImpl implements UserVipService{
     @Override
     public Object addVipOrder(Integer userId, Integer vipLevel, Integer vipType,Integer type,Integer payType,String payPwd) throws ServiceException {
         try{
-
             VipOrder vipOrder = new VipOrder();
             vipOrder.setUserId(userId);
             //订单号
@@ -193,6 +192,8 @@ public class UserVipServiceImpl implements UserVipService{
                 payInfo.append("余额支付成功！");
             }
             return payInfo.toString();
+        }catch (ServiceException e){
+            throw new ServiceException(e.getMessage());
         }catch (Exception e){
             throw new ServiceException("会员开通/续费下单失败！");
         }

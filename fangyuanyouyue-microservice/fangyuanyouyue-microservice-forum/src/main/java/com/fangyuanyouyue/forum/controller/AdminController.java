@@ -3,6 +3,7 @@ package com.fangyuanyouyue.forum.controller;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.forum.model.ForumColumnApply;
 import com.fangyuanyouyue.forum.param.ForumParam;
 import com.fangyuanyouyue.forum.service.ForumColumnService;
 import com.fangyuanyouyue.forum.service.SchedualRedisService;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/appraisal")
@@ -38,9 +40,10 @@ public class AdminController extends BaseController {
 
 	@ApiOperation(value = "专栏申请列表", notes = "专栏申请列表", response = BaseResp.class)
 	@ApiImplicitParams({
-			@ApiImplicitParam(name = "start", value = "用户id",required = true, dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "limit", value = "专栏申请id",required = true, dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "keyword", value = "关键字搜索",required = true, dataType = "String", paramType = "query")
+			@ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "keyword", value = "关键字搜索",required = false, dataType = "String", paramType = "query"),
+			@ApiImplicitParam(name = "status", value = "状态 0申请中 1通过 2未通过",required = true, dataType = "int", paramType = "query")
 	})
 	@PostMapping(value = "/applyList")
 	@ResponseBody
@@ -51,10 +54,13 @@ public class AdminController extends BaseController {
             if(param.getStart()==null || param.getStart() < 0 ||param.getLimit()==null || param.getLimit() < 1) {
                 return toError("分页参数错误");
             }
+            if(param.getStatus() == null){
+                return toError("状态错误");
+            }
 			//TODO 专栏申请列表
-			forumColumnService.applyList(param.getStart(),param.getLimit(),param.getKeyword());
+            List<ForumColumnApply> forumColumnApplies = forumColumnService.applyList(param.getStart(), param.getLimit(), param.getKeyword(), param.getStatus());
 
-			return toSuccess();
+            return toSuccess(forumColumnApplies);
 		} catch (ServiceException e) {
 			e.printStackTrace();
 			return toError(e.getMessage());

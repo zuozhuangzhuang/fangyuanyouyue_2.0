@@ -26,7 +26,7 @@ public class GoodsCommentDto {
 
     private String goodsName;//商品名称
 
-    private String descprition;//商品描述
+    private String description;//商品描述
 
     private Integer fromUserId;//发表评论用户id
 

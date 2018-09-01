@@ -47,9 +47,9 @@ public class TimerServiceImpl implements TimerService{
         List<OrderInfo> orders = orderInfoMapper.selectByStatus(1);
         if(orders != null && orders.size() > 0){
             for(OrderInfo orderInfo:orders){
-//                if((new Date().getTime() - orderInfo.getAddTime().getTime()) >= 24*60*60*1000){
+                if((new Date().getTime() - orderInfo.getAddTime().getTime()) >= 24*60*60*1000){
                 //测试暂用3min
-                if((new Date().getTime() - orderInfo.getAddTime().getTime()) >= 3*60*1000){
+//                if((new Date().getTime() - orderInfo.getAddTime().getTime()) >= 3*60*1000){
                     OrderPay orderPay = orderPayMapper.selectByOrderId(orderInfo.getId());
                     //更改总订单状态
                     orderInfo.setStatus(5);//状态 1待支付 2待发货 3待收货 4已完成 5已取消

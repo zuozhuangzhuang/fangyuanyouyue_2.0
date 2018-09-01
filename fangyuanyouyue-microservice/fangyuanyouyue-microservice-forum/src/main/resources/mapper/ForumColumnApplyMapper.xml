@@ -127,6 +127,10 @@
   </update>
 
   <select id="selectApplyList" resultMap="BaseResultMap">
-    select a.* from forum_column_apply a where a.column_name like "%"#{keyword}"%" or (select nick_name from user_info where id = a.user_id) like "%"#{keyword}"%"
+    select a.* from forum_column_apply a where a.status = #{status}
+     <if test="keyword != null">
+       and a.column_name like "%"#{keyword}"%" or (select nick_name from user_info where id = a.user_id) like "%"#{keyword}"%"
+     </if>
+     order by a.add_time desc limit #{start},#{limit}
   </select>
 </mapper>

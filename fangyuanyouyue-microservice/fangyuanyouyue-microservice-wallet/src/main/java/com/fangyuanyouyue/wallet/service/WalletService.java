@@ -2,9 +2,12 @@ package com.fangyuanyouyue.wallet.service;
 
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.wallet.dto.BillMonthDto;
+import com.fangyuanyouyue.wallet.dto.UserBalanceDto;
 import com.fangyuanyouyue.wallet.dto.WalletDto;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 钱包操作接口
@@ -105,5 +108,49 @@ public interface WalletService {
      * @return
      * @throws ServiceException
      */
-    String orderPayByALi(String orderNo, BigDecimal price,String notifyUrl) throws Exception;
+    String orderPayByALi(String orderNo, BigDecimal price, String notifyUrl) throws Exception;
+
+    /**
+     * 修改充值订单状态
+     * @param orderNo
+     * @param thirdOrderNo
+     * @param payType
+     * @return
+     * @throws ServiceException
+     */
+    boolean updateOrder(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException;
+
+    /**
+     * 余额账单
+     * @param userId
+     * @param start
+     * @param limit
+     * @param type
+     * @param date
+     * @return
+     * @throws ServiceException
+     */
+    List<UserBalanceDto> billList(Integer userId, Integer start, Integer limit, Integer type, String date) throws ServiceException;
+
+    /**
+     * 余额账单详情
+     * @param userId
+     * @param orderNo
+     * @return
+     * @throws ServiceException
+     */
+    UserBalanceDto billDetail(Integer userId, String orderNo) throws ServiceException;
+
+    /**
+     * 新增用户收支信息
+     * @param userId
+     * @param amount
+     * @param payType
+     * @param type
+     * @param orderNo
+     * @param title
+     * @param sellerId
+     * @throws ServiceException
+     */
+    void addUserBalance(Integer userId,BigDecimal amount,Integer payType,Integer type, String orderNo, String title,Integer sellerId) throws ServiceException;
 }

@@ -445,17 +445,26 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public List<OrderDto> myOrderList(Integer userId, Integer start, Integer limit, Integer type, Integer status,String search) throws ServiceException {
-        ArrayList<OrderDto> orderDtos;
+        ArrayList<OrderDto> orderDtos = new ArrayList<>();;
 
         if(type == 1){//我买下的
             //买家
             UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
             //获取所有未拆单的订单
-            //TODO 增加搜索功能
+            //增加搜索功能
             List<OrderInfo> listByUserIdTypeStatus = orderInfoMapper.getListByUserIdStatus(userId, start * limit, limit, status,search);
-            orderDtos = OrderDto.toDtoList(listByUserIdTypeStatus);
-            for(OrderDto orderDto:orderDtos){//获取订单详情列表
-                List<OrderDetail> orderDetails = orderDetailMapper.selectByMainOrderId(orderDto.getOrderId());
+//            orderDtos = OrderDto.toDtoList(listByUserIdTypeStatus);
+//            for(OrderDto orderDto:orderDtos){
+            for(OrderInfo info:listByUserIdTypeStatus){
+                OrderDto orderDto = new OrderDto(info);
+                //获取订单详情列表
+                //如果是没有拆单的订单根据主订单获取，拆了单的根据订单id获取
+                List<OrderDetail> orderDetails;
+                if(info.getSellerId() == null){
+                    orderDetails = orderDetailMapper.selectByMainOrderId(orderDto.getOrderId());
+                }else{
+                    orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
+                }
                 ArrayList<OrderDetailDto> orderDetailDtos = OrderDetailDto.toDtoList(orderDetails, orderDto.getStatus());
                 //卖家信息DTO
                 List<SellerDto> sellerDtos = getSellerDtos(orderDetailDtos);
@@ -477,6 +486,7 @@ public class OrderServiceImpl implements OrderService{
                 if(orderComment != null){
                     orderDto.setIsEvaluation(1);
                 }
+                orderDtos.add(orderDto);
             }
         }else if(type == 2){//我卖出的
             //卖家
@@ -636,15 +646,7 @@ public class OrderServiceImpl implements OrderService{
                 if(orderPay == null){
                     throw new ServiceException("订单支付信息异常！");
                 }
-                //获取商品名字列表
-                List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderId);
-                StringBuffer goodsName = new StringBuffer();
-                boolean isAuction = false;
-                for(OrderDetail detail:orderDetails){
-                    GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
-                    isAuction = goodsInfo.getType() == 2?true:false;
-                    goodsName.append("【"+goodsInfo.getName()+"】");
-                }
+
 
                 StringBuffer payInfo = new StringBuffer();
                 if(payType.intValue() == 1){//微信
@@ -654,7 +656,7 @@ public class OrderServiceImpl implements OrderService{
                     return wechatPayDto;
                 }else if(payType.intValue() == 2){//支付宝
                     //TODO 支付宝，失败不做处理，成功继续拆单生成订单
-                    String info = JSONObject.parseObject(schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderInfo.getAmount(),NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.order_alipay_notify.getNotifUrl())).getString("data");
+                    String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(orderInfo.getOrderNo(), orderInfo.getAmount(),NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.order_alipay_notify.getNotifUrl())).getString("data");
                     payInfo.append(info);
                 }else if(payType.intValue() == 3){//余额
                     //验证支付密码
@@ -682,6 +684,20 @@ public class OrderServiceImpl implements OrderService{
                                 pay.setPayTime(DateStampUtils.getTimesteamp());
                                 pay.setStatus(2);
                                 orderPayMapper.updateByPrimaryKey(pay);
+
+                                //获取商品名字列表
+                                List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(childOrder.getId());
+                                StringBuffer goodsName = new StringBuffer();
+                                boolean isAuction = false;
+                                for(OrderDetail detail:orderDetails){
+                                    GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
+                                    isAuction = goodsInfo.getType() == 2?true:false;
+                                    goodsName.append("【"+goodsInfo.getName()+"】");
+                                }
+                                //交易信息：恭喜您！您的商品【大头三年原光】已被买下，点击此处查看订单
+                                //交易信息：恭喜您！您的抢购【大头三年原光】已被买下，点击此处查看订单
+                                schedualMessageService.easemobMessage(childOrder.getSellerId().toString(),
+                                        "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单","3","2",orderId.toString());
                             }
                         }
                         orderInfo.setStatus(2);
@@ -690,10 +706,6 @@ public class OrderServiceImpl implements OrderService{
                         orderPay.setPayTime(DateStampUtils.getTimesteamp());
                         orderPay.setStatus(2);
                         orderPayMapper.updateByPrimaryKey(orderPay);
-                        //交易信息：恭喜您！您的商品【大头三年原光】已被买下，点击此处查看订单
-                        //交易信息：恭喜您！您的抢购【大头三年原光】已被买下，点击此处查看订单
-                        schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
-                                "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单","3","2",orderId.toString());
                         payInfo.append("余额支付成功！");
                     }
                 }else{

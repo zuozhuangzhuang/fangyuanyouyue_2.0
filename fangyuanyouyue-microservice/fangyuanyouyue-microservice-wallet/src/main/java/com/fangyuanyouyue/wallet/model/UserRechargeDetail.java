@@ -27,4 +27,6 @@ public class UserRechargeDetail {
     private Date addTime;//添加时间
 
     private Date updateTime;//更新时间
+
+    private Integer status;//状态 1待支付 2已完成 3已删除
 }

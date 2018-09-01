@@ -1,19 +1,16 @@
 package com.fangyuanyouyue.wallet.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.base.model.WxPayResult;
-import com.fangyuanyouyue.base.util.WechatUtil.WXPayUtil;
-import com.fangyuanyouyue.base.util.alipay.util.AlipayNotify;
 import com.fangyuanyouyue.wallet.param.WalletParam;
 import com.fangyuanyouyue.wallet.service.SchedualOrderService;
 import com.fangyuanyouyue.wallet.service.SchedualRedisService;
 import com.fangyuanyouyue.wallet.service.SchedualUserService;
 import com.fangyuanyouyue.wallet.service.WalletService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +18,8 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 @Controller
 @RequestMapping(value = "/walletFeign")
@@ -222,6 +214,24 @@ public class FeignController extends BaseController{
             //支付宝支付
             String payInfo = walletService.orderPayByALi(orderNo, price, notifyUrl);
             return toSuccess(payInfo);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "新增用户收支信息", notes = "(void)新增用户收支信息",hidden = true)
+    @PostMapping(value = "/addUserBalance")
+    @ResponseBody
+    public BaseResp addUserBalance(Integer userId,BigDecimal amount,Integer payType,Integer type, String orderNo, String title,Integer sellerId) throws IOException {
+        try {
+            log.info("----》新增用户收支信息《----");
+            //新增用户收支信息
+            walletService.addUserBalance(userId,amount,payType,type,orderNo,title,sellerId);
+            return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());

@@ -67,4 +67,10 @@ public class WalletParam {
 
     @ApiModelProperty(name = "newPwd", value = "新密码", dataType = "String",hidden = true)
     private String newPwd;//新密码
+
+    @ApiModelProperty(name = "date", value = "日期", dataType = "String",hidden = true)
+    private String date;//日期
+
+    @ApiModelProperty(name = "orderNo", value = "订单号", dataType = "String",hidden = true)
+    private String orderNo;//订单号
 }

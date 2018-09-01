@@ -178,7 +178,7 @@ public class CollectServiceImpl implements CollectService{
                 }
                 goodsCommentDto.setMainUrl(mainImgUrl);
                 goodsCommentDto.setGoodsName(goodsInfo.getName());
-                goodsCommentDto.setDescprition(goodsInfo.getDescription());
+                goodsCommentDto.setDescription(goodsInfo.getDescription());
             }
             //获取卖家信息
             UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(goodsInfo.getUserId())).getString("data")), UserInfo.class);

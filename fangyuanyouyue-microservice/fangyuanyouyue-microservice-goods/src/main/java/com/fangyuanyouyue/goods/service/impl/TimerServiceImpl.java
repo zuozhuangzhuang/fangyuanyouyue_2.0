@@ -138,8 +138,8 @@ public class TimerServiceImpl implements TimerService{
         if(goodsBargains != null && goodsBargains.size() > 0){
             for(GoodsBargain bargain:goodsBargains){
                 //24h未处理的议价申请就拒绝
-//                if((new Date().getTime() - bargain.getAddTime().getTime()) > 24*60*60*1000){
-                if((new Date().getTime() - bargain.getAddTime().getTime()) > 3*60*1000){
+                if((new Date().getTime() - bargain.getAddTime().getTime()) > 24*60*60*1000){
+//                if((new Date().getTime() - bargain.getAddTime().getTime()) > 3*60*1000){
                     bargain.setStatus(3);//状态 2同意 3拒绝 4取消
                     goodsBargainMapper.updateByPrimaryKey(bargain);
                     //退回余额

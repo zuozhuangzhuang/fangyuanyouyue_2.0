@@ -169,7 +169,7 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 	public Object addAppraisal(Integer userId, BigDecimal bonus, String title, String content,String[] imgUrls,Integer[] userIds,Integer payType,String payPwd) throws ServiceException {
 
 		StringBuffer payInfo = new StringBuffer();
-		if(bonus != null){
+		if(bonus != null && bonus.compareTo(new BigDecimal(0)) > 0){
 			//生成订单
 			ArgueOrder argueOrder = new ArgueOrder();
 			argueOrder.setUserId(userId);
@@ -182,6 +182,7 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 			argueOrder.setAddTime(DateStampUtils.getTimesteamp());
 			argueOrder.setTitle(title);
 			argueOrder.setContent(content);
+			//保存邀请好友id到订单
 			StringBuffer toUsers = new StringBuffer();
 			if(userIds != null && userIds.length > 0){
 				for(Integer toUser:userIds){
@@ -192,6 +193,7 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 					}
 				}
 			}
+			//保存图片路径到订单
 			StringBuffer imgs = new StringBuffer();
 			for(String imgUrl:imgUrls){
 				if(imgUrl.equals(imgUrls[imgUrls.length-1])){
@@ -222,7 +224,8 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 					BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, bonus, 2)), BaseResp.class);
 					if(baseResp.getCode() == 1){
 						throw new ServiceException(baseResp.getReport().toString());
-					}				}
+					}
+				}
 				payInfo.append("余额支付成功！");
 				//生成全民鉴定信息
 				applyAppraisal(argueOrder.getOrderNo(),null,3);
@@ -242,6 +245,7 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 			appraisalDetail.setEndTime(DateUtil.getDateAfterDay(DateStampUtils.getTimesteamp(),7));
 			appraisalDetail.setAddTime(DateStampUtils.getTimesteamp());
 			appraisalDetail.setPvCount(0);
+			appraisalDetail.setBonus(new BigDecimal(0));
 			appraisalDetailMapper.insert(appraisalDetail);
 			//存储图片
 			insertAppraisalImg(imgUrls, appraisalDetail);

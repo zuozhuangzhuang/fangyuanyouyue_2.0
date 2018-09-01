@@ -181,6 +181,7 @@ public class BargainServiceImpl implements BargainService{
                     orderInfo.setStatus(2);//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
                     orderInfo.setAddTime(DateStampUtils.getTimesteamp());
                     orderInfo.setSellerId(goodsInfo.getUserId());
+                    orderInfo.setIsRefund(2);
                     orderInfoMapper.insert(orderInfo);
                     //生成订单支付表
                     UserAddressInfo addressInfo = userAddressInfoMapper.selectByPrimaryKey(goodsBargain.getAddressId());
@@ -239,6 +240,7 @@ public class BargainServiceImpl implements BargainService{
                     goodsInfoMapper.updateByPrimaryKey(goodsInfo);
                     //议价：恭喜您！您对商品【商品名称】的议价卖家已同意，点击此处查看订单详情
                     //如果卖家同意议价，就拒绝此商品剩余的申请中议价
+                    orderId = orderInfo.getId();
                     schedualMessageService.easemobMessage(goodsBargain.getUserId().toString(),
                             "恭喜您！您对商品【"+goodsInfo.getName()+"】的议价卖家已同意，点击此处查看订单详情","3","2",orderId.toString());
                     List<GoodsBargain> goodsBargains = goodsBargainMapper.selectAllByGoodsId(goodsId,1);//状态 1申请 2同意 3拒绝 4取消
@@ -249,7 +251,6 @@ public class BargainServiceImpl implements BargainService{
                         schedualMessageService.easemobMessage(bargain.getUserId().toString(),
                                 "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情","2","2",bargain.getGoodsId().toString());
                     }
-                    orderId = orderInfo.getId();
                 }else if(status.intValue() == 3){
                     //退回余额
                     //调用wallet-service修改余额功能
@@ -363,7 +364,7 @@ public class BargainServiceImpl implements BargainService{
                     goodsCommentDto.setToUserName((String)map.get("nick_name"));
                 }
                 goodsCommentDto.setGoodsName(goodsInfo.getName());
-                goodsCommentDto.setDescprition(goodsInfo.getDescription());
+                goodsCommentDto.setDescription(goodsInfo.getDescription());
                 goodsCommentDto.setMainUrl(mainImgUrl);
                 if(userId != null){
                     //获取每条评论是否点赞

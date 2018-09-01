@@ -182,7 +182,7 @@ public class CommentServiceImpl implements CommentService{
             }
             goodsCommentDto.setGoodsName(goodsInfo.getName());
             goodsCommentDto.setMainUrl(mainImgUrl.toString());
-            goodsCommentDto.setDescprition(goodsInfo.getDescription());
+            goodsCommentDto.setDescription(goodsInfo.getDescription());
         }
         return goodsCommentDtos;
     }

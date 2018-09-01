@@ -232,7 +232,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                     goodsCommentDto.setToUserName((String)map.get("nick_name"));
                 }
                 goodsCommentDto.setGoodsName(goodsInfo.getName());
-                goodsCommentDto.setDescprition(goodsInfo.getDescription());
+                goodsCommentDto.setDescription(goodsInfo.getDescription());
                 goodsCommentDto.setMainUrl(mainImgUrl);
                 if(userId != null){
                     //获取每条评论是否点赞

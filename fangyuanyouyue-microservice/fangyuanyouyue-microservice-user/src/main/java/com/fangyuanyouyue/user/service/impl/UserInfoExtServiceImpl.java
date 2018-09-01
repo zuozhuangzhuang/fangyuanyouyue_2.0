@@ -1,22 +1,27 @@
 package com.fangyuanyouyue.user.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.dto.WechatPayDto;
+import com.fangyuanyouyue.base.enums.NotifyUrl;
+import com.fangyuanyouyue.base.util.IdGenerator;
 import com.fangyuanyouyue.base.util.MD5Util;
-import com.fangyuanyouyue.user.dao.UserFansMapper;
-import com.fangyuanyouyue.user.model.UserFans;
+import com.fangyuanyouyue.user.dao.*;
+import com.fangyuanyouyue.user.model.*;
 import com.fangyuanyouyue.user.service.SchedualMessageService;
+import com.fangyuanyouyue.user.service.SchedualWalletService;
+import io.swagger.annotations.Api;
+import org.bytedeco.javacpp.presets.opencv_core;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
-import com.fangyuanyouyue.user.dao.IdentityAuthApplyMapper;
-import com.fangyuanyouyue.user.dao.UserInfoExtMapper;
-import com.fangyuanyouyue.user.model.IdentityAuthApply;
-import com.fangyuanyouyue.user.model.UserInfo;
-import com.fangyuanyouyue.user.model.UserInfoExt;
 import com.fangyuanyouyue.user.service.UserInfoExtService;
 import com.fangyuanyouyue.user.service.UserInfoService;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 
 @Service(value = "userInfoExtService")
 @Transactional(rollbackFor=Exception.class)
@@ -32,6 +37,12 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
     private UserFansMapper userFans;
     @Autowired
     private SchedualMessageService schedualMessageService;
+    @Autowired
+    private SchedualWalletService schedualWalletService;
+    @Autowired
+    private UserAuthOrderMapper userAuthOrderMapper;
+    @Autowired
+    private UserAuthApplyMapper userAuthApplyMapper;
 
     @Override
     public void certification(String token, String name, String identity, String identityImgCoverUrl, String identityImgBackUrl) throws ServiceException {
@@ -102,7 +113,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
     }
 
     @Override
-    public void authType(Integer userId) throws ServiceException {
+    public Object authType(Integer userId,Integer payType,String payPwd) throws ServiceException {
         UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(userId);
         if(userInfoExt == null){
             throw new ServiceException("用户扩展信息错误！");
@@ -113,12 +124,62 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
             }else if(userInfoExt.getAuthType() == 0){
                 throw new ServiceException("您已提交官方认证，请耐心等待！");
             }else{
-                userInfoExt.setAuthType(0);
-                userInfoExtMapper.updateByPrimaryKey(userInfoExt);
+                //下单
+                UserAuthOrder authOrder = new UserAuthOrder();
+                authOrder.setUserId(userId);
+                //订单号
+                final IdGenerator idg = IdGenerator.INSTANCE;
+                String id = idg.nextId();
+                authOrder.setOrderNo(id);
+                authOrder.setAmount(new BigDecimal(360));
+                authOrder.setStatus(1);
+                authOrder.setAddTime(DateStampUtils.getTimesteamp());
+                authOrder.setTitle("官方认证支付");
+                userAuthOrderMapper.insert(authOrder);
+
+                StringBuffer payInfo = new StringBuffer();
+                if(payType.intValue() == 1){//TODO 微信,如果回调失败就不做处理，成功就在回调接口中继续生成全民鉴定
+                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(authOrder.getOrderNo(), authOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.auth_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+                    return wechatPayDto;
+                }else if(payType.intValue() == 2){//TODO 支付宝,如果回调失败就不做处理，成功就在回调接口中继续生成全民鉴定
+                    String info = JSONObject.parseObject(schedualWalletService.orderPayByWechat(authOrder.getOrderNo(), authOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.auth_alipay_notify.getNotifUrl())).getString("data");
+                    payInfo.append(info);
+                }else if(payType.intValue() == 3) {//余额
+                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, authOrder.getAmount(), 2)), BaseResp.class);
+                    if(baseResp.getCode() == 1){
+                        throw new ServiceException(baseResp.getReport().toString());
+                    }
+                    updateOrder(authOrder.getOrderNo(),null,3);
+                    payInfo.append("余额支付成功！");
+                }
+                return payInfo.toString();
             }
         }
+    }
+
+    /**
+     * 修改订单状态
+     * @param orderNo
+     * @throws ServiceException
+     */
+    public boolean updateOrder(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException {
+        UserAuthOrder authOrder = userAuthOrderMapper.selectByOrderNo(orderNo);
+        //添加申请记录
+        UserAuthApply userAuthApply = new UserAuthApply();
+        userAuthApply.setUserId(authOrder.getUserId());
+        userAuthApply.setStatus(1);
+        userAuthApply.setAddTime(DateStampUtils.getTimesteamp());
+        userAuthApplyMapper.insert(userAuthApply);
+
+        //修改扩展表中信息为申请中
+        UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(authOrder.getUserId());
+        userInfoExt.setAuthType(0);
+        userInfoExtMapper.updateByPrimaryKey(userInfoExt);
+        authOrder.setStatus(2);
+        userAuthOrderMapper.updateByPrimaryKeySelective(authOrder);
         //系统消息：您的认证店铺申请已提交，将于5个工作日内完成审核，请注意消息通知
-        schedualMessageService.easemobMessage(userId.toString(),"您的认证店铺申请已提交，将于5个工作日内完成审核，请注意消息通知","1","1","");
+        schedualMessageService.easemobMessage(authOrder.getUserId().toString(),"您的认证店铺申请已提交，将于5个工作日内完成审核，请注意消息通知","1","1","");
+        return true;
     }
 
     @Override

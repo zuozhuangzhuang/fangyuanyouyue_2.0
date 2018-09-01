@@ -5,7 +5,9 @@ import com.alibaba.fastjson.JSONObject;
 //import com.alipay.api.DefaultAlipayClient;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.base.util.MD5;
 import com.fangyuanyouyue.base.util.MD5Util;
+import org.apache.http.NameValuePair;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -45,6 +47,7 @@ public class PayCommonUtil {
         parameters.put("fee_type", "CNY");
         parameters.put("notify_url", notifyUrl);//微信异步回调处理
         parameters.put("trade_type", "APP");
+        parameters.put("sign_type", "MD5");
         return parameters;
     }
 
@@ -63,6 +66,7 @@ public class PayCommonUtil {
             // 本来生成的时间戳是13位，但是ios必须是10位，所以截取了一下
             parameterMap.put("timestamp", Long.parseLong(String.valueOf(System.currentTimeMillis()).toString().substring(0, 10)));
             String sign = PayCommonUtil.createSign("UTF-8", parameterMap);
+//            String sign = PayCommonUtil.genAppSign("UTF-8", parameterMap);
             parameterMap.put("sign", sign);
             WechatPayDto wechatPayDto = new WechatPayDto();
             wechatPayDto.setAppId("wx306dfd8f2342f051");
@@ -70,7 +74,7 @@ public class PayCommonUtil {
             wechatPayDto.setPrepayId(map.get("prepay_id"));
             wechatPayDto.setPackageValue("Sign=WXPay");
             wechatPayDto.setNonceStr(PayCommonUtil.CreateNoncestr());
-            wechatPayDto.setTimeStamp(DateUtil.getFormatDate(new Date()));
+            wechatPayDto.setTimeStamp(String.valueOf(System.currentTimeMillis()).toString().substring(0, 10));
             wechatPayDto.setSign(sign);
             return wechatPayDto;
         } catch (Exception e){
@@ -152,7 +156,6 @@ public class PayCommonUtil {
         String sign = MD5Util.MD5Encode(sb.toString(), characterEncoding).toUpperCase();
         return sign;
     }
-
     /**
      * @Description：将请求参数转换为xml格式的string
      * @param parameters

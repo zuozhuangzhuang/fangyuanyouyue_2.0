@@ -107,4 +107,22 @@ public class WalletControllerTest {
                 .andReturn();
     }
 
+    /**
+     * 余额账单列表
+     * @throws Exception
+     */
+    @Test
+    @Transactional
+    public void billList() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/wallet/billList")
+                .param("token","10045FY1535599469421")
+                .param("start","0")
+                .param("limit","10")
+                .param("date","2018-09")
+                .param("type","")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
 }

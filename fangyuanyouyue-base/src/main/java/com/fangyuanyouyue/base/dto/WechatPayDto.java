@@ -19,7 +19,7 @@ public class WechatPayDto {
 
 	private String prepayId;//预支付交易会话标识
 
-	private String packageValue;//
+	private String packageValue;//扩展字段
 
 	private String nonceStr;//随机字符串
 

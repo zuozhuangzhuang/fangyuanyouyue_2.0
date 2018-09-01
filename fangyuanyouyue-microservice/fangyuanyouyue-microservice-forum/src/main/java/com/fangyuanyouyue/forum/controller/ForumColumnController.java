@@ -405,4 +405,44 @@ public class ForumColumnController extends BaseController {
 		 }
 	 }
 
+
+	 @ApiOperation(value = "用户的专栏", notes = "(MyColumnDto)用户的专栏", response = BaseResp.class)
+	 @ApiImplicitParams({
+			 @ApiImplicitParam(name = "id", value = "用户id",required = true, dataType = "int", paramType = "query"),
+			 @ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
+			 @ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query")
+	 })
+	 @PostMapping(value = "/userColumn")
+	 @ResponseBody
+	 public BaseResp userColumn(ForumParam param) throws IOException {
+		 try {
+			 log.info("----》用户的专栏《----");
+			 log.info("参数：" + param.toString());
+			 //验证用户
+			 if(StringUtils.isEmpty(param.getToken())){
+				 return toError("用户token不能为空！");
+			 }
+			 Integer userId = (Integer)schedualRedisService.get(param.getToken());
+			 String verifyUser = schedualUserService.verifyUserById(userId);
+			 JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+			 if((Integer)jsonObject.get("code") != 0){
+				 return toError(jsonObject.getString("report"));
+			 }
+
+			 if(param.getStart()==null || param.getStart() < 0 ||param.getLimit()==null || param.getLimit() < 1) {
+				 return toError("分页参数错误");
+			 }
+			 //我是栏主
+			 MyColumnDto myColumn = forumColumnService.myColumn(userId,param.getStart(),param.getLimit());
+
+			 return toSuccess(myColumn);
+		 } catch (ServiceException e) {
+			 e.printStackTrace();
+			 return toError(e.getMessage());
+		 } catch (Exception e) {
+			 e.printStackTrace();
+			 return toError("系统繁忙，请稍后再试！");
+		 }
+	 }
+
  }

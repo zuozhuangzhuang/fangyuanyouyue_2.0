@@ -67,10 +67,11 @@ public interface ForumColumnService {
 	 * @param start
 	 * @param limit
 	 * @param keyword
+	 * @param status
 	 * @return
 	 * @throws ServiceException
 	 */
-	List<ForumColumnApply> applyList(Integer start, Integer limit, String keyword) throws ServiceException;
+	List<ForumColumnApply> applyList(Integer start, Integer limit, String keyword,Integer status) throws ServiceException;
 
 	/**
 	 * 生成申请记录

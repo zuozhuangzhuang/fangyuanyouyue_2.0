@@ -1,132 +1,185 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.fangyuanyouyue.wallet.dao.UserBalanceDetailMapper" >
-  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.wallet.model.UserBalanceDetail" >
-    <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="user_id" property="userId" jdbcType="INTEGER" />
-    <result column="amount" property="amount" jdbcType="DECIMAL" />
-    <result column="befor_amount" property="beforAmount" jdbcType="DECIMAL" />
-    <result column="after_amount" property="afterAmount" jdbcType="DECIMAL" />
-    <result column="pay_type" property="payType" jdbcType="INTEGER" />
-    <result column="type" property="type" jdbcType="INTEGER" />
-    <result column="add_time" property="addTime" jdbcType="TIMESTAMP" />
-    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangyuanyouyue.wallet.dao.UserBalanceDetailMapper">
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.wallet.model.UserBalanceDetail">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="amount" jdbcType="DECIMAL" property="amount" />
+    <result column="befor_amount" jdbcType="DECIMAL" property="beforAmount" />
+    <result column="after_amount" jdbcType="DECIMAL" property="afterAmount" />
+    <result column="pay_type" jdbcType="INTEGER" property="payType" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="order_no" jdbcType="VARCHAR" property="orderNo" />
+    <result column="order_type" jdbcType="INTEGER" property="orderType" />
+    <result column="seller_id" jdbcType="INTEGER" property="sellerId" />
+    <result column="buyer_id" jdbcType="INTEGER" property="buyerId" />
   </resultMap>
-  <sql id="Base_Column_List" >
-    id, user_id, amount, befor_amount, after_amount, pay_type, type, add_time, update_time
+  <sql id="Base_Column_List">
+    id, user_id, amount, befor_amount, after_amount, pay_type, type, add_time, update_time, 
+    title, order_no, order_type, seller_id, buyer_id
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from user_balance_detail
     where id = #{id,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from user_balance_detail
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.fangyuanyouyue.wallet.model.UserBalanceDetail" useGeneratedKeys="true" keyProperty="id">
     insert into user_balance_detail (id, user_id, amount, 
       befor_amount, after_amount, pay_type, 
-      type, add_time, update_time
-      )
+      type, add_time, update_time, 
+      title, order_no, order_type, 
+      seller_id, buyer_id)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{amount,jdbcType=DECIMAL}, 
       #{beforAmount,jdbcType=DECIMAL}, #{afterAmount,jdbcType=DECIMAL}, #{payType,jdbcType=INTEGER}, 
-      #{type,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
-      )
+      #{type,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{title,jdbcType=VARCHAR}, #{orderNo,jdbcType=VARCHAR}, #{orderType,jdbcType=INTEGER}, 
+      #{sellerId,jdbcType=INTEGER}, #{buyerId,jdbcType=INTEGER})
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.wallet.model.UserBalanceDetail" >
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.wallet.model.UserBalanceDetail" useGeneratedKeys="true" keyProperty="id">
     insert into user_balance_detail
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         id,
       </if>
-      <if test="userId != null" >
+      <if test="userId != null">
         user_id,
       </if>
-      <if test="amount != null" >
+      <if test="amount != null">
         amount,
       </if>
-      <if test="beforAmount != null" >
+      <if test="beforAmount != null">
         befor_amount,
       </if>
-      <if test="afterAmount != null" >
+      <if test="afterAmount != null">
         after_amount,
       </if>
-      <if test="payType != null" >
+      <if test="payType != null">
         pay_type,
       </if>
-      <if test="type != null" >
+      <if test="type != null">
         type,
       </if>
-      <if test="addTime != null" >
+      <if test="addTime != null">
         add_time,
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         update_time,
       </if>
+      <if test="title != null">
+        title,
+      </if>
+      <if test="orderNo != null">
+        order_no,
+      </if>
+      <if test="orderType != null">
+        order_type,
+      </if>
+      <if test="sellerId != null">
+        seller_id,
+      </if>
+      <if test="buyerId != null">
+        buyer_id,
+      </if>
     </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         #{id,jdbcType=INTEGER},
       </if>
-      <if test="userId != null" >
+      <if test="userId != null">
         #{userId,jdbcType=INTEGER},
       </if>
-      <if test="amount != null" >
+      <if test="amount != null">
         #{amount,jdbcType=DECIMAL},
       </if>
-      <if test="beforAmount != null" >
+      <if test="beforAmount != null">
         #{beforAmount,jdbcType=DECIMAL},
       </if>
-      <if test="afterAmount != null" >
+      <if test="afterAmount != null">
         #{afterAmount,jdbcType=DECIMAL},
       </if>
-      <if test="payType != null" >
+      <if test="payType != null">
         #{payType,jdbcType=INTEGER},
       </if>
-      <if test="type != null" >
+      <if test="type != null">
         #{type,jdbcType=INTEGER},
       </if>
-      <if test="addTime != null" >
+      <if test="addTime != null">
         #{addTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNo != null">
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="orderType != null">
+        #{orderType,jdbcType=INTEGER},
+      </if>
+      <if test="sellerId != null">
+        #{sellerId,jdbcType=INTEGER},
+      </if>
+      <if test="buyerId != null">
+        #{buyerId,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.wallet.model.UserBalanceDetail" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.wallet.model.UserBalanceDetail">
     update user_balance_detail
-    <set >
-      <if test="userId != null" >
+    <set>
+      <if test="userId != null">
         user_id = #{userId,jdbcType=INTEGER},
       </if>
-      <if test="amount != null" >
+      <if test="amount != null">
         amount = #{amount,jdbcType=DECIMAL},
       </if>
-      <if test="beforAmount != null" >
+      <if test="beforAmount != null">
         befor_amount = #{beforAmount,jdbcType=DECIMAL},
       </if>
-      <if test="afterAmount != null" >
+      <if test="afterAmount != null">
         after_amount = #{afterAmount,jdbcType=DECIMAL},
       </if>
-      <if test="payType != null" >
+      <if test="payType != null">
         pay_type = #{payType,jdbcType=INTEGER},
       </if>
-      <if test="type != null" >
+      <if test="type != null">
         type = #{type,jdbcType=INTEGER},
       </if>
-      <if test="addTime != null" >
+      <if test="addTime != null">
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNo != null">
+        order_no = #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="orderType != null">
+        order_type = #{orderType,jdbcType=INTEGER},
+      </if>
+      <if test="sellerId != null">
+        seller_id = #{sellerId,jdbcType=INTEGER},
+      </if>
+      <if test="buyerId != null">
+        buyer_id = #{buyerId,jdbcType=INTEGER},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.wallet.model.UserBalanceDetail" >
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.wallet.model.UserBalanceDetail">
     update user_balance_detail
     set user_id = #{userId,jdbcType=INTEGER},
       amount = #{amount,jdbcType=DECIMAL},
@@ -135,7 +188,24 @@
       pay_type = #{payType,jdbcType=INTEGER},
       type = #{type,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      title = #{title,jdbcType=VARCHAR},
+      order_no = #{orderNo,jdbcType=VARCHAR},
+      order_type = #{orderType,jdbcType=INTEGER},
+      seller_id = #{sellerId,jdbcType=INTEGER},
+      buyer_id = #{buyerId,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectByUserIdType" resultMap="BaseResultMap">
+    select * from user_balance_detail where user_id = #{userId} and add_time <![CDATA[ <= ]]> #{searchDate}
+    <if test="type != null">
+      and type = #{type}
+    </if>
+     order by add_time desc limit #{start},#{limit}
+  </select>
+
+  <select id="selectByUserIdOrderNo" resultMap="BaseResultMap">
+    select * from user_balance_detail where user_id = #{userId} and order_no = #{orderNo}
+  </select>
 </mapper>
