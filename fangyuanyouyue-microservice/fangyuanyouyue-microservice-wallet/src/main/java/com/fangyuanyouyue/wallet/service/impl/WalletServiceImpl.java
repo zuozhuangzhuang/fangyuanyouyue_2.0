@@ -456,13 +456,22 @@ public class WalletServiceImpl implements WalletService{
     }
 
     @Override
-    public void addUserBalance(Integer userId, BigDecimal amount, Integer payType, Integer type, String orderNo, String title,Integer sellerId) throws ServiceException {
+    public void addUserBalance(Integer userId, BigDecimal amount, Integer payType, Integer type, String orderNo, String title,Integer orderType,Integer sellerId,Integer buyerId) throws ServiceException {
         //TODO 确认下单后生成用户和平台收支表信息
         UserWallet userWallet = userWalletMapper.selectByUserId(userId);
 
         UserBalanceDetail userBalance = new UserBalanceDetail();
         userBalance.setUserId(userId);
         userBalance.setAmount(amount);
+        userBalance.setPayType(payType);
+        userBalance.setType(type);
+        userBalance.setAddTime(DateStampUtils.getTimesteamp());
+        userBalance.setTitle(title);
+        userBalance.setOrderNo(orderNo);
+        userBalance.setOrderType(orderType);
+        userBalance.setSellerId(sellerId);
+        userBalance.setBuyerId(buyerId);
+        userBalanceDetailMapper.insert(userBalance);
 
     }
 

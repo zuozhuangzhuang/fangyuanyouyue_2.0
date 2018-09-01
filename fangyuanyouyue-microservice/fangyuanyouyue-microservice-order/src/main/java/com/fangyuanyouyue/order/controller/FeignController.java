@@ -47,7 +47,7 @@ public class FeignController extends BaseController{
     @ResponseBody
     public BaseResp getProcess(Integer userId,Integer type) throws IOException {
         try {
-            log.info("----》生成订单《----");
+            log.info("----》获取待处理订单《----");
             log.info("参数：userId："+userId+",type："+type);
             //参数判断
             //验证用户

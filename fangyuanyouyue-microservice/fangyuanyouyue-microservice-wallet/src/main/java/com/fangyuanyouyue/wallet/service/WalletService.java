@@ -149,8 +149,10 @@ public interface WalletService {
      * @param type
      * @param orderNo
      * @param title
+     * @param orderType
      * @param sellerId
+     * @param buyerId
      * @throws ServiceException
      */
-    void addUserBalance(Integer userId,BigDecimal amount,Integer payType,Integer type, String orderNo, String title,Integer sellerId) throws ServiceException;
+    void addUserBalance(Integer userId,BigDecimal amount,Integer payType,Integer type, String orderNo, String title,Integer orderType,Integer sellerId,Integer buyerId) throws ServiceException;
 }

@@ -51,7 +51,7 @@ public class RefundServiceImpl implements RefundService{
             if (orderInfo.getUserId().intValue() != userId.intValue()) {
                 throw new ServiceException("你无法操作该条订单！");
             }
-            OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderId, null);
+            OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderId, null,null);
             if(orderRefund != null){
                 throw new ServiceException("您已申请退货！");
             }
@@ -156,7 +156,7 @@ public class RefundServiceImpl implements RefundService{
             if (orderInfo.getSellerId().intValue() != userId.intValue()) {
                 throw new ServiceException("你无法操作该条订单！");
             }
-            OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderId, 1);
+            OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderId, 1,1);
             if (orderRefund == null) {
                 throw new ServiceException("获取退货信息失败！");
             }else{
@@ -196,7 +196,7 @@ public class RefundServiceImpl implements RefundService{
 
     @Override
     public OrderRefundDto orderReturnDetail(Integer userId, Integer orderId) throws ServiceException {
-        OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderId, null);
+        OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderId, null,null);
         if(orderRefund == null){
             throw new ServiceException("没找到退货信息！");
         }else{

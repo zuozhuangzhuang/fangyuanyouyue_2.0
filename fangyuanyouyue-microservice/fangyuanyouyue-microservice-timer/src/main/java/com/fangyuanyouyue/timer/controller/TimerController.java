@@ -94,19 +94,19 @@ public class TimerController extends BaseController {
         }
     }
 
-//
-//    @Scheduled(cron="0 * *  * * ? ")
-//    public BaseResp updateOrderRefundTwoDay() throws IOException {
-//        try {
-//            log.info("----》仅退款：48小时卖家未处理自动退款《----");
-//
-//            return toSuccess();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return toError("系统繁忙，请稍后再试！");
-//        }
-//    }
-//
+
+    @Scheduled(cron="0 * *  * * ? ")
+    public BaseResp updateOrderRefund() throws IOException {
+        try {
+            log.info("----》自动处理退货《----");
+            schedualOrderService.updateOrderRefund();
+            return toSuccess();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
 //
 //    @Scheduled(cron="0 * *  * * ? ")
 //    public BaseResp updateOrderRefundThreeDay() throws IOException {

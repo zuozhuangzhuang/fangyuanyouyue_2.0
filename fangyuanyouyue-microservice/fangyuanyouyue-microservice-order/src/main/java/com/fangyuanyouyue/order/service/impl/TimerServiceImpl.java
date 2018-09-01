@@ -3,12 +3,10 @@ package com.fangyuanyouyue.order.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.order.dao.*;
-import com.fangyuanyouyue.order.model.GoodsInfo;
-import com.fangyuanyouyue.order.model.OrderDetail;
-import com.fangyuanyouyue.order.model.OrderInfo;
-import com.fangyuanyouyue.order.model.OrderPay;
+import com.fangyuanyouyue.order.model.*;
 import com.fangyuanyouyue.order.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -124,6 +122,35 @@ public class TimerServiceImpl implements TimerService{
                     schedualWalletService.updateScore(orderInfo.getSellerId(),20L,1);
                 }else{//2000以上+50分
                     schedualWalletService.updateScore(orderInfo.getSellerId(),50L,1);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void updateOrderRefund() throws ServiceException {
+        //1、获取申请了退货的订单 2、判断订单状态为待发货还是已发货 3、根据订单状态判断处理逻辑（待发货2天处理时间，自动同意）（已发货3天处理时间，自动拒绝） 4、更新退货申请表
+        List<OrderInfo> refundOrders = orderInfoMapper.getRefundOrder(null, null, null, null);
+        if(refundOrders != null){
+            for(OrderInfo info:refundOrders){
+                OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(info.getId(), 1,1);
+                if(orderRefund != null){
+                    if(info.getStatus() == 2){
+                        //退货申请时间 + 2天 < 当前时间
+                        if(DateUtil.getDateAfterDay(orderRefund.getAddTime(),2).getTime() < new Date().getTime()){
+                            //自动同意
+                            orderRefund.setSellerReturnStatus(4);
+                        }
+                    }else if(info.getStatus() == 3){
+                        //退货申请时间 + 3天 < 当前时间
+                        if(DateUtil.getDateAfterDay(orderRefund.getAddTime(),3).getTime() < new Date().getTime()){
+                            //自动拒绝
+                            orderRefund.setSellerReturnStatus(5);
+                        }
+                    }else{
+                        throw new ServiceException("订单状态错误！");
+                    }
+                    orderRefundMapper.updateByPrimaryKeySelective(orderRefund);
                 }
             }
         }

@@ -311,7 +311,7 @@
           and a.status = 2
         </if>
       </if>
-      <if test="goodsCategoryIds != null">
+      <if test="goodsCategoryIds != null and goodsCategoryIds.length > 0">
         and a.id in (select goods_id from goods_correlation where (goods_category_id in
         <foreach close=")" collection="goodsCategoryIds" index="index" item="categoryId" open="(" separator=",">
           #{categoryId,jdbcType=INTEGER}

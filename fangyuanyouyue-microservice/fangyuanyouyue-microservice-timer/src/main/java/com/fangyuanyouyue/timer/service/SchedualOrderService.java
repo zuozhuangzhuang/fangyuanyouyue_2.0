@@ -26,4 +26,11 @@ public interface SchedualOrderService {
     @RequestMapping(value = "/timer/saveReceiptGoods",method = RequestMethod.POST)
     String saveReceiptGoods();
 
+    /**
+     * 自动处理退货
+     * @return
+     */
+    @RequestMapping(value = "/timer/updateOrderRefund",method = RequestMethod.POST)
+    String updateOrderRefund();
+
 }

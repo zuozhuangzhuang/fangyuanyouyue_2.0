@@ -31,7 +31,7 @@ public class TimerController extends BaseController{
     @ApiOperation(value = "定时取消订单", notes = "(void)定时取消订单",hidden = true)
     @PostMapping(value = "/cancelOrder")
     @ResponseBody
-    public BaseResp cancelOrder(OrderParam param) throws IOException {
+    public BaseResp cancelOrder() throws IOException {
         try {
             log.info("----》定时取消订单《----");
             //定时取消订单
@@ -51,11 +51,30 @@ public class TimerController extends BaseController{
     @ApiOperation(value = "自动收货", notes = "(void)12天自动收货",hidden = true)
     @PostMapping(value = "/saveReceiptGoods")
     @ResponseBody
-    public BaseResp saveReceiptGoods(OrderParam param) throws IOException {
+    public BaseResp saveReceiptGoods() throws IOException {
         try {
             log.info("----》自动收货《----");
             //自动收货
             timerService.saveReceiptGoods();
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+
+    @ApiOperation(value = "自动处理退货", notes = "(void)自动处理退货",hidden = true)
+    @PostMapping(value = "/updateOrderRefund")
+    @ResponseBody
+    public BaseResp updateOrderRefund() throws IOException {
+        try {
+            log.info("----》自动处理退货《----");
+            //自动收货
+            timerService.updateOrderRefund();
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();

@@ -399,7 +399,7 @@ public class OrderServiceImpl implements OrderService{
             orderDto.setSellerDtos(sellerDtos);
             if(orderInfo.getIsRefund() == 1){
                 //退货状态
-                OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderInfo.getId(), null);
+                OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderInfo.getId(), null,null);
                 orderDto.setReturnStatus(orderRefund.getStatus());
                 orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
             }
@@ -477,7 +477,7 @@ public class OrderServiceImpl implements OrderService{
                 orderDto.setNickName(user.getNickName());
                 if(orderDto.getIsRefund() == 1){
                     //退货状态
-                    OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null);
+                    OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null,null);
                     orderDto.setReturnStatus(orderRefund.getStatus());
                     orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
                 }
@@ -516,7 +516,7 @@ public class OrderServiceImpl implements OrderService{
                 orderDto.setNickName(user.getNickName());
                 if(orderDto.getIsRefund() == 1){
                     //退货状态
-                    OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null);
+                    OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null,null);
                     orderDto.setReturnStatus(orderRefund.getStatus());
                     orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
                 }
@@ -734,11 +734,12 @@ public class OrderServiceImpl implements OrderService{
             count = (list1 == null?0:list1.size())+(list2 == null?0:list2.size());
         }else{
             //状态 2待发货  7已申请退货
-            List<OrderInfo> list1 = orderInfoMapper.getListByUserIdStatus(userId, null, null, 2,null);
-            List<OrderInfo> list2 = orderInfoMapper.getRefundOrder(userId, null, null, 2);
+            List<OrderInfo> list1 = orderInfoMapper.getOrderBySellerId(userId, null, null, 2,null);
+            List<OrderInfo> list2 = orderInfoMapper.getOrderBySellerId(userId, null, null, 7,null);
+//            List<OrderInfo> list2 = orderInfoMapper.getRefundOrder(userId, null, null, 2);
             for(OrderInfo orderInfo:list2){
                 //状态 1申请退货 2退货成功 3拒绝退货
-                OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderInfo.getId(), 1);
+                OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderInfo.getId(), 1,1);
                 if(orderRefund != null){
                     count++;
                 }

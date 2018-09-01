@@ -711,16 +711,16 @@ public class UserInfoServiceImpl implements UserInfoService {
          *   待发货+待处理退货
          */
         Integer buy = JSONObject.parseObject(schedualOrderService.getProcess(userId, 1)).getInteger("data");
-        waitProcessDto.setBuy(buy);
+        waitProcessDto.setBuy(buy==null?0:buy);
         Integer sell = JSONObject.parseObject(schedualOrderService.getProcess(userId, 2)).getInteger("data");
-        waitProcessDto.setSell(sell);
+        waitProcessDto.setSell(sell==null?0:sell);
         /**
          * 市集：
          *  商品：
          *   待处理的议价
          */
         Integer goods = JSONObject.parseObject(schedualGoodsService.getProcess(userId)).getInteger("data");
-        waitProcessDto.setGoods(goods);
+        waitProcessDto.setGoods(goods==null?0:goods);
         return waitProcessDto;
     }
 

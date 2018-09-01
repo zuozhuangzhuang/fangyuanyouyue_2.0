@@ -14,4 +14,10 @@ public interface TimerService {
      * @throws ServiceException
      */
     void saveReceiptGoods() throws ServiceException;
+
+    /**
+     * 自动处理退货
+     * @throws ServiceException
+     */
+    void updateOrderRefund() throws ServiceException;
 }

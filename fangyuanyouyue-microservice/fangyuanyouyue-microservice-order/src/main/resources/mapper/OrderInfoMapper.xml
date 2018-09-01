@@ -220,7 +220,7 @@
         and a.seller_id = #{sellerId}
       </if>
       <if test="status != null and status != 0 and status != 7">
-        and a.status = #{status}
+        and a.status = #{status} and a.is_refund = 2
       </if>
       <if test="status != null and status == 7">
         and a.is_refund = 1
@@ -229,7 +229,10 @@
         and b.goods_id in (select id from goods_info where name like "%"#{search}"%" or description like "%"#{search}"%")
       </if>
     </where>
-    order by a.add_time desc limit #{start},#{limit}
+    order by a.add_time desc
+    <if test="start != null and limit != null">
+      limit #{start},#{limit}
+    </if>
   </select>
 
 
@@ -247,17 +250,17 @@
   </select>
 
   <select id="getRefundOrder" parameterType="Integer" resultMap="BaseResultMap">
-    select * from order_info
+    select * from order_info a,order_refund b
     <where>
-      is_refund = 1
+      a.is_refund = 1 and b.order_id = a.id and b.status = 1 and (a.status = 2 or a.status = 3)
       <if test="userId != null and type == 1">
-        and user_id = #{userId}
+        and a.user_id = #{userId}
       </if>
       <if test="userId != null and type == 2">
-        and seller_id = #{userId}
+        and a.seller_id = #{userId}
       </if>
     </where>
-    order by add_time desc
+    order by a.add_time desc
     <if test="start != null and limit != null">
       limit #{start},#{limit}
     </if>

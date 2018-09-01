@@ -82,6 +82,7 @@ public class ForumController extends BaseController {
     @ApiOperation(value = "帖子/视频列表", notes = "（ForumInfoDto）获取帖子列表大集合",response = BaseResp.class)
     @ApiImplicitParams({
         @ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "string", paramType = "query"),
+        @ApiImplicitParam(name = "userId", value = "用户id(获取个人店铺内帖子列表需传)", required = false, dataType = "int", paramType = "query"),
         @ApiImplicitParam(name = "columnId", value = "专栏id",required = false, dataType = "int", paramType = "query"),
         @ApiImplicitParam(name = "keyword", value = "搜索关键字",required = false, dataType = "string", paramType = "query"),
         @ApiImplicitParam(name = "searchType", value = "搜索类型 1古物圈子 2专栏精选 ",required = false, dataType = "int", paramType = "query"),
@@ -116,7 +117,7 @@ public class ForumController extends BaseController {
             	    return toError("类型异常！");
                 }
             }
-            List<ForumInfoDto> dto = forumInfoService.getForumList(param.getColumnId(),userId,param.getType(),param.getKeyword(),param.getStart(),param.getLimit(),param.getListType(),param.getSearchType());
+            List<ForumInfoDto> dto = forumInfoService.getForumList(param.getColumnId(),param.getListType()==1?param.getUserId():userId,param.getType(),param.getKeyword(),param.getStart(),param.getLimit(),param.getListType(),param.getSearchType());
             
             return toSuccess(dto);
         } catch (ServiceException e) {
