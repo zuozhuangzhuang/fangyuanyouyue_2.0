@@ -3,16 +3,14 @@ package com.fangyuanyouyue.forum.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
-import com.fangyuanyouyue.forum.dao.AppraisalDetailMapper;
-import com.fangyuanyouyue.forum.dao.CollectMapper;
-import com.fangyuanyouyue.forum.dao.ForumColumnMapper;
-import com.fangyuanyouyue.forum.dao.ForumInfoMapper;
+import com.fangyuanyouyue.forum.constants.StatusEnum;
+import com.fangyuanyouyue.forum.dao.*;
 import com.fangyuanyouyue.forum.dto.AppraisalDetailDto;
+import com.fangyuanyouyue.forum.dto.AppraisalImgDto;
 import com.fangyuanyouyue.forum.dto.ForumColumnDto;
 import com.fangyuanyouyue.forum.dto.ForumInfoDto;
 import com.fangyuanyouyue.forum.model.*;
-import com.fangyuanyouyue.forum.service.CollectService;
-import com.fangyuanyouyue.forum.service.SchedualUserService;
+import com.fangyuanyouyue.forum.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +31,22 @@ public class CollectServiceImpl implements CollectService{
     private ForumColumnMapper forumColumnMapper;
     @Autowired
     private ForumInfoMapper forumInfoMapper;
+    @Autowired
+    private ForumLikesMapper forumLikesMapper;
+    @Autowired
+    private AppraisalLikesMapper appraisalLikesMapper;
+    @Autowired
+    private AppraisalCommentMapper appraisalCommentMapper;
+    @Autowired
+    private AppraisalImgMapper appraisalImgMapper;
+    @Autowired
+    private ForumLikesService forumLikesService;
+    @Autowired
+    private ForumImgMapper forumImgMapper;
+    @Autowired
+    private ForumCommentService forumCommentService;
+    @Autowired
+    private ForumPvService forumPvService;
 
     @Override
     public void collect(Integer userId, Integer collectId, Integer collectType,Integer status) throws ServiceException {
@@ -40,15 +54,10 @@ public class CollectServiceImpl implements CollectService{
             ForumInfo forumInfo = forumInfoMapper.selectByPrimaryKey(collectId);
             if(forumInfo == null){
                 throw new ServiceException("收藏对象不存在！");
-            }else{
-                //帖子不能收藏
-                if(forumInfo.getType() == 1){
-                    throw new ServiceException("类型错误！");
-                }
             }
-        }else if (collectType == 4) {//专栏
-            ForumColumn forumColumn = forumColumnMapper.selectByPrimaryKey(collectId);
-            if(forumColumn == null){
+        }else if (collectType == 4) {//帖子
+            ForumInfo forumInfo = forumInfoMapper.selectByPrimaryKey(collectId);
+            if(forumInfo == null){
                 throw new ServiceException("收藏对象不存在！");
             }
         }else if(collectType == 5){//鉴定
@@ -61,7 +70,7 @@ public class CollectServiceImpl implements CollectService{
         }
         Collect collect = collectMapper.selectByCollectIdType(userId, collectId, collectType);
         //status        : 状态 1发起 2取消
-        //collectType   : 收藏类型 3视频 4专栏
+        //collectType   : 收藏类型 3视频 4帖子
         if (status == 1) {
             if (collect == null) {
                 collect = new Collect();
@@ -86,68 +95,68 @@ public class CollectServiceImpl implements CollectService{
     }
 
     @Override
-    public List collectList(Integer userId, Integer collectType,Integer start, Integer limit) throws ServiceException {
-        //collectType 收藏类型 3视频 4专栏 5鉴赏
+    public List collectList(Integer userId, Integer collectType,Integer start, Integer limit,String search) throws ServiceException {
+        //collectType 收藏类型 3视频 4帖子 5鉴赏
         //type 类型 1关注 2收藏
-        List dtos;
-        if(collectType == 3){
-            List<ForumInfo> forumInfos = forumInfoMapper.selectCollectList(userId, start * limit, limit, collectType);
-            dtos = ForumInfoDto.toDtoList(forumInfos);
-            for(ForumInfoDto dto:(List<ForumInfoDto>)dtos){
-                //获取卖家信息
-                UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(dto.getUserId())).getString("data")), UserInfo.class);
-                dto.setNickName(user.getNickName());
-                dto.setHeadImgUrl(user.getHeadImgUrl());
+        List dtos = new ArrayList();
+        if(collectType.intValue() == 3 || collectType.intValue() == 4){
+            List<ForumInfo> forumInfos = forumInfoMapper.selectCollectList(userId, start * limit, limit, collectType,collectType == 4?1:2,search);
+            for(ForumInfo info:forumInfos) {
+                ForumInfoDto dto = new ForumInfoDto(info);
+                //计算点赞数
+                Integer likesCount = forumLikesService.countLikes(info.getId());
+                dto.setLikesCount(likesCount);
+
+                //计算评论数
+                Integer commentCount = forumCommentService.countComment(info.getId());
+                dto.setCommentCount(commentCount);
+                //是否点赞
+                ForumLikes forumLikes = forumLikesMapper.selectByForumIdUserId(dto.getForumId(), userId);
+                if(forumLikes != null){
+                    dto.setIsLikes(StatusEnum.YES.getValue());
+                }
+                //浏览量
+                Integer pvCount = forumPvService.countPv(info.getId());
+                dto.setViewCount(pvCount+info.getPvCount());
+                dtos.add(dto);
             }
-        }else if(collectType == 4){
-            List<ForumColumn> forumColumns = forumColumnMapper.selectCollectList(userId, start * limit, limit, collectType);
-            dtos = ForumColumnDto.toDtoList(forumColumns);
         }else if(collectType.intValue() == 5){
-            List<AppraisalDetail> appraisalDetails = appraisalDetailMapper.selectCollectList(userId, start * limit, limit,collectType);
-            dtos = AppraisalDetailDto.toDtoList(appraisalDetails);
+            List<AppraisalDetail> appraisalDetails = appraisalDetailMapper.selectCollectList(userId, start * limit, limit,collectType,search);
+            //列表不需要返回点赞数、浏览量、评论量
+            for(AppraisalDetail model:appraisalDetails) {
+                AppraisalDetailDto dto = new AppraisalDetailDto(model);
+                //是否收藏
+                Collect collect = collectMapper.selectByCollectIdType(userId, model.getId(), 5);
+                if(collect != null){
+                    dto.setIsCollect(StatusEnum.YES.getValue());
+                }
+                //参与鉴定用户头像列表
+                List<String> headImgUrls = new ArrayList<>();
+                List<AppraisalComment> appraisalComments = appraisalCommentMapper.selectByAppraisalId(model.getId(), 0, 5);
+                if(appraisalComments != null && appraisalComments.size() > 0){
+                    for(AppraisalComment comment:appraisalComments){
+                        headImgUrls.add(comment.getHeadImgUrl());
+                    }
+                }
+                dto.setHeadImgUrls(headImgUrls);
+                //鉴定图片列表
+                List<AppraisalImg> appraisalImgs = appraisalImgMapper.selectListByAppraisal(model.getId());
+                dto.setImgDtos(AppraisalImgDto.toDtoList(appraisalImgs));
+                AppraisalComment comment = appraisalCommentMapper.selectByAppraisalIdUserId(userId,model.getId());
+                if(comment != null){
+                    //用户观点
+                    dto.setViewpoint(comment.getViewpoint());
+                    //是否获胜
+                    dto.setIsWinner(comment.getIsWinner());
+                }
+                dtos.add(dto);
+            }
         }else{
             throw new ServiceException("收藏类型错误！");
         }
         return dtos;
     }
 
-    /**
-     * 给GoodsDto赋值
-     * @param goodsInfo
-     * @return
-     * @throws ServiceException
-     */
-//    private GoodsDto setDtoByGoodsInfo(GoodsInfo goodsInfo) throws ServiceException{
-//        if(goodsInfo == null){
-//            throw new ServiceException("获取商品失败！");
-//        }else{
-//            List<GoodsImg> goodsImgs = goodsImgMapper.getImgsByGoodsId(goodsInfo.getId());
-//            String mainImgUrl = null;
-//            for(GoodsImg goodsImg:goodsImgs){
-//                if(goodsImg.getType() == 1){
-//                    mainImgUrl = goodsImg.getImgUrl();
-//                }
-//            }
-//            List<GoodsCorrelation> goodsCorrelations = goodsCorrelationMapper.getCorrelationsByGoodsId(goodsInfo.getId());
-//            //按照先后顺序获取评论
-//            List<Map<String, Object>> maps = goodsCommentMapperl.selectMapByGoodsIdCommentId(null,goodsInfo.getId(), 0, 3);
-//            List<GoodsCommentDto> goodsCommentDtos = GoodsCommentDto.mapToDtoList(maps);
-//            for(GoodsCommentDto goodsCommentDto:goodsCommentDtos){
-//                Map<String, Object> map = goodsCommentMapperl.selectByCommentId(goodsCommentDto.getCommentId());
-//                if(map != null){
-//                    goodsCommentDto.setToUserId((Integer)map.get("user_id"));
-//                    goodsCommentDto.setToUserHeadImgUrl((String)map.get("head_img_url"));
-//                    goodsCommentDto.setToUserName((String)map.get("nick_name"));
-//                }
-//                goodsCommentDto.setMainUrl(mainImgUrl);
-//                goodsCommentDto.setGoodsName(goodsInfo.getName());
-//                goodsCommentDto.setDescprition(goodsInfo.getDescription());
-//            }
-//            //获取卖家信息
-//            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(goodsInfo.getUserId())).getString("data")), UserInfo.class);
-//            GoodsDto goodsDto = new GoodsDto(user,goodsInfo,goodsImgs,goodsCorrelations,goodsCommentDtos);
-//            goodsDto.setCommentCount(goodsCommentMapperl.selectCount(goodsInfo.getId()));
-//            return goodsDto;
-//        }
-//    }
+
+
 }

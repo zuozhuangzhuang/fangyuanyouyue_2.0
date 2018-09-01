@@ -1,45 +1,23 @@
 package com.fangyuanyouyue.forum.model;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.util.Date;
 
+/**
+ * 鉴定浏览记录
+ */
+@Getter
+@Setter
+@ToString
 public class AppraisalPv {
     private Integer id;
 
-    private Integer userId;
+    private Integer userId;//用户id
 
-    private Integer appraisalId;
+    private Integer appraisalId;//鉴定id
 
-    private Date addTime;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public Integer getAppraisalId() {
-        return appraisalId;
-    }
-
-    public void setAppraisalId(Integer appraisalId) {
-        this.appraisalId = appraisalId;
-    }
-
-    public Date getAddTime() {
-        return addTime;
-    }
-
-    public void setAddTime(Date addTime) {
-        this.addTime = addTime;
-    }
+    private Date addTime;//添加时间
 }

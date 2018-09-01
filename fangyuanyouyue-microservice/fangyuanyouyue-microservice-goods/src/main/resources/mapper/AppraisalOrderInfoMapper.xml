@@ -114,4 +114,8 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectByOrderNo" parameterType="String" resultMap="BaseResultMap">
+    select * from appraisal_order_info where order_no = #{orderNo}
+  </select>
 </mapper>

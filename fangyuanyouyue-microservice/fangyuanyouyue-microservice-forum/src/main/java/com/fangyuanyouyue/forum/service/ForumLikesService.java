@@ -35,6 +35,6 @@ public interface ForumLikesService {
      * @param forumId
      * @param type
      */
-    void saveLikes(Integer type,Integer userId,Integer forumId);
+    void saveLikes(Integer type,Integer userId,Integer forumId) throws ServiceException;
 
 }

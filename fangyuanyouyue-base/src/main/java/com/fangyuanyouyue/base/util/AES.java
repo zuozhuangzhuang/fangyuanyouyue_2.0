@@ -31,7 +31,6 @@ public class AES {
     public byte[] decrypt(byte[] content, byte[] keyByte, byte[] ivByte) throws InvalidAlgorithmParameterException {
         initialize();
         try {
-            // java是没有
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
             Key sKeySpec = new SecretKeySpec(keyByte, "AES");
             cipher.init(Cipher.DECRYPT_MODE, sKeySpec, generateIV(ivByte));// 初始化

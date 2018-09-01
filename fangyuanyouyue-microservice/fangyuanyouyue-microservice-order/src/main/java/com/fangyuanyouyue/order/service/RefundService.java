@@ -2,6 +2,8 @@ package com.fangyuanyouyue.order.service;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.order.dto.OrderDto;
+import com.fangyuanyouyue.order.dto.OrderRefundDto;
+import com.fangyuanyouyue.order.model.OrderRefund;
 
 import java.util.List;
 
@@ -36,4 +38,6 @@ public interface RefundService {
      * @throws ServiceException
      */
     void handleReturns(Integer userId, Integer orderId, String reason, Integer status) throws ServiceException;
+
+    OrderRefundDto orderReturnDetail(Integer userId, Integer orderId) throws ServiceException;
 }

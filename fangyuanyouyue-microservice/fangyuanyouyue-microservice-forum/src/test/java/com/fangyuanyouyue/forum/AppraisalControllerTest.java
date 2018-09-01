@@ -35,6 +35,92 @@ public class AppraisalControllerTest {
     }
 
     /**
+     * 全民鉴定详情
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void appraisalDetail() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/appraisal/detail")
+                .param("token", "10045FY1534743584507")
+                .param("appraisalId", "10")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 全民鉴定列表
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void appraisalList() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/appraisal/list")
+                .param("token", "10045FY1534743584507")
+                //关键字
+                .param("keyword", "")
+                .param("start", "0")
+                .param("limit", "20")
+                //类型 1我参与的 2我发起的
+                .param("type", "2")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 全民鉴定评论列表
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void commentList() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/appraisal/comment/list")
+                .param("token", "10045FY1534743584507")
+                .param("appraisalId", "")
+                .param("start", "0")
+                .param("limit", "10")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 全民鉴定点赞
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void likes() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/appraisal/likes")
+                .param("token", "10045FY1534743584507")
+                .param("appraisalId", "")
+                //类型 1点赞 2取消点赞
+                .param("type", "0")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 全民鉴定评论点赞
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void commentLikes() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/appraisal/likes")
+                .param("token", "10045FY1534743584507")
+                .param("commentId", "")
+                //类型 1点赞 2取消点赞
+                .param("type", "0")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
      * 发起鉴定
      * @throws Exception
      */
@@ -42,7 +128,7 @@ public class AppraisalControllerTest {
 //    @Transactional
     public void addAppraisal() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/appraisal/addAppraisal")
-                .param("token", "10045FY1534183918247")
+                .param("token", "10045FY1534743584507")
                 .param("bonus", "10")
                 .param("title", "来看看这个咸丰")
                 .param("content", "刚入手一枚好看的钱，大家帮我看看是真的还是假的")
@@ -51,4 +137,41 @@ public class AppraisalControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
+
+    /**
+     * 添加评论
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void saveComment() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/appraisal/saveComment")
+                .param("token", "10045FY1534743584507")
+                .param("appraisalId", "10")
+                //评论观点 1看真 2看假
+                .param("viewpoint", "1")
+                .param("content", "真的")
+                //邀请用户数组
+                .param("userIds", "16")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+    /**
+     * 邀请好友
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void invite() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/appraisal/invite")
+                .param("token", "10045FY1534743584507")
+                .param("appraisalId", "10")
+                //邀请用户数组
+                .param("userIds", "16,39,25,42")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
 }

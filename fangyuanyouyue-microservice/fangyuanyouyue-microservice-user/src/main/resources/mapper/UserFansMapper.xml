@@ -108,6 +108,9 @@
       <if test="userId != null and type == 2">
         and a.id = b.user_id and b.to_user_id = #{userId}
       </if>
+      <if test="search != null and search != ''">
+        and a.nick_name like "%"#{search}"%"
+      </if>
     </where>
     order by b.add_time desc limit #{start},#{limit}
   </select>

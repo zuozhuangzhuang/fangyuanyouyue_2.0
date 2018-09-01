@@ -11,7 +11,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * 论坛信息
+ * 帖子、视频信息
  */
 @Getter
 @Setter

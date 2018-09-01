@@ -6,6 +6,7 @@ import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.order.dto.OrderDto;
+import com.fangyuanyouyue.order.dto.OrderRefundDto;
 import com.fangyuanyouyue.order.param.OrderParam;
 import com.fangyuanyouyue.order.service.*;
 import io.swagger.annotations.Api;
@@ -60,7 +61,7 @@ public class RefundController extends BaseController{
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -69,7 +70,7 @@ public class RefundController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getOrderId() == null){
-                return toError(ReCode.FAILD.getValue(),"订单id不能为空！");
+                return toError("订单id不能为空！");
             }
 
             if(StringUtils.isEmpty(param.getReason())){
@@ -78,6 +79,43 @@ public class RefundController extends BaseController{
             //退货申请
             refundService.orderReturnToSeller(userId,param.getOrderId(),param.getReason(),param.getImgUrls());
             return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+
+    @ApiOperation(value = "退货详情", notes = "(OrderRefundDto)退货详情")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orderId", value = "订单id",required = true, dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/orderReturnDetail")
+    @ResponseBody
+    public BaseResp orderReturnDetail(OrderParam param) throws IOException {
+        try {
+            log.info("----》退货详情《----");
+            log.info("参数："+param.toString());
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError("用户token不能为空！");
+            }
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            String verifyUser = schedualUserService.verifyUserById(userId);
+            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+            if((Integer)jsonObject.get("code") != 0){
+                return toError(jsonObject.getString("report"));
+            }
+            if(param.getOrderId() == null){
+                return toError("订单id不能为空！");
+            }
+            //退货详情
+            OrderRefundDto orderRefundDto = refundService.orderReturnDetail(userId, param.getOrderId());
+            return toSuccess(orderRefundDto);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
@@ -103,7 +141,7 @@ public class RefundController extends BaseController{
 //            log.info("参数："+param.toString());
 //            //验证用户
 //            if(StringUtils.isEmpty(param.getToken())){
-//                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+//                return toError("用户token不能为空！");
 //            }
 //            Integer userId = (Integer)schedualRedisService.get(param.getToken());
 //            String verifyUser = schedualUserService.verifyUserById(userId);
@@ -112,10 +150,10 @@ public class RefundController extends BaseController{
 //                return toError(jsonObject.getString("report"));
 //            }
 //            if(param.getStart() == null || param.getStart() < 0){
-//                return toError(ReCode.FAILD.getValue(),"起始页数错误！");
+//                return toError("起始页数错误！");
 //            }
 //            if(param.getLimit() == null || param.getLimit() < 1){
-//                return toError(ReCode.FAILD.getValue(),"每页个数错误！");
+//                return toError("每页个数错误！");
 //            }
 //            if(param.getType() == null){
 //                return toError("类型不能为空！");
@@ -148,7 +186,7 @@ public class RefundController extends BaseController{
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -157,11 +195,11 @@ public class RefundController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getOrderId() == null){
-                return toError(ReCode.FAILD.getValue(),"订单id不能为空！");
+                return toError("订单id不能为空！");
             }
 
             if(param.getStatus() == null){
-                return toError(ReCode.FAILD.getValue(),"处理状态不能为空！");
+                return toError("处理状态不能为空！");
             }
             //卖家处理退货
             refundService.handleReturns(userId,param.getOrderId(),param.getReason(),param.getStatus());

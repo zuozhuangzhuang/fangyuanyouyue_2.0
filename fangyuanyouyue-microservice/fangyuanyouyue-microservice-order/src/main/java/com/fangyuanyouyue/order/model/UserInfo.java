@@ -57,5 +57,6 @@ public class UserInfo {
 
     private Date updateTime;//更新时间
 
+    private Integer isRegHx;//是否注册环信1是 2否
 
 }

@@ -63,29 +63,31 @@ public class CollectControllerTest {
 //    @Transactional
     public void collectFroumColumnList() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/collect/collectList")
-                .param("token","10045FY1534236594430")
+                .param("token","10045FY1534451510951")
                 //关注/收藏类型  3视频 4专栏 5鉴定
                 .param("collectType","3")
                 .param("start","0")
                 .param("limit","10")
+                .param("search","测试")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
 
     /**
-     * 我的收藏列表:专栏
+     * 我的收藏列表:帖子
      * @throws Exception
      */
     @Test
 //    @Transactional
     public void collectFroumList() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/collect/collectList")
-                .param("token","10045FY1534236594430")
-                //关注/收藏类型  3视频 4专栏 5鉴定
+                .param("token","10015FY1534813319913")
+                //关注/收藏类型  3视频 4帖子 5鉴定
                 .param("collectType","4")
                 .param("start","0")
                 .param("limit","10")
+//                .param("search","测试")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -99,11 +101,12 @@ public class CollectControllerTest {
 //    @Transactional
     public void collectAppraisalList() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/collect/collectList")
-                .param("token","10045FY1534236594430")
+                .param("token","10015FY1534813319913")
                 //关注/收藏类型  3视频 4专栏 5鉴定
                 .param("collectType","5")
                 .param("start","0")
                 .param("limit","10")
+                .param("search","")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

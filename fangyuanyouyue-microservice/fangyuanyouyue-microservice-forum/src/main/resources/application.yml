@@ -7,7 +7,7 @@ server:
     base-url: http://localhost:9411
 spring:
   profiles:
-    active: test
+    active: dev
 #springcloud-bus
 management:
   endpoints:
@@ -33,8 +33,3 @@ pagehelper:
     supportMethodsArguments: true
     params: count=countSql
     returnPageInfo: check
-debug: true
-# 打印sql
-logging:
-  level:
-    com.fangyuanyouyue.goods: DEBUG

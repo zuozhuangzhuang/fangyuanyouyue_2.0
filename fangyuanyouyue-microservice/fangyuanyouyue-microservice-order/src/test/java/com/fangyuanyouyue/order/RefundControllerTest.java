@@ -41,12 +41,12 @@ public class RefundControllerTest {
      * @throws Exception
      */
     @Test
-//    @Transactional
+    @Transactional
     public void cancelOrder() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/refund/orderReturnToSeller")
-                .param("token","10042FY1533767510392")
-                .param("orderId","918")
-                .param("reason","坏的")
+                .param("token","10045FY1534556954408")
+                .param("orderId","964")
+                .param("reason","不要了")
 //                .param("imgUrls","")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
@@ -73,7 +73,7 @@ public class RefundControllerTest {
     }
 
     /**
-     * 退货列表
+     * 卖家处理退货
      * @throws Exception
      */
     @Test

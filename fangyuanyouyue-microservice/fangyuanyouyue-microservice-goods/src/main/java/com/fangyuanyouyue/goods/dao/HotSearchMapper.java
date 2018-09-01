@@ -2,6 +2,7 @@ package com.fangyuanyouyue.goods.dao;
 
 import com.fangyuanyouyue.goods.model.HotSearch;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public interface HotSearchMapper {
 
     int updateByPrimaryKey(HotSearch record);
 
-    HotSearch selectByName(String name);
+    HotSearch selectByName(@Param("name") String name);
 
     List<HotSearch> getHotSearchList();
 }

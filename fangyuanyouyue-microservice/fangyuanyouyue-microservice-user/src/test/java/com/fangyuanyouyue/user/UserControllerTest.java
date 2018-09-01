@@ -369,11 +369,12 @@ public class UserControllerTest {
     @Transactional
     public void myFansOrFollows() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/user/myFansOrFollows")
-                .param("token","10025FY1533144562288")
+                .param("token","10045FY1535418023463")
                 //类型 1我的关注 2我的粉丝
                 .param("type","1")
                 .param("start","0")
                 .param("limit","10")
+                .param("search","师弟")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -388,6 +389,24 @@ public class UserControllerTest {
     public void myWaitProcess() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/user/myWaitProcess")
                 .param("token","10041FY1533753292042")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+
+
+    /**
+     * 根据用户名获取用户列表
+     * @throws Exception
+     */
+    @Test
+    @Transactional
+    public void getUserByName() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/user/getUserByName")
+                .param("search","")
+                .param("start","0")
+                .param("limit","20")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

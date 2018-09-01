@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.user.dao;
 
 import com.fangyuanyouyue.user.model.UserInfo;
+import org.apache.catalina.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -39,4 +40,12 @@ public interface UserInfoMapper {
     
     List<UserInfo> getPage(@Param("start") Integer start,@Param("limit") Integer limit,@Param("keyword")String keyword,@Param("status")Integer status,@Param("startDate")String startDate,@Param("endDate")String endDate,@Param("orders")String orders);
     
+    /**
+     * 根据用户名获取用户列表
+     * @param nickName
+     * @param start
+     * @param limit
+     * @return
+     */
+    List<Map<String,Object>> getUserByName(@Param("nickName") String nickName,@Param("start") Integer start,@Param("limit") Integer limit);
 }

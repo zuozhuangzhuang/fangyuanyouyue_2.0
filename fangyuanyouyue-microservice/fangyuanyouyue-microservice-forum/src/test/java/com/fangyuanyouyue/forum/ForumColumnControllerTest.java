@@ -80,4 +80,22 @@ public class ForumColumnControllerTest {
     }
 
 
+    /**
+     * 我是栏主
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void myColumn() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/column/myColumn")
+                .param("token", "10045FY1535479286901")
+                .param("start", "0")
+                .param("limit", "10")
+
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+
 }

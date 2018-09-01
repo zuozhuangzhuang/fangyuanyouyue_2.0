@@ -17,6 +17,8 @@
     <result column="status" jdbcType="INTEGER" property="status" />
     <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+    <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, appraisal_id, viewpoint, content, pic1, pic2, pic3, pic4, pic5, pic6, 
@@ -220,8 +222,13 @@
     a.*,b.nick_name,b.head_img_url
     from appraisal_comment a,user_info b
     where a.user_id=b.id and appraisal_id=#{appraisalId}
-    order by id desc
+    order by (select count(id) from appraisal_comment_likes where comment_id = a.id) desc,a.add_time desc
+    <if test="start != null and limit != null">
     limit #{start},#{limit}
+    </if>
   </select>
-  
+
+  <select id="selectByAppraisalIdUserId" parameterType="Integer" resultMap="BaseResultMap">
+    select a.*,b.nick_name,b.head_img_url from appraisal_comment a,user_info b where a.user_id = b.id and user_id = #{userId} and appraisal_id = #{appraisalId}
+  </select>
 </mapper>

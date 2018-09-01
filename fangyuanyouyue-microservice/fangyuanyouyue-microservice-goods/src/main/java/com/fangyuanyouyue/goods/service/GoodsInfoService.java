@@ -143,9 +143,10 @@ public interface GoodsInfoService {
     /**
      * 举报商品
      * @param userId
-     * @param goodsId
+     * @param businessId
+     * @param reason
      * @param reason
      * @throws ServiceException
      */
-    void reportGoods(Integer userId,Integer goodsId,String reason) throws ServiceException;
+//    void report(Integer userId,Integer businessId,String reason,Integer type) throws ServiceException;
 }

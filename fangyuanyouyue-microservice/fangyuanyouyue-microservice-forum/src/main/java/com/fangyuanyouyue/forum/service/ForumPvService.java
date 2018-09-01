@@ -9,18 +9,18 @@ public interface ForumPvService {
 
     
     /**
-     * 计算点赞数量
+     * 计算浏览量
      * @param forumId
      * @return
      */
     Integer countPv(Integer forumId);
     
     /**
-     * 
+     * 增加浏览量
      * @param userId
      * @param forumId
-     * @param type
+     * @param columnId
      */
-    void savePv(Integer userId,Integer forumId);
+    void savePv(Integer userId,Integer forumId,Integer columnId);
 
 }

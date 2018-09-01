@@ -1,19 +1,19 @@
 package com.fangyuanyouyue.order.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
+import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.order.dao.*;
-import com.fangyuanyouyue.order.dto.OrderDetailDto;
-import com.fangyuanyouyue.order.dto.OrderDto;
-import com.fangyuanyouyue.order.dto.OrderPayDto;
-import com.fangyuanyouyue.order.dto.SellerDto;
+import com.fangyuanyouyue.order.dto.*;
 import com.fangyuanyouyue.order.model.*;
 import com.fangyuanyouyue.order.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service(value = "refundService")
@@ -51,7 +51,7 @@ public class RefundServiceImpl implements RefundService{
             if (orderInfo.getUserId().intValue() != userId.intValue()) {
                 throw new ServiceException("你无法操作该条订单！");
             }
-            OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderId, null);
+            OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderId, null,null);
             if(orderRefund != null){
                 throw new ServiceException("您已申请退货！");
             }
@@ -59,6 +59,8 @@ public class RefundServiceImpl implements RefundService{
             if (orderInfo.getStatus().intValue() == 2 || orderInfo.getStatus().intValue() == 3) {
                 //退货信息
                 orderRefund = new OrderRefund();
+                //待发货处理时间2天，已发货处理时间3天
+                orderRefund.setEndTime(DateUtil.getDateAfterDay(new Date(),orderInfo.getStatus()));
                 orderRefund.setUserId(userId);
                 orderRefund.setOrderId(orderId);
                 if(imgUrls != null && imgUrls.length > 0){
@@ -90,9 +92,21 @@ public class RefundServiceImpl implements RefundService{
                 orderRefundMapper.insert(orderRefund);
                 orderInfo.setIsRefund(1);//是否退货 1是 2否
                 orderInfoMapper.updateByPrimaryKey(orderInfo);
-                //TODO 环信给卖家发送信息
-//                schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),"您的商品【"+"商品名称"+"】买家已申请退货，点击此处处理一下吧","txt",orderId.toString());
-
+                //环信给卖家发送信息 退货：您的商品【商品名称】、【xxx】、【xx】买家已申请退货，点击此处处理一下吧
+                //您的抢购【抢购名称】买家已申请退货，点击此处处理一下吧
+                List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderId);
+                StringBuffer goodsName = new StringBuffer();
+                boolean isAuction = false;
+                for(OrderDetail detail:orderDetails){
+                    //获取商品、抢购信息
+                    GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
+                    goodsName.append("【"+goodsInfo.getName()+"】");
+                    isAuction = goodsInfo.getType() == 2?true:false;
+                }
+                schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
+                        "您的"+(isAuction?"抢购":"商品")+goodsName+"买家已申请退货，点击此处处理一下吧","3","2",orderId.toString());
+            }else{
+                throw new ServiceException("订单无法退货！");
             }
         }
     }
@@ -142,7 +156,7 @@ public class RefundServiceImpl implements RefundService{
             if (orderInfo.getSellerId().intValue() != userId.intValue()) {
                 throw new ServiceException("你无法操作该条订单！");
             }
-            OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderId, 1);
+            OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderId, 1,1);
             if (orderRefund == null) {
                 throw new ServiceException("获取退货信息失败！");
             }else{
@@ -153,7 +167,22 @@ public class RefundServiceImpl implements RefundService{
                     orderInfoMapper.updateByPrimaryKeySelective(orderInfo);
                     orderRefundMapper.updateByPrimaryKeySelective(orderRefund);
                     //修改余额
-                    schedualWalletService.updateBalance(orderInfo.getUserId(),orderPay.getPayAmount(),1);
+                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(orderInfo.getUserId(),orderPay.getPayAmount(),1)), BaseResp.class);
+                    if(baseResp.getCode() == 1){
+                        throw new ServiceException(baseResp.getReport().toString());
+                    }
+                    //退货：您对商品/抢购【商品名称】申请的退货卖家已同意，货款已退回您的余额。点击此处查看您的余额吧
+                    List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderId);
+                    StringBuffer goodsName = new StringBuffer();
+                    boolean isAuction = false;
+                    for(OrderDetail detail:orderDetails){
+                        //获取商品、抢购信息
+                        GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
+                        goodsName.append("【"+goodsInfo.getName()+"】");
+                        isAuction = goodsInfo.getType() == 2?true:false;
+                    }
+                    schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
+                            "您对"+(isAuction?"抢购":"商品")+goodsName+"申请的退货卖家已同意，货款已退回您的余额。点击此处查看您的余额吧","13","2","");
                 }else{//拒绝
                     //订单状态不变
                     orderRefund.setStatus(3);
@@ -161,9 +190,18 @@ public class RefundServiceImpl implements RefundService{
                     orderRefund.setSellerReturnStatus(3);
                     orderRefundMapper.updateByPrimaryKeySelective(orderRefund);
                 }
-                //TODO 环信发送消息
-
             }
+        }
+    }
+
+    @Override
+    public OrderRefundDto orderReturnDetail(Integer userId, Integer orderId) throws ServiceException {
+        OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderId, null,null);
+        if(orderRefund == null){
+            throw new ServiceException("没找到退货信息！");
+        }else{
+            OrderRefundDto orderRefundDto = new OrderRefundDto(orderRefund);
+            return orderRefundDto;
         }
     }
 }

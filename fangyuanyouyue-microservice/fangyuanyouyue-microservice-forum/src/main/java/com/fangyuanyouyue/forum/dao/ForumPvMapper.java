@@ -3,6 +3,9 @@ package com.fangyuanyouyue.forum.dao;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.fangyuanyouyue.forum.model.ForumPv;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.Date;
 
 @Mapper
 public interface ForumPvMapper {
@@ -21,4 +24,19 @@ public interface ForumPvMapper {
     int countById(Integer forumId);
 
     int countByUserId(Integer forumId,Integer userId);
+
+    /**
+     * 根据用户id和帖子id获取浏览信息
+     * @param userId
+     * @param forumId
+     * @return
+     */
+    ForumPv selectByUserIdColumnId(@Param("userId")Integer userId,@Param("forumId")Integer forumId);
+
+    /**
+     * 根据专栏id获取访问量
+     * @param columnId
+     * @return
+     */
+    Integer getCountByColumnId(@Param("columnId")Integer columnId,@Param("date")Date date);
 }

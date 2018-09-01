@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.forum.dto.ForumCommentDto;
+import com.fangyuanyouyue.forum.dto.MyForumCommentDto;
 
 /**
  * 帖子评论接口
@@ -24,7 +25,8 @@ public interface ForumCommentService {
     
 	/**
 	 * 获取评论列表
-	 * @param forumId
+	 * @param userId
+	 * @param commentId
 	 * @param start
 	 * @param limit
 	 * @return
@@ -46,12 +48,17 @@ public interface ForumCommentService {
      * @param content
      * @param commentId
      */
-    void saveComment(Integer userId,Integer forumId,String content,Integer commentId) throws ServiceException;
-    
-    /**
-     * 删除评论
-     * @param commentId
-     */
-    void deleteComment(Integer commentId) throws ServiceException;
+	ForumCommentDto saveComment(Integer userId,Integer forumId,String content,Integer commentId) throws ServiceException;
+
+	/**
+	 * 我的帖子、视频评论列表
+	 * @param userId
+	 * @param statr
+	 * @param limit
+	 * @param type
+	 * @return
+	 * @throws ServiceException
+	 */
+    List<MyForumCommentDto> myComments(Integer userId, Integer statr, Integer limit, Integer type) throws ServiceException;
 
 }

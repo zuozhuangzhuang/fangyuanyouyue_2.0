@@ -15,7 +15,7 @@ spring:
     async:
       request-timeout: 30s
   profiles:
-    active: test
+    active: dev
 #springcloud-bus
 management:
   endpoints:
@@ -54,7 +54,3 @@ pagehelper:
 #      exposure:
 #        include: "*"
 #base-path: /
-# 打印sql
-logging:
-  level:
-    com.fangyuanyouyue.order: DEBUG

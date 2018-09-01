@@ -44,11 +44,11 @@ public class OrderControllerTest {
     public void saveOrderByCart() throws Exception {
         String a = "[{\"sellerId\":16,\"addOrderDetailDtos\":[{\"goodsId\":2,\"couponId\":10}]}]";
         String b = "[{\"sellerId\":25,\"addOrderDetailDtos\":[{\"goodsId\":101},{\"goodsId\":102}]},{\"sellerId\":24,\"addOrderDetailDtos\":[{\"goodsId\":33}]}]";
+        String c = "[{\"sellerId\":39,\"addOrderDetailDtos\":[{\"goodsId\":140},{\"goodsId\":141},{\"goodsId\":142}]}]";
         mvc.perform(MockMvcRequestBuilders.post("/order/saveOrderByCart")
-                .param("token","10036FY1533354566271")
-                .param("sellerList",b)
-                .param("addressId","45")
-                .param("type","1")
+                .param("token","10045FY1534556954408")
+                .param("sellerList",c)
+                .param("addressId","58")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -92,13 +92,14 @@ public class OrderControllerTest {
     @Transactional
     public void myOrderList() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/order/myOrderList")
-                .param("token","10025FY1533317806918")
+                .param("token","10042FY1535624711851")
                 .param("start","0")
-                .param("limit","10")
+                .param("limit","100")
                 //类型 1买家（我买下的） 2卖家（我卖出的）
-                .param("type","2")
+                .param("type","1")
                 //订单状态 0全部 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
                 .param("status","2")
+//                .param("search","卡")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -133,10 +134,10 @@ public class OrderControllerTest {
 //    @Transactional
     public void getOrderPay() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/order/getOrderPay")
-                .param("token","10041FY1533753292042")
-                .param("orderId","921")
+                .param("token","10042FY1535624711851")
+                .param("orderId","1087")
                 //支付方式 1支付宝 2微信 3余额支付
-                .param("type","3")
+                .param("payType","3")
                 .param("payPwd","e10adc3949ba59abbe56e057f20f883e")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())

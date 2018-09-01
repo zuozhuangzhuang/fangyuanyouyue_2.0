@@ -10,15 +10,16 @@ import com.fangyuanyouyue.goods.model.GoodsBargain;
 
 public interface BargainService {
     /**
-     * （批量）商品压价
+     * 商品压价
      * @param userId
      * @param goodsId
      * @param price
      * @param reason
      * @param payPwd
+//     * @param payType
      * @throws ServiceException
      */
-    void addBargain(Integer userId, Integer goodsId, BigDecimal price,String reason,Integer addressId,String payPwd) throws ServiceException;
+    void addBargain(Integer userId, Integer goodsId, BigDecimal price,String reason,Integer addressId,String payPwd,Integer payType) throws ServiceException;
 
     /**
      * 处理压价

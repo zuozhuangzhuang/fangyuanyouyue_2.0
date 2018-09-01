@@ -19,11 +19,13 @@ import java.util.List;
 public class BannerIndexDto {
     private Integer bannerId;//唯一自增ID
 
-    private Integer businessId;//业务ID:商品ID/用户ID
+    private Integer businessId;//业务ID：例：商品id
 
-    private Integer jumpType;//跳转类型,0:商品 1：个人
+    private Integer jumpType;//跳转类型 1页面 2链接 3图片（businessId为空）
 
-    private Integer type;//业务类型,0:商品 1：个人
+    private Integer businessType;//业务类型 1商品详情、2抢购详情、3帖子详情、4全民鉴定详情、5视频详情、6专栏
+
+    private Integer type;//类型 1首页 2商城
 
     private String title;//描述标题
 
@@ -31,7 +33,7 @@ public class BannerIndexDto {
 
     private Integer sort;//排序，由低到高
 
-    private Integer status;//是否下架，0未下架 1下架
+    private Integer status;//是否展示，1展示 2不展示
 
     public BannerIndexDto() {
     }
@@ -40,6 +42,7 @@ public class BannerIndexDto {
         this.bannerId = bannerIndex.getId();
         this.businessId = bannerIndex.getBusinessId();
         this.jumpType = bannerIndex.getJumpType();
+        this.businessType = bannerIndex.getBusinessType();
         this.type = bannerIndex.getType();
         this.title = bannerIndex.getTitle();
         this.imgUrl = bannerIndex.getImgUrl();
@@ -49,7 +52,7 @@ public class BannerIndexDto {
 
     public static List<BannerIndexDto> toDtoList(List<BannerIndex> list) {
         if (list == null)
-            return null;
+            return new ArrayList<>();
         List<BannerIndexDto> dtolist = new ArrayList<>();
         for (BannerIndex model : list) {
             BannerIndexDto dto = new BannerIndexDto(model);

@@ -10,6 +10,7 @@ import com.fangyuanyouyue.goods.dao.GoodsInfoMapper;
 import com.fangyuanyouyue.goods.model.CommentLikes;
 import com.fangyuanyouyue.goods.model.GoodsImg;
 import com.fangyuanyouyue.goods.model.GoodsInfo;
+import com.fangyuanyouyue.goods.service.SchedualMessageService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,8 @@ public class CommentServiceImpl implements CommentService{
     private GoodsInfoMapper goodsInfoMapper;
     @Autowired
     private GoodsImgMapper goodsImgMapper;
+    @Autowired
+    private SchedualMessageService schedualMessageService;
 
     @Override
     public Integer addComment(GoodsParam param) throws ServiceException {
@@ -59,6 +62,11 @@ public class CommentServiceImpl implements CommentService{
         goodsComment.setGoodsId(param.getGoodsId());
         goodsComment.setLikesCount(0);//点赞数初始值为0
         goodsCommentMapper.insert(goodsComment);
+        //社交消息：您的商品【商品名称】有新的评论，点击此处前往查看吧
+        //社交消息：您的抢购【抢购名称】有新的评论，点击此处前往查看吧
+        GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(param.getGoodsId());
+        schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
+                "您的"+(goodsInfo.getType() == 1?"商品【":"抢购【")+goodsInfo.getName()+"】有新的评论，点击此处前往查看吧","8","3",goodsComment.getId().toString());
         return goodsComment.getId();
     }
 
@@ -151,6 +159,9 @@ public class CommentServiceImpl implements CommentService{
         while(it.hasNext()){
             GoodsCommentDto goodsCommentDto = it.next();
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsCommentDto.getGoodsId());
+            if(goodsInfo == null){
+                throw new ServiceException("商品信息异常！");
+            }
             if(goodsInfo.getType().intValue() != type.intValue()){
                 it.remove();
                 continue;
@@ -171,7 +182,7 @@ public class CommentServiceImpl implements CommentService{
             }
             goodsCommentDto.setGoodsName(goodsInfo.getName());
             goodsCommentDto.setMainUrl(mainImgUrl.toString());
-            goodsCommentDto.setDescprition(goodsInfo.getDescription());
+            goodsCommentDto.setDescription(goodsInfo.getDescription());
         }
         return goodsCommentDtos;
     }

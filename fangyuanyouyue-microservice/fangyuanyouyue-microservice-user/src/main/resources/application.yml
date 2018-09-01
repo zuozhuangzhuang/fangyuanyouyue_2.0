@@ -11,11 +11,12 @@ spring:
     multipart:
       max-file-size: 1024MB
       max-request-size: 10240MB
+      enabled: true
   mvc:
     async:
       request-timeout: 30s
   profiles:
-    active: test
+    active: dev
 #springcloud-bus
 management:
   endpoints:
@@ -34,7 +35,6 @@ mapper:
   mappers:  com.fangyuanyouyue.user.dao
   not-empty: false
   identity: MYSQL
-
 #pagehelper
 pagehelper:
     helperDialect: mysql
@@ -42,3 +42,6 @@ pagehelper:
     supportMethodsArguments: true
     params: count=countSql
     returnPageInfo: check
+ribbon:
+  ReadTimeout: 60000
+  ConnectTimeout: 60000

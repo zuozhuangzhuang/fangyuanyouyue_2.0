@@ -24,7 +24,8 @@ public interface OrderRefundMapper {
      * 根据订单ID和状态获取退货信息
      * @param orderId
      * @param status
+     * @param sellerReturnStatus
      * @return
      */
-    OrderRefund selectByOrderIdStatus(@Param("orderId")Integer orderId, @Param("status")Integer status);
+    OrderRefund selectByOrderIdStatus(@Param("orderId")Integer orderId, @Param("status")Integer status,@Param("sellerReturnStatus")Integer sellerReturnStatus);
 }

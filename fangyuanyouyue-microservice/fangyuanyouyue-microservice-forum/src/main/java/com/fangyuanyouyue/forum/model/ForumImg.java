@@ -7,7 +7,7 @@ import lombok.ToString;
 import java.util.Date;
 
 /**
- *
+ * 帖子图片表
  */
 @Getter
 @Setter
@@ -15,10 +15,10 @@ import java.util.Date;
 public class ForumImg {
     private Integer id;
 
-    private Integer forumId;
+    private Integer forumId;//帖子id
 
-    private String imgUrl;
+    private String imgUrl;//图片路径
 
-    private Date addTime;
+    private Date addTime;//添加时间
 
 }

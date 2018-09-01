@@ -45,7 +45,28 @@ public interface UserInfoExtService {
     /**
      * 申请官方认证
      * @param userId
+     * @param payType
+     * @param payPwd
      * @throws ServiceException
      */
-    void authType(Integer userId) throws ServiceException;
+    Object authType(Integer userId,Integer payType,String payPwd) throws ServiceException;
+
+    /**
+     * A是否关注用户B
+     * @param userId
+     * @param toUserId
+     * @return
+     * @throws ServiceException
+     */
+    boolean isFans(Integer userId,Integer toUserId) throws ServiceException;
+
+    /**
+     * 修改订单状态
+     * @param orderNo
+     * @param thirdOrderNo
+     * @param payType
+     * @return
+     * @throws ServiceException
+     */
+    boolean updateOrder(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException;
 }

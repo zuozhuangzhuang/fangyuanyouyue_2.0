@@ -18,23 +18,22 @@ public class ForumComment {
 	
     private Integer id;
 
-    private Integer userId;
+    private Integer userId;//评论用户id
 
-    private Integer forumId;
+    private Integer forumId;//帖子id
 
-    private Integer commentId;
+    private Integer commentId;//评论id
 
-    private String content;
+    private String content;//评论内容
 
-    private Integer status;
+    private Integer status;//状态
 
-    private Date addTime;
+    private Date addTime;//添加时间
 
-    private Date updateTime;
+    private Date updateTime;//修改时间
     
-    private String headImgUrl;
+    private String headImgUrl;//用户头像
     
-    private String nickName;
-    
+    private String nickName;//用户昵称
 
 }

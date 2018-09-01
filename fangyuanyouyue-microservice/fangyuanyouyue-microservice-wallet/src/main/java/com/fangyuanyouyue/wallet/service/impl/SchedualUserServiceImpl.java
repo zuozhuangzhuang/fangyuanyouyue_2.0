@@ -2,8 +2,10 @@ package com.fangyuanyouyue.wallet.service.impl;
 
 import com.fangyuanyouyue.wallet.service.SchedualUserService;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@Transactional
 public class SchedualUserServiceImpl implements SchedualUserService{
     @Override
     public String verifyUserById(Integer userId) {

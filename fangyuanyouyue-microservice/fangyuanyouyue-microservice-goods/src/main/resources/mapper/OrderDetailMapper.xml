@@ -235,10 +235,11 @@
   </update>
 
   <select id="selectOrderByGoodsIdStatus" parameterType="Integer" resultMap="BaseResultMap">
-    select * from order_detail
+    select a.* from order_detail a,order_pay b
     <where>
+      a.order_id = b.order_id and b.status <![CDATA[ <> ]]> 5 and b.status <![CDATA[ <> ]]> 6
       <if test="goodsId != null">
-        and goods_id = #{goodsId}
+        and a.goods_id = #{goodsId}
       </if>
     </where>
   </select>

@@ -16,7 +16,8 @@ public interface AppraisalDetailService {
  
     /**
      * 获取全民鉴定详情
-     * @param id
+     * @param userId
+     * @param appraisalId
      * @return
      * @throws ServiceException
      */
@@ -24,12 +25,15 @@ public interface AppraisalDetailService {
     
     /**
      * 获取全民鉴定列表
+     * @param userId
+     * @param keyword
      * @param start
      * @param limit
+     * @param type
      * @return
      * @throws ServiceException
      */
-    List<AppraisalDetailDto> getAppraisalList(Integer userId,String keyword,Integer start,Integer limit) throws ServiceException;
+    List<AppraisalDetailDto> getAppraisalList(Integer userId,String keyword,Integer start,Integer limit,Integer type) throws ServiceException;
 
     /**
      * 发起鉴定
@@ -38,7 +42,29 @@ public interface AppraisalDetailService {
      * @param title
      * @param content
      * @param imgUrls
+     * @param userIds
+     * @param payType
+     * @param payPwd
      * @throws ServiceException
      */
-    void addAppraisal(Integer userId, BigDecimal bonus,String title,String content,String[] imgUrls) throws ServiceException;
+    Object addAppraisal(Integer userId, BigDecimal bonus,String title,String content,String[] imgUrls,Integer[] userIds,Integer payType,String payPwd) throws ServiceException;
+
+    /**
+     * 鉴定内邀请好友
+     * @param userId
+     * @param appraisalId
+     * @param userIds
+     * @throws ServiceException
+     */
+    void invite(Integer userId,Integer appraisalId,Integer[] userIds) throws ServiceException;
+
+    /**
+     * 根据订单号继续发布鉴定
+     * @param orderNo
+     * @param thirdOrderNo
+     * @param payType
+     * @return
+     * @throws ServiceException
+     */
+    boolean applyAppraisal(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException;
 }

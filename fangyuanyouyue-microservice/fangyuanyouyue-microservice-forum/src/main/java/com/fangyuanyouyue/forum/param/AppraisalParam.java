@@ -34,8 +34,8 @@ public class AppraisalParam{
 	private Integer appraisalId;//鉴定id
 
 	@ApiModelProperty(name = "viewpoint", value = "看法，1看真 2看假", dataType = "int",hidden = true)
-	private Integer viewpoint;
-	
+	private Integer viewpoint;//看法，1看真 2看假
+
 	@ApiModelProperty(name = "commentId", value = "评论id", dataType = "int",hidden = true)
 	private Integer commentId;//评论id
 
@@ -54,4 +54,12 @@ public class AppraisalParam{
 	@ApiModelProperty(name = "imgUrls", value = "图片数组", dataType = "String",hidden = true)
 	private String[] imgUrls;//图片数组
 
+	@ApiModelProperty(name = "userIds", value = "邀请用户id数组", dataType = "int",hidden = true)
+	private Integer[] userIds;//邀请用户id数组
+
+	@ApiModelProperty(name = "payType", value = "支付类型 1微信 2支付宝 3余额", dataType = "int",hidden = true)
+	private Integer payType;//支付类型 1微信 2支付宝 3余额
+
+	@ApiModelProperty(name = "payPwd", value = "支付密码", dataType = "String",hidden = true)
+	private String payPwd;//支付密码
 }

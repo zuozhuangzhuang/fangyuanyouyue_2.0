@@ -69,9 +69,10 @@ public interface GoodsInfoMapper {
      * @param goodsId
      * @param start
      * @param limit
+     * @param search
      * @return
      */
-    List<GoodsInfo> selectMyCollectGoods(@Param("userId")Integer userId,@Param("collectType")Integer collectType,@Param("type")Integer type,@Param("goodsId")Integer goodsId,@Param("start")Integer start,@Param("limit")Integer limit);
+    List<GoodsInfo> selectMyCollectGoods(@Param("userId")Integer userId,@Param("collectType")Integer collectType,@Param("type")Integer type,@Param("goodsId")Integer goodsId,@Param("start")Integer start,@Param("limit")Integer limit,@Param("search")String search);
 
     /**
      * 根据商品所属分类列表获取商品列表
@@ -111,4 +112,12 @@ public interface GoodsInfoMapper {
      * @return
      */
     List<GoodsInfo> selectGoodsByUserId(@Param("userId")Integer userId,@Param("start")Integer start,@Param("limit")Integer limit);
+
+    /**
+     * 根据类型和状态获取列表
+     * @param type
+     * @param status
+     * @return
+     */
+    List<GoodsInfo> selectListByTypeStatus(@Param("type")Integer type,@Param("status")Integer status);
 }

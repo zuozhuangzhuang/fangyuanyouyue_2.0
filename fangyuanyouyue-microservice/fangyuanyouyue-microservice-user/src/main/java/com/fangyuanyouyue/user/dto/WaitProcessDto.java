@@ -11,9 +11,9 @@ import lombok.ToString;
 @Setter
 @ToString
 public class WaitProcessDto {
-    private Integer buy;//我买下的
-    private Integer sell;//我卖出的
-    private Integer goods;//我的市集
+    private Integer buy = 0;//我买下的（待付款+待收货）
+    private Integer sell = 0;//我卖出的（待发货+待处理退货）
+    private Integer goods = 0;//我的市集（待处理的议价）
 //    private Integer snapUp;//我的抢购
 //    private Integer comment;//我的评论
 //    private Integer my;//全民鉴定

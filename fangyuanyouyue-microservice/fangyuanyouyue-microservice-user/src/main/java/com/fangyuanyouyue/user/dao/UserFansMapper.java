@@ -48,9 +48,10 @@ public interface UserFansMapper {
      * @param userId
      * @param start
      * @param limit
+     * @param search
      * @return
      */
-    List<Map<String,Object>> myFansOrFollows(@Param("userId")Integer userId,@Param("type")Integer type,@Param("start")Integer start,@Param("limit")Integer limit);
+    List<Map<String,Object>> myFansOrFollows(@Param("userId")Integer userId,@Param("type")Integer type,@Param("start")Integer start,@Param("limit")Integer limit,@Param("search")String search);
 
     /**
      * 我的粉丝

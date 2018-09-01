@@ -59,7 +59,7 @@ public class CollectController extends BaseController{
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -68,16 +68,16 @@ public class CollectController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getType() == null){
-                return toError(ReCode.FAILD.getValue(),"类型不能为空！");
+                return toError("类型不能为空！");
             }
             if(param.getCollectType() == null){
-                return toError(ReCode.FAILD.getValue(),"关注/收藏类型不能为空！");
+                return toError("关注/收藏类型不能为空！");
             }
             if(param.getCollectIds() == null || param.getCollectIds().length < 1){
-                return toError(ReCode.FAILD.getValue(),"对象ID不能为空！");
+                return toError("对象ID不能为空！");
             }
             if(param.getStatus() == null){
-                return toError(ReCode.FAILD.getValue(),"状态不能为空！");
+                return toError("状态不能为空！");
             }
             //收藏/关注或取消
             collectService.collect(userId,param.getCollectIds(),param.getCollectType(),param.getType(),param.getStatus());
@@ -87,7 +87,7 @@ public class CollectController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -97,7 +97,8 @@ public class CollectController extends BaseController{
             @ApiImplicitParam(name = "type", value = "类型 1关注 2收藏", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "collectType", value = "关注/收藏类型 1商品 2抢购（只有抢购可以关注）", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "search", value = "搜索字段", dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/collectList")
     @ResponseBody
@@ -106,11 +107,11 @@ public class CollectController extends BaseController{
             log.info("----》获取我的收藏/关注《----");
             log.info("参数："+param.toString());
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
-                return toError(ReCode.FAILD.getValue(),"用户token不能为空！");
+                return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
             String verifyUser = schedualUserService.verifyUserById(userId);
@@ -119,25 +120,25 @@ public class CollectController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getType() == null){
-                return toError(ReCode.FAILD.getValue(),"类型不能为空！");
+                return toError("类型不能为空！");
             }
             if(param.getCollectType() == null){
-                return toError(ReCode.FAILD.getValue(),"关注/收藏类型不能为空！");
+                return toError("关注/收藏类型不能为空！");
             }
             if(param.getStart() == null || param.getStart() < 0){
-                return toError(ReCode.FAILD.getValue(),"起始页数错误！");
+                return toError("起始页数错误！");
             }
             if(param.getLimit() == null || param.getLimit() < 1){
-                return toError(ReCode.FAILD.getValue(),"每页个数错误！");
+                return toError("每页个数错误！");
             }
-            List<GoodsDto> goodsDtos = collectService.collectList(userId, param.getCollectType(), param.getType(),param.getStart(),param.getLimit());
+            List<GoodsDto> goodsDtos = collectService.collectList(userId, param.getCollectType(), param.getType(),param.getStart(),param.getLimit(),param.getSearch());
             return toSuccess(goodsDtos);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 }

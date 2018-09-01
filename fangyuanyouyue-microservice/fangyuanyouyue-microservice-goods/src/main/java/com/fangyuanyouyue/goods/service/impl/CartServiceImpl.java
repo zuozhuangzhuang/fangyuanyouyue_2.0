@@ -182,7 +182,7 @@ public class CartServiceImpl implements CartService {
                     goodsCommentDto.setToUserName((String) map.get("nick_name"));
                 }
                 goodsCommentDto.setGoodsName(goodsInfo.getName());
-                goodsCommentDto.setDescprition(goodsInfo.getDescription());
+                goodsCommentDto.setDescription(goodsInfo.getDescription());
                 goodsCommentDto.setMainUrl(mainImgUrl);
             }
 

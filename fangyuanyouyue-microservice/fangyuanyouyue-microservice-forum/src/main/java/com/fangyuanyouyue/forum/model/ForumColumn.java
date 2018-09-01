@@ -6,6 +6,9 @@ import lombok.ToString;
 
 import java.util.Date;
 
+/**
+ * 专栏
+ */
 @Getter
 @Setter
 @ToString
@@ -27,5 +30,7 @@ public class ForumColumn {
     private Integer isChosen;//是否精选1是 2否
 
     private Integer typeId;//专栏分类id
+
+    private String typeName;//专栏分类名称
 
 }

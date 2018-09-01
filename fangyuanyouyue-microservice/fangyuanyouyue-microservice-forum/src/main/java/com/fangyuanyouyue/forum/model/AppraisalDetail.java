@@ -23,7 +23,7 @@ public class AppraisalDetail {
 
     private Integer sort;//排序
 
-    private Integer status;//状态 1显示 2隐藏
+    private Integer status;//状态 1进行中 2结束
 
     private Date endTime;//结束时间
 
@@ -32,4 +32,10 @@ public class AppraisalDetail {
     private Date addTime;//添加时间
 
     private String content;//内容描述
+
+    private Integer pvCount;//浏览量基数
+
+    private String headImgUrl;//用户头像
+
+    private String nickName;//用户昵称
 }

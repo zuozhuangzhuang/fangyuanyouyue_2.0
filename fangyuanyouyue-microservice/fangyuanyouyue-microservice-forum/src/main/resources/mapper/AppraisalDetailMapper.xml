@@ -12,18 +12,22 @@
     <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
+    <result column="pv_count" jdbcType="INTEGER" property="pvCount" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+    <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.forum.model.AppraisalDetail">
     <result column="content" jdbcType="LONGVARCHAR" property="content" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, user_id, title, bonus, label, sort, status, end_time, update_time, add_time
+    id, user_id, title, bonus, label, sort, status, end_time, update_time, add_time, 
+    pv_count
   </sql>
   <sql id="Blob_Column_List">
     content
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
-    select 
+    select
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
@@ -34,15 +38,17 @@
     delete from appraisal_detail
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.AppraisalDetail" useGeneratedKeys="true" keyProperty="id">
+  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.AppraisalDetail" useGeneratedKeys="true" keyProperty="id" >
     insert into appraisal_detail (id, user_id, title, 
       bonus, label, sort, 
       status, end_time, update_time, 
-      add_time, content)
+      add_time, pv_count, content
+      )
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, 
       #{bonus,jdbcType=DECIMAL}, #{label,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER}, 
       #{status,jdbcType=INTEGER}, #{endTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{addTime,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR})
+      #{addTime,jdbcType=TIMESTAMP}, #{pvCount,jdbcType=INTEGER}, #{content,jdbcType=LONGVARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.fangyuanyouyue.forum.model.AppraisalDetail">
     insert into appraisal_detail
@@ -76,6 +82,9 @@
       </if>
       <if test="addTime != null">
         add_time,
+      </if>
+      <if test="pvCount != null">
+        pv_count,
       </if>
       <if test="content != null">
         content,
@@ -112,6 +121,9 @@
       <if test="addTime != null">
         #{addTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="pvCount != null">
+        #{pvCount,jdbcType=INTEGER},
+      </if>
       <if test="content != null">
         #{content,jdbcType=LONGVARCHAR},
       </if>
@@ -147,6 +159,9 @@
       <if test="addTime != null">
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="pvCount != null">
+        pv_count = #{pvCount,jdbcType=INTEGER},
+      </if>
       <if test="content != null">
         content = #{content,jdbcType=LONGVARCHAR},
       </if>
@@ -164,6 +179,7 @@
       end_time = #{endTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       add_time = #{addTime,jdbcType=TIMESTAMP},
+      pv_count = #{pvCount,jdbcType=INTEGER},
       content = #{content,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -177,37 +193,67 @@
       status = #{status,jdbcType=INTEGER},
       end_time = #{endTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      add_time = #{addTime,jdbcType=TIMESTAMP}
+      add_time = #{addTime,jdbcType=TIMESTAMP},
+      pv_count = #{pvCount,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
   <select id="selectCollectList" parameterType="Integer" resultMap="BaseResultMap">
-    select a.* from appraisal_detail a,collect b
+    select a.*,c.nick_name,c.head_img_url from appraisal_detail a,collect b,user_info c
     <where>
-      a.id = b.collect_id
+      a.id = b.collect_id and a.user_id = c.id
       <if test="userId != null">
         and b.user_id = #{userId}
       </if>
       <if test="collectType != null">
-      and b.collect_type = #{collectType}
-    </if>
+        and b.collect_type = #{collectType}
+      </if>
+      <if test="search != null">
+        and (a.title like "%"#{search}"%" or a.content like "%"#{search}"%" or a.user_id in (select id from user_info where nick_name like "%"#{search}"%"))
+      </if>
     </where>
     order by b.add_time desc
     <if test="start != null and limit != null">
       limit #{start},#{limit}
     </if>
   </select>
-  <select id="selectList" resultMap="BaseResultMap" >
+  <select id="selectMyList" parameterType="Integer" resultMap="BaseResultMap">
     select
     a.*,b.nick_name,b.head_img_url
     from appraisal_detail a,user_info b
     where a.user_id=b.id
-    <if test="userId != null" >
+    <if test="userId != null">
       and a.user_id = #{userId}
     </if>
-    <if test="keyword != null" >
+    <if test="keyword != null">
       and a.title like "%"#{keyword}"%"
     </if>
-    limit #{start},#{limit}
+    order by a.add_time desc limit #{start},#{limit}
   </select>
+
+  <select id="selectListWithMe" parameterType="Integer" resultMap="BaseResultMap">
+    select
+    a.*,b.nick_name,b.head_img_url
+    from appraisal_detail a,user_info b,appraisal_comment c
+    where a.user_id=b.id and a.id = c.appraisal_id
+    <if test="userId != null">
+      and c.user_id = #{userId}
+    </if>
+    <if test="keyword != null">
+      and (a.title like "%"#{keyword}"%" or a.content like "%"#{keyword}"%" or (a.user_id in (select id from user_info)))
+    </if>
+    order by a.add_time desc limit #{start},#{limit}
+  </select>
+
+  <select id="selectDetailByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    a.*,b.nick_name,b.head_img_url
+    from appraisal_detail a,user_info b
+    where a.user_id=b.id and a.id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectByStatusEndTime" resultMap="BaseResultMap">
+    select * from appraisal_detail where status = #{status} and end_time <![CDATA[ < ]]> #{endTime}
+  </select>
+
 </mapper>

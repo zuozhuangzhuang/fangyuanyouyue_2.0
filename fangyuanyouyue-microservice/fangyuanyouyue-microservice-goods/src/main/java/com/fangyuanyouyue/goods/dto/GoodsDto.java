@@ -95,13 +95,16 @@ public class GoodsDto {
 
     private Long credit;//信誉度
 
+    private Integer creditLevel;//信誉度等级 1差 2低 3中 4高 5优
+
     //GoodsBargain
     private List<BargainDto> bargainDtos;//用户议价信息列表
 
     //OrderInfo
     private Integer orderId;//订单ID
 
-    //TODO 待付款时间，剩余收货时间，退货待处理时间，物流号，物流公司编号
+    //抢购降价历史
+    private List<GoodsIntervalHistoryDto> historyDtos;//抢购降价历史
 
     public GoodsDto() {
     }

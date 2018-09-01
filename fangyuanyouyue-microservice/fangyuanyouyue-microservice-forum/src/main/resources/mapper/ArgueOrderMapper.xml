@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangyuanyouyue.forum.dao.ArgueOrderMapper">
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.forum.model.ArgueOrder">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="order_no" jdbcType="VARCHAR" property="orderNo" />
+    <result column="amount" jdbcType="DECIMAL" property="amount" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="to_users" jdbcType="VARCHAR" property="toUsers" />
+    <result column="img_urls" jdbcType="VARCHAR" property="imgUrls" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.forum.model.ArgueOrder">
+    <result column="content" jdbcType="LONGVARCHAR" property="content" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, user_id, order_no, amount, status, add_time, update_time, title, to_users, img_urls
+  </sql>
+  <sql id="Blob_Column_List">
+    content
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from argue_order
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from argue_order
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ArgueOrder" useGeneratedKeys="true" keyProperty="id">
+    insert into argue_order (id, user_id, order_no, 
+      amount, status, add_time, 
+      update_time, title, to_users, 
+      img_urls, content)
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{orderNo,jdbcType=VARCHAR}, 
+      #{amount,jdbcType=DECIMAL}, #{status,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{title,jdbcType=VARCHAR}, #{toUsers,jdbcType=VARCHAR}, 
+      #{imgUrls,jdbcType=VARCHAR}, #{content,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.forum.model.ArgueOrder">
+    insert into argue_order
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="orderNo != null">
+        order_no,
+      </if>
+      <if test="amount != null">
+        amount,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="addTime != null">
+        add_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="title != null">
+        title,
+      </if>
+      <if test="toUsers != null">
+        to_users,
+      </if>
+      <if test="imgUrls != null">
+        img_urls,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="orderNo != null">
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="amount != null">
+        #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="addTime != null">
+        #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="toUsers != null">
+        #{toUsers,jdbcType=VARCHAR},
+      </if>
+      <if test="imgUrls != null">
+        #{imgUrls,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.forum.model.ArgueOrder">
+    update argue_order
+    <set>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="orderNo != null">
+        order_no = #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="amount != null">
+        amount = #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="addTime != null">
+        add_time = #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="toUsers != null">
+        to_users = #{toUsers,jdbcType=VARCHAR},
+      </if>
+      <if test="imgUrls != null">
+        img_urls = #{imgUrls,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.fangyuanyouyue.forum.model.ArgueOrder">
+    update argue_order
+    set user_id = #{userId,jdbcType=INTEGER},
+      order_no = #{orderNo,jdbcType=VARCHAR},
+      amount = #{amount,jdbcType=DECIMAL},
+      status = #{status,jdbcType=INTEGER},
+      add_time = #{addTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      title = #{title,jdbcType=VARCHAR},
+      to_users = #{toUsers,jdbcType=VARCHAR},
+      img_urls = #{imgUrls,jdbcType=VARCHAR},
+      content = #{content,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.forum.model.ArgueOrder">
+    update argue_order
+    set user_id = #{userId,jdbcType=INTEGER},
+      order_no = #{orderNo,jdbcType=VARCHAR},
+      amount = #{amount,jdbcType=DECIMAL},
+      status = #{status,jdbcType=INTEGER},
+      add_time = #{addTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      title = #{title,jdbcType=VARCHAR},
+      to_users = #{toUsers,jdbcType=VARCHAR},
+      img_urls = #{imgUrls,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectByOrderNo" parameterType="String" resultMap="BaseResultMap">
+    select * from argue_order where order_no = #{orderNo} and status = 1
+  </select>
+</mapper>

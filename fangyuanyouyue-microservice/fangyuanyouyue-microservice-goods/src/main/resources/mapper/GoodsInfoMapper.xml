@@ -311,7 +311,7 @@
           and a.status = 2
         </if>
       </if>
-      <if test="goodsCategoryIds != null">
+      <if test="goodsCategoryIds != null and goodsCategoryIds.length > 0">
         and a.id in (select goods_id from goods_correlation where (goods_category_id in
         <foreach close=")" collection="goodsCategoryIds" index="index" item="categoryId" open="(" separator=",">
           #{categoryId,jdbcType=INTEGER}
@@ -340,6 +340,7 @@
     </if>
     a.update_time desc limit #{start},#{limit}
   </select>
+
   <select id="getGoodsByGoodsIds" parameterType="Integer" resultMap="BaseResultMap">
     select * from goods_info
     <where>
@@ -350,9 +351,11 @@
     </where>
     order by update_time desc
   </select>
+
   <select id="selectGoodsByIntervalTime" parameterType="Long" resultMap="BaseResultMap">
         select * from goods_info where type = 2 and status = 1 and interval_time <![CDATA[ <= ]]> (#{nowTime} - last_interval_time)
     </select>
+
   <select id="selectMyCollectGoods" parameterType="Integer" resultMap="BaseResultMap">
     select a.* from goods_info a left join collect b on a.id=b.collect_id
     <where>
@@ -368,6 +371,9 @@
       </if>
       <if test="goodsId != null">
         and a.id = #{goodsId,jdbcType=INTEGER}
+      </if>
+      <if test="search != null and search != ''">
+        and (a.name like "%"#{search}"%" or a.description like "%"#{search}"%" or a.user_id in (select id from user_info where nick_name like "%"#{search}"%"))
       </if>
     </where>
     order by b.add_time desc
@@ -398,5 +404,9 @@
   </select>
   <select id="selectGoodsByUserId" parameterType="Integer" resultMap="BaseResultMap">
     select * from goods_info where user_id = #{userId} and status <![CDATA[ <> ]]> 5 order by update_time desc limit #{start},#{limit}
+  </select>
+
+  <select id="selectListByTypeStatus" parameterType="Integer" resultMap="BaseResultMap">
+    select * from goods_info where type = #{type} and status = #{status}
   </select>
 </mapper>

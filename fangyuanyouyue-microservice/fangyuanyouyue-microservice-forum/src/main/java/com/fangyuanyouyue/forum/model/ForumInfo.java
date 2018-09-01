@@ -6,6 +6,9 @@ import lombok.ToString;
 
 import java.util.Date;
 
+/**
+ * 帖子/视频表
+ */
 @Getter
 @Setter
 @ToString
@@ -24,7 +27,7 @@ public class ForumInfo {
 
     private Integer sort;//排列优先级
 
-    private Integer type;//帖子类型 1图文 2视频
+    private Integer type;//帖子类型 1帖子 2视频
 
     private Integer status;//状态 1显示 2隐藏
 
@@ -39,8 +42,10 @@ public class ForumInfo {
     private String videoImg;//视频封面图
 
     private String content;//内容描述，富文本
-    
-    private String nickName;
-    
-    private String headImgUrl;
+
+    private String nickName;//用户昵称
+
+    private String headImgUrl;//用户头像
+
+    private Integer pvCount;//帖子浏览量基数，展示浏览量为基数＋浏览量个数
 }

@@ -4,10 +4,17 @@ import java.util.Date;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 /**
  * 后台请求基础参数
  */
 @ApiModel(value = "后台请求基础参数")
+@Getter
+@Setter
+@ToString
 public class WechatMessageParam {
 
 	@ApiModelProperty(name = "userName", value = "环信用户名", dataType = "string",hidden = true)
@@ -29,74 +36,9 @@ public class WechatMessageParam {
     private String headImgUrl; // 头像url
 
     @ApiModelProperty(name = "type", value = "消息类型", dataType = "string",hidden = true)
-    private String type; // 扩展消息类型 如系统消息、订单消息
+    private String type; //扩展消息类型 1系统消息 2商品消息 3订单消息 4视频消息 5帖子消息 6专栏消息 7全民鉴定消息 8商品、抢购评论消息 9帖子评论消息 10视频评论消息 11全民鉴定评论消息 12会员特权 13钱包余额
 
     @ApiModelProperty(name = "businessId", value = "扩展消息业务ID", dataType = "string",hidden = true)
     private String businessId; //扩展消息业务ID，如订单消息里面的订单id
-    
-
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
-
-	public Date getTime() {
-		return time;
-	}
-
-	public void setTime(Date time) {
-		this.time = time;
-	}
-
-	public String getNickName() {
-		return nickName;
-	}
-
-	public void setNickName(String nickName) {
-		this.nickName = nickName;
-	}
-
-	public String getHeadImgUrl() {
-		return headImgUrl;
-	}
-
-	public void setHeadImgUrl(String headImgUrl) {
-		this.headImgUrl = headImgUrl;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public String getBusinessId() {
-		return businessId;
-	}
-
-	public void setBusinessId(String businessId) {
-		this.businessId = businessId;
-	}
     
 }

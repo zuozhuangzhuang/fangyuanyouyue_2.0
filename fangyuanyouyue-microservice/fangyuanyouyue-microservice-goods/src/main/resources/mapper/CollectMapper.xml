@@ -124,6 +124,9 @@
       <if test="collectId != null">
         and collect_id = #{collectId}
       </if>
+      <if test="collectType != null">
+        and collect_type = #{collectType}
+      </if>
       <if test="type != null">
         and type = #{type}
       </if>

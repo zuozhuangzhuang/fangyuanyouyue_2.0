@@ -23,15 +23,20 @@ public interface ForumColumnMapper {
     
     List<ForumColumn> selectPage(@Param("start")Integer start,@Param("limit")Integer limit);
 
-    List<ForumColumn> selectChosen(@Param("isChosen")Integer isChosen);
+    List<ForumColumn> selectChosen(@Param("start")Integer start,@Param("limit")Integer limit,@Param("isChosen")Integer isChosen);
+
 
     /**
-     * 获取用户收藏的专栏列表
+     * 根据用户id获取专栏，每个用户只能有一个专栏
      * @param userId
-     * @param start
-     * @param limit
-     * @param collectType
      * @return
      */
-    List<ForumColumn> selectCollectList(@Param("userId")Integer userId,@Param("start")Integer start,@Param("limit")Integer limit,@Param("collectType")Integer collectType);
+    ForumColumn selectByUserId(@Param("userId")Integer userId);
+
+    /**
+     * 根据名称获取专栏
+     * @param name
+     * @return
+     */
+    ForumColumn selectByName(@Param("name")String name);
 }

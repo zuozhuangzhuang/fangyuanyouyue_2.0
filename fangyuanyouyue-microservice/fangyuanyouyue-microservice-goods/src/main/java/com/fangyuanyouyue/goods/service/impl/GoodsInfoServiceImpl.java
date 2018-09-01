@@ -9,6 +9,7 @@ import com.fangyuanyouyue.goods.model.*;
 import com.fangyuanyouyue.goods.param.GoodsParam;
 import com.fangyuanyouyue.goods.service.BargainService;
 import com.fangyuanyouyue.goods.service.GoodsInfoService;
+import com.fangyuanyouyue.goods.service.SchedualMessageService;
 import com.fangyuanyouyue.goods.service.SchedualUserService;
 import com.github.pagehelper.PageHelper;
 import org.apache.commons.lang.StringUtils;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,8 +46,6 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     @Autowired
     private SchedualUserService schedualUserService;//调用其他service时用
     @Autowired
-    private ReportGoodsMapper reportGoodsMapper;
-    @Autowired
     private CommentLikesMapper commentLikesMapper;
     @Autowired
     private GoodsBargainMapper goodsBargainMapper;
@@ -55,6 +55,10 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     private OrderDetailMapper orderDetailMapper;
     @Autowired
     private BargainService bargainService;
+    @Autowired
+    private SchedualMessageService schedualMessageService;
+    @Autowired
+    private GoodsIntervalHistoryMapper goodsIntervalHistoryMapper;
 
     @Override
     public GoodsInfo selectByPrimaryKey(Integer id) throws ServiceException{
@@ -142,7 +146,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         goodsInfo.setName(param.getGoodsInfoName());
         goodsInfo.setDescription(param.getDescription());
         goodsInfo.setPrice(param.getPrice());
-        goodsInfo.setPostage(param.getPostage());
+        goodsInfo.setPostage(param.getPostage()==null?new BigDecimal(0):param.getPostage());
         //排序：是否置顶
 //        goodsInfo.setSort(param.getSort());
         if(StringUtils.isNotEmpty(param.getLabel())){
@@ -150,7 +154,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         }
         goodsInfo.setType(param.getType());
         goodsInfo.setStatus(1);//状态 1出售中 2 已售出 5删除
-        if(StringUtils.isNotEmpty(param.getVideoUrl()) && StringUtils.isNotEmpty(param.getVideoImg())){
+        if(StringUtils.isNotEmpty(param.getVideoUrl())){
             goodsInfo.setVideoUrl(param.getVideoUrl());
         }
         goodsInfo.setAddTime(DateStampUtils.getTimesteamp());
@@ -171,6 +175,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             goodsCorrelation.setGoodsId(goodsInfo.getId());
             goodsCorrelation.setAddTime(DateStampUtils.getTimesteamp());
             goodsCorrelation.setGoodsCategoryId(param.getGoodsCategoryIds()[i]);
+            goodsCorrelation.setCategoryParentId(goodsCategoryMapper.selectParentId(param.getGoodsCategoryIds()[i]));
             goodsCorrelationMapper.insert(goodsCorrelation);
         }
         //商品图片表 goods_img
@@ -182,10 +187,13 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 saveGoodsPicOne(goodsInfo.getId(),param.getImgUrls()[i],2,i+1);
             }
         }
-        //TODO 给被邀请的用户发送信息
+        //给被邀请的用户发送信息 邀请我：用户“用户昵称”上传商品【商品名称】时邀请了您！点击此处前往查看吧
+        //邀请我：用户“用户昵称”上传抢购【抢购名称】时邀请了您！点击此处前往查看吧
+        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
         if(param.getUserIds() != null && param.getUserIds().length > 0){
             for(Integer toUserId:param.getUserIds()){
-
+                schedualMessageService.easemobMessage(toUserId.toString(),
+                        "用户“"+user.getNickName()+"”上传"+(goodsInfo.getType()==1?"商品【":"抢购【")+goodsInfo.getName()+"】时邀请了您！点击此处前往查看吧","2","5",goodsInfo.getId().toString());
             }
         }
 //        return setDtoByGoodsInfo(null,goodsInfo);
@@ -201,6 +209,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         if(goodsInfo == null){
             throw new ServiceException("获取商品失败！");
         }else{
+
             List<GoodsImg> goodsImgs = goodsImgMapper.getImgsByGoodsId(goodsInfo.getId());
             String mainImgUrl = null;
             for(GoodsImg goodsImg:goodsImgs){
@@ -223,7 +232,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                     goodsCommentDto.setToUserName((String)map.get("nick_name"));
                 }
                 goodsCommentDto.setGoodsName(goodsInfo.getName());
-                goodsCommentDto.setDescprition(goodsInfo.getDescription());
+                goodsCommentDto.setDescription(goodsInfo.getDescription());
                 goodsCommentDto.setMainUrl(mainImgUrl);
                 if(userId != null){
                     //获取每条评论是否点赞
@@ -238,6 +247,11 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(goodsInfo.getUserId())).getString("data")), UserInfo.class);
             GoodsDto goodsDto = new GoodsDto(user,goodsInfo,goodsImgs,goodsCorrelations,goodsCommentDtos);
             goodsDto.setCommentCount(goodsCommentMapper.selectCount(goodsInfo.getId()));
+            if(goodsInfo.getType() == 2){
+                //只去最近三次降价记录
+                List<GoodsIntervalHistory> historyList = goodsIntervalHistoryMapper.selectByGoodsId(goodsInfo.getId(),0,3);
+                goodsDto.setHistoryDtos(GoodsIntervalHistoryDto.toDtoList(historyList));
+            }
             return goodsDto;
         }
     }
@@ -261,8 +275,6 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
 
     @Override
     public void deleteGoods(Integer userId,Integer[] goodsIds) throws ServiceException {
-        //TODO 如果商品存在用户议价，取消所有议价并返还用户余额？
-        //TODO 删除商品所有评论？
         //批量修改商品状态为删除
         for(Integer goodsId:goodsIds){
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
@@ -273,6 +285,9 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 List<GoodsBargain> goodsBargains = goodsBargainMapper.selectAllByGoodsId(goodsId,1);//状态 1申请 2同意 3拒绝 4取消
                 for(GoodsBargain bargain:goodsBargains){
                     bargainService.updateBargain(userId,goodsId,bargain.getId(),3);
+                    //议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
+                    schedualMessageService.easemobMessage(bargain.getUserId().toString(),
+                            "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情","2","2",bargain.getGoodsId().toString());
                 }
                 goodsInfo.setStatus(5);//状态 普通商品 1出售中 2已售出 5删除
                 goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
@@ -318,7 +333,16 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             if(StringUtils.isNotEmpty(param.getVideoUrl())){
                 goodsInfo.setVideoUrl(param.getVideoUrl());
             }
-
+            //TODO 商品分类修改+商品父级分类修改
+            //初始化商品分类关联表
+            for(int i=0;i<param.getGoodsCategoryIds().length;i++){
+                GoodsCorrelation goodsCorrelation = goodsCorrelationMapper.selectCorrekationsByGoodsIdCategoryId(param.getGoodsCategoryIds()[i],goodsInfo.getId());
+                goodsCorrelation.setGoodsId(goodsInfo.getId());
+                goodsCorrelation.setAddTime(DateStampUtils.getTimesteamp());
+                goodsCorrelation.setGoodsCategoryId(param.getGoodsCategoryIds()[i]);
+                goodsCorrelation.setCategoryParentId(goodsCategoryMapper.selectParentId(param.getGoodsCategoryIds()[i]));
+                goodsCorrelationMapper.insert(goodsCorrelation);
+            }
             //删除旧商品图片信息
             goodsImgMapper.deleteByGoodsId(goodsInfo.getId());
             //新增商品图片信息
@@ -346,7 +370,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     @Override
     public GoodsDto goodsInfoByToken(Integer goodsId, Integer userId) throws ServiceException {
         //获取收藏表信息获取商品集合（存在多条此商品重复信息）
-        List<GoodsInfo> goodsInfos = goodsInfoMapper.selectMyCollectGoods(userId, null, null, goodsId,null,null);
+        List<GoodsInfo> goodsInfos = goodsInfoMapper.selectMyCollectGoods(userId, null, null, goodsId,null,null,null);
         GoodsInfo goodsInfo;
         GoodsDto goodsDto;
         //是否收藏/关注 1未关注未收藏（商品/抢购） 2已关注未收藏(抢购) 3未关注已收藏（商品/抢购） 4已关注已收藏(抢购)
@@ -358,7 +382,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 goodsDto.setIsCollect(4);
             }else{
                 //只有一条收藏数据——判断是收藏还是关注
-                Collect collect = collectMapper.selectByCollectId(userId,goodsId, null);
+                Collect collect = collectMapper.selectByCollectId(userId,goodsId, null,null);
                 if(collect == null){
                     throw new ServiceException("获取收藏信息失败！");
                 }
@@ -381,7 +405,21 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         if(goodsUserInfoExtAndVip != null){
             goodsDto.setAuthType((Integer)goodsUserInfoExtAndVip.get("auth_type"));
             goodsDto.setVipLevel((Integer)goodsUserInfoExtAndVip.get("vip_level"));
-            goodsDto.setCredit((Long)goodsUserInfoExtAndVip.get("credit"));
+            Long credit = (Long)goodsUserInfoExtAndVip.get("credit");
+            goodsDto.setCredit(credit);
+            if(credit != null){
+                if(credit < -100){//差
+                    goodsDto.setCreditLevel(1);
+                }else if(-100 <= credit && credit < 1000){//低
+                    goodsDto.setCreditLevel(2);
+                }else if(1000 <= credit && credit < 10000){//中
+                    goodsDto.setCreditLevel(3);
+                }else if(10000 <= credit && credit < 500000){//高
+                    goodsDto.setCreditLevel(4);
+                }else if(500000 <= credit){//优
+                    goodsDto.setCreditLevel(5);
+                }
+            }
         }
         //卖家信息
         //粉丝数
@@ -434,7 +472,21 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         if(goodsUserInfoExtAndVip != null){
             goodsDto.setAuthType((Integer)goodsUserInfoExtAndVip.get("auth_type"));
             goodsDto.setVipLevel((Integer)goodsUserInfoExtAndVip.get("vip_level"));
-            goodsDto.setCredit((Long)goodsUserInfoExtAndVip.get("credit"));
+            Long credit = (Long)goodsUserInfoExtAndVip.get("credit");
+            goodsDto.setCredit(credit);
+            if(credit != null){
+                if(credit < -100){//差
+                    goodsDto.setCreditLevel(1);
+                }else if(-100 <= credit && credit < 1000){//低
+                    goodsDto.setCreditLevel(2);
+                }else if(1000 <= credit && credit < 10000){//中
+                    goodsDto.setCreditLevel(3);
+                }else if(10000 <= credit && credit < 500000){//高
+                    goodsDto.setCreditLevel(4);
+                }else if(500000 <= credit){//优
+                    goodsDto.setCreditLevel(5);
+                }
+            }
         }
         //卖家信息
         //粉丝数
@@ -480,6 +532,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         bannerIndex.setBusinessId(param.getBusinessId());
         bannerIndex.setImgUrl(param.getImgUrl());
         bannerIndex.setJumpType(param.getJumpType());
+        bannerIndex.setBusinessType(param.getBusinessType());
         if(StringUtils.isNotEmpty(param.getTitle())){
             bannerIndex.setTitle(param.getTitle());
         }
@@ -501,6 +554,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             bannerIndex.setBusinessId(param.getBusinessId());
             bannerIndex.setImgUrl(param.getImgUrl());
             bannerIndex.setJumpType(param.getJumpType());
+            bannerIndex.setBusinessType(param.getBusinessType());
             if(StringUtils.isNotEmpty(param.getTitle())){
                 bannerIndex.setTitle(param.getTitle());
             }
@@ -568,24 +622,25 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         }
     }
 
-    @Override
-    public void reportGoods(Integer userId, Integer goodsId, String reason) throws ServiceException {
-        GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
-        if(goodsInfo == null){
-            throw new ServiceException("获取商品失败！");
-        }else{
-            //判断商品状态
-            ReportGoods reportGoods = reportGoodsMapper.selectByUserIdGoodsId(userId,goodsId);
-            if(reportGoods != null){
-                throw new ServiceException("您已举报过此商品！");
-            }else{
-                reportGoods = new ReportGoods();
-                reportGoods.setAddTime(DateStampUtils.getTimesteamp());
-                reportGoods.setGoodsId(goodsId);
-                reportGoods.setReason(reason);
-                reportGoods.setUserId(userId);
-                reportGoodsMapper.insert(reportGoods);
-            }
-        }
-    }
+//    @Override
+//    public void report(Integer userId, Integer businessId, String reason,Integer type) throws ServiceException {
+//        GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId,type);
+//
+//        if(goodsInfo == null){
+//            throw new ServiceException("获取商品失败！");
+//        }else{
+//            //判断商品状态
+//            ReportGoods reportGoods = reportGoodsMapper.selectByUserIdGoodsId(userId,goodsId);
+//            if(reportGoods != null){
+//                throw new ServiceException("您已举报过此商品！");
+//            }else{
+//                reportGoods = new ReportGoods();
+//                reportGoods.setAddTime(DateStampUtils.getTimesteamp());
+//                reportGoods.setGoodsId(goodsId);
+//                reportGoods.setReason(reason);
+//                reportGoods.setUserId(userId);
+//                reportGoodsMapper.insert(reportGoods);
+//            }
+//        }
+//    }
 }

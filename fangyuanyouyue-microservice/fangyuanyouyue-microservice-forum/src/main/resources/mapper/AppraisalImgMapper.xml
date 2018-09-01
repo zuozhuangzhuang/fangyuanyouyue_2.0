@@ -20,7 +20,7 @@
     delete from appraisal_img
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.AppraisalImg" >
+  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.AppraisalImg" useGeneratedKeys="true" keyProperty="id">
     insert into appraisal_img (id, img_url, appraisal_id, 
       add_time)
     values (#{id,jdbcType=INTEGER}, #{imgUrl,jdbcType=VARCHAR}, #{appraisalId,jdbcType=INTEGER}, 
@@ -79,4 +79,8 @@
       add_time = #{addTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectListByAppraisal" parameterType="Integer" resultMap="BaseResultMap">
+    select * from appraisal_img where appraisal_id = #{appraisalId}
+  </select>
 </mapper>

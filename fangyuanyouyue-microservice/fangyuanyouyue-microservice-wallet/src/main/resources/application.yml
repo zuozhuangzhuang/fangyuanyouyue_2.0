@@ -33,8 +33,3 @@ pagehelper:
     supportMethodsArguments: true
     params: count=countSql
     returnPageInfo: check
-debug: true
-# 打印sql
-logging:
-  level:
-    com.fangyuanyouyue.goods: DEBUG

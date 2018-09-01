@@ -3,6 +3,7 @@ package com.fangyuanyouyue.forum.dao;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.fangyuanyouyue.forum.model.AppraisalPv;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface AppraisalPvMapper {
@@ -21,5 +22,12 @@ public interface AppraisalPvMapper {
     int countById(Integer appraisalId);
     
     int countByUserId(Integer appraisalId,Integer userId);
-    
+
+    /**
+     * 根据用户id和鉴定id获取浏览信息
+     * @param userId
+     * @param appraisalId
+     * @return
+     */
+    AppraisalPv selectByUserIdAppraisalId(@Param("userId")Integer userId,@Param("appraisalId")Integer appraisalId);
 }

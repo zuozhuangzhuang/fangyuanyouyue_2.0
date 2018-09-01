@@ -26,7 +26,7 @@
     select 
     a.*,b.nick_name,b.head_img_url
     from forum_likes a,user_info b
-    where a.user_id=b.id and forum_id=#{forumId} limit #{start},#{limit}
+    where a.user_id=b.id and forum_id=#{forumId} order by a.add_time desc limit #{start},#{limit}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from forum_likes
@@ -94,5 +94,9 @@
   
   <select id="countByUserId" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
     select count(*) from forum_likes where forum_id = #{forumId,jdbcType=INTEGER} and user_id = #{userId,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectByForumIdUserId" parameterType="Integer" resultMap="BaseResultMap">
+    select * from forum_likes where forum_id = #{forumId} and user_id = #{userId}
   </select>
 </mapper>

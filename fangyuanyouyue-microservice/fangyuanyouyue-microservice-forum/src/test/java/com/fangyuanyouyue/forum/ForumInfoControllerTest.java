@@ -43,15 +43,38 @@ public class ForumInfoControllerTest {
     @Transactional
     public void forumList() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/forum/list")
-        		.param("start", "0")
-        		.param("limit", "100")
-        		.param("type", "2")
-        		
+//                .param("token", "10045FY1534451510951")
+                .param("userId", "42")
+//                .param("columnId", "1")
+//        		.param("keyword", "")
+                //搜索类型1古物圈子 2专栏精选
+//        		.param("searchType", "")
+                //帖子类型 1帖子 2视频
+                .param("type", "1")
+                .param("start", "0")
+                .param("limit", "10")
+                //列表类型 1普通列表 2我的帖子/视频列表
+                .param("listType", "1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
-    
+
+    /**
+     * 帖子详情
+     * @throws Exception
+     */
+    @Test
+    @Transactional
+    public void forumDetail() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/forum/detail")
+                .param("token", "10045FY1534451510951")
+                .param("forumId", "1")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
 
     /**
      * 发布视频
@@ -61,7 +84,7 @@ public class ForumInfoControllerTest {
 //    @Transactional
     public void addForum() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/forum/addForum")
-        		.param("token", "10045FY1534183918247")
+        		.param("token", "10045FY1534451510951")
         		.param("columnId", "4")
         		.param("title", "这是一个帖子")
         		.param("content", "这个帖子主要是为了测试一下发布帖子接口能不能用")
@@ -77,6 +100,8 @@ public class ForumInfoControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
+
+
 
 
 }

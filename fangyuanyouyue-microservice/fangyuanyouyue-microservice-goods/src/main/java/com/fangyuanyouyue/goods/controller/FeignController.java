@@ -41,7 +41,7 @@ public class FeignController extends BaseController{
             log.info("参数：" + param.toString());
 
             if (param.getGoodsId() == null) {
-                return toError(ReCode.FAILD.getValue(), "商品id不能为空！");
+                return toError( "商品id不能为空！");
             }
             //商品详情
             String goodsMainImg = goodsInfoService.goodsMainImg(param.getGoodsId());
@@ -49,7 +49,7 @@ public class FeignController extends BaseController{
             return toSuccess(goodsMainImg);
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -61,7 +61,7 @@ public class FeignController extends BaseController{
             log.info("参数：" + param.toString());
 
             if (param.getGoodsId() == null) {
-                return toError(ReCode.FAILD.getValue(), "商品id不能为空！");
+                return toError( "商品id不能为空！");
             }
             //商品详情
             GoodsInfo goodsInfo = goodsInfoService.selectByPrimaryKey(param.getGoodsId());
@@ -69,7 +69,7 @@ public class FeignController extends BaseController{
             return toSuccess(goodsInfo);
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -80,10 +80,10 @@ public class FeignController extends BaseController{
             log.info("----》修改商品状态《----");
             log.info("参数：" + param.toString());
             if(param.getGoodsId() == null){
-                return toError(ReCode.FAILD.getValue(),"商品ID不能为空！");
+                return toError("商品ID不能为空！");
             }
             if(param.getStatus() == null){
-                return toError(ReCode.FAILD.getValue(),"状态不能为空！");
+                return toError("状态不能为空！");
             }
             //修改商品状态
             goodsInfoService.updateGoodsStatus(param.getGoodsId(),param.getStatus());
@@ -93,7 +93,7 @@ public class FeignController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -106,7 +106,7 @@ public class FeignController extends BaseController{
             log.info("参数：" + param.toString());
             //验证用户
             if(param.getUserId() == null){
-                return toError(ReCode.FAILD.getValue(),"用户id不能为空！");
+                return toError("用户id不能为空！");
             }
             String verifyUser = schedualUserService.verifyUserById(param.getUserId());
             JSONObject jsonObject = JSONObject.parseObject(verifyUser);
@@ -114,7 +114,7 @@ public class FeignController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getGoodsIds() == null || param.getGoodsIds().length == 0){
-                return toError(ReCode.FAILD.getValue(),"商品id不能为空！");
+                return toError("商品id不能为空！");
             }
             //移出购物车
             cartService.cartRemoveByIds(param.getUserId(),param.getGoodsIds());
@@ -124,7 +124,7 @@ public class FeignController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 
@@ -138,7 +138,7 @@ public class FeignController extends BaseController{
             log.info("参数：userId：" + userId);
             //验证用户
             if(userId == null){
-                return toError(ReCode.FAILD.getValue(),"用户id不能为空！");
+                return toError("用户id不能为空！");
             }
             //获取统计信息
             Integer count = bargainService.getProcess(userId);
@@ -148,7 +148,7 @@ public class FeignController extends BaseController{
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 }

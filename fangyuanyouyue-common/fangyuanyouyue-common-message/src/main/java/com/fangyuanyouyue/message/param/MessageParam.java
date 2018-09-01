@@ -2,10 +2,17 @@ package com.fangyuanyouyue.message.param;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 /**
  * 后台请求基础参数
  */
 @ApiModel(value = "后台请求基础参数")
+@Getter
+@Setter
+@ToString
 public class MessageParam {
     //公用
     @ApiModelProperty(name = "start", value = "起始页", dataType = "int",hidden = true)
@@ -31,91 +38,4 @@ public class MessageParam {
 
     @ApiModelProperty(name = "code", value = "验证码", dataType = "String",hidden = true)
     private String code;//验证码
-
-    public Integer getStart() {
-        return start;
-    }
-
-    public void setStart(Integer start) {
-        this.start = start;
-    }
-
-    public Integer getLimit() {
-        return limit;
-    }
-
-    public void setLimit(Integer limit) {
-        this.limit = limit;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getUnionId() {
-        return unionId;
-    }
-
-    public void setUnionId(String unionId) {
-        this.unionId = unionId;
-    }
-
-    public Integer getThirdType() {
-        return thirdType;
-    }
-
-    public void setThirdType(Integer thirdType) {
-        this.thirdType = thirdType;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    @Override
-    public String toString() {
-        return "MessageParam{" +
-                "start=" + start +
-                ", limit=" + limit +
-                ", name='" + name + '\'' +
-                ", type=" + type +
-                ", userId=" + userId +
-                ", phone='" + phone + '\'' +
-                ", unionId='" + unionId + '\'' +
-                ", thirdType=" + thirdType +
-                ", code='" + code + '\'' +
-                '}';
-    }
 }

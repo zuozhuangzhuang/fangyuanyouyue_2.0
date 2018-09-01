@@ -43,4 +43,16 @@ public class MessageControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
+
+    @Test
+    public void easemobMessage() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/message/easemob/message")
+                .param("userName","45")
+                .param("content","您的商品【商品名称】、【xxx】、【xx】买家已申请退货，点击此处处理一下吧")
+                .param("type","txt")
+                .param("businessId","922")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
 }

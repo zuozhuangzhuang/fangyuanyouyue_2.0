@@ -23,13 +23,16 @@ public class AppraisalPvServiceImp implements AppraisalPvService {
 
 	@Override
 	public void savePv(Integer userId, Integer appraisalId) {
-		AppraisalPv model = new AppraisalPv();
-		model.setAddTime(new Date());
-		model.setUserId(userId);
-		model.setAppraisalId(appraisalId);
-		
-		appraisalPvMapper.insert(model);
-		
+		AppraisalPv appraisalPv = appraisalPvMapper.selectByUserIdAppraisalId(userId, appraisalId);
+		if(appraisalPv == null){
+			appraisalPv = new AppraisalPv();
+			appraisalPv.setAddTime(new Date());
+			appraisalPv.setUserId(userId);
+			appraisalPv.setAppraisalId(appraisalId);
+			appraisalPvMapper.insert(appraisalPv);
+		}
+
+
 	}
 
    

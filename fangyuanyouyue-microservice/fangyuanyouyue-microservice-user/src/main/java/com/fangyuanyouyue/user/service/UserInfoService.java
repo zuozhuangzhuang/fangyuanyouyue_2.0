@@ -171,10 +171,11 @@ public interface UserInfoService {
      * @param userId
      * @param start
      * @param limit
+     * @param search
      * @return
      * @throws ServiceException
      */
-    List<UserFansDto> myFansOrFollows(Integer userId,Integer type,Integer start,Integer limit) throws ServiceException;
+    List<UserFansDto> myFansOrFollows(Integer userId,Integer type,Integer start,Integer limit,String search) throws ServiceException;
 
     /**
      * 获取待处理信息
@@ -197,4 +198,14 @@ public interface UserInfoService {
     Pager getPage(AdminUserParam param);
     
     void upateUserStatus(Integer userId,Integer status);
+
+    /**
+     * 根据用户名获取用户列表
+     * @param search
+     * @param start
+     * @param limit
+     * @return
+     * @throws ServiceException
+     */
+    List<ShopDto> getUserByName(String search,Integer start,Integer limit) throws ServiceException;
 }
