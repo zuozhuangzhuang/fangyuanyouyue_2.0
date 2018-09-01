@@ -99,18 +99,14 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<version>1.16.18</version>
 			<scope>provided</scope>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.alipay.api/k12-alipay-sdk -->
-		<!--支付宝-->
-		<dependency>
-			<groupId>com.alipay.api</groupId>
-			<artifactId>k12-alipay-sdk</artifactId>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/net.guerlab/sdk-alipay-core -->
 		<dependency>
 			<groupId>net.guerlab</groupId>
 			<artifactId>sdk-alipay-core</artifactId>
+			<version>1.0.3</version>
 		</dependency>
 	</dependencies>
 

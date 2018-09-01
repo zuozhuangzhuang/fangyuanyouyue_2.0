@@ -203,11 +203,6 @@
 				<artifactId>rest-java-sdk</artifactId>
 				<version>1.0.5</version>
 			</dependency>
-			<dependency>
-				<groupId>com.alipay.api</groupId>
-				<artifactId>k12-alipay-sdk</artifactId>
-				<version>0.0.1-beta</version>
-			</dependency>
 			<!-- https://mvnrepository.com/artifact/net.guerlab/sdk-alipay-core -->
 			<dependency>
 				<groupId>net.guerlab</groupId>
