@@ -2,11 +2,11 @@ package com.fangyuanyouyue.user.service.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import feign.RetryableException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
+import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.base.util.MD5Util;
 import com.fangyuanyouyue.user.constant.StatusEnum;
 import com.fangyuanyouyue.user.dao.IdentityAuthApplyMapper;
@@ -26,6 +28,7 @@ import com.fangyuanyouyue.user.dao.UserInfoMapper;
 import com.fangyuanyouyue.user.dao.UserThirdPartyMapper;
 import com.fangyuanyouyue.user.dao.UserVipMapper;
 import com.fangyuanyouyue.user.dao.UserWalletMapper;
+import com.fangyuanyouyue.user.dto.AdminUserDto;
 import com.fangyuanyouyue.user.dto.ShopDto;
 import com.fangyuanyouyue.user.dto.UserDto;
 import com.fangyuanyouyue.user.dto.UserFansDto;
@@ -36,12 +39,15 @@ import com.fangyuanyouyue.user.model.UserInfoExt;
 import com.fangyuanyouyue.user.model.UserThirdParty;
 import com.fangyuanyouyue.user.model.UserVip;
 import com.fangyuanyouyue.user.model.UserWallet;
+import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.param.UserParam;
 import com.fangyuanyouyue.user.service.SchedualGoodsService;
 import com.fangyuanyouyue.user.service.SchedualMessageService;
 import com.fangyuanyouyue.user.service.SchedualOrderService;
 import com.fangyuanyouyue.user.service.SchedualRedisService;
 import com.fangyuanyouyue.user.service.UserInfoService;
+
+import feign.RetryableException;
 
 @Service(value = "userInfoService")
 @Transactional(rollbackFor=Exception.class)
@@ -754,5 +760,26 @@ public class UserInfoServiceImpl implements UserInfoService {
         }catch (RetryableException e){
             throw new ServiceException("连接超时！");
         }
+	}
+
+
+	@Override
+	public Pager getPage(AdminUserParam param) {
+		
+		Integer total = userInfoMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
+		List<UserInfo> datas = userInfoMapper.getPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders());
+		Pager pager = new Pager();
+		pager.setTotal(total);
+		pager.setDatas(AdminUserDto.toDtoList(datas));
+		return pager;
+	}
+
+	@Override
+	public void upateUserStatus(Integer userId, Integer status) {
+		
+		UserInfo user = userInfoMapper.selectByPrimaryKey(userId);
+		user.setStatus(status);
+		userInfoMapper.updateByPrimaryKey(user);
+		
 	}
 }

@@ -79,5 +79,18 @@ public class BaseController {
 	public BaseResp toError() {
 		return toError(ReCode.FAILD.getValue(), ReCode.FAILD.getMessage());
 	}
+	
+	/**
+	 * 返回分页数据
+	 * @param pager
+	 * @return
+	 */
+	public BaseResp toPage(Pager pager) {
+		BasePageResp resp = new BasePageResp();
+		resp.setCode(ReCode.SUCCESS.getValue());
+		resp.setData(pager.getDatas());
+		resp.setTotal(pager.getTotal());
+		return resp;
+	}
 
 }

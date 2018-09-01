@@ -47,6 +47,21 @@ public class DateUtil {
 	
 	
 	
+	public static Date getDate(String time, String format) {
+		SimpleDateFormat sdf = new SimpleDateFormat(format);
+		Date d = null;
+		try {
+
+			d = sdf.parse(time);
+			return d;
+
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return d;
+	}
+	
+	
 	public static long getTimestampLong(String time, String format) {
 		SimpleDateFormat sdf = new SimpleDateFormat(format);
 		Date d;

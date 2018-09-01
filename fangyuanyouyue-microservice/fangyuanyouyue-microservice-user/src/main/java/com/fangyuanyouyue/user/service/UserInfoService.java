@@ -2,12 +2,14 @@ package com.fangyuanyouyue.user.service;
 
 import java.util.List;
 
+import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.user.dto.ShopDto;
 import com.fangyuanyouyue.user.dto.UserDto;
 import com.fangyuanyouyue.user.dto.UserFansDto;
 import com.fangyuanyouyue.user.dto.WaitProcessDto;
 import com.fangyuanyouyue.user.model.UserInfo;
+import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.param.UserParam;
 
 /**
@@ -187,4 +189,12 @@ public interface UserInfoService {
      */
     void registIMUser(UserInfo user) throws ServiceException;
     
+    /**
+     * 获取后台分页数据
+     * @param param
+     * @return
+     */
+    Pager getPage(AdminUserParam param);
+    
+    void upateUserStatus(Integer userId,Integer status);
 }
