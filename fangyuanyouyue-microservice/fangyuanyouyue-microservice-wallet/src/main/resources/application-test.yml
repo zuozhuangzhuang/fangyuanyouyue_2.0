@@ -2,12 +2,12 @@ eureka:
   client:
     serviceUrl:
 #     服务注册中心的地址
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://eureka-server:8761/eureka/
 spring:
   application:
   #   服务与服务之间相互调用一般都是根据这个name
       name: wallet-service
-    datasource:
+      datasource:
         name: test
   #     末尾useSSL=true：ssl是一种加密技术在客户端连接数据库的中间做了加密，TCP/IP层中
   #      url: jdbc:mysql://127.0.0.1:3306/xiaofangyuan?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=true
