@@ -9,7 +9,7 @@ server:
 spring:
 
   profiles:
-    active: dev
+    active: test
 #springcloud-bus
 management:
   endpoints:
