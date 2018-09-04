@@ -405,7 +405,7 @@ public class WalletServiceImpl implements WalletService{
 //        WechatPayDto wechatPayDto = PayCommonUtil.startWXPay(result);
 //        System.out.println("最终的结果是：" + wechatPayDto.toString());
         WechatPay util = new WechatPay();
-        WechatPayDto wechatPayDto= util.genOrder(orderNo, price.intValue()+"", "小方圆-微信在线支付", notifyUrl, "127.0.0.1");
+        WechatPayDto wechatPayDto= util.genOrder(orderNo, price.doubleValue()+"", "小方圆-微信在线支付", notifyUrl, "127.0.0.1");
         return wechatPayDto;
     }
 
