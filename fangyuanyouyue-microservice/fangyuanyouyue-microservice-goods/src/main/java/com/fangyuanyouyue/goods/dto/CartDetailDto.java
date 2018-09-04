@@ -34,6 +34,8 @@ public class CartDetailDto {
 
     private Integer status;//商品状态 1出售中 2已售出
 
+    private Integer bargainId;//如果存在申请中的议价就返回议价详情id，否则为null
+
     private Integer userId;//店铺ID
 
     public CartDetailDto() {

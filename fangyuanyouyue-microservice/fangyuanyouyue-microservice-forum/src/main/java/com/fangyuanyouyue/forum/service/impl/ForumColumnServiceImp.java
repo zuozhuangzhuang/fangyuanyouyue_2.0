@@ -103,7 +103,7 @@ public class ForumColumnServiceImp implements ForumColumnService {
 					WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.column_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
 					return wechatPayDto;
 				}else if(payType.intValue() == 2){//TODO 支付宝,如果回调失败就不做处理，成功就在回调接口中继续生成全民鉴定
-					String info = JSONObject.parseObject(schedualWalletService.orderPayByWechat(columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.column_alipay_notify.getNotifUrl())).getString("data");
+					String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.column_alipay_notify.getNotifUrl())).getString("data");
 					payInfo.append(info);
 				}else if(payType.intValue() == 3) {//余额
 					//验证支付密码
@@ -148,6 +148,8 @@ public class ForumColumnServiceImp implements ForumColumnService {
 			//系统消息：您的【专栏名称】专栏申请已提交，将于3个工作日内完成审核，请注意消息通知
 			schedualMessageService.easemobMessage(columnOrder.getUserId().toString(),
 					"您的【"+columnOrder.getName()+"】专栏申请已提交，将于3个工作日内完成审核，请注意消息通知","1","1","");
+			//余额账单
+			schedualWalletService.addUserBalanceDetail(columnOrder.getUserId(),columnOrder.getAmount(),payType,2,orderNo,columnOrder.getName(),null,columnOrder.getUserId(),5);
 			return true;
 		}catch (Exception e){
 			throw e;

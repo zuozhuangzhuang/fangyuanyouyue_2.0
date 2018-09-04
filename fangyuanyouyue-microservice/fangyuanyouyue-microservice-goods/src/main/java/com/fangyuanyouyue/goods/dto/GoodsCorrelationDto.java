@@ -18,6 +18,8 @@ public class GoodsCorrelationDto {
 
     private Integer goodsCategoryId;//商品分类ID
 
+    private String goodsCategoryName;//类目名称
+
     private Integer goodsId;//商品ID
 
     private Integer categoryParentId;//商品分类父ID
@@ -28,6 +30,7 @@ public class GoodsCorrelationDto {
     public GoodsCorrelationDto(GoodsCorrelation goodsCorrelation) {
         this.correlationId = goodsCorrelation.getId();
         this.goodsCategoryId = goodsCorrelation.getGoodsCategoryId();
+        this.goodsCategoryName = goodsCorrelation.getGoodsCategoryName();
         this.goodsId = goodsCorrelation.getGoodsId();
         this.categoryParentId = goodsCorrelation.getCategoryParentId();
     }

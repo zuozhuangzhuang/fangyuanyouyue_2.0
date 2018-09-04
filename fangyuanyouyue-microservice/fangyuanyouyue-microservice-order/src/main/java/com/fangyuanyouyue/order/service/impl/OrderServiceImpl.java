@@ -651,7 +651,7 @@ public class OrderServiceImpl implements OrderService{
                 StringBuffer payInfo = new StringBuffer();
                 if(payType.intValue() == 1){//微信
                     WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderPay.getPayAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.appraisal_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
-                    orderPay.setPayNo(wechatPayDto.getSign());
+//                    orderPay.setPayNo(wechatPayDto.getSign());
                     //微信，失败不做处理，成功继续拆单生成订单
                     return wechatPayDto;
                 }else if(payType.intValue() == 2){//支付宝
@@ -927,6 +927,11 @@ public class OrderServiceImpl implements OrderService{
                 }
                 schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
                         "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单","3","2",orderInfo.getId().toString());
+                //买家新增余额账单
+                schedualWalletService.addUserBalanceDetail(orderInfo.getUserId(),orderInfo.getAmount(),payType,2,orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),1);
+                //卖家新增余额账单
+                schedualWalletService.addUserBalanceDetail(orderInfo.getSellerId(),orderInfo.getAmount(),3,1,orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),1);
+
                 return true;
             }
         }

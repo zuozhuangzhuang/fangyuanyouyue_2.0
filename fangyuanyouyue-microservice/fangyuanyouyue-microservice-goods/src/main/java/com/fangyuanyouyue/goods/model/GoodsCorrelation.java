@@ -25,5 +25,7 @@ public class GoodsCorrelation {
 
     private Date updateTime;//更新时间
 
+    private String goodsCategoryName;//类目名称
+
 
 }

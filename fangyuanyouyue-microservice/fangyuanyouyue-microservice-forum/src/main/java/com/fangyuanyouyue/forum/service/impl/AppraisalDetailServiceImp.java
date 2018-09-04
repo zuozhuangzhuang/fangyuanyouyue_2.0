@@ -211,7 +211,7 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 				WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(argueOrder.getOrderNo(), argueOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.argue_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
 				return wechatPayDto;
 			}else if(payType.intValue() == 2){//TODO 支付宝,如果回调失败就不做处理，成功就在回调接口中继续生成全民鉴定
-				String info = JSONObject.parseObject(schedualWalletService.orderPayByWechat(argueOrder.getOrderNo(), argueOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.argue_alipay_notify.getNotifUrl())).getString("data");
+				String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(argueOrder.getOrderNo(), argueOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.argue_alipay_notify.getNotifUrl())).getString("data");
 				payInfo.append(info);
 			}else if(payType.intValue() == 3){//余额
 				//验证支付密码
@@ -261,6 +261,11 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 		return payInfo.toString();
 	}
 
+	/**
+	 * 新增鉴定图片
+	 * @param imgUrls
+	 * @param appraisalDetail
+	 */
 	private void insertAppraisalImg(String[] imgUrls, AppraisalDetail appraisalDetail) {
 		for(String imgUrl:imgUrls){
 			//存储图片
@@ -302,6 +307,8 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 		}
 		argueOrder.setStatus(2);
 		argueOrderMapper.updateByPrimaryKey(argueOrder);
+		//余额账单
+		schedualWalletService.addUserBalanceDetail(user.getId(),argueOrder.getAmount(),payType,2,orderNo,appraisalDetail.getTitle(),null,user.getId(),4);
 		return true;
 	}
 

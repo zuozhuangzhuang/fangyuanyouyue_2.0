@@ -121,6 +121,10 @@ public class BargainServiceImpl implements BargainService{
                         //议价：恭喜您！您的商品【商品名称】有新的议价，点击此处查看详情
                         schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
                                 "恭喜您！您的商品【"+goodsInfo.getName()+"】有新的议价，点击此处查看详情","2","2",goodsId.toString());
+                        //买家新增余额账单
+                        schedualWalletService.addUserBalanceDetail(goodsBargain.getUserId(),goodsBargain.getPrice(),payType,2,goodsBargain.getBargainNo(),goodsInfo.getName(),goodsInfo.getUserId(),goodsBargain.getUserId(),3);
+
+
                     }
 //                }else{
 //                    throw new ServiceException("支付方式错误！");
@@ -250,6 +254,8 @@ public class BargainServiceImpl implements BargainService{
                         //议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
                         schedualMessageService.easemobMessage(bargain.getUserId().toString(),
                                 "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情","2","2",bargain.getGoodsId().toString());
+                        //买家新增余额账单
+                        schedualWalletService.addUserBalanceDetail(bargain.getUserId(),bargain.getPrice(),3,1,bargain.getBargainNo(),goodsInfo.getName(),goodsInfo.getUserId(),bargain.getUserId(),3);
                     }
                 }else if(status.intValue() == 3){
                     //退回余额
@@ -261,6 +267,8 @@ public class BargainServiceImpl implements BargainService{
                     //议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
                     schedualMessageService.easemobMessage(goodsBargain.getUserId().toString(),
                             "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情","2","2",goodsBargain.getGoodsId().toString());
+                    //买家新增余额账单
+                    schedualWalletService.addUserBalanceDetail(goodsBargain.getUserId(),goodsBargain.getPrice(),3,1,goodsBargain.getBargainNo(),goodsInfo.getName(),goodsInfo.getUserId(),goodsBargain.getUserId(),3);
                 }else{
                     throw new ServiceException("状态异常！");
                 }
@@ -275,6 +283,8 @@ public class BargainServiceImpl implements BargainService{
                 if(baseResp.getCode() == 1){
                     throw new ServiceException(baseResp.getReport().toString());
                 }
+                //买家新增余额账单
+                schedualWalletService.addUserBalanceDetail(goodsBargain.getUserId(),goodsBargain.getPrice(),3,1,goodsBargain.getBargainNo(),goodsInfo.getName(),goodsInfo.getUserId(),goodsBargain.getUserId(),3);
             }else{
                 throw new ServiceException("压价信息异常！");
             }
@@ -415,6 +425,8 @@ public class BargainServiceImpl implements BargainService{
                         throw new ServiceException(baseResp.getReport().toString());
                     }
                     updateBargain(userId,goodsId,bargain.getId(),4);
+                    //买家新增余额账单
+                    schedualWalletService.addUserBalanceDetail(bargain.getUserId(),bargain.getPrice(),3,1,bargain.getBargainNo(),goodsInfo.getName(),goodsInfo.getUserId(),bargain.getUserId(),3);
                 }
                 bargain.setIsDelete(1);//是否删除 1是 2否
                 goodsBargainMapper.updateByPrimaryKey(bargain);

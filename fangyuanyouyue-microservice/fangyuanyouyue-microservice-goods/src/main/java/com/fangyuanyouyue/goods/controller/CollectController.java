@@ -49,7 +49,7 @@ public class CollectController extends BaseController{
             @ApiImplicitParam(name = "collectIds", value = "收藏对象ID数组", allowMultiple = true,required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "type", value = "类型 1关注 2收藏", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "status", value = "状态 1发起 2取消", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "collectType", value = "关注/收藏类型 1商品 2抢购 3视频 4专栏 5鉴赏（只有抢购可以关注）", required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "collectType", value = "关注/收藏类型 1商品 2抢购", required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/collect")
     @ResponseBody

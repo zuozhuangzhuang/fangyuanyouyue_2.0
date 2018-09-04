@@ -504,7 +504,7 @@ public class AppraisalController extends BaseController {
         }
     }
 
-    //TODO 支付宝回调
+    //支付宝回调
     @ApiOperation(value = "申请官方鉴赏支付宝回调接口", notes = "支付宝回调", response = BaseResp.class,hidden = true)
     @RequestMapping(value = "/notify/alipay", method = RequestMethod.POST)
     @ResponseBody

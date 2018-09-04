@@ -21,9 +21,11 @@ public class OrderComment {
     private Integer serviceAttitude;//服务质量 1一颗星 2~3~4~5~
 
     /*
-    2~3：-300信誉度
-    4~6：+300信誉度
-    6~10：+500信誉度
+    差：小于-100分
+    低：-100~1000分之间
+    中：1000~1万之间
+    高：1万~50万之间
+    优：50万以上
      */
 
     private Integer status;//状态 1好评 2中评 3差评

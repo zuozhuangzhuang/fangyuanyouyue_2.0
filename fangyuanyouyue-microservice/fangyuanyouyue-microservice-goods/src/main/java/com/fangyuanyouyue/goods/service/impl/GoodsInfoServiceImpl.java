@@ -333,27 +333,40 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             if(StringUtils.isNotEmpty(param.getVideoUrl())){
                 goodsInfo.setVideoUrl(param.getVideoUrl());
             }
-            //TODO 商品分类修改+商品父级分类修改
-            //初始化商品分类关联表
-            for(int i=0;i<param.getGoodsCategoryIds().length;i++){
-                GoodsCorrelation goodsCorrelation = goodsCorrelationMapper.selectCorrekationsByGoodsIdCategoryId(param.getGoodsCategoryIds()[i],goodsInfo.getId());
-                goodsCorrelation.setGoodsId(goodsInfo.getId());
-                goodsCorrelation.setAddTime(DateStampUtils.getTimesteamp());
-                goodsCorrelation.setGoodsCategoryId(param.getGoodsCategoryIds()[i]);
-                goodsCorrelation.setCategoryParentId(goodsCategoryMapper.selectParentId(param.getGoodsCategoryIds()[i]));
-                goodsCorrelationMapper.insert(goodsCorrelation);
+            //视频截图路径
+            if(StringUtils.isNotEmpty(param.getVideoImg())){
+                saveGoodsPicOne(goodsInfo.getId(),param.getVideoImg(),3,1);
             }
-            //删除旧商品图片信息
-            goodsImgMapper.deleteByGoodsId(goodsInfo.getId());
-            //新增商品图片信息
-            //每个图片储存一条商品图片表信息
-            for(int i=0;i<param.getImgUrls().length;i++){
-                if(i == 0){
-                    saveGoodsPicOne(goodsInfo.getId(),param.getImgUrls()[i],param.getType(),1);
-                }else{
-                    saveGoodsPicOne(goodsInfo.getId(),param.getImgUrls()[i],param.getType(),2);
+            if(param.getGoodsCategoryIds() != null && param.getGoodsCategoryIds().length > 0){
+                //删除旧商品分类关联表
+                List<GoodsCorrelation> goodsCorrelations = goodsCorrelationMapper.getCorrelationsByGoodsId(goodsInfo.getId());
+                for(GoodsCorrelation correlation:goodsCorrelations){
+                    goodsCorrelationMapper.deleteByPrimaryKey(correlation.getId());
+                }
+                //初始化商品分类关联表
+                for(int i=0;i<param.getGoodsCategoryIds().length;i++){
+                    GoodsCorrelation goodsCorrelation = new GoodsCorrelation();
+                    goodsCorrelation.setGoodsId(goodsInfo.getId());
+                    goodsCorrelation.setAddTime(DateStampUtils.getTimesteamp());
+                    goodsCorrelation.setGoodsCategoryId(param.getGoodsCategoryIds()[i]);
+                    goodsCorrelation.setCategoryParentId(goodsCategoryMapper.selectParentId(param.getGoodsCategoryIds()[i]));
+                    goodsCorrelationMapper.insert(goodsCorrelation);
                 }
             }
+            //新增商品图片信息
+            //每个图片储存一条商品图片表信息
+            if(param.getImgUrls() != null && param.getImgUrls().length > 0){
+                //删除旧商品图片信息
+                goodsImgMapper.deleteByGoodsId(goodsInfo.getId());
+                for(int i=0;i<param.getImgUrls().length;i++){
+                    if(i == 0){
+                        saveGoodsPicOne(goodsInfo.getId(),param.getImgUrls()[i],1,i+1);
+                    }else{
+                        saveGoodsPicOne(goodsInfo.getId(),param.getImgUrls()[i],2,i+1);
+                    }
+                }
+            }
+            goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
         }
     }
 

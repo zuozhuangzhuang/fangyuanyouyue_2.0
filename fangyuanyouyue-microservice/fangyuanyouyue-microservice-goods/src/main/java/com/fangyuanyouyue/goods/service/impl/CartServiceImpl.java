@@ -38,6 +38,8 @@ public class CartServiceImpl implements CartService {
     private GoodsCorrelationMapper goodsCorrelationMapper;
     @Autowired
     private GoodsCommentMapper goodsCommentMapperl;
+    @Autowired
+    private GoodsBargainMapper goodsBargainMapper;
 
 
 
@@ -118,6 +120,11 @@ public class CartServiceImpl implements CartService {
                         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(cartDetailDto.getGoodsId());
                         cartDetailDto.setStatus(goodsInfo.getStatus());
                         cartDetailDto.setUserId(cartDetail.getUserId());
+                        //用户是否存在申请中议价
+                        List<GoodsBargain> goodsBargains = goodsBargainMapper.selectByUserIdGoodsId(userId, cartDetailDto.getGoodsId(), 1);
+                        if(goodsBargains != null && goodsBargains.size() > 0){
+                            cartDetailDto.setBargainId(goodsBargains.get(0).getId());
+                        }
                     }
                     cartShopDto.setCartDetail(cartDetailDtos);
                     cartShopDtos.add(cartShopDto);

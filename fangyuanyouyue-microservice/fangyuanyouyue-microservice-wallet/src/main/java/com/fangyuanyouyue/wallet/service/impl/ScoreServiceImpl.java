@@ -48,7 +48,6 @@ public class ScoreServiceImpl implements ScoreService{
                 throw new ServiceException("获取用户扩展信息失败！");
             } else {
                 BonusPool bonus = new BonusPool();
-                //TODO 抽奖
                 //总的概率区间
                 float totalPro = 0f;
                 //存储每个奖品新的概率区间
@@ -72,6 +71,7 @@ public class ScoreServiceImpl implements ScoreService{
                 }
                 //扣除积分余额
                 walletService.updateScore(userId,10000L,2);
+                //TODO 增加用户积分、优惠券
                 return bonus.getBonusName();
             }
         }
