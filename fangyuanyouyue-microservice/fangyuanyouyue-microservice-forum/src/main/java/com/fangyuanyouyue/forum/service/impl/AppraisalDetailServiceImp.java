@@ -281,6 +281,9 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 	public boolean applyAppraisal(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException{
 		//获取订单
 		ArgueOrder argueOrder = argueOrderMapper.selectByOrderNo(orderNo);
+		if(argueOrder == null){
+			throw new ServiceException("订单不存在！");
+		}
 		//生成全民鉴定
 		AppraisalDetail appraisalDetail = new AppraisalDetail();
 		appraisalDetail.setBonus(argueOrder.getAmount());

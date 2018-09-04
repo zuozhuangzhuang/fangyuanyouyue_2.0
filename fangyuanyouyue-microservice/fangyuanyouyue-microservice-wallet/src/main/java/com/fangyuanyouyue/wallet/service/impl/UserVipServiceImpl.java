@@ -38,6 +38,9 @@ public class UserVipServiceImpl implements UserVipService{
     @Override
     public boolean updateOrder(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException {
         VipOrder vipOrder = vipOrderMapper.selectByOrderNo(orderNo);
+        if(vipOrder == null){
+            throw new ServiceException("订单不存在！");
+        }
         UserVip userVip = userVipMapper.selectByUserId(vipOrder.getUserId());
         if(userVip == null){
             throw new ServiceException("获取用户会员信息失败！");

@@ -164,6 +164,9 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
      */
     public boolean updateOrder(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException {
         UserAuthOrder authOrder = userAuthOrderMapper.selectByOrderNo(orderNo);
+        if(authOrder == null){
+            throw new ServiceException("订单不存在！");
+        }
         //添加申请记录
         UserAuthApply userAuthApply = new UserAuthApply();
         userAuthApply.setUserId(authOrder.getUserId());

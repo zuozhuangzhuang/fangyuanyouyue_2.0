@@ -650,7 +650,7 @@ public class OrderServiceImpl implements OrderService{
 
                 StringBuffer payInfo = new StringBuffer();
                 if(payType.intValue() == 1){//微信
-                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderPay.getPayAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.appraisal_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderPay.getPayAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.order_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
 //                    orderPay.setPayNo(wechatPayDto.getSign());
                     //微信，失败不做处理，成功继续拆单生成订单
                     return wechatPayDto;
