@@ -482,6 +482,9 @@ public class WalletServiceImpl implements WalletService{
     public boolean updateOrder(String orderNo, String thirdOrderNo, Integer payType) throws ServiceException {
         //获取订单
         UserRechargeDetail userRechargeDetail = userRechargeDetailMapper.selectByOrderNo(orderNo);
+        if(userRechargeDetail == null){
+            throw new ServiceException("订单不存在！");
+        }
         userRechargeDetail.setStatus(2);
         userRechargeDetailMapper.updateByPrimaryKeySelective(userRechargeDetail);
         //充值

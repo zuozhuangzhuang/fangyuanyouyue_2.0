@@ -134,6 +134,9 @@ public class ForumColumnServiceImp implements ForumColumnService {
 		try{
 			//获取订单
 			ColumnOrder columnOrder = columnOrderMapper.selectByOrderNo(orderNo);
+			if(columnOrder == null){
+				throw new ServiceException("订单不存在！");
+			}
 			//专栏申请
 			ForumColumnApply forumColumnApply = new ForumColumnApply();
 			forumColumnApply.setUserId(columnOrder.getUserId());

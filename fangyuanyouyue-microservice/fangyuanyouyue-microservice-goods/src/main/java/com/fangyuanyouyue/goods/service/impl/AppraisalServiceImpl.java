@@ -270,6 +270,9 @@ public class AppraisalServiceImpl implements AppraisalService{
     public boolean updateOrder(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException{
         try{
             AppraisalOrderInfo appraisalOrderInfo = appraisalOrderInfoMapper.selectByOrderNo(orderNo);
+            if(appraisalOrderInfo == null){
+                throw new ServiceException("订单不存在！");
+            }
             List<GoodsAppraisalDetail> listByOrderIdStatus = goodsAppraisalDetailMapper.getListByOrderIdStatus(appraisalOrderInfo.getId(), 4);
             for(GoodsAppraisalDetail detail:listByOrderIdStatus){
                 detail.setStatus(0);//支付后修改为申请中
