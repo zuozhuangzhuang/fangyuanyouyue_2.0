@@ -36,7 +36,7 @@ public class UserBalanceDetail {
 
     private String orderNo;//订单号
 
-    private Integer orderType;//订单类型 1商品、抢购 2官方鉴定 3商品议价 4全民鉴定 5申请专栏 6充值 7开通、续费会员
+    private Integer orderType;//订单类型 1商品、抢购 2官方鉴定 3商品议价 4全民鉴定 5申请专栏 6充值 7开通、续费会员 8认证店铺
 
     private Integer sellerId;//卖家id
 

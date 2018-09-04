@@ -61,4 +61,22 @@ public interface SchedualWalletService {
     @RequestMapping(value = "/walletFeign/orderPayByALi",method = RequestMethod.POST)
     String orderPayByALi(@RequestParam(value = "orderNo") String orderNo, @RequestParam(value = "price") BigDecimal price, @RequestParam(value = "notifyUrl") String notifyUrl);
 
+    /**
+     * 新增用户收支信息
+     * @param userId
+     * @param amount
+     * @param payType 支付类型 1微信 2支付宝 3余额
+     * @param type 收支类型 1收入 2支出
+     * @param orderNo
+     * @param title
+     * @param sellerId
+     * @param buyerId
+     * @param orderType 订单类型 1商品、抢购 2官方鉴定 3商品议价 4全民鉴定 5申请专栏 6充值 7开通、续费会员 8认证店铺
+     * @return
+     */
+    @RequestMapping(value = "/walletFeign/addUserBalanceDetail",method = RequestMethod.POST)
+    String addUserBalanceDetail(@RequestParam(value = "userId")Integer userId,@RequestParam(value = "amount")BigDecimal amount,@RequestParam(value = "payType")Integer payType,
+                          @RequestParam(value = "type")Integer type,@RequestParam(value = "orderNo") String orderNo,
+                          @RequestParam(value = "title")String title,@RequestParam(value = "sellerId")Integer sellerId,
+                          @RequestParam(value = "buyerId")Integer buyerId,@RequestParam(value = "orderType")Integer orderType);
 }

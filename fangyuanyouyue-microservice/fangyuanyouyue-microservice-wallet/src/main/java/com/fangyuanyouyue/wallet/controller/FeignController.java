@@ -224,13 +224,13 @@ public class FeignController extends BaseController{
     }
 
     @ApiOperation(value = "新增用户收支信息", notes = "(void)新增用户收支信息",hidden = true)
-    @PostMapping(value = "/addUserBalance")
+    @PostMapping(value = "/addUserBalanceDetail")
     @ResponseBody
-    public BaseResp addUserBalance(Integer userId,BigDecimal amount,Integer payType,Integer type, String orderNo, String title,Integer sellerId,Integer buyerId,Integer orderType) throws IOException {
+    public BaseResp addUserBalanceDetail(Integer userId,BigDecimal amount,Integer payType,Integer type, String orderNo, String title,Integer sellerId,Integer buyerId,Integer orderType) throws IOException {
         try {
             log.info("----》新增用户收支信息《----");
             //新增用户收支信息
-            walletService.addUserBalance(userId,amount,payType,type,orderNo,title,orderType,sellerId,buyerId);
+            walletService.addUserBalanceDetail(userId,amount,payType,type,orderNo,title,orderType,sellerId,buyerId);
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();

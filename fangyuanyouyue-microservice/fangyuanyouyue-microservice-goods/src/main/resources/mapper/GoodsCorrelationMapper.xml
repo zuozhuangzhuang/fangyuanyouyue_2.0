@@ -8,6 +8,7 @@
     <result column="category_parent_id" jdbcType="INTEGER" property="categoryParentId" />
     <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="name" jdbcType="VARCHAR" property="goodsCategoryName" />
   </resultMap>
   <sql id="Base_Column_List">
     id, goods_category_id, goods_id, category_parent_id, add_time, update_time
@@ -105,7 +106,7 @@
   </update>
 
   <select id="getCorrelationsByGoodsId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from goods_correlation where goods_id = #{goodsId,jdbcType=INTEGER}
+    select a.*,b.name from goods_correlation a,goods_category b where a.goods_category_id = b.id and  a.goods_id = #{goodsId,jdbcType=INTEGER}
   </select>
   <select id="selectCategoryIdByGoodsId" parameterType="Integer" resultType="Integer">
     select goods_category_id from goods_correlation where goods_id = #{goodsId,jdbcType=INTEGER}

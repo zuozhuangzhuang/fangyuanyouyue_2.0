@@ -107,19 +107,6 @@ public class TimerController extends BaseController {
         }
     }
 
-//
-//    @Scheduled(cron="0 * *  * * ? ")
-//    public BaseResp updateOrderRefundThreeDay() throws IOException {
-//        try {
-//            log.info("----》退货退款：72小时卖家未处理自动交给后台处理《----");
-//
-//            return toSuccess();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return toError("系统繁忙，请稍后再试！");
-//        }
-//    }
-//
     @Scheduled(cron="0 * *  * * ? ")
     public BaseResp cancelVip() throws IOException {
         try {

@@ -128,11 +128,13 @@ public class AppraisalControllerTest {
 //    @Transactional
     public void addAppraisal() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/appraisal/addAppraisal")
-                .param("token", "10045FY1534743584507")
-                .param("bonus", "10")
-                .param("title", "来看看这个咸丰")
-                .param("content", "刚入手一枚好看的钱，大家帮我看看是真的还是假的")
+                .param("token", "10025FY1535933972396")
+                .param("bonus", "100")
+                .param("title", "来看看这个咸丰哦哦哦")
+                .param("content", "刚入手一枚好看的钱111")
                 .param("imgUrls", "123,124,125")
+                .param("payType", "3")
+                .param("payPwd", "123456")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

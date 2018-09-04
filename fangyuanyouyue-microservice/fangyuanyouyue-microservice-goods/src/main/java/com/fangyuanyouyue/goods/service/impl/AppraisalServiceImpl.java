@@ -241,7 +241,7 @@ public class AppraisalServiceImpl implements AppraisalService{
                 WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderInfo.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.appraisal_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
                 return wechatPayDto;
             }else if(payType.intValue() == 2){//TODO 支付宝,如果回调失败就不做处理，成功就在回调接口中继续订单支付
-                String info = JSONObject.parseObject(schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderInfo.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.appraisal_alipay_notify.getNotifUrl())).getString("data");
+                String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(orderInfo.getOrderNo(), orderInfo.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.appraisal_alipay_notify.getNotifUrl())).getString("data");
                 payInfo.append(info);
             }else if(payType.intValue() == 3) {//余额
                 //验证支付密码
@@ -278,7 +278,8 @@ public class AppraisalServiceImpl implements AppraisalService{
             //系统消息：您的鉴定申请已提交，专家将于两个工作日内给出答复，请注意消息通知
             schedualMessageService.easemobMessage(appraisalOrderInfo.getUserId().toString(),
                     "您的鉴定申请已提交，专家将于两个工作日内给出答复，请注意消息通知","1","1","");
-
+            //余额账单
+            schedualWalletService.addUserBalanceDetail(appraisalOrderInfo.getUserId(),appraisalOrderInfo.getAmount(),payType,2,orderNo,"官方鉴定",null,appraisalOrderInfo.getUserId(),2);
             return true;
         } catch (Exception e){
             throw new ServiceException("官方鉴定申请失败！");

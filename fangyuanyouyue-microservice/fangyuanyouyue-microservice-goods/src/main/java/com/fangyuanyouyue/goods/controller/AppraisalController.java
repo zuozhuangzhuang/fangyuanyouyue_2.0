@@ -79,7 +79,7 @@ public class AppraisalController extends BaseController{
             }
             if(param.getGoodsIds() == null || param.getGoodsIds().length < 1){
                 if(param.getImgUrls() == null && param.getVideoUrl() == null){
-                    toError("至少包含一张图片或一段视频！");
+                    return toError("至少包含一张图片或一段视频！");
                 }
             }
             //申请鉴定，需要生成订单并返回订单信息

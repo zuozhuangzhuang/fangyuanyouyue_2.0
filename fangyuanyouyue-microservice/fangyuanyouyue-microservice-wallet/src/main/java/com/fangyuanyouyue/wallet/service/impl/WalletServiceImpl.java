@@ -428,11 +428,13 @@ public class WalletServiceImpl implements WalletService{
         List<UserBalanceDetail> userBalanceDetails = userBalanceDetailMapper.selectByUserIdType(userId, start * limit, limit, type, searchDate);
         List<UserBalanceDto> dtoList = UserBalanceDto.toDtoList(userBalanceDetails);
         for(UserBalanceDto dto:dtoList){
-            UserInfo info = userInfoMapper.selectByPrimaryKey(dto.getSellerId());
-            //对当前用户来说只有别人的头像
+            if(dto.getSellerId() != null){
+                UserInfo info = userInfoMapper.selectByPrimaryKey(dto.getSellerId());
+                //对当前用户来说只有别人的头像
 
-            //1收入 2支出
-            dto.setImgUrl(info.getHeadImgUrl());
+                //1收入 2支出
+                dto.setImgUrl(info.getHeadImgUrl());
+            }
         }
 //        BillMonthDto billMonthDto = new BillMonthDto();
         return dtoList;
@@ -456,7 +458,7 @@ public class WalletServiceImpl implements WalletService{
     }
 
     @Override
-    public void addUserBalance(Integer userId, BigDecimal amount, Integer payType, Integer type, String orderNo, String title,Integer orderType,Integer sellerId,Integer buyerId) throws ServiceException {
+    public void addUserBalanceDetail(Integer userId, BigDecimal amount, Integer payType, Integer type, String orderNo, String title,Integer orderType,Integer sellerId,Integer buyerId) throws ServiceException {
         //TODO 确认下单后生成用户和平台收支表信息
         UserWallet userWallet = userWalletMapper.selectByUserId(userId);
 
