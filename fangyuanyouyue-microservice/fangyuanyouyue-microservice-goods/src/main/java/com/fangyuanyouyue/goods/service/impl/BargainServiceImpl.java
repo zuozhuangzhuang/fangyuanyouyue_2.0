@@ -90,10 +90,10 @@ public class BargainServiceImpl implements BargainService{
                 goodsBargain.setStatus(1);//状态 1申请 2同意 3拒绝 4取消
                 goodsBargain.setAddTime(DateStampUtils.getTimesteamp());
                 goodsBargain.setIsDelete(2);//是否删除 1是 2否
-//                //订单号
-//                final IdGenerator idg = IdGenerator.INSTANCE;
-//                String id = idg.nextId();
-//                goodsBargain.setBargainNo(id);
+                //订单号
+                final IdGenerator idg = IdGenerator.INSTANCE;
+                String id = idg.nextId();
+                goodsBargain.setBargainNo(id);
 //                StringBuffer info = new StringBuffer();
 //                if(payType == 1){//微信
 //                    //TODO 微信支付回调，如果回调失败不做操作，如果成功就继续申请议价

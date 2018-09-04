@@ -9,8 +9,8 @@ import com.fangyuanyouyue.base.util.IdGenerator;
 import com.fangyuanyouyue.base.util.MD5Util;
 import com.fangyuanyouyue.base.util.WechatUtil.PayCommonUtil;
 import com.fangyuanyouyue.base.util.alipay.util.GenOrderUtil;
+import com.fangyuanyouyue.base.util.wechat.pay.WechatPay;
 import com.fangyuanyouyue.wallet.dao.*;
-import com.fangyuanyouyue.wallet.dto.BillMonthDto;
 import com.fangyuanyouyue.wallet.dto.UserBalanceDto;
 import com.fangyuanyouyue.wallet.dto.WalletDto;
 import com.fangyuanyouyue.wallet.model.*;
@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.SortedMap;
@@ -104,16 +103,16 @@ public class WalletServiceImpl implements WalletService{
             if(userInfoExt.getPayPwd()==null){
                 throw new ServiceException("请先设置支付密码再提现");
             }
-            if(MD5Util.verify(userInfoExt.getPayPwd(),MD5Util.MD5(payPwd)) == false){
+            if(MD5Util.verify(MD5Util.MD5(payPwd),userInfoExt.getPayPwd()) == false){
                 throw new ServiceException("支付密码错误！");
             }
             userWithdraw.setAccount(account);
             userWithdraw.setRealName(realName);
-        }else{
+        }/*else{
             //TODO 微信提现需要用户绑定微信账号
 
             userWithdraw.setAccount("用户unionID");
-        }
+        }*/
 
         userWithdrawMapper.insert(userWithdraw);
 
@@ -386,26 +385,27 @@ public class WalletServiceImpl implements WalletService{
     @Override
     public WechatPayDto orderPayByWechat(String orderNo, BigDecimal price,String notifyUrl) throws Exception {
 
-        SortedMap<Object, Object> parameters = PayCommonUtil.getWXPrePayID(notifyUrl); // 获取预付单，此处已做封装，需要工具类
-        parameters.put("body", "小方圆-微信在线支付");
-        parameters.put("spbill_create_ip", "127.0.0.1");
-        parameters.put("out_trade_no", orderNo);
-        parameters.put("total_fee", price.intValue()*100); // 测试时，每次支付一分钱，微信支付所传的金额是以分为单位的，因此实际开发中需要x100
-
-
-        // 设置签名
-        String sign = PayCommonUtil.createSign("UTF-8", parameters);
-        parameters.put("sign", sign);
-        // 封装请求参数结束
-
-        String requestXML = PayCommonUtil.getRequestXml(parameters); // 获取xml结果
-        System.out.println("封装请求参数是：" + requestXML);
-        // 调用统一下单接口
-        String result = PayCommonUtil.httpsRequest("https://api.mch.weixin.qq.com/pay/unifiedorder", "POST", requestXML);
-        System.out.println("调用统一下单接口：" + result);
-        WechatPayDto wechatPayDto = PayCommonUtil.startWXPay(result);
-        System.out.println("最终的结果是：" + wechatPayDto.toString());
-
+//        SortedMap<Object, Object> parameters = PayCommonUtil.getWXPrePayID(notifyUrl); // 获取预付单，此处已做封装，需要工具类
+//        parameters.put("body", "小方圆-微信在线支付");
+//        parameters.put("spbill_create_ip", "127.0.0.1");
+//        parameters.put("out_trade_no", orderNo);
+//        parameters.put("total_fee", price.intValue()*100); // 测试时，每次支付一分钱，微信支付所传的金额是以分为单位的，因此实际开发中需要x100
+//
+//
+//        // 设置签名
+//        String sign = PayCommonUtil.createSign("UTF-8", parameters);
+//        parameters.put("sign", sign);
+//        // 封装请求参数结束
+//
+//        String requestXML = PayCommonUtil.getRequestXml(parameters); // 获取xml结果
+//        System.out.println("封装请求参数是：" + requestXML);
+//        // 调用统一下单接口
+//        String result = PayCommonUtil.httpsRequest("https://api.mch.weixin.qq.com/pay/unifiedorder", "POST", requestXML);
+//        System.out.println("调用统一下单接口：" + result);
+//        WechatPayDto wechatPayDto = PayCommonUtil.startWXPay(result);
+//        System.out.println("最终的结果是：" + wechatPayDto.toString());
+        WechatPay util = new WechatPay();
+        WechatPayDto wechatPayDto= util.genOrder(orderNo, price.intValue()+"", "小方圆-微信在线支付", notifyUrl, "127.0.0.1");
         return wechatPayDto;
     }
 

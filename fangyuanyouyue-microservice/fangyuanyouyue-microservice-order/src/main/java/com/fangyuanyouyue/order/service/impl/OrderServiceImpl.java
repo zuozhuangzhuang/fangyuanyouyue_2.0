@@ -102,7 +102,7 @@ public class OrderServiceImpl implements OrderService{
         orderInfo.setAmount(amount);
         orderInfo.setCount(0);//商品数量，初始为0
         orderInfo.setStatus(1);//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
-        orderInfo.setAddTime(DateStampUtils.getTimesteamp());
+        orderInfo.setAddTime(new Date());
         orderInfoMapper.insert(orderInfo);
         //生成订单支付表
         OrderPay orderPay = new OrderPay();

@@ -629,7 +629,7 @@ public class UserController extends BaseController {
             String code = "1234";
             log.info("code---:"+code);
 
-            boolean result = schedualRedisService.set(param.getPhone(), code, 60l);
+            boolean result = schedualRedisService.set(param.getPhone(), code, 600l);
             log.info("缓存结果："+result);
             
             //redisTemplate.opsForValue().set(param.getPhone(),code);

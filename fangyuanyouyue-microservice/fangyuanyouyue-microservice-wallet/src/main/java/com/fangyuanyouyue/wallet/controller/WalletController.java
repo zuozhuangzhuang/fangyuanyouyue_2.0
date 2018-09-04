@@ -299,8 +299,8 @@ public class WalletController extends BaseController{
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "amount", value = "提现金额",  required = true,dataType = "BigDecimal", paramType = "query"),
-            @ApiImplicitParam(name = "type", value = "提现方式 1微信 2支付宝 ",required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "account", value = "支付宝账号(如果提现方试是支付宝，必填)", dataType = "String", paramType = "query"),
+//            @ApiImplicitParam(name = "type", value = "提现方式 1微信 2支付宝 ",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "account", value = "支付宝账号",required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "realName", value = "真实姓名",required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "payPwd", value = "支付密码",required = true, dataType = "String", paramType = "query")
     })
@@ -323,16 +323,16 @@ public class WalletController extends BaseController{
             if(param.getAmount()==null || param.getAmount().doubleValue()==0 ){
                 return toError("提现金额不能为空！");
             }
-            if(param.getType() == null){
-                return toError("提现方式不能为空！");
+//            if(param.getType() == null){
+//                return toError("提现方式不能为空！");
+//            }
+            if(param.getAmount().doubleValue() < 1){
+                return toError("提现金额不能少于1！");
             }
-            if(param.getAmount().doubleValue() < 100){
-                return toError("提现金额不能少于100！");
-            }
-            if("0".equals(param.getType()) && StringUtils.isEmpty(param.getAccount())){
+            if(StringUtils.isEmpty(param.getAccount())){
                 return toError("请输入支付宝账号！");
             }
-            if("0".equals(param.getType()) && StringUtils.isEmpty(param.getRealName())){
+            if(StringUtils.isEmpty(param.getRealName())){
                 return toError("真实姓名不能为空！");
             }
             //TODO 提现
