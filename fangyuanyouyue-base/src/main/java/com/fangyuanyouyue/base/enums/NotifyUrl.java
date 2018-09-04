@@ -7,7 +7,7 @@ public enum NotifyUrl {
 //    开发环境
     dev_notify("http://localhost:8769"),
 //    测试环境
-    test_notify("http://zuul.fangyuanyouyue.com:80"),
+    test_notify("http://zuul.fangyuanyouyue.com"),
 //    生产环境
     prod_notify(""),
 
