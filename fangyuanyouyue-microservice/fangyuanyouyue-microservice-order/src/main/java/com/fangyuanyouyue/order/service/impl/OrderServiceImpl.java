@@ -914,6 +914,12 @@ public class OrderServiceImpl implements OrderService{
             if(orderInfo.getStatus() != 1){
                 throw new ServiceException("订单状态错误！");
             }else{
+                OrderPay orderPay = orderPayMapper.selectByOrderId(orderInfo.getId());
+                orderPay.setStatus(2);
+                orderPay.setPayTime(DateStampUtils.getTimesteamp());
+                orderPay.setPayType(payType);
+                orderPayMapper.updateByPrimaryKeySelective(orderPay);
+
                 orderInfo.setStatus(2);
                 orderInfoMapper.updateByPrimaryKeySelective(orderInfo);
                 //获取商品名字列表
