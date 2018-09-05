@@ -466,7 +466,9 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         //如果商品status为已售出，获取商品所属订单ID
         if(goodsInfo.getStatus().intValue() == 2){
             OrderDetail orderDetail = orderDetailMapper.selectOrderByGoodsIdStatus(userId, goodsInfo.getId());
-            goodsDto.setOrderId(orderDetail.getOrderId());
+            if(orderDetail != null){
+                goodsDto.setOrderId(orderDetail.getOrderId());
+            }
         }
 
 
