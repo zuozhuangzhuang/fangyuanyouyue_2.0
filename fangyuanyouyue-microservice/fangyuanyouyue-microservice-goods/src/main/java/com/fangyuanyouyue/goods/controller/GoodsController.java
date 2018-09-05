@@ -221,7 +221,7 @@ public class GoodsController extends BaseController{
                 return toError("商品ID不能为空！");
             }
             for(Integer goodsId:param.getGoodsIds()){
-                //TODO 1、商品是否存在订单 2、订单是否已完成或已取消 3、订单已退款：是否已完成退款、是否已拒绝退款
+                //1、商品是否存在订单 2、订单是否已完成或已取消 3、订单已退款：是否已完成退款、是否已拒绝退款
                 GoodsInfo goodsInfo = goodsInfoService.selectByPrimaryKey(goodsId);
                 if(goodsInfo.getStatus() == 2){
                     OrderInfo orderInfo = orderInfoService.selectOrderByGoodsId(userId,goodsId);
@@ -233,7 +233,7 @@ public class GoodsController extends BaseController{
                 }
             }
 
-            //TODO 批量删除商品
+            //批量删除商品
             goodsInfoService.deleteGoods(userId,param.getGoodsIds());
             return toSuccess();
         } catch (ServiceException e) {

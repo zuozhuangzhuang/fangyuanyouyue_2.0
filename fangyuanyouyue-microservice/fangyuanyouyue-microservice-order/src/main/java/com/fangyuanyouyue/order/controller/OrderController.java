@@ -254,7 +254,7 @@ public class OrderController extends BaseController{
                 //TODO 非会员只能免费抢购一次，会员可无限制抢购——验证是否为会员
 
             }
-            //TODO 商品/抢购直接下单
+            //商品/抢购直接下单
             OrderDto orderDto = orderService.saveOrder(param.getToken(),param.getGoodsId(),param.getCouponId(), userId, param.getAddressId());
             return toSuccess(orderDto);
         } catch (ServiceException e) {
@@ -296,7 +296,7 @@ public class OrderController extends BaseController{
             if(param.getPayType()==null){
                 return toError("支付类型不能为空！");
             }
-            //TODO 订单支付
+            //订单支付
             Object payInfo = orderService.getOrderPay(userId, param.getOrderId(), param.getPayType(), param.getPayPwd());
             return toSuccess(payInfo);
         } catch (ServiceException e) {
@@ -626,7 +626,7 @@ public class OrderController extends BaseController{
         }
     }
 
-    //TODO 支付宝回调
+    //支付宝回调
     @ApiOperation(value = "申请官方鉴赏支付宝回调接口", notes = "支付宝回调", response = BaseResp.class,hidden = true)
     @RequestMapping(value = "/notify/alipay", method = RequestMethod.POST)
     @ResponseBody

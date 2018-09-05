@@ -42,7 +42,7 @@ public class RefundServiceImpl implements RefundService{
 
     @Override
     public void orderReturnToSeller(Integer userId, Integer orderId, String reason,String[] imgUrls) throws ServiceException {
-        //TODO 退货扣除用户积分
+        //TODO 退货扣除用户
         //1、检测订单状态 2、检测是否退货 3、新增退货 4、发送信息
         OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderId);
         if (orderInfo == null) {

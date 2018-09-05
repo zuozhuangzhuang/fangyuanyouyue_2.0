@@ -50,7 +50,8 @@ public class OrderDto {
 
     private Integer isEvaluation = 2;//是否已评价 1是 2否
 
-    //TODO 待付款时间，剩余收货时间，退货待处理时间，物流号，物流公司编号
+    private String receiveTime;//收货时间
+
     public OrderDto() {
     }
 
@@ -62,6 +63,9 @@ public class OrderDto {
         this.status = orderInfo.getStatus();
         this.addTime = DateUtil.getFormatDate(orderInfo.getAddTime(), DateUtil.DATE_FORMT);
         this.isRefund = orderInfo.getIsRefund();
+        if(orderInfo.getReceiveTime() != null){
+            this.receiveTime = DateUtil.getFormatDate(orderInfo.getReceiveTime(), DateUtil.DATE_FORMT);
+        }
     }
 
     public static ArrayList<OrderDto> toDtoList(List<OrderInfo> list) {

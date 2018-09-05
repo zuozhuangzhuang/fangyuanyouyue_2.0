@@ -9,10 +9,12 @@ import com.fangyuanyouyue.base.util.WechatUtil.WXPayUtil;
 import com.fangyuanyouyue.base.util.alipay.util.AlipayNotify;
 import com.fangyuanyouyue.wallet.dto.BillMonthDto;
 import com.fangyuanyouyue.wallet.dto.UserBalanceDto;
+import com.fangyuanyouyue.wallet.dto.UserCouponDto;
 import com.fangyuanyouyue.wallet.dto.WalletDto;
 import com.fangyuanyouyue.wallet.param.WalletParam;
 import com.fangyuanyouyue.wallet.service.SchedualRedisService;
 import com.fangyuanyouyue.wallet.service.SchedualUserService;
+import com.fangyuanyouyue.wallet.service.UserCouponService;
 import com.fangyuanyouyue.wallet.service.WalletService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -51,6 +53,8 @@ public class WalletController extends BaseController{
     private SchedualUserService schedualUserService;
     @Autowired
     private SchedualRedisService schedualRedisService;
+    @Autowired
+    private UserCouponService userCouponService;
 
     @ApiOperation(value = "充值", notes = "(void)充值",response = BaseResp.class)
     @ApiImplicitParams({
@@ -83,7 +87,7 @@ public class WalletController extends BaseController{
             if(param.getType() == null){
                 return toError("充值方式不能为空！");
             }
-            //TODO 充值
+            //充值
             Object payInfo = walletService.recharge(userId, param.getAmount(), param.getType());
             return toSuccess(payInfo);
         } catch (ServiceException e) {
@@ -454,7 +458,7 @@ public class WalletController extends BaseController{
             if(param.getLimit() == null || param.getLimit() < 1){
                 return toError("每页个数错误！");
             }
-            //TODO 余额账单
+            //余额账单
             List<UserBalanceDto> dtoList = walletService.billList(userId, param.getStart(), param.getLimit(), param.getType(),param.getDate());
             return toSuccess(dtoList);
         } catch (ServiceException e) {
@@ -491,9 +495,43 @@ public class WalletController extends BaseController{
             if(param.getOrderNo() == null){
                 return toError("订单号不能为空！");
             }
-            //TODO 余额账单详情
+            //余额账单详情
             UserBalanceDto dto = walletService.billDetail(userId, param.getOrderNo());
             return toSuccess(dto);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+
+    @ApiOperation(value = "获取用户的优惠券列表", notes = "(UserCouponDto)根据用户id获取优惠券列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query")
+    })
+    @PostMapping(value = "/getUserCouponList")
+    @ResponseBody
+    public BaseResp getUserCouponList(WalletParam param) throws IOException {
+        try {
+            log.info("----》根据用户id获取优惠券列表《----");
+            log.info("参数："+param.toString());
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError("用户token不能为空！");
+            }
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            String verifyUser = schedualUserService.verifyUserById(userId);
+            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+            if(jsonObject != null && (Integer)jsonObject.get("code") != 0){
+                return toError(jsonObject.getString("report"));
+            }
+
+            //根据用户id获取优惠券列表
+            List<UserCouponDto> listByUserId = userCouponService.getListByUserId(userId);
+            return toSuccess(listByUserId);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());

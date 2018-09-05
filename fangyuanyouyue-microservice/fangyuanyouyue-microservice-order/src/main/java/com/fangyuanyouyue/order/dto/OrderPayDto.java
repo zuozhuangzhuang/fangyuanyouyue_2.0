@@ -1,5 +1,6 @@
 package com.fangyuanyouyue.order.dto;
 
+import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.order.model.OrderInfo;
 import com.fangyuanyouyue.order.model.OrderPay;
 import lombok.Getter;
@@ -8,6 +9,7 @@ import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -50,6 +52,12 @@ public class OrderPayDto {
 
     private String sellerReturnStatus;//卖家是否同意退货状态 null正常  1申请退货 2卖家直接同意退货 3卖家直接拒绝退货 4卖家48h不处理默认同意退货 5卖家72h小时不处理默认不同意退货
 
+    //TODO 待付款时间，剩余收货时间，退货待处理时间，物流号，物流公司编号
+
+    private String payTime;//支付时间
+
+    private String sendTime;//发货时间
+
     public OrderPayDto() {
     }
 
@@ -68,6 +76,12 @@ public class OrderPayDto {
         this.freight = orderPay.getFreight();
         this.count = orderPay.getCount();
         this.status = orderPay.getStatus();
+        if(orderPay.getPayTime() != null){
+            this.payTime = DateUtil.getFormatDate(orderPay.getPayTime(),DateUtil.DATE_FORMT);
+        }
+        if(orderPay.getSendTime() != null){
+            this.sendTime = DateUtil.getFormatDate(orderPay.getSendTime(),DateUtil.DATE_FORMT);
+        }
     }
 
     public static ArrayList<OrderPayDto> toDtoList(List<OrderPay> list) {

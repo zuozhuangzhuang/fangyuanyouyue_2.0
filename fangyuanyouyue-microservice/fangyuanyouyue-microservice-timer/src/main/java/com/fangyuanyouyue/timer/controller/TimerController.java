@@ -131,4 +131,9 @@ public class TimerController extends BaseController {
         }
     }
 
+    //TODO 优惠券自动过期
+
+    //TODO 官方认证自动过期（一年）
+
+
 }

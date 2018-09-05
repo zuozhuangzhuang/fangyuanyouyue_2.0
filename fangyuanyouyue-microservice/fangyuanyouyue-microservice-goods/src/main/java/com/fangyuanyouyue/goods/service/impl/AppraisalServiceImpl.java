@@ -114,7 +114,7 @@ public class AppraisalServiceImpl implements AppraisalService{
                 }
             }
         }else{//用户提交图片或视频进行鉴定
-            //TODO 先查询用户免费鉴定次数，如果是 我要鉴定，且有免费鉴定次数，直接鉴定
+            //先查询用户免费鉴定次数，如果是 我要鉴定，且有免费鉴定次数，直接鉴定
             Integer appraisalCount = JSONObject.parseObject(schedualWalletService.getAppraisalCount(userId)).getInteger("data");
             GoodsAppraisalDetail goodsAppraisalDetail = new GoodsAppraisalDetail();
             goodsAppraisalDetail.setUserId(userId);
@@ -156,7 +156,7 @@ public class AppraisalServiceImpl implements AppraisalService{
         appraisalOrderInfoMapper.updateByPrimaryKey(appraisalOrderInfo);
         AppraisalOrderInfoDto appraisalOrderInfoDto = new AppraisalOrderInfoDto(appraisalOrderInfo);
         appraisalOrderInfoDto.setGoodsNames(goodsNames);
-        //TODO 用户需要支付对应的资金才可以鉴定成功
+        //用户需要支付对应的资金才可以鉴定成功
         return appraisalOrderInfoDto;
     }
 
@@ -179,7 +179,7 @@ public class AppraisalServiceImpl implements AppraisalService{
 
     @Override
     public void cancelAppraisal(Integer userId, Integer orderId) throws ServiceException {
-        //TODO 取消鉴定时删除鉴定订单
+        //取消鉴定时删除鉴定订单
         AppraisalOrderInfo appraisalOrderInfo = appraisalOrderInfoMapper.selectByPrimaryKey(orderId);
         if(appraisalOrderInfo == null){
             throw new ServiceException("获取鉴定信息失败！");
@@ -237,10 +237,10 @@ public class AppraisalServiceImpl implements AppraisalService{
             throw new ServiceException("订单不存在！");
         }else{
             StringBuffer payInfo = new StringBuffer();
-            if(payType.intValue() == 1){//TODO 微信,如果回调失败就不做处理，成功就在回调接口中继续订单支付
+            if(payType.intValue() == 1){//微信,如果回调失败就不做处理，成功就在回调接口中继续订单支付
                 WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderInfo.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.appraisal_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
                 return wechatPayDto;
-            }else if(payType.intValue() == 2){//TODO 支付宝,如果回调失败就不做处理，成功就在回调接口中继续订单支付
+            }else if(payType.intValue() == 2){//支付宝,如果回调失败就不做处理，成功就在回调接口中继续订单支付
                 String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(orderInfo.getOrderNo(), orderInfo.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.appraisal_alipay_notify.getNotifUrl())).getString("data");
                 payInfo.append(info);
             }else if(payType.intValue() == 3) {//余额
