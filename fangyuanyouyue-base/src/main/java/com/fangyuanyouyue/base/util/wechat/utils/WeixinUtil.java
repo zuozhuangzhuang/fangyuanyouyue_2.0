@@ -108,7 +108,7 @@ public class WeixinUtil {
 			inputStream.close();
 			inputStream = null;
 			httpUrlConn.disconnect();
-			System.out.println("buffer:\n"+buffer.toString());//TODO 
+			System.out.println("buffer:\n"+buffer.toString());
 			jsonObject = JSONObject.parseObject(buffer.toString());
 		} catch (ConnectException ce) {
 			log.info("Weixin server connection timed out.");

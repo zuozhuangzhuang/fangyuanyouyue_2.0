@@ -36,4 +36,9 @@ public class SchedualWalletServiceImpl implements SchedualWalletService{
     public String addUserBalanceDetail(Integer userId, BigDecimal amount, Integer payType, Integer type, String orderNo, String title, Integer sellerId, Integer buyerId, Integer orderType) {
         return "新增用户收支信息失败！";
     }
+
+    @Override
+    public String getPriceByCoupon(Integer userId,BigDecimal price, Integer couponId) {
+        return "价格计算失败！";
+    }
 }

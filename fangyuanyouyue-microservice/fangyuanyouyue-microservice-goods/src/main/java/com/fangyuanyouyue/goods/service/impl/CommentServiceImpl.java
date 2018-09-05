@@ -152,7 +152,7 @@ public class CommentServiceImpl implements CommentService{
 
     @Override
     public List<GoodsCommentDto> myComments(Integer userId, Integer type, Integer start, Integer limit) throws ServiceException {
-        //TODO 根据用户ID获取所有user_id为userId且status=1的评论，按照时间排序，并根据评论商品ID获取商品信息，根据userId获取用户信息
+        //根据用户ID获取所有user_id为userId且status=1的评论，按照时间排序，并根据评论商品ID获取商品信息，根据userId获取用户信息
         List<Map<String, Object>> maps = goodsCommentMapper.selectByUserId(userId, start * limit, limit);
         List<GoodsCommentDto> goodsCommentDtos = GoodsCommentDto.mapToDtoList(maps);
         Iterator<GoodsCommentDto> it = goodsCommentDtos.iterator();

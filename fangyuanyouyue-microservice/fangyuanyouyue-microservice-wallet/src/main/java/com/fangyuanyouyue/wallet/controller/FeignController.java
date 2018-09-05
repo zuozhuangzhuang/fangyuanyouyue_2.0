@@ -4,11 +4,9 @@ import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.wallet.dto.UserCouponDto;
 import com.fangyuanyouyue.wallet.param.WalletParam;
-import com.fangyuanyouyue.wallet.service.SchedualOrderService;
-import com.fangyuanyouyue.wallet.service.SchedualRedisService;
-import com.fangyuanyouyue.wallet.service.SchedualUserService;
-import com.fangyuanyouyue.wallet.service.WalletService;
+import com.fangyuanyouyue.wallet.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
@@ -20,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Controller
 @RequestMapping(value = "/walletFeign")
@@ -38,6 +37,8 @@ public class FeignController extends BaseController{
     private SchedualRedisService schedualRedisService;
     @Autowired
     private SchedualOrderService schedualOrderService;
+    @Autowired
+    private UserCouponService userCouponService;
 
 
     @PostMapping(value = "/updateScore")
@@ -232,6 +233,32 @@ public class FeignController extends BaseController{
             //新增用户收支信息
             walletService.addUserBalanceDetail(userId,amount,payType,type,orderNo,title,orderType,sellerId,buyerId);
             return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+
+    @ApiOperation(value = "根据优惠券id计算价格", notes = "(BigDecimal)计算后价格",hidden = true)
+    @PostMapping(value = "/getPriceByCoupon")
+    @ResponseBody
+    public BaseResp getPriceByCoupon(Integer userId,BigDecimal price,Integer couponId) throws IOException {
+        try {
+            log.info("----》根据优惠券id计算价格《----");
+            log.info("参数:userId="+userId+",price="+price+",couponId="+couponId);
+            if(price == null || price.compareTo(new BigDecimal(0))<=0){
+                return toError("价格错误！");
+            }
+            if(couponId == null){
+                return toError("优惠券id不能为空！");
+            }
+            //根据优惠券id计算价格
+            BigDecimal priceByCoupon = userCouponService.getPriceByCoupon(userId,price, couponId);
+            return toSuccess(priceByCoupon);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());

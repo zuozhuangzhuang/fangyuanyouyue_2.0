@@ -10,14 +10,15 @@
     <result column="count" jdbcType="INTEGER" property="count" />
     <result column="status" jdbcType="INTEGER" property="status" />
     <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
-    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="seller_id" jdbcType="INTEGER" property="sellerId" />
     <result column="is_resolve" jdbcType="INTEGER" property="isResolve" />
     <result column="is_refund" jdbcType="INTEGER" property="isRefund" />
+    <result column="receive_time" jdbcType="TIMESTAMP" property="receiveTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, user_id, main_order_id, order_no, amount, count, status, add_time, update_time, 
-    seller_id, is_resolve, is_refund
+    id, user_id, main_order_id, order_no, amount, count, status, add_time, seller_id, 
+    is_resolve, is_refund, receive_time, update_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -32,16 +33,16 @@
   <insert id="insert" parameterType="com.fangyuanyouyue.order.model.OrderInfo" useGeneratedKeys="true" keyProperty="id">
     insert into order_info (id, user_id, main_order_id, 
       order_no, amount, count, 
-      status, add_time, update_time, 
-      seller_id, is_resolve, is_refund
-      )
+      status, add_time, seller_id, 
+      is_resolve, is_refund, receive_time, 
+      update_time)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{mainOrderId,jdbcType=INTEGER}, 
       #{orderNo,jdbcType=VARCHAR}, #{amount,jdbcType=DECIMAL}, #{count,jdbcType=INTEGER}, 
-      #{status,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{sellerId,jdbcType=INTEGER}, #{isResolve,jdbcType=INTEGER}, #{isRefund,jdbcType=INTEGER}
-      )
+      #{status,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, #{sellerId,jdbcType=INTEGER}, 
+      #{isResolve,jdbcType=INTEGER}, #{isRefund,jdbcType=INTEGER}, #{receiveTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.order.model.OrderInfo">
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.order.model.OrderInfo" useGeneratedKeys="true" keyProperty="id">
     insert into order_info
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -68,9 +69,6 @@
       <if test="addTime != null">
         add_time,
       </if>
-      <if test="updateTime != null">
-        update_time,
-      </if>
       <if test="sellerId != null">
         seller_id,
       </if>
@@ -79,6 +77,12 @@
       </if>
       <if test="isRefund != null">
         is_refund,
+      </if>
+      <if test="receiveTime != null">
+        receive_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -106,9 +110,6 @@
       <if test="addTime != null">
         #{addTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null">
-        #{updateTime,jdbcType=TIMESTAMP},
-      </if>
       <if test="sellerId != null">
         #{sellerId,jdbcType=INTEGER},
       </if>
@@ -117,6 +118,12 @@
       </if>
       <if test="isRefund != null">
         #{isRefund,jdbcType=INTEGER},
+      </if>
+      <if test="receiveTime != null">
+        #{receiveTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -144,9 +151,6 @@
       <if test="addTime != null">
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
-      </if>
       <if test="sellerId != null">
         seller_id = #{sellerId,jdbcType=INTEGER},
       </if>
@@ -155,6 +159,12 @@
       </if>
       <if test="isRefund != null">
         is_refund = #{isRefund,jdbcType=INTEGER},
+      </if>
+      <if test="receiveTime != null">
+        receive_time = #{receiveTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -168,10 +178,11 @@
       count = #{count,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       seller_id = #{sellerId,jdbcType=INTEGER},
       is_resolve = #{isResolve,jdbcType=INTEGER},
-      is_refund = #{isRefund,jdbcType=INTEGER}
+      is_refund = #{isRefund,jdbcType=INTEGER},
+      receive_time = #{receiveTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
 

@@ -94,7 +94,7 @@ public class UserVipController extends BaseController{
                     return toError("支付密码不能为空！");
                 }
             }
-            //TODO 开通/续费会员 下单
+            //开通/续费会员 下单
             Object payInfo = userVipService.addVipOrder(userId, param.getVipLevel(), param.getVipType(), param.getType(), param.getPayType(), param.getPayPwd());
             return toSuccess(payInfo);
         } catch (ServiceException e) {

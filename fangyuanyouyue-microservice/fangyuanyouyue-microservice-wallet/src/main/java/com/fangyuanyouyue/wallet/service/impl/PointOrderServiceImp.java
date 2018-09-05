@@ -49,7 +49,7 @@ public class PointOrderServiceImp implements PointOrderService{
 			throw new ServiceException("该商品已经被抢光啦，再次早点来哦");
 		}
 
-		//TODO 1 减库存 2 扣除积分 3 保存订单信息 4 保存用户优惠券
+		//1 减库存 2 扣除积分 3 保存订单信息 4 保存用户优惠券
 		Integer count = coupon.getCount();
 		coupon.setCount(count-1);
 		couponInfoMapper.updateByPrimaryKey(coupon);

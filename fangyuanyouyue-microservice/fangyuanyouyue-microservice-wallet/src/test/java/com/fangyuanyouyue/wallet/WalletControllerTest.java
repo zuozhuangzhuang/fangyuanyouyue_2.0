@@ -47,7 +47,7 @@ public class WalletControllerTest {
      * @throws Exception
      */
     @Test
-    @Transactional
+//    @Transactional
     public void recharge() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/wallet/recharge")
                 .param("token","10025FY1533317806918")
@@ -63,7 +63,7 @@ public class WalletControllerTest {
      * @throws Exception
      */
     @Test
-    @Transactional
+//    @Transactional
     public void withdrawDeposit() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/wallet/withdrawDeposit")
                 .param("token","10025FY1533317806918")
@@ -82,7 +82,7 @@ public class WalletControllerTest {
      * @throws Exception
      */
     @Test
-    @Transactional
+//    @Transactional
     public void getWallet() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/wallet/getWallet")
                 .param("token","10025FY1533317806918")
@@ -96,7 +96,7 @@ public class WalletControllerTest {
      * @throws Exception
      */
     @Test
-    @Transactional
+//    @Transactional
     public void updatePayPwd() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/wallet/updatePayPwd")
                 .param("token","10045FY1534236594430")
@@ -112,7 +112,7 @@ public class WalletControllerTest {
      * @throws Exception
      */
     @Test
-    @Transactional
+//    @Transactional
     public void billList() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/wallet/billList")
                 .param("token","10045FY1535599469421")
@@ -120,6 +120,20 @@ public class WalletControllerTest {
                 .param("limit","10")
                 .param("date","2018-09")
                 .param("type","")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 余额账单列表
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void getUserCouponList() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/wallet/getUserCouponList")
+                .param("token","10045FY1535599469421")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

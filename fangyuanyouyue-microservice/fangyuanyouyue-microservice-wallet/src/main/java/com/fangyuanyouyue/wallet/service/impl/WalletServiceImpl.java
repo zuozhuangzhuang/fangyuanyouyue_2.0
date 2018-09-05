@@ -12,8 +12,10 @@ import com.fangyuanyouyue.base.util.alipay.util.GenOrderUtil;
 import com.fangyuanyouyue.base.util.wechat.pay.WechatPay;
 import com.fangyuanyouyue.wallet.dao.*;
 import com.fangyuanyouyue.wallet.dto.UserBalanceDto;
+import com.fangyuanyouyue.wallet.dto.UserCouponDto;
 import com.fangyuanyouyue.wallet.dto.WalletDto;
 import com.fangyuanyouyue.wallet.model.*;
+import com.fangyuanyouyue.wallet.service.UserCouponService;
 import com.fangyuanyouyue.wallet.service.WalletService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,8 @@ public class WalletServiceImpl implements WalletService{
     private UserInfoMapper userInfoMapper;
     @Autowired
     private UserWithdrawMapper userWithdrawMapper;
+    @Autowired
+    private UserCouponService userCouponService;
 
     @Override
     public Object recharge(Integer userId, BigDecimal amount, Integer type) throws Exception {
@@ -116,7 +120,7 @@ public class WalletServiceImpl implements WalletService{
 
         userWithdrawMapper.insert(userWithdraw);
 
-        //TODO 根据用户会员等级扣除不同手续费
+        //根据用户会员等级扣除不同手续费
         UserVip userVip = userVipMapper.selectByUserId(userId);
         Integer vipLevel = userVip.getVipLevel();//会员等级
         BigDecimal charge;//手续费
@@ -166,6 +170,9 @@ public class WalletServiceImpl implements WalletService{
                 }else{
                     throw new ServiceException("信誉度错误！");
                 }
+//                //获取用户优惠券列表
+//                List<UserCouponDto> listByUserId = userCouponService.getListByUserId(userId);
+//                walletDto.setCouponDtos(listByUserId);
                 return walletDto;
             }
         }
@@ -260,7 +267,6 @@ public class WalletServiceImpl implements WalletService{
                 throw new ServiceException("类型错误！");
             }
             userWalletMapper.updateByPrimaryKey(userWallet);
-            //TODO 新增用户账单信息(加一个title参数，访问修改余额接口时传递订单名称)
             return true;
         }
     }

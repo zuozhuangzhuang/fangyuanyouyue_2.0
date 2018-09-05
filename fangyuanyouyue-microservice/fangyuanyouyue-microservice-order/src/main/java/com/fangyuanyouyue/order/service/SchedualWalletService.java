@@ -81,4 +81,12 @@ public interface SchedualWalletService {
                           @RequestParam(value = "title")String title,@RequestParam(value = "sellerId")Integer sellerId,
                           @RequestParam(value = "buyerId")Integer buyerId,@RequestParam(value = "orderType")Integer orderType);
 
+    /**
+     * 根据优惠券id计算价格
+     * @param price
+     * @param couponId
+     * @return
+     */
+    @RequestMapping(value = "/walletFeign/getPriceByCoupon",method = RequestMethod.POST)
+    String getPriceByCoupon(@RequestParam(value = "userId") Integer userId,@RequestParam(value = "price") BigDecimal price,@RequestParam(value = "couponId") Integer couponId);
 }

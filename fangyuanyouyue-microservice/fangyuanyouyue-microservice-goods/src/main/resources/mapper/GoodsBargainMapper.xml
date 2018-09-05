@@ -183,14 +183,14 @@
     order by add_time desc
   </select>
   <select id="selectAllByUserId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from goods_bargain
+    select a.* from goods_bargain a,goods_info b
     <where>
-      1=1
+      a.goods_id = b.id
       <if test="userId != null">
-        and user_id = #{userId}
+        and b.user_id = #{userId}
       </if>
       <if test="status != null">
-        and status = #{status}
+        and a.status = #{status}
       </if>
     </where>
   </select>

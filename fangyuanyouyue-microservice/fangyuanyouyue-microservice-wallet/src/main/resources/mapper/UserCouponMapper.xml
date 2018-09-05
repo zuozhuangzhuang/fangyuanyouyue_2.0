@@ -8,6 +8,11 @@
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="add_time" property="addTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="coupon_type" property="couponType" jdbcType="INTEGER" />
+    <result column="coupon_amount" property="couponAmount" jdbcType="DECIMAL" />
+    <result column="condition_amount" property="conditionAmount" jdbcType="DECIMAL" />
+    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, user_id, coupon_id, status, add_time, update_time
@@ -103,4 +108,12 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectUserCouponDetail" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    select a.*,b.coupon_type,b.coupon_amount,b.condition_amount,b.start_time,b.end_time from user_coupon a,coupon_info b where a.coupon_id = b.id and a.user_id = #{userId} and a.id = #{id} and a.status = 1
+  </select>
+
+  <select id="getListByUserId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select a.*,b.coupon_type,b.coupon_amount,b.condition_amount,b.start_time,b.end_time from user_coupon a,coupon_info b where a.coupon_id = b.id and a.user_id = #{userId} and a.status = 1
+  </select>
 </mapper>

@@ -320,7 +320,7 @@ public class UserController extends BaseController {
 //                    }
                 }
             }
-            //TODO 完善资料
+            //完善资料
             userInfoService.modify(param);
             return toSuccess();
         } catch (ServiceException e) {
@@ -1059,7 +1059,7 @@ public class UserController extends BaseController {
         }
     }
 
-    //TODO 支付宝回调
+    //支付宝回调
     @ApiOperation(value = "申请官方认证支付宝回调接口", notes = "官方认证支付宝回调", response = BaseResp.class,hidden = true)
     @RequestMapping(value = "/notify/alipay", method = RequestMethod.POST)
     @ResponseBody
