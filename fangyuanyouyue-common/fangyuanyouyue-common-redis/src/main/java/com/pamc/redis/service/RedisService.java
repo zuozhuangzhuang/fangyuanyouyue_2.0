@@ -37,7 +37,11 @@ public class RedisService {
   public boolean set(String key, String value, Long expire) {
     boolean flag = false;
     try {
-      this.redisTemplate.opsForValue().set(key, value, expire, TimeUnit.SECONDS);
+      if(value == null){
+        this.redisTemplate.opsForValue().set(key, value);
+      }else{
+        this.redisTemplate.opsForValue().set(key, value, expire, TimeUnit.SECONDS);
+      }
       flag = this.redisTemplate.opsForValue().get(key) == null
           || "".equals(this.redisTemplate.opsForValue().get(key)) ? false : true;
     } catch (Exception e) {

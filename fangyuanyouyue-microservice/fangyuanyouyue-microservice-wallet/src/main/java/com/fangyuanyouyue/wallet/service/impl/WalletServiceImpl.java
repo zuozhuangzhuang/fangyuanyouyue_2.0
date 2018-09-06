@@ -71,11 +71,11 @@ public class WalletServiceImpl implements WalletService{
 
         if(type.intValue() == 1){
             //微信
-            WechatPayDto wechatPayDto = orderPayByWechat(userRechargeDetail.getPayNo(), userRechargeDetail.getAmount(), NotifyUrl.recharge_wechat_notify.getNotifUrl());
+            WechatPayDto wechatPayDto = orderPayByWechat(userRechargeDetail.getPayNo(), userRechargeDetail.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.recharge_wechat_notify.getNotifUrl());
             return wechatPayDto;
         }else if(type.intValue() == 2){
             //支付宝
-            String aliPay = orderPayByALi(userRechargeDetail.getPayNo(), userRechargeDetail.getAmount(), NotifyUrl.recharge_alipay_notify.getNotifUrl());
+            String aliPay = orderPayByALi(userRechargeDetail.getPayNo(), userRechargeDetail.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.recharge_alipay_notify.getNotifUrl());
             return aliPay;
         }else if(type.intValue() == 3){
             //小程序
@@ -198,7 +198,6 @@ public class WalletServiceImpl implements WalletService{
                 if(updateScore < 0){
                     throw new ServiceException("积分不足！");
                 }
-                userWallet.setScore(updateScore);
                 userWallet.setPoint(updateScore);
             }
             userWalletMapper.updateByPrimaryKey(userWallet);
@@ -283,6 +282,7 @@ public class WalletServiceImpl implements WalletService{
 
     @Override
     public void updateAppraisalCount(Integer userId, Integer count) throws ServiceException {
+        //TODO 只做了减少次数
         UserWallet userWallet = userWalletMapper.selectByUserId(userId);
         if(userWallet == null){
             throw new ServiceException("获取钱包信息失败！");

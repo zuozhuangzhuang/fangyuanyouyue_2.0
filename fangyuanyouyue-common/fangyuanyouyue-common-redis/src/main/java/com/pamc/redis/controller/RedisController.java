@@ -1,6 +1,7 @@
 package com.pamc.redis.controller;
 
 import com.fangyuanyouyue.base.BaseController;
+import com.fangyuanyouyue.base.BaseResp;
 import com.pamc.redis.param.RedisParam;
 import com.pamc.redis.service.RedisService;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 
 /**
  * 
@@ -49,5 +51,16 @@ public class RedisController extends BaseController {
 	@ResponseBody
 	public Object getObject(String key) {
 		return redisService.get(key);
+	}
+	/**
+	 * 根据key查询token
+	 *
+	 * @param key
+	 * @return
+	 */
+	@PostMapping(value = "/getToken")
+	@ResponseBody
+	public BaseResp getToken(String key) throws IOException {
+		return toSuccess(redisService.get(key));
 	}
 }

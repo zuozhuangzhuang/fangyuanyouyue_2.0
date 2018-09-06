@@ -26,7 +26,7 @@
     select 
     a.*,b.nick_name,b.head_img_url
     from forum_likes a,user_info b
-    where a.user_id=b.id and forum_id=#{forumId} order by a.add_time desc limit #{start},#{limit}
+    where a.user_id=b.id and a.forum_id=#{forumId} and b.status <![CDATA[ <> ]]> 3 order by a.add_time desc limit #{start},#{limit}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from forum_likes

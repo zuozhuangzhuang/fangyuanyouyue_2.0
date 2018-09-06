@@ -15,7 +15,7 @@ import java.util.Date;
 public class UserVip {
     private Integer id;//唯一自增ID
 
-    private Integer userId;//用户id，user_info id
+    private Integer userId;//用户id
 
     private Date startTime;//会员开通时间
 

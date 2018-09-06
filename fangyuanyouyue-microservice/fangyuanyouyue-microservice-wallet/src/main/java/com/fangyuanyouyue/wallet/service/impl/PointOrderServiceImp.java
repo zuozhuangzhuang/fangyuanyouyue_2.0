@@ -2,6 +2,7 @@ package com.fangyuanyouyue.wallet.service.impl;
 
 import java.util.Date;
 
+import com.fangyuanyouyue.wallet.service.UserCouponService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +33,7 @@ public class PointOrderServiceImp implements PointOrderService{
     @Autowired
     private CouponInfoMapper couponInfoMapper;
     @Autowired
-    private UserCouponMapper userCouponMapper;
+    private UserCouponService userCouponService;
     @Autowired
     private WalletService walletService;
 
@@ -75,12 +76,7 @@ public class PointOrderServiceImp implements PointOrderService{
 		pointOrderMapper.insert(order);
 		
 		//保存用户优惠券
-		UserCoupon userCoupon = new UserCoupon();
-		userCoupon.setAddTime(new Date());
-		userCoupon.setCouponId(coupon.getId());
-		userCoupon.setStatus(StatusEnum.COUPON_NOTUSE.getCode());
-		userCoupon.setUserId(userId);
-		userCouponMapper.insert(userCoupon);
+		userCouponService.insertUserCoupon(userId,coupon.getId());
 		
 		
 	}

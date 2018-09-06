@@ -16,4 +16,9 @@ public class SchedualRedisServiceImpl implements SchedualRedisService{
 	public Object get(String key) {
 		return "系统繁忙";
 	}
+
+	@Override
+	public String getToken(String key) {
+		return "获取token失败！";
+	}
 }

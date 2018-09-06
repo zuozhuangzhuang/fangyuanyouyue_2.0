@@ -15,7 +15,7 @@ import java.util.Date;
 public class UserAddressInfo {
     private Integer id;//唯一自增ID
 
-    private Integer userId;//用户id，user_info id
+    private Integer userId;//用户id
 
     private String receiverName;//收货人
 

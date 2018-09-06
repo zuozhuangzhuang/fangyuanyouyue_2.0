@@ -200,7 +200,7 @@
   <select id="selectGoodsIdsByUserId" parameterType="Integer" resultType="Integer">
     select DISTINCT a.goods_id from goods_bargain a,goods_info b,user_info c
     <where>
-      a.is_delete = 2 and a.goods_id = b.id and b.user_id = c.id and b.status <![CDATA[ <> ]]> 5
+      a.is_delete = 2 and a.goods_id = b.id and b.user_id = c.id and b.status <![CDATA[ <> ]]> 5 and c.status <![CDATA[ <> ]]> 3
       <if test="userId != null">
         and a.user_id = #{userId}
       </if>

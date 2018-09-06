@@ -58,7 +58,37 @@ public class ScoreControllerTest {
 //    @Transactional
     public void lottery() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/score/lottery")
-                .param("token","10025FY1533837647461")
+                .param("token","10025FY1536135283895")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 积分商品列表
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void goodsList() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/score/goodsList")
+                .param("start","0")
+                .param("limit","10")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 兑换商品
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void goodsBuy() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/score/goodsBuy")
+                .param("token","10025FY1536135283895")
+                .param("goodsId","10")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

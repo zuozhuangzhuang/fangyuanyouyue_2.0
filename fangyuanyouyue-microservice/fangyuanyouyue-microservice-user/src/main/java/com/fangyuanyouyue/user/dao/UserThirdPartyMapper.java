@@ -28,8 +28,8 @@ public interface UserThirdPartyMapper {
 
     /**
      * 根据用户ID获取用户第三方信息
-     * @param userId
      * @return
+     * @param id
      */
-    UserThirdParty getUserThirdByUserId(Integer userId);
+    UserThirdParty getUserThirdByUserId(Integer id);
 }

@@ -1,93 +1,128 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.fangyuanyouyue.wallet.dao.BonusPoolMapper" >
-  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.wallet.model.BonusPool" >
-    <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="bonus_name" property="bonusName" jdbcType="VARCHAR" />
-    <result column="probability" property="probability" jdbcType="DOUBLE" />
-    <result column="add_time" property="addTime" jdbcType="TIMESTAMP" />
-    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangyuanyouyue.wallet.dao.BonusPoolMapper">
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.wallet.model.BonusPool">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="bonus_name" jdbcType="VARCHAR" property="bonusName" />
+    <result column="probability" jdbcType="DOUBLE" property="probability" />
+    <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="score" jdbcType="BIGINT" property="score" />
+    <result column="coupon_id" jdbcType="INTEGER" property="couponId" />
   </resultMap>
-  <sql id="Base_Column_List" >
-    id, bonus_name, probability, add_time, update_time
+  <sql id="Base_Column_List">
+    id, bonus_name, probability, add_time, update_time, type, score, coupon_id
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from bonus_pool
     where id = #{id,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from bonus_pool
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.fangyuanyouyue.wallet.model.BonusPool" useGeneratedKeys="true" keyProperty="id">
     insert into bonus_pool (id, bonus_name, probability, 
-      add_time, update_time)
+      add_time, update_time, type, 
+      score, coupon_id)
     values (#{id,jdbcType=INTEGER}, #{bonusName,jdbcType=VARCHAR}, #{probability,jdbcType=DOUBLE}, 
-      #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+      #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{type,jdbcType=INTEGER}, 
+      #{score,jdbcType=BIGINT}, #{couponId,jdbcType=INTEGER})
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.wallet.model.BonusPool" >
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.wallet.model.BonusPool" useGeneratedKeys="true" keyProperty="id">
     insert into bonus_pool
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         id,
       </if>
-      <if test="bonusName != null" >
+      <if test="bonusName != null">
         bonus_name,
       </if>
-      <if test="probability != null" >
+      <if test="probability != null">
         probability,
       </if>
-      <if test="addTime != null" >
+      <if test="addTime != null">
         add_time,
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         update_time,
       </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="score != null">
+        score,
+      </if>
+      <if test="couponId != null">
+        coupon_id,
+      </if>
     </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         #{id,jdbcType=INTEGER},
       </if>
-      <if test="bonusName != null" >
+      <if test="bonusName != null">
         #{bonusName,jdbcType=VARCHAR},
       </if>
-      <if test="probability != null" >
+      <if test="probability != null">
         #{probability,jdbcType=DOUBLE},
       </if>
-      <if test="addTime != null" >
+      <if test="addTime != null">
         #{addTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="score != null">
+        #{score,jdbcType=BIGINT},
+      </if>
+      <if test="couponId != null">
+        #{couponId,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.wallet.model.BonusPool" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.wallet.model.BonusPool">
     update bonus_pool
-    <set >
-      <if test="bonusName != null" >
+    <set>
+      <if test="bonusName != null">
         bonus_name = #{bonusName,jdbcType=VARCHAR},
       </if>
-      <if test="probability != null" >
+      <if test="probability != null">
         probability = #{probability,jdbcType=DOUBLE},
       </if>
-      <if test="addTime != null" >
+      <if test="addTime != null">
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="score != null">
+        score = #{score,jdbcType=BIGINT},
+      </if>
+      <if test="couponId != null">
+        coupon_id = #{couponId,jdbcType=INTEGER},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.wallet.model.BonusPool" >
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.wallet.model.BonusPool">
     update bonus_pool
     set bonus_name = #{bonusName,jdbcType=VARCHAR},
       probability = #{probability,jdbcType=DOUBLE},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      type = #{type,jdbcType=INTEGER},
+      score = #{score,jdbcType=BIGINT},
+      coupon_id = #{couponId,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
 

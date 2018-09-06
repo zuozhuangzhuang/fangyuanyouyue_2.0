@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.fangyuanyouyue.user.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,11 +42,6 @@ import com.fangyuanyouyue.user.model.UserVip;
 import com.fangyuanyouyue.user.model.UserWallet;
 import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.param.UserParam;
-import com.fangyuanyouyue.user.service.SchedualGoodsService;
-import com.fangyuanyouyue.user.service.SchedualMessageService;
-import com.fangyuanyouyue.user.service.SchedualOrderService;
-import com.fangyuanyouyue.user.service.SchedualRedisService;
-import com.fangyuanyouyue.user.service.UserInfoService;
 
 import feign.RetryableException;
 
@@ -75,6 +71,8 @@ public class UserInfoServiceImpl implements UserInfoService {
     private SchedualOrderService schedualOrderService;
     @Autowired
     private SchedualMessageService schedualMessageService;
+    @Autowired
+    private UserThirdService userThirdService;
 
     @Override
     public UserInfo getUserByToken(String token) throws ServiceException {
@@ -97,7 +95,12 @@ public class UserInfoServiceImpl implements UserInfoService {
     private String setToken(String token,Integer userId){
         //生成用户token，存到Redis
         token = 10000+userId+"FY"+DateStampUtils.getGMTUnixTimeByCalendar()+"";
-        
+
+        //设置旧token失效
+         String oldUserId = JSONObject.parseObject(schedualRedisService.getToken(userId.toString())).getString("data");
+        if(StringUtils.isNotEmpty(oldUserId)){
+            schedualRedisService.set(oldUserId,null,null);
+        }
         //覆盖原来的
         schedualRedisService.set(token, userId.toString(), 7*24*60*60l);
         schedualRedisService.set(userId.toString(), token, 7*24*60*60l);
@@ -304,9 +307,10 @@ public class UserInfoServiceImpl implements UserInfoService {
                     throw new ServiceException("请勿重复绑定！");
                 }else{
                     UserInfo user = userInfoMapper.selectByPrimaryKey(userThirdParty.getUserId());
-                    if(StringUtils.isEmpty(user.getPhone())){
-                        //TODO 是否合并
-                        throw new ServiceException("是否合并用户！");
+                    boolean result = userThirdService.judgeMerge(token,unionId,null,type);
+                    if(result){
+                        //可以合并账号
+                        throw new ServiceException("已存在三方用户，此三方用户未绑定手机号，是否合并用户！");
                     }else{
                         throw new ServiceException("已绑定其他用户！");
                     }
@@ -409,27 +413,6 @@ public class UserInfoServiceImpl implements UserInfoService {
             userInfoMapper.updateByPrimaryKey(userInfo);
             UserDto userDto = setUserDtoByInfo(token,userInfo);
             return userDto;
-        }
-    }
-
-    @Override
-    public UserDto accountMerge(String token, String phone) throws ServiceException {
-    	UserInfo userInfo = getUserByToken(token);
-        if(userInfo == null){
-            throw new ServiceException("第三方用户不存在！");
-        }else{
-            UserInfo userInfoByPhone = userInfoMapper.getUserByPhone(phone);
-            if(userInfoByPhone == null){
-                throw new ServiceException("手机号用户不存在！");
-            }else{
-                //TODO 合并余额、粉丝、关注、收藏、商品、收货地址、好友、会员时间
-                //TODO 清除旧token
-                //第三方登录账号在未绑定手机号时拥有功能：
-
-                userInfoMapper.updateByPrimaryKey(userInfo);
-                UserDto userDto = setUserDtoByInfo(token,userInfo);
-                return userDto;
-            }
         }
     }
 
@@ -763,6 +746,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 		userInfoMapper.updateByPrimaryKey(user);
 		
 	}
+
     @Override
     public List<ShopDto> getUserByName(String search,Integer start,Integer limit) throws ServiceException {
         //个人店铺排序：1.会员等级 2.认证店铺 3.信誉度 4.发布商品时间
@@ -770,4 +754,53 @@ public class UserInfoServiceImpl implements UserInfoService {
         List<ShopDto> shopDtos = ShopDto.toDtoList(userByName);
         return shopDtos;
     }
+
+    @Override
+    public UserDto accountMerge(String token, String phone,String unionId,Integer type) throws ServiceException {
+        //当前用户
+        UserInfo user = getUserByToken(token);
+        UserThirdParty userThird = userThirdPartyMapper.getUserThirdByUserId(user.getId());
+        if(unionId == null){
+            //绑定手机
+            //手机用户
+            UserInfo phoneUser = getUserByPhone(phone);
+            UserThirdParty phoneThird = userThirdPartyMapper.getUserThirdByUserId(phoneUser.getId());
+            if(StringUtils.isEmpty(user.getPhone()) && phoneThird == null){
+                //TODO 粉丝、关注、收货地址、优惠券
+                //TODO 商品、商品评论、商品鉴定、购物车详情帖子评论、点赞信息、视频评论、视频点赞
+                //TODO 我的收藏（商品、抢购、视频、帖子）+ 关注（抢购）
+
+                //TODO 个人相关：我买下的、我卖出的、我的钱包、我的商城、我的抢购、我的评论、全民鉴定、我的帖子、我的粉丝、我的关注、我的收藏、所有特权、我的鉴定、我是栏主
+                //三方登录可以购买手机账号的商品
+                UserWallet userWallet = userWalletMapper.selectByUserId(user.getId());
+                UserWallet phoneUserWallet = userWalletMapper.selectByUserId(phoneUser.getId());
+                userWallet.setBalance(userWallet.getBalance().add(phoneUserWallet.getBalance()));
+                userWallet.setBalanceFrozen(userWallet.getBalanceFrozen().add(phoneUserWallet.getBalanceFrozen()));
+                userWallet.setPoint(userWallet.getPoint()+phoneUserWallet.getPoint());
+
+                //最后将三方改到手机号账号
+                userThird.setUserId(phoneUser.getId());
+                //删除三方账号
+                user.setStatus(3);
+                //TODO 清除旧token
+                return new UserDto();
+            }
+        }else if(phone == null){
+            //三方绑定
+            //三方用户
+            UserInfo unionIdThird = getUserByUnionId(unionId, type);
+            if(userThird == null && StringUtils.isEmpty(unionIdThird.getPhone())){
+
+                //最后将三方改到手机号账号
+                UserThirdParty userByThirdNoType = userThirdPartyMapper.getUserByThirdNoType(unionId, type);
+                userByThirdNoType.setUserId(user.getId());
+                //删除三方账号
+                unionIdThird.setStatus(3);
+                //TODO 清除旧token
+                return new UserDto();
+            }
+        }
+        return null;
+    }
+
 }
