@@ -9,6 +9,7 @@ import com.fangyuanyouyue.wallet.model.BonusPool;
 import com.fangyuanyouyue.wallet.model.UserInfoExt;
 import com.fangyuanyouyue.wallet.model.UserWallet;
 import com.fangyuanyouyue.wallet.service.ScoreService;
+import com.fangyuanyouyue.wallet.service.UserCouponService;
 import com.fangyuanyouyue.wallet.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,8 @@ public class ScoreServiceImpl implements ScoreService{
     private BonusPoolMapper bonusPoolMapper;
     @Autowired
     private WalletService walletService;
+    @Autowired
+    private UserCouponService userCouponService;
 
     @Override
     public List<BonusPoolDto> getBonusPool() throws ServiceException {
@@ -71,7 +74,15 @@ public class ScoreServiceImpl implements ScoreService{
                 }
                 //扣除积分余额
                 walletService.updateScore(userId,10000L,2);
-                //TODO 增加用户积分、优惠券
+                //增加用户积分、优惠券
+                if(bonus.getType() == 1){
+                    //积分
+                    walletService.updateScore(userId,bonus.getScore(),1);
+                }else if(bonus.getType() == 2){
+                    //优惠券
+                    //保存用户优惠券
+                    userCouponService.insertUserCoupon(userId,bonus.getCouponId());
+                }
                 return bonus.getBonusName();
             }
         }

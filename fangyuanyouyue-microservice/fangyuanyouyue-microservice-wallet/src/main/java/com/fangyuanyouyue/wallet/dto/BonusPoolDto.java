@@ -22,7 +22,6 @@ public class BonusPoolDto {
 
     private String bonusName;//奖品名字
 
-//    private Double probability;//中奖概率
 
     private String addTime;//添加时间
 
@@ -34,7 +33,6 @@ public class BonusPoolDto {
     public BonusPoolDto(BonusPool bonusPool) {
         this.bonusId = bonusPool.getId();
         this.bonusName = bonusPool.getBonusName();
-//        this.probability = bonusPool.getProbability();
         this.addTime = DateUtil.getFormatDate(bonusPool.getAddTime(), DateUtil.DATE_FORMT);
         this.updateTime = DateUtil.getFormatDate(bonusPool.getUpdateTime(), DateUtil.DATE_FORMT);
     }

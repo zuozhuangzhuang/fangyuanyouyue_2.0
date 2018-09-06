@@ -36,13 +36,13 @@ public class UserVipControllerTest {
     }
 
     /**
-     * 开通会员
+     * 开通/续费会员
      * @throws Exception
      */
     @Test
 //    @Transactional
-    public void updateMebber() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/userVip/updateMebber")
+    public void updateMember() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/userVip/updateMember")
                 .param("token","10045FY1535423776645")
                 //会员等级 1铂金会员 2至尊会员
                 .param("vipLevel","2")
@@ -50,6 +50,7 @@ public class UserVipControllerTest {
                 .param("vipType","3")
                 //类型 1开通 2续费
                 .param("type","2")
+                //支付方式  1微信 2支付宝 3余额
                 .param("payType","3")
                 .param("payPwd","123456")
                 .accept(MediaType.APPLICATION_JSON))

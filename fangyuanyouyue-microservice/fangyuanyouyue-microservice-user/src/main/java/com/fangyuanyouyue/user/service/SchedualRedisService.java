@@ -16,4 +16,7 @@ public interface SchedualRedisService {
 
     @RequestMapping(value = "/redis/get",method = RequestMethod.POST)
     Object get(@RequestParam(value = "key") String key);
+
+    @RequestMapping(value = "/redis/getToken",method = RequestMethod.POST)
+    String getToken(@RequestParam(value = "key") String key);
 }

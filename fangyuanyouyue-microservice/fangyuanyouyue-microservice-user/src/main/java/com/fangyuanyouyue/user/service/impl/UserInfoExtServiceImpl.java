@@ -170,7 +170,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
             throw new ServiceException("订单不存在！");
         }
         //添加申请记录
-        //TODO 官方认证添加时间限制
+        //TODO 官方认证添加时间限制(后台通过时添加开始时间和结束时间，每次申请默认为一年期限)
         UserAuthApply userAuthApply = new UserAuthApply();
         userAuthApply.setUserId(authOrder.getUserId());
         userAuthApply.setStatus(1);

@@ -43,7 +43,7 @@ public class UserInfo {
 
     private Integer regPlatform;//注册平台 1安卓 2IOS 3小程序
 
-    private Integer status;//状态 1正常 2冻结
+    private Integer status;//状态 1正常 2冻结 3删除
 
     private Integer pwdErrCount;//登录密码错误次数
 

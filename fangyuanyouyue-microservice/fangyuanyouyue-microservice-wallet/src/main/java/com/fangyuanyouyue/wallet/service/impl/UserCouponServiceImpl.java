@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.wallet.service.impl;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.wallet.constant.StatusEnum;
 import com.fangyuanyouyue.wallet.dao.UserCouponMapper;
 import com.fangyuanyouyue.wallet.dto.UserCouponDto;
 import com.fangyuanyouyue.wallet.model.UserCoupon;
@@ -50,5 +51,15 @@ public class UserCouponServiceImpl implements UserCouponService {
         }
         userCouponMapper.updateByPrimaryKeySelective(userCoupon);
         return couponPrice;
+    }
+
+    @Override
+    public void insertUserCoupon(Integer userId, Integer couponId) throws ServiceException {
+        UserCoupon userCoupon = new UserCoupon();
+        userCoupon.setAddTime(new Date());
+        userCoupon.setCouponId(couponId);
+        userCoupon.setStatus(StatusEnum.COUPON_NOTUSE.getCode());
+        userCoupon.setUserId(userId);
+        userCouponMapper.insert(userCoupon);
     }
 }

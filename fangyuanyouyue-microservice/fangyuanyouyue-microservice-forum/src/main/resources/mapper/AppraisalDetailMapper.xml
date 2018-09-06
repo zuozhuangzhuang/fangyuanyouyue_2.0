@@ -201,7 +201,7 @@
   <select id="selectCollectList" parameterType="Integer" resultMap="BaseResultMap">
     select a.*,c.nick_name,c.head_img_url from appraisal_detail a,collect b,user_info c
     <where>
-      a.id = b.collect_id and a.user_id = c.id
+      a.id = b.collect_id and a.user_id = c.id and c.status <![CDATA[ <> ]]> 3
       <if test="userId != null">
         and b.user_id = #{userId}
       </if>
@@ -209,7 +209,7 @@
         and b.collect_type = #{collectType}
       </if>
       <if test="search != null">
-        and (a.title like "%"#{search}"%" or a.content like "%"#{search}"%" or a.user_id in (select id from user_info where nick_name like "%"#{search}"%"))
+        and (a.title like "%"#{search}"%" or a.content like "%"#{search}"%" or a.user_id in (select id from user_info where nick_name like "%"#{search}"%" and status <![CDATA[ <> ]]> 3))
       </if>
     </where>
     order by b.add_time desc
@@ -221,7 +221,7 @@
     select
     a.*,b.nick_name,b.head_img_url
     from appraisal_detail a,user_info b
-    where a.user_id=b.id
+    where a.user_id=b.id and b.status <![CDATA[ <> ]]> 3
     <if test="userId != null">
       and a.user_id = #{userId}
     </if>
@@ -235,12 +235,12 @@
     select
     a.*,b.nick_name,b.head_img_url
     from appraisal_detail a,user_info b,appraisal_comment c
-    where a.user_id=b.id and a.id = c.appraisal_id
+    where a.user_id=b.id and a.id = c.appraisal_id and b.status <![CDATA[ <> ]]> 3
     <if test="userId != null">
       and c.user_id = #{userId}
     </if>
     <if test="keyword != null">
-      and (a.title like "%"#{keyword}"%" or a.content like "%"#{keyword}"%" or (a.user_id in (select id from user_info)))
+      and (a.title like "%"#{keyword}"%" or a.content like "%"#{keyword}"%" or (a.user_id in (select id from user_info where status <![CDATA[ <> ]]> 3)))
     </if>
     order by a.add_time desc limit #{start},#{limit}
   </select>
@@ -249,7 +249,7 @@
     select
     a.*,b.nick_name,b.head_img_url
     from appraisal_detail a,user_info b
-    where a.user_id=b.id and a.id = #{id,jdbcType=INTEGER}
+    where a.user_id=b.id and a.id = #{id,jdbcType=INTEGER} and b.status <![CDATA[ <> ]]> 3
   </select>
 
   <select id="selectByStatusEndTime" resultMap="BaseResultMap">

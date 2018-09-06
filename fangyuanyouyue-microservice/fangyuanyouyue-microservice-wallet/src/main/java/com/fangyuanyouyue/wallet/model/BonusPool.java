@@ -23,4 +23,9 @@ public class BonusPool {
 
     private Date updateTime;//更新时间
 
+    private Integer type;//类型 0谢谢惠顾 1积分 2优惠券
+
+    private Long score;//积分值
+
+    private Integer couponId;//优惠券id
 }

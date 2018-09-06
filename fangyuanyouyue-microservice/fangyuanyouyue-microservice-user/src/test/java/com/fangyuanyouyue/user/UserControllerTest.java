@@ -75,7 +75,7 @@ public class UserControllerTest {
      * @throws Exception
      */
     @Test
-    @Transactional
+//    @Transactional
     public void login() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/user/login")
                 .param("phone","181039660571")
@@ -118,10 +118,10 @@ public class UserControllerTest {
     @Transactional
     public void thirdBind() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/user/thirdBind")
-                .param("token","6008FY1525397451364")
-                .param("unionId","oJ9SjwtB9Yqh_6pvlAaoIP3QvhwE")
+                .param("token","10025FY1536135283895")
+                .param("unionId","D7B2FB693AA3B2F28793D656303C9B28")
                 //类型 1微信 2QQ 3微博
-                .param("type","1")
+                .param("type","2")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -132,7 +132,7 @@ public class UserControllerTest {
      * @throws Exception
      */
     @Test
-//    @Transactional
+    @Transactional
     public void certification() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/user/certification")
                 .param("token","10025FY1533317806918")
@@ -148,7 +148,6 @@ public class UserControllerTest {
                 .andReturn();
     }
 
-
     /**
      * 完善资料
      * @throws Exception
@@ -157,28 +156,28 @@ public class UserControllerTest {
     @Transactional
     public void modify() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/user/modify")
-                .param("token","10014FY1531254449019")
-                .param("phone","18103966057")
-                .param("email","zuozhuang_zzz@163.com")
+                .param("token","10016FY1536143745761")
+                .param("phone","181039660571")
+//                .param("email","zuozhuang_zzz@163.com")
                 //用户所在地
-                .param("userAddress","zuozhuang_zzz@163.com")
-                .param("nickName","偷看看哟")
+//                .param("userAddress","zuozhuang_zzz@163.com")
+//                .param("nickName","偷看看哟")
                 //头像图片路径
-                .param("headImgUrl","偷看看哟")
+//                .param("headImgUrl","偷看看哟")
                 //背景图片路径
-                .param("bgImgUrl","偷看看哟")
+//                .param("bgImgUrl","偷看看哟")
                 //性别，1男 2女 0不确定
-                .param("gender","1")
+//                .param("gender","1")
                 //个性签名
-                .param("signature","个性签名")
+//                .param("signature","个性签名")
                 //联系电话
-                .param("contact","13333333333")
+//                .param("contact","13333333333")
                 //身份证号码
-                .param("identity","41282419940411772X")
+//                .param("identity","41282419940411772X")
                 //真实姓名
-                .param("name","左壮壮")
+//                .param("name","左壮壮")
                 //支付密码，md5加密，32位小写字母
-                .param("payPwd","123456")
+//                .param("payPwd","123456")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -272,7 +271,6 @@ public class UserControllerTest {
                 .andReturn();
     }
 
-
     /**
      * 发送验证码
      * @throws Exception
@@ -293,7 +291,6 @@ public class UserControllerTest {
                 .andReturn();
     }
 
-
     /**
      * 验证验证码
      * @throws Exception
@@ -309,8 +306,6 @@ public class UserControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
-
-
 
     /**
      * 获取个人店铺列表
@@ -360,7 +355,6 @@ public class UserControllerTest {
                 .andReturn();
     }
 
-
     /**
      * 我的粉丝/我的关注
      * @throws Exception
@@ -394,7 +388,22 @@ public class UserControllerTest {
                 .andReturn();
     }
 
-
+    /**
+     * 申请官方认证
+     * @throws Exception
+     */
+    @Test
+    @Transactional
+    public void authType() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/user/authType")
+                .param("token","")
+                //支付方式 1微信 2支付宝 3余额
+                .param("payType","3")
+                .param("payPwd","123456")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
 
     /**
      * 根据用户名获取用户列表

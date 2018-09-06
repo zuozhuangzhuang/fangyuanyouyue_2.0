@@ -11,6 +11,8 @@ import com.fangyuanyouyue.base.util.WechatUtil.WXPayUtil;
 import com.fangyuanyouyue.base.util.alipay.util.AlipayNotify;
 import com.fangyuanyouyue.user.dto.UserFansDto;
 import com.fangyuanyouyue.user.dto.WaitProcessDto;
+import com.fangyuanyouyue.user.model.UserThirdParty;
+import com.fangyuanyouyue.user.service.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -36,10 +38,6 @@ import com.fangyuanyouyue.user.dto.UserDto;
 import com.fangyuanyouyue.user.model.UserInfo;
 import com.fangyuanyouyue.user.model.WeChatSession;
 import com.fangyuanyouyue.user.param.UserParam;
-import com.fangyuanyouyue.user.service.SchedualMessageService;
-import com.fangyuanyouyue.user.service.SchedualRedisService;
-import com.fangyuanyouyue.user.service.UserInfoExtService;
-import com.fangyuanyouyue.user.service.UserInfoService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -64,6 +62,8 @@ public class UserController extends BaseController {
     private SchedualRedisService schedualRedisService;//调用redis-service
     @Autowired
     private SchedualMessageService schedualMessageService;//message-service
+    @Autowired
+    private UserThirdService userThirdService;
 
     @ApiOperation(value = "注册", notes = "(UserDto)注册",response = BaseResp.class)
     @ApiImplicitParams({
@@ -148,7 +148,6 @@ public class UserController extends BaseController {
         }
     }
 
-
     @ApiOperation(value = "APP三方注册/登录", notes = "(UserDto)APP三方注册/登录",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "thirdNickName", value = "第三方账号昵称", required = true,dataType = "String", paramType = "query"),
@@ -198,6 +197,9 @@ public class UserController extends BaseController {
             if(StringUtils.isEmpty(param.getUnionId())){
                 return toError("三方识别号不能为空！");
             }
+            if(param.getType() == null){
+                return toError("三方类型不能为空！");
+            }
             if(StringUtils.isEmpty(param.getToken())){
                 return toError("用户token不能为空！");
             }
@@ -222,7 +224,6 @@ public class UserController extends BaseController {
             return toError("系统繁忙，请稍后再试！");
         }
     }
-
 
     @ApiOperation(value = "实名认证", notes = "(void)实名认证",response = BaseResp.class)
     @ApiImplicitParams({
@@ -266,7 +267,6 @@ public class UserController extends BaseController {
         }
     }
 
-
     @ApiOperation(value = "完善资料", notes = "(void)完善资料",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
@@ -302,7 +302,13 @@ public class UserController extends BaseController {
             }
             //手机号不可以重复
             if(StringUtils.isNotEmpty(param.getPhone())){
+                //三方用户未绑定手机，手机用户未绑定次type三方时可以选择合并用户，需要验证手机号
                 UserInfo userByPhone = userInfoService.getUserByPhone(param.getPhone());
+                boolean result = userThirdService.judgeMerge(param.getToken(), null, param.getPhone(),null);
+                if(result){
+                    //可以合并账号
+                    return toError("此手机号已被注册，是否合并账号！");
+                }
                 if(userByPhone != null){
                     return toError("此手机号已被注册！");
                 }
@@ -450,7 +456,9 @@ public class UserController extends BaseController {
     @ApiOperation(value = "合并账号", notes = "(UserDto)合并账号",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "phone", value = "手机号", required = true, dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "phone", value = "手机号", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "unionId", value = "第三方唯一ID", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1微信 2QQ 3微博", required = false, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/accountMerge")
     @ResponseBody
@@ -458,9 +466,6 @@ public class UserController extends BaseController {
         try {
             log.info("----》合并账号《----");
             log.info("参数："+param.toString());
-            if(StringUtils.isEmpty(param.getPhone())){
-                return toError("手机号码不能为空！");
-            }
             if(StringUtils.isEmpty(param.getToken())){
                 return toError("用户token不能为空！");
             }
@@ -472,7 +477,7 @@ public class UserController extends BaseController {
                 return toError("您的账号已被冻结，请联系管理员！");
             }
             //TODO 合并账号,一定是从三方账号发起请求
-            UserDto userDto = userInfoService.accountMerge(param.getToken(),param.getPhone());
+            UserDto userDto = userInfoService.accountMerge(param.getToken(),param.getPhone(),param.getUnionId(),param.getType());
             return toSuccess(userDto);
         } catch (ServiceException e) {
             e.printStackTrace();
@@ -482,7 +487,6 @@ public class UserController extends BaseController {
             return toError("系统繁忙，请稍后再试！");
         }
     }
-
 
     @ApiOperation(value = "小程序登录", notes = "(UserDto)小程序登录",response = BaseResp.class)
     @ApiImplicitParams({
@@ -567,7 +571,6 @@ public class UserController extends BaseController {
             return toError("系统繁忙，请稍后再试！");
         }
     }
-
 
     @ApiOperation(value = "发送验证码", notes = "(void)发送验证码",response = BaseResp.class)
     @ApiImplicitParams({
@@ -708,7 +711,6 @@ public class UserController extends BaseController {
         }
     }
 
-
     @ApiOperation(value = "获取用户信息", notes = "(UserDto)获取用户信息",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", dataType = "String", paramType = "query"),
@@ -788,7 +790,6 @@ public class UserController extends BaseController {
         }
     }
 
-
     @ApiOperation(value = "我的关注/我的粉丝", notes = "（UserFansDto）我的关注/我的粉丝")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
@@ -830,7 +831,6 @@ public class UserController extends BaseController {
             return toError("系统繁忙，请稍后再试！");
         }
     }
-
 
     @ApiOperation(value = "获取待处理信息", notes = "（WaitProcessDto）获取待处理信息")
     @ApiImplicitParams({
@@ -928,53 +928,6 @@ public class UserController extends BaseController {
         }
     }
 
-    
-    
-
-    public static void main(String[] args) {
-        //微信获取的code
-        String code = "";
-        //包括敏感数据在内的完整用户信息的加密数据
-        String encryptedData = "";
-        //加密算法的初始向量
-        String iv = "";
-        String url = "https://api.weixin.qq.com/sns/jscode2session?appid="+WeChatSession.APPID+
-                "&secret="+WeChatSession.SECRET+"&js_code="+ code +"&grant_type=authorization_code";
-        RestTemplate restTemplate = new RestTemplate();
-        //进行网络请求,访问url接口
-        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
-        System.out.println(responseEntity);
-        if(responseEntity != null && responseEntity.getStatusCode() == HttpStatus.OK) {
-            String sessionData = responseEntity.getBody();
-            WeChatSession weChatSession = JSONObject.parseObject(sessionData,WeChatSession.class);
-            //微信用户在此小程序的识别号
-            String openid = weChatSession.getOpenid();
-            //获取会话秘钥
-            String session_key = weChatSession.getSession_key();
-            System.out.println("openid:"+openid);
-            System.out.println("session_key:"+session_key);
-            // 被加密的数据
-            byte[] dataByte = Base64.decodeBase64(encryptedData);
-            // 加密秘钥
-            byte[] aeskey = Base64.decodeBase64(session_key);
-            // 偏移量
-            byte[] ivByte = Base64.decodeBase64(iv);
-            String newuserInfo = "";
-            try {
-                AES aes = new AES();
-                byte[] resultByte = aes.decrypt(dataByte, aeskey, ivByte);
-                if (null != resultByte && resultByte.length > 0) {
-                    newuserInfo = new String(resultByte, "UTF-8");
-                    System.out.println("解密完毕,解密结果为newuserInfo:"+ newuserInfo);
-                }
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }
-    }
-
-
-
     @ApiOperation(value = "申请官方认证回调接口", notes = "申请官方认证", response = BaseResp.class)
     @PostMapping(value = "/notify/wechat")
     @ResponseBody
@@ -1059,7 +1012,6 @@ public class UserController extends BaseController {
         }
     }
 
-    //支付宝回调
     @ApiOperation(value = "申请官方认证支付宝回调接口", notes = "官方认证支付宝回调", response = BaseResp.class,hidden = true)
     @RequestMapping(value = "/notify/alipay", method = RequestMethod.POST)
     @ResponseBody
@@ -1175,4 +1127,46 @@ public class UserController extends BaseController {
 
     }
 
+
+    public static void main(String[] args) {
+        //微信获取的code
+        String code = "";
+        //包括敏感数据在内的完整用户信息的加密数据
+        String encryptedData = "";
+        //加密算法的初始向量
+        String iv = "";
+        String url = "https://api.weixin.qq.com/sns/jscode2session?appid="+WeChatSession.APPID+
+                "&secret="+WeChatSession.SECRET+"&js_code="+ code +"&grant_type=authorization_code";
+        RestTemplate restTemplate = new RestTemplate();
+        //进行网络请求,访问url接口
+        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
+        System.out.println(responseEntity);
+        if(responseEntity != null && responseEntity.getStatusCode() == HttpStatus.OK) {
+            String sessionData = responseEntity.getBody();
+            WeChatSession weChatSession = JSONObject.parseObject(sessionData,WeChatSession.class);
+            //微信用户在此小程序的识别号
+            String openid = weChatSession.getOpenid();
+            //获取会话秘钥
+            String session_key = weChatSession.getSession_key();
+            System.out.println("openid:"+openid);
+            System.out.println("session_key:"+session_key);
+            // 被加密的数据
+            byte[] dataByte = Base64.decodeBase64(encryptedData);
+            // 加密秘钥
+            byte[] aeskey = Base64.decodeBase64(session_key);
+            // 偏移量
+            byte[] ivByte = Base64.decodeBase64(iv);
+            String newuserInfo = "";
+            try {
+                AES aes = new AES();
+                byte[] resultByte = aes.decrypt(dataByte, aeskey, ivByte);
+                if (null != resultByte && resultByte.length > 0) {
+                    newuserInfo = new String(resultByte, "UTF-8");
+                    System.out.println("解密完毕,解密结果为newuserInfo:"+ newuserInfo);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
 }

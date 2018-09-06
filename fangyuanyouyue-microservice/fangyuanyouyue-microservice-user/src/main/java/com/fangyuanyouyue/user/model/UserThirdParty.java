@@ -15,7 +15,7 @@ import java.util.Date;
 public class UserThirdParty {
     private Integer id;//唯一自增ID
 
-    private Integer userId;//用户id，user_info id
+    private Integer userId;//用户id
 
     private Integer type;//类型 1微信 2QQ 3微博
 

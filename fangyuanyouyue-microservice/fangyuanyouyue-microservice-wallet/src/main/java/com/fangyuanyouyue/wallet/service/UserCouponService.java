@@ -24,4 +24,12 @@ public interface UserCouponService {
      * @throws ServiceException
      */
     BigDecimal getPriceByCoupon(Integer userId,BigDecimal price,Integer couponId) throws ServiceException;
+
+    /**
+     * 用户新增优惠券
+     * @param userId
+     * @param couponId
+     * @throws ServiceException
+     */
+    void insertUserCoupon(Integer userId,Integer couponId) throws ServiceException;
 }

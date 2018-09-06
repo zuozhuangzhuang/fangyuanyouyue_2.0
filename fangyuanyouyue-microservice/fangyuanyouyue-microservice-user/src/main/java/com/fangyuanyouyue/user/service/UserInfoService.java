@@ -45,8 +45,6 @@ public interface UserInfoService {
      */
     UserInfo getUserByNickName(String nickName) throws ServiceException;
 
-
-
     /**
      * 用户手机注册
      * @param param
@@ -81,8 +79,6 @@ public interface UserInfoService {
      */
     UserDto thirdBind(String token,String unionId,Integer type) throws ServiceException;
 
-
-
     /**
      * 完善资料
      * @param param
@@ -114,15 +110,6 @@ public interface UserInfoService {
      * @throws ServiceException
      */
     UserDto updatePhone(String token,String phone) throws ServiceException;
-
-    /**
-     * 合并账号
-     * @param token
-     * @param phone
-     * @return
-     * @throws ServiceException
-     */
-    UserDto accountMerge(String token,String phone) throws ServiceException;
 
     /**
      * 小程序登录
@@ -184,19 +171,19 @@ public interface UserInfoService {
      * @throws ServiceException
      */
     WaitProcessDto myWaitProcess(Integer userId) throws ServiceException;
-    
+
     /**
      * 注册通讯账号
      */
     void registIMUser(UserInfo user) throws ServiceException;
-    
+
     /**
      * 获取后台分页数据
      * @param param
      * @return
      */
     Pager getPage(AdminUserParam param);
-    
+
     void upateUserStatus(Integer userId,Integer status);
 
     /**
@@ -208,4 +195,15 @@ public interface UserInfoService {
      * @throws ServiceException
      */
     List<ShopDto> getUserByName(String search,Integer start,Integer limit) throws ServiceException;
+
+    /**
+     * 合并账号
+     * @param token
+     * @param phone
+     * @param unionId
+     * @param type
+     * @return
+     * @throws ServiceException
+     */
+    UserDto accountMerge(String token,String phone,String unionId,Integer type) throws ServiceException;
 }

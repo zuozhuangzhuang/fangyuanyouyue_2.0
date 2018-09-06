@@ -126,7 +126,22 @@ public class WalletControllerTest {
     }
 
     /**
-     * 余额账单列表
+     * 余额账单详情
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void billDetail() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/wallet/billDetail")
+                .param("token","10045FY1535599469421")
+                .param("orderNo","")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 获取用户的优惠券列表
      * @throws Exception
      */
     @Test
