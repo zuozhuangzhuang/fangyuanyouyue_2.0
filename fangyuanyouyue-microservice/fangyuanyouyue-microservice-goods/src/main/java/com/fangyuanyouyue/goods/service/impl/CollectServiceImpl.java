@@ -155,7 +155,7 @@ public class CollectServiceImpl implements CollectService{
      * @throws ServiceException
      */
     private GoodsDto setDtoByGoodsInfo(GoodsInfo goodsInfo) throws ServiceException{
-        if(goodsInfo == null || goodsInfo.getStatus().intValue() == 3 || goodsInfo.getStatus().intValue() == 5){
+        if(goodsInfo == null){
             throw new ServiceException("商品不存在或已下架！");
         }else{
             List<GoodsImg> goodsImgs = goodsImgMapper.getImgsByGoodsId(goodsInfo.getId());
