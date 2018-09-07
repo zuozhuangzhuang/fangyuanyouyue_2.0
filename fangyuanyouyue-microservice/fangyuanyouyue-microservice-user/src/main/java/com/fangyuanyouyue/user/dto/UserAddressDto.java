@@ -50,8 +50,9 @@ public class UserAddressDto {
         this.addressType = userAddressInfo.getType();
     }
     public static List<UserAddressDto> toDtoList(List<UserAddressInfo> list) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         List<UserAddressDto> dtolist = new ArrayList<>();
         for (UserAddressInfo model : list) {
             UserAddressDto dto = new UserAddressDto(model);

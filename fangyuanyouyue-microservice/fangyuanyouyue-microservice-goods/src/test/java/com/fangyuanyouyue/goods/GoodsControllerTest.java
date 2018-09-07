@@ -49,7 +49,7 @@ public class GoodsControllerTest {
         mvc.perform(MockMvcRequestBuilders.post("/goods/goodsList")
                 .param("token","10025FY1533317806918")
 //                .param("userId","1")
-                //商品状态 普通商品 1出售中 2已售出 5删除
+                //商品状态 普通商品 1出售中 2已售出 3已下架（已结束） 5删除
 //                .param("status","1")
                 .param("start","0")
                 .param("limit","10")

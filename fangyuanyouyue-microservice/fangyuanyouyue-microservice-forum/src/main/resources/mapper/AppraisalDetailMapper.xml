@@ -240,7 +240,7 @@
       and c.user_id = #{userId}
     </if>
     <if test="keyword != null">
-      and (a.title like "%"#{keyword}"%" or a.content like "%"#{keyword}"%" or (a.user_id in (select id from user_info where status <![CDATA[ <> ]]> 3)))
+      and (a.title like "%"#{keyword}"%" or a.content like "%"#{keyword}"%" or b.nick_name like "%"#{keyword}"%" or c.content like "%"#{keyword}"%")
     </if>
     order by a.add_time desc limit #{start},#{limit}
   </select>

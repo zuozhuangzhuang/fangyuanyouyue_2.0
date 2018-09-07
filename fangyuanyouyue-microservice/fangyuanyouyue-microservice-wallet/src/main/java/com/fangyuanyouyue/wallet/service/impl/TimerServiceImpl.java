@@ -51,7 +51,7 @@ public class TimerServiceImpl implements TimerService{
         List<UserVip> userVips = userVipMapper.selectByEndTime(DateUtil.getDateAfterDay(new Date(),7));
         if(userVips != null && userVips.size() > 0){
             for(UserVip userVip:userVips){
-                if(userVip.getEndTime().getTime() < new Date().getTime()){
+                if(userVip.getEndTime().getTime() < System.currentTimeMillis()){
                     //结束时间 < 当前时间 = 直接注销会员
                     userVip.setStartTime(null);
                     userVip.setEndTime(null);

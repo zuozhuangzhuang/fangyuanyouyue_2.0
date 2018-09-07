@@ -21,7 +21,7 @@ import java.util.List;
 
 
 @Service(value = "forumInfoService")
-public class ForumInfoServiceImp implements ForumInfoService {
+public class ForumInfoServiceImpl implements ForumInfoService {
 
 
 	@Autowired

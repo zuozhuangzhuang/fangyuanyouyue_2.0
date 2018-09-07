@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service(value = "pointGoodsService")
 @Transactional
-public class PointGoodsServiceImp implements PointGoodsService {
+public class PointGoodsServiceImpl implements PointGoodsService {
 
     @Autowired
     private PointGoodsMapper pointGoodsMapper;

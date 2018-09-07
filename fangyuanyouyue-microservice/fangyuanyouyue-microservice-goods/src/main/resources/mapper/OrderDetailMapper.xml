@@ -250,7 +250,7 @@
     <where>
       1=1
       <if test="userId != null">
-        and user_id = #{userId}
+        and seller_id = #{userId}
       </if>
       <if test="goodsId != null">
         and goods_id = #{goodsId}

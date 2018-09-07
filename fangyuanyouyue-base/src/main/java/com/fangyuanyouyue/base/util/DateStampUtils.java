@@ -288,7 +288,7 @@ public class DateStampUtils {
 				if(curCalendar.get(Calendar.MONTH)==targetCalendar.get(Calendar.MONTH)){
 					// 是否为当天
 					if(curCalendar.get(Calendar.DAY_OF_MONTH)==targetCalendar.get(Calendar.DAY_OF_MONTH)){
-						long time = Math.abs(new Date().getTime() - date);
+						long time = Math.abs(System.currentTimeMillis() - date);
 						// 一小时以内
 						if (time < TIME_NUMBERS*TIME_NUMBERS * TIME_MILLISECONDS) {
 //							strTime = "刚刚";
@@ -363,7 +363,9 @@ public class DateStampUtils {
 	 */
 	public static Timestamp getTimesteamp(){
 		Date date = new Date();
+		System.out.println("new Date()："+DateUtil.getFormatDate(date,DateUtil.DATE_FORMT));
 		Timestamp timestamp = new Timestamp(date.getTime());
+		System.out.println("DateStampUtils.getTimesteamp()："+DateUtil.getFormatDate(timestamp,DateUtil.DATE_FORMT));
 		return timestamp;
 	}
 }

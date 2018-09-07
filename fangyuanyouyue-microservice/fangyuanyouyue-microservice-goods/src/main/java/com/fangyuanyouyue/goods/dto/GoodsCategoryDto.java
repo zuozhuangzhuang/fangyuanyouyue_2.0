@@ -47,8 +47,9 @@ public class GoodsCategoryDto {
     }
 
     public static List<GoodsCategoryDto> toDtoList(List<GoodsCategory> list) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         List<GoodsCategoryDto> dtolist = new ArrayList<>();
         for (GoodsCategory model : list) {
             GoodsCategoryDto dto = new GoodsCategoryDto(model);

@@ -40,7 +40,7 @@ public class GoodsParam{
     private BigDecimal price;//GoodsInfo:价格 Appraisal:鉴定赏金
 
     @ApiModelProperty(name = "status", value = "状态", dataType = "int",hidden = true)
-    private Integer status;//状态 GoodsComment：1正常 2隐藏 GoodsInfo：普通商品 1出售中 2已售出 5删除 Appraisal: 0申请 1真 2假 3存疑
+    private Integer status;//状态 GoodsComment：1正常 2隐藏 GoodsInfo：普通商品 1出售中 2已售出 3已下架（已结束） 5删除 Appraisal: 0申请 1真 2假 3存疑
 
     @ApiModelProperty(name = "title", value = "描述标题", dataType = "String",hidden = true)
     private String title;//BannerIndex描述标题 Appraisal:鉴定标题

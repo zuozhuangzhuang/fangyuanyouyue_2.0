@@ -44,8 +44,9 @@ public class GoodsIntervalHistoryDto {
 
 
     public static List<GoodsIntervalHistoryDto> toDtoList(List<GoodsIntervalHistory> list) {
-        if (list == null)
+        if (list == null) {
             return new ArrayList<>();
+        }
         List<GoodsIntervalHistoryDto> dtolist = new ArrayList<>();
         for (GoodsIntervalHistory model : list) {
             GoodsIntervalHistoryDto dto = new GoodsIntervalHistoryDto(model);

@@ -38,4 +38,6 @@ public class OrderInfo {
     private Integer isRefund = 2;//是否退货 1是 2否
 
     private Date receiveTime;//收货时间
+
+    //卖家处理时间 平台处理时间
 }

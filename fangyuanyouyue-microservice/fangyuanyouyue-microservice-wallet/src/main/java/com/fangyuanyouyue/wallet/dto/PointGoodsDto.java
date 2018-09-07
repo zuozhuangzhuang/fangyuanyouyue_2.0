@@ -36,8 +36,9 @@ public class PointGoodsDto {
     }
 
     public static List<PointGoodsDto> toDtoList(List<PointGoods> list) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         List<PointGoodsDto> dtolist = new ArrayList<>();
         for (PointGoods model : list) {
         	PointGoodsDto dto = new  PointGoodsDto(model);

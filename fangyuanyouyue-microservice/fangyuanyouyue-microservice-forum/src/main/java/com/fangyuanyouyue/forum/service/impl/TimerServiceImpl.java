@@ -22,11 +22,11 @@ public class TimerServiceImpl implements TimerService{
     @Autowired
     private AppraisalImgMapper appraisalImgMapper;
     @Autowired
-    private AppraisalCommentServiceImp appraisalCommentServiceImp;
+    private AppraisalCommentServiceImpl appraisalCommentServiceImpl;
     @Autowired
-    private AppraisalLikesServiceImp appraisalLikesServiceImp;
+    private AppraisalLikesServiceImpl appraisalLikesServiceImpl;
     @Autowired
-    private AppraisalPvServiceImp appraisalPvServiceImp;
+    private AppraisalPvServiceImpl appraisalPvServiceImpl;
     @Autowired
     private CollectMapper collectMapper;
     @Autowired

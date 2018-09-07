@@ -12,11 +12,12 @@ import com.fangyuanyouyue.forum.service.ForumCommentLikesService;
 
 
 @Service(value = "forumCommentLikesService")
-public class ForumCommentLikesServiceImp implements ForumCommentLikesService {
+public class ForumCommentLikesServiceImpl implements ForumCommentLikesService {
 
     @Autowired
     private ForumCommentLikesMapper forumCommentLikesMapper;
     
+	@Override
 	public Integer countLikes(Integer commentId) {
 		return forumCommentLikesMapper.countById(commentId);
 	}

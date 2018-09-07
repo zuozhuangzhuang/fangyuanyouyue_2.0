@@ -59,8 +59,8 @@ public class CollectServiceImpl implements CollectService{
         for(Integer collectId:collectIds){
             Collect collect = collectMapper.selectByCollectId(userId,collectId, type,collectType);
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(collectId);
-            if(goodsInfo == null){
-                throw new ServiceException("商品数据异常！");
+            if(goodsInfo == null || goodsInfo.getStatus().intValue() == 3 || goodsInfo.getStatus().intValue() == 5){
+                throw new ServiceException("商品不存在或已下架！");
             }else{
                 if(goodsInfo.getType().intValue() != collectType.intValue()){
                     throw new ServiceException("类型错误！");
@@ -155,8 +155,8 @@ public class CollectServiceImpl implements CollectService{
      * @throws ServiceException
      */
     private GoodsDto setDtoByGoodsInfo(GoodsInfo goodsInfo) throws ServiceException{
-        if(goodsInfo == null){
-            throw new ServiceException("获取商品失败！");
+        if(goodsInfo == null || goodsInfo.getStatus().intValue() == 3 || goodsInfo.getStatus().intValue() == 5){
+            throw new ServiceException("商品不存在或已下架！");
         }else{
             List<GoodsImg> goodsImgs = goodsImgMapper.getImgsByGoodsId(goodsInfo.getId());
             String mainImgUrl = null;

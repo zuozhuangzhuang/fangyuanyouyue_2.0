@@ -113,7 +113,7 @@ public class Demo {
 		String createOrderURL = "https://api.mch.weixin.qq.com/pay/unifiedorder";
 		
 		
-		code_url = new GetWxOrderno().getCodeUrl(createOrderURL, xml);
+		code_url = GetWxOrderno.getCodeUrl(createOrderURL, xml);
 		System.out.println("code_url----------------"+code_url);
 		
 		return code_url;
@@ -190,7 +190,7 @@ public class Demo {
 		String createOrderURL = "https://api.mch.weixin.qq.com/pay/unifiedorder";
 		
 		
-		prepay_id = new GetWxOrderno().getPayNo(createOrderURL, xml);
+		prepay_id = GetWxOrderno.getPayNo(createOrderURL, xml);
 
 		System.out.println("获取到的预支付ID：" + prepay_id);
 		
@@ -249,7 +249,7 @@ public class Demo {
 		String currency =  amount.replaceAll("\\$|\\￥|\\,", "");  //处理包含, ￥ 或者$的金额  
         int index = currency.indexOf(".");  
         int length = currency.length();  
-        Long amLong = 0l;  
+        Long amLong = 0L;
         if(index == -1){  
             amLong = Long.valueOf(currency+"00");  
         }else if(length - index >= 3){  

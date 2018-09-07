@@ -30,10 +30,11 @@ public class MenuManager {
             int result = WeixinUtil.createMenu(getMenu(), at.getToken());  
        
             // 判断菜单创建结果  
-            if (0 == result)  
-                log.info("菜单创建成功！");  
-            else
-                log.info("菜单创建失败，错误码：" + result);  
+            if (0 == result) {
+                log.info("菜单创建成功！");
+            } else {
+                log.info("菜单创建失败，错误码：" + result);
+            }
         }  
         
     }  

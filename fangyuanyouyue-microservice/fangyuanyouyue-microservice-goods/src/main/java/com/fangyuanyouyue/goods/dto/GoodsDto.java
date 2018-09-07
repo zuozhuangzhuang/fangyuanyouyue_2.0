@@ -32,7 +32,7 @@ public class GoodsDto {
 
     private String label;//标签
 
-    private Integer status;//状态 1出售中 2已售出 3（抢购）已结束 5删除
+    private Integer status;//状态 1出售中 2已售出 3已下架（已结束） 5删除
 
     private BigDecimal floorPrice;//最低价
 

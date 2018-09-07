@@ -38,8 +38,9 @@ public class GoodsImgDto {
     }
 
     public static List<GoodsImgDto> toDtoList(List<GoodsImg> list) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         List<GoodsImgDto> dtolist = new ArrayList<>();
         for (GoodsImg model : list) {
             GoodsImgDto dto = new GoodsImgDto(model);

@@ -38,8 +38,9 @@ public class MyForumCommentDto {
 
 
     public static List<MyForumCommentDto> toDtoList(List<Map> list) {
-        if (list == null)
+        if (list == null) {
             return new ArrayList<>();
+        }
         List<MyForumCommentDto> dtolist = new ArrayList<>();
         for (Map model : list) {
             MyForumCommentDto dto = new MyForumCommentDto(model);

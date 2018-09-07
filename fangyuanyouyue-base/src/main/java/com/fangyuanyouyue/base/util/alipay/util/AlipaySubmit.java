@@ -45,7 +45,7 @@ public class AlipaySubmit {
 	public static String buildRequestMysign(Map<String, String> sPara) {
     	String prestr = AlipayCore.createLinkString(sPara); //把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
         String mysign = "";
-        if(AlipayConfig.sign_type_refund.equals("MD5") ) {
+        if("MD5".equals(AlipayConfig.sign_type_refund)) {
         	mysign = MD5.sign(prestr, AlipayConfig.key, AlipayConfig.input_charset);
         }
         return mysign;
@@ -205,7 +205,7 @@ public class AlipaySubmit {
 
         for (Node node : nodeList) {
             // 截取部分不需要解析的信息
-            if (node.getName().equals("is_success") && node.getText().equals("T")) {
+            if ("is_success".equals(node.getName()) && "T".equals(node.getText())) {
                 // 判断是否有成功标示
                 List<Node> nodeList1 = doc.selectNodes("//response/timestamp/*");
                 for (Node node1 : nodeList1) {

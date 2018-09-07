@@ -51,8 +51,9 @@ public class BannerIndexDto {
     }
 
     public static List<BannerIndexDto> toDtoList(List<BannerIndex> list) {
-        if (list == null)
+        if (list == null) {
             return new ArrayList<>();
+        }
         List<BannerIndexDto> dtolist = new ArrayList<>();
         for (BannerIndex model : list) {
             BannerIndexDto dto = new BannerIndexDto(model);

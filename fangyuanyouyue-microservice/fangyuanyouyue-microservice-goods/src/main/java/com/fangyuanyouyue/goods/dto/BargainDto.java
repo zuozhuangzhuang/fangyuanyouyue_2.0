@@ -53,12 +53,13 @@ public class BargainDto {
         this.status = goodsBargain.getStatus();
         this.addTime = DateUtil.getFormatDate(goodsBargain.getAddTime(), DateUtil.DATE_FORMT);
         this.updateTime = DateUtil.getFormatDate(goodsBargain.getUpdateTime(), DateUtil.DATE_FORMT);
-        this.leftTime = DateUtil.getTimeDifference(goodsBargain.getAddTime().getTime()+24*60*60*1000,new Date().getTime());
+        this.leftTime = DateUtil.getTimeDifference(goodsBargain.getAddTime().getTime()+24*60*60*1000,System.currentTimeMillis());
     }
 
     public static List<BargainDto> toDtoList(List<GoodsBargain> list) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         List<BargainDto> dtolist = new ArrayList<>();
         for (GoodsBargain model : list) {
             BargainDto dto = new BargainDto(model);

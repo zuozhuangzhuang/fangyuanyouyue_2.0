@@ -29,18 +29,18 @@ import static javafx.scene.input.KeyCode.I;
 
 
 @Service(value = "appraisalDetailService")
-public class AppraisalDetailServiceImp implements AppraisalDetailService {
+public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 
 	@Autowired
 	private AppraisalDetailMapper appraisalDetailMapper;
 	@Autowired
 	private AppraisalImgMapper appraisalImgMapper;
 	@Autowired
-	private AppraisalCommentServiceImp appraisalCommentServiceImp;
+	private AppraisalCommentServiceImpl appraisalCommentServiceImpl;
 	@Autowired
-	private AppraisalLikesServiceImp appraisalLikesServiceImp;
+	private AppraisalLikesServiceImpl appraisalLikesServiceImpl;
 	@Autowired
-	private AppraisalPvServiceImp appraisalPvServiceImp;
+	private AppraisalPvServiceImpl appraisalPvServiceImpl;
 	@Autowired
 	private CollectMapper collectMapper;
 	@Autowired
@@ -62,24 +62,24 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 		AppraisalDetail model = appraisalDetailMapper.selectDetailByPrimaryKey(appraisalId);
 		AppraisalDetailDto dto = new AppraisalDetailDto(model);
 		//评论数量
-		Integer commentCount = appraisalCommentServiceImp.countComment(appraisalId);
+		Integer commentCount = appraisalCommentServiceImpl.countComment(appraisalId);
 		dto.setCommentCount(commentCount);
 		//点赞数量
-		Integer likesCount = appraisalLikesServiceImp.countLikes(appraisalId);
+		Integer likesCount = appraisalLikesServiceImpl.countLikes(appraisalId);
 		dto.setLikesCount(likesCount);
 		//浏览量
-		Integer viewCount = appraisalPvServiceImp.countPv(appraisalId);
+		Integer viewCount = appraisalPvServiceImpl.countPv(appraisalId);
 		dto.setViewCount(viewCount+model.getPvCount());
 		//看真数量
-		Integer truthCount = appraisalCommentServiceImp.countComment(appraisalId,StatusEnum.YES.getValue());
+		Integer truthCount = appraisalCommentServiceImpl.countComment(appraisalId,StatusEnum.YES.getValue());
 		//看假数量
-		Integer untruthCount = appraisalCommentServiceImp.countComment(appraisalId,StatusEnum.NO.getValue());
+		Integer untruthCount = appraisalCommentServiceImpl.countComment(appraisalId,StatusEnum.NO.getValue());
 		dto.setTruthCount(truthCount);
 		dto.setUntruthCount(untruthCount);
 
 		if(userId!=null) {
 			//增加浏览量
-			appraisalPvServiceImp.savePv(userId,appraisalId);
+			appraisalPvServiceImpl.savePv(userId,appraisalId);
 			//是否收藏
 			Collect collect = collectMapper.selectByCollectIdType(userId, appraisalId, 5);
 			if(collect != null){
@@ -96,7 +96,7 @@ public class AppraisalDetailServiceImp implements AppraisalDetailService {
 				dto.setIsLikes(StatusEnum.YES.getValue());
 			}
 			//浏览量
-			Integer pvCount = appraisalPvServiceImp.countPv(appraisalId);
+			Integer pvCount = appraisalPvServiceImpl.countPv(appraisalId);
 			dto.setViewCount(pvCount+model.getPvCount());
 			AppraisalComment comment = appraisalCommentMapper.selectByAppraisalIdUserId(userId, appraisalId);
 			if(comment != null){

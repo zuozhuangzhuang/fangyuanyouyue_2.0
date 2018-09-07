@@ -22,7 +22,7 @@ import com.fangyuanyouyue.forum.service.ForumCommentService;
 
 
 @Service(value = "forumCommentService")
-public class ForumCommentServiceImp implements ForumCommentService {
+public class ForumCommentServiceImpl implements ForumCommentService {
 
     @Autowired
     private ForumCommentMapper forumCommentMapper;
@@ -33,6 +33,7 @@ public class ForumCommentServiceImp implements ForumCommentService {
     @Autowired
 	private ForumInfoMapper forumInfoMapper;
 
+	@Override
 	public Integer countComment(Integer forumId) {
 		return forumCommentMapper.countById(forumId);
 	}

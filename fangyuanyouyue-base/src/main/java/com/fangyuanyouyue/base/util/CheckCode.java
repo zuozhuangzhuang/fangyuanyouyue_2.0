@@ -26,7 +26,7 @@ public class CheckCode {
 		for (int i = 0; i <  4; i++) {
 			//得到随机产生的验证码数字。
 			String strRand = String.valueOf(codeSequence[random.nextInt(10)]);
-			if(i == 0 && strRand.equals("0")){
+			if(i == 0 && "0".equals(strRand)){
 				i = -1;
 				continue;
 			}

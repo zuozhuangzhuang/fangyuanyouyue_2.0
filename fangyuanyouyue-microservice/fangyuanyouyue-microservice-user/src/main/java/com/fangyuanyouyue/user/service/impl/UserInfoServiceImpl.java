@@ -79,8 +79,8 @@ public class UserInfoServiceImpl implements UserInfoService {
         Integer userId = (Integer)schedualRedisService.get(token);
         if(userId!=null) {
             //更新时间
-            schedualRedisService.set(token, userId.toString(), 7*24*60*60l);
-            schedualRedisService.set(userId.toString(), token, 7*24*60*60l);
+            schedualRedisService.set(token, userId.toString(), 7*24*60* 60L);
+            schedualRedisService.set(userId.toString(), token, 7*24*60* 60L);
             UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
             return userInfo;
         }
@@ -102,8 +102,8 @@ public class UserInfoServiceImpl implements UserInfoService {
             schedualRedisService.set(oldUserId,null,null);
         }
         //覆盖原来的
-        schedualRedisService.set(token, userId.toString(), 7*24*60*60l);
-        schedualRedisService.set(userId.toString(), token, 7*24*60*60l);
+        schedualRedisService.set(token, userId.toString(), 7*24*60* 60L);
+        schedualRedisService.set(userId.toString(), token, 7*24*60* 60L);
         return token;
     }
     
@@ -303,7 +303,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             UserThirdParty userThirdParty = userThirdPartyMapper.getUserByThirdNoType(unionId,type);
             //校验是否绑定三方账号
             if(userThirdParty != null){
-                if(userThirdParty.getUserId() == userInfo.getId()){
+                if(userThirdParty.getUserId().intValue() == userInfo.getId().intValue()){
                     throw new ServiceException("请勿重复绑定！");
                 }else{
                     UserInfo user = userInfoMapper.selectByPrimaryKey(userThirdParty.getUserId());
@@ -717,7 +717,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 	public void registIMUser(UserInfo user) throws ServiceException {
         try {
             //判断用户是否已经注册环信
-            if(user.getIsRegHx()==null||user.getIsRegHx()==StatusEnum.NO.getCode()) {
+            if(user.getIsRegHx()==null||user.getIsRegHx().intValue()==StatusEnum.NO.getCode().intValue()) {
                 schedualMessageService.easemobRegist(user.getId().toString(), MD5Util.MD5("xiaofangyuan"+user.getId().toString()));
                 user.setIsRegHx(StatusEnum.YES.getCode());
                 userInfoMapper.updateByPrimaryKey(user);

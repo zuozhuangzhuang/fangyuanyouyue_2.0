@@ -160,7 +160,7 @@ public class CommentServiceImpl implements CommentService{
             GoodsCommentDto goodsCommentDto = it.next();
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsCommentDto.getGoodsId());
             if(goodsInfo == null){
-                throw new ServiceException("商品信息异常！");
+                throw new ServiceException("商品不存在！");
             }
             if(goodsInfo.getType().intValue() != type.intValue()){
                 it.remove();

@@ -67,8 +67,9 @@ public class UserBalanceDto {
     }
     
     public static List<UserBalanceDto> toDtoList(List<UserBalanceDetail> list) {
-        if (list == null)
+        if (list == null) {
             return new ArrayList<>();
+        }
         List<UserBalanceDto> dtolist = new ArrayList<>();
         for (UserBalanceDetail model : list) {
             UserBalanceDto dto = new UserBalanceDto(model);

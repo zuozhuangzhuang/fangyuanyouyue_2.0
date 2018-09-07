@@ -426,7 +426,7 @@ public class OrderController extends BaseController{
     @ApiOperation(value = "删除订单", notes = "(void)删除订单")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "orderIds", value = "订单id数组",allowMultiple = true,required = true, dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "orderIds", value = "订单id数组",allowMultiple = true,required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/deleteOrder")
     @ResponseBody
@@ -445,7 +445,7 @@ public class OrderController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getOrderIds() == null || param.getOrderIds().length < 1){
-
+                return toError("订单不能为空！");
             }
             //删除订单
             orderService.deleteOrder(userId,param.getOrderIds());

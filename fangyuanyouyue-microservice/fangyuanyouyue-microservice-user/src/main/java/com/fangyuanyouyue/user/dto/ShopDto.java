@@ -69,8 +69,9 @@ public class ShopDto {
     }
 
     public static List<ShopDto> toDtoList(List<Map<String,Object>> list) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         List<ShopDto> dtolist = new ArrayList<>();
         for (Map<String,Object> model : list) {
             ShopDto dto = new ShopDto(model);

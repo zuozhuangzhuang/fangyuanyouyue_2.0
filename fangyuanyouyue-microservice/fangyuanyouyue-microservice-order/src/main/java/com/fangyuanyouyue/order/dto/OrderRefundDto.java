@@ -41,11 +41,13 @@ public class OrderRefundDto {
 
     private String refuseReason;//拒绝退货理由
 
-    private String addTime;//添加时间
+    private String addTime;//申请退货时间
 
-    private String updateTime;//更新时间
+    private String updateTime;//修改时间
 
-    private Long endTime;//剩余处理时间
+    private String endTime;//最终（后台管理）处理时间
+
+    private String dealTime;//卖家处理时间
 
     public OrderRefundDto() {
     }
@@ -67,6 +69,11 @@ public class OrderRefundDto {
         this.refuseReason = refund.getRefuseReason();
         this.addTime =  DateUtil.getFormatDate(refund.getAddTime(), DateUtil.DATE_FORMT);
         this.updateTime = DateUtil.getFormatDate(refund.getUpdateTime(), DateUtil.DATE_FORMT);
-        this.endTime = refund.getEndTime().getTime();
+        if(refund.getEndTime() != null){
+            this.endTime = DateUtil.getFormatDate(refund.getEndTime(), DateUtil.DATE_FORMT);
+        }
+        if(refund.getDealTime() != null){
+            this.dealTime = DateUtil.getFormatDate(refund.getDealTime(), DateUtil.DATE_FORMT);
+        }
     }
 }

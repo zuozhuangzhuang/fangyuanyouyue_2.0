@@ -29,8 +29,9 @@ public class SearchDto {
     }
 
     public static List<SearchDto> toDtoList(List<HotSearch> list) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         List<SearchDto> dtolist = new ArrayList<>();
         for (HotSearch model : list) {
             SearchDto dto = new SearchDto(model);

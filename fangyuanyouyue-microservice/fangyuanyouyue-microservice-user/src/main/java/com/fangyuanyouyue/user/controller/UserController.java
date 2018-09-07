@@ -843,11 +843,14 @@ public class UserController extends BaseController {
             log.info("----》获取待处理信息《----");
             log.info("参数："+param.toString());
             if(StringUtils.isEmpty(param.getToken())){
-                return toError("用户ID不能为空！");
+                return toError("用户token不能为空！");
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
                 return toError("登录超时，请重新登录！");
+            }
+            if(user.getStatus() == 2){
+                return toError("您的账号已被冻结，请联系管理员！");
             }
             //获取待处理信息
             WaitProcessDto waitProcessDto = userInfoService.myWaitProcess(user.getId());
@@ -874,7 +877,7 @@ public class UserController extends BaseController {
             log.info("----》申请官方认证《----");
             log.info("参数："+param.toString());
             if(StringUtils.isEmpty(param.getToken())){
-                return toError("用户ID不能为空！");
+                return toError("用户token不能为空！");
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){

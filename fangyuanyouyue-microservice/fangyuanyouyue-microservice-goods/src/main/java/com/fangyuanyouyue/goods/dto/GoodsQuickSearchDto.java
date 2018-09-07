@@ -41,8 +41,9 @@ public class GoodsQuickSearchDto {
     }
 
     public static List<GoodsQuickSearchDto> toDtoList(List<GoodsQuickSearch> list) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         List<GoodsQuickSearchDto> dtolist = new ArrayList<>();
         for (GoodsQuickSearch model : list) {
             GoodsQuickSearchDto dto = new GoodsQuickSearchDto(model);

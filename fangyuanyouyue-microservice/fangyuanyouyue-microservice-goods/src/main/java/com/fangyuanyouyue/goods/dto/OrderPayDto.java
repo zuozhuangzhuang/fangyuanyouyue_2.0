@@ -65,8 +65,9 @@ public class OrderPayDto {
     }
 
     public static ArrayList<OrderPayDto> toDtoList(List<OrderPay> list) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         ArrayList<OrderPayDto> dtolist = new ArrayList<>();
         for (OrderPay model : list) {
             OrderPayDto dto = new OrderPayDto(model);

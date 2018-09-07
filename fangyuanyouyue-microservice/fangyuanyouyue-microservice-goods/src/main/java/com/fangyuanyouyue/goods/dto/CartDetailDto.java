@@ -32,7 +32,7 @@ public class CartDetailDto {
 
     private String mainUrl;//商品主图
 
-    private Integer status;//商品状态 1出售中 2已售出
+    private Integer status;//商品状态 1出售中 2已售出 3已下架（已结束） 5已删除
 
     private Integer bargainId;//如果存在申请中的议价就返回议价详情id，否则为null
 
@@ -53,8 +53,9 @@ public class CartDetailDto {
     }
 
     public static List<CartDetailDto> toDtoList(List<Map<String,Object>> list) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         List<CartDetailDto> dtolist = new ArrayList<>();
         for (Map<String,Object> model : list) {
             CartDetailDto dto = new CartDetailDto(model);
