@@ -464,6 +464,13 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 }
                 goodsDto.setBargainDtos(bargainDtos);
             }
+            //如果商品status为已售出，获取商品所属订单ID
+            if(goodsInfo.getStatus().intValue() == 2){
+                OrderDetail orderDetail = orderDetailMapper.selectOrderByGoodsIdStatus(userId, goodsInfo.getId(),2);
+                if(orderDetail != null){
+                    goodsDto.setOrderId(orderDetail.getOrderId());
+                }
+            }
         }else{//买家
             List<GoodsBargain> bargain = goodsBargainMapper.selectByUserIdGoodsId(userId, goodsInfo.getId(), null);
             List<BargainDto> bargainDtos = BargainDto.toDtoList(bargain);
@@ -473,14 +480,15 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 bargainDto.setHeadImgUrl(seller.getHeadImgUrl());
             }
             goodsDto.setBargainDtos(bargainDtos);
-        }
-        //如果商品status为已售出，获取商品所属订单ID
-        if(goodsInfo.getStatus().intValue() == 2){
-            OrderDetail orderDetail = orderDetailMapper.selectOrderByGoodsIdStatus(userId, goodsInfo.getId());
-            if(orderDetail != null){
-                goodsDto.setOrderId(orderDetail.getOrderId());
+            //如果商品status为已售出，获取商品所属订单ID
+            if(goodsInfo.getStatus().intValue() == 2){
+                OrderDetail orderDetail = orderDetailMapper.selectOrderByGoodsIdStatus(userId, goodsInfo.getId(),1);
+                if(orderDetail != null){
+                    goodsDto.setOrderId(orderDetail.getOrderId());
+                }
             }
         }
+
 
 
         return goodsDto;
