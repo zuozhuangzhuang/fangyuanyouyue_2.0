@@ -43,8 +43,8 @@ public class ForumInfoControllerTest {
     @Transactional
     public void forumList() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/forum/list")
-//                .param("token", "10045FY1534451510951")
-                .param("userId", "42")
+                .param("token", "10015FY1536222536781")
+//                .param("userId", "42")
 //                .param("columnId", "1")
 //        		.param("keyword", "")
                 //搜索类型1古物圈子 2专栏精选

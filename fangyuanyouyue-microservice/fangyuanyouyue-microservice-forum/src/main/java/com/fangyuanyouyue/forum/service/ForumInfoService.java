@@ -21,6 +21,7 @@ public interface ForumInfoService {
 
 	/**
 	 * 获取帖子列表
+	 * @param requesterId
 	 * @param columnId
 	 * @param userId
 	 * @param type
@@ -32,7 +33,7 @@ public interface ForumInfoService {
 	 * @return
 	 * @throws ServiceException
 	 */
-    List<ForumInfoDto> getForumList(Integer columnId,Integer userId, Integer type, String keyword,Integer start,Integer limit,Integer listType,Integer searchType)
+    List<ForumInfoDto> getForumList(Integer requesterId,Integer columnId,Integer userId, Integer type, String keyword,Integer start,Integer limit,Integer listType,Integer searchType)
 			throws ServiceException;
 
 	/**

@@ -1077,7 +1077,7 @@ public class UserController extends BaseController {
                     // 如果没有做过处理，根据订单号（out_trade_no）在商户网站的订单系统中查到该笔订单的详细，并执行商户的业务程序
                     // 如果有做过处理，不执行商户的业务程序
 //                    boolean result = orderService.saveNotify(out_trade_no, trade_no,Type.PAYTYPE_ALIPAY.getValue());
-                    boolean result = true;
+                    boolean result = userInfoExtService.updateOrder(out_trade_no,trade_no,2);
                     if(result){
                         ret = "success"; // 请不要修改或删除
                     }else{

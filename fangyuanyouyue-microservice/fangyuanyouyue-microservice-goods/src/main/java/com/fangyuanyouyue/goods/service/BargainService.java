@@ -19,7 +19,8 @@ public interface BargainService {
 //     * @param payType
      * @throws ServiceException
      */
-    void addBargain(Integer userId, Integer goodsId, BigDecimal price,String reason,Integer addressId,String payPwd,Integer payType) throws ServiceException;
+    Object addBargain(Integer userId, Integer goodsId, BigDecimal price,String reason,Integer addressId,String payPwd,Integer payType) throws ServiceException;
+
 
     /**
      * 处理压价
@@ -70,4 +71,14 @@ public interface BargainService {
      * @throws ServiceException
      */
     void deleteBargain(Integer userId,Integer[] goodsIds) throws ServiceException;
+
+    /**
+     * 修改议价订单状态
+     * @param orderNo
+     * @param thridOrderNo
+     * @param payType
+     * @return
+     * @throws ServiceException
+     */
+    boolean updateOrder(String orderNo, String thridOrderNo, Integer payType) throws ServiceException;
 }

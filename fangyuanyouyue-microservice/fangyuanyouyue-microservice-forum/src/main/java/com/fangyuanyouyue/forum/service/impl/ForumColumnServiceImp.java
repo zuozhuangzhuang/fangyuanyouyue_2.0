@@ -217,7 +217,7 @@ public class ForumColumnServiceImp implements ForumColumnService {
 			throw new ServiceException("未找到专栏！");
 		}
 		MyColumnDto myColumnDto = new MyColumnDto();
-		List<ForumInfoDto> forumList = forumInfoService.getForumList(forumColumn.getId(), null, 1, null, start, limit, 1, null);
+		List<ForumInfoDto> forumList = forumInfoService.getForumList(userId,forumColumn.getId(), null, 1, null, start, limit, 1, null);
 		Date date = DateUtil.getTimestamp(DateUtil.getCurrentTime(),DateUtil.DATE_FORMT_YEAR);
 		Integer countByColumnId = forumPvMapper.getCountByColumnId(forumColumn.getId(), date);
 		myColumnDto.setColumnId(forumColumn.getId());
