@@ -38,8 +38,9 @@ public class BonusPoolDto {
     }
 
     public static List<BonusPoolDto> toDtoList(List<BonusPool> list) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         List<BonusPoolDto> dtolist = new ArrayList<>();
         for (BonusPool model : list) {
             BonusPoolDto dto = new BonusPoolDto(model);

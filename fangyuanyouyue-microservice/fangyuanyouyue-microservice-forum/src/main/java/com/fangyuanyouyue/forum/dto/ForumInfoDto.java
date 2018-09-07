@@ -78,8 +78,9 @@ public class ForumInfoDto {
     }
     
     public static List<ForumInfoDto> toDtoList(List<ForumInfo> list) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         List<ForumInfoDto> dtolist = new ArrayList<>();
         for (ForumInfo model : list) {
             ForumInfoDto dto = new ForumInfoDto(model);

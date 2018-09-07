@@ -86,8 +86,9 @@ public class AdminUserDto {
     }
 
     public static List<AdminUserDto> toDtoList(List<UserInfo> list) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         List<AdminUserDto> dtolist = new ArrayList<>();
         for (UserInfo model : list) {
             AdminUserDto dto = new AdminUserDto(model);

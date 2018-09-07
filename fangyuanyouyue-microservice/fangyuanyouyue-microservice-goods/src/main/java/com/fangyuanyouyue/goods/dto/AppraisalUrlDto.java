@@ -38,8 +38,9 @@ public class AppraisalUrlDto {
 
 
     public static ArrayList<AppraisalUrlDto> toDtoList(List<AppraisalUrl> list) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         ArrayList<AppraisalUrlDto> dtolist = new ArrayList<>();
         for (AppraisalUrl model : list) {
             AppraisalUrlDto dto = new AppraisalUrlDto(model);

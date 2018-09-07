@@ -41,8 +41,9 @@ public class ForumColumnDto {
         this.typeName = forumInfo.getTypeName();
     }
     public static List<ForumColumnDto> toDtoList(List<ForumColumn> list) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         List<ForumColumnDto> dtolist = new ArrayList<>();
         for (ForumColumn model : list) {
             ForumColumnDto dto = new ForumColumnDto(model);

@@ -100,7 +100,7 @@ public class DateUtil {
 //		Date date = new Date();
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
-		c.add(c.YEAR, year);// 属性很多也有月等等，可以操作各种时间日期
+		c.add(Calendar.YEAR, year);// 属性很多也有月等等，可以操作各种时间日期
 		Date temp_date = c.getTime();
 //		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		return temp_date;
@@ -114,7 +114,7 @@ public class DateUtil {
 	public static Date getDateAfterMonth(Date date,int month) {
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
-		c.add(c.MONTH, month);// 属性很多也有月等等，可以操作各种时间日期
+		c.add(Calendar.MONTH, month);// 属性很多也有月等等，可以操作各种时间日期
 		Date temp_date = c.getTime();
 //		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		return temp_date;
@@ -130,7 +130,7 @@ public class DateUtil {
 		Date date = new Date();
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
-		c.add(c.YEAR, year);// 属性很多也有月等等，可以操作各种时间日期
+		c.add(Calendar.YEAR, year);// 属性很多也有月等等，可以操作各种时间日期
 		Date temp_date = c.getTime();
 		SimpleDateFormat sdf = new SimpleDateFormat(format);
 		return sdf.format(temp_date);
@@ -193,13 +193,13 @@ public class DateUtil {
 		calendar.setTime(new Date());
 		if (field != null && !field.equals("")) {
 			if (field.equals("y")) {
-				calendar.add(calendar.YEAR, amount);
+				calendar.add(Calendar.YEAR, amount);
 			} else if (field.equals("M")) {
-				calendar.add(calendar.MONTH, amount);
+				calendar.add(Calendar.MONTH, amount);
 			} else if (field.equals("d")) {
-				calendar.add(calendar.DAY_OF_MONTH, amount);
+				calendar.add(Calendar.DAY_OF_MONTH, amount);
 			} else if (field.equals("H")) {
-				calendar.add(calendar.HOUR, amount);
+				calendar.add(Calendar.HOUR, amount);
 			}
 		} else {
 			return null;
@@ -223,13 +223,13 @@ public class DateUtil {
 		calendar.setTime(date);
 		if (field != null && !field.equals("")) {
 			if (field.equals("y")) {
-				calendar.add(calendar.YEAR, amount);
+				calendar.add(Calendar.YEAR, amount);
 			} else if (field.equals("M")) {
-				calendar.add(calendar.MONTH, amount);
+				calendar.add(Calendar.MONTH, amount);
 			} else if (field.equals("d")) {
-				calendar.add(calendar.DAY_OF_MONTH, amount);
+				calendar.add(Calendar.DAY_OF_MONTH, amount);
 			} else if (field.equals("H")) {
-				calendar.add(calendar.HOUR, amount);
+				calendar.add(Calendar.HOUR, amount);
 			}
 		} else {
 			return null;
@@ -253,13 +253,13 @@ public class DateUtil {
 		calendar.setTime(d);
 		if (field != null && !field.equals("")) {
 			if (field.equals("y")) {
-				calendar.add(calendar.YEAR, amount);
+				calendar.add(Calendar.YEAR, amount);
 			} else if (field.equals("M")) {
-				calendar.add(calendar.MONTH, amount);
+				calendar.add(Calendar.MONTH, amount);
 			} else if (field.equals("d")) {
-				calendar.add(calendar.DAY_OF_MONTH, amount);
+				calendar.add(Calendar.DAY_OF_MONTH, amount);
 			} else if (field.equals("H")) {
-				calendar.add(calendar.HOUR, amount);
+				calendar.add(Calendar.HOUR, amount);
 			}
 		} else {
 			return null;

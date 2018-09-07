@@ -79,8 +79,8 @@ public class UserInfoServiceImpl implements UserInfoService {
         Integer userId = (Integer)schedualRedisService.get(token);
         if(userId!=null) {
             //更新时间
-            schedualRedisService.set(token, userId.toString(), 7*24*60*60l);
-            schedualRedisService.set(userId.toString(), token, 7*24*60*60l);
+            schedualRedisService.set(token, userId.toString(), 7*24*60* 60L);
+            schedualRedisService.set(userId.toString(), token, 7*24*60* 60L);
             UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
             return userInfo;
         }
@@ -102,8 +102,8 @@ public class UserInfoServiceImpl implements UserInfoService {
             schedualRedisService.set(oldUserId,null,null);
         }
         //覆盖原来的
-        schedualRedisService.set(token, userId.toString(), 7*24*60*60l);
-        schedualRedisService.set(userId.toString(), token, 7*24*60*60l);
+        schedualRedisService.set(token, userId.toString(), 7*24*60* 60L);
+        schedualRedisService.set(userId.toString(), token, 7*24*60* 60L);
         return token;
     }
     

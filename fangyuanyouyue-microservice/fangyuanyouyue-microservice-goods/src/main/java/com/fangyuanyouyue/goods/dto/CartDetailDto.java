@@ -53,8 +53,9 @@ public class CartDetailDto {
     }
 
     public static List<CartDetailDto> toDtoList(List<Map<String,Object>> list) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         List<CartDetailDto> dtolist = new ArrayList<>();
         for (Map<String,Object> model : list) {
             CartDetailDto dto = new CartDetailDto(model);

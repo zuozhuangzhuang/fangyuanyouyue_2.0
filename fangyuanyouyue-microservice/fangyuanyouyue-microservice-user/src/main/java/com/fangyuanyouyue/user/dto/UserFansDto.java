@@ -60,8 +60,9 @@ public class UserFansDto {
         this.signature = (String)map.get("signature");
     }
     public static List<UserFansDto> toDtoList(List<Map<String,Object>> list) {
-        if (list == null)
+        if (list == null) {
             return new ArrayList<>();
+        }
         List<UserFansDto> dtolist = new ArrayList<>();
         for (Map<String,Object> model : list) {
             UserFansDto dto = new UserFansDto(model);

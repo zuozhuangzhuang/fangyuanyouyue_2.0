@@ -34,8 +34,9 @@ public class AppraisalImgDto {
 
 
     public static ArrayList<AppraisalImgDto> toDtoList(List<AppraisalImg> list) {
-        if (list == null)
+        if (list == null) {
             return new ArrayList<>();
+        }
         ArrayList<AppraisalImgDto> dtolist = new ArrayList<>();
         for (AppraisalImg model : list) {
             AppraisalImgDto dto = new AppraisalImgDto(model);

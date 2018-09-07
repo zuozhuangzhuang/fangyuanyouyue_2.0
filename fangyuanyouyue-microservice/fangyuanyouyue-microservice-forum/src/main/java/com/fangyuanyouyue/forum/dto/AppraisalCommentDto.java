@@ -78,8 +78,9 @@ public class AppraisalCommentDto {
     }
 
     public static List<AppraisalCommentDto> toDtoList(List<AppraisalComment> list) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         List<AppraisalCommentDto> dtolist = new ArrayList<>();
         for (AppraisalComment model : list) {
             AppraisalCommentDto dto = new AppraisalCommentDto(model);

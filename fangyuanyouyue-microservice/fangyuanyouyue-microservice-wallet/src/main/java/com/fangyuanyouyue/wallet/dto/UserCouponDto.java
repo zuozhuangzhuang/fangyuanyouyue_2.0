@@ -57,8 +57,9 @@ public class UserCouponDto {
     }
 
     public static List<UserCouponDto> toDtoList(List<UserCoupon> list) {
-        if (list == null)
+        if (list == null) {
             return new ArrayList<>();
+        }
         List<UserCouponDto> dtolist = new ArrayList<>();
         for (UserCoupon model : list) {
             UserCouponDto dto = new UserCouponDto(model);

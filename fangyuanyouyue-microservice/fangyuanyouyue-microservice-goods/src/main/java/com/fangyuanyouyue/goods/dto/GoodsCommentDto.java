@@ -78,8 +78,9 @@ public class GoodsCommentDto {
 
 
     public static List<GoodsCommentDto> mapToDtoList(List<Map<String,Object>> maps) {
-        if (maps == null)
+        if (maps == null) {
             return null;
+        }
         List<GoodsCommentDto> dtolist = new ArrayList<>();
         for (Map<String,Object> model : maps) {
             GoodsCommentDto dto = new GoodsCommentDto(model);

@@ -133,14 +133,6 @@ public class BargainServiceImpl implements BargainService{
 
     }
 
-    /**
-     *
-     * @param orderNo
-     * @param thridOrderNo
-     * @param payType
-     * @return
-     * @throws ServiceException
-     */
     @Override
     public boolean updateOrder(String orderNo, String thridOrderNo, Integer payType) throws ServiceException{
         BargainOrder bargainOrder = bargainOrderMapper.selectByOrderNo(orderNo);
@@ -162,7 +154,7 @@ public class BargainServiceImpl implements BargainService{
         bargainOrderMapper.updateByPrimaryKeySelective(bargainOrder);
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(bargainOrder.getGoodsId());
         //议价：恭喜您！您的商品【商品名称】有新的议价，点击此处查看详情
-        schedualMessageService.easemobMessage(bargainOrder.getUserId().toString(),
+        schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
                 "恭喜您！您的商品【"+goodsInfo.getName()+"】有新的议价，点击此处查看详情","2","2",goodsInfo.getId().toString());
         //买家新增余额账单
         schedualWalletService.addUserBalanceDetail(goodsBargain.getUserId(),goodsBargain.getPrice(),payType,2,bargainOrder.getOrderNo(),goodsInfo.getName(),goodsInfo.getUserId(),goodsBargain.getUserId(),3);

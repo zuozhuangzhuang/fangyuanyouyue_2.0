@@ -57,8 +57,9 @@ public class BargainDto {
     }
 
     public static List<BargainDto> toDtoList(List<GoodsBargain> list) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         List<BargainDto> dtolist = new ArrayList<>();
         for (GoodsBargain model : list) {
             BargainDto dto = new BargainDto(model);

@@ -34,8 +34,9 @@ public class CompanyDto {
     }
 
     public static List<CompanyDto> toDtoList(List<Company> list) {
-        if (list == null)
+        if (list == null) {
             return new ArrayList<>();
+        }
         ArrayList<CompanyDto> dtolist = new ArrayList<CompanyDto>();
         for (Company model : list) {
             CompanyDto dto = new CompanyDto(model);

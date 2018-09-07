@@ -42,8 +42,9 @@ public class ForumLikesDto {
         this.userId = model.getUserId();
     }
     public static List<ForumLikesDto> toDtoList(List<ForumLikes> list) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         List<ForumLikesDto> dtolist = new ArrayList<>();
         for (ForumLikes model : list) {
         	ForumLikesDto dto = new ForumLikesDto(model);

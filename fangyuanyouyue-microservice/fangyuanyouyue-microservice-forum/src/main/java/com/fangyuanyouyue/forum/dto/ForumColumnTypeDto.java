@@ -59,8 +59,9 @@ public class ForumColumnTypeDto {
     }
 
     public static List<ForumColumnTypeDto> toDtoListByType(List<ForumColumnType> list) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         List<ForumColumnTypeDto> dtolist = new ArrayList<>();
         for (ForumColumnType model : list) {
             ForumColumnTypeDto dto = new ForumColumnTypeDto(model);

@@ -52,8 +52,9 @@ public class ForumCommentDto {
         this.userId = model.getUserId();
     }
     public static List<ForumCommentDto> toDtoList(List<ForumComment> list) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         List<ForumCommentDto> dtolist = new ArrayList<>();
         for (ForumComment model : list) {
         	ForumCommentDto dto = new ForumCommentDto(model);

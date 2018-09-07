@@ -35,8 +35,9 @@ public class GoodsCorrelationDto {
         this.categoryParentId = goodsCorrelation.getCategoryParentId();
     }
     public static List<GoodsCorrelationDto> toDtoList(List<GoodsCorrelation> list) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         List<GoodsCorrelationDto> dtolist = new ArrayList<>();
         for (GoodsCorrelation model : list) {
             GoodsCorrelationDto dto = new GoodsCorrelationDto(model);
