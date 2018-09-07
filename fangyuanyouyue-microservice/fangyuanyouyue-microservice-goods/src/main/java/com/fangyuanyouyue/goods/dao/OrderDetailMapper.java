@@ -36,7 +36,7 @@ public interface OrderDetailMapper {
      * @param goodsId
      * @return
      */
-    OrderDetail selectOrderByGoodsIdStatus(@Param("userId")Integer userId, @Param("goodsId")Integer goodsId);
+    OrderDetail selectOrderByGoodsIdStatus(@Param("userId")Integer userId, @Param("goodsId")Integer goodsId,@Param("type")Integer type);
 
     /**
      * 根据买家id和商品id获取订单详情

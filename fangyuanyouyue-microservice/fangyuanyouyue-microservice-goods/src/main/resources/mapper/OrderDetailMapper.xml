@@ -237,7 +237,13 @@
   <select id="selectOrderByGoodsIdStatus" parameterType="Integer" resultMap="BaseResultMap">
     select a.* from order_detail a,order_pay b
     <where>
-      a.order_id = b.order_id and b.status <![CDATA[ <> ]]> 5 and b.status <![CDATA[ <> ]]> 6 and a.user_id = #{userId}
+      a.order_id = b.order_id and b.status <![CDATA[ <> ]]> 5 and b.status <![CDATA[ <> ]]> 6
+      <if test="type != null and type == 1">
+        and a.user_id = #{userId}
+      </if>
+      <if test="type != null and type == 2">
+        and a.seller_id = #{userId}
+      </if>
       <if test="goodsId != null">
         and a.goods_id = #{goodsId}
       </if>
