@@ -87,7 +87,7 @@ public class ForumInfoServiceImp implements ForumInfoService {
 	}
 
 	@Override
-	public List<ForumInfoDto> getForumList(Integer columnId,Integer userId, Integer type, String keyword, Integer start, Integer limit,Integer listType,Integer searchType) throws ServiceException {
+	public List<ForumInfoDto> getForumList(Integer requesterId,Integer columnId,Integer userId, Integer type, String keyword, Integer start, Integer limit,Integer listType,Integer searchType) throws ServiceException {
 		List<ForumInfo> list;
 		if(listType.intValue() == 1){
 			//普通列表，需要判断是否点赞/收藏
@@ -97,7 +97,7 @@ public class ForumInfoServiceImp implements ForumInfoService {
 //				throw new ServiceException("用户信息为空！");
 //			}
 			//我的xx列表
-			list = forumInfoMapper.selectList(columnId,userId,type,keyword, start*limit, limit,searchType);
+			list = forumInfoMapper.selectList(columnId,requesterId,type,keyword, start*limit, limit,searchType);
 		}else{
 			throw new ServiceException("列表类型错误！");
 		}
@@ -110,14 +110,14 @@ public class ForumInfoServiceImp implements ForumInfoService {
 			//计算评论数
 			Integer commentCount = forumCommentService.countComment(info.getId());
 			dto.setCommentCount(commentCount);
-			if(userId != null){
+			if(requesterId != null){
 				//是否收藏
-				Collect collect = collectMapper.selectByCollectIdType(userId, info.getId(), info.getType() == 2?3:4);
+				Collect collect = collectMapper.selectByCollectIdType(requesterId, info.getId(), info.getType() == 2?3:4);
 				if(collect != null){
 					dto.setIsCollect(StatusEnum.YES.getValue());
 				}
 				//是否点赞
-				ForumLikes forumLikes = forumLikesMapper.selectByForumIdUserId(dto.getForumId(), userId);
+				ForumLikes forumLikes = forumLikesMapper.selectByForumIdUserId(dto.getForumId(), requesterId);
 				if(forumLikes != null){
 					dto.setIsLikes(StatusEnum.YES.getValue());
 				}

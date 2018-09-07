@@ -117,7 +117,7 @@ public class ForumController extends BaseController {
             	    return toError("类型异常！");
                 }
             }
-            List<ForumInfoDto> dto = forumInfoService.getForumList(param.getColumnId(),param.getListType()==1?param.getUserId():userId,param.getType(),param.getKeyword(),param.getStart(),param.getLimit(),param.getListType(),param.getSearchType());
+            List<ForumInfoDto> dto = forumInfoService.getForumList(userId,param.getColumnId(),param.getUserId(),param.getType(),param.getKeyword(),param.getStart(),param.getLimit(),param.getListType(),param.getSearchType());
             
             return toSuccess(dto);
         } catch (ServiceException e) {
