@@ -24,7 +24,7 @@ import com.fangyuanyouyue.wallet.service.WalletService;
 
 @Service(value = "pointOrderService")
 @Transactional
-public class PointOrderServiceImp implements PointOrderService{
+public class PointOrderServiceImpl implements PointOrderService{
 
     @Autowired
     private PointGoodsMapper pointGoodsMapper;
@@ -41,7 +41,7 @@ public class PointOrderServiceImp implements PointOrderService{
 	public void saveOrder(Integer userId, Integer goodsId) throws ServiceException {
 		PointGoods goods = pointGoodsMapper.selectByPrimaryKey(goodsId);
 		if(goods==null) {
-			throw new ServiceException("商品不存在或已下架");
+			throw new ServiceException("商品不存在或已下架！");
 		}
 		
 		//判断库存

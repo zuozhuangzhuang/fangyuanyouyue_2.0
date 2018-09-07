@@ -28,7 +28,7 @@ import java.util.List;
 
 
 @Service(value = "forumColumnService")
-public class ForumColumnServiceImp implements ForumColumnService {
+public class ForumColumnServiceImpl implements ForumColumnService {
 
     @Autowired
     private ForumColumnMapper forumColumnMapper;

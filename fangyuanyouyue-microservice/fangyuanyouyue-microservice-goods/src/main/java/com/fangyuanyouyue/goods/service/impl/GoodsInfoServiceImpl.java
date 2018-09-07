@@ -64,7 +64,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     public GoodsInfo selectByPrimaryKey(Integer id) throws ServiceException{
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(id);
         if(goodsInfo == null){
-            throw new SecurityException("获取商品失败！");
+            throw new ServiceException("商品不存在！");
         }
         return goodsInfo;
     }
@@ -153,7 +153,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             goodsInfo.setLabel(param.getLabel());
         }
         goodsInfo.setType(param.getType());
-        goodsInfo.setStatus(1);//状态 1出售中 2 已售出 5删除
+        goodsInfo.setStatus(1);//状态 1出售中 2 已售出 3已下架（已结束） 5删除
         if(StringUtils.isNotEmpty(param.getVideoUrl())){
             goodsInfo.setVideoUrl(param.getVideoUrl());
         }
@@ -207,7 +207,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
      */
     private GoodsDto setDtoByGoodsInfo(Integer userId,GoodsInfo goodsInfo) throws ServiceException{
         if(goodsInfo == null){
-            throw new ServiceException("获取商品失败！");
+            throw new ServiceException("商品不存在或已下架！");
         }else{
 
             List<GoodsImg> goodsImgs = goodsImgMapper.getImgsByGoodsId(goodsInfo.getId());
@@ -278,8 +278,8 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         //批量修改商品状态为删除
         for(Integer goodsId:goodsIds){
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
-            if(goodsInfo == null){
-                throw new ServiceException("商品状态错误！");
+            if(goodsInfo == null || goodsInfo.getStatus().intValue() == 5){
+                throw new ServiceException("商品不存在或已下架！");
             }else{
                 //取消所有议价
                 List<GoodsBargain> goodsBargains = goodsBargainMapper.selectAllByGoodsId(goodsId,1);//状态 1申请 2同意 3拒绝 4取消
@@ -289,7 +289,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                     schedualMessageService.easemobMessage(bargain.getUserId().toString(),
                             "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情","2","2",bargain.getGoodsId().toString());
                 }
-                goodsInfo.setStatus(5);//状态 普通商品 1出售中 2已售出 5删除
+                goodsInfo.setStatus(5);//状态 普通商品 1出售中 2已售出 3已下架（已结束） 5删除
                 goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
             }
         }
@@ -298,11 +298,11 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     @Override
     public void modifyGoods(GoodsParam param) throws ServiceException {
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(param.getGoodsId());
-        if(goodsInfo == null){
-            throw new ServiceException("商品状态错误！");
+        if(goodsInfo == null || goodsInfo.getStatus().intValue() == 5){
+            throw new ServiceException("商品不存在！");
         }else{
-            if(goodsInfo.getStatus() != 1){
-                throw new ServiceException("商品已下架或已售出！");
+            if(goodsInfo.getStatus() == 2){
+                throw new ServiceException("商品已售出！");
             }
             //修改商品信息
             if(StringUtils.isNotEmpty(param.getGoodsInfoName())){
@@ -366,7 +366,18 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                     }
                 }
             }
+            //如果是已下架的商品或抢购，重新上架
+            goodsInfo.setStatus(1);//状态 1出售中 2已售出 3已下架（已结束） 5删除
             goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
+
+            //抢购 重新编辑可以重新上架，删除旧降价历史
+            if(goodsInfo.getType() == 2){
+                //抢购
+                List<GoodsIntervalHistory> goodsIntervalHistories = goodsIntervalHistoryMapper.selectByGoodsId(goodsInfo.getId(), null, null);
+                for(GoodsIntervalHistory history:goodsIntervalHistories){
+                    goodsIntervalHistoryMapper.deleteByPrimaryKey(history.getId());
+                }
+            }
         }
     }
 
@@ -410,9 +421,9 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             goodsDto = setDtoByGoodsInfo(userId,goodsInfo);
             goodsDto.setIsCollect(1);
         }
-        if(goodsInfo.getStatus().intValue() == 5){
-            throw new ServiceException("商品不存在或已下架！");
-        }
+//        if(goodsInfo.getStatus().intValue() == 5){
+//            throw new ServiceException("商品不存在或已下架！");
+//        }
         //是否官方认证
         Map<String, Object> goodsUserInfoExtAndVip = goodsInfoMapper.getGoodsUserInfoExtAndVip(goodsId);
         if(goodsUserInfoExtAndVip != null){
@@ -479,7 +490,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     public GoodsDto goodsInfo(Integer goodsId) throws ServiceException {
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
         if(goodsInfo == null){
-            throw new ServiceException("获取商品失败！");
+            throw new ServiceException("商品不存在或已下架！");
         }
         GoodsDto goodsDto = setDtoByGoodsInfo(null,goodsInfo);
         //是否官方认证

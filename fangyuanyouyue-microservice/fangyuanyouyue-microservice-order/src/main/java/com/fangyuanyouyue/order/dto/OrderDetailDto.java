@@ -36,8 +36,6 @@ public class OrderDetailDto {
 
     private String description;//商品详情
 
-    private Integer status;//状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除 7已申请退货
-
     private Integer allowReturn = 0;//是否可以退货  0可退货  1不可退货
 
     //order_refund
@@ -51,7 +49,7 @@ public class OrderDetailDto {
     public OrderDetailDto() {
     }
 
-    public OrderDetailDto(OrderDetail orderDetail,Integer status) {
+    public OrderDetailDto(OrderDetail orderDetail) {
         this.userId = orderDetail.getUserId();
         this.sellerId = orderDetail.getSellerId();
         this.orderId = orderDetail.getOrderId();
@@ -61,18 +59,16 @@ public class OrderDetailDto {
         this.amount = orderDetail.getAmount();
         this.payAmount = orderDetail.getPayAmount();
         this.freight = orderDetail.getFreight();
-        this.status = status;
         this.description = orderDetail.getDescription();
-//        this.allowReturn = allowReturn;
     }
 
-    public static ArrayList<OrderDetailDto> toDtoList(List<OrderDetail> list, Integer status) {
+    public static ArrayList<OrderDetailDto> toDtoList(List<OrderDetail> list) {
         if (list == null) {
             return null;
         }
         ArrayList<OrderDetailDto> dtolist = new ArrayList<>();
         for (OrderDetail model : list) {
-            OrderDetailDto dto = new OrderDetailDto(model,status);
+            OrderDetailDto dto = new OrderDetailDto(model);
             dtolist.add(dto);
         }
         return dtolist;

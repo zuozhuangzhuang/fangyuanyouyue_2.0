@@ -303,7 +303,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             UserThirdParty userThirdParty = userThirdPartyMapper.getUserByThirdNoType(unionId,type);
             //校验是否绑定三方账号
             if(userThirdParty != null){
-                if(userThirdParty.getUserId() == userInfo.getId()){
+                if(userThirdParty.getUserId().intValue() == userInfo.getId().intValue()){
                     throw new ServiceException("请勿重复绑定！");
                 }else{
                     UserInfo user = userInfoMapper.selectByPrimaryKey(userThirdParty.getUserId());
@@ -717,7 +717,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 	public void registIMUser(UserInfo user) throws ServiceException {
         try {
             //判断用户是否已经注册环信
-            if(user.getIsRegHx()==null||user.getIsRegHx()==StatusEnum.NO.getCode()) {
+            if(user.getIsRegHx()==null||user.getIsRegHx().intValue()==StatusEnum.NO.getCode().intValue()) {
                 schedualMessageService.easemobRegist(user.getId().toString(), MD5Util.MD5("xiaofangyuan"+user.getId().toString()));
                 user.setIsRegHx(StatusEnum.YES.getCode());
                 userInfoMapper.updateByPrimaryKey(user);

@@ -333,7 +333,7 @@ public class BargainController extends BaseController{
         for (String key : params.keySet()) {
             response += key + "=" + params.get(key) + ",";
         }
-        if (response.equals("")) {
+        if ("".equals(response)) {
             log.warn("无数据返回");
             return "";
         }
@@ -364,7 +364,7 @@ public class BargainController extends BaseController{
 
                 // ——请根据您的业务逻辑来编写程序（以下代码仅作参考）——
 
-                if (trade_status.equals("TRADE_FINISHED")) {
+                if ("TRADE_FINISHED".equals(trade_status)) {
 
                     log.info("支付宝支付完成！TRADE_FINISHED");
                     // 判断该笔订单是否在商户网站中已经做过处理
@@ -380,7 +380,7 @@ public class BargainController extends BaseController{
                     // 该种交易状态只在两种情况下出现
                     // 1、开通了普通即时到账，买家付款成功后。
                     // 2、开通了高级即时到账，从该笔交易成功时间算起，过了签约时的可退款时限（如：三个月以内可退款、一年以内可退款等）后。
-                } else if (trade_status.equals("TRADE_SUCCESS")) {
+                } else if ("TRADE_SUCCESS".equals(trade_status)) {
 
                     log.info("支付宝支付完成！TRADE_SUCCESS");
 

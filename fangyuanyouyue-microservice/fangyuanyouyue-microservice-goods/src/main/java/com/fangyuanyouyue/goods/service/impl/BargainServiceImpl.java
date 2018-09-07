@@ -61,8 +61,8 @@ public class BargainServiceImpl implements BargainService{
     @Override
     public Object addBargain(Integer userId, Integer goodsId, BigDecimal price, String reason,Integer addressId,String payPwd,Integer payType) throws ServiceException {
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
-        if(goodsInfo == null){
-            throw new ServiceException("商品不存在！");
+        if(goodsInfo == null || goodsInfo.getStatus().intValue() == 3 || goodsInfo.getStatus().intValue() == 5){
+            throw new ServiceException("商品不存在或已下架！");
         }else{
             if(goodsInfo.getUserId().intValue() == userId.intValue()){
                 throw new ServiceException("不可以对自己的商品进行压价！");
@@ -172,11 +172,11 @@ public class BargainServiceImpl implements BargainService{
         }else{
             //判断商品状态
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
-            if(goodsInfo == null){
-                throw new ServiceException("商品不存在！");
+            if(goodsInfo == null || goodsInfo.getStatus().intValue() == 3 || goodsInfo.getStatus().intValue() == 5){
+                throw new ServiceException("商品不存在或已下架！");
             }
             if(goodsInfo.getStatus().intValue() != 1){
-                throw new ServiceException("商品已售出或已下架！");
+                throw new ServiceException("商品已售出！");
             }
             //判断压价状态
             if(goodsBargain.getStatus().intValue() == 2){
@@ -265,7 +265,7 @@ public class BargainServiceImpl implements BargainService{
                     orderDetail.setDescription(goodsInfo.getDescription());
                     orderDetailMapper.insert(orderDetail);
                     //修改商品的状态为已售出
-                    goodsInfo.setStatus(2);//状态  1出售中 2已售出 5删除
+                    goodsInfo.setStatus(2);//状态  1出售中 2已售出 3已下架（已结束） 5删除
                     goodsInfoMapper.updateByPrimaryKey(goodsInfo);
                     //议价：恭喜您！您对商品【商品名称】的议价卖家已同意，点击此处查看订单详情
                     //如果卖家同意议价，就拒绝此商品剩余的申请中议价
@@ -349,11 +349,11 @@ public class BargainServiceImpl implements BargainService{
         }else{
             //判断商品状态
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
-            if(goodsInfo == null){
-                throw new ServiceException("商品不存在！");
+            if(goodsInfo == null || goodsInfo.getStatus().intValue() == 3 || goodsInfo.getStatus().intValue() == 5){
+                throw new ServiceException("商品不存在或已下架！");
             }
             if(goodsInfo.getStatus().intValue() != 1){
-                throw new ServiceException("商品已售出或已下架！");
+                throw new ServiceException("商品已售出！");
             }
             if(goodsInfo.getUserId().intValue() == userId.intValue()){//卖家获取压价详情
 
@@ -377,8 +377,8 @@ public class BargainServiceImpl implements BargainService{
      * @throws ServiceException
      */
     private GoodsDto setDtoByGoodsInfo(Integer userId,GoodsInfo goodsInfo) throws ServiceException{
-        if(goodsInfo == null){
-            throw new ServiceException("获取商品失败！");
+        if(goodsInfo == null || goodsInfo.getStatus().intValue() == 3 || goodsInfo.getStatus().intValue() == 5){
+            throw new ServiceException("商品不存在或已下架！");
         }else{
             List<GoodsImg> goodsImgs = goodsImgMapper.getImgsByGoodsId(goodsInfo.getId());
             String mainImgUrl = null;

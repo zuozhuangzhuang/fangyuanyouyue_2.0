@@ -60,7 +60,7 @@ public class RefundServiceImpl implements RefundService{
                 //退货信息
                 orderRefund = new OrderRefund();
                 //待发货处理时间2天，已发货处理时间3天
-                orderRefund.setEndTime(DateUtil.getDateAfterDay(new Date(),orderInfo.getStatus()));
+//                orderRefund.setEndTime(DateUtil.getDateAfterDay(new Date(),orderInfo.getStatus()));
                 orderRefund.setUserId(userId);
                 orderRefund.setOrderId(orderId);
                 if(imgUrls != null && imgUrls.length > 0){
@@ -164,6 +164,7 @@ public class RefundServiceImpl implements RefundService{
                     orderInfo.setStatus(4);//设置为已完成
                     orderRefund.setStatus(2);
                     orderRefund.setSellerReturnStatus(2);
+                    orderRefund.setDealTime(new Date());
                     orderInfoMapper.updateByPrimaryKeySelective(orderInfo);
                     orderRefundMapper.updateByPrimaryKeySelective(orderRefund);
                     //修改余额
@@ -188,6 +189,7 @@ public class RefundServiceImpl implements RefundService{
                     orderRefund.setStatus(3);
                     orderRefund.setRefuseReason(reason);//拒绝理由
                     orderRefund.setSellerReturnStatus(3);
+                    orderRefund.setDealTime(new Date());
                     orderRefundMapper.updateByPrimaryKeySelective(orderRefund);
                 }
             }

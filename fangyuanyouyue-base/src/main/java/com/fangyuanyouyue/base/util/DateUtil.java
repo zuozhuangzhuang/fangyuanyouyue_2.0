@@ -191,14 +191,14 @@ public class DateUtil {
 	 */
 	public static String getPreDate(String field, int amount, String format) {
 		calendar.setTime(new Date());
-		if (field != null && !field.equals("")) {
-			if (field.equals("y")) {
+		if (field != null && !"".equals(field)) {
+			if ("y".equals(field)) {
 				calendar.add(Calendar.YEAR, amount);
-			} else if (field.equals("M")) {
+			} else if ("M".equals(field)) {
 				calendar.add(Calendar.MONTH, amount);
-			} else if (field.equals("d")) {
+			} else if ("d".equals(field)) {
 				calendar.add(Calendar.DAY_OF_MONTH, amount);
-			} else if (field.equals("H")) {
+			} else if ("H".equals(field)) {
 				calendar.add(Calendar.HOUR, amount);
 			}
 		} else {
@@ -221,14 +221,14 @@ public class DateUtil {
 	public static String getPreDate(Date date, String field, int amount,
                                     String format) {
 		calendar.setTime(date);
-		if (field != null && !field.equals("")) {
-			if (field.equals("y")) {
+		if (field != null && !"".equals(field)) {
+			if ("y".equals(field)) {
 				calendar.add(Calendar.YEAR, amount);
-			} else if (field.equals("M")) {
+			} else if ("M".equals(field)) {
 				calendar.add(Calendar.MONTH, amount);
-			} else if (field.equals("d")) {
+			} else if ("d".equals(field)) {
 				calendar.add(Calendar.DAY_OF_MONTH, amount);
-			} else if (field.equals("H")) {
+			} else if ("H".equals(field)) {
 				calendar.add(Calendar.HOUR, amount);
 			}
 		} else {
@@ -251,14 +251,14 @@ public class DateUtil {
 	 */
 	public static String getPreDate(Date d, String field, int amount) {
 		calendar.setTime(d);
-		if (field != null && !field.equals("")) {
-			if (field.equals("y")) {
+		if (field != null && !"".equals(field)) {
+			if ("y".equals(field)) {
 				calendar.add(Calendar.YEAR, amount);
-			} else if (field.equals("M")) {
+			} else if ("M".equals(field)) {
 				calendar.add(Calendar.MONTH, amount);
-			} else if (field.equals("d")) {
+			} else if ("d".equals(field)) {
 				calendar.add(Calendar.DAY_OF_MONTH, amount);
-			} else if (field.equals("H")) {
+			} else if ("H".equals(field)) {
 				calendar.add(Calendar.HOUR, amount);
 			}
 		} else {

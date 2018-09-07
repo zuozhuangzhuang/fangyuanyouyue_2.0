@@ -115,19 +115,19 @@ public class MessageController extends BaseController{
             String headImgUrl = "http://pic.baike.soso.com/p/20120419/20120419170638-1137484758.jpg";
             String nickName;
             String from;
-            if(param.getJumpType().equals("1")){
+            if("1".equals(param.getJumpType())){
                 nickName = "系统消息";
                 from = "65";
 //                headImgUrl = "";
-            }else if(param.getJumpType().equals("2")){
+            }else if("2".equals(param.getJumpType())){
                 nickName = "交易消息";
                 from = "66";
 //                headImgUrl = "";
-            }else if(param.getJumpType().equals("3")){
+            }else if("3".equals(param.getJumpType())){
                 nickName = "社交消息";
                 from = "67";
 //                headImgUrl = "";
-            }else if(param.getJumpType().equals("4")){
+            }else if("4".equals(param.getJumpType())){
                 nickName = "新增粉丝";
                 from = "68";
 //                headImgUrl = "";

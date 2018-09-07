@@ -19,11 +19,13 @@ public class ViewButton extends Button {
 		this.type = type;
 	}
 
-	public String getUrl() {
+	@Override
+    public String getUrl() {
 		return url;
 	}
 
-	public void setUrl(String url) {
+	@Override
+    public void setUrl(String url) {
 		this.url = url;
 	}
 }

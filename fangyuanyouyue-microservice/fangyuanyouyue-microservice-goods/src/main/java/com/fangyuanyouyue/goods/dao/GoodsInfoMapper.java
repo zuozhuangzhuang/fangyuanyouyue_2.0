@@ -47,12 +47,6 @@ public interface GoodsInfoMapper {
                                  @Param("start") Integer start, @Param("limit") Integer limit, @Param("type")Integer type,
                                  @Param("goodsCategoryIds")Integer[] goodsCategoryIds);
 
-    /**
-     * 根据商品ID集合获取商品
-     * @param goodsIds
-     * @return
-     */
-//    List<GoodsInfo> getGoodsByGoodsIds(@Param("goodsIds") Set<Integer> goodsIds, int pageNum, int pageSize);
 
     /**
      * 根据当前时间获取需要降价的抢购列表
@@ -103,15 +97,6 @@ public interface GoodsInfoMapper {
      * @return
      */
     Integer getGoodsUserCollectCount(Integer goodsId);
-
-    /**
-     * 根据用户ID获取商品列表
-     * @param userId
-     * @param start
-     * @param limit
-     * @return
-     */
-    List<GoodsInfo> selectGoodsByUserId(@Param("userId")Integer userId,@Param("start")Integer start,@Param("limit")Integer limit);
 
     /**
      * 根据类型和状态获取列表

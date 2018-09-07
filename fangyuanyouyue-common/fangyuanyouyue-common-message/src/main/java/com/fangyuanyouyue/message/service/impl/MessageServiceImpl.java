@@ -60,7 +60,8 @@ public class MessageServiceImpl implements MessageService{
     }
 
     //发送验证码
-    public void sendCode(String phone, String code,String ip) throws Exception{
+    @Override
+    public void sendCode(String phone, String code, String ip) throws Exception{
         sendMessage(phone, "{'code':'"+code+"','product':'小方圆'}", ip, MODULE_CODE);
     }
 

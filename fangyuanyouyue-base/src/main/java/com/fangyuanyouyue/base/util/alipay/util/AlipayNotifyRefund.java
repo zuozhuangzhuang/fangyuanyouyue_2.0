@@ -52,7 +52,7 @@ public class AlipayNotifyRefund {
         //String sWord = "responseTxt=" + responseTxt + "\n isSign=" + isSign + "\n 返回回来的参数：" + AlipayCore.createLinkString(params);
 	    //AlipayCore.logResult(sWord);
 
-        if (isSign && responseTxt.equals("true")) {
+        if (isSign && "true".equals(responseTxt)) {
             return true;
         } else {
             return false;
@@ -72,7 +72,7 @@ public class AlipayNotifyRefund {
         String preSignStr = AlipayCore.createLinkString(sParaNew);
         //获得签名验证结果
         boolean isSign = false;
-        if(AlipayConfig.sign_type_refund.equals("MD5") ) {
+        if("MD5".equals(AlipayConfig.sign_type_refund)) {
         	isSign = MD5.verify(preSignStr, sign, AlipayConfig.key, AlipayConfig.input_charset);
         }
         return isSign;

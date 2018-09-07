@@ -200,7 +200,7 @@
         and a.is_refund = 1
       </if>
       <if test="search != null and search != ''">
-        and b.goods_id in (select id from goods_info where name like "%"#{search}"%" or description like "%"#{search}"%" and status <![CDATA[ <> ]]> 3 and status <![CDATA[ <> ]]> 5)
+        and b.goods_id in (select id from goods_info where name like "%"#{search}"%" or description like "%"#{search}"%")
       </if>
     </where>
     order by a.add_time desc
@@ -237,7 +237,7 @@
         and a.is_refund = 1
       </if>
       <if test="search != null and search != ''">
-        and b.goods_id in (select id from goods_info where name like "%"#{search}"%" or description like "%"#{search}"%" and status <![CDATA[ <> ]]> 3 and status <![CDATA[ <> ]]> 5)
+        and b.goods_id in (select id from goods_info where name like "%"#{search}"%" or description like "%"#{search}"%")
       </if>
     </where>
     order by a.add_time desc

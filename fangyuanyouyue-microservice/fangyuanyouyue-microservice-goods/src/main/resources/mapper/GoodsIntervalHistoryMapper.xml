@@ -105,6 +105,9 @@
   </update>
 
   <select id="selectByGoodsId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from goods_interval_history where goods_id = #{goodsId} order by add_time desc limit #{start},#{limit}
+    select * from goods_interval_history where goods_id = #{goodsId} order by add_time desc
+    <if test="start != null and limit != null">
+      limit #{start},#{limit}
+    </if>
   </select>
 </mapper>

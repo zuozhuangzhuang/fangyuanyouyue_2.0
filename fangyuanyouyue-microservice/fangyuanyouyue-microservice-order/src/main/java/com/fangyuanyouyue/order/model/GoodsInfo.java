@@ -32,7 +32,7 @@ public class GoodsInfo {
 
     private Integer type;//类型 1普通商品 2抢购商品
 
-    private Integer status;//状态 1出售中 2已售出 3已下架 5删除
+    private Integer status;//状态 1出售中 2已售出 3已下架（已结束） 5删除
 
     private BigDecimal floorPrice;//最低价
 

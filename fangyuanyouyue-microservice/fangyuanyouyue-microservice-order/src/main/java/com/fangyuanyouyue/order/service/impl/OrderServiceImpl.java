@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSONException;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
+import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.order.dao.*;
 import com.fangyuanyouyue.order.dto.*;
 import com.fangyuanyouyue.order.model.*;
@@ -154,7 +155,7 @@ public class OrderServiceImpl implements OrderService{
             }
             for(AddOrderDetailDto addOrderDetailDto:addOrderDetailDtos) {
                 GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(addOrderDetailDto.getGoodsId())).getString("data")), GoodsInfo.class);
-                if (goods.getStatus() != 1) {//状态 1出售中 2已售出 5删除
+                if (goods.getStatus() != 1) {//状态 1出售中 2已售出 3已下架（已结束） 5删除
                     throw new ServiceException("商品状态异常！");
                 }
                 if(goods.getUserId().intValue() == mainOrder.getUserId().intValue()){
@@ -267,11 +268,11 @@ public class OrderServiceImpl implements OrderService{
                 orderDetail.setDescription(goods.getDescription());
                 orderDetailMapper.insert(orderDetail);
                 //修改商品的状态为已售出
-                schedualGoodsService.updateGoodsStatus(addOrderDetailDto.getGoodsId(),2);//状态  1出售中 2已售出 5删除
+                schedualGoodsService.updateGoodsStatus(addOrderDetailDto.getGoodsId(),2);//状态  1出售中 2已售出 3已下架（已结束） 5删除
                 payFreight = payFreight.add(orderDetail.getFreight());
                 amount = amount.add(orderDetail.getAmount());//原价
                 payAmount = payAmount.add(orderDetail.getPayAmount());//实际支付
-                OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail,orderInfo.getStatus());
+                OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail);
                 orderDetailDtos.add(orderDetailDto);
                 goodsName.append("【"+goods.getName()+"】");
             }
@@ -354,7 +355,7 @@ public class OrderServiceImpl implements OrderService{
             StringBuffer goodsName = new StringBuffer();
             boolean isAuction = false;
             for(OrderDetail orderDetail:orderDetails){
-                schedualGoodsService.updateGoodsStatus(orderDetail.getGoodsId(),1);//状态 1出售中 2已售出 5删除
+                schedualGoodsService.updateGoodsStatus(orderDetail.getGoodsId(),1);//状态 1出售中 2已售出 3已下架（已结束） 5删除
                 GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(
                         schedualGoodsService.goodsInfo(orderDetail.getGoodsId())).getString("data")), GoodsInfo.class);
 
@@ -391,7 +392,7 @@ public class OrderServiceImpl implements OrderService{
             OrderPayDto orderPayDto = new OrderPayDto(orderPay);
             OrderDto orderDto = new OrderDto(orderInfo);
             orderDto.setOrderPayDto(orderPayDto);
-            ArrayList<OrderDetailDto> orderDetailDtos = OrderDetailDto.toDtoList(orderDetails,orderPay.getStatus());
+            ArrayList<OrderDetailDto> orderDetailDtos = OrderDetailDto.toDtoList(orderDetails);
 //            for(OrderDetailDto orderDetailDto:orderDetailDtos){
 //                if(orderDetailDto.getFreight().compareTo(new BigDecimal(0)) > 0){
 //                    //订单详情DTO邮费为0则说明邮费不是最高或者邮费为0
@@ -474,7 +475,7 @@ public class OrderServiceImpl implements OrderService{
                 }else{
                     orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
                 }
-                ArrayList<OrderDetailDto> orderDetailDtos = OrderDetailDto.toDtoList(orderDetails, orderDto.getStatus());
+                ArrayList<OrderDetailDto> orderDetailDtos = OrderDetailDto.toDtoList(orderDetails);
                 //卖家信息DTO
                 List<SellerDto> sellerDtos = getSellerDtos(orderDetailDtos);
                 //订单支付表
@@ -512,7 +513,7 @@ public class OrderServiceImpl implements OrderService{
             sellerDtos.add(sellerDto);
             for(OrderDto orderDto:orderDtos){//获取订单详情列表
                 List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
-                ArrayList<OrderDetailDto> orderDetailDtos = OrderDetailDto.toDtoList(orderDetails, orderDto.getStatus());
+                ArrayList<OrderDetailDto> orderDetailDtos = OrderDetailDto.toDtoList(orderDetails);
 
                 //订单支付表
                 OrderPay orderPay = orderPayMapper.selectByOrderId(orderDto.getOrderId());
@@ -556,7 +557,7 @@ public class OrderServiceImpl implements OrderService{
 
         //获取商品信息
         GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(goodsId)).getString("data")),GoodsInfo.class);
-        if (goods.getStatus() != 1) {//状态 1出售中 2已售出 5删除
+        if (goods.getStatus() != 1) {//状态 1出售中 2已售出 3已下架（已结束） 5删除
             throw new ServiceException("商品状态异常！");
         }
         if(goods.getUserId().intValue() == userId.intValue()){
@@ -626,9 +627,9 @@ public class OrderServiceImpl implements OrderService{
         orderDetail.setSellerId(goods.getUserId());
         orderDetailMapper.insert(orderDetail);
         //修改商品的状态为已售出
-        schedualGoodsService.updateGoodsStatus(goodsId,2);//状态  1出售中 2已售出 5删除
+        schedualGoodsService.updateGoodsStatus(goodsId,2);//状态  1出售中 2已售出 3已下架（已结束） 5删除
         ArrayList<OrderDetailDto> orderDetailDtos = new ArrayList<>();
-        orderDetailDtos.add(new OrderDetailDto(orderDetail,orderInfo.getStatus()));
+        orderDetailDtos.add(new OrderDetailDto(orderDetail));
         //卖家dto
         List<SellerDto> sellerDtos = getSellerDtos(orderDetailDtos);
         //生成子订单，在总订单中加入价格和邮费，实际支付价格

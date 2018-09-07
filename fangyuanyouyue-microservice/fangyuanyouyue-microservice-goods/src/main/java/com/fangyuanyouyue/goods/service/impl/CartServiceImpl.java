@@ -60,7 +60,7 @@ public class CartServiceImpl implements CartService {
 
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
             //判断商品还在不
-            if (goodsInfo == null || goodsInfo.getStatus().intValue() == 5) {
+            if (goodsInfo == null || goodsInfo.getStatus().intValue() == 3 || goodsInfo.getStatus().intValue() == 5) {
                 throw new ServiceException("商品不存在或已下架！");
             } else {
                 if(goodsInfo.getStatus().intValue() != 1){//1出售中
@@ -167,8 +167,8 @@ public class CartServiceImpl implements CartService {
      * @throws ServiceException
      */
     private GoodsDto setDtoByGoodsInfo(GoodsInfo goodsInfo) throws ServiceException {
-        if (goodsInfo == null) {
-            throw new ServiceException("获取商品失败！");
+        if(goodsInfo == null || goodsInfo.getStatus().intValue() == 3 || goodsInfo.getStatus().intValue() == 5){
+            throw new ServiceException("商品不存在或已下架！");
         } else {
             List<GoodsImg> goodsImgs = goodsImgMapper.getImgsByGoodsId(goodsInfo.getId());
             String mainImgUrl = null;

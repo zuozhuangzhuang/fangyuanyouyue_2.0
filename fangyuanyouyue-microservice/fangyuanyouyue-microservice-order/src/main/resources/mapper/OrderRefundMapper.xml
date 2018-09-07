@@ -19,10 +19,11 @@
     <result column="user_id" jdbcType="INTEGER" property="userId" />
     <result column="refuse_reason" jdbcType="VARCHAR" property="refuseReason" />
     <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="deal_time" jdbcType="TIMESTAMP" property="dealTime" />
   </resultMap>
   <sql id="Base_Column_List">
     id, order_id, reason, service_no, pic1, pic2, pic3, pic4, pic5, pic6, status, add_time, 
-    update_time, seller_return_status, user_id, refuse_reason, end_time
+    update_time, seller_return_status, user_id, refuse_reason, end_time,deal_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -40,13 +41,13 @@
       pic3, pic4, pic5, pic6, 
       status, add_time, update_time, 
       seller_return_status, user_id, refuse_reason, 
-      end_time)
+      end_time,deal_time)
     values (#{id,jdbcType=INTEGER}, #{orderId,jdbcType=INTEGER}, #{reason,jdbcType=VARCHAR}, 
       #{serviceNo,jdbcType=VARCHAR}, #{pic1,jdbcType=VARCHAR}, #{pic2,jdbcType=VARCHAR}, 
       #{pic3,jdbcType=VARCHAR}, #{pic4,jdbcType=VARCHAR}, #{pic5,jdbcType=VARCHAR}, #{pic6,jdbcType=VARCHAR}, 
       #{status,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
       #{sellerReturnStatus,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{refuseReason,jdbcType=VARCHAR}, 
-      #{endTime,jdbcType=TIMESTAMP})
+      #{endTime,jdbcType=TIMESTAMP},#{dealTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.fangyuanyouyue.order.model.OrderRefund">
     insert into order_refund
@@ -102,6 +103,9 @@
       <if test="endTime != null">
         end_time,
       </if>
+      <if test="dealTime != null">
+        deal_time,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -154,6 +158,9 @@
       </if>
       <if test="endTime != null">
         #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dealTime != null">
+        #{dealTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -208,6 +215,9 @@
       <if test="endTime != null">
         end_time = #{endTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="dealTime != null">
+        deal_time = #{dealTime,jdbcType=TIMESTAMP},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -228,7 +238,8 @@
       seller_return_status = #{sellerReturnStatus,jdbcType=INTEGER},
       user_id = #{userId,jdbcType=INTEGER},
       refuse_reason = #{refuseReason,jdbcType=VARCHAR},
-      end_time = #{endTime,jdbcType=TIMESTAMP}
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      deal_time = #{dealTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
 

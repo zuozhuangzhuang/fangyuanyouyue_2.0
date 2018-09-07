@@ -119,7 +119,7 @@
     select * from cart_detail where cart_id = #{cartId,jdbcType=INTEGER} group by user_id
   </select>
   <select id="selectByCartIdUserId" parameterType="Integer" resultType="Map">
-    select * from cart_detail a left join goods_info b on a.goods_id = b.id where a.cart_id = #{cartId,jdbcType=INTEGER} and a.user_id = #{userId,jdbcType=INTEGER} and b.status <![CDATA[ <> ]]> 3 and b.status <![CDATA[ <> ]]> 5
+    select * from cart_detail a left join goods_info b on a.goods_id = b.id where a.cart_id = #{cartId,jdbcType=INTEGER} and a.user_id = #{userId,jdbcType=INTEGER}
   </select>
   <select id="selectByCartIdGoodsId" parameterType="Integer" resultMap="BaseResultMap">
     select * from cart_detail where cart_id = #{cartId,jdbcType=INTEGER} and goods_id = #{goodsId,jdbcType=INTEGER}

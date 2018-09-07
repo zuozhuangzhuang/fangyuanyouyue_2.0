@@ -12,7 +12,7 @@ import com.fangyuanyouyue.forum.service.AppraisalCommentLikesService;
 
 
 @Service(value = "appraisalCommentLikesService")
-public class AppraisalCommentLikesServiceImp implements AppraisalCommentLikesService {
+public class AppraisalCommentLikesServiceImpl implements AppraisalCommentLikesService {
 
 	@Autowired
 	private AppraisalCommentLikesMapper appraisalCommentLikesMapper;

@@ -33,7 +33,7 @@ public class UserCouponServiceImpl implements UserCouponService {
             throw new ServiceException("未找到优惠券！");
         }
         BigDecimal couponPrice = price;
-        if(userCoupon.getEndTime().getTime() < new Date().getTime()){
+        if(userCoupon.getEndTime().getTime() < System.currentTimeMillis()){
             //优惠券已失效
         }else{
             //计算优惠后价格并返回

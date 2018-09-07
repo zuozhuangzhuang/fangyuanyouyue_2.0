@@ -75,8 +75,8 @@ public class AppraisalServiceImpl implements AppraisalService{
                     throw new ServiceException("您已申请过鉴定！");
                 }else{
                     GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
-                    if(goodsInfo == null){
-                        throw new ServiceException("鉴定列表中包含不存在或已下架商品！");
+                    if(goodsInfo == null || goodsInfo.getStatus().intValue() == 3 || goodsInfo.getStatus().intValue() == 5){
+                        throw new ServiceException("商品不存在或已下架！");
                     }else{
                         //生成鉴定和订单
                         goodsAppraisalDetail = new GoodsAppraisalDetail();

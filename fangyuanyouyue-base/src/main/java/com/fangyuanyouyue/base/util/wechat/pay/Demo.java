@@ -113,7 +113,7 @@ public class Demo {
 		String createOrderURL = "https://api.mch.weixin.qq.com/pay/unifiedorder";
 		
 		
-		code_url = new GetWxOrderno().getCodeUrl(createOrderURL, xml);
+		code_url = GetWxOrderno.getCodeUrl(createOrderURL, xml);
 		System.out.println("code_url----------------"+code_url);
 		
 		return code_url;
@@ -190,7 +190,7 @@ public class Demo {
 		String createOrderURL = "https://api.mch.weixin.qq.com/pay/unifiedorder";
 		
 		
-		prepay_id = new GetWxOrderno().getPayNo(createOrderURL, xml);
+		prepay_id = GetWxOrderno.getPayNo(createOrderURL, xml);
 
 		System.out.println("获取到的预支付ID：" + prepay_id);
 		
