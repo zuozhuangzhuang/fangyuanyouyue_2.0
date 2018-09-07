@@ -378,11 +378,19 @@
 
   <select id="selectByCategoryIds" parameterType="Integer" resultMap="BaseResultMap">
     select a.* from goods_info a,user_info_ext b,user_vip c where a.user_id = b.user_id and a.user_id = c.user_id and a.status = 1
-    and a.id in (select goods_id from goods_correlation where goods_category_id in
-    <foreach close=")" collection="goodsCategoryIds" index="index" item="categoryId" open="(" separator=",">
-      #{categoryId,jdbcType=INTEGER}
-    </foreach>
-    ) order by c.vip_level desc,c.vip_type desc,b.auth_type,a.update_time desc limit #{start},#{limit}
+    and a.id in
+    (select goods_id from goods_correlation
+    <where>
+      1=1
+      <if test="goodsCategoryIds != null and goodsCategoryIds.size() > 0">
+        and  goods_category_id in
+        <foreach close=")" collection="goodsCategoryIds" index="index" item="categoryId" open="(" separator=",">
+          #{categoryId,jdbcType=INTEGER}
+        </foreach>
+      </if>
+    </where>
+    )
+    order by c.vip_level desc,c.vip_type desc,b.auth_type,a.update_time desc limit #{start},#{limit}
   </select>
 
   <!--<select id="getGoodsAuthType" parameterType="Integer" resultType="Integer">-->
