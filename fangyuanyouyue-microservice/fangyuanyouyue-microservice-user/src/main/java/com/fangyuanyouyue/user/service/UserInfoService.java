@@ -112,6 +112,15 @@ public interface UserInfoService {
     UserDto updatePhone(String token,String phone) throws ServiceException;
 
     /**
+     * 将userInfo封装到userDto中
+     * @param token
+     * @param user
+     * @return
+     * @throws ServiceException
+     */
+    UserDto setUserDtoByInfo(String token, UserInfo user) throws ServiceException;
+
+    /**
      * 小程序登录
      * @param param
      * @return
@@ -196,14 +205,4 @@ public interface UserInfoService {
      */
     List<ShopDto> getUserByName(String search,Integer start,Integer limit) throws ServiceException;
 
-    /**
-     * 合并账号
-     * @param token
-     * @param phone
-     * @param unionId
-     * @param type
-     * @return
-     * @throws ServiceException
-     */
-    UserDto accountMerge(String token,String phone,String unionId,Integer type) throws ServiceException;
 }

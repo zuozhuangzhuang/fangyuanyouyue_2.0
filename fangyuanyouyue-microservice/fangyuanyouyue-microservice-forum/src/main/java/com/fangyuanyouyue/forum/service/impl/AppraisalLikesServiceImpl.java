@@ -9,9 +9,11 @@ import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.forum.dao.AppraisalLikesMapper;
 import com.fangyuanyouyue.forum.model.AppraisalLikes;
 import com.fangyuanyouyue.forum.service.AppraisalLikesService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service(value = "appraisalLikesService")
+@Transactional(rollbackFor=Exception.class)
 public class AppraisalLikesServiceImpl implements AppraisalLikesService {
 	
 	@Autowired

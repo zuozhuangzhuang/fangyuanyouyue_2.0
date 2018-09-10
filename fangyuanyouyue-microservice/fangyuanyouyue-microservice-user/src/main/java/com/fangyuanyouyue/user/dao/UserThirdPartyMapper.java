@@ -31,5 +31,5 @@ public interface UserThirdPartyMapper {
      * @return
      * @param id
      */
-    UserThirdParty getUserThirdByUserId(Integer id);
+    UserThirdParty getUserThirdByUserId(@Param("userId") Integer userId,@Param("type")Integer type);
 }

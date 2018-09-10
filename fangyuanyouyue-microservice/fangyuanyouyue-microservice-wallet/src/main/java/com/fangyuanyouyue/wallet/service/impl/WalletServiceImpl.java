@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.SortedMap;
 
 @Service(value = "walletService")
-@Transactional
+@Transactional(rollbackFor=Exception.class)
 public class WalletServiceImpl implements WalletService{
 
     @Autowired

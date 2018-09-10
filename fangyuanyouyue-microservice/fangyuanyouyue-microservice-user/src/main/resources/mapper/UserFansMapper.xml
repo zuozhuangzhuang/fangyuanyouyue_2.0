@@ -114,4 +114,11 @@
     </where>
     order by b.add_time desc limit #{start},#{limit}
   </select>
+
+  <select id="userFans" parameterType="Integer" resultMap="BaseResultMap">
+    select * from user_fans where to_user_id = #{userId}
+    <if test="start != null and limit != null">
+      limit #{start},#{limit}
+    </if>
+  </select>
 </mapper>

@@ -9,12 +9,14 @@ import com.fangyuanyouyue.wallet.model.UserCoupon;
 import com.fangyuanyouyue.wallet.service.UserCouponService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
 @Service(value = "userCouponService")
+@Transactional(rollbackFor=Exception.class)
 public class UserCouponServiceImpl implements UserCouponService {
     @Autowired
     private UserCouponMapper userCouponMapper;

@@ -120,9 +120,6 @@ public class FeignController  extends BaseController {
             if(userInfo.getStatus() == 2){
                 return toError("您的账号已被冻结，请联系管理员！");
             }
-//            BaseClientResult result = new BaseClientResult(Status.YES.getValue(), "根据三方唯一识别号获取用户成功！");
-//            result.put("userInfo",userInfo);
-//            return toResult(result);
             return toSuccess(userInfo);
         } catch (Exception e) {
             e.printStackTrace();

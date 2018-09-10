@@ -20,6 +20,7 @@ import com.fangyuanyouyue.forum.service.SchedualWalletService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import static javafx.scene.input.KeyCode.I;
 
 
 @Service(value = "appraisalDetailService")
+@Transactional(rollbackFor=Exception.class)
 public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 
 	@Autowired

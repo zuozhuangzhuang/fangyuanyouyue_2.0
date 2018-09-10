@@ -11,12 +11,14 @@ import com.fangyuanyouyue.order.model.*;
 import com.fangyuanyouyue.order.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Service(value = "refundService")
+@Transactional(rollbackFor=Exception.class)
 public class RefundServiceImpl implements RefundService{
     @Autowired
     private SchedualGoodsService schedualGoodsService;

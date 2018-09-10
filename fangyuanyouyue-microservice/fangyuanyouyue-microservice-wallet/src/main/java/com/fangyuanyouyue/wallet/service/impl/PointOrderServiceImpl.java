@@ -23,7 +23,7 @@ import com.fangyuanyouyue.wallet.service.PointOrderService;
 import com.fangyuanyouyue.wallet.service.WalletService;
 
 @Service(value = "pointOrderService")
-@Transactional
+@Transactional(rollbackFor=Exception.class)
 public class PointOrderServiceImpl implements PointOrderService{
 
     @Autowired

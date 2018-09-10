@@ -21,6 +21,7 @@ import com.fangyuanyouyue.forum.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -28,6 +29,7 @@ import java.util.List;
 
 
 @Service(value = "forumColumnService")
+@Transactional(rollbackFor=Exception.class)
 public class ForumColumnServiceImpl implements ForumColumnService {
 
     @Autowired

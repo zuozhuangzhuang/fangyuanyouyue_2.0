@@ -8,9 +8,11 @@ import org.springframework.stereotype.Service;
 import com.fangyuanyouyue.forum.dao.ForumPvMapper;
 import com.fangyuanyouyue.forum.model.ForumPv;
 import com.fangyuanyouyue.forum.service.ForumPvService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service(value = "forumPvService")
+@Transactional(rollbackFor=Exception.class)
 public class ForumPvServiceImpl implements ForumPvService {
 	
 	@Autowired

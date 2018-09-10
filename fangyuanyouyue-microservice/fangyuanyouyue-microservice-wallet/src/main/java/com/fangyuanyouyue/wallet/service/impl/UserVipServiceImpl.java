@@ -23,7 +23,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 @Service(value = "userVipService")
-@Transactional
+@Transactional(rollbackFor=Exception.class)
 public class UserVipServiceImpl implements UserVipService{
 
     @Autowired
