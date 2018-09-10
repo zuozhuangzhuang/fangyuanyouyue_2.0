@@ -125,15 +125,17 @@ public class WalletServiceImpl implements WalletService{
         Integer vipLevel = userVip.getVipLevel();//会员等级
         BigDecimal charge;//手续费
         BigDecimal percent;
-        if(vipLevel.intValue() == 1){
-            //铂金会员
-            percent = new BigDecimal(0.008);
-        }else if(vipLevel.intValue() == 2){
-            //至尊会员
-            percent = new BigDecimal(0.006);
-        }else{
+        if(vipLevel == null){
             //普通用户
             percent = new BigDecimal(0.008);
+        }else{
+            if(vipLevel.intValue() == 1){
+                //铂金会员
+                percent = new BigDecimal(0.008);
+            }else{
+                //至尊会员
+                percent = new BigDecimal(0.006);
+            }
         }
         charge = amount.multiply(percent);
         amount = amount.add(charge);
@@ -180,6 +182,7 @@ public class WalletServiceImpl implements WalletService{
 
     @Override
     public void updateScore(Integer userId, Long score,Integer type) throws ServiceException {
+        //TODO 每个用户每天可增加200积分 增加一张用户积分记录表，记录用户积分增加历史，按天筛选，不可超过200分
         UserWallet userWallet = userWalletMapper.selectByUserId(userId);
         if(userWallet == null){
             throw new ServiceException("获取钱包信息失败！");
@@ -282,7 +285,7 @@ public class WalletServiceImpl implements WalletService{
 
     @Override
     public void updateAppraisalCount(Integer userId, Integer count) throws ServiceException {
-        //TODO 只做了减少次数
+        //TODO 只做了减少次数，后期可支持 增加次数
         UserWallet userWallet = userWalletMapper.selectByUserId(userId);
         if(userWallet == null){
             throw new ServiceException("获取钱包信息失败！");

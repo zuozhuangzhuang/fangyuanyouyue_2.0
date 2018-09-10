@@ -106,6 +106,11 @@ public class GoodsDto {
     //抢购降价历史
     private List<GoodsIntervalHistoryDto> historyDtos;//抢购降价历史
 
+
+    private Integer videoLength;//视频长度
+
+    private BigDecimal startPrice;//初始价格
+
     public GoodsDto() {
     }
 
@@ -138,6 +143,9 @@ public class GoodsDto {
             this.addTime = DateUtil.getFormatDate(goodsInfo.getAddTime(), DateUtil.DATE_FORMT_YEAR);
             this.updateTime = DateUtil.getFormatDate(goodsInfo.getUpdateTime(), DateUtil.DATE_FORMT_YEAR);
             this.videoUrl = goodsInfo.getVideoUrl();
+            this.videoLength = goodsInfo.getVideoLength();
+            this.startPrice = goodsInfo.getStartPrice();
+
         }
         //GoodsImg
         if(goodsImgs != null && goodsImgs.size()>0){

@@ -175,7 +175,7 @@ public class RefundController extends BaseController{
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "orderId", value = "订单id",required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "reason", value = "拒绝理由", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "reason", value = "处理理由", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "status", value = "处理状态 2同意 3拒绝",required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/handleReturns")

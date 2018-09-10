@@ -278,6 +278,41 @@ public class OrderController extends BaseController{
     @ResponseBody
     public BaseResp getOrderPay(OrderParam param) throws IOException {
         try {
+            log.info("\n" +
+                    "                      d*##$.\n" +
+                    " zP\"\"\"\"\"$e.           $\"    $o\n" +
+                    "4$       '$          $\"      $\n" +
+                    "'$        '$        J$       $F\n" +
+                    " 'b        $k       $>       $\n" +
+                    "  $k        $r     J$       d$\n" +
+                    "  '$         $     $\"       $~\n" +
+                    "   '$        \"$   '$E       $\n" +
+                    "    $         $L   $\"      $F ...\n" +
+                    "     $.       4B   $      $$$*\"\"\"*b\n" +
+                    "     '$        $.  $$     $$      $F\n" +
+                    "      \"$       R$  $F     $\"      $\n" +
+                    "       $k      ?$ u*     dF      .$\n" +
+                    "       ^$.      $$\"     z$      u$$$$e\n" +
+                    "        #$b             $E.dW@e$\"    ?$\n" +
+                    "         #$           .o$$# d$$$$c    ?F\n" +
+                    "          $      .d$$#\" . zo$>   #$r .uF\n" +
+                    "          $L .u$*\"      $&$$$k   .$$d$$F\n" +
+                    "           $$\"            \"\"^\"$$$P\"$P9$\n" +
+                    "          JP              .o$$$$u:$P $$\n" +
+                    "          $          ..ue$\"      \"\"  $\"\n" +
+                    "         d$          $F              $\n" +
+                    "         $$     ....udE             4B\n" +
+                    "          #$    \"\"\"\"` $r            @$\n" +
+                    "           ^$L        '$            $F\n" +
+                    "             RN        4N           $\n" +
+                    "              *$b                  d$\n" +
+                    "               $$k                 $F\n" +
+                    "               $$b                $F\n" +
+                    "                 $\"\"               $F\n" +
+                    "                 '$                $\n" +
+                    "                  $L               $\n" +
+                    "                  '$               $\n" +
+                    "                   $               $");
             log.info("----》订单支付《----");
             log.info("参数："+param.toString());
             //验证用户

@@ -12,26 +12,29 @@
     <result column="type" jdbcType="INTEGER" property="type" />
     <result column="status" jdbcType="INTEGER" property="status" />
     <result column="floor_price" jdbcType="DECIMAL" property="floorPrice" />
-    <result column="interval_time" jdbcType="TIMESTAMP" property="intervalTime" />
+    <result column="interval_time" jdbcType="INTEGER" property="intervalTime" />
     <result column="markdown" jdbcType="DECIMAL" property="markdown" />
     <result column="last_interval_time" jdbcType="TIMESTAMP" property="lastIntervalTime" />
     <result column="is_appraisal" jdbcType="INTEGER" property="isAppraisal" />
     <result column="video_url" jdbcType="VARCHAR" property="videoUrl" />
     <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="video_length" jdbcType="INTEGER" property="videoLength" />
+    <result column="start_price" jdbcType="DECIMAL" property="startPrice" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.goods.model.GoodsInfo">
     <result column="description" jdbcType="LONGVARCHAR" property="description" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, name, price, postage, sort, label, type, status, floor_price, interval_time, 
-    markdown, last_interval_time, is_appraisal, video_url, add_time, update_time
+    markdown, last_interval_time, is_appraisal, video_url, add_time, update_time, video_length, 
+    start_price
   </sql>
   <sql id="Blob_Column_List">
     description
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
-    select
+    select 
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
@@ -48,17 +51,17 @@
       label, type, status, 
       floor_price, interval_time, markdown, 
       last_interval_time, is_appraisal, video_url, 
-      add_time, update_time, description
-      )
+      add_time, update_time, video_length, 
+      start_price, description)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, 
       #{price,jdbcType=DECIMAL}, #{postage,jdbcType=DECIMAL}, #{sort,jdbcType=INTEGER}, 
       #{label,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
-      #{floorPrice,jdbcType=DECIMAL}, #{intervalTime,jdbcType=TIMESTAMP}, #{markdown,jdbcType=DECIMAL}, 
+      #{floorPrice,jdbcType=DECIMAL}, #{intervalTime,jdbcType=INTEGER}, #{markdown,jdbcType=DECIMAL}, 
       #{lastIntervalTime,jdbcType=TIMESTAMP}, #{isAppraisal,jdbcType=INTEGER}, #{videoUrl,jdbcType=VARCHAR}, 
-      #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR}
-      )
+      #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{videoLength,jdbcType=INTEGER}, 
+      #{startPrice,jdbcType=DECIMAL}, #{description,jdbcType=LONGVARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.goods.model.GoodsInfo">
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.goods.model.GoodsInfo" useGeneratedKeys="true" keyProperty="id">
     insert into goods_info
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -112,6 +115,12 @@
       <if test="updateTime != null">
         update_time,
       </if>
+      <if test="videoLength != null">
+        video_length,
+      </if>
+      <if test="startPrice != null">
+        start_price,
+      </if>
       <if test="description != null">
         description,
       </if>
@@ -148,7 +157,7 @@
         #{floorPrice,jdbcType=DECIMAL},
       </if>
       <if test="intervalTime != null">
-        #{intervalTime,jdbcType=TIMESTAMP},
+        #{intervalTime,jdbcType=INTEGER},
       </if>
       <if test="markdown != null">
         #{markdown,jdbcType=DECIMAL},
@@ -167,6 +176,12 @@
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="videoLength != null">
+        #{videoLength,jdbcType=INTEGER},
+      </if>
+      <if test="startPrice != null">
+        #{startPrice,jdbcType=DECIMAL},
       </if>
       <if test="description != null">
         #{description,jdbcType=LONGVARCHAR},
@@ -204,7 +219,7 @@
         floor_price = #{floorPrice,jdbcType=DECIMAL},
       </if>
       <if test="intervalTime != null">
-        interval_time = #{intervalTime,jdbcType=TIMESTAMP},
+        interval_time = #{intervalTime,jdbcType=INTEGER},
       </if>
       <if test="markdown != null">
         markdown = #{markdown,jdbcType=DECIMAL},
@@ -224,6 +239,12 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="videoLength != null">
+        video_length = #{videoLength,jdbcType=INTEGER},
+      </if>
+      <if test="startPrice != null">
+        start_price = #{startPrice,jdbcType=DECIMAL},
+      </if>
       <if test="description != null">
         description = #{description,jdbcType=LONGVARCHAR},
       </if>
@@ -241,13 +262,15 @@
       type = #{type,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
       floor_price = #{floorPrice,jdbcType=DECIMAL},
-      interval_time = #{intervalTime,jdbcType=TIMESTAMP},
+      interval_time = #{intervalTime,jdbcType=INTEGER},
       markdown = #{markdown,jdbcType=DECIMAL},
       last_interval_time = #{lastIntervalTime,jdbcType=TIMESTAMP},
       is_appraisal = #{isAppraisal,jdbcType=INTEGER},
       video_url = #{videoUrl,jdbcType=VARCHAR},
       add_time = #{addTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
+      video_length = #{videoLength,jdbcType=INTEGER},
+      start_price = #{startPrice,jdbcType=DECIMAL},
       description = #{description,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -262,13 +285,15 @@
       type = #{type,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
       floor_price = #{floorPrice,jdbcType=DECIMAL},
-      interval_time = #{intervalTime,jdbcType=TIMESTAMP},
+      interval_time = #{intervalTime,jdbcType=INTEGER},
       markdown = #{markdown,jdbcType=DECIMAL},
       last_interval_time = #{lastIntervalTime,jdbcType=TIMESTAMP},
       is_appraisal = #{isAppraisal,jdbcType=INTEGER},
       video_url = #{videoUrl,jdbcType=VARCHAR},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      video_length = #{videoLength,jdbcType=INTEGER},
+      start_price = #{startPrice,jdbcType=DECIMAL}
     where id = #{id,jdbcType=INTEGER}
   </update>
 

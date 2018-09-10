@@ -23,7 +23,7 @@ import org.springframework.web.context.WebApplicationContext;
 @ContextConfiguration
 @Rollback
 public class OrderControllerTest {
-    @Autowired
+       @Autowired
     private WebApplicationContext context;
 
     private MockMvc mvc;

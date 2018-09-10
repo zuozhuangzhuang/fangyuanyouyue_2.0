@@ -56,11 +56,6 @@ public class ForumController extends BaseController {
             Integer userId = null;
             if(StringUtils.isNotEmpty(param.getToken())) {
                 userId = (Integer)schedualRedisService.get(param.getToken());
-//                String verifyUser = schedualUserService.verifyUserById(userId);
-//                JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-//                if((Integer)jsonObject.get("code") != 0){
-//                    return toError(jsonObject.getString("report"));
-//                }
             }
             
             if(param.getForumId()==null) {
@@ -106,11 +101,6 @@ public class ForumController extends BaseController {
             Integer userId = null;
             if(StringUtils.isNotEmpty(param.getToken())) {
                 userId = (Integer)schedualRedisService.get(param.getToken());
-//                String verifyUser = schedualUserService.verifyUserById(userId);
-//                JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-//                if((Integer)jsonObject.get("code") != 0){
-//                    return toError(jsonObject.getString("report"));
-//                }
             }
             if(param.getType() == null){
                 if(param.getSearchType() != null && param.getSearchType() != 1){
