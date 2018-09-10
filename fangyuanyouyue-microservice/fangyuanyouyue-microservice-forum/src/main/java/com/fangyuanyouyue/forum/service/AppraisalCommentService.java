@@ -46,6 +46,6 @@ public interface AppraisalCommentService {
      * 保存评论
      * @param param
      */
-    void saveComment(Integer userId,AppraisalParam param) throws ServiceException;
+    AppraisalCommentDto saveComment(Integer userId,AppraisalParam param) throws ServiceException;
 
 }

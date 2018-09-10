@@ -32,18 +32,6 @@ public class AppraisalCommentDto {
 
     private String content;//评论内容
 
-//    private String pic1;//图片1（弃用）
-//
-//    private String pic2;
-//
-//    private String pic3;
-//
-//    private String pic4;
-//
-//    private String pic5;
-//
-//    private String pic6;
-
     private Integer isWinner = 2; //是否赢了 1是 2否
     
     private Integer isLikes = 2; //是否点赞 1是 2否
@@ -63,12 +51,6 @@ public class AppraisalCommentDto {
         this.appraisalId = comment.getAppraisalId();
         this.viewpoint = comment.getViewpoint();
         this.content = comment.getContent();
-//        this.pic1 = comment.getPic1();
-//        this.pic2 = comment.getPic2();
-//        this.pic3 = comment.getPic3();
-//        this.pic4 = comment.getPic4();
-//        this.pic5 = comment.getPic5();
-//        this.pic6 = comment.getPic6();
         this.isWinner = comment.getIsWinner();
         this.status = comment.getStatus();
         this.addTime = DateUtil.getFormatDate(comment.getUpdateTime(), DateUtil.DATE_FORMT);

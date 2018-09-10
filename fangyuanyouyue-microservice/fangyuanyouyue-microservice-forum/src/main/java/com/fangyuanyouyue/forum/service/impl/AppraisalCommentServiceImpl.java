@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.forum.constants.StatusEnum;
 import com.fangyuanyouyue.forum.dao.AppraisalCommentLikesMapper;
 import com.fangyuanyouyue.forum.dao.AppraisalDetailMapper;
@@ -62,7 +63,7 @@ public class AppraisalCommentServiceImpl implements AppraisalCommentService {
 	}
 
 	@Override
-	public void saveComment(Integer userId,AppraisalParam param) throws ServiceException{
+	public AppraisalCommentDto saveComment(Integer userId,AppraisalParam param) throws ServiceException{
 		AppraisalComment model = appraisalCommentMapper.selectByAppraisalIdUserId(userId,param.getAppraisalId());
 		if(model == null){
 			model = new AppraisalComment();
@@ -70,7 +71,7 @@ public class AppraisalCommentServiceImpl implements AppraisalCommentService {
 			model.setAppraisalId(param.getAppraisalId());
 			model.setViewpoint(param.getViewpoint());
 			model.setContent(param.getContent());
-			model.setAddTime(new Date());
+			model.setAddTime(DateStampUtils.getTimesteamp());
 			appraisalCommentMapper.insert(model);
 			if(param.getUserIds() != null && param.getUserIds().length > 0){
 				//邀请我：用户“用户昵称”参与全民鉴定【全民鉴定名称】时邀请了您！点击此处前往查看吧
@@ -81,6 +82,8 @@ public class AppraisalCommentServiceImpl implements AppraisalCommentService {
 							"用户“"+user.getNickName()+"”参与全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧","7","5",appraisalDetail.getId().toString());
 				}
 			}
+			AppraisalCommentDto dto = new AppraisalCommentDto(model);
+			return dto;
 		}else{
 			throw new ServiceException("您只能发表一次看法！");
 		}

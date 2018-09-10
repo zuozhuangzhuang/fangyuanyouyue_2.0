@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -39,7 +40,7 @@ public class AppraisalComment {
 
     private Integer status;//状态
 
-    private Date addTime;//添加时间
+    private Timestamp addTime;//添加时间
 
     private Date updateTime;//修改时间
 
