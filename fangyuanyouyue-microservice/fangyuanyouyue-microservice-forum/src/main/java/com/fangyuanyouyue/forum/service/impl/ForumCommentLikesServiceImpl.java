@@ -10,9 +10,11 @@ import org.springframework.stereotype.Service;
 import com.fangyuanyouyue.forum.dao.ForumCommentLikesMapper;
 import com.fangyuanyouyue.forum.model.ForumCommentLikes;
 import com.fangyuanyouyue.forum.service.ForumCommentLikesService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service(value = "forumCommentLikesService")
+@Transactional(rollbackFor=Exception.class)
 public class ForumCommentLikesServiceImpl implements ForumCommentLikesService {
 
     @Autowired

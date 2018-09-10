@@ -58,7 +58,7 @@ public class UserVipController extends BaseController{
             @ApiImplicitParam(name = "vipLevel", value = "会员等级 1铂金会员 2至尊会员",required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "vipType", value = "会员类型 1一个月 2三个月 3一年会员",required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "type", value = "类型 1开通 2续费",required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "payType", value = "支付方式  1微信 2支付宝 3余额", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "payType", value = "支付方式  1微信 2支付宝 3余额 4小程序", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "payPwd", value = "支付密码", dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/updateMember")
@@ -88,11 +88,6 @@ public class UserVipController extends BaseController{
             }
             if(param.getPayType() == null){
                 return toError("支付类型不能为空！");
-            }
-            if(param.getPayType() == 3){
-                if(StringUtils.isEmpty(param.getPayPwd())){
-                    return toError("支付密码不能为空！");
-                }
             }
             //开通/续费会员 下单
             Object payInfo = userVipService.addVipOrder(userId, param.getVipLevel(), param.getVipType(), param.getType(), param.getPayType(), param.getPayPwd());

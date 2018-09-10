@@ -19,9 +19,11 @@ import com.fangyuanyouyue.forum.dao.ForumCommentMapper;
 import com.fangyuanyouyue.forum.dto.ForumCommentDto;
 import com.fangyuanyouyue.forum.model.ForumComment;
 import com.fangyuanyouyue.forum.service.ForumCommentService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service(value = "forumCommentService")
+@Transactional(rollbackFor=Exception.class)
 public class ForumCommentServiceImpl implements ForumCommentService {
 
     @Autowired

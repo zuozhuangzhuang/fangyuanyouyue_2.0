@@ -20,9 +20,11 @@ import com.fangyuanyouyue.forum.dao.AppraisalCommentMapper;
 import com.fangyuanyouyue.forum.dto.AppraisalCommentDto;
 import com.fangyuanyouyue.forum.param.AppraisalParam;
 import com.fangyuanyouyue.forum.service.AppraisalCommentService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service(value = "appraisalCommentService")
+@Transactional(rollbackFor=Exception.class)
 public class AppraisalCommentServiceImpl implements AppraisalCommentService {
 	
 	@Autowired

@@ -50,7 +50,7 @@ public class UserVipControllerTest {
                 .param("vipType","3")
                 //类型 1开通 2续费
                 .param("type","2")
-                //支付方式  1微信 2支付宝 3余额
+                //支付方式  1微信 2支付宝 3余额 4小程序
                 .param("payType","3")
                 .param("payPwd","123456")
                 .accept(MediaType.APPLICATION_JSON))

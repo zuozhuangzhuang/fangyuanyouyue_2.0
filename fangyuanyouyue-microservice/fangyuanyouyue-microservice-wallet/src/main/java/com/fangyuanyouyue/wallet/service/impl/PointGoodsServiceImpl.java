@@ -15,7 +15,7 @@ import com.fangyuanyouyue.wallet.service.PointGoodsService;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service(value = "pointGoodsService")
-@Transactional
+@Transactional(rollbackFor=Exception.class)
 public class PointGoodsServiceImpl implements PointGoodsService {
 
     @Autowired

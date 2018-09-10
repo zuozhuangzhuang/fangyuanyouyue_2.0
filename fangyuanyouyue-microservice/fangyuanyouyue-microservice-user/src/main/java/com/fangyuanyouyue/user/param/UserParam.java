@@ -172,6 +172,6 @@ public class UserParam{
 	@ApiModelProperty(name = "authType", value = "认证状态 1已认证 2未认证", dataType = "int",hidden = true)
 	private Integer authType;//认证状态 1已认证 2未认证
 
-	@ApiModelProperty(name = "payType", value = "支付方式 1微信 2支付宝 3余额", dataType = "int",hidden = true)
-	private Integer payType;//支付方式 1微信 2支付宝 3余额
+	@ApiModelProperty(name = "payType", value = "支付方式 1微信 2支付宝 3余额 4小程序", dataType = "int",hidden = true)
+	private Integer payType;//支付方式 1微信 2支付宝 3余额 4小程序
 }

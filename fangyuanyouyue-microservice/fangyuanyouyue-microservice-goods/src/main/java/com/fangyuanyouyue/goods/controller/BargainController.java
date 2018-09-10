@@ -57,8 +57,8 @@ public class BargainController extends BaseController{
             @ApiImplicitParam(name = "price", value = "出价钱", required = true, dataType = "BigDecimal", paramType = "query"),
             @ApiImplicitParam(name = "reason", value = "议价理由", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "addressId", value = "收货地址id",required = true, dataType = "int", paramType = "query"),
-//            @ApiImplicitParam(name = "payType", value = "支付方式  1微信 2支付宝 3余额", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "payPwd", value = "支付密码",required = true, dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "payType", value = "支付方式 1微信 2支付宝 3余额 4小程序", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "payPwd", value = "支付密码",required = false, dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/addBargain")
     @ResponseBody
@@ -85,11 +85,11 @@ public class BargainController extends BaseController{
             if(param.getAddressId() == null){
                 return toError("收货地址不能为空！");
             }
-            if(param.getPayPwd() == null){
-                return toError("支付密码不能为空！");
+            if(param.getPayType() == null){
+                return toError("支付方式不能为空！");
             }
             //申请商品压价
-            Object payInfo = bargainService.addBargain(userId, param.getGoodsId(), param.getPrice(), param.getReason(), param.getAddressId(), param.getPayPwd(), 3);
+            Object payInfo = bargainService.addBargain(userId, param.getGoodsId(), param.getPrice(), param.getReason(), param.getAddressId(), param.getPayPwd(), param.getPayType());
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();

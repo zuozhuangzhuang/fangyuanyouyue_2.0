@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Random;
 
 @Service(value = "scoreService")
-@Transactional
+@Transactional(rollbackFor=Exception.class)
 public class ScoreServiceImpl implements ScoreService{
     @Autowired
     private UserWalletMapper userWalletMapper;

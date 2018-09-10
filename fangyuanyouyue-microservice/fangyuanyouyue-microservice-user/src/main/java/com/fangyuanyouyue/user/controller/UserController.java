@@ -9,8 +9,7 @@ import java.util.Map;
 import com.fangyuanyouyue.base.model.WxPayResult;
 import com.fangyuanyouyue.base.util.WechatUtil.WXPayUtil;
 import com.fangyuanyouyue.base.util.alipay.util.AlipayNotify;
-import com.fangyuanyouyue.user.dto.UserFansDto;
-import com.fangyuanyouyue.user.dto.WaitProcessDto;
+import com.fangyuanyouyue.user.dto.*;
 import com.fangyuanyouyue.user.model.UserThirdParty;
 import com.fangyuanyouyue.user.service.*;
 import org.apache.commons.codec.binary.Base64;
@@ -33,8 +32,6 @@ import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.AES;
 import com.fangyuanyouyue.base.util.MD5Util;
 import com.fangyuanyouyue.user.constant.PhoneCodeEnum;
-import com.fangyuanyouyue.user.dto.ShopDto;
-import com.fangyuanyouyue.user.dto.UserDto;
 import com.fangyuanyouyue.user.model.UserInfo;
 import com.fangyuanyouyue.user.model.WeChatSession;
 import com.fangyuanyouyue.user.param.UserParam;
@@ -64,6 +61,8 @@ public class UserController extends BaseController {
     private SchedualMessageService schedualMessageService;//message-service
     @Autowired
     private UserThirdService userThirdService;
+
+
 
     @ApiOperation(value = "注册", notes = "(UserDto)注册",response = BaseResp.class)
     @ApiImplicitParams({
@@ -123,6 +122,25 @@ public class UserController extends BaseController {
     @ResponseBody
     public BaseResp login(UserParam param) throws IOException {
         try {
+            log.info("\n" +
+                    "                                                __----~~~~~~~~~~~------___\n" +
+                    "                                          .  .   ~~//====......          __--~ ~~\n" +
+                    "                          -.            \\_|//     |||\\\\  ~~~~~~::::... /~\n" +
+                    "                       ___-==_       _-~o~  \\/    |||  \\\\            _/~~-\n" +
+                    "               __---~~~.==~||\\=_    -_--~/_-~|-   |\\\\   \\\\        _/~\n" +
+                    "           _-~~     .=~    |  \\\\-_    '-~7  /-   /  ||    \\      /\n" +
+                    "         .~       .~       |   \\\\ -_    /  /-   /   ||      \\   /\n" +
+                    "        /  ____  /         |     \\\\ ~-_/  /|- _/   .||       \\ /\n" +
+                    "        |~~    ~~|--~~~~--_ \\     ~==-/   | \\~--===~~        .\\\n" +
+                    "                 '         ~-|      /|    |-~\\~~       __--~~\n" +
+                    "                             |-~~-_/ |    |   ~\\_   _-~            /\\\n" +
+                    "                                  /  \\     \\__   \\/~                \\__\n" +
+                    "                              _--~ _/ | .-~~____--~-/                  ~~==.\n" +
+                    "                             ((->/~   '.|||' -_|    ~~-/ ,              . _||\n" +
+                    "                                        -_     ~\\      ~~---l__i__i__i--~~_/\n" +
+                    "                                        _-~-__   ~)  \\--______________--~~\n" +
+                    "                                      //.-~~~-~_--~- |-------~~~~~~~~\n" +
+                    "                                             //.-~~~--\\\n");
             log.info("----》用户登录《----");
             log.info("参数：" + param.toString());
             if (StringUtils.isEmpty(param.getPhone())) {
@@ -218,6 +236,10 @@ public class UserController extends BaseController {
             return toSuccess(userDto);
         } catch (ServiceException e) {
             e.printStackTrace();
+            //如果可以合并账号，就返回 code = 2
+            if(e.getCode() != null){
+                return toError(e.getCode(),e.getMessage());
+            }
             return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
@@ -304,12 +326,12 @@ public class UserController extends BaseController {
             if(StringUtils.isNotEmpty(param.getPhone())){
                 //三方用户未绑定手机，手机用户未绑定次type三方时可以选择合并用户，需要验证手机号
                 UserInfo userByPhone = userInfoService.getUserByPhone(param.getPhone());
-                boolean result = userThirdService.judgeMerge(param.getToken(), null, param.getPhone(),null);
-                if(result){
-                    //可以合并账号
-                    return toError("此手机号已被注册，是否合并账号！");
-                }
                 if(userByPhone != null){
+                    MergeDto mergeDto = userThirdService.judgeMerge(param.getToken(), null, param.getPhone(),null);
+                    if(mergeDto == null){
+                        //可以合并账号
+                        return toError(2,"此手机号已被注册，是否合并账号！");
+                    }
                     return toError("此手机号已被注册！");
                 }
             }
@@ -329,6 +351,44 @@ public class UserController extends BaseController {
             //完善资料
             userInfoService.modify(param);
             return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+@ApiOperation(value = "获取合并账号用户信息", notes = "(MergeDto)获取合并账号用户信息:目前只支持三方账户绑定手机号",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "phone", value = "手机号", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "unionId", value = "第三方唯一ID(暂不支持)", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1微信 2QQ 3微博(暂不支持)", required = false, dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/getMergeUser")
+    @ResponseBody
+    public BaseResp getMergeUser(UserParam param) throws IOException {
+        try {
+            log.info("----》获取合并账号用户信息《----");
+            log.info("参数："+param.toString());
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError("用户token不能为空！");
+            }
+            UserInfo user=userInfoService.getUserByToken(param.getToken());
+            if(user==null){
+                return toError("登录超时，请重新登录！");
+            }
+            if(user.getStatus() == 2){
+                return toError("您的账号已被冻结，请联系管理员！");
+            }
+            if(StringUtils.isEmpty(param.getPhone())){
+                return toError("手机号码不能为空！");
+            }
+
+            MergeDto mergeDto = userThirdService.judgeMerge(param.getToken(), param.getUnionId(), param.getPhone(),param.getType());
+            return toSuccess(mergeDto);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
@@ -453,12 +513,13 @@ public class UserController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "合并账号", notes = "(UserDto)合并账号",response = BaseResp.class)
+    @ApiOperation(value = "合并账号", notes = "(String)合并账号",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "phone", value = "手机号", required = false, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "unionId", value = "第三方唯一ID", required = false, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "type", value = "类型 1微信 2QQ 3微博", required = false, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "phone", value = "手机号(只支持三方账户绑定手机号)", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "unionId", value = "第三方唯一ID(暂不支持)", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1微信 2QQ 3微博(暂不支持)", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "loginPwd", value = "登录密码", required = true, dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/accountMerge")
     @ResponseBody
@@ -476,9 +537,12 @@ public class UserController extends BaseController {
             if(user.getStatus() == 2){
                 return toError("您的账号已被冻结，请联系管理员！");
             }
-            //TODO 合并账号,一定是从三方账号发起请求
-            UserDto userDto = userInfoService.accountMerge(param.getToken(),param.getPhone(),param.getUnionId(),param.getType());
-            return toSuccess(userDto);
+            if (StringUtils.isEmpty(param.getLoginPwd())) {
+                return toError("密码不能为空！");
+            }
+            //合并账号,1、手机号绑定三方账号 （暂不支持）2、三方账号绑定手机号
+            userThirdService.accountMerge(param.getToken(),param.getPhone(),param.getUnionId(),param.getType(),param.getLoginPwd());
+            return toSuccess("账号已合并，请重新登录！");
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
@@ -613,9 +677,6 @@ public class UserController extends BaseController {
 //                    }
 //                }
             }else if(PhoneCodeEnum.TYPE_NEW_PHONE.getCode() == param.getType()){//为4绑定新手机
-                if(userInfo != null){
-                    return toError("此手机号已被注册！");
-                }
             }else if(PhoneCodeEnum.TYPE_AUTH.getCode() == param.getType()){//为5认证店铺
 				/*if(count == 0){
 					return toError("此手机号尚未注册！");
@@ -724,15 +785,6 @@ public class UserController extends BaseController {
             log.info("参数："+param.toString());
             if(param.getUserId() == null){
                 return toError("用户ID不能为空！");
-            }
-            if(StringUtils.isNotEmpty(param.getToken())) {//验证用户
-                UserInfo user=userInfoService.getUserByToken(param.getToken());
-                if(user==null){
-                    return toError("登录超时，请重新登录！");
-                }
-                if(user.getStatus() == 2){
-                    return toError("您的账号已被冻结，请联系管理员！");
-                }
             }
             UserDto userDto = userInfoService.userInfo(param.getToken(),param.getUserId());
             return toSuccess(userDto);
@@ -867,7 +919,7 @@ public class UserController extends BaseController {
     @ApiOperation(value = "申请官方认证", notes = "（void）申请官方认证")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "payType", value = "支付方式 1微信 2支付宝 3余额", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "payType", value = "支付方式 1微信 2支付宝 3余额 4小程序", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "payPwd", value = "支付密码", required = false, dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/authType")
@@ -934,14 +986,17 @@ public class UserController extends BaseController {
     @ApiOperation(value = "申请官方认证回调接口", notes = "申请官方认证", response = BaseResp.class)
     @PostMapping(value = "/notify/wechat")
     @ResponseBody
-    public BaseResp notify(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try {
+    public String notify(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        String resXml = "";
+
+        try{
+            //把如下代码贴到的你的处理回调的servlet 或者.do 中即可明白回调操作
             wechatLog.info("微信支付小方圆回调数据开始");
 
 
             //示例报文
             //		String xml = "<xml><appid><![CDATA[wxb4dc385f953b356e]]></appid><bank_type><![CDATA[CCB_CREDIT]]></bank_type><cash_fee><![CDATA[1]]></cash_fee><fee_type><![CDATA[CNY]]></fee_type><is_subscribe><![CDATA[Y]]></is_subscribe><mch_id><![CDATA[1228442802]]></mch_id><nonce_str><![CDATA[1002477130]]></nonce_str><openid><![CDATA[o-HREuJzRr3moMvv990VdfnQ8x4k]]></openid><out_trade_no><![CDATA[1000000000051249]]></out_trade_no><result_code><![CDATA[SUCCESS]]></result_code><return_code><![CDATA[SUCCESS]]></return_code><sign><![CDATA[1269E03E43F2B8C388A414EDAE185CEE]]></sign><time_end><![CDATA[20150324100405]]></time_end><total_fee>1</total_fee><trade_type><![CDATA[JSAPI]]></trade_type><transaction_id><![CDATA[1009530574201503240036299496]]></transaction_id></xml>";
-            String resXml = "";
             String inputLine;
             String notityXml = "";
             try {
@@ -979,10 +1034,10 @@ public class UserController extends BaseController {
             }
             wechatLog.info("返回信息："+wpr.toString());
             if("SUCCESS".equals(wpr.getResultCode())){
-                //支付成功,修改官方认证订单状态
-                boolean result = userInfoExtService.updateOrder(wpr.getOutTradeNo(),wpr.getTransactionId(),1);
-                wechatLog.info("支付成功！");
+                //支付成功
+                boolean result = userInfoExtService.updateOrder(wpr.getOutTradeNo(), wpr.getTransactionId(),1);
 
+                wechatLog.info("支付成功！");
                 if(result){
                     resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"
                             + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
@@ -1005,14 +1060,13 @@ public class UserController extends BaseController {
             wechatLog.info("微信支付回调结束");
 
 
-            return toSuccess(resXml);
-        } catch (ServiceException e) {
-            e.printStackTrace();
-            return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError("系统繁忙，请稍后再试！");
+            wechatLog.error("微信通知后台处理系统出错", e);
+            resXml = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>"
+                    + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
         }
+        return resXml;
     }
 
     @ApiOperation(value = "申请官方认证支付宝回调接口", notes = "官方认证支付宝回调", response = BaseResp.class,hidden = true)

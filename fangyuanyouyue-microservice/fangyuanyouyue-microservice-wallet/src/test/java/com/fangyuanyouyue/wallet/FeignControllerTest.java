@@ -161,7 +161,7 @@ public class FeignControllerTest {
         mvc.perform(MockMvcRequestBuilders.post("/walletFeign/addUserBalanceDetail")
                 .param("userId","25")
                 .param("amount","10.00")
-                //支付类型 1微信 2支付宝 3余额
+                //支付类型 1微信 2支付宝 3余额 4小程序
                 .param("payType","1")
                 //收支类型 1收入 2支出
                 .param("type","1")

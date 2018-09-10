@@ -26,7 +26,8 @@ public class WechatPay {
 	public static void main(String[] args) {
 		WechatPay pay = new WechatPay();
 		//pay.genOrderWeb("o5VaduLtpTIRGv7sHd5QureMkV20","VIP010101", "1", "VIP购买", "http://test.shaugnchiyiming.com/weixin/personal_center", "127.0.0.1");
-		WechatPayDto dto = pay.genOrderWeb("oteLFwc3oyWMRkXX7PrqWqtD-Z2g","TEST001", "0.01", "小方圆测试支付", "http://wechat.xiaohoukx.com/client/user", "127.0.0.1");
+//		WechatPayDto dto = pay.genOrderWeb("oteLFwc3oyWMRkXX7PrqWqtD-Z2g","TEST001", "0.01", "小方圆测试支付", "http://wechat.xiaohoukx.com/client/user", "127.0.0.1");
+		WechatPayDto dto = pay.genOrderMini("onuC35VLb3lBsPPKehB3cNxzBU24","123123123", "0.01", "小方圆测试支付", "https://miniprogram.fangyuanyouyue.com/wallet/wallet/notify/wechat", "127.0.0.1");
 		System.out.println(dto);
 		
 		/*boolean dto = pay.refund("VI000000057","VI000000057","1","");
@@ -45,7 +46,16 @@ public class WechatPay {
 		
 		
 	}
-	
+
+	/**
+	 * 微信三方下单
+	 * @param orderNo
+	 * @param totalFee
+	 * @param desc
+	 * @param notify_url
+	 * @param ip
+	 * @return
+	 */
 	public WechatPayDto genOrder(String orderNo,String totalFee,String desc,String notify_url,String ip){
 		totalFee = getMoney(totalFee);
 		String prepayId = getPrePayId(orderNo, totalFee, desc, notify_url, ip);
@@ -53,8 +63,17 @@ public class WechatPay {
 		genPayReq(prepayId, wechatPayDto);
 		return wechatPayDto;
 	}
-	
-	
+
+	/**
+	 * 公众号下单
+	 * @param openId
+	 * @param orderNo
+	 * @param totalFee
+	 * @param desc
+	 * @param notify_url
+	 * @param ip
+	 * @return
+	 */
 	public WechatPayDto genOrderWeb(String openId,String orderNo,String totalFee,String desc,String notify_url,String ip){
 		totalFee = getMoney(totalFee);
 		String prepayId = getPrePayIdWeb(openId,orderNo, totalFee, desc, notify_url, ip);
@@ -74,10 +93,40 @@ public class WechatPay {
 		 
 		return wechatPayDto;
 	}
-	
 
 	/**
-	 * 获取prepayId
+	 * 小程序下单
+	 * @param openId
+	 * @param orderNo
+	 * @param totalFee
+	 * @param desc
+	 * @param notify_url
+	 * @param ip
+	 * @return
+	 */
+	public WechatPayDto genOrderMini(String openId,String orderNo,String totalFee,String desc,String notify_url,String ip){
+		totalFee = getMoney(totalFee);
+		String prepayId = getPrePayIdMini(openId,orderNo, totalFee, desc, notify_url, ip);
+		WechatPayDto wechatPayDto = new WechatPayDto();
+		genPayReqMini(prepayId, wechatPayDto);
+		//生成第二次加密
+	    List<NameValuePair> packageParams = new LinkedList<NameValuePair>();
+		packageParams.add(new BasicNameValuePair("appId", wechatPayDto.getAppId()));
+		packageParams.add(new BasicNameValuePair("nonceStr", wechatPayDto.getNonceStr()));
+		packageParams.add(new BasicNameValuePair("package","prepay_id="+wechatPayDto.getPrepayId()));
+		packageParams.add(new BasicNameValuePair("signType","MD5"));
+		packageParams.add(new BasicNameValuePair("timeStamp", wechatPayDto.getTimeStamp()));
+
+		String sign = genPackageSignMini(packageParams);
+		wechatPayDto.setWebSign(sign);
+
+
+		return wechatPayDto;
+	}
+
+
+	/**
+	 * 三方支付获取prepayId
 	 * @param orderNo
 	 * @param totalFee
 	 * @param desc
@@ -136,7 +185,7 @@ public class WechatPay {
 
 	
 	/**
-	 * 获取prepayId
+	 * 公众号获取prepayId
 	 * @param openId
 	 * @param orderNo
 	 * @param totalFee
@@ -193,6 +242,66 @@ public class WechatPay {
 		
 		return prepayId;
 		
+	}
+
+	/**
+	 * 小程序获取prepayId
+	 * @param openId
+	 * @param orderNo
+	 * @param totalFee
+	 * @param desc
+	 * @param notify_url
+	 * @param ip
+	 * @return
+	 */
+	private String getPrePayIdMini(String openId,String orderNo,String totalFee,String desc,String notify_url,String ip) {
+
+		String appId = WechatPayConfig.APP_ID_MINI;
+		// 1 参数
+		// 订单号
+	//	String orderId = orderNo;
+		// 附加数据 原样返回
+	//	String attach = "";
+		// 总金额以分为单位，不带小数点
+	//	String totalFee = totalFee;
+		// 订单生成的机器 IP
+		String spbill_create_ip = ip;
+		// 这里notify_url是 支付完成后微信发给该链接信息，可以判断会员是否支付成功，改变订单状态等。
+	//	String notify_url = notify_url;
+
+		// ---必须参数
+		// 商户号
+		String mch_id = WechatPayConfig.MCH_ID_MINI;
+		// 商品描述根据情况修改
+		String body = desc;
+		// 商户订单号
+	//	String out_trade_no = orderId;
+		// 随机字符串
+		String	nonceStr = genNonceStr();
+
+        List<NameValuePair> packageParams = new LinkedList<NameValuePair>();
+		packageParams.add(new BasicNameValuePair("appid", appId));
+		packageParams.add(new BasicNameValuePair("body", body));
+		packageParams.add(new BasicNameValuePair("mch_id", mch_id));
+		packageParams.add(new BasicNameValuePair("nonce_str", nonceStr));
+		packageParams.add(new BasicNameValuePair("notify_url", notify_url));
+		packageParams.add(new BasicNameValuePair("openid", openId));
+		packageParams.add(new BasicNameValuePair("out_trade_no",orderNo));
+		packageParams.add(new BasicNameValuePair("spbill_create_ip",spbill_create_ip));
+		packageParams.add(new BasicNameValuePair("total_fee", totalFee));
+		packageParams.add(new BasicNameValuePair("trade_type", "JSAPI"));
+
+		String sign = genPackageSignWeb(packageParams);
+		packageParams.add(new BasicNameValuePair("sign", sign));
+
+	   String xmlstring =toXml(packageParams);
+
+		String createOrderURL = "https://api.mch.weixin.qq.com/pay/unifiedorder";
+
+		String prepayId =  GetWxOrderno.getPayNo(createOrderURL, xmlstring);
+
+		return prepayId;
+
 	}
 	
 	
@@ -406,7 +515,30 @@ public class WechatPay {
 		dto.setSign(sign);
 		return sign;
 	}
-	
+
+	//小程序生成订单请求
+	private String genPayReqMini(String prepayId,WechatPayDto dto) {
+
+		List<NameValuePair> signParams = new LinkedList<NameValuePair>();
+		signParams.add(new BasicNameValuePair("appid", WechatPayConfig.APP_ID_MINI));
+		dto.setAppId(WechatPayConfig.APP_ID_MINI);
+		String nonceStr = genNonceStr();
+		signParams.add(new BasicNameValuePair("noncestr", nonceStr));
+		dto.setNonceStr(nonceStr);
+		signParams.add(new BasicNameValuePair("package", "Sign=WXPay"));
+		dto.setPackageValue("Sign=WXPay");
+		signParams.add(new BasicNameValuePair("partnerid", WechatPayConfig.MCH_ID_MINI));
+		dto.setPartnerId(WechatPayConfig.MCH_ID_MINI);
+		signParams.add(new BasicNameValuePair("prepayid", prepayId));
+		dto.setPrepayId(prepayId);
+		String timeStamp = String.valueOf(genTimeStamp());
+		signParams.add(new BasicNameValuePair("timestamp", timeStamp));
+		dto.setTimeStamp(timeStamp);
+		String sign = genAppSign(signParams);
+		dto.setSign(sign);
+		return sign;
+	}
+
 	
 	//获取签名
 	private String genPackageSign(List<NameValuePair> params) {
@@ -436,6 +568,22 @@ public class WechatPay {
 		}
 		sb.append("key=");
 		sb.append(WechatPayConfig.API_KEY_WEB);
+		String packageSign = MD5.getMessageDigest(sb.toString().getBytes()).toUpperCase();
+		return packageSign;
+	}
+
+	//小程序获取签名
+	private String genPackageSignMini(List<NameValuePair> params) {
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < params.size(); i++) {
+			sb.append(params.get(i).getName());
+			sb.append('=');
+			sb.append(params.get(i).getValue());
+			sb.append('&');
+		}
+		sb.append("key=");
+		sb.append(WechatPayConfig.API_KEY_MINI);
 		String packageSign = MD5.getMessageDigest(sb.toString().getBytes()).toUpperCase();
 		return packageSign;
 	}

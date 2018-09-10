@@ -230,21 +230,6 @@ public class UserControllerTest {
     }
 
     /**
-     * 合并账号
-     * @throws Exception
-     */
-    @Test
-//    @Transactional
-    public void accountMerge() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/user/accountMerge")
-                .param("token","1")
-                .param("phone","18103966056")
-                .accept(MediaType.APPLICATION_JSON))
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
-    }
-
-    /**
      * 小程序登录
      * @throws Exception
      */
@@ -397,7 +382,7 @@ public class UserControllerTest {
     public void authType() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/user/authType")
                 .param("token","")
-                //支付方式 1微信 2支付宝 3余额
+                //支付方式 1微信 2支付宝 3余额 4小程序
                 .param("payType","3")
                 .param("payPwd","123456")
                 .accept(MediaType.APPLICATION_JSON))
@@ -435,6 +420,22 @@ public class UserControllerTest {
         mvc.perform(MockMvcRequestBuilders.post("/user/getMergeUser")
                 .param("token","10091FY1536445350902")
                 .param("phone","18103966056")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 获取合并账号用户信息
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void accountMerge() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/user/accountMerge")
+                .param("token","10041FY1536550905200")
+                .param("phone","18103966056")
+                .param("loginPwd","111111")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

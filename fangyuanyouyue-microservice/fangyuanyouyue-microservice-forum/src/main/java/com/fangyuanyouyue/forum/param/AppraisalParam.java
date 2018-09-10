@@ -57,8 +57,8 @@ public class AppraisalParam{
 	@ApiModelProperty(name = "userIds", value = "邀请用户id数组", dataType = "int",hidden = true)
 	private Integer[] userIds;//邀请用户id数组
 
-	@ApiModelProperty(name = "payType", value = "支付类型 1微信 2支付宝 3余额", dataType = "int",hidden = true)
-	private Integer payType;//支付类型 1微信 2支付宝 3余额
+	@ApiModelProperty(name = "payType", value = "支付类型 1微信 2支付宝 3余额 4小程序", dataType = "int",hidden = true)
+	private Integer payType;//支付类型 1微信 2支付宝 3余额 4小程序
 
 	@ApiModelProperty(name = "payPwd", value = "支付密码", dataType = "String",hidden = true)
 	private String payPwd;//支付密码

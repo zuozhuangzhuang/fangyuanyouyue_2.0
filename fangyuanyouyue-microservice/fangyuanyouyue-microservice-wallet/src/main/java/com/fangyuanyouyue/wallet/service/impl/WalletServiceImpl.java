@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.SortedMap;
 
 @Service(value = "walletService")
-@Transactional
+@Transactional(rollbackFor=Exception.class)
 public class WalletServiceImpl implements WalletService{
 
     @Autowired
@@ -49,6 +49,8 @@ public class WalletServiceImpl implements WalletService{
     private UserWithdrawMapper userWithdrawMapper;
     @Autowired
     private UserCouponService userCouponService;
+    @Autowired
+    private UserThirdPartyMapper userThirdPartyMapper;
 
     @Override
     public Object recharge(Integer userId, BigDecimal amount, Integer type) throws Exception {
@@ -77,9 +79,9 @@ public class WalletServiceImpl implements WalletService{
             //支付宝
             String aliPay = orderPayByALi(userRechargeDetail.getPayNo(), userRechargeDetail.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.recharge_alipay_notify.getNotifUrl());
             return aliPay;
-        }else if(type.intValue() == 3){
-            //小程序
-            return null;
+        }else if(type.intValue() == 4){//小程序支付
+            WechatPayDto wechatPayDto = orderPayByWechatMini(userId, userRechargeDetail.getPayNo(), userRechargeDetail.getAmount(), NotifyUrl.mini_test_notify.getNotifUrl()+NotifyUrl.recharge_wechat_notify.getNotifUrl());
+            return wechatPayDto;
         }else{
             throw new ServiceException("充值类型错误！");
         }
@@ -349,6 +351,19 @@ public class WalletServiceImpl implements WalletService{
          * 9  通知地址     notify_url         http://www.weixin.qq.com/wxpay/pay.php 异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的url，不能携带参数。
          * 10 交易类型     trade_type         JSAPI                                  JSAPI 公众号支付 NATIVE 扫码支付 APP APP支付
          */
+/*
+小程序ID	    appid	            是	String(32)	wxd678efh567hg6787	                    微信分配的小程序ID
+商户号	        mch_id	            是	String(32)	1230000109	                            微信支付分配的商户号
+随机字符串	    nonce_str	        是	String(32)	5K8264ILTKCH16CQ2502SI8ZNMTM67VS	    随机字符串，长度要求在32位以内。推荐随机数生成算法
+签名	        sign	            是	String(32)	C380BEC2BFD727A4B6845133519F3AD6	    通过签名算法计算得出的签名值，详见签名生成算法
+商品描述	    body	            是	String(128)	腾讯充值中心-QQ会员充值               商品简单描述，该字段请按照规范传递，具体请见参数规定
+商户订单号	    out_trade_no	    是	String(32)	20150806125346	                        商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*且在同一个商户号下唯一。详见商户订单号
+标价金额	    total_fee	        是	Int	        88	                                    订单总金额，单位为分，详见支付金额
+终端IP	        spbill_create_ip	是	String(16)	123.12.12.123	                        APP和网页支付提交用户端ip，Native支付填调用微信支付API的机器IP。
+通知地址	    notify_url	        是	String(256)	http://www.weixin.qq.com/wxpay/pay.php	异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的url，不能携带参数。
+交易类型	    trade_type	        是	String(16)	JSAPI	                                小程序取值如下：JSAPI，详细说明见参数规定
+用户标识	    openid	            否	String(128)	oUpF8uMuAJO_M2pxb1Q9zNjWeS6o	        trade_type=JSAPI，此参数必传，用户在商户appid下的唯一标识。openid如何获取，可参考【获取openid】。
+*/
 //        MyWechatConfig config = new MyWechatConfig();
 //        WXPay wxpay = new WXPay(config);
 //        Map<String, String> data = new HashMap<>();
@@ -370,7 +385,7 @@ public class WalletServiceImpl implements WalletService{
 //            e.printStackTrace();
 //        }
 
-        SortedMap<Object, Object> parameters = PayCommonUtil.getWXPrePayID("1234"); // 获取预付单，此处已做封装，需要工具类
+        SortedMap<Object, Object> parameters = PayCommonUtil.getWXPrePayID("","","1234"); // 获取预付单，此处已做封装，需要工具类
         parameters.put("body", "小方圆-微信在线支付");
         parameters.put("spbill_create_ip", "127.0.0.1");
         parameters.put("out_trade_no", "2015080612534612");
@@ -393,30 +408,27 @@ public class WalletServiceImpl implements WalletService{
 
     @Override
     public WechatPayDto orderPayByWechat(String orderNo, BigDecimal price,String notifyUrl) throws Exception {
-
-//        SortedMap<Object, Object> parameters = PayCommonUtil.getWXPrePayID(notifyUrl); // 获取预付单，此处已做封装，需要工具类
-//        parameters.put("body", "小方圆-微信在线支付");
-//        parameters.put("spbill_create_ip", "127.0.0.1");
-//        parameters.put("out_trade_no", orderNo);
-//        parameters.put("total_fee", price.intValue()*100); // 测试时，每次支付一分钱，微信支付所传的金额是以分为单位的，因此实际开发中需要x100
-//
-//
-//        // 设置签名
-//        String sign = PayCommonUtil.createSign("UTF-8", parameters);
-//        parameters.put("sign", sign);
-//        // 封装请求参数结束
-//
-//        String requestXML = PayCommonUtil.getRequestXml(parameters); // 获取xml结果
-//        System.out.println("封装请求参数是：" + requestXML);
-//        // 调用统一下单接口
-//        String result = PayCommonUtil.httpsRequest("https://api.mch.weixin.qq.com/pay/unifiedorder", "POST", requestXML);
-//        System.out.println("调用统一下单接口：" + result);
-//        WechatPayDto wechatPayDto = PayCommonUtil.startWXPay(result);
-//        System.out.println("最终的结果是：" + wechatPayDto.toString());
         WechatPay util = new WechatPay();
         System.out.println("请求路径："+notifyUrl);
-        WechatPayDto wechatPayDto= util.genOrder(orderNo, price.doubleValue()+"", "小方圆-微信在线支付", notifyUrl, "127.0.0.1");
-        return wechatPayDto;
+        WechatPayDto dto= util.genOrder(orderNo, price.doubleValue()+"", "小方圆-微信在线支付", notifyUrl, "127.0.0.1");
+        if(dto==null|| org.apache.commons.lang3.StringUtils.isEmpty(dto.getPrepayId())||dto.getSign()==null){
+            throw new ServiceException("在线支付生成订单信息出错！");
+        }
+        return dto;
+    }
+
+    @Override
+    public WechatPayDto orderPayByWechatMini(Integer userId, String orderNo, BigDecimal price, String notifyUrl) throws Exception {
+        //根据userId获取三方openId
+        UserThirdParty userThirdByUserId = userThirdPartyMapper.getUserThirdByUserId(userId, 1);
+        String openId = userThirdByUserId.getMiniOpenId();
+        WechatPay util = new WechatPay();
+        System.out.println("请求路径："+notifyUrl);
+        WechatPayDto dto = util.genOrderMini(openId,orderNo, price.doubleValue()+"", "小方圆-微信小程序支付", notifyUrl, "127.0.0.1");
+        if(dto==null|| org.apache.commons.lang3.StringUtils.isEmpty(dto.getPrepayId())||dto.getSign()==null){
+            throw new ServiceException("小程序支付生成订单信息出错！");
+        }
+        return dto;
     }
 
     @Override

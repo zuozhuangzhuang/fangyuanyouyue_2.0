@@ -275,7 +275,7 @@ public class AppraisalController extends BaseController {
             @ApiImplicitParam(name = "content", value = "商品描述", required = false, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "imgUrls", value = "图片数组", allowMultiple = true,required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "userIds", value = "邀请用户id数组", allowMultiple = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "payType", value = "支付方式  1微信 2支付宝 3余额", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "payType", value = "支付方式  1微信 2支付宝 3余额 4小程序", required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "payPwd", value = "支付密码", required = false, dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/addAppraisal")

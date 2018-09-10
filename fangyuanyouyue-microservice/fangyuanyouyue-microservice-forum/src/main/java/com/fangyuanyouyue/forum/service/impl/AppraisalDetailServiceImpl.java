@@ -20,6 +20,7 @@ import com.fangyuanyouyue.forum.service.SchedualWalletService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import static javafx.scene.input.KeyCode.I;
 
 
 @Service(value = "appraisalDetailService")
+@Transactional(rollbackFor=Exception.class)
 public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 
 	@Autowired
@@ -229,8 +231,11 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 				payInfo.append("余额支付成功！");
 				//生成全民鉴定信息
 				applyAppraisal(argueOrder.getOrderNo(),null,3);
+			}else if(payType.intValue() == 4){//小程序支付
+				WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,argueOrder.getOrderNo(), argueOrder.getAmount(), NotifyUrl.mini_test_notify.getNotifUrl()+NotifyUrl.argue_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+				return wechatPayDto;
 			}else{
-				throw new ServiceException("支付类型错误！");
+				throw new ServiceException("支付方式错误！");
 			}
 		}else{
 

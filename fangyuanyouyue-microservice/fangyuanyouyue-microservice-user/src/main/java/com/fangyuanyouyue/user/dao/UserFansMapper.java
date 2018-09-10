@@ -54,11 +54,11 @@ public interface UserFansMapper {
     List<Map<String,Object>> myFansOrFollows(@Param("userId")Integer userId,@Param("type")Integer type,@Param("start")Integer start,@Param("limit")Integer limit,@Param("search")String search);
 
     /**
-     * 我的粉丝
+     * 用户的粉丝
      * @param userId
      * @param start
      * @param limit
      * @return
      */
-//    List<UserFans> myFans(@Param("userId")Integer userId,@Param("start")Integer start,@Param("limit")Integer limit);
+    List<UserFans> userFans(@Param("userId")Integer userId,@Param("start")Integer start,@Param("limit")Integer limit);
 }

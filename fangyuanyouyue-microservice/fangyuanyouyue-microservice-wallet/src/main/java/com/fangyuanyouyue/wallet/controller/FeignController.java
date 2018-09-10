@@ -197,6 +197,36 @@ public class FeignController extends BaseController{
         }
     }
 
+    @PostMapping(value = "/orderPayByWechatMini")
+    @ResponseBody
+    public BaseResp orderPayByWechatMini(Integer userId,String orderNo, BigDecimal price,String notifyUrl) throws IOException {
+        try {
+            log.info("----》微信小程序支付《----");
+            log.info("参数：orderNo："+orderNo+",price:"+price);
+            if(userId == null){
+                return toError("用户Id不能为空！");
+            }
+            if(StringUtils.isEmpty(orderNo)){
+                return toError("订单号不能为空！");
+            }
+            if(price == null || price.compareTo(new BigDecimal(0))<=0){
+                return toError("订单金额异常！");
+            }
+            if(StringUtils.isEmpty(notifyUrl)){
+                return toError("回调地址不能为空！");
+            }
+            //微信支付
+            WechatPayDto wechatPayDto = walletService.orderPayByWechatMini(userId,orderNo, price,notifyUrl);
+            return toSuccess(wechatPayDto);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
     @PostMapping(value = "/orderPayByALi")
     @ResponseBody
     public BaseResp orderPayByALi(String orderNo, BigDecimal price,String notifyUrl) throws IOException {
