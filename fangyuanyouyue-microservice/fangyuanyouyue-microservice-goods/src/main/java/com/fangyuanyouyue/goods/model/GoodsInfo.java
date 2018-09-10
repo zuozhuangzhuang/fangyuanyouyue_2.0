@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -46,7 +47,7 @@ public class GoodsInfo {
 
     private String videoUrl;//视频路径
 
-    private Date addTime;//发布时间
+    private Timestamp addTime;//发布时间
 
     private Date updateTime;//修改时间
 
