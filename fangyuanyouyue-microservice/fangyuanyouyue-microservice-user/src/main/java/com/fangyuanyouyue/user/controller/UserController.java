@@ -540,7 +540,7 @@ public class UserController extends BaseController {
             if (StringUtils.isEmpty(param.getLoginPwd())) {
                 return toError("密码不能为空！");
             }
-            //TODO 合并账号,1、手机号绑定三方账号 2、三方账号绑定手机号
+            //合并账号,1、手机号绑定三方账号 （暂不支持）2、三方账号绑定手机号
             userThirdService.accountMerge(param.getToken(),param.getPhone(),param.getUnionId(),param.getType(),param.getLoginPwd());
             return toSuccess("账号已合并，请重新登录！");
         } catch (ServiceException e) {
