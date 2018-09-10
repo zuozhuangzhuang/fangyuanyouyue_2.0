@@ -87,7 +87,7 @@ public class UserThirdServiceImpl implements UserThirdService {
             UserThirdParty phoneThird = userThirdPartyMapper.getUserThirdByUserId(phoneUser.getId(),type);
             if(StringUtils.isEmpty(user.getPhone()) && phoneThird == null){
                 //修改手机用户的密码
-                phoneUser.setLoginPwd(MD5Util.MD5(loginPwd));
+                phoneUser.setLoginPwd(MD5Util.generate(MD5Util.MD5(loginPwd)));
                 userInfoMapper.updateByPrimaryKeySelective(phoneUser);
                 //将三方改到手机号账号
                 userThird.setUserId(phoneUser.getId());

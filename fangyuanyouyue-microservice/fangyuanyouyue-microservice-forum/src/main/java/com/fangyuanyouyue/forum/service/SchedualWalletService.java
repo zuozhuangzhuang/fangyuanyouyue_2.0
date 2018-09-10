@@ -53,6 +53,17 @@ public interface SchedualWalletService {
     String orderPayByWechat(@RequestParam(value = "orderNo") String orderNo, @RequestParam(value = "price") BigDecimal price,@RequestParam(value = "notifyUrl") String notifyUrl);
 
     /**
+     * 小程序支付
+     * @param userId
+     * @param orderNo
+     * @param price
+     * @param notifyUrl
+     * @return
+     */
+    @RequestMapping(value = "/walletFeign/orderPayByWechatMini",method = RequestMethod.POST)
+    String orderPayByWechatMini(@RequestParam(value = "userId") Integer userId,@RequestParam(value = "orderNo") String orderNo,@RequestParam(value = "price") BigDecimal price,@RequestParam(value = "notifyUrl") String notifyUrl);
+
+    /**
      * 支付宝支付
      * @param orderNo
      * @param price
@@ -65,7 +76,7 @@ public interface SchedualWalletService {
      * 新增用户收支信息
      * @param userId
      * @param amount
-     * @param payType 支付类型 1微信 2支付宝 3余额
+     * @param payType 支付类型 1微信 2支付宝 3余额 4小程序
      * @param type 收支类型 1收入 2支出
      * @param orderNo
      * @param title

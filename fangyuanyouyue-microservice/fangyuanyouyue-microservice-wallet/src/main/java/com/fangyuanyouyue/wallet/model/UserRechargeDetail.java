@@ -20,7 +20,7 @@ public class UserRechargeDetail {
 
     private BigDecimal amount;//金额
 
-    private Integer payType;//支付类型 1微信 2支付宝
+    private Integer payType;//支付类型 1微信 2支付宝 4小程序
 
     private String payNo;//第三方支付流水号
 

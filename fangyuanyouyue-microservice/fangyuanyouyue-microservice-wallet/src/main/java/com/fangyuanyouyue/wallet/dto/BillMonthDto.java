@@ -15,9 +15,9 @@ import java.util.List;
 public class BillMonthDto {
     private String date;//日期
 
-    private Integer income;//收入
+    private Integer income;//月收入
 
-    private Integer disburse;//支出
+    private Integer disburse;//月支出
 
-    private List<BillMonthDto> balanceDtos;//用户账单列表
+    private List<UserBalanceDto> balanceDtos;//用户账单列表
 }

@@ -147,12 +147,22 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
                     String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(authOrder.getOrderNo(), authOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.auth_alipay_notify.getNotifUrl())).getString("data");
                     payInfo.append(info);
                 }else if(payType.intValue() == 3) {//余额
+                    //验证支付密码
+                    boolean verifyPayPwd = verifyPayPwd(userId, payPwd);
+                    if(!verifyPayPwd){
+                        throw new ServiceException("支付密码错误！");
+                    }
                     BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, authOrder.getAmount(), 2)), BaseResp.class);
                     if(baseResp.getCode() == 1){
                         throw new ServiceException(baseResp.getReport().toString());
                     }
                     updateOrder(authOrder.getOrderNo(),null,3);
                     payInfo.append("余额支付成功！");
+                }else if(payType.intValue() == 4){//小程序支付
+                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,authOrder.getOrderNo(), authOrder.getAmount(), NotifyUrl.mini_test_notify.getNotifUrl()+NotifyUrl.auth_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+                    return wechatPayDto;
+                }else{
+                    throw new ServiceException("支付方式错误！");
                 }
                 return payInfo.toString();
             }

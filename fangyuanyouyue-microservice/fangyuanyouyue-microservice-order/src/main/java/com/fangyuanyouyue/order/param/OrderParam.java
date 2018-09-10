@@ -57,8 +57,8 @@ public class OrderParam{
     @ApiModelProperty(name = "number", value = "物流公司编号", dataType = "int",hidden = true)
     private String number;//物流公司编号
 
-    @ApiModelProperty(name = "payType", value = "支付类型 1微信 2支付宝 3余额", dataType = "int",hidden = true)
-    private Integer payType;//支付类型 1微信 2支付宝 3余额
+    @ApiModelProperty(name = "payType", value = "支付类型 1微信 2支付宝 3余额 4小程序", dataType = "int",hidden = true)
+    private Integer payType;//支付类型 1微信 2支付宝 3余额 4小程序
 
     @ApiModelProperty(name = "orderIds", value = "订单id数组", dataType = "int",hidden = true)
     private Integer[] orderIds;//订单id数组

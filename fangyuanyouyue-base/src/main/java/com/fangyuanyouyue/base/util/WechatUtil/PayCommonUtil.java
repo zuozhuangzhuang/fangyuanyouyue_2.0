@@ -38,8 +38,7 @@ public class PayCommonUtil {
     /**
      * 创建微信交易对象
      */
-    public static SortedMap<Object, Object> getWXPrePayID(String notifyUrl)
-    {
+    public static SortedMap<Object, Object> getWXPrePayID(String appId,String mchId,String notifyUrl){
         SortedMap<Object, Object> parameters = new TreeMap<Object, Object>();
         parameters.put("appid","wx306dfd8f2342f051");
         parameters.put("mch_id","1418798002");

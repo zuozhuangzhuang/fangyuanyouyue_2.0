@@ -60,7 +60,7 @@ public class WalletController extends BaseController{
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "amount", value = "充值金额",  required = true,dataType = "BigDecimal", paramType = "query"),
-            @ApiImplicitParam(name = "type", value = "充值方式 1微信 2支付宝 3小程序微信",required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "type", value = "充值方式 1微信 2支付宝  4小程序",required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/recharge")
     @ResponseBody

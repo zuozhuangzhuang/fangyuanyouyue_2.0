@@ -101,6 +101,16 @@ public interface WalletService {
     WechatPayDto orderPayByWechat(String orderNo, BigDecimal price,String notifyUrl) throws Exception;
 
     /**
+     * 小程序支付
+     * @param userId
+     * @param orderNo
+     * @param price
+     * @param notifyUrl
+     * @throws ServiceException
+     */
+    WechatPayDto orderPayByWechatMini(Integer userId,String orderNo, BigDecimal price,String notifyUrl) throws Exception;
+
+    /**
      * 支付宝支付
      * @param orderNo
      * @param price

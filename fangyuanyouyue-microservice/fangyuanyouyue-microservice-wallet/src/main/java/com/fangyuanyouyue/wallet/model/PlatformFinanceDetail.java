@@ -24,7 +24,7 @@ public class PlatformFinanceDetail {
 
     private String payNo;//第三方支付流水号
 
-    private Integer payType;//支付类型1微信 2支付宝
+    private Integer payType;//支付类型1微信 2支付宝 4小程序
 
     private Integer type;//收支类型
 

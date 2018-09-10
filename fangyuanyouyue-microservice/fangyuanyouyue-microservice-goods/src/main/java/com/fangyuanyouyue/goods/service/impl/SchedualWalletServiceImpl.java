@@ -37,4 +37,9 @@ public class SchedualWalletServiceImpl implements SchedualWalletService{
     public String addUserBalanceDetail(Integer userId, BigDecimal amount, Integer payType, Integer type, String orderNo, String title, Integer sellerId, Integer buyerId, Integer orderType) {
         return "新增用户收支信息失败！";
     }
+
+    @Override
+    public String orderPayByWechatMini(Integer userId, String orderNo, BigDecimal price, String notifyUrl) {
+        return "小程序支付失败！";
+    }
 }

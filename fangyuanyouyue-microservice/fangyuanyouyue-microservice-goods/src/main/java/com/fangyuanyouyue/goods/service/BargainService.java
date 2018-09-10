@@ -16,7 +16,7 @@ public interface BargainService {
      * @param price
      * @param reason
      * @param payPwd
-//     * @param payType
+     * @param payType
      * @throws ServiceException
      */
     Object addBargain(Integer userId, Integer goodsId, BigDecimal price,String reason,Integer addressId,String payPwd,Integer payType) throws ServiceException;

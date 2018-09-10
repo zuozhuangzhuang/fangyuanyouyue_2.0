@@ -41,4 +41,9 @@ public class SchedualWalletServiceImpl implements SchedualWalletService{
     public String getPriceByCoupon(Integer userId,BigDecimal price, Integer couponId) {
         return "价格计算失败！";
     }
+
+    @Override
+    public String orderPayByWechatMini(Integer userId, String orderNo, BigDecimal price, String notifyUrl) {
+        return "小程序支付失败！";
+    }
 }

@@ -127,7 +127,7 @@ public class ForumColumnController extends BaseController {
 			@ApiImplicitParam(name = "token", value = "用户token",required = true, dataType = "String", paramType = "query"),
 			@ApiImplicitParam(name = "typeId", value = "专栏分类id",required = true, dataType = "int", paramType = "query"),
 			@ApiImplicitParam(name = "name", value = "专栏名称",required = true, dataType = "String", paramType = "query"),
-			@ApiImplicitParam(name = "payType", value = "支付方式  1微信 2支付宝 3余额",required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "payType", value = "支付方式  1微信 2支付宝 3余额 4小程序",required = true, dataType = "int", paramType = "query"),
 			@ApiImplicitParam(name = "payPwd", value = "支付密码", dataType = "String", paramType = "query")
 	})
 	@PostMapping(value = "/addColumn")
