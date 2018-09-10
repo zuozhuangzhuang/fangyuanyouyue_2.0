@@ -127,6 +127,6 @@
   </update>
 
   <select id="selectByOrderNo" parameterType="String" resultMap="BaseResultMap">
-    select * from user_recharge_detail where pay_no = #{orderNo}
+    select * from user_recharge_detail where pay_no = #{orderNo} and status = 1
   </select>
 </mapper>

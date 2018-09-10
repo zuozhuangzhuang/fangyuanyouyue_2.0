@@ -3,6 +3,7 @@ package com.fangyuanyouyue.forum.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.forum.constants.StatusEnum;
 import com.fangyuanyouyue.forum.dao.*;
 import com.fangyuanyouyue.forum.model.AppraisalComment;
@@ -48,7 +49,7 @@ public class TimerServiceImpl implements TimerService{
     @Override
     public void appraisalEnd() throws ServiceException {
         //1、获取status=1，enndTime小于当前时间的全民鉴定 2、获取鉴定中评论获取点赞最多的评论，定为获胜者(票数一致最先评论者胜出) 3、向发起者和获胜者发送消息通知
-        List<AppraisalDetail> details = appraisalDetailMapper.selectByStatusEndTime(1, new Date());
+        List<AppraisalDetail> details = appraisalDetailMapper.selectByStatusEndTime(1, DateStampUtils.getTimesteamp());
         if(details != null && details.size() > 0){
             for(AppraisalDetail detail:details){
                 List<AppraisalComment> comments= appraisalCommentMapper.selectByAppraisalId(detail.getId(), null, null);

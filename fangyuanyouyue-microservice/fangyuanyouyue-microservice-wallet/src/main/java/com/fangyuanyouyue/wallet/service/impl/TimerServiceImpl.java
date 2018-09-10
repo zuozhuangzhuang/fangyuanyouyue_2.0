@@ -48,7 +48,7 @@ public class TimerServiceImpl implements TimerService{
         //会员记录。后台页面查看
         //1、根据会员到期时间查询会员列表 2、修改会员状态
         //获取7天后过期的会员 现在时间 < 结束时间 < 7天后时间
-        List<UserVip> userVips = userVipMapper.selectByEndTime(DateUtil.getDateAfterDay(new Date(),7));
+        List<UserVip> userVips = userVipMapper.selectByEndTime(DateUtil.getDateAfterDay(DateStampUtils.getTimesteamp(),7));
         if(userVips != null && userVips.size() > 0){
             for(UserVip userVip:userVips){
                 if(userVip.getEndTime().getTime() < System.currentTimeMillis()){
