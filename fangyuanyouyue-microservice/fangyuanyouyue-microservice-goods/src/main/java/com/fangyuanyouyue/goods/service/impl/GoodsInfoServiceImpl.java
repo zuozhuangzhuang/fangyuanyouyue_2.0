@@ -167,7 +167,6 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             goodsInfo.setIntervalTime(param.getIntervalTime());
             goodsInfo.setMarkdown(param.getMarkdown());
         }
-        goodsInfo.setUpdateTime(DateStampUtils.getTimesteamp());
         goodsInfoMapper.insert(goodsInfo);
         //视频截图路径
         if(StringUtils.isNotEmpty(param.getVideoImg())){

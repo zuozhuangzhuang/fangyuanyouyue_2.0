@@ -3,6 +3,7 @@ package com.fangyuanyouyue.forum.service.impl;
 import java.util.Date;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.base.util.DateStampUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +33,7 @@ public class ForumCommentLikesServiceImpl implements ForumCommentLikesService {
 				forumCommentLikes = new ForumCommentLikes();
 				forumCommentLikes.setUserId(userId);
 				forumCommentLikes.setCommentId(commentId);
-				forumCommentLikes.setAddTime(new Date());
+				forumCommentLikes.setAddTime(DateStampUtils.getTimesteamp());
 				forumCommentLikesMapper.insert(forumCommentLikes);
 			}
 		}else if(type == 2){

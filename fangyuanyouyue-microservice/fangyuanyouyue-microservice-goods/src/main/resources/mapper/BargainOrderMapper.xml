@@ -152,6 +152,6 @@
   </update>
 
   <select id="selectByOrderNo" parameterType="String" resultMap="BaseResultMap">
-    select * from bargain_order where order_no = #{orderNo}
+    select * from bargain_order where order_no = #{orderNo} and status = 1
   </select>
 </mapper>
