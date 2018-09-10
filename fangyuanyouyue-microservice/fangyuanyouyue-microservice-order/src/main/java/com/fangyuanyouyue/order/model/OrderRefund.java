@@ -43,10 +43,13 @@ public class OrderRefund {
 
     private Integer sellerReturnStatus;//卖家是否同意退货状态 1申请退货 2卖家直接同意退货 3卖家直接拒绝退货 4卖家48h不处理默认同意退货 5卖家72h小时不处理默认不同意退货
 
-    private String refuseReason;//拒绝退货理由
+    private String refuseReason;//卖家处理退货理由
 
     private Date endTime;//最终（后台管理）处理时间
 
     private Date dealTime;//卖家处理时间
 
+    private String platformReason;//平台处理原因
+
+    //TODO 后台处理人员id
 }

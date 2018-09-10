@@ -52,11 +52,13 @@ public class OrderPayDto {
 
     private String sellerReturnStatus;//卖家是否同意退货状态 null正常  1申请退货 2卖家直接同意退货 3卖家直接拒绝退货 4卖家48h不处理默认同意退货 5卖家72h小时不处理默认不同意退货
 
-    //TODO 待付款时间，剩余收货时间，退货待处理时间，物流号，物流公司编号
-
     private String payTime;//支付时间
 
     private String sendTime;//发货时间
+
+    private String logisticCode;//物流单号
+
+    private String logisticCompany;//物流公司
 
     public OrderPayDto() {
     }
@@ -82,6 +84,8 @@ public class OrderPayDto {
         if(orderPay.getSendTime() != null){
             this.sendTime = DateUtil.getFormatDate(orderPay.getSendTime(),DateUtil.DATE_FORMT);
         }
+        this.logisticCode = orderPay.getLogisticCode();
+        this.logisticCompany = orderPay.getLogisticCompany();
     }
 
     public static ArrayList<OrderPayDto> toDtoList(List<OrderPay> list) {

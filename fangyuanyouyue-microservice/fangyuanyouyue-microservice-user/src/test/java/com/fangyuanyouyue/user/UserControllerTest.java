@@ -234,7 +234,7 @@ public class UserControllerTest {
      * @throws Exception
      */
     @Test
-    @Transactional
+//    @Transactional
     public void accountMerge() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/user/accountMerge")
                 .param("token","1")
@@ -424,4 +424,19 @@ public class UserControllerTest {
 
 
 
+
+    /**
+     * 获取合并账号用户信息
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void getMergeUser() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/user/getMergeUser")
+                .param("token","10091FY1536445350902")
+                .param("phone","18103966056")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
 }

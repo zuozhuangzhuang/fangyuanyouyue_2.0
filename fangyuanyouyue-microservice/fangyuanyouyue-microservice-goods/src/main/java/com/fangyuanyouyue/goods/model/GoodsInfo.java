@@ -50,4 +50,7 @@ public class GoodsInfo {
 
     private Date updateTime;//修改时间
 
+    private Integer videoLength;//视频长度
+
+    private BigDecimal startPrice;//初始价格
 }

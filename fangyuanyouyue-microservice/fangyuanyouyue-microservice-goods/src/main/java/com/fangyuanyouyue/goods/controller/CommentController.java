@@ -149,15 +149,10 @@ public class CommentController extends BaseController{
         try {
             log.info("----》查看全部评论《----");
             log.info("参数："+param.toString());
+            Integer userId = null;
             if(StringUtils.isNotEmpty(param.getToken())){
                 //根据用户token获取userId
-                Integer userId = (Integer)schedualRedisService.get(param.getToken());
-                String verifyUser = schedualUserService.verifyUserById(userId);
-                JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-                if((Integer)jsonObject.get("code") != 0){
-                    return toError(jsonObject.getString("report"));
-                }
-                param.setUserId(userId);
+                userId = (Integer)schedualRedisService.get(param.getToken());
             }
             if(param.getGoodsId() == null){
                 return toError("商品id不能为空！");
@@ -165,7 +160,7 @@ public class CommentController extends BaseController{
             if(param.getStart() == null || param.getStart().intValue() < 0 || param.getLimit() == null || param.getLimit() < 1){
                 return toError("分页参数异常！");
             }
-            List<GoodsCommentDto> comments = commentService.getComments(param.getUserId(),param.getGoodsId(),param.getStart(),param.getLimit());
+            List<GoodsCommentDto> comments = commentService.getComments(userId,param.getGoodsId(),param.getStart(),param.getLimit());
             return toSuccess(comments);
         } catch (ServiceException e) {
             e.printStackTrace();

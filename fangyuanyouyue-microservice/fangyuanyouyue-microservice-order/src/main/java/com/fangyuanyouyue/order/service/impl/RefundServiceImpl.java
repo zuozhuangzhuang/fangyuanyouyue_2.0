@@ -160,38 +160,67 @@ public class RefundServiceImpl implements RefundService{
             if (orderRefund == null) {
                 throw new ServiceException("获取退货信息失败！");
             }else{
+                orderRefund.setSellerReturnStatus(status);
+                orderRefund.setRefuseReason(reason);//处理理由
+                orderRefund.setDealTime(new Date());
+                orderRefundMapper.updateByPrimaryKeySelective(orderRefund);
+            }
+        }
+    }
+
+    @Override
+    public void platformDealReturns(Integer userId, Integer orderId, String reason, Integer status) throws ServiceException {
+        //1、订单状态修改 2、退货状态修改 3、发送信息给买家卖家
+        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderId);
+        OrderPay orderPay = orderPayMapper.selectByOrderId(orderId);
+        if (orderInfo == null) {
+            throw new ServiceException("订单不存在！");
+        } else {
+            OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderId, 1,null);
+            if (orderRefund == null) {
+                throw new ServiceException("获取退货信息失败！");
+            }else{
+                orderRefund.setPlatformReason(reason);//处理理由
+                orderRefund.setEndTime(new Date());
+                orderRefund.setStatus(status);
+                //获取发信息的商品名【xx】
+                List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderId);
+                StringBuffer goodsName = new StringBuffer();
+                boolean isAuction = false;
+                for(OrderDetail detail:orderDetails){
+                    //获取商品、抢购信息
+                    GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
+                    goodsName.append("【"+goodsInfo.getName()+"】");
+                    isAuction = goodsInfo.getType() == 2?true:false;
+                }
                 if(status.intValue() == 2){//同意
-                    orderInfo.setStatus(4);//设置为已完成
-                    orderRefund.setStatus(2);
-                    orderRefund.setSellerReturnStatus(2);
-                    orderRefund.setDealTime(new Date());
-                    orderInfoMapper.updateByPrimaryKeySelective(orderInfo);
-                    orderRefundMapper.updateByPrimaryKeySelective(orderRefund);
                     //修改余额
                     BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(orderInfo.getUserId(),orderPay.getPayAmount(),1)), BaseResp.class);
                     if(baseResp.getCode() == 1){
                         throw new ServiceException(baseResp.getReport().toString());
                     }
-                    //退货：您对商品/抢购【商品名称】申请的退货卖家已同意，货款已退回您的余额。点击此处查看您的余额吧
-                    List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderId);
-                    StringBuffer goodsName = new StringBuffer();
-                    boolean isAuction = false;
-                    for(OrderDetail detail:orderDetails){
-                        //获取商品、抢购信息
-                        GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
-                        goodsName.append("【"+goodsInfo.getName()+"】");
-                        isAuction = goodsInfo.getType() == 2?true:false;
-                    }
-                    schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
+                    orderInfo.setStatus(4);//设置为已完成
+                    orderInfoMapper.updateByPrimaryKeySelective(orderInfo);
+                    //退货：您对商品/抢购【商品名称】申请的退货官方已同意，货款已退回您的余额。点击此处查看您的余额吧
+                    //给买家发信息
+                    schedualMessageService.easemobMessage(orderInfo.getUserId().toString(),
                             "您对"+(isAuction?"抢购":"商品")+goodsName+"申请的退货卖家已同意，货款已退回您的余额。点击此处查看您的余额吧","13","2","");
+                    //给卖家发信息
+                    //买家申请退货的商品/抢购【名称】官方已同意，退款已退回买家余额。如有疑问可联系客服咨询详情
+                    schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
+                            "买家申请退货的"+(isAuction?"抢购":"商品")+goodsName+"官方已同意，退款已退回买家余额。如有疑问可联系客服咨询详情","3","2",orderInfo.getId().toString());
                 }else{//拒绝
                     //订单状态不变
-                    orderRefund.setStatus(3);
-                    orderRefund.setRefuseReason(reason);//拒绝理由
-                    orderRefund.setSellerReturnStatus(3);
-                    orderRefund.setDealTime(new Date());
-                    orderRefundMapper.updateByPrimaryKeySelective(orderRefund);
+                    //给买家发信息
+                    //很抱歉，您对商品/抢购【商品名称】申请的退货，官方已拒绝
+                    schedualMessageService.easemobMessage(orderInfo.getUserId().toString(),
+                            "很抱歉，您对"+(isAuction?"抢购":"商品")+goodsName+"申请的退货，官方已拒绝","3","2",orderInfo.getId().toString());
+                    //买家申请退货的商品/抢购【名称】官方已拒绝，退款已退回买家余额。如有疑问可联系客服咨询详情
+                    schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
+                            "买家申请退货的"+(isAuction?"抢购":"商品")+goodsName+"官方已拒绝，退款已退回买家余额。如有疑问可联系客服咨询详情","3","2",orderInfo.getId().toString());
+
                 }
+                orderRefundMapper.updateByPrimaryKeySelective(orderRefund);
             }
         }
     }

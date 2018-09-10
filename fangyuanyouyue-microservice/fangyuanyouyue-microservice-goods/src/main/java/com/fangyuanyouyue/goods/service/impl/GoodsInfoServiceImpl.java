@@ -146,6 +146,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         goodsInfo.setName(param.getGoodsInfoName());
         goodsInfo.setDescription(param.getDescription());
         goodsInfo.setPrice(param.getPrice());
+        goodsInfo.setStartPrice(param.getPrice());
         goodsInfo.setPostage(param.getPostage()==null?new BigDecimal(0):param.getPostage());
         //排序：是否置顶
 //        goodsInfo.setSort(param.getSort());
@@ -156,6 +157,9 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         goodsInfo.setStatus(1);//状态 1出售中 2 已售出 3已下架（已结束） 5删除
         if(StringUtils.isNotEmpty(param.getVideoUrl())){
             goodsInfo.setVideoUrl(param.getVideoUrl());
+            if(param.getVideoLength() != null){
+                goodsInfo.setVideoLength(param.getVideoLength());
+            }
         }
         goodsInfo.setAddTime(DateStampUtils.getTimesteamp());
         if(param.getType() == 2){
@@ -313,6 +317,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             }
             if(param.getPrice() != null){
                 goodsInfo.setPrice(param.getPrice());
+                goodsInfo.setStartPrice(param.getPrice());
             }
             if(param.getPostage() != null){
                 goodsInfo.setPostage(param.getPostage());
@@ -332,6 +337,9 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             }
             if(StringUtils.isNotEmpty(param.getVideoUrl())){
                 goodsInfo.setVideoUrl(param.getVideoUrl());
+                if(param.getVideoLength() != null){
+                    goodsInfo.setVideoLength(param.getVideoLength());
+                }
             }
             //视频截图路径
             if(StringUtils.isNotEmpty(param.getVideoImg())){

@@ -59,8 +59,8 @@ public class CollectServiceImpl implements CollectService{
         for(Integer collectId:collectIds){
             Collect collect = collectMapper.selectByCollectId(userId,collectId, type,collectType);
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(collectId);
-            if(goodsInfo == null || goodsInfo.getStatus().intValue() == 3 || goodsInfo.getStatus().intValue() == 5){
-                throw new ServiceException("商品不存在或已下架！");
+            if(goodsInfo == null){
+                throw new ServiceException("商品不存在！");
             }else{
                 if(goodsInfo.getType().intValue() != collectType.intValue()){
                     throw new ServiceException("类型错误！");

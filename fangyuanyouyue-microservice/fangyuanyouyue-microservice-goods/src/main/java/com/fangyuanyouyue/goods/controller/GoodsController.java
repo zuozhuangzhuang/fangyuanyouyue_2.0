@@ -120,6 +120,7 @@ public class GoodsController extends BaseController{
             @ApiImplicitParam(name = "imgUrls", value = "商品图片路径数组", required = true,allowMultiple = true,dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "videoUrl", value = "视频路径",dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "videoImg", value = "视频截图路径",dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "videoLength", value = "视频长度",dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "userIds", value = "邀请用户id数组",allowMultiple = true,dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/addGoods")
@@ -307,20 +308,17 @@ public class GoodsController extends BaseController{
                 return toError("商品id不能为空！");
             }
             GoodsDto goodsDto;
-            if(StringUtils.isNotEmpty(param.getToken())){//商品详情验证用户
+            Integer userId = null;
+            if(StringUtils.isNotEmpty(param.getToken())) {//商品详情验证用户
                 //根据用户token获取userId
-                Integer userId = (Integer)schedualRedisService.get(param.getToken());
-                String verifyUser = schedualUserService.verifyUserById(userId);
-                JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-                if((Integer)jsonObject.get("code") != 0){
-                    return toError(jsonObject.getString("report"));
-                }
-                param.setUserId(userId);
-                //获取用户是否已关注此商品
-                goodsDto = goodsInfoService.goodsInfoByToken(param.getGoodsId(),param.getUserId());
-            }else{
+                userId = (Integer)schedualRedisService.get(param.getToken());
+            }
+            if(userId == null){
                 //商品详情
                 goodsDto = goodsInfoService.goodsInfo(param.getGoodsId());
+            }else{
+                //获取用户是否已关注此商品
+                goodsDto = goodsInfoService.goodsInfoByToken(param.getGoodsId(),userId);
             }
 
             return toSuccess(goodsDto);
@@ -468,164 +466,5 @@ public class GoodsController extends BaseController{
             return toError("系统繁忙，请稍后再试！");
         }
     }
-
-
-
-//    //他的商品
-//    @ApiOperation(value = "他的商品", notes = "他的商品")
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "string", paramType = "query"),
-//            @ApiImplicitParam(name = "start", value = "分页start", required = true, dataType = "int", paramType = "query"),
-//            @ApiImplicitParam(name = "limit", value = "分页limit", required = true, dataType = "int", paramType = "query"),
-//            @ApiImplicitParam(name = "search", value = "搜索内容（标题和内容）", dataType = "string", paramType = "query")
-//    })
-//    @PostMapping(value = "/otherGoods")
-//    @ResponseBody
-//    public String otherGoods(GoodsParam param) throws IOException {
-//        try {
-//            log.info("----》他的商品《----");
-//            log.info("参数："+param.toString());
-//
-//            if(param.getGoodsId()==null || param.getGoodsId().intValue()==0){
-//                return toError("商品id不能为空！");
-//            }
-//            if(param.getCatalogId()==null || param.getCatalogId().intValue()==0){
-//                return toError("推荐类型不能为空！");
-//            }
-//            if(param.getStart()==null){
-//                return toError("start不能为空！");
-//            }
-//            if(param.getLimit()==null){
-//                return toError("limit不能为空！");
-//            }
-//            //他的商品
-//
-//            BaseClientResult result = new BaseClientResult(Status.YES.getValue(), "获取他的商品成功！");
-//            return toResult(result);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return toError("系统繁忙，请稍后再试！");
-//        }
-//    }
-//    //商品鉴定申请
-//    @ApiOperation(value = "商品鉴定申请", notes = "商品鉴定申请")
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "string", paramType = "query"),
-//            @ApiImplicitParam(name = "file", value = "商品图片（6张图片）file1~file6", dataType = "file", paramType = "query"),
-//            @ApiImplicitParam(name = "content", value = "分页limit", required = true, dataType = "string", paramType = "query"),
-//            @ApiImplicitParam(name = "title", value = "搜索内容（标题和内容）", dataType = "string", paramType = "query")
-//    })
-//    @PostMapping(value = "/authenticate")
-//    @ResponseBody
-//    public String authenticate(GoodsParam param) throws IOException {
-//        try {
-//            log.info("----》商品鉴定申请《----");
-//            log.info("参数："+param.toString());
-//            if(StringUtils.isEmpty(param.getToken())){
-//                return toError("用户token不能为空！");
-//            }
-//            if(StringUtils.isEmpty(param.getTitle())){
-//                return toError("商品标题不能为空！");
-//            }
-////            AUser user=userService.getByToken(param.getToken());
-////            if(user==null){
-////                return toError("登录超时，请重新登录！");
-////            }
-////            if(StringUtils.isNotEmpty(user.getStatus()) && "1".equals(user.getStatus())){
-////                return toError("您的账号已被冻结，请联系管理员！");
-////            }
-//            if(StringUtils.isEmpty(param.getContent())){
-//                return toError("商品介绍不能为空!");
-//            }
-//            //商品鉴定申请
-//
-//            BaseClientResult result = new BaseClientResult(Status.YES.getValue(), "商品鉴定申请成功！");
-//            return toResult(result);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return toError("系统繁忙，请稍后再试！");
-//        }
-//    }
-//    //我的鉴定列表
-//    @ApiOperation(value = "我的鉴定列表", notes = "我的鉴定列表")
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "string", paramType = "query"),
-//            @ApiImplicitParam(name = "start", value = "分页start", required = true, dataType = "int", paramType = "query"),
-//            @ApiImplicitParam(name = "limit", value = "分页limit", required = true, dataType = "int", paramType = "query")
-//    })
-//    @PostMapping(value = "/authenticateList")
-//    @ResponseBody
-//    public String authenticateList(GoodsParam param) throws IOException {
-//        try {
-//            log.info("----》我的鉴定列表《----");
-//            log.info("参数："+param.toString());
-//
-//            if(param.getGoodsId()==null || param.getGoodsId().intValue()==0){
-//                return toError("商品id不能为空！");
-//            }
-//            if(param.getCatalogId()==null || param.getCatalogId().intValue()==0){
-//                return toError("推荐类型不能为空！");
-//            }
-//            if(param.getStart()==null){
-//                return toError("start不能为空！");
-//            }
-//            if(param.getLimit()==null){
-//                return toError("limit不能为空！");
-//            }
-//            //我的鉴定列表
-//
-//            BaseClientResult result = new BaseClientResult(Status.YES.getValue(), "获取我的鉴定列表成功！");
-//            return toResult(result);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return toError("系统繁忙，请稍后再试！");
-//        }
-//    }
-//
-//    //收藏商品/取消收藏
-//    @ApiOperation(value = "收藏商品/取消收藏", notes = "收藏商品/取消收藏 ")
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "string", paramType = "query"),
-//            @ApiImplicitParam(name = "type", value = "收藏类型 0收藏商品   1取消收藏", required = true, dataType = "string", paramType = "query"),
-//            @ApiImplicitParam(name = "goodsId", value = "商品id", required = true,  dataType = "int", paramType = "query")
-//    })
-//    @PostMapping(value = "/collectGoods")
-//    @ResponseBody
-//    public String collectGoods(GoodsParam param) throws IOException {
-//        try {
-//            log.info("----》收藏商品/取消收藏《----");
-//            log.info("参数："+param.toString());
-//            if(StringUtils.isEmpty(param.getToken())){
-//                return toError("用户token不能为空！");
-//            }
-//            if(param.getGoodsId()==null){
-//                return toError("商品id不能为空！");
-//            }
-//            if(StringUtils.isEmpty(param.getType())){
-//                return toError("收藏类型不能为空！");
-//            }
-//
-////            ResponseEntity<List> responseEntity = restTemplate.postForObject("http://localhost/user/login");
-//
-////            AUser user=userService.getByToken(param.getToken());
-////            if(user==null){
-////                return toError("登录超时，请重新登录！");
-////            }
-////            if(StringUtils.isNotEmpty(user.getStatus()) && "1".equals(user.getStatus())){
-////                return toError("您的账号已被冻结，请联系管理员！");
-////            }
-////            AGoods goods=goodsService.get(param.getGoodsId());
-////            if(goods==null){
-////                return toError("此商品不存在,参数有误！");
-////            }
-//            //收藏商品/取消收藏
-//
-//            BaseClientResult result = new BaseClientResult(Status.YES.getValue(), "收藏商品/取消收藏成功！");
-//            return toResult(result);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return toError("系统繁忙，请稍后再试！");
-//        }
-//    }
 
 }
