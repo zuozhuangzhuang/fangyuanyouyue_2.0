@@ -580,14 +580,17 @@ public class OrderController extends BaseController{
     @ApiOperation(value = "订单支付回调接口", notes = "订单支付", response = BaseResp.class)
     @PostMapping(value = "/notify/wechat")
     @ResponseBody
-    public BaseResp notify(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try {
+    public String notify(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        String resXml = "";
+
+        try{
+            //把如下代码贴到的你的处理回调的servlet 或者.do 中即可明白回调操作
             wechatLog.info("微信支付小方圆回调数据开始");
 
 
             //示例报文
             //		String xml = "<xml><appid><![CDATA[wxb4dc385f953b356e]]></appid><bank_type><![CDATA[CCB_CREDIT]]></bank_type><cash_fee><![CDATA[1]]></cash_fee><fee_type><![CDATA[CNY]]></fee_type><is_subscribe><![CDATA[Y]]></is_subscribe><mch_id><![CDATA[1228442802]]></mch_id><nonce_str><![CDATA[1002477130]]></nonce_str><openid><![CDATA[o-HREuJzRr3moMvv990VdfnQ8x4k]]></openid><out_trade_no><![CDATA[1000000000051249]]></out_trade_no><result_code><![CDATA[SUCCESS]]></result_code><return_code><![CDATA[SUCCESS]]></return_code><sign><![CDATA[1269E03E43F2B8C388A414EDAE185CEE]]></sign><time_end><![CDATA[20150324100405]]></time_end><total_fee>1</total_fee><trade_type><![CDATA[JSAPI]]></trade_type><transaction_id><![CDATA[1009530574201503240036299496]]></transaction_id></xml>";
-            String resXml = "";
             String inputLine;
             String notityXml = "";
             try {
@@ -609,8 +612,8 @@ public class OrderController extends BaseController{
                 wpr.setAppid(m.get("appid").toString());
                 wpr.setBankType(m.get("bank_type").toString());
                 wpr.setCashFee(m.get("cash_fee").toString());
-//                wpr.setFeeType(m.get("fee_type").toString());
-//                wpr.setIsSubscribe(m.get("is_subscribe").toString());
+                //wpr.setFeeType(m.get("fee_type").toString());
+                //wpr.setIsSubscribe(m.get("is_subscribe").toString());
                 wpr.setMchId(m.get("mch_id").toString());
                 wpr.setNonceStr(m.get("nonce_str").toString());
                 wpr.setOpenid(m.get("openid").toString());
@@ -625,10 +628,10 @@ public class OrderController extends BaseController{
             }
             wechatLog.info("返回信息："+wpr.toString());
             if("SUCCESS".equals(wpr.getResultCode())){
-                //支付成功,修改全民鉴定订单状态
-                boolean result = orderService.updateOrder(wpr.getOutTradeNo(),wpr.getTransactionId(),1);
-                wechatLog.info("支付成功！");
+                //支付成功
+                boolean result = orderService.updateOrder(wpr.getOutTradeNo(), wpr.getTransactionId(),1);
 
+                wechatLog.info("支付成功！");
                 if(result){
                     resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"
                             + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
@@ -651,14 +654,13 @@ public class OrderController extends BaseController{
             wechatLog.info("微信支付回调结束");
 
 
-            return toSuccess(resXml);
-        } catch (ServiceException e) {
-            e.printStackTrace();
-            return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return toError("系统繁忙，请稍后再试！");
+            wechatLog.error("微信通知后台处理系统出错", e);
+            resXml = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>"
+                    + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
         }
+        return resXml;
     }
 
     //支付宝回调
