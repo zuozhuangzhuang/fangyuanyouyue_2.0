@@ -560,13 +560,18 @@ public class UserInfoServiceImpl implements UserInfoService {
             UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userThirdParty.getUserId());
             userInfo.setLastLoginPlatform(3);//最后登录平台 1安卓 2IOS 3小程序
             userInfo.setLastLoginTime(DateStampUtils.getTimesteamp());
-            userInfoMapper.updateByPrimaryKey(userInfo);
+            userInfoMapper.updateByPrimaryKeySelective(userInfo);
 
             registIMUser(userInfo);
             
             String token = setToken("",userInfo.getId());
-            userThirdParty.setSessionKey(session_key);
-            userThirdPartyMapper.updateByPrimaryKey(userThirdParty);
+            if(StringUtils.isNotEmpty(session_key)){
+                userThirdParty.setSessionKey(session_key);
+            }
+            if(StringUtils.isNotEmpty(openid)){
+                userThirdParty.setMiniOpenId(openid);
+            }
+            userThirdPartyMapper.updateByPrimaryKeySelective(userThirdParty);
             UserDto userDto = setUserDtoByInfo(token,userInfo);
             return userDto;
         }
