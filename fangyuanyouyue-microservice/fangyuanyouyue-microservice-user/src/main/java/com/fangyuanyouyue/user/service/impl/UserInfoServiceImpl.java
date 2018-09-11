@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.fangyuanyouyue.user.dto.*;
 import com.fangyuanyouyue.user.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -29,11 +30,6 @@ import com.fangyuanyouyue.user.dao.UserInfoMapper;
 import com.fangyuanyouyue.user.dao.UserThirdPartyMapper;
 import com.fangyuanyouyue.user.dao.UserVipMapper;
 import com.fangyuanyouyue.user.dao.UserWalletMapper;
-import com.fangyuanyouyue.user.dto.AdminUserDto;
-import com.fangyuanyouyue.user.dto.ShopDto;
-import com.fangyuanyouyue.user.dto.UserDto;
-import com.fangyuanyouyue.user.dto.UserFansDto;
-import com.fangyuanyouyue.user.dto.WaitProcessDto;
 import com.fangyuanyouyue.user.model.UserFans;
 import com.fangyuanyouyue.user.model.UserInfo;
 import com.fangyuanyouyue.user.model.UserInfoExt;
@@ -300,6 +296,10 @@ public class UserInfoServiceImpl implements UserInfoService {
         if(userInfo == null){
             throw new ServiceException("用户不存在！");
         }else{
+            UserThirdParty userThirdByUserId = userThirdPartyMapper.getUserThirdByUserId(userInfo.getId(),type);
+            if(userThirdByUserId != null){
+
+            }
             UserThirdParty userThirdParty = userThirdPartyMapper.getUserByThirdNoType(unionId,type);
             //校验是否绑定三方账号
             if(userThirdParty != null){
@@ -307,10 +307,14 @@ public class UserInfoServiceImpl implements UserInfoService {
                     throw new ServiceException("请勿重复绑定！");
                 }else{
                     UserInfo user = userInfoMapper.selectByPrimaryKey(userThirdParty.getUserId());
-                    boolean result = userThirdService.judgeMerge(token,unionId,null,type);
-                    if(result){
+                    if(StringUtils.isEmpty(user.getPhone())){
+                        //三方账号 未绑定账号
+                        //手机账号是否绑定三方号
+                    }
+                    MergeDto mergeDto = userThirdService.judgeMerge(token,unionId,null,type);
+                    if(mergeDto != null){
                         //可以合并账号
-                        throw new ServiceException("已存在三方用户，此三方用户未绑定手机号，是否合并用户！");
+                        throw new ServiceException(2,"已存在三方用户，此三方用户未绑定手机号，是否合并用户！");
                     }else{
                         throw new ServiceException("已绑定其他用户！");
                     }
@@ -422,7 +426,8 @@ public class UserInfoServiceImpl implements UserInfoService {
      * @return
      * @throws ServiceException
      */
-    private UserDto setUserDtoByInfo(String token,UserInfo user) throws ServiceException{
+    @Override
+    public UserDto setUserDtoByInfo(String token,UserInfo user) throws ServiceException{
         if(user == null){
             throw new ServiceException("用户不存在！");
         }else{
@@ -555,13 +560,18 @@ public class UserInfoServiceImpl implements UserInfoService {
             UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userThirdParty.getUserId());
             userInfo.setLastLoginPlatform(3);//最后登录平台 1安卓 2IOS 3小程序
             userInfo.setLastLoginTime(DateStampUtils.getTimesteamp());
-            userInfoMapper.updateByPrimaryKey(userInfo);
+            userInfoMapper.updateByPrimaryKeySelective(userInfo);
 
             registIMUser(userInfo);
             
             String token = setToken("",userInfo.getId());
-            userThirdParty.setSessionKey(session_key);
-            userThirdPartyMapper.updateByPrimaryKey(userThirdParty);
+            if(StringUtils.isNotEmpty(session_key)){
+                userThirdParty.setSessionKey(session_key);
+            }
+            if(StringUtils.isNotEmpty(openid)){
+                userThirdParty.setMiniOpenId(openid);
+            }
+            userThirdPartyMapper.updateByPrimaryKeySelective(userThirdParty);
             UserDto userDto = setUserDtoByInfo(token,userInfo);
             return userDto;
         }
@@ -755,52 +765,5 @@ public class UserInfoServiceImpl implements UserInfoService {
         return shopDtos;
     }
 
-    @Override
-    public UserDto accountMerge(String token, String phone,String unionId,Integer type) throws ServiceException {
-        //当前用户
-        UserInfo user = getUserByToken(token);
-        UserThirdParty userThird = userThirdPartyMapper.getUserThirdByUserId(user.getId());
-        if(unionId == null){
-            //绑定手机
-            //手机用户
-            UserInfo phoneUser = getUserByPhone(phone);
-            UserThirdParty phoneThird = userThirdPartyMapper.getUserThirdByUserId(phoneUser.getId());
-            if(StringUtils.isEmpty(user.getPhone()) && phoneThird == null){
-                //TODO 粉丝、关注、收货地址、优惠券
-                //TODO 商品、商品评论、商品鉴定、购物车详情帖子评论、点赞信息、视频评论、视频点赞
-                //TODO 我的收藏（商品、抢购、视频、帖子）+ 关注（抢购）
-
-                //TODO 个人相关：我买下的、我卖出的、我的钱包、我的商城、我的抢购、我的评论、全民鉴定、我的帖子、我的粉丝、我的关注、我的收藏、所有特权、我的鉴定、我是栏主
-                //三方登录可以购买手机账号的商品
-                UserWallet userWallet = userWalletMapper.selectByUserId(user.getId());
-                UserWallet phoneUserWallet = userWalletMapper.selectByUserId(phoneUser.getId());
-                userWallet.setBalance(userWallet.getBalance().add(phoneUserWallet.getBalance()));
-                userWallet.setBalanceFrozen(userWallet.getBalanceFrozen().add(phoneUserWallet.getBalanceFrozen()));
-                userWallet.setPoint(userWallet.getPoint()+phoneUserWallet.getPoint());
-
-                //最后将三方改到手机号账号
-                userThird.setUserId(phoneUser.getId());
-                //删除三方账号
-                user.setStatus(3);
-                //TODO 清除旧token
-                return new UserDto();
-            }
-        }else if(phone == null){
-            //三方绑定
-            //三方用户
-            UserInfo unionIdThird = getUserByUnionId(unionId, type);
-            if(userThird == null && StringUtils.isEmpty(unionIdThird.getPhone())){
-
-                //最后将三方改到手机号账号
-                UserThirdParty userByThirdNoType = userThirdPartyMapper.getUserByThirdNoType(unionId, type);
-                userByThirdNoType.setUserId(user.getId());
-                //删除三方账号
-                unionIdThird.setStatus(3);
-                //TODO 清除旧token
-                return new UserDto();
-            }
-        }
-        return null;
-    }
 
 }

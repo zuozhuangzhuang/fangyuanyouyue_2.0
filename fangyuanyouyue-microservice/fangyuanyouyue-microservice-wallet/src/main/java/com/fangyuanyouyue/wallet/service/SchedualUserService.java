@@ -22,4 +22,7 @@ public interface SchedualUserService {
     @RequestMapping(value = "/address/getAddressList",method = RequestMethod.POST)
     String getAddressList(@RequestParam(value = "token") String token, @RequestParam(value = "addressId") Integer addressId);
 
+    @RequestMapping(value = "/userFeign/verifyPayPwd",method = RequestMethod.POST)
+    String verifyPayPwd(@RequestParam(value = "userId") Integer userId, @RequestParam(value = "payPwd") String payPwd);
+
 }

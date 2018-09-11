@@ -232,8 +232,8 @@ public class GoodsParam{
     @ApiModelProperty(name = "businessType", value = "业务类型 1商品详情、2抢购详情、3帖子详情、4全民鉴定详情、5视频详情、6专栏", dataType = "int",hidden = true)
     private Integer businessType;//业务类型 1商品详情、2抢购详情、3帖子详情、4全民鉴定详情、5视频详情、6专栏
 
-    @ApiModelProperty(name = "payType", value = "支付类型 1微信 2支付宝 3余额", dataType = "int",hidden = true)
-    private Integer payType;//支付类型 1微信 2支付宝 3余额
+    @ApiModelProperty(name = "payType", value = "支付类型 1微信 2支付宝 3余额 4小程序", dataType = "int",hidden = true)
+    private Integer payType;//支付类型 1微信 2支付宝 3余额 4小程序
 
     @ApiModelProperty(name = "videoLength", value = "视频长度", dataType = "int",hidden = true)
     private Integer videoLength;//视频长度

@@ -258,6 +258,10 @@ public class AppraisalServiceImpl implements AppraisalService{
                 //订单支付成功
                 updateOrder(orderInfo.getOrderNo(),null,3);
                 payInfo.append("余额支付成功！");
+            }else if(payType.intValue() == 4){
+                //小程序支付
+                WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,orderInfo.getOrderNo(), orderInfo.getAmount(), NotifyUrl.mini_test_notify.getNotifUrl()+NotifyUrl.appraisal_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+                return wechatPayDto;
             }else{
                     throw new ServiceException("支付类型错误！");
             }

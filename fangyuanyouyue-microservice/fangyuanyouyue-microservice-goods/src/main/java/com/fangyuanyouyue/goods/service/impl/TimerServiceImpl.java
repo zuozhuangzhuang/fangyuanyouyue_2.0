@@ -11,12 +11,14 @@ import com.fangyuanyouyue.goods.model.GoodsIntervalHistory;
 import com.fangyuanyouyue.goods.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
 @Service(value = "timerService")
+@Transactional(rollbackFor=Exception.class)
 public class TimerServiceImpl implements TimerService{
     @Autowired
     private GoodsInfoMapper goodsInfoMapper;

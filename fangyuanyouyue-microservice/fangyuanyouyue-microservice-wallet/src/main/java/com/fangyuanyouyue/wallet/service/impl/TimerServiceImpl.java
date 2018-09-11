@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service(value = "timerService")
-@Transactional
+@Transactional(rollbackFor=Exception.class)
 public class TimerServiceImpl implements TimerService{
     @Autowired
     private UserWalletMapper userWalletMapper;

@@ -1,6 +1,8 @@
 package com.fangyuanyouyue.user.service;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.user.dto.MergeDto;
+import com.fangyuanyouyue.user.dto.UserDto;
 
 public interface UserThirdService {
 
@@ -13,5 +15,18 @@ public interface UserThirdService {
      * @return
      * @throws ServiceException
      */
-    boolean judgeMerge(String token,String unionId,String phone,Integer type) throws ServiceException;
+    MergeDto judgeMerge(String token, String unionId, String phone, Integer type) throws ServiceException;
+
+
+    /**
+     * 合并账号
+     * @param token
+     * @param phone
+     * @param unionId
+     * @param type
+     * @param loginPwd
+     * @return
+     * @throws ServiceException
+     */
+    void accountMerge(String token, String phone, String unionId, Integer type, String loginPwd) throws ServiceException;
 }

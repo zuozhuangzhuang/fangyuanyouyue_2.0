@@ -11,9 +11,11 @@ import com.fangyuanyouyue.forum.dao.ForumLikesMapper;
 import com.fangyuanyouyue.forum.dto.ForumLikesDto;
 import com.fangyuanyouyue.forum.model.ForumLikes;
 import com.fangyuanyouyue.forum.service.ForumLikesService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service(value = "forumLikesService")
+@Transactional(rollbackFor=Exception.class)
 public class ForumLikesServiceImpl implements ForumLikesService {
 
     @Autowired

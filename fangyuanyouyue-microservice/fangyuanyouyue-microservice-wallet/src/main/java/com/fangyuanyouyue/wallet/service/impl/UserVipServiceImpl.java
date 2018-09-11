@@ -12,6 +12,7 @@ import com.fangyuanyouyue.wallet.dao.VipOrderMapper;
 import com.fangyuanyouyue.wallet.model.UserVip;
 import com.fangyuanyouyue.wallet.model.VipOrder;
 import com.fangyuanyouyue.wallet.service.SchedualMessageService;
+import com.fangyuanyouyue.wallet.service.SchedualUserService;
 import com.fangyuanyouyue.wallet.service.UserVipService;
 import com.fangyuanyouyue.wallet.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 @Service(value = "userVipService")
-@Transactional
+@Transactional(rollbackFor=Exception.class)
 public class UserVipServiceImpl implements UserVipService{
 
     @Autowired
@@ -34,6 +35,8 @@ public class UserVipServiceImpl implements UserVipService{
     private VipOrderMapper vipOrderMapper;
     @Autowired
     private WalletService walletService;
+    @Autowired
+    private SchedualUserService schedualUserService;
 
     @Override
     public boolean updateOrder(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException {
@@ -187,12 +190,22 @@ public class UserVipServiceImpl implements UserVipService{
                 String info = walletService.orderPayByALi(vipOrder.getOrderNo(), vipOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.vip_alipay_notify.getNotifUrl());
                 payInfo.append(info);
             }else if(payType.intValue() == 3) {//余额
+                //验证支付密码
+                Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
+                if(!verifyPayPwd){
+                    throw new ServiceException("支付密码错误！");
+                }
                 //余额支付
                 walletService.updateBalance(userId,vipOrder.getAmount(),2);
                 //修改用户会员信息
                 updateOrder(vipOrder.getOrderNo(),null,3);
 
                 payInfo.append("余额支付成功！");
+            }else if(payType.intValue() == 4){//小程序支付
+                WechatPayDto wechatPayDto = walletService.orderPayByWechatMini(userId, vipOrder.getOrderNo(), vipOrder.getAmount(), NotifyUrl.mini_test_notify.getNotifUrl() + NotifyUrl.vip_wechat_notify.getNotifUrl());
+                return wechatPayDto;
+            }else{
+                throw new ServiceException("支付方式错误！");
             }
             return payInfo.toString();
         }catch (ServiceException e){

@@ -27,4 +27,9 @@ public class SchedualUserServiceImpl implements SchedualUserService{
     public String getAddressList(String token, Integer addressId) {
         return "系统繁忙，请稍后重试！";
     }
+
+    @Override
+    public String verifyPayPwd(Integer userId, String payPwd) {
+        return "验证密码失败！";
+    }
 }

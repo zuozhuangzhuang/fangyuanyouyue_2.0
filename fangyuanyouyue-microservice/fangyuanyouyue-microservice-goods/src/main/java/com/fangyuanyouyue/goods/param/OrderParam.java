@@ -24,6 +24,6 @@ public class OrderParam {
     @ApiModelProperty(name = "payPwd", value = "支付密码", dataType = "String",hidden = true)
     private String payPwd;//支付密码
 
-    @ApiModelProperty(name = "payType", value = "支付方式 1微信 2支付宝 3余额支付", dataType = "int",hidden = true)
-    private Integer payType;//支付方式 1微信 2支付宝 3余额支付
+    @ApiModelProperty(name = "payType", value = "支付方式 1微信 2支付宝 3余额支付 4小程序", dataType = "int",hidden = true)
+    private Integer payType;//支付方式 1微信 2支付宝 3余额支付 4小程序
 }

@@ -16,6 +16,7 @@
     <result column="pay_amount" jdbcType="DECIMAL" property="payAmount" />
     <result column="seller_id" jdbcType="INTEGER" property="sellerId" />
     <result column="main_order_id" jdbcType="INTEGER" property="mainOrderId" />
+    <result column="goods_type" jdbcType="INTEGER" property="goodsType" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.order.model.OrderDetail">
     <result column="description" jdbcType="LONGVARCHAR" property="description" />
@@ -235,8 +236,9 @@
   </update>
 
   <select id="selectByOrderId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from order_detail
+    select a.*,b.type goods_type from order_detail a,goods_info b
     <where>
+      a.goods_id = b.id
       <if test="orderId != null">
         and order_id = #{orderId,jdbcType=INTEGER}
       </if>
@@ -244,8 +246,9 @@
   </select>
 
   <select id="selectByMainOrderId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from order_detail
+    select a.*,b.type goods_type from order_detail a,goods_info b
     <where>
+      a.goods_id = b.id
       <if test="mainOrderId != null">
         and main_order_id = #{mainOrderId,jdbcType=INTEGER}
       </if>

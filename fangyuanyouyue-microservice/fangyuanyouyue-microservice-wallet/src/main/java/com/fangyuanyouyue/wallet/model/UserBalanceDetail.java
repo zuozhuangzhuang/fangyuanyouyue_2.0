@@ -24,7 +24,7 @@ public class UserBalanceDetail {
 
     private BigDecimal afterAmount;//操作后金额
 
-    private Integer payType;//支付类型 1微信 2支付宝 3余额
+    private Integer payType;//支付类型 1微信 2支付宝 3余额 4小程序
 
     private Integer type;//收支类型 1收入 2支出
 

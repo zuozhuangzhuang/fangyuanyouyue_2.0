@@ -1,35 +1,35 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.fangyuanyouyue.user.dao.UserThirdPartyMapper">
-  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.user.model.UserThirdParty">
-    <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="user_id" jdbcType="INTEGER" property="userId" />
-    <result column="type" jdbcType="INTEGER" property="type" />
-    <result column="union_id" jdbcType="VARCHAR" property="unionId" />
-    <result column="app_open_id" jdbcType="VARCHAR" property="appOpenId" />
-    <result column="mp_open_id" jdbcType="VARCHAR" property="mpOpenId" />
-    <result column="mini_open_id" jdbcType="VARCHAR" property="miniOpenId" />
-    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
-    <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl" />
-    <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
-    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="session_key" jdbcType="VARCHAR" property="sessionKey" />
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fangyuanyouyue.wallet.dao.UserThirdPartyMapper" >
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.wallet.model.UserThirdParty" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="union_id" property="unionId" jdbcType="VARCHAR" />
+    <result column="app_open_id" property="appOpenId" jdbcType="VARCHAR" />
+    <result column="mp_open_id" property="mpOpenId" jdbcType="VARCHAR" />
+    <result column="mini_open_id" property="miniOpenId" jdbcType="VARCHAR" />
+    <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+    <result column="head_img_url" property="headImgUrl" jdbcType="VARCHAR" />
+    <result column="add_time" property="addTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="session_key" property="sessionKey" jdbcType="VARCHAR" />
   </resultMap>
-  <sql id="Base_Column_List">
+  <sql id="Base_Column_List" >
     id, user_id, type, union_id, app_open_id, mp_open_id, mini_open_id, nick_name, head_img_url, 
     add_time, update_time, session_key
   </sql>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
     from user_third_party
     where id = #{id,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from user_third_party
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.user.model.UserThirdParty" useGeneratedKeys="true" keyProperty="id">
+  <insert id="insert" parameterType="com.fangyuanyouyue.wallet.model.UserThirdParty" useGeneratedKeys="true" keyProperty="id" >
     insert into user_third_party (id, user_id, type, 
       union_id, app_open_id, mp_open_id, 
       mini_open_id, nick_name, head_img_url, 
@@ -41,125 +41,125 @@
       #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{sessionKey,jdbcType=VARCHAR}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.user.model.UserThirdParty">
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.wallet.model.UserThirdParty" useGeneratedKeys="true" keyProperty="id">
     insert into user_third_party
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null">
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
         id,
       </if>
-      <if test="userId != null">
+      <if test="userId != null" >
         user_id,
       </if>
-      <if test="type != null">
+      <if test="type != null" >
         type,
       </if>
-      <if test="unionId != null">
+      <if test="unionId != null" >
         union_id,
       </if>
-      <if test="appOpenId != null">
+      <if test="appOpenId != null" >
         app_open_id,
       </if>
-      <if test="mpOpenId != null">
+      <if test="mpOpenId != null" >
         mp_open_id,
       </if>
-      <if test="miniOpenId != null">
+      <if test="miniOpenId != null" >
         mini_open_id,
       </if>
-      <if test="nickName != null">
+      <if test="nickName != null" >
         nick_name,
       </if>
-      <if test="headImgUrl != null">
+      <if test="headImgUrl != null" >
         head_img_url,
       </if>
-      <if test="addTime != null">
+      <if test="addTime != null" >
         add_time,
       </if>
-      <if test="updateTime != null">
+      <if test="updateTime != null" >
         update_time,
       </if>
-      <if test="sessionKey != null">
+      <if test="sessionKey != null" >
         session_key,
       </if>
     </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null">
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
         #{id,jdbcType=INTEGER},
       </if>
-      <if test="userId != null">
+      <if test="userId != null" >
         #{userId,jdbcType=INTEGER},
       </if>
-      <if test="type != null">
+      <if test="type != null" >
         #{type,jdbcType=INTEGER},
       </if>
-      <if test="unionId != null">
+      <if test="unionId != null" >
         #{unionId,jdbcType=VARCHAR},
       </if>
-      <if test="appOpenId != null">
+      <if test="appOpenId != null" >
         #{appOpenId,jdbcType=VARCHAR},
       </if>
-      <if test="mpOpenId != null">
+      <if test="mpOpenId != null" >
         #{mpOpenId,jdbcType=VARCHAR},
       </if>
-      <if test="miniOpenId != null">
+      <if test="miniOpenId != null" >
         #{miniOpenId,jdbcType=VARCHAR},
       </if>
-      <if test="nickName != null">
+      <if test="nickName != null" >
         #{nickName,jdbcType=VARCHAR},
       </if>
-      <if test="headImgUrl != null">
+      <if test="headImgUrl != null" >
         #{headImgUrl,jdbcType=VARCHAR},
       </if>
-      <if test="addTime != null">
+      <if test="addTime != null" >
         #{addTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null">
+      <if test="updateTime != null" >
         #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="sessionKey != null">
+      <if test="sessionKey != null" >
         #{sessionKey,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.user.model.UserThirdParty">
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.wallet.model.UserThirdParty" >
     update user_third_party
-    <set>
-      <if test="userId != null">
+    <set >
+      <if test="userId != null" >
         user_id = #{userId,jdbcType=INTEGER},
       </if>
-      <if test="type != null">
+      <if test="type != null" >
         type = #{type,jdbcType=INTEGER},
       </if>
-      <if test="unionId != null">
+      <if test="unionId != null" >
         union_id = #{unionId,jdbcType=VARCHAR},
       </if>
-      <if test="appOpenId != null">
+      <if test="appOpenId != null" >
         app_open_id = #{appOpenId,jdbcType=VARCHAR},
       </if>
-      <if test="mpOpenId != null">
+      <if test="mpOpenId != null" >
         mp_open_id = #{mpOpenId,jdbcType=VARCHAR},
       </if>
-      <if test="miniOpenId != null">
+      <if test="miniOpenId != null" >
         mini_open_id = #{miniOpenId,jdbcType=VARCHAR},
       </if>
-      <if test="nickName != null">
+      <if test="nickName != null" >
         nick_name = #{nickName,jdbcType=VARCHAR},
       </if>
-      <if test="headImgUrl != null">
+      <if test="headImgUrl != null" >
         head_img_url = #{headImgUrl,jdbcType=VARCHAR},
       </if>
-      <if test="addTime != null">
+      <if test="addTime != null" >
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null">
+      <if test="updateTime != null" >
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="sessionKey != null">
+      <if test="sessionKey != null" >
         session_key = #{sessionKey,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.user.model.UserThirdParty">
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.wallet.model.UserThirdParty" >
     update user_third_party
     set user_id = #{userId,jdbcType=INTEGER},
       type = #{type,jdbcType=INTEGER},
@@ -175,9 +175,7 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
 
-  <select id="getUserByThirdNoType" resultMap="BaseResultMap">
-    select * from user_third_party where union_id = #{unionId,jdbcType=VARCHAR} and type = #{type,jdbcType=INTEGER}
-  </select>
+
   <select id="getUserThirdByUserId" parameterType="Integer" resultMap="BaseResultMap">
     select * from user_third_party where user_id = #{userId} and type = #{type}
   </select>

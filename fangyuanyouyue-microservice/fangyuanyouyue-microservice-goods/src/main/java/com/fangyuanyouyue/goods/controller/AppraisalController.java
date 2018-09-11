@@ -235,7 +235,7 @@ public class AppraisalController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getOrderId() == null){
-                toError("订单ID不能为空！");
+                return toError("订单ID不能为空！");
             }
             //取消鉴定，删除订单及详情
             appraisalService.cancelAppraisal(userId,param.getOrderId());
@@ -336,9 +336,8 @@ public class AppraisalController extends BaseController{
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "orderId", value = "订单ID",required = true,dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "payType", value = "支付方式 1微信 2支付宝 3余额", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "payType", value = "支付方式 1微信 2支付宝 3余额 4小程序", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "payPwd", value = "支付密码", dataType = "String", paramType = "query")
-
     })
     @PostMapping(value = "/payAppraisal")
     @ResponseBody
@@ -357,10 +356,7 @@ public class AppraisalController extends BaseController{
                 return toError(jsonObject.getString("report"));
             }
             if(param.getOrderId() == null){
-                toError("订单ID不能为空！");
-            }
-            if(StringUtils.isEmpty(param.getPayPwd())){
-                toError("支付密码不能为空！");
+                return toError("订单ID不能为空！");
             }
             if(param.getPayType()==null){
                 return toError("支付类型不能为空！");

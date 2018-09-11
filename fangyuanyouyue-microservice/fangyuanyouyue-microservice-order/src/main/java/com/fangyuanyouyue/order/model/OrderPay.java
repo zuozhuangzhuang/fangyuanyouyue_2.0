@@ -36,7 +36,7 @@ public class OrderPay {
 
     private Integer count;//商品总数
 
-    private Integer payType;//支付类型 1微信 2支付宝 3余额
+    private Integer payType;//支付类型 1微信 2支付宝 3余额 4小程序
 
     private String payNo;//支付流水号
 

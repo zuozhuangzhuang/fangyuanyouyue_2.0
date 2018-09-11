@@ -124,6 +124,10 @@ public class BargainServiceImpl implements BargainService{
                         payInfo.append("余额支付成功");
                         updateOrder(bargainOrder.getOrderNo(),null,3);
                     }
+                }else if(payType.intValue() == 4){
+                    //小程序支付
+                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,bargainOrder.getOrderNo(), bargainOrder.getAmount(),NotifyUrl.mini_test_notify.getNotifUrl()+NotifyUrl.bargain_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+                    return wechatPayDto;
                 }else{
                     throw new ServiceException("支付方式错误！");
                 }
@@ -377,7 +381,7 @@ public class BargainServiceImpl implements BargainService{
      * @throws ServiceException
      */
     private GoodsDto setDtoByGoodsInfo(Integer userId,GoodsInfo goodsInfo) throws ServiceException{
-        if(goodsInfo == null || goodsInfo.getStatus().intValue() == 3 || goodsInfo.getStatus().intValue() == 5){
+        if(goodsInfo == null){
             throw new ServiceException("商品不存在或已下架！");
         }else{
             List<GoodsImg> goodsImgs = goodsImgMapper.getImgsByGoodsId(goodsInfo.getId());

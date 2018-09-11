@@ -21,4 +21,13 @@ public interface OrderInfoService {
      * @throws ServiceException
      */
     OrderRefund seletRefundByOrderId(Integer orderId) throws ServiceException;
+
+    /**
+     * 是否存在未完成订单
+     * @param userId
+     * @param goodsId
+     * @return
+     * @throws ServiceException
+     */
+    boolean ifHasOrder(Integer userId,Integer goodsId) throws ServiceException;
 }
