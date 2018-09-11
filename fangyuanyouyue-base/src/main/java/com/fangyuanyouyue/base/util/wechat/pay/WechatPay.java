@@ -291,7 +291,7 @@ public class WechatPay {
 		packageParams.add(new BasicNameValuePair("total_fee", totalFee));
 		packageParams.add(new BasicNameValuePair("trade_type", "JSAPI"));
 
-		String sign = genPackageSignWeb(packageParams);
+		String sign = genPackageSignMini(packageParams);
 		packageParams.add(new BasicNameValuePair("sign", sign));
 
 	   String xmlstring =toXml(packageParams);
@@ -625,7 +625,7 @@ public class WechatPay {
 			sb.append('&');
 		}
 		sb.append("key=");
-		sb.append(WechatPayConfig.API_KEY_MINI);
+		sb.append(WechatPayConfig.API_KEY);
 		System.out.println(sb.toString());
 		String appSign = MD5.getMessageDigest(sb.toString().getBytes()).toUpperCase();
 		return appSign;

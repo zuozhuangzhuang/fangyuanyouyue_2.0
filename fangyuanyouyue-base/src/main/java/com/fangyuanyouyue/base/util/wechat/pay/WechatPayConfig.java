@@ -30,7 +30,7 @@ public class WechatPayConfig {
     //  API密钥，在商户平台设置
     public static final  String API_KEY_WEB="ShenZhenShiXiaoFangYuan123456789";
     //小程序APP秘钥
-    public static final  String API_KEY_MINI="b292058a4e2cb4df763b46fe8ece6aae";
+    public static final  String API_KEY_MINI="ShenZhenShiXiaoFangYuan123456789";
 
 
 
