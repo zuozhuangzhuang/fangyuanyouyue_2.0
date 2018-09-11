@@ -14,6 +14,8 @@ public class WechatPayConfig {
     public static final String APP_SECRET = "52baeacdb9a1d280d2e7e636d774c386";
 
     public static final String APP_SECRET_WEB = "b4c884a6ed60c963cdd59dfc77075c3d";
+    //小程序秘钥
+    public static final String APP_SECRET_MINI = "b292058a4e2cb4df763b46fe8ece6aae";
 
     //商户号
     public static final String MCH_ID = "1418798002";

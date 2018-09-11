@@ -291,7 +291,7 @@ public class WechatPay {
 		packageParams.add(new BasicNameValuePair("total_fee", totalFee));
 		packageParams.add(new BasicNameValuePair("trade_type", "JSAPI"));
 
-		String sign = genPackageSignWeb(packageParams);
+		String sign = genPackageSignMini(packageParams);
 		packageParams.add(new BasicNameValuePair("sign", sign));
 
 	   String xmlstring =toXml(packageParams);
