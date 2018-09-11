@@ -625,7 +625,7 @@ public class WechatPay {
 			sb.append('&');
 		}
 		sb.append("key=");
-		sb.append(WechatPayConfig.API_KEY);
+		sb.append(WechatPayConfig.API_KEY_MINI);
 		System.out.println(sb.toString());
 		String appSign = MD5.getMessageDigest(sb.toString().getBytes()).toUpperCase();
 		return appSign;
