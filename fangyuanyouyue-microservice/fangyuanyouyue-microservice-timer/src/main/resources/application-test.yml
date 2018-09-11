@@ -8,8 +8,8 @@ spring:
   #   服务与服务之间相互调用一般都是根据这个name
       name: timer-service
 #bus
-rabbitmq:
-  host: localhost
-  port: 5672
-  username: guest
-  password: guest
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest

@@ -55,9 +55,9 @@ public class AES {
     }
 
     public static void initialize() {
-        if (initialized) {
+        if (initialized)
             return;
-        }
+
         Security.addProvider(new BouncyCastleProvider());
         initialized = true;
     }
