@@ -13,7 +13,7 @@ import lombok.ToString;
 public class WeChatSession {
     public static final long serialVersionUID = 1L;
     public static final String APPID = "wx69860c142cdc5391";
-    public static final String SECRET = "85eb12819eee80ae2ad054825dc7932e";
+    public static final String SECRET = "b292058a4e2cb4df763b46fe8ece6aae";
 
     private Integer id;
     private String code;//微信获取的code
