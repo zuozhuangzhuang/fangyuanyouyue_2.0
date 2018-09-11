@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.fangyuanyouyue.forum.dto.ForumColumnDto;
 import com.fangyuanyouyue.forum.model.ForumColumn;
 @Mapper
 public interface ForumColumnMapper {
@@ -20,7 +21,7 @@ public interface ForumColumnMapper {
     int updateByPrimaryKeySelective(ForumColumn record);
 
     int updateByPrimaryKey(ForumColumn record);
-    
+
     List<ForumColumn> selectPage(@Param("start")Integer start,@Param("limit")Integer limit);
 
     List<ForumColumn> selectChosen(@Param("start")Integer start,@Param("limit")Integer limit,@Param("isChosen")Integer isChosen);
@@ -39,4 +40,29 @@ public interface ForumColumnMapper {
      * @return
      */
     ForumColumn selectByName(@Param("name")String name);
+    
+    /**
+     * 后台分页总数
+     * @param keyword
+     * @param status
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    int countPage(@Param("keyword")String keyword,@Param("status")Integer status,@Param("startDate")String startDate,@Param("endDate")String endDate);
+    
+    /**
+     * 后台分页数据
+     * @param start
+     * @param limit
+     * @param keyword
+     * @param status
+     * @param startDate
+     * @param endDate
+     * @param orders
+     * @return
+     */
+    List<ForumColumn> getPage(@Param("start") Integer start,@Param("limit") Integer limit,@Param("keyword")String keyword,@Param("status")Integer status,@Param("startDate")String startDate,@Param("endDate")String endDate,@Param("orders")String orders);
+    
+    
 }

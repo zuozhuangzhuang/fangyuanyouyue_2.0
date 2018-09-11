@@ -27,4 +27,10 @@ public class ForumColumnApply {
     private Date updateTime;//修改时间
 
     private Date addTime;//添加时间
+    
+    private String nickName;
+    
+    private String headImgUrl;
+    
+    private String phone;
 }

@@ -2,6 +2,8 @@ package com.fangyuanyouyue.forum.service;
 
 import java.util.List;
 
+import com.fangyuanyouyue.base.BasePageReq;
+import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.forum.dto.ForumColumnDto;
 import com.fangyuanyouyue.forum.dto.ForumColumnTypeDto;
@@ -92,4 +94,22 @@ public interface ForumColumnService {
 	 * @throws ServiceException
 	 */
 	MyColumnDto myColumn(Integer userId,Integer start,Integer limit) throws ServiceException;
+	
+
+    /**
+     * 获取后台分页数据
+     * @param param
+     * @return
+     */
+    Pager getPage(BasePageReq param);
+    
+
+    /**
+     * 获取后台分页数据
+     * @param param
+     * @return
+     */
+    Pager getPageApply(BasePageReq param);
+    
+    
 }

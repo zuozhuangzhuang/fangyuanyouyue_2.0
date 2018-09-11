@@ -355,11 +355,11 @@
     </if>
     
     <if test="startDate != null">
-      and add_time &gt; #{startDate}
+      and add_time <![CDATA[ > ]]> #{startDate}
     </if>
     
     <if test="endDate != null">
-      and add_time &lt; #{endDate}
+      and add_time <![CDATA[ < ]]> #{endDate}
     </if>
     
     <if test="orders != null">

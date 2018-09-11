@@ -1,14 +1,31 @@
 package com.fangyuanyouyue.forum.service.impl;
 
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BasePageReq;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.base.util.IdGenerator;
-import com.fangyuanyouyue.forum.dao.*;
+import com.fangyuanyouyue.forum.dao.ColumnOrderMapper;
+import com.fangyuanyouyue.forum.dao.ForumColumnApplyMapper;
+import com.fangyuanyouyue.forum.dao.ForumColumnMapper;
+import com.fangyuanyouyue.forum.dao.ForumColumnTypeMapper;
+import com.fangyuanyouyue.forum.dao.ForumPvMapper;
+import com.fangyuanyouyue.forum.dto.AdminForumColumnApplyDto;
+import com.fangyuanyouyue.forum.dto.AdminForumColumnDto;
 import com.fangyuanyouyue.forum.dto.ForumColumnDto;
 import com.fangyuanyouyue.forum.dto.ForumColumnTypeDto;
 import com.fangyuanyouyue.forum.dto.ForumInfoDto;
@@ -17,17 +34,15 @@ import com.fangyuanyouyue.forum.model.ColumnOrder;
 import com.fangyuanyouyue.forum.model.ForumColumn;
 import com.fangyuanyouyue.forum.model.ForumColumnApply;
 import com.fangyuanyouyue.forum.model.ForumColumnType;
-import com.fangyuanyouyue.forum.service.*;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
+import com.fangyuanyouyue.forum.service.ForumColumnService;
+import com.fangyuanyouyue.forum.service.ForumInfoService;
+import com.fangyuanyouyue.forum.service.SchedualMessageService;
+import com.fangyuanyouyue.forum.service.SchedualUserService;
+import com.fangyuanyouyue.forum.service.SchedualWalletService;
 
 
 @Service(value = "forumColumnService")
+@Transactional(rollbackFor=Exception.class)
 public class ForumColumnServiceImpl implements ForumColumnService {
 
     @Autowired
@@ -120,8 +135,11 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 					payInfo.append("余额支付成功！");
 					//生成申请记录
 					applyColumn(columnOrder.getOrderNo(), null, 3);
+				}else if(payType.intValue() == 4){//小程序支付
+					WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.mini_test_notify.getNotifUrl()+NotifyUrl.column_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+					return wechatPayDto;
 				}else{
-						throw new ServiceException("支付类型错误！");
+					throw new ServiceException("支付方式错误！");
 				}
 				return payInfo.toString();
 			}
@@ -226,5 +244,31 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 		myColumnDto.setForumList(forumList);
 		return myColumnDto;
 	}
+	
 
+	@Override
+	public Pager getPage(BasePageReq param) {
+		
+		Integer total = forumColumnMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
+		List<ForumColumn> datas = forumColumnMapper.getPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders());
+		Pager pager = new Pager();
+		pager.setTotal(total);
+		pager.setDatas(AdminForumColumnDto.toDtoList(datas));
+		return pager;
+	}
+
+
+
+	@Override
+	public Pager getPageApply(BasePageReq param) {
+		
+		Integer total = forumColumnApplyMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
+		List<ForumColumnApply> datas = forumColumnApplyMapper.getPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders());
+		Pager pager = new Pager();
+		pager.setTotal(total);
+		pager.setDatas(AdminForumColumnApplyDto.toDtoList(datas));
+		return pager;
+	}
+
+	
 }

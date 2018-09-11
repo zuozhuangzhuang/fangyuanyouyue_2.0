@@ -1,17 +1,8 @@
 package com.fangyuanyouyue.forum.controller;
 
-import com.fangyuanyouyue.base.BaseController;
-import com.fangyuanyouyue.base.BaseResp;
-import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.forum.model.ForumColumnApply;
-import com.fangyuanyouyue.forum.param.ForumParam;
-import com.fangyuanyouyue.forum.service.ForumColumnService;
-import com.fangyuanyouyue.forum.service.SchedualRedisService;
-import com.fangyuanyouyue.forum.service.SchedualUserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import java.io.IOException;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -20,8 +11,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.util.List;
+import com.fangyuanyouyue.base.BaseController;
+import com.fangyuanyouyue.base.BasePageReq;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.Pager;
+import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.forum.model.ForumColumnApply;
+import com.fangyuanyouyue.forum.param.ForumParam;
+import com.fangyuanyouyue.forum.service.ForumColumnService;
+import com.fangyuanyouyue.forum.service.SchedualRedisService;
+import com.fangyuanyouyue.forum.service.SchedualUserService;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping(value = "/appraisal")
@@ -47,7 +51,7 @@ public class AdminController extends BaseController {
 	})
 	@PostMapping(value = "/applyList")
 	@ResponseBody
-	public BaseResp applyList(ForumParam param) throws IOException {
+	public BaseResp applyList(BasePageReq param) throws IOException {
 		try {
 			log.info("----》专栏申请列表《----");
 			log.info("参数：" + param.toString());
@@ -57,13 +61,12 @@ public class AdminController extends BaseController {
             if(param.getStatus() == null){
                 return toError("状态错误");
             }
+            
+            Pager pager = forumColumnService.getPageApply(param);
 			//TODO 专栏申请列表
-            List<ForumColumnApply> forumColumnApplies = forumColumnService.applyList(param.getStart(), param.getLimit(), param.getKeyword(), param.getStatus());
+           // List<ForumColumnApply> forumColumnApplies = forumColumnService.applyList(param.getStart(), param.getLimit(), param.getKeyword(), param.getStatus());
 
-            return toSuccess(forumColumnApplies);
-		} catch (ServiceException e) {
-			e.printStackTrace();
-			return toError(e.getMessage());
+            return toPage(pager);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return toError("系统繁忙，请稍后再试！");
