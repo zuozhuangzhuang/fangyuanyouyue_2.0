@@ -107,26 +107,8 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         List<GoodsDto> goodsDtos = new ArrayList<>();
         //遍历商品列表，添加到GoodsDtos中
         for (GoodsInfo goodsInfo:goodsInfos) {
-            GoodsDto goodsDto = setDtoByGoodsInfo(null,goodsInfo);
+            GoodsDto goodsDto = setDtoByGoodsInfo(param.getUserId(),goodsInfo);
             //token不为空为我的商品列表，均为卖家。商品列表其实不需要返回这些信息
-//            if(param.getToken() != null && goodsInfo.getUserId().intValue() == param.getUserId().intValue()){
-//                //压价信息
-//                List<GoodsBargain> bargains = goodsBargainMapper.selectAllByGoodsId(goodsInfo.getId(),null);
-//                List<BargainDto> bargainDtos = BargainDto.toDtoList(bargains);
-//                if(bargainDtos != null && bargainDtos.size()>0){
-//                    for(BargainDto bargainDto:bargainDtos){
-//                        UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(bargainDto.getUserId())).getString("data")), UserInfo.class);
-//                        bargainDto.setNickName(seller.getNickName());
-//                        bargainDto.setHeadImgUrl(seller.getHeadImgUrl());
-//                    }
-//                    goodsDto.setBargainDtos(bargainDtos);
-//                }
-//                //如果商品status为已售出，获取商品所属订单ID
-//                if(goodsInfo.getStatus().intValue() == 2){
-//                    OrderDetail orderDetail = orderDetailMapper.selectOrderByGoodsIdStatus(param.getUserId(), goodsInfo.getId());
-//                    goodsDto.setOrderId(orderDetail.getOrderId());
-//                }
-//            }
             goodsDtos.add(goodsDto);
         }
         return goodsDtos;
@@ -249,6 +231,36 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             //获取卖家信息
             UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(goodsInfo.getUserId())).getString("data")), UserInfo.class);
             GoodsDto goodsDto = new GoodsDto(user,goodsInfo,goodsImgs,goodsCorrelations,goodsCommentDtos);
+            if(userId != null){
+                Integer type;
+                List<GoodsBargain> bargains;
+                //压价信息
+                if(userId.intValue() == goodsInfo.getUserId().intValue()) {//卖家
+                    type = 2;
+                    bargains = goodsBargainMapper.selectAllByGoodsId(goodsInfo.getId(),null);
+                }else{
+                    type = 1;
+                    bargains = goodsBargainMapper.selectByUserIdGoodsId(userId, goodsInfo.getId(), null);
+                }
+                List<BargainDto> bargainDtos = BargainDto.toDtoList(bargains);
+                if(bargainDtos != null && bargainDtos.size()>0){
+                    for(BargainDto bargainDto:bargainDtos){
+                        UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(bargainDto.getUserId())).getString("data")), UserInfo.class);
+                        bargainDto.setNickName(seller.getNickName());
+                        bargainDto.setHeadImgUrl(seller.getHeadImgUrl());
+                    }
+                    goodsDto.setBargainDtos(bargainDtos);
+                }
+                //如果商品status为已售出，获取商品所属订单ID
+                if (goodsInfo.getStatus().intValue() == 2) {
+                    OrderDetail orderDetail = orderDetailMapper.selectOrderByGoodsIdStatus(userId, goodsInfo.getId(), type);
+                    if (orderDetail != null) {
+                        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderDetail.getOrderId());
+                        goodsDto.setOrderStatus(orderInfo.getStatus());
+                        goodsDto.setOrderId(orderDetail.getOrderId());
+                    }
+                }
+            }
             goodsDto.setCommentCount(goodsCommentMapper.selectCount(goodsInfo.getId()));
             if(goodsInfo.getType() == 2){
                 //只去最近三次降价记录
@@ -457,47 +469,6 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         goodsDto.setFansCount(goodsInfoMapper.getGoodsUserFansCount(goodsId));
         //关注数
         goodsDto.setCollectCount(goodsInfoMapper.getGoodsUserCollectCount(goodsId));
-
-        //压价信息
-        if(userId.intValue() == goodsInfo.getUserId().intValue()){//卖家
-            //压价信息
-            List<GoodsBargain> bargains = goodsBargainMapper.selectAllByGoodsId(goodsInfo.getId(),null);
-            List<BargainDto> bargainDtos = BargainDto.toDtoList(bargains);
-            if(bargainDtos != null && bargainDtos.size()>0){
-                for(BargainDto bargainDto:bargainDtos){
-                    UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(bargainDto.getUserId())).getString("data")), UserInfo.class);
-                    bargainDto.setNickName(seller.getNickName());
-                    bargainDto.setHeadImgUrl(seller.getHeadImgUrl());
-                }
-                goodsDto.setBargainDtos(bargainDtos);
-            }
-            //如果商品status为已售出，获取商品所属订单ID
-            if(goodsInfo.getStatus().intValue() == 2){
-                OrderDetail orderDetail = orderDetailMapper.selectOrderByGoodsIdStatus(userId, goodsInfo.getId(),2);
-                if(orderDetail != null){
-                    goodsDto.setOrderId(orderDetail.getOrderId());
-                }
-            }
-        }else{//买家
-            List<GoodsBargain> bargain = goodsBargainMapper.selectByUserIdGoodsId(userId, goodsInfo.getId(), null);
-            List<BargainDto> bargainDtos = BargainDto.toDtoList(bargain);
-            for(BargainDto bargainDto:bargainDtos){
-                UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(bargainDto.getUserId())).getString("data")), UserInfo.class);
-                bargainDto.setNickName(seller.getNickName());
-                bargainDto.setHeadImgUrl(seller.getHeadImgUrl());
-            }
-            goodsDto.setBargainDtos(bargainDtos);
-            //如果商品status为已售出，获取商品所属订单ID
-            if(goodsInfo.getStatus().intValue() == 2){
-                OrderDetail orderDetail = orderDetailMapper.selectOrderByGoodsIdStatus(userId, goodsInfo.getId(),1);
-                if(orderDetail != null){
-                    goodsDto.setOrderId(orderDetail.getOrderId());
-                }
-            }
-        }
-
-
-
         return goodsDto;
     }
 

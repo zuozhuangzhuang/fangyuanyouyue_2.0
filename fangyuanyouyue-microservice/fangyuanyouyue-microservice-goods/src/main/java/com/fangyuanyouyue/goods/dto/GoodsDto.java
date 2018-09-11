@@ -103,6 +103,8 @@ public class GoodsDto {
     //OrderInfo
     private Integer orderId;//订单ID
 
+    private Integer orderStatus;//订单状态（不存在订单时为null）
+
     //抢购降价历史
     private List<GoodsIntervalHistoryDto> historyDtos;//抢购降价历史
 

@@ -407,9 +407,12 @@ public class WalletServiceImpl implements WalletService{
     }
 
     @Override
-    public WechatPayDto orderPayByWechat(String orderNo, BigDecimal price,String notifyUrl) throws Exception {
+    public WechatPayDto orderPayByWechat(String orderNo, BigDecimal price,String notifyUrl) throws ServiceException {
         WechatPay util = new WechatPay();
         System.out.println("请求路径："+notifyUrl);
+        if(price.compareTo(new BigDecimal(0.01)) < 0){
+            throw new ServiceException("金额不能小于0.01元");
+        }
         WechatPayDto dto= util.genOrder(orderNo, price.doubleValue()+"", "小方圆-微信在线支付", notifyUrl, "127.0.0.1");
         if(dto==null|| org.apache.commons.lang3.StringUtils.isEmpty(dto.getPrepayId())||dto.getSign()==null){
             throw new ServiceException("在线支付生成订单信息出错！");
@@ -418,12 +421,15 @@ public class WalletServiceImpl implements WalletService{
     }
 
     @Override
-    public WechatPayDto orderPayByWechatMini(Integer userId, String orderNo, BigDecimal price, String notifyUrl) throws Exception {
+    public WechatPayDto orderPayByWechatMini(Integer userId, String orderNo, BigDecimal price, String notifyUrl) throws ServiceException {
         //根据userId获取三方openId
         UserThirdParty userThirdByUserId = userThirdPartyMapper.getUserThirdByUserId(userId, 1);
         String openId = userThirdByUserId.getMiniOpenId();
         WechatPay util = new WechatPay();
         System.out.println("请求路径："+notifyUrl);
+        if(price.compareTo(new BigDecimal(0.01)) < 0){
+            throw new ServiceException("金额不能小于0.01元");
+        }
         WechatPayDto dto = util.genOrderMini(openId,orderNo, price.doubleValue()+"", "小方圆-微信小程序支付", notifyUrl, "127.0.0.1");
         if(dto==null|| org.apache.commons.lang3.StringUtils.isEmpty(dto.getPrepayId())||dto.getSign()==null){
             throw new ServiceException("小程序支付生成订单信息出错！");
@@ -432,9 +438,12 @@ public class WalletServiceImpl implements WalletService{
     }
 
     @Override
-    public String orderPayByALi(String orderNo, BigDecimal price,String notifyUrl) throws Exception {
+    public String orderPayByALi(String orderNo, BigDecimal price,String notifyUrl) throws ServiceException,Exception {
         GenOrderUtil util = new GenOrderUtil();
         String orderInfo="";
+        if(price.compareTo(new BigDecimal(0.01)) < 0){
+            throw new ServiceException("金额不能小于0.01元");
+        }
         orderInfo = util.getOrder(orderNo, "小方圆下单",  "小方圆下单", notifyUrl, price);
         return orderInfo;
     }

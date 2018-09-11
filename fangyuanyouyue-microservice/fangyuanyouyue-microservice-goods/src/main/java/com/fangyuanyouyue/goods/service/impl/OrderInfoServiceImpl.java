@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service(value = "orderInfoService")
 @Transactional(rollbackFor=Exception.class)
 public class OrderInfoServiceImpl implements OrderInfoService{
@@ -27,6 +29,7 @@ public class OrderInfoServiceImpl implements OrderInfoService{
 
     @Override
     public OrderInfo selectOrderByGoodsId(Integer userId,Integer goodsId) throws ServiceException {
+
         OrderDetail orderDetail = orderDetailMapper.getByUserIdGoodsId(userId, goodsId);
         if(orderDetail != null){
             OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderDetail.getOrderId());
@@ -40,5 +43,11 @@ public class OrderInfoServiceImpl implements OrderInfoService{
     public OrderRefund seletRefundByOrderId(Integer orderId) throws ServiceException {
         OrderRefund orderRefund = orderRefundMapper.selectByUserIdOrderId(orderId);
         return orderRefund;
+    }
+
+    @Override
+    public boolean ifHasOrder(Integer userId, Integer goodsId) throws ServiceException {
+        List<OrderInfo> orderInfos = orderInfoMapper.selectByUserIdGoodsIdStauts(userId, goodsId);
+        return orderInfos != null && orderInfos.size() > 0;
     }
 }

@@ -225,10 +225,7 @@ public class GoodsController extends BaseController{
                 //1、商品是否存在订单 2、订单是否已完成或已取消 3、订单已退款：是否已完成退款、是否已拒绝退款
                 GoodsInfo goodsInfo = goodsInfoService.selectByPrimaryKey(goodsId);
                 if(goodsInfo.getStatus() == 2){
-                    OrderInfo orderInfo = orderInfoService.selectOrderByGoodsId(userId,goodsId);
-                    //1、判断是否在退货 2、判断是否已完成、已取消
-                    OrderRefund orderRefund = orderInfoService.seletRefundByOrderId(orderInfo.getId());
-                    if((orderInfo.getStatus().intValue() != 4 && orderInfo.getStatus().intValue() != 5) || (orderRefund != null && orderRefund.getStatus() == 1) ){
+                    if(orderInfoService.ifHasOrder(userId,goodsId)){
                         return toError("商品【"+goodsInfo.getName()+"】存在未完成订单，请勿删除！");
                     }
                 }

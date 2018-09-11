@@ -44,4 +44,6 @@ public class OrderDetail {
 
     private Integer mainOrderId;//主订单ID
 
+    private Integer goodsType;//类型 1普通商品 2抢购商品
+
 }

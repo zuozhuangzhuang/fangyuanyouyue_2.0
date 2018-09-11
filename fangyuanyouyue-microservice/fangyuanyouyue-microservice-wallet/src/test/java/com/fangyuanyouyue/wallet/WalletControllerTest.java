@@ -50,8 +50,8 @@ public class WalletControllerTest {
 //    @Transactional
     public void recharge() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/wallet/recharge")
-                .param("token","10025FY1533317806918")
-                .param("price","100")
+                .param("token","10025FY1536568175945")
+                .param("amount","0.001")
                 .param("type","1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
