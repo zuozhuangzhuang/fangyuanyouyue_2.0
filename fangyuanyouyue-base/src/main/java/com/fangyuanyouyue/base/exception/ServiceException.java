@@ -13,7 +13,7 @@ import lombok.ToString;
 public class ServiceException extends Exception {
 
 	private static final long serialVersionUID = 1L;
-	private Integer code;
+	private Integer code = 1;
 
 	public ServiceException(String msg) {
 		super(msg);

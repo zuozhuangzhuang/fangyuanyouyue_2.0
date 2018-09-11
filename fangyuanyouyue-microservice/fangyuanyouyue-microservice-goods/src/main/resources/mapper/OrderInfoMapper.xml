@@ -174,4 +174,10 @@
       is_refund = #{isRefund,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectByUserIdGoodsIdStauts" parameterType="Integer" resultMap="BaseResultMap">
+    select a.* from order_info a,order_detail b where
+    a.status <![CDATA[ <> ]]> 4 and a.status <![CDATA[ <> ]]> 5 and a.status <![CDATA[ <> ]]> 6
+    and a.id = b.order_id and a.seller_id = #{userId} and b.goods_id = #{goodsId}
+  </select>
 </mapper>
