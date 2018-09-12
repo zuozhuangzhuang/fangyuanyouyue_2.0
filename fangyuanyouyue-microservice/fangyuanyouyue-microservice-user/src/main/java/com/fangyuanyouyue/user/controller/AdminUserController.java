@@ -2,10 +2,6 @@ package com.fangyuanyouyue.user.controller;
 
 import java.io.IOException;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -21,7 +17,14 @@ import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.user.param.AdminUserParam;
+import com.fangyuanyouyue.user.service.UserAuthApplyService;
+import com.fangyuanyouyue.user.service.UserAuthOrderService;
 import com.fangyuanyouyue.user.service.UserInfoService;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 
 @Api(description = "用户后台管理系统Controller")
 @Controller
@@ -32,19 +35,12 @@ public class AdminUserController extends BaseController {
     protected Logger log = Logger.getLogger(this.getClass());
     @Autowired
     private UserInfoService userInfoService;
+    @Autowired
+    private UserAuthApplyService userAuthApplyService;
+    @Autowired
+    private UserAuthOrderService userAuthOrderService;
 
     @ApiOperation(value = "用户列表", notes = "用户列表",response = BaseResp.class)
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "receiverName", value = "收货人姓名",  required = true,dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "receiverPhone", value = "联系电话",required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "province", value = "省",required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "city", value = "市",required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "area", value = "区",required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "address", value = "详细收货地址",  required = true,dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "postCode", value = "邮编",dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "type", value = "类型 1默认地址 2其他",dataType = "String", paramType = "query")
-    })
     @GetMapping(value = "/list")
     @ResponseBody
     public BaseResp list(AdminUserParam param) throws IOException {
@@ -85,6 +81,65 @@ public class AdminUserController extends BaseController {
         }
     }
 
+
+    @ApiOperation(value = "修改认证状态", notes = "修改认证状态",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "1同意 2拒绝",  required = true,dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/auth/status")
+    @ResponseBody
+    public BaseResp authApplyStatus(AdminUserParam param) throws IOException {
+        try {
+            log.info("后台管理修改用户");
+        	log.info(param.toString());
+        	if(param.getStatus().equals(1)) {
+        		userAuthApplyService.updateAccept(param.getId());
+        	}else if(param.getStatus().equals(2)) {
+        		userAuthApplyService.updateReject(param.getId(), "");
+        	}else {
+
+                return toError("状态不对！");
+        	}
+        	
+
+            return toSuccess();
+        }catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
     
+
+
+    @ApiOperation(value = "修改认证状态", notes = "修改认证状态",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "1同意 2拒绝",  required = true,dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/auth/order/status")
+    @ResponseBody
+    public BaseResp authOrderStatus(AdminUserParam param) throws IOException {
+        try {
+            log.info("后台管理修改用户");
+        	log.info(param.toString());
+        	if(param.getStatus().equals(1)) {
+        		userAuthOrderService.updateAccept(param.getId());
+        	}else if(param.getStatus().equals(2)) {
+        		userAuthOrderService.updateReject(param.getId(), "");
+        	}else {
+
+                return toError("状态不对！");
+        	}
+        	
+
+            return toSuccess();
+        }catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
 
 }

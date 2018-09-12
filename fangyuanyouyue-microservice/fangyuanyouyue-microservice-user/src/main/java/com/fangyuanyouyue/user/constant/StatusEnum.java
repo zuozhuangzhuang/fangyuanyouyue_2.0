@@ -12,6 +12,11 @@ public enum StatusEnum {
 	
 	ADDRESS_DEFAULT(1),
 	ADDRESS_OTHER(2),
+	
+	
+	AUTH_ACCEPT(1),
+	AUTH_REJECT(2),
+	
 	;
 	
 	private Integer code;
