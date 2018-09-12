@@ -25,10 +25,10 @@ import com.fangyuanyouyue.user.service.UserInfoService;
 
 @Api(description = "用户后台管理系统Controller")
 @Controller
-@RequestMapping(value = "/admin/user")
+@RequestMapping(value = "/adminUser")
 @RefreshScope
 @CrossOrigin
-public class AdminUserController extends BaseController {
+public class AdminController extends BaseController {
     protected Logger log = Logger.getLogger(this.getClass());
     @Autowired
     private UserInfoService userInfoService;
@@ -85,6 +85,8 @@ public class AdminUserController extends BaseController {
         }
     }
 
-    
+    //实名认证管理
+
+    //认证店铺管理
 
 }

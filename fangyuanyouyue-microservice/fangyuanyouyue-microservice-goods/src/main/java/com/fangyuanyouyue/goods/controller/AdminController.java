@@ -309,9 +309,8 @@ public class AdminController  extends BaseController {
     //后台处理举报
     @ApiOperation(value = "后台处理举报", notes = "后台处理举报，发送信息给被举报者",response = BaseResp.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "商品、抢购id", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "content", value = "处理原因", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "status", value = "处理状态 1删除商品 2驳回举报", required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "id", value = "举报信息id", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "content", value = "处理原因", required = true, dataType = "int", paramType = "query")
     })
     @PutMapping(value = "/dealReport")
     @ResponseBody
@@ -325,10 +324,7 @@ public class AdminController  extends BaseController {
             if(StringUtils.isEmpty(param.getContent())){
                 return toError("处理原因不能为空！");
             }
-            if(param.getStatus() == null){
-                return toError("处理状态不能为空！");
-            }
-            reportService.dealReport(param.getId(),param.getContent(),param.getStatus());
+            reportService.dealReport(param.getId(),param.getContent());
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
@@ -346,19 +342,19 @@ public class AdminController  extends BaseController {
             @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "keyword", value = "搜索词条", required = false, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "status", value = "状态", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "状态 1已处理 2待处理", required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "startDate", value = "开始日期", required = false, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "endDate", value = "结束日期", required = false, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "orders", value = "排序规则", required = false, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "ascType", value = "排序类型 1升序 2降序", required = false, dataType = "int", paramType = "query")
     })
-    @PutMapping(value = "/reportList")
+    @GetMapping(value = "/reportList")
     @ResponseBody
     public BaseResp reportList(AdminGoodsParam param) throws IOException {
         try {
             log.info("----》获取举报商品列表《----");
             log.info("参数："+param.toString());
-            Pager pager = reportService.getReportPage(param);
+            Pager pager = reportService.getGoodsReportPage(param);
             return toPage(pager);
         } catch (ServiceException e) {
             e.printStackTrace();

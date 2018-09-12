@@ -10,6 +10,9 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="type" jdbcType="INTEGER" property="type" />
     <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+    <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl" />
+    <result column="goodsName" jdbcType="VARCHAR" property="goodsName" />
   </resultMap>
   <sql id="Base_Column_List">
     id, reason, business_id, user_id, add_time, update_time, type, status
@@ -131,7 +134,7 @@
   </select>
 
   <select id="countPage" resultType="Integer">
-    select count(a.*) from report a,goods_info b
+    select count(*) from report a,goods_info b
     <where>
       a.business_id = b.id and a.type = 1
       <if test="type != null">
@@ -156,10 +159,10 @@
       </if>
     </where>
   </select>
-  <select id="getReportPage" resultMap="BaseResultMap">
-    select a.* from report a,goods_info b
+  <select id="getGoodsReportPage" resultMap="BaseResultMap">
+    select a.*,b.name goodsName,c.nick_name,c.head_img_url from report a,goods_info b,user_info c
     <where>
-      a.business_id = b.id and a.type = 1
+      a.business_id = b.id and a.type = 1 and a.user_id = c.id
       <if test="type != null">
         and b.type = #{type}
       </if>
@@ -188,7 +191,7 @@
       </if>
     </if>
     <if test="start != null and limit != null">
-      limit #{start},#{limit]}
+      limit #{start},#{limit}
     </if>
   </select>
 </mapper>

@@ -22,10 +22,9 @@ public interface ReportService {
      * 后台处理举报
      * @param id
      * @param content
-     * @param status
      * @throws ServiceException
      */
-    void dealReport(Integer id,String content,Integer status) throws ServiceException;
+    void dealReport(Integer id,String content) throws ServiceException;
 
     /**
      * 获取举报商品列表
@@ -33,6 +32,6 @@ public interface ReportService {
      * @return
      * @throws ServiceException
      */
-    Pager getReportPage(AdminGoodsParam param) throws ServiceException;
+    Pager getGoodsReportPage(AdminGoodsParam param) throws ServiceException;
 
 }

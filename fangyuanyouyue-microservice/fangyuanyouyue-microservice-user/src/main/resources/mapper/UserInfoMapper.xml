@@ -344,26 +344,31 @@
   
   <select id="getPage" resultMap="BaseResultMap">
     select * from user_info
-    <if test="keyword != null">
-      and ( 
-      	nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
-      	or phone like "%"#{keyword,jdbcType=VARCHAR}"%"
-      )
-    </if>
-    <if test="status != null">
-      and status = #{status}
-    </if>
-    
-    <if test="startDate != null">
-      and add_time <![CDATA[ > ]]> #{startDate}
-    </if>
-    
-    <if test="endDate != null">
-      and add_time <![CDATA[ <= ]]> #{endDate}
-    </if>
-    
+    <where>
+      1=1
+      <if test="keyword != null">
+        and (
+        nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
+        or phone like "%"#{keyword,jdbcType=VARCHAR}"%"
+        )
+      </if>
+      <if test="status != null">
+        and status = #{status}
+      </if>
+
+      <if test="startDate != null">
+        and add_time <![CDATA[ > ]]> #{startDate}
+      </if>
+
+      <if test="endDate != null">
+        and add_time <![CDATA[ <= ]]> #{endDate}
+      </if>
+    </where>
     <if test="orders != null">
       order by #{orders}
+      <if test="ascType != null and ascType == 2">
+        desc
+      </if>
     </if>
     <if test="start != null and limit != null">
       limit #{start},#{limit}
