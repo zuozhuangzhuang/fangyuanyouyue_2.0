@@ -28,4 +28,8 @@ public class UserAuthOrder {
     private Date updateTime;//更新时间
 
     private String title;//订单标题
+    
+    private	String phone;
+    
+    private	String nickName;
 }
