@@ -33,4 +33,6 @@ public class ForumColumnApply {
     private String headImgUrl;
     
     private String phone;
+    
+    private String typeName;
 }

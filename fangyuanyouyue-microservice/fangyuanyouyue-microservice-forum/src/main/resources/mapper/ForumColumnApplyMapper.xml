@@ -10,6 +10,10 @@
     <result column="reason" jdbcType="VARCHAR" property="reason" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+    <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="name" jdbcType="VARCHAR" property="typeName" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, type_id, column_name, status, reason, update_time, add_time
@@ -157,7 +161,7 @@
   </select>
   
   <select id="getPage" resultMap="BaseResultMap">
-    select a.*,b.nick_name,b.head_img_url,b.phone from forum_column_apply a,user_info b where a.user_id=b.id
+    select a.*,b.nick_name,b.head_img_url,b.phone,c.name as typeName from forum_column_apply a,user_info b,forum_column_type c where a.user_id=b.id and a.type_id=c.id
     <if test="keyword != null">
       and ( 
       	a.column_name like "%"#{keyword,jdbcType=VARCHAR}"%"
