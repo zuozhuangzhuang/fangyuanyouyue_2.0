@@ -5,12 +5,14 @@ import java.util.*;
 
 import com.alibaba.fastjson.JSONException;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.order.dao.*;
 import com.fangyuanyouyue.order.dto.*;
 import com.fangyuanyouyue.order.model.*;
+import com.fangyuanyouyue.order.param.AdminOrderParam;
 import com.fangyuanyouyue.order.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -946,5 +948,10 @@ public class OrderServiceImpl implements OrderService{
                 return true;
             }
         }
+    }
+
+    @Override
+    public Pager orderList(AdminOrderParam param) throws ServiceException {
+        return null;
     }
 }

@@ -31,6 +31,8 @@ public class FileUploadController extends BaseController {
 
     @ApiOperation(value = "图片上传", notes = "(String)图片上传",response = BaseResp.class)
     @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token",dataType = "file", paramType = "form"),
+            @ApiImplicitParam(name = "type", value = "类型 1头像 2商品、抢购 3视频、帖子 4全民鉴定 5官方鉴定",dataType = "file", paramType = "form"),
             @ApiImplicitParam(name = "imgFile", value = "图片，格式为：jpeg，png，jpg",dataType = "file", paramType = "form")
     })
     @PostMapping(value = "/uploadPic")

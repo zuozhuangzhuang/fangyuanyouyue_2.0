@@ -3,8 +3,10 @@ package com.fangyuanyouyue.order.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.order.dto.OrderDto;
+import com.fangyuanyouyue.order.param.AdminOrderParam;
 import com.fangyuanyouyue.order.param.OrderParam;
 import com.fangyuanyouyue.order.service.*;
 import io.swagger.annotations.Api;
@@ -44,46 +46,42 @@ public class AdminController extends BaseController{
     private RefundService refundService;
 
 
-//    @ApiOperation(value = "查看所有用户订单", notes = "(OrderDto)查看订单",response = BaseResp.class)
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "userId", value = "用户id", required = true, dataType = "int", paramType = "query"),
-//            @ApiImplicitParam(name = "start", value = "分页start", required = true, dataType = "int", paramType = "query"),
-//            @ApiImplicitParam(name = "limit", value = "分页limit", required = true, dataType = "int", paramType = "query"),
-//            @ApiImplicitParam(name = "type", value = "类型 1买家（我买下的） 2卖家（我卖出的）", required = true, dataType = "int", paramType = "query"),
-//            @ApiImplicitParam(name = "status", value = "订单状态 0全部 1待支付 2待发货 3待收货 4已完成 5已取消 7退货",required = true, dataType = "int", paramType = "query"),
-//            @ApiImplicitParam(name = "search", value = "搜索条件",required = false, dataType = "String", paramType = "query")
-//    })
-//    @PostMapping(value = "/saveOrderByCart")
-//    @ResponseBody
-//    public BaseResp saveOrderByCart(OrderParam param) throws IOException {
-//        try {
-//            log.info("----》查看所有用户订单《----");
-//            log.info("参数："+param.toString());
-//            //参数判断
-//            //验证用户
-//            if(param.getStart() == null || param.getStart() < 0){
-//                return toError("起始页数错误！");
-//            }
-//            if(param.getLimit() == null || param.getLimit() < 1){
-//                return toError("每页个数错误！");
-//            }
-//            if(param.getType() == null){
-//                return toError("类型不能为空！");
-//            }
-//            //购物车商品下单
-//            List<OrderDto> orderDtos = orderService.myOrderList(null, param.getStart(), param.getLimit(), param.getType(), param.getStatus(),param.getSearch());
-//            return toSuccess(orderDtos);
-//        } catch (ServiceException e) {
-//            e.printStackTrace();
-//            return toError(e.getMessage());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return toError("系统繁忙，请稍后再试！");
-//        }
-//    }
-
-    //TODO 查看订单详情
-
+    @ApiOperation(value = "查看所有用户订单", notes = "查看所有用户订单",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "keyword", value = "搜索词条", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "状态", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "startDate", value = "开始日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "endDate", value = "结束日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orders", value = "排序规则", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "ascType", value = "排序类型 1升序 2降序", required = false, dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/orderList")
+    @ResponseBody
+    public BaseResp orderList(AdminOrderParam param) throws IOException {
+        try {
+            log.info("----》查看所有用户订单《----");
+            log.info("参数："+param.toString());
+            //参数判断
+            //验证用户
+            if(param.getStart() == null || param.getStart() < 0){
+                return toError("起始页数错误！");
+            }
+            if(param.getLimit() == null || param.getLimit() < 1){
+                return toError("每页个数错误！");
+            }
+            //购物车商品下单
+            Pager pager = orderService.orderList(param);
+            return toPage(pager);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
 
     @ApiOperation(value = "官方处理退货", notes = "(void)官方处理退货")
     @ApiImplicitParams({

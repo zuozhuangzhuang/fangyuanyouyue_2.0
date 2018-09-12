@@ -105,4 +105,27 @@ public interface GoodsInfoMapper {
      * @return
      */
     List<GoodsInfo> selectListByTypeStatus(@Param("type")Integer type,@Param("status")Integer status);
+
+    /**
+     * 分页总条数
+     * @return
+     */
+    int countPage(@Param("keyword")String keyword,@Param("status")Integer status,@Param("startDate")String startDate,@Param("endDate")String endDate);
+
+    /**
+     * 分页获取商品\抢购列表
+     * @param type
+     * @param start
+     * @param limit
+     * @param keyword
+     * @param status
+     * @param startDate
+     * @param endDate
+     * @param orders
+     * @param ascType
+     * @return
+     */
+    List<GoodsInfo> getGoodsPage(@Param("type")Integer type,@Param("start") Integer start,
+                            @Param("limit") Integer limit,@Param("keyword")String keyword,@Param("status")Integer status,
+                            @Param("startDate")String startDate,@Param("endDate")String endDate,@Param("orders")String orders,@Param("ascType")Integer ascType);
 }

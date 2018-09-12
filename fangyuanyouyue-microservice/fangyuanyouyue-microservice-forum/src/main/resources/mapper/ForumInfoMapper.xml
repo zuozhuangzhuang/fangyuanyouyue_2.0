@@ -309,7 +309,7 @@
   
     
   <select id="countPage" parameterType="Integer" resultType="Integer">
-    select count(*) from forum_column where status 1=1
+    select count(*) from forum_column where 1=1
     <if test="keyword != null">
       and ( 
       	name like "%"#{keyword,jdbcType=VARCHAR}"%"
@@ -323,7 +323,7 @@
     </if>
     
     <if test="endDate != null">
-      and add_time <![CDATA[ < ]]> #{endDate}
+      and add_time <![CDATA[ <= ]]> #{endDate}
     </if>
     
   </select>
@@ -331,10 +331,9 @@
   <select id="getPage" resultMap="BaseResultMap">
     select a.*,b.head_img_url,b.nick_name from forum_column a,user_info b where a.user_id=b.id
     <if test="keyword != null">
-      and ( 
-      	a.title like "%"#{keyword,jdbcType=VARCHAR}"%"
-      	or 
-      	content like "%"#{keyword,jdbcType=VARCHAR}"%"
+      and (
+        a.name like "%"#{keyword,jdbcType=VARCHAR}"%"
+        or b.nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
       )
     </if>
     <if test="status != null">
@@ -342,11 +341,11 @@
     </if>
     
     <if test="startDate != null">
-      and a.add_time &gt; #{startDate}
+      and a.add_time <![CDATA[ > ]]> #{startDate}
     </if>
     
     <if test="endDate != null">
-      and a.add_time &lt; #{endDate}
+      and a.add_time <![CDATA[ <= ]]> #{endDate}
     </if>
     
     <if test="orders != null">

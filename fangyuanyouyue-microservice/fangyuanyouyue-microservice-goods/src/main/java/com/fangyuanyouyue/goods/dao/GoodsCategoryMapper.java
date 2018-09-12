@@ -53,4 +53,11 @@ public interface GoodsCategoryMapper {
      * @return
      */
     Integer selectParentId(@Param("categoryId")Integer categoryId);
+
+    /**
+     * 分页总条数
+     * @return
+     */
+    int countPage(@Param("keyword")String keyword,@Param("status")Integer status);
+
 }

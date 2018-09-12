@@ -2,9 +2,11 @@ package com.fangyuanyouyue.order.service;
 
 import java.util.List;
 
+import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.order.dto.CompanyDto;
 import com.fangyuanyouyue.order.dto.OrderDto;
+import com.fangyuanyouyue.order.param.AdminOrderParam;
 
 public interface OrderService {
     /**
@@ -141,4 +143,12 @@ public interface OrderService {
      * @throws ServiceException
      */
     boolean updateOrder(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException;
+
+    /**
+     * 查看所有用户订单
+     * @param param
+     * @return
+     * @throws ServiceException
+     */
+    Pager orderList(AdminOrderParam param) throws ServiceException;
 }

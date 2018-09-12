@@ -26,12 +26,7 @@
     from point_goods
     where id = #{id,jdbcType=INTEGER}
   </select>
-  <select id="selectList" resultMap="BaseResultMap" >
-    select 
-    <include refid="Base_Column_List" />
-    from point_goods
-    where 1=1 limit #{start},#{limit}
-  </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from point_goods
     where id = #{id,jdbcType=INTEGER}
@@ -46,7 +41,7 @@
       #{coverImgUrl,jdbcType=VARCHAR}, #{couponId,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.wallet.model.PointGoods" >
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.wallet.model.PointGoods" useGeneratedKeys="true" keyProperty="id">
     insert into point_goods
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -182,4 +177,11 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectList" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from point_goods
+    where 1=1 limit #{start},#{limit}
+  </select>
 </mapper>

@@ -2,6 +2,7 @@ package com.fangyuanyouyue.goods.service;
 
 import java.util.List;
 
+import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.goods.dto.BannerIndexDto;
 import com.fangyuanyouyue.goods.dto.GoodsCategoryDto;
@@ -10,6 +11,7 @@ import com.fangyuanyouyue.goods.dto.GoodsQuickSearchDto;
 import com.fangyuanyouyue.goods.dto.SearchDto;
 import com.fangyuanyouyue.goods.model.BannerIndex;
 import com.fangyuanyouyue.goods.model.GoodsInfo;
+import com.fangyuanyouyue.goods.param.AdminGoodsParam;
 import com.fangyuanyouyue.goods.param.GoodsParam;
 
 public interface GoodsInfoService {
@@ -95,23 +97,6 @@ public interface GoodsInfoService {
      * @throws ServiceException
      */
     List<BannerIndexDto> getBanner(Integer type) throws ServiceException;
-
-    /**
-     * 新增首页轮播图
-     * @param param
-     * @return
-     * @throws ServiceException
-     */
-    BannerIndex addBanner(GoodsParam param) throws ServiceException;
-
-    /**
-     * 修改首页轮播图
-     * @param param
-     * @return
-     * @throws ServiceException
-     */
-    BannerIndex updateBanner(GoodsParam param) throws ServiceException;
-
     /**
      * 热门搜索
      * @return
@@ -149,4 +134,26 @@ public interface GoodsInfoService {
      * @throws ServiceException
      */
 //    void report(Integer userId,Integer businessId,String reason,Integer type) throws ServiceException;
+
+    /**
+     * 查看商品分类列表
+     * @param param
+     * @return
+     * @throws ServiceException
+     */
+    Pager categoryPage(AdminGoodsParam param) throws ServiceException;
+    /**
+     * 获取商品列表
+     * @param param
+     * @return
+     * @throws ServiceException
+     */
+    Pager getGoodsPage(AdminGoodsParam param) throws ServiceException;
+
+    /**
+     * 后台管理修改商品、抢购
+     * @param param
+     * @throws ServiceException
+     */
+    void updateGoods(AdminGoodsParam param) throws ServiceException;
 }

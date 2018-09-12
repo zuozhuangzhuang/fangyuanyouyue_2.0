@@ -1,11 +1,14 @@
 package com.fangyuanyouyue.goods.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.goods.dao.*;
 import com.fangyuanyouyue.goods.dto.*;
+import com.fangyuanyouyue.goods.dto.adminDto.AdminGoodsDto;
 import com.fangyuanyouyue.goods.model.*;
+import com.fangyuanyouyue.goods.param.AdminGoodsParam;
 import com.fangyuanyouyue.goods.param.GoodsParam;
 import com.fangyuanyouyue.goods.service.BargainService;
 import com.fangyuanyouyue.goods.service.GoodsInfoService;
@@ -535,52 +538,6 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         List<BannerIndexDto> bannerIndexDtos = BannerIndexDto.toDtoList(banners);
         return bannerIndexDtos;
     }
-
-    @Override
-    public BannerIndex addBanner(GoodsParam param) throws ServiceException {
-        BannerIndex bannerIndex = new BannerIndex();
-        bannerIndex.setAddTime(DateStampUtils.getTimesteamp());
-        bannerIndex.setType(param.getType());
-        bannerIndex.setBusinessId(param.getBusinessId());
-        bannerIndex.setImgUrl(param.getImgUrl());
-        bannerIndex.setJumpType(param.getJumpType());
-        bannerIndex.setBusinessType(param.getBusinessType());
-        if(StringUtils.isNotEmpty(param.getTitle())){
-            bannerIndex.setTitle(param.getTitle());
-        }
-        if(param.getSort() != null){
-            bannerIndex.setSort(param.getSort());
-        }
-        bannerIndex.setStatus(0);//是否下架，0未下架 1下架
-        bannerIndexMapper.insert(bannerIndex);
-        return bannerIndex;
-    }
-
-    @Override
-    public BannerIndex updateBanner(GoodsParam param) throws ServiceException {
-        BannerIndex bannerIndex = bannerIndexMapper.selectByPrimaryKey(param.getBannerIndexId());
-        if(bannerIndex == null){
-            throw new ServiceException("获取轮播图失败！");
-        }else{
-            bannerIndex.setType(param.getType());
-            bannerIndex.setBusinessId(param.getBusinessId());
-            bannerIndex.setImgUrl(param.getImgUrl());
-            bannerIndex.setJumpType(param.getJumpType());
-            bannerIndex.setBusinessType(param.getBusinessType());
-            if(StringUtils.isNotEmpty(param.getTitle())){
-                bannerIndex.setTitle(param.getTitle());
-            }
-            if(param.getSort() != null){
-                bannerIndex.setSort(param.getSort());
-            }
-            if(param.getStatus() != null){
-                bannerIndex.setStatus(param.getStatus());
-            }
-            bannerIndexMapper.updateByPrimaryKeySelective(bannerIndex);
-            return bannerIndex;
-        }
-    }
-
     @Override
     public List<SearchDto> hotSearch() throws ServiceException {
         List<HotSearch> hotSearchList = hotSearchMapper.getHotSearchList();
@@ -655,4 +612,118 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
 //            }
 //        }
 //    }
+
+
+    @Override
+    public Pager categoryPage(AdminGoodsParam param) throws ServiceException {
+        Integer total = goodsCategoryMapper.countPage(param.getKeyword(),param.getStatus());
+        //商品分类列表
+        List<GoodsCategoryDto> goodsCategoryDtos = categoryList();
+        Pager pager = new Pager();
+        pager.setTotal(total);
+        pager.setDatas(goodsCategoryDtos);
+        return pager;
+    }
+
+    @Override
+    public Pager getGoodsPage(AdminGoodsParam param) throws ServiceException {
+        Integer total = goodsInfoMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
+        //商品列表
+//        List<GoodsInfo> goodsList = goodsInfoMapper.getGoodsList(null, param.getStatus(), param.getKeyword(), param.getPriceMin(), param.getPriceMax(), param.getSynthesize(), param.getQuality(), param.getStart() * param.getLimit(), param.getLimit(), param.getType(), param.getGoodsCategoryIds());
+        List<GoodsInfo> goodsList = goodsInfoMapper.getGoodsPage(param.getType(),param.getStart()*param.getLimit(),param.getLimit(),
+                param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+        List<GoodsDto> dtos = new ArrayList<>();
+        //遍历商品列表，添加到GoodsDtos中
+        for (GoodsInfo goodsInfo:goodsList) {
+            GoodsDto goodsDto = setDtoByGoodsInfo(null,goodsInfo);
+            dtos.add(goodsDto);
+        }
+        Pager pager = new Pager();
+        pager.setTotal(total);
+        pager.setDatas(dtos);
+        return pager;
+    }
+
+    @Override
+    public void updateGoods(AdminGoodsParam param) throws ServiceException {
+        GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(param.getId());
+        if(goodsInfo == null){
+            throw new ServiceException("商品不存在！");
+        }else{
+            //修改商品信息
+            if(StringUtils.isNotEmpty(param.getName())){
+                goodsInfo.setName(param.getName());
+            }
+            if(StringUtils.isNotEmpty(param.getDescription())){
+                goodsInfo.setDescription(param.getDescription());
+            }
+            if(param.getPrice() != null){
+                goodsInfo.setPrice(param.getPrice());
+                goodsInfo.setStartPrice(param.getPrice());
+            }
+            if(param.getPostage() != null){
+                goodsInfo.setPostage(param.getPostage());
+            }
+            if(StringUtils.isNotEmpty(param.getLabel())){
+                goodsInfo.setLabel(param.getLabel());
+            }
+            if(param.getSort() != null){
+                goodsInfo.setSort(param.getSort());
+            }
+            if(param.getFloorPrice() != null){
+                goodsInfo.setFloorPrice(param.getFloorPrice());
+            }
+            if(param.getIntervalTime() != null){
+                goodsInfo.setIntervalTime(param.getIntervalTime());
+            }
+            if(param.getMarkdown() != null){
+                goodsInfo.setMarkdown(param.getMarkdown());
+            }
+            if(StringUtils.isNotEmpty(param.getVideoUrl())){
+                goodsInfo.setVideoUrl(param.getVideoUrl());
+                if(param.getVideoLength() != null){
+                    goodsInfo.setVideoLength(param.getVideoLength());
+                }
+            }
+            //视频截图路径
+            if(StringUtils.isNotEmpty(param.getVideoImg())){
+                saveGoodsPicOne(goodsInfo.getId(),param.getVideoImg(),3,1);
+            }
+            if(param.getGoodsCategoryIds() != null && param.getGoodsCategoryIds().length > 0){
+                //删除旧商品分类关联表
+                List<GoodsCorrelation> goodsCorrelations = goodsCorrelationMapper.getCorrelationsByGoodsId(goodsInfo.getId());
+                for(GoodsCorrelation correlation:goodsCorrelations){
+                    goodsCorrelationMapper.deleteByPrimaryKey(correlation.getId());
+                }
+                //初始化商品分类关联表
+                for(int i=0;i<param.getGoodsCategoryIds().length;i++){
+                    GoodsCorrelation goodsCorrelation = new GoodsCorrelation();
+                    goodsCorrelation.setGoodsId(goodsInfo.getId());
+                    goodsCorrelation.setAddTime(DateStampUtils.getTimesteamp());
+                    goodsCorrelation.setGoodsCategoryId(param.getGoodsCategoryIds()[i]);
+                    goodsCorrelation.setCategoryParentId(goodsCategoryMapper.selectParentId(param.getGoodsCategoryIds()[i]));
+                    goodsCorrelationMapper.insert(goodsCorrelation);
+                }
+            }
+            //新增商品图片信息
+            //每个图片储存一条商品图片表信息
+            if(param.getImgUrls() != null && param.getImgUrls().length > 0){
+                //删除旧商品图片信息
+                goodsImgMapper.deleteByGoodsId(goodsInfo.getId());
+                for(int i=0;i<param.getImgUrls().length;i++){
+                    if(i == 0){
+                        saveGoodsPicOne(goodsInfo.getId(),param.getImgUrls()[i],1,i+1);
+                    }else{
+                        saveGoodsPicOne(goodsInfo.getId(),param.getImgUrls()[i],2,i+1);
+                    }
+                }
+            }
+            //如果是已下架的商品或抢购，重新上架
+            if(param.getStatus() != null){
+                goodsInfo.setStatus(param.getStatus());//状态 1出售中 2已售出 3已下架（已结束） 5删除
+            }
+            goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
+
+        }
+    }
 }
