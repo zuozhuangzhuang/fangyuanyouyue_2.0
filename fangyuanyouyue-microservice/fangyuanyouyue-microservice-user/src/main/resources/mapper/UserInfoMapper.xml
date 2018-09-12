@@ -333,17 +333,17 @@
       and status = #{status}
     </if>
     <if test="startDate != null">
-      and add_time &gt; #{startDate}
+      and add_time <![CDATA[ > ]]> #{startDate}
     </if>
     
     <if test="endDate != null">
-      and add_time &lt; #{endDate}
+      and add_time <![CDATA[ <= ]]> #{endDate}
     </if>
     
   </select>
   
   <select id="getPage" resultMap="BaseResultMap">
-    select * from user_info where status <![CDATA[ <> ]]> 3
+    select * from user_info
     <if test="keyword != null">
       and ( 
       	nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
@@ -359,13 +359,15 @@
     </if>
     
     <if test="endDate != null">
-      and add_time <![CDATA[ < ]]> #{endDate}
+      and add_time <![CDATA[ <= ]]> #{endDate}
     </if>
     
     <if test="orders != null">
       order by #{orders}
     </if>
-    limit #{start},#{limit}
+    <if test="start != null and limit != null">
+      limit #{start},#{limit}
+    </if>
   </select>
   
   <select id="getUserByName" parameterType="String" resultType="Map">
@@ -373,6 +375,9 @@
     <if test="nickName != null">
       and a.nick_name like "%"#{nickName,jdbcType=VARCHAR}"%"
     </if>
-    order by c.vip_level desc,c.vip_type desc,b.auth_type limit #{start},#{limit}
+    order by c.vip_level desc,c.vip_type desc,b.auth_type
+    <if test="start != null and limit != null">
+      limit #{start},#{limit}
+    </if>
   </select>
 </mapper>

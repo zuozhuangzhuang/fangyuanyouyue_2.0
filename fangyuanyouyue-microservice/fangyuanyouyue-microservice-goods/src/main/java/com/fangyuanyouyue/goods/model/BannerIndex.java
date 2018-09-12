@@ -15,13 +15,13 @@ import java.util.Date;
 public class BannerIndex {
     private Integer id;//唯一自增ID
 
-    private Integer businessId;//业务ID:商品ID/用户ID
+    private Integer businessId;//业务ID：例：商品id、视频id、积分商城商品id...
 
     private Integer jumpType;//跳转类型 1页面 2链接 3图片（businessId为空）
 
-    private Integer businessType;//业务类型 1商品详情、2抢购详情、3帖子详情、4全民鉴定详情、5视频详情、6专栏
+    private Integer businessType;//业务类型 1商品详情、2抢购详情、3帖子详情、4全民鉴定详情、5视频详情、6专栏 7积分商品
 
-    private Integer type;//类型 1首页 2商城
+    private Integer type;//类型 1首页 2商城 3积分商城
 
     private String title;//描述标题
 

@@ -30,9 +30,6 @@ public class GoodsParam{
     @ApiModelProperty(name = "goodsIds", value = "商品id数组", dataType = "int",hidden = true)
     private Integer[] goodsIds;//商品id数组
 
-    @ApiModelProperty(name = "imgUrl", value = "图片地址", dataType = "String",hidden = true)
-    private String imgUrl;//图片地址
-
     @ApiModelProperty(name = "imgUrls", value = "图片地址数组", dataType = "String",hidden = true)
     private String[] imgUrls;//图片地址数组
 
@@ -66,9 +63,6 @@ public class GoodsParam{
     @ApiModelProperty(name = "label", value = "标签", dataType = "String",hidden = true)
     private String label;//标签
 
-    @ApiModelProperty(name = "sort", value = "排序", dataType = "int",hidden = true)
-    private Integer sort;//排序
-
     @ApiModelProperty(name = "floorPrice", value = "最低价", dataType = "BigDecimal",hidden = true)
     private BigDecimal floorPrice;//最低价
 
@@ -84,35 +78,7 @@ public class GoodsParam{
     @ApiModelProperty(name = "videoImg", value = "视频截图路径", dataType = "String",hidden = true)
     private String videoImg;//视频截图路径
 
-
-    //GoodsImg
-    @ApiModelProperty(name = "goodsImgId", value = "商品图片表ID", dataType = "int",hidden = true)
-    private Integer goodsImgId;//商品图片表ID
-
-//    @ApiModelProperty(name = "file1", value = "图片文件1路径", dataType = "file",hidden = true)
-//    private String file1;//图片文件1路径
-//
-//    @ApiModelProperty(name = "file2", value = "图片文件2路径", dataType = "file",hidden = true)
-//    private String file2;
-//
-//    @ApiModelProperty(name = "file3", value = "图片文件3路径", dataType = "file",hidden = true)
-//    private String file3;
-//
-//    @ApiModelProperty(name = "file4", value = "图片文件4路径", dataType = "file",hidden = true)
-//    private String file4;
-//
-//    @ApiModelProperty(name = "file5", value = "图片文件5路径", dataType = "file",hidden = true)
-//    private String file5;
-//
-//    @ApiModelProperty(name = "file6", value = "图片文件6路径", dataType = "file",hidden = true)
-//    private String file6;
-
-
-
    //GoodsComment
-    @ApiModelProperty(name = "goodsCommentId", value = "商品评论表ID", dataType = "int",hidden = true)
-    private Integer goodsCommentId;//商品评论表ID
-
     @ApiModelProperty(name = "commentId", value = "回复评论id", dataType = "int",hidden = true)
     private Integer commentId;//回复评论id
 
@@ -131,42 +97,13 @@ public class GoodsParam{
     @ApiModelProperty(name = "img3Url", value = "图片地址3", dataType = "String",hidden = true)
     private String img3Url;//图片地址3
 
-
-
     //GoodsCategory
-    @ApiModelProperty(name = "goodsCategoryId", value = "商品类目表ID", dataType = "int",hidden = true)
-    private Integer goodsCategoryId;//商品类目表ID
-
     @ApiModelProperty(name = "goodsCategoryIds", value = "商品分类数组（同一商品可多种分类）", dataType = "int",hidden = true)
     private Integer[] goodsCategoryIds;//商品分类数组（同一商品可多种分类）
 
-    @ApiModelProperty(name = "parentId", value = "上级id", dataType = "int",hidden = true)
-    private Integer parentId;//上级id
-
-    @ApiModelProperty(name = "goodsCategoryName", value = "类目名称", dataType = "String",hidden = true)
-    private String goodsCategoryName;//类目名称
-
-
-
-    //CartInfo
-    @ApiModelProperty(name = "cartInfoId", value = "购物车表ID", dataType = "int",hidden = true)
-    private Integer cartInfoId;//购物车表ID
-
-
-
     //CartDetail
-    @ApiModelProperty(name = "cartDetailId", value = "购物车明细表ID", dataType = "int",hidden = true)
-    private Integer cartDetailId;//购物车明细表ID
-
     @ApiModelProperty(name = "cartDetailIds", value = "购物车明细表ID数组", dataType = "int",hidden = true)
     private Integer[] cartDetailIds;//购物车明细表ID数组
-
-    @ApiModelProperty(name = "cartId", value = "购物车id", dataType = "int",hidden = true)
-    private Integer cartId;//购物车id
-
-    @ApiModelProperty(name = "count", value = "数量", dataType = "int",hidden = true)
-    private Integer count;//数量
-
 
     //条件查询
     @ApiModelProperty(name = "search", value = "搜索词条", dataType = "String",hidden = true)
@@ -184,17 +121,9 @@ public class GoodsParam{
     @ApiModelProperty(name = "quality", value = "品质", dataType = "int",hidden = true)
     private Integer quality;//品质 1：认证店铺 2：官方保真 3：高信誉度 4：我的关注
 
-
     //轮播图 BannerIndex
-    @ApiModelProperty(name = "bannerIndexId", value = "轮播图ID", dataType = "int",hidden = true)
-    private Integer bannerIndexId;//轮播图ID
-
     @ApiModelProperty(name = "businessId", value = "业务ID:商品ID/用户ID", dataType = "int",hidden = true)
     private Integer businessId;//业务ID:商品ID/用户ID
-
-    @ApiModelProperty(name = "jumpType", value = "跳转类型,0:商品 1：个人", dataType = "int",hidden = true)
-    private Integer jumpType;//跳转类型,0:商品 1：个人
-
 
     //Collect
     @ApiModelProperty(name = "collectIds", value = "收藏对象ID数组", dataType = "int",hidden = true)
@@ -203,14 +132,9 @@ public class GoodsParam{
     @ApiModelProperty(name = "collectType", value = "关注/收藏类型 1商品 2抢购 3视频 4专栏 5鉴赏", dataType = "int",hidden = true)
     private Integer collectType;//关注/收藏类型 1商品 2抢购 3视频 4专栏 5鉴赏
 
-
     //Appraisal
-    @ApiModelProperty(name = "opinion", value = "鉴定观点", dataType = "String",hidden = true)
-    private String opinion;//鉴定观点
-
     @ApiModelProperty(name = "detailId", value = "鉴定详情ID", dataType = "int",hidden = true)
     private Integer detailId;//鉴定详情ID
-
 
     //ReportGoods
     @ApiModelProperty(name = "reason", value = "举报原因", dataType = "String",hidden = true)
@@ -229,8 +153,8 @@ public class GoodsParam{
     @ApiModelProperty(name = "userIds", value = "邀请用户id数组", dataType = "int",hidden = true)
     private Integer[] userIds;//邀请用户id数组
 
-    @ApiModelProperty(name = "businessType", value = "业务类型 1商品详情、2抢购详情、3帖子详情、4全民鉴定详情、5视频详情、6专栏", dataType = "int",hidden = true)
-    private Integer businessType;//业务类型 1商品详情、2抢购详情、3帖子详情、4全民鉴定详情、5视频详情、6专栏
+    @ApiModelProperty(name = "businessType", value = "业务类型 1商品详情、2抢购详情、3帖子详情、4全民鉴定详情、5视频详情、6专栏 7积分商品", dataType = "int",hidden = true)
+    private Integer businessType;//业务类型 1商品详情、2抢购详情、3帖子详情、4全民鉴定详情、5视频详情、6专栏 7积分商品
 
     @ApiModelProperty(name = "payType", value = "支付类型 1微信 2支付宝 3余额 4小程序", dataType = "int",hidden = true)
     private Integer payType;//支付类型 1微信 2支付宝 3余额 4小程序

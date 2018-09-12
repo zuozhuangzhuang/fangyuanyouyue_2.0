@@ -23,7 +23,7 @@ public class PointGoodsServiceImpl implements PointGoodsService {
 
     @Override
     public List<PointGoodsDto> getPointGoods(Integer start, Integer limit) throws ServiceException {
-        List<PointGoods> list = pointGoodsMapper.selectList(start, limit);
+        List<PointGoods> list = pointGoodsMapper.selectList(start*limit, limit);
         return PointGoodsDto.toDtoList(list);
     }
 

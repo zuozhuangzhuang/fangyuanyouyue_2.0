@@ -741,7 +741,8 @@ public class UserInfoServiceImpl implements UserInfoService {
 	public Pager getPage(AdminUserParam param) {
 		
 		Integer total = userInfoMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
-		List<UserInfo> datas = userInfoMapper.getPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders());
+
+		List<UserInfo> datas = userInfoMapper.getPage(param.getStart()*param.getLimit(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
 		Pager pager = new Pager();
 		pager.setTotal(total);
 		pager.setDatas(AdminUserDto.toDtoList(datas));

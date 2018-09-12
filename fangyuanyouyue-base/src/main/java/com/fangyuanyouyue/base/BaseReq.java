@@ -1,5 +1,10 @@
 package com.fangyuanyouyue.base;
 
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.io.Serializable;
 
 /**
@@ -8,6 +13,9 @@ import java.io.Serializable;
  * @author wuzhimin
  *
  */
+@Getter
+@Setter
+@ToString
 public abstract class BaseReq implements Serializable {
 
 	/**
@@ -18,27 +26,13 @@ public abstract class BaseReq implements Serializable {
 	/**
 	 * 接口调用平台
 	 */
+	@ApiModelProperty(name = "platform", value = "接口调用平台", dataType = "String",hidden = true)
 	private String platform;
 
 	/**
 	 * APP版本号
 	 */
+	@ApiModelProperty(name = "appVersion", value = "APP版本号", dataType = "String",hidden = true)
 	private String appVersion;
-
-	public String getPlatform() {
-		return platform;
-	}
-
-	public void setPlatform(String platform) {
-		this.platform = platform;
-	}
-
-	public String getAppVersion() {
-		return appVersion;
-	}
-
-	public void setAppVersion(String appVersion) {
-		this.appVersion = appVersion;
-	}
 
 }

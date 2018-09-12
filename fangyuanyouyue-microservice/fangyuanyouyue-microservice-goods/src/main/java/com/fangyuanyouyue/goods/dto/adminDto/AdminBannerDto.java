@@ -1,13 +1,11 @@
-package com.fangyuanyouyue.goods.dto;
+package com.fangyuanyouyue.goods.dto.adminDto;
 
 import com.fangyuanyouyue.goods.model.BannerIndex;
-import com.fangyuanyouyue.goods.model.GoodsCorrelation;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -16,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-public class BannerIndexDto {
+public class AdminBannerDto {
     private Integer bannerId;//唯一自增ID
 
     private Integer businessId;//业务ID：例：商品id、视频id、积分商城商品id...
@@ -35,10 +33,10 @@ public class BannerIndexDto {
 
     private Integer status;//是否展示，1展示 2不展示
 
-    public BannerIndexDto() {
+    public AdminBannerDto() {
     }
 
-    public BannerIndexDto(BannerIndex bannerIndex) {
+    public AdminBannerDto(BannerIndex bannerIndex) {
         this.bannerId = bannerIndex.getId();
         this.businessId = bannerIndex.getBusinessId();
         this.jumpType = bannerIndex.getJumpType();
@@ -50,13 +48,13 @@ public class BannerIndexDto {
         this.status = bannerIndex.getStatus();
     }
 
-    public static List<BannerIndexDto> toDtoList(List<BannerIndex> list) {
+    public static List<AdminBannerDto> toDtoList(List<BannerIndex> list) {
         if (list == null) {
             return new ArrayList<>();
         }
-        List<BannerIndexDto> dtolist = new ArrayList<>();
+        List<AdminBannerDto> dtolist = new ArrayList<>();
         for (BannerIndex model : list) {
-            BannerIndexDto dto = new BannerIndexDto(model);
+            AdminBannerDto dto = new AdminBannerDto(model);
             dtolist.add(dto);
         }
         return dtolist;
