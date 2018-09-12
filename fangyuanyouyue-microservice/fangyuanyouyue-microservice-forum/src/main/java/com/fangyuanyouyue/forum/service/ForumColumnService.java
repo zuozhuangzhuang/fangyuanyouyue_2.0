@@ -19,12 +19,13 @@ public interface ForumColumnService {
 
 	/**
 	 * 获取全部专栏
+	 * @param typeId
 	 * @param start
 	 * @param limit
 	 * @return
 	 * @throws ServiceException
 	 */
-    List<ForumColumnTypeDto> getColumnList(Integer start,Integer limit) throws ServiceException;
+    List<ForumColumnTypeDto> getColumnList(Integer typeId,Integer start,Integer limit) throws ServiceException;
 
 	/**
 	 * 获取精选专栏

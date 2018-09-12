@@ -43,6 +43,7 @@ public class ForumColumnControllerTest {
     @Transactional
     public void columnList() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/column/list")
+                .param("typeId","")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

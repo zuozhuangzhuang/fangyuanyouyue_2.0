@@ -31,30 +31,41 @@ import java.util.List;
 @Transactional(rollbackFor=Exception.class)
 public class ForumColumnServiceImpl implements ForumColumnService {
 
-    @Autowired
-    private ForumColumnMapper forumColumnMapper;
-    @Autowired
+	@Autowired
+	private ForumColumnMapper forumColumnMapper;
+	@Autowired
 	private ForumColumnTypeMapper forumColumnTypeMapper;
-    @Autowired
+	@Autowired
 	private SchedualMessageService schedualMessageService;
-    @Autowired
+	@Autowired
 	private SchedualUserService schedualUserService;
-    @Autowired
+	@Autowired
 	private SchedualWalletService schedualWalletService;
-    @Autowired
+	@Autowired
 	private ForumColumnApplyMapper forumColumnApplyMapper;
-    @Autowired
+	@Autowired
 	private ColumnOrderMapper columnOrderMapper;
-    @Autowired
+	@Autowired
 	private ForumInfoService forumInfoService;
-    @Autowired
+	@Autowired
 	private ForumPvMapper forumPvMapper;
 
 	@Override
-	public List<ForumColumnTypeDto> getColumnList(Integer start, Integer limit) throws ServiceException {
-		List<ForumColumn> list = forumColumnMapper.selectPage(start*limit, limit);
-		List<ForumColumnDto> dtos = ForumColumnDto.toDtoList(list);
-		return ForumColumnTypeDto.toDtoList(dtos);
+	public List<ForumColumnTypeDto> getColumnList(Integer typeId,Integer start, Integer limit) throws ServiceException {
+		List<ForumColumnTypeDto> forumTypeList;
+		if(typeId == null){
+			forumTypeList = getForumTypeList();
+			for(ForumColumnTypeDto dto:forumTypeList){
+				List<ForumColumn> list = forumColumnMapper.selectPage(dto.getTypeId(),start*limit, limit);
+				List<ForumColumnDto> dtos = ForumColumnDto.toDtoList(list);
+				dto.setForumColumnList(dtos);
+			}
+		}else{
+			List<ForumColumn> list = forumColumnMapper.selectPage(typeId,start*limit, limit);
+			List<ForumColumnDto> dtos = ForumColumnDto.toDtoList(list);
+			forumTypeList = ForumColumnTypeDto.toDtoList(dtos);
+		}
+		return forumTypeList;
 	}
 
 	@Override
@@ -230,11 +241,11 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 		myColumnDto.setForumList(forumList);
 		return myColumnDto;
 	}
-	
+
 
 	@Override
 	public Pager getPage(BasePageReq param) {
-		
+
 		Integer total = forumColumnMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
 		List<ForumColumn> datas = forumColumnMapper.getPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders());
 		Pager pager = new Pager();
@@ -247,7 +258,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 
 	@Override
 	public Pager getPageApply(BasePageReq param) {
-		
+
 		Integer total = forumColumnApplyMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
 		List<ForumColumnApply> datas = forumColumnApplyMapper.getPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders());
 		Pager pager = new Pager();
@@ -256,5 +267,5 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 		return pager;
 	}
 
-	
+
 }
