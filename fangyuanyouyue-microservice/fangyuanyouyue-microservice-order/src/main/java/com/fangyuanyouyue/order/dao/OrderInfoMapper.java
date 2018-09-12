@@ -22,6 +22,13 @@ public interface OrderInfoMapper {
     int updateByPrimaryKey(OrderInfo record);
 
     /**
+     * 获取订单详情
+     * @param id
+     * @return
+     */
+    OrderInfo selectByPrimaryKeyDetail(Integer id);
+
+    /**
      * 获取未拆单订单列表
      * @param userId
      * @param start
@@ -82,4 +89,30 @@ public interface OrderInfoMapper {
      * @return
      */
     List<OrderInfo> selectByStatus(@Param("status")Integer status);
+
+    /**
+     * 分页总条数
+     * @param keyword
+     * @param status
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    Integer countPage(@Param("keyword")String keyword,@Param("status")Integer status,@Param("startDate")String startDate,@Param("endDate")String endDate);
+
+    /**
+     * 分页获取订单
+     * @param start
+     * @param limit
+     * @param keyword
+     * @param status
+     * @param startDate
+     * @param endDate
+     * @param orders
+     * @param ascType
+     * @return
+     */
+    List<OrderInfo> getOrderPage(@Param("start") Integer start,
+                                 @Param("limit") Integer limit,@Param("keyword")String keyword,@Param("status")Integer status,
+                                 @Param("startDate")String startDate,@Param("endDate")String endDate,@Param("orders")String orders,@Param("ascType")Integer ascType);
 }

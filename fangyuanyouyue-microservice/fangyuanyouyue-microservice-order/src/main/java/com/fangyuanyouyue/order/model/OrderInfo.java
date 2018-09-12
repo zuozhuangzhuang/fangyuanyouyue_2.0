@@ -25,7 +25,7 @@ public class OrderInfo {
 
     private Integer count;//商品总数
 
-    private Integer status;//状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除
+    private Integer status;//状态 1待支付 2待发货 3待收货 4已完成 5已取消
 
     private Date addTime;//添加时间
 
@@ -39,5 +39,12 @@ public class OrderInfo {
 
     private Date receiveTime;//收货时间
 
+    private String nickName;//用户昵称
+
+    private String headImgUrl;//用户头像
+
+    private Integer sellerIsDelete;//卖家是否删除 1是 2否
+
+    private Integer buyerIsDelete;//买家是否删除 1是 2否
     //卖家处理时间 平台处理时间
 }

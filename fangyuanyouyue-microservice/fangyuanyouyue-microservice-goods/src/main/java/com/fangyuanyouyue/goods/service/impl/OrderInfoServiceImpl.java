@@ -27,17 +27,6 @@ public class OrderInfoServiceImpl implements OrderInfoService{
     @Autowired
     private OrderRefundMapper orderRefundMapper;
 
-    @Override
-    public OrderInfo selectOrderByGoodsId(Integer userId,Integer goodsId) throws ServiceException {
-
-        OrderDetail orderDetail = orderDetailMapper.getByUserIdGoodsId(userId, goodsId);
-        if(orderDetail != null){
-            OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderDetail.getOrderId());
-            return orderInfo;
-        }else{
-            throw new ServiceException("订单信息错误！");
-        }
-    }
 
     @Override
     public OrderRefund seletRefundByOrderId(Integer orderId) throws ServiceException {

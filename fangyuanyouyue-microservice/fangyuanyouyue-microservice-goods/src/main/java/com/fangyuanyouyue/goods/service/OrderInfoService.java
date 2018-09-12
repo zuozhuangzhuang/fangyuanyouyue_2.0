@@ -5,14 +5,6 @@ import com.fangyuanyouyue.goods.model.OrderInfo;
 import com.fangyuanyouyue.goods.model.OrderRefund;
 
 public interface OrderInfoService {
-    /**
-     * 根据商品ID获取订单
-     * @param userId
-     * @param goodsId
-     * @return
-     * @throws ServiceException
-     */
-    OrderInfo selectOrderByGoodsId(Integer userId,Integer goodsId) throws ServiceException;
 
     /**
      * 获取退货详情

@@ -342,7 +342,7 @@
   <select id="selectByOrderId" parameterType="Integer" resultMap="BaseResultMap">
     select * from order_pay
     <where>
-      status <![CDATA[ <> ]]> 6
+      1=1
       <if test="orderId != null">
         and order_id = #{orderId,jdbcType=INTEGER}
       </if>
