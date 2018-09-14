@@ -14,8 +14,8 @@ public enum StatusEnum {
 	ADDRESS_OTHER(2),
 	
 	
-	AUTH_ACCEPT(1),
-	AUTH_REJECT(2),
+	AUTH_ACCEPT(2),
+	AUTH_REJECT(3),
 	
 	;
 	
