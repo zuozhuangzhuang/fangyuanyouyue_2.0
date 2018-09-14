@@ -33,4 +33,7 @@ public class IdentityAuthApply {
 
     private Date updateTime;//更新时间
 
+    private String phone;//手机号码
+
+    private String nickName;//昵称
 }

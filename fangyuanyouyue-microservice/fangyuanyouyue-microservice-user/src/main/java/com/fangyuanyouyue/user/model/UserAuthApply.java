@@ -6,7 +6,7 @@ import lombok.ToString;
 
 import java.util.Date;
 /**
- * 官方认证申请表
+ * 认证店铺申请表
  */
 @Getter
 @Setter
@@ -27,9 +27,5 @@ public class UserAuthApply {
     private Date addTime;//申请时间
 
     private Date updateTime;//更新时间
-    
-    private String identity;
-
-    private String name;
 
 }

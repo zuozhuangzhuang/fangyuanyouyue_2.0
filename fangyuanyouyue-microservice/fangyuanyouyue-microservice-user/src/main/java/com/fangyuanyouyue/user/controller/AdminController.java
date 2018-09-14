@@ -2,6 +2,7 @@ package com.fangyuanyouyue.user.controller;
 
 import java.io.IOException;
 
+import com.fangyuanyouyue.user.service.UserInfoExtService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -18,8 +19,6 @@ import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.user.param.AdminUserParam;
-import com.fangyuanyouyue.user.service.UserAuthApplyService;
-import com.fangyuanyouyue.user.service.UserAuthOrderService;
 import com.fangyuanyouyue.user.service.UserInfoService;
 
 import io.swagger.annotations.Api;
@@ -37,9 +36,7 @@ public class AdminController extends BaseController {
     @Autowired
     private UserInfoService userInfoService;
     @Autowired
-    private UserAuthApplyService userAuthApplyService;
-    @Autowired
-    private UserAuthOrderService userAuthOrderService;
+    private UserInfoExtService userInfoExtService;
 
     @ApiOperation(value = "用户列表", notes = "用户列表",response = BaseResp.class)
     @ApiImplicitParams({
@@ -95,12 +92,22 @@ public class AdminController extends BaseController {
 
 
 
-    @ApiOperation(value = "用户列表", notes = "用户列表",response = BaseResp.class)
+    @ApiOperation(value = "实名认证列表", notes = "实名认证列表",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "keyword", value = "搜索词条", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "实名认证状态 1申请 2通过 3未通过", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "startDate", value = "开始日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "endDate", value = "结束日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orders", value = "排序规则", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "ascType", value = "排序类型 1升序 2降序", required = false, dataType = "int", paramType = "query")
+    })
     @GetMapping(value = "/auth/list")
     @ResponseBody
     public BaseResp authList(BasePageReq param) throws IOException {
         try {
-            log.info("后台管理查看认证列表");
+            log.info("实名认证列表");
         	log.info("参数："+param.toString());
             if(param.getStart() == null || param.getStart() < 0){
                 return toError("起始页数错误！");
@@ -108,7 +115,7 @@ public class AdminController extends BaseController {
             if(param.getLimit() == null || param.getLimit() < 1){
                 return toError("每页个数错误！");
             }
-        	Pager pager = userAuthApplyService.getPage(param);
+        	Pager pager = userInfoExtService.getExtAuthPage(param);
             return toPage(pager);
         }catch (Exception e) {
             e.printStackTrace();
@@ -116,26 +123,25 @@ public class AdminController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "修改认证状态", notes = "修改认证状态",response = BaseResp.class)
+    @ApiOperation(value = "修改实名认证状态", notes = "修改认证状态",response = BaseResp.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "status", value = "1同意 2拒绝",  required = true,dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "id", value = "申请信息id", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "处理状态 2同意 3拒绝",  required = true,dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/auth/status")
     @ResponseBody
     public BaseResp authApplyStatus(AdminUserParam param) throws IOException {
         try {
-            log.info("后台管理修改用户");
+            log.info("修改实名认证状态");
         	log.info(param.toString());
-        	if(param.getStatus().equals(1)) {
-        		userAuthApplyService.updateAccept(param.getId());
-        	}else if(param.getStatus().equals(2)) {
-        		userAuthApplyService.updateReject(param.getId(), "");
-        	}else {
+            if(param.getId() == null){
+                return toError("申请信息id不能为空");
+            }
+            if(param.getStatus() == null){
+                return toError("处理状态不能为空");
+            }
+            userInfoExtService.updateExtAuth(param.getId(),param.getStatus(),param.getContent());
 
-                return toError("状态不对！");
-        	}
-        	
 
             return toSuccess();
         }catch (Exception e) {
@@ -145,10 +151,17 @@ public class AdminController extends BaseController {
     }
 
 
-
-
-
     @ApiOperation(value = "认证店铺列表", notes = "认证店铺列表",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "keyword", value = "搜索词条", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "认证店铺状态 1申请 2认证 3未认证", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "startDate", value = "开始日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "endDate", value = "结束日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orders", value = "排序规则", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "ascType", value = "排序类型 1升序 2降序", required = false, dataType = "int", paramType = "query")
+    })
     @GetMapping(value = "/auth/order/list")
     @ResponseBody
     public BaseResp authOrderList(BasePageReq param) throws IOException {
@@ -161,7 +174,7 @@ public class AdminController extends BaseController {
             if(param.getLimit() == null || param.getLimit() < 1){
                 return toError("每页个数错误！");
             }
-        	Pager pager = userAuthOrderService.getPage(param);
+        	Pager pager = userInfoExtService.getShopAuthPage(param);
             return toPage(pager);
         }catch (Exception e) {
             e.printStackTrace();
@@ -170,26 +183,25 @@ public class AdminController extends BaseController {
     }
 
 
-    @ApiOperation(value = "修改认证状态", notes = "修改认证状态",response = BaseResp.class)
+    @ApiOperation(value = "修改认证店铺状态", notes = "修改认证状态",response = BaseResp.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "status", value = "1同意 2拒绝",  required = true,dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "id", value = "申请信息id", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "处理状态 2同意 3拒绝",  required = true,dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/auth/order/status")
     @ResponseBody
     public BaseResp authOrderStatus(AdminUserParam param) throws IOException {
         try {
-            log.info("后台管理修改用户");
+            log.info("修改认证店铺状态");
         	log.info(param.toString());
-        	if(param.getStatus().equals(1)) {
-        		userAuthOrderService.updateAccept(param.getId());
-        	}else if(param.getStatus().equals(2)) {
-        		userAuthOrderService.updateReject(param.getId(), "");
-        	}else {
+        	if(param.getId() == null){
+        	    return toError("申请信息id不能为空");
+            }
+            if(param.getStatus() == null){
+        	    return toError("处理状态不能为空");
+            }
+            userInfoExtService.updateShopAuth(param.getId(),param.getStatus(),param.getContent());
 
-                return toError("状态不对！");
-        	}
-        	
 
             return toSuccess();
         }catch (Exception e) {
