@@ -1,15 +1,18 @@
 package com.fangyuanyouyue.forum.service.impl;
 
-import java.util.Date;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.forum.dao.AppraisalDetailMapper;
 import com.fangyuanyouyue.forum.dao.AppraisalLikesMapper;
+import com.fangyuanyouyue.forum.model.AppraisalDetail;
 import com.fangyuanyouyue.forum.model.AppraisalLikes;
 import com.fangyuanyouyue.forum.service.AppraisalLikesService;
+import com.fangyuanyouyue.forum.service.SchedualWalletService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
 
 
 @Service(value = "appraisalLikesService")
@@ -18,6 +21,10 @@ public class AppraisalLikesServiceImpl implements AppraisalLikesService {
 	
 	@Autowired
 	private AppraisalLikesMapper appraisalLikesMapper;
+	@Autowired
+	private SchedualWalletService schedualWalletService;
+	@Autowired
+	private AppraisalDetailMapper appraisalDetailMapper;
 
 	@Override
 	public Integer countLikes(Integer appraisalId) throws ServiceException {
@@ -35,8 +42,10 @@ public class AppraisalLikesServiceImpl implements AppraisalLikesService {
 				appraisalLikes.setAddTime(new Date());
 				appraisalLikes.setUserId(userId);
 				appraisalLikes.setAppraisalId(appraisalId);
-
 				appraisalLikesMapper.insert(appraisalLikes);
+				//增加用户行为
+				AppraisalDetail detail = appraisalDetailMapper.selectByPrimaryKey(appraisalId);
+				schedualWalletService.addUserBehavior(userId,detail.getUserId(),appraisalId, Status.BUSINESS_TYPE_APPRAISAL.getValue(),Status.BEHAVIOR_TYPE_LIKES.getValue());
 			}
 		}else if(type == 2){
 			if(appraisalLikes == null){

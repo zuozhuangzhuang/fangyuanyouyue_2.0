@@ -32,4 +32,9 @@ public class SchedualWalletServiceImpl implements SchedualWalletService{
     public String cancelVip() {
         return "会员自动到期";
     }
+
+    @Override
+    public String addUserBehavior(Integer userId, Integer toUserId, Integer businessId, Integer businessType, Integer type) {
+        return "新增用户行为失败！";
+    }
 }

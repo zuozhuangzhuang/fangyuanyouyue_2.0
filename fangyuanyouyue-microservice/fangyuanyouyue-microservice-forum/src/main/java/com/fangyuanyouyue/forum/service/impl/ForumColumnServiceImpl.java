@@ -6,6 +6,7 @@ import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
@@ -111,14 +112,13 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 
 				StringBuffer payInfo = new StringBuffer();
 				//支付
-				if(payType.intValue() == 1){//微信,如果回调失败就不做处理，成功就在回调接口中继续生成全民鉴定
+				if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
 					WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.column_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
 					return wechatPayDto;
-				}else if(payType.intValue() == 2){//支付宝,如果回调失败就不做处理，成功就在回调接口中继续生成全民鉴定
+				}else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
 					String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.column_alipay_notify.getNotifUrl())).getString("data");
 					payInfo.append(info);
-				}else if(payType.intValue() == 3) {//余额
-					//验证支付密码
+				}else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()) {
 					Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
 					if (!verifyPayPwd) {
 						throw new ServiceException("支付密码错误！");
@@ -132,7 +132,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 					payInfo.append("余额支付成功！");
 					//生成申请记录
 					applyColumn(columnOrder.getOrderNo(), null, 3);
-				}else if(payType.intValue() == 4){//小程序支付
+				}else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
 					WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.mini_test_notify.getNotifUrl()+NotifyUrl.column_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
 					return wechatPayDto;
 				}else{

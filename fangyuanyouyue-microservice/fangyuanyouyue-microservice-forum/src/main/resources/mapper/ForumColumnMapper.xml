@@ -229,7 +229,7 @@
     </if>
     
     <if test="orders != null">
-      order by #{orders}
+      order by ${orders}
     </if>
     limit #{start},#{limit}
   </select>

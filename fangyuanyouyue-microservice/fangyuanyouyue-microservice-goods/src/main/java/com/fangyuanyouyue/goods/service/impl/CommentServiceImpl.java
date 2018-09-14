@@ -1,28 +1,29 @@
 package com.fangyuanyouyue.goods.service.impl;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import com.fangyuanyouyue.base.enums.Status;
+import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.goods.dao.CommentLikesMapper;
+import com.fangyuanyouyue.goods.dao.GoodsCommentMapper;
 import com.fangyuanyouyue.goods.dao.GoodsImgMapper;
 import com.fangyuanyouyue.goods.dao.GoodsInfoMapper;
+import com.fangyuanyouyue.goods.dto.GoodsCommentDto;
 import com.fangyuanyouyue.goods.model.CommentLikes;
+import com.fangyuanyouyue.goods.model.GoodsComment;
 import com.fangyuanyouyue.goods.model.GoodsImg;
 import com.fangyuanyouyue.goods.model.GoodsInfo;
+import com.fangyuanyouyue.goods.param.GoodsParam;
+import com.fangyuanyouyue.goods.service.CommentService;
 import com.fangyuanyouyue.goods.service.SchedualMessageService;
+import com.fangyuanyouyue.goods.service.SchedualWalletService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.base.util.DateStampUtils;
-import com.fangyuanyouyue.goods.dao.GoodsCommentMapper;
-import com.fangyuanyouyue.goods.dto.GoodsCommentDto;
-import com.fangyuanyouyue.goods.model.GoodsComment;
-import com.fangyuanyouyue.goods.param.GoodsParam;
-import com.fangyuanyouyue.goods.service.CommentService;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 @Service(value = "commentService")
 @Transactional(rollbackFor=Exception.class)
@@ -37,6 +38,8 @@ public class CommentServiceImpl implements CommentService{
     private GoodsImgMapper goodsImgMapper;
     @Autowired
     private SchedualMessageService schedualMessageService;
+    @Autowired
+    private SchedualWalletService schedualWalletService;
 
     @Override
     public Integer addComment(GoodsParam param) throws ServiceException {
@@ -67,6 +70,14 @@ public class CommentServiceImpl implements CommentService{
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(param.getGoodsId());
         schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
                 "您的"+(goodsInfo.getType() == 1?"商品【":"抢购【")+goodsInfo.getName()+"】有新的评论，点击此处前往查看吧","8","3",goodsComment.getId().toString());
+        if(param.getCommentId() != null){
+            //回复
+            GoodsComment comment = goodsCommentMapper.selectByPrimaryKey(param.getCommentId());
+            schedualWalletService.addUserBehavior(param.getUserId(),comment.getUserId(),param.getCommentId(), Status.BUSINESS_TYPE_GOODS_COMMENT.getValue(),Status.BEHAVIOR_TYPE_COMMENT.getValue());
+        }else{
+            //评论商品
+            schedualWalletService.addUserBehavior(param.getUserId(),goodsInfo.getUserId(),param.getGoodsId(),Status.BUSINESS_TYPE_GOODS.getValue(),Status.BEHAVIOR_TYPE_COMMENT.getValue());
+        }
         return goodsComment.getId();
     }
 
@@ -91,6 +102,8 @@ public class CommentServiceImpl implements CommentService{
                     //更新点赞数
                     goodsComment.setLikesCount(goodsComment.getLikesCount()+1);
                     goodsCommentMapper.updateByPrimaryKey(goodsComment);
+                    schedualWalletService.addUserBehavior(userId,goodsComment.getUserId(),goodsComment.getId(),Status.BUSINESS_TYPE_GOODS_COMMENT.getValue(),Status.BEHAVIOR_TYPE_LIKES.getValue());
+
                 }
             }else if(type == 2){//取消点赞
                 if(commentLikes != null){

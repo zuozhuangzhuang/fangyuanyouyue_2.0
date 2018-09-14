@@ -39,6 +39,8 @@ public class FeignController extends BaseController{
     private SchedualOrderService schedualOrderService;
     @Autowired
     private UserCouponService userCouponService;
+    @Autowired
+    private UserBehaviorService userBehaviorService;
 
 
     @PostMapping(value = "/updateScore")
@@ -289,6 +291,39 @@ public class FeignController extends BaseController{
             //根据优惠券id计算价格
             BigDecimal priceByCoupon = userCouponService.getPriceByCoupon(userId,price, couponId);
             return toSuccess(priceByCoupon);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "新增用户行为", notes = "新增用户行为，并增加积分、信誉度、发送关注信息",hidden = true)
+    @PostMapping(value = "/addUserBehavior")
+    @ResponseBody
+    public BaseResp addUserBehavior(Integer userId,Integer toUserId, Integer businessId, Integer businessType, Integer type) throws IOException {
+        try {
+            log.info("----》新增用户行为《----");
+            if(userId == null){
+                return toError("用户id不能为空！");
+            }
+            if(toUserId == null){
+                return toError("行为对象用户id不能为空！");
+            }
+            if(businessId == null){
+                return toError("对象id不能为空！");
+            }
+            if(businessType == null){
+                return toError("对象类型不能为空！");
+            }
+            if(type == null){
+                return toError("行为类型不能为空！");
+            }
+            //新增用户行为
+            userBehaviorService.addUserBehavior(userId,toUserId,businessId,businessType,type);
+            return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());

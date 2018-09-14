@@ -20,4 +20,11 @@ public interface ScoreService {
      * @throws ServiceException
      */
     String lottery(Integer userId) throws ServiceException;
+
+    /**
+     * 分享增加积分
+     * @param userId
+     * @throws ServiceException
+     */
+    void shareHtml(Integer userId) throws ServiceException;
 }

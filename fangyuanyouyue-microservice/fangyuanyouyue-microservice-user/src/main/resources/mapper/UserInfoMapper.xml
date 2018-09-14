@@ -368,7 +368,7 @@
       </if>
     </where>
     <if test="orders != null">
-      order by #{orders}
+      order by ${orders}
       <if test="ascType != null and ascType == 2">
         desc
       </if>

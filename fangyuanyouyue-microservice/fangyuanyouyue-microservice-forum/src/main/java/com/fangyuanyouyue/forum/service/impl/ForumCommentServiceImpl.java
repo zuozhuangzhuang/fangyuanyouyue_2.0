@@ -5,10 +5,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.forum.dao.ForumInfoMapper;
 import com.fangyuanyouyue.forum.dto.MyForumCommentDto;
 import com.fangyuanyouyue.forum.model.ForumInfo;
 import com.fangyuanyouyue.forum.service.SchedualMessageService;
+import com.fangyuanyouyue.forum.service.SchedualWalletService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +38,8 @@ public class ForumCommentServiceImpl implements ForumCommentService {
 	private SchedualMessageService schedualMessageService;
     @Autowired
 	private ForumInfoMapper forumInfoMapper;
+    @Autowired
+	private SchedualWalletService schedualWalletService;
 
 	@Override
 	public Integer countComment(Integer forumId) {
@@ -88,6 +94,9 @@ public class ForumCommentServiceImpl implements ForumCommentService {
 			schedualMessageService.easemobMessage(forumInfo.getUserId().toString(),
 					"您的视频【"+forumInfo.getTitle()+"】有新的评论，点击此处前往查看吧","10","3",forumId.toString());
 		}
+		//新增用户行为
+		schedualWalletService.addUserBehavior(userId,forumInfo.getUserId(),forumId, Status.BUSINESS_TYPE_FORUM.getValue(),Status.BEHAVIOR_TYPE_COMMENT.getValue());
+
 		ForumCommentDto dto = new ForumCommentDto(model);
 
 		Integer likesCount = forumCommentLikesMapper.countById(dto.getCommentId());

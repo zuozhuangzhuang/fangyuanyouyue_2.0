@@ -58,9 +58,9 @@ public class UserDto {
 
     private Integer creditLevel;//信誉度等级 1差 2低 3中 4高 5优
 
-    private Integer authType;//认证状态 0申请中 1已认证 2未认证
+    private Integer authType;//认证店铺状态 1申请 2认证 3未认证
 
-    private Integer extStatus;//实名登记状态 0申请中 1已实名 2未实名
+    private Integer extStatus;//实名认证状态 1申请 2通过 3未通过
 
     private Integer isPayPwd;//是否已设置支付密码 1是 2否
 
@@ -68,56 +68,6 @@ public class UserDto {
 
     private Integer isLoginPwd;//是否已设置登录密码 1是 2否
 
-    /**
-     * ↓↓↓↓↓↓↓注释掉不需要返回的属性↓↓↓↓↓↓↓
-     *
-     */
-
-//    private Integer vipType;//会员类型 1体验会员 2月会员 3年会员
-
-//    private String vipStartTime;//会员开通时间
-
-//    private String vipEndTime;//会员过期时间
-
-//    private String levelDesc;//等级描述
-
-//    private Integer identityStatus;//实名认证状态 1申请 2通过 3拒绝
-    //UserAddressDto
-//    private UserAddressDto defaultAddress;//用户默认收货地址
-
-    //UserWallet
-//    private Integer score;//用户积分
-    //UserInfoExt 用户扩展表
-
-//    private Long credit;//信誉度
-
-    //IdentityAuthApply
-//    private String identityImgCover;//身份证封面图
-
-//    private String identityImgBack;//身份证背面
-
-//    private String identityRejectDesc;//拒绝原因
-
-
-
-    //UserThirdParty
-//    private Integer thirdType;//类型 1微信 2QQ 3微博
-
-//    private String unionId;//第三方唯一ID
-
-//    private String appOpenId;//微信app openid
-
-//    private String mpOpenId;//公众号openid
-
-//    private String miniOpenId;//小程序openid
-
-//    private String identity;//身份证号码
-
-//    private String name;//真实姓名
-
-    /**
-     * ↑↑↑↑↑↑注释掉不需要返回的属性↑↑↑↑↑↑
-     */
 
     public UserDto() {
     }

@@ -12,6 +12,8 @@
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="add_time" property="addTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, user_id, name, identity, identity_img_cover, identity_img_back, reject_desc, 
@@ -154,4 +156,59 @@
   <select id="selectByUserId" parameterType="Integer" resultMap="BaseResultMap">
     select * from identity_auth_apply where user_id = #{userId,jdbcType=INTEGER} and status <![CDATA[ <> ]]> 3
   </select>
+
+
+  <select id="countPage" parameterType="Integer" resultType="Integer">
+    select count(*) from user_auth_order a,user_info b where a.user_id=b.id
+    <if test="keyword != null">
+      and (
+      b.phone like "%"#{keyword,jdbcType=VARCHAR}"%"
+      or b.nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
+      )
+    </if>
+    <if test="status != null">
+      and a.status = #{status}
+    </if>
+    <if test="startDate != null">
+      and a.add_time <![CDATA[ > ]]> #{startDate}
+    </if>
+
+    <if test="endDate != null">
+      and a.add_time <![CDATA[ <= ]]> #{endDate}
+    </if>
+
+  </select>
+
+
+  <select id="getPage" resultMap="BaseResultMap">
+    select a.*,b.nick_name,b.phone from identity_auth_apply a,user_info b where a.user_id=b.id
+    <if test="keyword != null">
+      and (
+      b.phone like "%"#{keyword,jdbcType=VARCHAR}"%"
+      or b.nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
+      or a.identity like "%"#{keyword,jdbcType=VARCHAR}"%"
+      or a.name like "%"#{keyword,jdbcType=VARCHAR}"%"
+      )
+    </if>
+    <if test="status != null">
+      and a.status = #{status}
+    </if>
+
+    <if test="startDate != null">
+      and a.add_time <![CDATA[ > ]]> #{startDate}
+    </if>
+
+    <if test="endDate != null">
+      and a.add_time <![CDATA[ <= ]]> #{endDate}
+    </if>
+
+    <if test="orders != null">
+      order by a.${orders}
+      <if test="ascType != null and ascType == 2">
+        desc
+      </if>
+    </if>
+    limit #{start},#{limit}
+  </select>
+
 </mapper>

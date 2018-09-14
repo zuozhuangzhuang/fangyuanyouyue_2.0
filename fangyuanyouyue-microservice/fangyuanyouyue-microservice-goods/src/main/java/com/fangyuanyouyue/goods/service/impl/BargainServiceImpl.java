@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.IdGenerator;
@@ -100,13 +101,13 @@ public class BargainServiceImpl implements BargainService{
                 bargainOrderMapper.insert(bargainOrder);
 
                 StringBuffer payInfo = new StringBuffer();
-                if(payType.intValue() == 1){//微信,如果回调失败就不做处理，成功就在回调接口中继续订单支付
+                if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
                     WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(bargainOrder.getOrderNo(), bargainOrder.getAmount(),NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.bargain_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
                     return wechatPayDto;
-                }else if(payType.intValue() == 2){//支付宝,如果回调失败就不做处理，成功就在回调接口中继续订单支付
+                }else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
                     String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(bargainOrder.getOrderNo(), bargainOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.bargain_alipay_notify.getNotifUrl())).getString("data");
                     payInfo.append(info);
-                }else if(payType == 3){
+                }else if(payType == Status.PAY_TYPE_BALANCE.getValue()){
                     if(StringUtils.isEmpty(payPwd)){
                         throw new ServiceException("支付密码不能为空！");
                     }
@@ -115,8 +116,6 @@ public class BargainServiceImpl implements BargainService{
                     if(!verifyPayPwd){
                         throw new ServiceException("支付密码错误！");
                     }else{
-                        //压价时扣除用户余额，如果余额不足就不可以议价
-                        //调用wallet-service修改余额功能
                         BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, bargainOrder.getAmount(), 2)), BaseResp.class);
                         if(baseResp.getCode() == 1){
                             throw new ServiceException(baseResp.getReport().toString());
@@ -124,8 +123,7 @@ public class BargainServiceImpl implements BargainService{
                         payInfo.append("余额支付成功");
                         updateOrder(bargainOrder.getOrderNo(),null,3);
                     }
-                }else if(payType.intValue() == 4){
-                    //小程序支付
+                }else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
                     WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,bargainOrder.getOrderNo(), bargainOrder.getAmount(),NotifyUrl.mini_test_notify.getNotifUrl()+NotifyUrl.bargain_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
                     return wechatPayDto;
                 }else{

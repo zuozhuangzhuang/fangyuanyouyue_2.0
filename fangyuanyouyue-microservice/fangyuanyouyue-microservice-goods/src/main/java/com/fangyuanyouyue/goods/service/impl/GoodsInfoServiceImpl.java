@@ -2,6 +2,9 @@ package com.fangyuanyouyue.goods.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.Pager;
+import com.fangyuanyouyue.base.enums.Credit;
+import com.fangyuanyouyue.base.enums.Status;
+import com.fangyuanyouyue.base.enums.Score;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
@@ -11,10 +14,7 @@ import com.fangyuanyouyue.goods.dto.adminDto.AdminGoodsDto;
 import com.fangyuanyouyue.goods.model.*;
 import com.fangyuanyouyue.goods.param.AdminGoodsParam;
 import com.fangyuanyouyue.goods.param.GoodsParam;
-import com.fangyuanyouyue.goods.service.BargainService;
-import com.fangyuanyouyue.goods.service.GoodsInfoService;
-import com.fangyuanyouyue.goods.service.SchedualMessageService;
-import com.fangyuanyouyue.goods.service.SchedualUserService;
+import com.fangyuanyouyue.goods.service.*;
 import com.github.pagehelper.PageHelper;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +63,8 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     private SchedualMessageService schedualMessageService;
     @Autowired
     private GoodsIntervalHistoryMapper goodsIntervalHistoryMapper;
+    @Autowired
+    private SchedualWalletService schedualWalletService;
 
     @Override
     public GoodsInfo selectByPrimaryKey(Integer id) throws ServiceException{
@@ -148,7 +150,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             }
         }
         goodsInfo.setAddTime(DateStampUtils.getTimesteamp());
-        if(param.getType() == 2){
+        if(param.getType() == Status.AUCTION.getValue()){
             goodsInfo.setFloorPrice(param.getFloorPrice());
             goodsInfo.setIntervalTime(param.getIntervalTime());
             goodsInfo.setMarkdown(param.getMarkdown());
@@ -175,6 +177,13 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             }else{
                 saveGoodsPicOne(goodsInfo.getId(),param.getImgUrls()[i],2,i+1);
             }
+        }
+        //增加积分、信誉度
+        schedualWalletService.updateScore(param.getUserId(), Score.ADD_GOODSINFO.getScore(),Status.ADD.getValue());
+        if(param.getType() == Status.GOODS.getValue()){
+            schedualWalletService.updateCredit(param.getUserId(), Credit.ADD_GOODSINFO.getCredit(),Status.ADD.getValue());
+        }else{
+            schedualWalletService.updateCredit(param.getUserId(), Credit.ADD_AUCTION.getCredit(),Status.ADD.getValue());
         }
         //给被邀请的用户发送信息 邀请我：用户“用户昵称”上传商品【商品名称】时邀请了您！点击此处前往查看吧
         //邀请我：用户“用户昵称”上传抢购【抢购名称】时邀请了您！点击此处前往查看吧
