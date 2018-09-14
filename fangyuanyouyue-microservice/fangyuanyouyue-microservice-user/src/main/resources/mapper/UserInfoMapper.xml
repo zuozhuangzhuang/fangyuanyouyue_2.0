@@ -304,12 +304,15 @@
       
     where id = #{id,jdbcType=INTEGER}
   </update>
+
   <select id="getUserByNickName" parameterType="String" resultMap="BaseResultMap">
     select * from user_info where nick_name = #{nickName,jdbcType=VARCHAR} and status <![CDATA[ <> ]]> 3
   </select>
+
   <select id="getUserByPhone" parameterType="String" resultMap="BaseResultMap">
     select * from user_info where phone = #{phone,jdbcType=VARCHAR} and status <![CDATA[ <> ]]> 3
   </select>
+
   <select id="shopList" resultType="Map">
     select a.*,b.*,c.* from user_info a,user_info_ext b,user_vip c where a.id = b.user_id and a.id = c.user_id and b.status = 1 and a.status <![CDATA[ <> ]]> 3
     <if test="nickName != null">
@@ -318,7 +321,7 @@
     <if test="authType != null">
       and b.auth_type = #{authType}
     </if>
-    order by c.vip_level desc,c.vip_type desc,b.auth_type limit #{start},#{limit}
+    order by c.vip_level desc,c.vip_type desc,b.auth_type,b.credit desc limit #{start},#{limit}
   </select>
   
   <select id="countPage" parameterType="Integer" resultType="Integer">
