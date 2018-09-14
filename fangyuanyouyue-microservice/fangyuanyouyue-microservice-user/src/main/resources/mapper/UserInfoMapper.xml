@@ -314,7 +314,11 @@
   </select>
 
   <select id="shopList" resultType="Map">
-    select a.*,b.*,c.* from user_info a,user_info_ext b,user_vip c where a.id = b.user_id and a.id = c.user_id and b.status = 1 and a.status <![CDATA[ <> ]]> 3
+    select a.*,b.*,c.* from user_info a,user_info_ext b,user_vip c 
+    where a.id = b.user_id 
+    and a.id = c.user_id 
+    and b.status = 2 
+    and a.status <![CDATA[ <> ]]> 3
     <if test="nickName != null">
       and a.nick_name like "%"#{nickName,jdbcType=VARCHAR}"%"
     </if>
@@ -383,7 +387,7 @@
     <if test="nickName != null">
       and a.nick_name like "%"#{nickName,jdbcType=VARCHAR}"%"
     </if>
-    order by c.vip_level desc,c.vip_type desc,b.auth_type
+    order by c.vip_level desc,c.vip_type desc
     <if test="start != null and limit != null">
       limit #{start},#{limit}
     </if>
