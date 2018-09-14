@@ -15,10 +15,14 @@
     <result column="is_refund" jdbcType="INTEGER" property="isRefund" />
     <result column="receive_time" jdbcType="TIMESTAMP" property="receiveTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="seller_is_delete" jdbcType="INTEGER" property="sellerIsDelete" />
+    <result column="buyer_is_delete" jdbcType="INTEGER" property="buyerIsDelete" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+    <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, main_order_id, order_no, amount, count, status, add_time, seller_id, 
-    is_resolve, is_refund, receive_time, update_time
+    is_resolve, is_refund, receive_time, update_time, seller_is_delete, buyer_is_delete
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -35,12 +39,14 @@
       order_no, amount, count, 
       status, add_time, seller_id, 
       is_resolve, is_refund, receive_time, 
-      update_time)
+      update_time, seller_is_delete, buyer_is_delete
+      )
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{mainOrderId,jdbcType=INTEGER}, 
       #{orderNo,jdbcType=VARCHAR}, #{amount,jdbcType=DECIMAL}, #{count,jdbcType=INTEGER}, 
       #{status,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, #{sellerId,jdbcType=INTEGER}, 
       #{isResolve,jdbcType=INTEGER}, #{isRefund,jdbcType=INTEGER}, #{receiveTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP})
+      #{updateTime,jdbcType=TIMESTAMP}, #{sellerIsDelete,jdbcType=INTEGER}, #{buyerIsDelete,jdbcType=INTEGER}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.fangyuanyouyue.order.model.OrderInfo" useGeneratedKeys="true" keyProperty="id">
     insert into order_info
@@ -84,6 +90,12 @@
       <if test="updateTime != null">
         update_time,
       </if>
+      <if test="sellerIsDelete != null">
+        seller_is_delete,
+      </if>
+      <if test="buyerIsDelete != null">
+        buyer_is_delete,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -124,6 +136,12 @@
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sellerIsDelete != null">
+        #{sellerIsDelete,jdbcType=INTEGER},
+      </if>
+      <if test="buyerIsDelete != null">
+        #{buyerIsDelete,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -166,6 +184,12 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="sellerIsDelete != null">
+        seller_is_delete = #{sellerIsDelete,jdbcType=INTEGER},
+      </if>
+      <if test="buyerIsDelete != null">
+        buyer_is_delete = #{buyerIsDelete,jdbcType=INTEGER},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -182,14 +206,20 @@
       is_resolve = #{isResolve,jdbcType=INTEGER},
       is_refund = #{isRefund,jdbcType=INTEGER},
       receive_time = #{receiveTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      seller_is_delete = #{sellerIsDelete,jdbcType=INTEGER},
+      buyer_is_delete = #{buyerIsDelete,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
+  <select id="selectByPrimaryKeyDetail" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select a.*,b.nick_name,b.head_img_url from order_info a,user_info b where a.user_id = b.id and a.id = #{id,jdbcType=INTEGER}
+  </select>
+
   <select id="getListByUserIdStatus" parameterType="Integer" resultMap="BaseResultMap">
-    select DISTINCT a.* from order_info a,order_detail b
+    select DISTINCT a.*,c.nick_name,c.head_img_url from order_info a,order_detail b,user_info c
     <where>
-      (a.id = b.order_id or a.id = b.main_order_id) and a.status <![CDATA[ <> ]]> 6 and a.is_resolve = 2
+      (a.id = b.order_id or a.id = b.main_order_id) and a.is_resolve = 2 and a.user_id = c.id and a.buyer_is_delete <![CDATA[ <> ]]> 1
       <if test="userId != null">
         and a.user_id = #{userId}
       </if>
@@ -211,22 +241,22 @@
 
 
   <select id="selectChildOrderByOrderId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from order_info
+    select a.*,b.nick_name,b.head_img_url from order_info a,user_info b
     <where>
-      status <![CDATA[ <> ]]> 5 and status <![CDATA[ <> ]]> 6
+      a.status <![CDATA[ <> ]]> 5 and a.user_id = b.id
       <if test="userId != null">
-        and user_id = #{userId}
+        and a.user_id = #{userId}
       </if>
       <if test="mainOrderId != null">
-        and main_order_id = #{mainOrderId}
+        and a.main_order_id = #{mainOrderId}
       </if>
     </where>
   </select>
 
   <select id="getOrderBySellerId" parameterType="Integer" resultMap="BaseResultMap">
-    select a.* from order_info a,order_detail b
+    select a.*,c.nick_name,c.head_img_url from order_info a,order_detail b,user_info c
     <where>
-      a.id = b.order_id and a.status <![CDATA[ <> ]]> 6 and a.is_resolve = 2
+      a.id = b.order_id and a.seller_is_delete <![CDATA[ <> ]]> 1 and a.is_resolve = 2 and a.user_id = c.id
       <if test="sellerId != null">
         and a.seller_id = #{sellerId}
       </if>
@@ -248,22 +278,22 @@
 
 
   <select id="getOrderByUserIdOrderId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from order_info
+    select a.*,b.nick_name,b.head_img_url from order_info a,user_info b
     <where>
-      status <![CDATA[ <> ]]> 6 and is_resolve = 2
+      a.buyer_is_delete <![CDATA[ <> ]]> 1 and a.is_resolve = 2 and a.user_id = b.id
       <if test="userId != null">
-        and user_id = #{userId}
+        and a.user_id = #{userId}
       </if>
       <if test="orderId != null">
-        and id = #{orderId}
+        and a.id = #{orderId}
       </if>
     </where>
   </select>
 
   <select id="getRefundOrder" parameterType="Integer" resultMap="BaseResultMap">
-    select * from order_info a,order_refund b
+    select a.*,c.nick_name,c.head_img_url from order_info a,order_refund b,user_info c
     <where>
-      a.is_refund = 1 and b.order_id = a.id and b.status = 1 and (a.status = 2 or a.status = 3)
+      a.is_refund = 1 and b.order_id = a.id and b.status = 1 and (a.status = 2 or a.status = 3) and a.user_id = c.id
       <if test="userId != null and type == 1">
         and a.user_id = #{userId}
       </if>
@@ -278,10 +308,69 @@
   </select>
 
   <select id="selectByOrderNo" parameterType="String" resultMap="BaseResultMap">
-    select * from order_info where order_no = #{orderNo} and status = 1
+    select a.*,b.nick_name,b.head_img_url from order_info a,user_info b where a.user_id = b.id and a.order_no = #{orderNo} and a.status = 1
   </select>
 
   <select id="selectByStatus" parameterType="Integer" resultMap="BaseResultMap">
-    select * from order_info where status = #{status} and is_resolve = 2
+    select a.*,b.nick_name,b.head_img_url from order_info a,user_info b where a.user_id = b.id and a.status = #{status} and a.is_resolve = 2
+  </select>
+
+
+  <select id="countPage" resultType="Integer">
+    select count(*) from order_info a,order_detail b
+    <where>
+      1=1
+      <if test="keyword != null">
+        and b.goods_id in (select id from goods_info where name like "%"#{keyword}"%" or description like "%"#{keyword}"%")
+      </if>
+      <if test="status != null">
+        and a.status = #{status}
+        <if test="status == 7">
+          and a.is_refund = 1
+        </if>
+      </if>
+
+      <if test="startDate != null">
+        and a.add_time <![CDATA[ > ]]> #{startDate}
+      </if>
+      <if test="endDate != null">
+        and a.add_time <![CDATA[ <= ]]> #{endDate}
+      </if>
+    </where>
+  </select>
+
+  <select id="getOrderPage" resultMap="BaseResultMap">
+    select DISTINCT a.*,c.nick_name,c.head_img_url from order_info a,order_detail b,user_info c,goods_info d
+    <where>
+      (a.id = b.order_id or a.id = b.main_order_id) and a.is_resolve = 2 and a.user_id = c.id and b.goods_id = d.id
+      <if test="keyword != null and keyword != ''">
+        and (
+          b.goods_id in
+            (select id from goods_info where name like "%"#{keyword}"%" or description like "%"#{keyword}"%")
+          or c.nick_name like "%"#{keyword}"%"
+        )
+      </if>
+      <if test="status != null">
+        and a.status = #{status}
+        <if test="status == 7">
+          and a.is_refund = 1
+        </if>
+      </if>
+      <if test="startDate != null and startDate != ''">
+        and a.add_time <![CDATA[ > ]]> #{startDate}
+      </if>
+      <if test="endDate != null and endDate != ''">
+        and a.add_time <![CDATA[ <= ]]> #{endDate}
+      </if>
+    </where>
+    <if test="orders != null">
+      order by #{orders}
+      <if test="ascType != null and ascType == 2">
+        desc
+      </if>
+    </if>
+    <if test="start != null and limit != null">
+      limit #{start},#{limit}
+    </if>
   </select>
 </mapper>

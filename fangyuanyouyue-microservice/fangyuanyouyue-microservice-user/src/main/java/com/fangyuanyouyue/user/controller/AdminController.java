@@ -29,10 +29,10 @@ import io.swagger.annotations.ApiOperation;
 
 @Api(description = "用户后台管理系统Controller")
 @Controller
-@RequestMapping(value = "/admin/user")
+@RequestMapping(value = "/adminUser")
 @RefreshScope
 @CrossOrigin
-public class AdminUserController extends BaseController {
+public class AdminController extends BaseController {
     protected Logger log = Logger.getLogger(this.getClass());
     @Autowired
     private UserInfoService userInfoService;
@@ -42,6 +42,16 @@ public class AdminUserController extends BaseController {
     private UserAuthOrderService userAuthOrderService;
 
     @ApiOperation(value = "用户列表", notes = "用户列表",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "keyword", value = "搜索词条", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "状态 1正常 2冻结 3删除", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "startDate", value = "开始日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "endDate", value = "结束日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orders", value = "排序规则", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "ascType", value = "排序类型 1升序 2降序", required = false, dataType = "int", paramType = "query")
+    })
     @GetMapping(value = "/list")
     @ResponseBody
     public BaseResp list(AdminUserParam param) throws IOException {
@@ -83,7 +93,7 @@ public class AdminUserController extends BaseController {
     }
 
 
-    
+
 
     @ApiOperation(value = "用户列表", notes = "用户列表",response = BaseResp.class)
     @GetMapping(value = "/auth/list")
@@ -105,7 +115,7 @@ public class AdminUserController extends BaseController {
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
         }
     }
-    
+
     @ApiOperation(value = "修改认证状态", notes = "修改认证状态",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "String", paramType = "query"),
@@ -134,8 +144,8 @@ public class AdminUserController extends BaseController {
         }
     }
 
-    
-    
+
+
 
 
     @ApiOperation(value = "认证店铺列表", notes = "认证店铺列表",response = BaseResp.class)

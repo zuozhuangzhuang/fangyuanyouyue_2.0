@@ -476,12 +476,15 @@
             <if test="endDate != null">
                 and add_time <![CDATA[ <= ]]> #{endDate}
             </if>
-            <if test="orders != null">
-                order by #{orders}
-                <if test="ascType != null and ascType == 2">
-                    desc
-                </if>
-            </if>
         </where>
+        <if test="orders != null">
+            order by #{orders}
+            <if test="ascType != null and ascType == 2">
+                desc
+            </if>
+        </if>
+        <if test="limit != null and start != null">
+            limit #{start},#{limit}
+        </if>
     </select>
 </mapper>

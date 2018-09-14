@@ -90,7 +90,7 @@ public class ScoreController extends BaseController{
             if(jsonObject != null && (Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            //TODO 抽奖
+            //抽奖
             String message = scoreService.lottery(userId);
             return toSuccess(message);
         } catch (ServiceException e) {

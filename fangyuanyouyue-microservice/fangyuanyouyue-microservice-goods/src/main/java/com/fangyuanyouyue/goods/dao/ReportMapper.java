@@ -37,7 +37,7 @@ public interface ReportMapper {
      * @param endDate
      * @return
      */
-    Integer countPage(@Param("keyword")String keyword,@Param("status")Integer status,@Param("startDate")String startDate,@Param("endDate")String endDate);
+    Integer countPage(@Param("type")Integer type,@Param("keyword")String keyword,@Param("status")Integer status,@Param("startDate")String startDate,@Param("endDate")String endDate);
 
     /**
      * 分页获取举报商品、抢购列表
@@ -52,7 +52,7 @@ public interface ReportMapper {
      * @param ascType
      * @return
      */
-    List<Report> getReportPage(@Param("type")Integer type,@Param("start") Integer start,
+    List<Report> getGoodsReportPage(@Param("type")Integer type,@Param("start") Integer start,
                               @Param("limit") Integer limit,@Param("keyword")String keyword,@Param("status")Integer status,
                               @Param("startDate")String startDate,@Param("endDate")String endDate,@Param("orders")String orders,@Param("ascType")Integer ascType);
 }

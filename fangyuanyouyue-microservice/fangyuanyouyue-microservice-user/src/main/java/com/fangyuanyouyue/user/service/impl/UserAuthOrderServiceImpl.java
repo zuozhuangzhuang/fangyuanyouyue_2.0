@@ -57,6 +57,7 @@ public class UserAuthOrderServiceImpl implements UserAuthOrderService {
 
 	@Override
 	public void updateReject(Integer id, String reason) {
+		//TODO 拒绝要退回余额
 		UserAuthOrder model = userAuthOrderMapper.selectByPrimaryKey(id);
 		UserInfoExt ext = userInfoExtMapper.selectByUserId(model.getUserId());
 		ext.setAuthType(2);

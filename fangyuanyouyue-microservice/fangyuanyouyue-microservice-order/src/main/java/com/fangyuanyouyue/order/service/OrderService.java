@@ -1,5 +1,6 @@
 package com.fangyuanyouyue.order.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.fangyuanyouyue.base.Pager;
@@ -151,4 +152,32 @@ public interface OrderService {
      * @throws ServiceException
      */
     Pager orderList(AdminOrderParam param) throws ServiceException;
+
+    /**
+     * 物流公司管理
+     * @param param
+     * @return
+     * @throws ServiceException
+     */
+    Pager companyList(AdminOrderParam param) throws ServiceException;
+
+    /**
+     * 增加物流公司
+     * @param number
+     * @param name
+     * @param price
+     * @throws ServiceException
+     */
+    void addCompany(String number, String name, BigDecimal price) throws ServiceException;
+
+    /**
+     * 修改物流公司信息
+     * @param id
+     * @param number
+     * @param name
+     * @param price
+     * @param status
+     * @throws ServiceException
+     */
+    void updateCompany(Integer id,String number, String name, BigDecimal price,Integer status) throws ServiceException;
 }

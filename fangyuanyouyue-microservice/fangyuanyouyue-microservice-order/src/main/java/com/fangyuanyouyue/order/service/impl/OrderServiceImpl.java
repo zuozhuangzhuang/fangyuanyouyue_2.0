@@ -11,6 +11,7 @@ import com.fangyuanyouyue.base.enums.NotifyUrl;
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.order.dao.*;
 import com.fangyuanyouyue.order.dto.*;
+import com.fangyuanyouyue.order.dto.adminDto.*;
 import com.fangyuanyouyue.order.model.*;
 import com.fangyuanyouyue.order.param.AdminOrderParam;
 import com.fangyuanyouyue.order.service.*;
@@ -65,8 +66,6 @@ public class OrderServiceImpl implements OrderService{
                 || StringUtils.isEmpty(addressInfo.getCity()) || StringUtils.isEmpty(addressInfo.getArea())){
             throw new  ServiceException("收货地址异常，请先更新地址");
         }
-        //获取用户信息
-        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
 
         //卖家DTO列表
         List<SellerDto> sellerDtos = new ArrayList<>();
@@ -132,7 +131,6 @@ public class OrderServiceImpl implements OrderService{
         orderDto.setOrderPayDto(orderPayDto);
         orderDto.setOrderDetailDtos(orderDetailDtos);
         orderDto.setSellerDtos(sellerDtos);
-        orderDto.setNickName(user.getNickName());
         return orderDto;
     }
 
@@ -316,7 +314,7 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public void cancelOrder(Integer userId, Integer orderId) throws ServiceException {
         //根据订单ID获取订单信息
-        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderId);
+        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKeyDetail(orderId);
         OrderPay orderPay = orderPayMapper.selectByOrderId(orderId);
         if(orderInfo != null && orderPay != null){
             if(orderInfo.getStatus() != 1){
@@ -375,14 +373,12 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public OrderDto orderDetail(Integer userId, Integer orderId) throws ServiceException {
         //根据订单ID获取订单信息
-        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderId);
+        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKeyDetail(orderId);
         if(userId.intValue() == orderInfo.getUserId().intValue()){//用户是买家
             if(orderInfo.getIsResolve().intValue() == 1){//已拆单的主订单
                 throw new ServiceException("订单状态异常！");
             }
         }
-        //买家
-        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(orderInfo.getUserId())).getString("data")), UserInfo.class);
         OrderPay orderPay = orderPayMapper.selectByOrderId(orderId);
         List<OrderDetail> orderDetails;
         if(orderInfo.getMainOrderId() == null){//主订单
@@ -404,7 +400,6 @@ public class OrderServiceImpl implements OrderService{
 //            }
             orderDto.setOrderDetailDtos(orderDetailDtos);
 
-            orderDto.setNickName(user.getNickName());
 
             //处理卖家信息
             List<SellerDto> sellerDtos = getSellerDtos(orderDetailDtos);
@@ -460,8 +455,6 @@ public class OrderServiceImpl implements OrderService{
         ArrayList<OrderDto> orderDtos = new ArrayList<>();;
 
         if(type == 1){//我买下的
-            //买家
-            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
             //获取所有未拆单的订单
             //增加搜索功能
             List<OrderInfo> listByUserIdTypeStatus = orderInfoMapper.getListByUserIdStatus(userId, start * limit, limit, status,search);
@@ -486,7 +479,6 @@ public class OrderServiceImpl implements OrderService{
                 orderDto.setOrderPayDto(orderPayDto);
                 orderDto.setSellerDtos(sellerDtos);
                 orderDto.setOrderDetailDtos(orderDetailDtos);
-                orderDto.setNickName(user.getNickName());
                 if(orderDto.getIsRefund() == 1){
                     //退货状态
                     OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null,null);
@@ -523,9 +515,6 @@ public class OrderServiceImpl implements OrderService{
                 orderDto.setOrderPayDto(orderPayDto);
                 orderDto.setSellerDtos(sellerDtos);
                 orderDto.setOrderDetailDtos(orderDetailDtos);
-                //买家
-                UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(orderDto.getUserId())).getString("data")), UserInfo.class);
-                orderDto.setNickName(user.getNickName());
                 if(orderDto.getIsRefund() == 1){
                     //退货状态
                     OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null,null);
@@ -554,8 +543,6 @@ public class OrderServiceImpl implements OrderService{
                 || StringUtils.isEmpty(addressInfo.getCity()) || StringUtils.isEmpty(addressInfo.getArea())){
             throw new  ServiceException("收货地址异常，请先更新地址");
         }
-        //获取用户信息
-        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
 
         //获取商品信息
         GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(goodsId)).getString("data")),GoodsInfo.class);
@@ -640,7 +627,6 @@ public class OrderServiceImpl implements OrderService{
         orderDto.setOrderPayDto(orderPayDto);
         orderDto.setOrderDetailDtos(orderDetailDtos);
         orderDto.setSellerDtos(sellerDtos);
-        orderDto.setNickName(user.getNickName());
         //交易消息：恭喜您！您的商品【大头三年原光】已有人下单，点击此处查看订单
         // 交易消息：恭喜您！您的抢购【大头三年原光】已有人下单，点击此处查看订单
         schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
@@ -652,7 +638,8 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public Object getOrderPay(Integer userId, Integer orderId, Integer payType, String payPwd) throws ServiceException {
         //只有买家能调用订单支付接口，直接根据orderId查询订单
-        OrderInfo orderInfo = orderInfoMapper.getOrderByUserIdOrderId(orderId,userId);
+//        OrderInfo orderInfo = orderInfoMapper.getOrderByUserIdOrderId(orderId,userId);
+        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKeyDetail(orderId);
         if(orderInfo == null){
             throw new ServiceException("订单不存在！");
         }else{
@@ -740,7 +727,7 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public void sendGoods(Integer userId, Integer orderId, Integer companyId, String number) throws ServiceException {
-        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderId);
+        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKeyDetail(orderId);
         if(orderInfo == null){
             throw new ServiceException("订单不存在！");
         }else{
@@ -768,7 +755,7 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public void getGoods(Integer userId, Integer orderId) throws ServiceException {
-        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderId);
+        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKeyDetail(orderId);
         if (orderInfo == null) {
             throw new ServiceException("订单不存在！");
         } else {
@@ -809,16 +796,18 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public void deleteOrder(Integer userId, Integer[] orderIds) throws ServiceException {
         for(Integer orderId:orderIds){
-            OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderId);
+            OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKeyDetail(orderId);
             if (orderInfo == null) {
                 throw new ServiceException("订单不存在！");
             } else {
-                //状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除
                 if(orderInfo.getStatus().intValue() == 4 || orderInfo.getStatus().intValue() == 5){
-                    OrderPay orderPay = orderPayMapper.selectByOrderId(orderId);
-                    orderPay.setStatus(6);
-                    orderPayMapper.updateByPrimaryKey(orderPay);
-                    orderInfo.setStatus(6);
+                    if(userId.intValue() == orderInfo.getUserId().intValue()){
+                        //买家
+                        orderInfo.setBuyerIsDelete(1);
+                    }else if(userId.intValue() == orderInfo.getSellerId().intValue()){
+                        //卖家
+                        orderInfo.setSellerIsDelete(1);
+                    }
                     orderInfoMapper.updateByPrimaryKey(orderInfo);
                 }else{
                     throw new ServiceException("存在未完成订单，删除失败！");
@@ -829,7 +818,7 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public void evaluationOrder(Integer userId, Integer orderId, Integer goodsQuality, Integer serviceAttitude) throws ServiceException {
-        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderId);
+        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKeyDetail(orderId);
         if (orderInfo == null) {
             throw new ServiceException("订单不存在！");
         } else {
@@ -952,6 +941,90 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public Pager orderList(AdminOrderParam param) throws ServiceException {
-        return null;
+        //后台查看所有用户订单
+        Integer total = orderInfoMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
+
+        List<OrderInfo> list = orderInfoMapper.getOrderPage(param.getStart()*param.getLimit(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+        List<AdminOrderDto> orderDtos = new ArrayList<>();
+        for(OrderInfo info:list){
+            AdminOrderDto orderDto = new AdminOrderDto(info);
+            //获取订单详情列表
+            //如果是没有拆单的订单根据主订单获取，拆了单的根据订单id获取
+            List<OrderDetail> orderDetails;
+            if(info.getSellerId() == null){
+                orderDetails = orderDetailMapper.selectByMainOrderId(orderDto.getOrderId());
+            }else{
+                orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
+            }
+            ArrayList<AdminOrderDetailDto> orderDetailDtos = AdminOrderDetailDto.toDtoList(orderDetails);
+            //卖家信息DTO
+            List sellerDtos = new ArrayList<>();
+            sellerDtos.addAll(getSellerDtos(OrderDetailDto.toDtoList(orderDetails)));
+            //订单支付表
+            OrderPay orderPay = orderPayMapper.selectByOrderId(orderDto.getOrderId());
+            AdminOrderPayDto orderPayDto = new AdminOrderPayDto(orderPay);
+            orderDto.setOrderPayDto(orderPayDto);
+            orderDto.setSellerDtos(sellerDtos);
+            orderDto.setOrderDetailDtos(orderDetailDtos);
+            if(orderDto.getIsRefund() == 1){
+                //退货状态
+                OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null,null);
+                orderDto.setReturnStatus(orderRefund.getStatus());
+                orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
+            }
+            //是否评价
+            OrderComment orderComment = orderCommentMapper.selectByOrder(orderDto.getOrderId());
+            if(orderComment != null){
+                orderDto.setIsEvaluation(1);
+            }
+            orderDtos.add(orderDto);
+        }
+        Pager pager = new Pager();
+        pager.setTotal(total);
+        pager.setDatas(orderDtos);
+        return pager;
+    }
+
+    @Override
+    public Pager companyList(AdminOrderParam param) throws ServiceException {
+        List<Company> list = companyMapper.getList();
+        Integer total = list.size();
+        List<AdminCompanyDto> adminCompanyDtos = AdminCompanyDto.toDtoList(list);
+        Pager pager = new Pager();
+        pager.setTotal(total);
+        pager.setDatas(adminCompanyDtos);
+        return pager;
+    }
+
+    @Override
+    public void addCompany(String number, String name, BigDecimal price) throws ServiceException {
+        Company company = new Company();
+        company.setCompanyNo(number);
+        company.setName(name);
+        company.setPrice(price);
+        company.setAddTime(DateStampUtils.getTimesteamp());
+        company.setStatus(1);
+        companyMapper.insert(company);
+    }
+
+    @Override
+    public void updateCompany(Integer id, String number, String name, BigDecimal price, Integer status) throws ServiceException {
+        Company company = companyMapper.selectByPrimaryKey(id);
+        if(company == null){
+            throw new ServiceException("没找到物流公司！");
+        }
+        if(StringUtils.isNotEmpty(number)){
+            company.setCompanyNo(number);
+        }
+        if(StringUtils.isNotEmpty(name)){
+            company.setName(name);
+        }
+        if(price != null){
+            company.setPrice(price);
+        }
+        if(status != null){
+            company.setStatus(status);
+        }
+        companyMapper.updateByPrimaryKey(company);
     }
 }

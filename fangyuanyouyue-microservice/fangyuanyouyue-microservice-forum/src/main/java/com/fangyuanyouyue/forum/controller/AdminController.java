@@ -3,13 +3,12 @@ package com.fangyuanyouyue.forum.controller;
 import java.io.IOException;
 import java.util.List;
 
+import com.fangyuanyouyue.forum.service.ForumInfoService;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BasePageReq;
@@ -28,7 +27,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
-@RequestMapping(value = "/appraisal")
+@RequestMapping(value = "/adminAppraisal")
 @Api(description = "首页后台管理Controller")
 @RefreshScope
 public class AdminController extends BaseController {
@@ -40,6 +39,8 @@ public class AdminController extends BaseController {
     private SchedualUserService schedualUserService;
     @Autowired
     private SchedualRedisService schedualRedisService;
+    @Autowired
+    private ForumInfoService forumInfoService;
 
 
 	@ApiOperation(value = "专栏申请列表", notes = "专栏申请列表", response = BaseResp.class)
@@ -105,4 +106,69 @@ public class AdminController extends BaseController {
             return toError("系统繁忙，请稍后再试！");
         }
     }
+
+
+    //后台处理举报
+    @ApiOperation(value = "后台处理举报", notes = "后台处理举报，发送信息给被举报者",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "举报信息id", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "content", value = "处理原因", required = true, dataType = "int", paramType = "query")
+    })
+    @PutMapping(value = "/dealReport")
+    @ResponseBody
+    public BaseResp dealReport(Integer id,String content) throws IOException {
+        try {
+            log.info("----》后台处理举报《----");
+            if(id == null){
+                return toError("id不能为空！");
+            }
+            if(StringUtils.isEmpty(content)){
+                return toError("处理原因不能为空！");
+            }
+            forumInfoService.dealReport(id,content);
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+/*
+@Override
+    public void dealReport(Integer id, String content) throws ServiceException {
+        //1、删除商品 2、发送信息（content）
+        Report report = reportMapper.selectByPrimaryKey(id);
+        if(report == null){
+            throw new ServiceException("未找到举报信息！");
+        }
+        if(report.getType() == 1){
+            //删除商品
+            GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(report.getBusinessId());
+            if(goodsInfo == null){
+                throw new ServiceException("未找到商品、抢购");
+            }
+            goodsInfo.setStatus(5);
+            goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
+            //很抱歉，您的商品/抢购【名称】被多用户举报，并经官方核实。已被删除，删除理由：￥@……#%￥&#%￥……@。点击查看详情
+            schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
+                    "很抱歉，您的"+(goodsInfo.getType()==1?"商品【":"抢购【")+goodsInfo.getName()+"】被多用户举报，并经官方核实。已被删除，删除理由："+content+"。点击查看详情","1","2",goodsInfo.getId().toString());
+        }else if(report.getType() == 2 || report.getType() == 3){
+            //删除帖子、视频
+
+            //很抱歉，您的帖子/视频/全民鉴定【名称】被多用户举报，并经官方核实。已被删除，删除理由：￥@……#%￥&#%￥……@
+            schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
+                    "很抱歉，您的"+(goodsInfo.getType()==1?"商品【":"抢购【")+goodsInfo.getName()+"】被多用户举报，并经官方核实。已被删除，删除理由："+content+"。点击查看详情","1","2",goodsInfo.getId().toString());
+        }else if(report.getType() == 4){
+            //删除全民鉴定
+
+            //很抱歉，您的帖子/视频/全民鉴定【名称】被多用户举报，并经官方核实。已被删除，删除理由：￥@……#%￥&#%￥……@
+            schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
+                    "很抱歉，全民鉴定【"+goodsInfo.getName()+"】被多用户举报，并经官方核实。已被删除，删除理由："+content,"1","","");
+        }
+        report.setStatus(1);
+        reportMapper.updateByPrimaryKeySelective(report);
+    }
+ */
 }

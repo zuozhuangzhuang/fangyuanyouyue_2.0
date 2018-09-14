@@ -1,9 +1,11 @@
 package com.fangyuanyouyue.order.service;
 
+import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.order.dto.OrderDto;
 import com.fangyuanyouyue.order.dto.OrderRefundDto;
 import com.fangyuanyouyue.order.model.OrderRefund;
+import com.fangyuanyouyue.order.param.AdminOrderParam;
 
 import java.util.List;
 
@@ -19,15 +21,14 @@ public interface RefundService {
     void orderReturnToSeller(Integer userId,Integer orderId,String reason,String[] imgUrls) throws ServiceException;
 
     /**
-     * 退货申请
-     * @param userId
+     * 退货列表
      * @param start
      * @param limit
      * @param type
      * @return
      * @throws ServiceException
      */
-//    List<OrderDto> orderReturnList(Integer userId, Integer start, Integer limit, Integer type) throws ServiceException;
+//    Pager orderReturnList(AdminOrderParam param) throws ServiceException;
 
     /**
      * 卖家处理退货

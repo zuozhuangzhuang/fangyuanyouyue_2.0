@@ -126,7 +126,8 @@ public class UserVipServiceImpl implements UserVipService{
                     userVip.setStatus(1);//会员状态 1已开通 2未开通
                 }
             }
-            userVipMapper.updateByPrimaryKeySelective(userVip);
+            userVip.setIsSendMessage(null);
+            userVipMapper.updateByPrimaryKey(userVip);
             vipOrder.setStatus(2);
             vipOrderMapper.updateByPrimaryKey(vipOrder);
             return true;

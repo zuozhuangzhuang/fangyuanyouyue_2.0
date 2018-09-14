@@ -142,7 +142,14 @@
   <select id="selectPage" resultMap="BaseResultMap">
     select 
     a.*,b.name as type_name
-    from forum_column a,forum_column_type b where a.type_id=b.id order by b.sort
+    from forum_column a,forum_column_type b
+    <where>
+      a.type_id=b.id
+      <if test="typeId != null">
+        and b.id = #{typeId}
+      </if>
+    </where>
+    order by b.sort
     <if test="start != null and limit != null">
     limit #{start},#{limit}
     </if>

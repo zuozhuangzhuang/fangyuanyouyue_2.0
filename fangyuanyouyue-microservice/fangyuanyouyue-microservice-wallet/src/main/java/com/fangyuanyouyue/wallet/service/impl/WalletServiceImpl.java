@@ -114,11 +114,11 @@ public class WalletServiceImpl implements WalletService{
             }
             userWithdraw.setAccount(account);
             userWithdraw.setRealName(realName);
-        }/*else{
-            //TODO 微信提现需要用户绑定微信账号
+        }else{
+            //微信提现需要用户绑定微信账号
 
             userWithdraw.setAccount("用户unionID");
-        }*/
+        }
 
         userWithdrawMapper.insert(userWithdraw);
 

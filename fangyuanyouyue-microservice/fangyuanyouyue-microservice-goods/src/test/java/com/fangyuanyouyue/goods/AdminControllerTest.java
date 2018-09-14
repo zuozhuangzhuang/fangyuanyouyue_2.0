@@ -1,4 +1,4 @@
-package com.fangyuanyouyue.forum;
+package com.fangyuanyouyue.goods;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,11 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ForumServiceApplication.class)
+@SpringBootTest(classes = GoodsServiceApplication.class)
 @WebAppConfiguration
 @ContextConfiguration
 @Rollback
-public class ForumColumnControllerTest {
+public class AdminControllerTest {
     @Autowired
     private WebApplicationContext context;
 
@@ -35,68 +35,43 @@ public class ForumColumnControllerTest {
                 .build();
     }
 
-    /**
-     * 获取全部专栏
-     * @throws Exception
-     */
-    @Test
-    @Transactional
-    public void columnList() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/column/list")
-                .param("typeId","")
-                .accept(MediaType.APPLICATION_JSON))
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
-    }
-    
 
     /**
-     * 获取推荐专栏
-     * @throws Exception
-     */
-    @Test
-    @Transactional
-    public void columnChosen() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/column/chosen")
-                .accept(MediaType.APPLICATION_JSON))
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
-    }
-
-    /**
-     * 发布专栏
+     * 后台处理举报
      * @throws Exception
      */
     @Test
 //    @Transactional
-    public void addColumn() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/column/addColumn")
-                .param("token", "10045FY1534183918247")
-                .param("typeId", "8")
-                .param("name", "女人都是大猪蹄子")
-
+    public void dealReport() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.put("/adminGoods/dealReport")
+                .param("id","2")
+                .param("content","假货！")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
 
-
     /**
-     * 我是栏主
+     * 获取举报商品列表
      * @throws Exception
      */
     @Test
 //    @Transactional
-    public void myColumn() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/column/myColumn")
-                .param("token", "10045FY1535479286901")
-                .param("start", "0")
-                .param("limit", "10")
-
+    public void reportList() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.get("/adminGoods/reportList")
+                .param("type","")
+                .param("start","0")
+                .param("limit","10")
+                .param("keyword","")
+                //状态 1已处理 2待处理
+                .param("status","")
+                .param("startDate","2016-01-01 01:01:01")
+                .param("endDate","2018-09-12 16:39:00")
+                .param("orders","add_time")
+                .param("ascType","2")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
-
 
 }

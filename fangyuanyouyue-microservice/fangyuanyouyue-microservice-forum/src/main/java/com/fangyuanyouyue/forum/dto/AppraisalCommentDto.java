@@ -53,8 +53,10 @@ public class AppraisalCommentDto {
         this.content = comment.getContent();
         this.isWinner = comment.getIsWinner();
         this.status = comment.getStatus();
-        this.addTime = DateUtil.getFormatDate(comment.getUpdateTime(), DateUtil.DATE_FORMT);
-        this.updateTime = DateUtil.getFormatDate(comment.getAddTime(), DateUtil.DATE_FORMT);
+        this.addTime = DateUtil.getFormatDate(comment.getAddTime(), DateUtil.DATE_FORMT);
+        if(comment.getUpdateTime() != null){
+            this.updateTime = DateUtil.getFormatDate(comment.getUpdateTime(), DateUtil.DATE_FORMT);
+        }
         this.nickName = comment.getNickName();
         this.headImgUrl = comment.getHeadImgUrl();
     }

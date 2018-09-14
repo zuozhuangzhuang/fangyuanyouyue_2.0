@@ -51,6 +51,7 @@ public class ForumColumnController extends BaseController {
 
 	@ApiOperation(value = "专栏列表", notes = "（ForumColumnTypeDto）获取全部专栏", response = BaseResp.class)
 	@ApiImplicitParams({
+			@ApiImplicitParam(name = "typeId", value = "专栏分类id",required = false, dataType = "int", paramType = "query"),
 			@ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
 			@ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query")
 	})
@@ -64,7 +65,7 @@ public class ForumColumnController extends BaseController {
 			if(param.getStart()==null || param.getStart() < 0 ||param.getLimit()==null || param.getLimit() < 1) {
 				return toError("分页参数错误");
 			}
-			List<ForumColumnTypeDto> dto = forumColumnService.getColumnList(param.getStart(),param.getLimit());
+			List<ForumColumnTypeDto> dto = forumColumnService.getColumnList(param.getTypeId(),param.getStart(),param.getLimit());
 
 			return toSuccess(dto);
 		} catch (ServiceException e) {

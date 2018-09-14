@@ -180,4 +180,9 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 			}
 		}
 	}
+
+	@Override
+	public void dealReport(Integer id, String content) throws ServiceException {
+		//TODO 1、删除帖子 2、发信息给用户 3、扣除被举报用户信誉度 4、给举报用户增加信誉度
+	}
 }

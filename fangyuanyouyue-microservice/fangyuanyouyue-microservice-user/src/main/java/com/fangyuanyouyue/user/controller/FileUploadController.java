@@ -2,14 +2,17 @@ package com.fangyuanyouyue.user.controller;
 
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.user.param.UserParam;
 import com.fangyuanyouyue.user.service.FileUploadService;
+import com.fangyuanyouyue.user.service.SchedualRedisService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -28,11 +31,13 @@ public class FileUploadController extends BaseController {
     protected Logger log = Logger.getLogger(this.getClass());
     @Autowired
     private FileUploadService fileUploadService;
+    @Autowired
+    private SchedualRedisService schedualRedisService;
 
     @ApiOperation(value = "图片上传", notes = "(String)图片上传",response = BaseResp.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "token", value = "用户token",dataType = "file", paramType = "form"),
-            @ApiImplicitParam(name = "type", value = "类型 1头像 2商品、抢购 3视频、帖子 4全民鉴定 5官方鉴定",dataType = "file", paramType = "form"),
+            @ApiImplicitParam(name = "token", value = "用户token",dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1头像 2商品、抢购 3视频、帖子 4全民鉴定 5官方鉴定",dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "imgFile", value = "图片，格式为：jpeg，png，jpg",dataType = "file", paramType = "form")
     })
     @PostMapping(value = "/uploadPic")
@@ -49,8 +54,12 @@ public class FileUploadController extends BaseController {
                     || name.endsWith("jpg"))){
                 return toError("请上传JPEG/PNG/JPG格式化图片！");
             }
+            Integer userId = null;
+            if(StringUtils.isNotEmpty(param.getToken())) {
+                userId = (Integer)schedualRedisService.get(param.getToken());
+            }
             //图片上传
-            String url= fileUploadService.uploadFile(param.getImgFile());
+            String url= fileUploadService.uploadPic(userId,param.getType(),param.getImgFile());
             return toSuccess(url);
         } catch (ServiceException e) {
             e.printStackTrace();
