@@ -11,7 +11,7 @@ public interface FileUploadService {
      * @return
      * @throws ServiceException
      */
-    String uploadFile(MultipartFile file) throws ServiceException;
+    String uploadPic(Integer userId,Integer type,MultipartFile file) throws Exception;
 
     /**
      * 上传视频文件

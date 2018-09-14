@@ -1,9 +1,14 @@
 package com.fangyuanyouyue.user.service.impl;
 
+import java.util.Base64;
 import java.util.UUID;
 
+import com.fangyuanyouyue.base.util.WaterMarkUtils;
+import com.fangyuanyouyue.user.model.UserInfo;
+import com.fangyuanyouyue.user.service.UserInfoService;
 import org.apache.tomcat.jni.File;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,13 +37,28 @@ public class FileUploadServiceImpl implements FileUploadService{
     @Value("${bucket}")
     private String bucket;
 
+    @Autowired
+    private UserInfoService userInfoService;
+
     @Override
-    public String uploadFile(MultipartFile file) throws ServiceException {
+    public String uploadPic(Integer userId,Integer type,MultipartFile file) throws Exception {
+
+//        String watermark = base64Encode("小方圆@"+userInfo.getNickName());
+
         String fileUrl = null;
         String fileName = getFileName(file.getOriginalFilename());
         fileName = "pic" + fileName;
         fileUrl = uploadFile(file, fileUrl, fileName);
-        return fileUrl;
+
+        if(type != null && (type == 2 || type == 3 || type == 4)){
+            UserInfo userInfo = userInfoService.selectByPrimaryKey(userId);
+            if(userInfo == null){
+                throw new ServiceException("用户不存在！");
+            }
+            return WaterMarkUtils.getWaterMark(fileUrl,userInfo.getNickName());
+        }else{
+            return fileUrl;
+        }
     }
 
     @Override
