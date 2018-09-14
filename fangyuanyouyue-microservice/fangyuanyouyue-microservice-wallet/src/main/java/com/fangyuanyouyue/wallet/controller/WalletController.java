@@ -342,6 +342,7 @@ public class WalletController extends BaseController{
                 return toError("真实姓名不能为空！");
             }
             //TODO 提现
+            param.setType(2);//暂时只支持支付宝 1微信 2支付宝
             walletService.withdrawDeposit(userId,param.getAmount(),param.getType(),param.getAccount(),param.getRealName(),param.getPayPwd());
             return toSuccess();
         } catch (ServiceException e) {
