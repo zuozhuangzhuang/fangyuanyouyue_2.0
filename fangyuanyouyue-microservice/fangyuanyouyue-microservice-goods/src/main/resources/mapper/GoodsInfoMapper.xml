@@ -324,7 +324,7 @@
             </if>
             <if test="quality != null">
                 <if test="quality == 1">
-                    and b.auth_type = 1
+                    and b.auth_type = 2
                 </if>
                 <if test="quality == 2">
                     and a.id in (select goods_id from goods_appraisal_detail where type = 1 and status = 1)
@@ -415,7 +415,7 @@
             </if>
         </where>
         )
-        order by c.vip_level desc,c.vip_type desc,b.auth_type,a.update_time desc limit #{start},#{limit}
+        order by c.vip_level desc,c.vip_type desc,a.update_time desc limit #{start},#{limit}
     </select>
 
     <!--<select id="getGoodsAuthType" parameterType="Integer" resultType="Integer">-->
