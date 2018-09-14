@@ -280,12 +280,12 @@
   <select id="getOrderByUserIdOrderId" parameterType="Integer" resultMap="BaseResultMap">
     select a.*,b.nick_name,b.head_img_url from order_info a,user_info b
     <where>
-      buyer_is_delete <![CDATA[ <> ]]> 1 and is_resolve = 2 and a.user_id = b.id
+      a.buyer_is_delete <![CDATA[ <> ]]> 1 and a.is_resolve = 2 and a.user_id = b.id
       <if test="userId != null">
-        and user_id = #{userId}
+        and a.user_id = #{userId}
       </if>
       <if test="orderId != null">
-        and id = #{orderId}
+        and a.id = #{orderId}
       </if>
     </where>
   </select>
@@ -318,18 +318,25 @@
 
   <select id="countPage" resultType="Integer">
     select count(*) from order_info a,order_detail b
-    <if test="keyword != null">
-      and b.goods_id in (select id from goods_info where name like "%"#{keyword}"%" or description like "%"#{keyword}"%")
-    </if>
-    <if test="status != null">
-      and a.status = #{status}
-    </if>
-    <if test="startDate != null">
-      and a.add_time <![CDATA[ > ]]> #{startDate}
-    </if>
-    <if test="endDate != null">
-      and a.add_time <![CDATA[ <= ]]> #{endDate}
-    </if>
+    <where>
+      1=1
+      <if test="keyword != null">
+        and b.goods_id in (select id from goods_info where name like "%"#{keyword}"%" or description like "%"#{keyword}"%")
+      </if>
+      <if test="status != null">
+        and a.status = #{status}
+        <if test="status == 7">
+          and a.is_refund = 1
+        </if>
+      </if>
+
+      <if test="startDate != null">
+        and a.add_time <![CDATA[ > ]]> #{startDate}
+      </if>
+      <if test="endDate != null">
+        and a.add_time <![CDATA[ <= ]]> #{endDate}
+      </if>
+    </where>
   </select>
 
   <select id="getOrderPage" resultMap="BaseResultMap">
@@ -345,6 +352,9 @@
       </if>
       <if test="status != null">
         and a.status = #{status}
+        <if test="status == 7">
+          and a.is_refund = 1
+        </if>
       </if>
       <if test="startDate != null and startDate != ''">
         and a.add_time <![CDATA[ > ]]> #{startDate}

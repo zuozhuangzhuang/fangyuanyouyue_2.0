@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
+import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.goods.dao.*;
 import com.fangyuanyouyue.goods.dto.*;
 import com.fangyuanyouyue.goods.dto.adminDto.AdminGoodsDto;
@@ -390,7 +391,8 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             }
             //如果是已下架的商品或抢购，重新上架
             goodsInfo.setStatus(1);//状态 1出售中 2已售出 3已下架（已结束） 5删除
-            goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
+            goodsInfo.setUpdateTime(DateStampUtils.getTimesteamp());
+            goodsInfoMapper.updateByPrimaryKey(goodsInfo);
 
             //抢购 重新编辑可以重新上架，删除旧降价历史
             if(goodsInfo.getType() == 2){

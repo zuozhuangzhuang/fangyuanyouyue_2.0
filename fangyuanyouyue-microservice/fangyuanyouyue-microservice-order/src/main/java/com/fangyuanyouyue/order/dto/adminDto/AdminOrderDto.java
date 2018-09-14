@@ -25,6 +25,8 @@ public class AdminOrderDto {
 
     private String nickName;//买家昵称
 
+    private String headImgUrl;//买家头像
+
     private Integer orderId;//订单ID
 
     private String orderNo;//订单号

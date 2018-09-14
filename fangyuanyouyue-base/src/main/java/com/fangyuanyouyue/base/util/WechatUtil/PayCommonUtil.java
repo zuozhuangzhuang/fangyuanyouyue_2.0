@@ -1,13 +1,8 @@
 package com.fangyuanyouyue.base.util.WechatUtil;
 
 import com.alibaba.fastjson.JSONObject;
-//import com.alipay.api.AlipayClient;
-//import com.alipay.api.DefaultAlipayClient;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
-import com.fangyuanyouyue.base.util.DateUtil;
-import com.fangyuanyouyue.base.util.MD5;
 import com.fangyuanyouyue.base.util.MD5Util;
-import org.apache.http.NameValuePair;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;

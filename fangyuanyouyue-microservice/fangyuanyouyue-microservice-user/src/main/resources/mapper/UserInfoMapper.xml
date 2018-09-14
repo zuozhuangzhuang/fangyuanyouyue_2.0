@@ -321,7 +321,7 @@
     <if test="authType != null">
       and b.auth_type = #{authType}
     </if>
-    order by c.vip_level desc,c.vip_type desc,b.auth_type,b.credit desc limit #{start},#{limit}
+    order by c.vip_level desc,c.vip_type desc,b.credit desc limit #{start},#{limit}
   </select>
   
   <select id="countPage" parameterType="Integer" resultType="Integer">

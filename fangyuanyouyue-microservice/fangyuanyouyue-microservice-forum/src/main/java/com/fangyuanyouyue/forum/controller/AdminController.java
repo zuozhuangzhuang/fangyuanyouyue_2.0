@@ -3,6 +3,7 @@ package com.fangyuanyouyue.forum.controller;
 import java.io.IOException;
 import java.util.List;
 
+import com.fangyuanyouyue.forum.service.ForumInfoService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
-@RequestMapping(value = "/appraisal")
+@RequestMapping(value = "/adminAppraisal")
 @Api(description = "首页后台管理Controller")
 @RefreshScope
 public class AdminController extends BaseController {
@@ -38,6 +39,8 @@ public class AdminController extends BaseController {
     private SchedualUserService schedualUserService;
     @Autowired
     private SchedualRedisService schedualRedisService;
+    @Autowired
+    private ForumInfoService forumInfoService;
 
 
 	@ApiOperation(value = "专栏申请列表", notes = "专栏申请列表", response = BaseResp.class)
@@ -105,34 +108,33 @@ public class AdminController extends BaseController {
     }
 
 
-//    //后台处理举报
-//    @ApiOperation(value = "后台处理举报", notes = "后台处理举报，发送信息给被举报者",response = BaseResp.class)
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "id", value = "举报信息id", required = true, dataType = "int", paramType = "query"),
-//            @ApiImplicitParam(name = "content", value = "处理原因", required = true, dataType = "int", paramType = "query")
-//    })
-//    @PutMapping(value = "/dealReport")
-//    @ResponseBody
-//    public BaseResp dealReport(Integer id,String content) throws IOException {
-//        try {
-//            log.info("----》后台处理举报《----");
-//            log.info("参数："+param.toString());
-//            if(param.getId() == null){
-//                return toError("id不能为空！");
-//            }
-//            if(StringUtils.isEmpty(param.getContent())){
-//                return toError("处理原因不能为空！");
-//            }
-//            reportService.dealReport(id,content);
-//            return toSuccess();
-//        } catch (ServiceException e) {
-//            e.printStackTrace();
-//            return toError(e.getMessage());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return toError("系统繁忙，请稍后再试！");
-//        }
-//    }
+    //后台处理举报
+    @ApiOperation(value = "后台处理举报", notes = "后台处理举报，发送信息给被举报者",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "举报信息id", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "content", value = "处理原因", required = true, dataType = "int", paramType = "query")
+    })
+    @PutMapping(value = "/dealReport")
+    @ResponseBody
+    public BaseResp dealReport(Integer id,String content) throws IOException {
+        try {
+            log.info("----》后台处理举报《----");
+            if(id == null){
+                return toError("id不能为空！");
+            }
+            if(StringUtils.isEmpty(content)){
+                return toError("处理原因不能为空！");
+            }
+            forumInfoService.dealReport(id,content);
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
 /*
 @Override
     public void dealReport(Integer id, String content) throws ServiceException {

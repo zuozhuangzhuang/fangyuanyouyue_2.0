@@ -384,7 +384,7 @@ public class GoodsController extends BaseController{
     //获取首页轮播图
     @ApiOperation(value = "获取首页轮播图", notes = "(BannerIndexDto)获取首页轮播图",response = BaseResp.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "类型 1首页 2商城", required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "type", value = "类型 1首页 2商城 3积分商城 4商品详情 ", required = true, dataType = "int", paramType = "query")
     })
     @GetMapping(value = "/getBanner")
     @ResponseBody

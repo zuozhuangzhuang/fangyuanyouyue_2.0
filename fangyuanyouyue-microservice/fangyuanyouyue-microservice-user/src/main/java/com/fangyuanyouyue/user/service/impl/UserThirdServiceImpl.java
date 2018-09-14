@@ -2,12 +2,13 @@ package com.fangyuanyouyue.user.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.base.util.MD5;
 import com.fangyuanyouyue.base.util.MD5Util;
 import com.fangyuanyouyue.user.dao.*;
 import com.fangyuanyouyue.user.dto.MergeDto;
-import com.fangyuanyouyue.user.dto.UserDto;
-import com.fangyuanyouyue.user.model.*;
+import com.fangyuanyouyue.user.model.UserFans;
+import com.fangyuanyouyue.user.model.UserInfo;
+import com.fangyuanyouyue.user.model.UserThirdParty;
+import com.fangyuanyouyue.user.model.UserWallet;
 import com.fangyuanyouyue.user.service.SchedualRedisService;
 import com.fangyuanyouyue.user.service.UserInfoService;
 import com.fangyuanyouyue.user.service.UserThirdService;

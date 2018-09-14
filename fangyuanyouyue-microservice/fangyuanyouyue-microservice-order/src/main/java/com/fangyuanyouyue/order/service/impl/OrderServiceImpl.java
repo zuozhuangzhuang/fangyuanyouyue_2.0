@@ -11,10 +11,7 @@ import com.fangyuanyouyue.base.enums.NotifyUrl;
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.order.dao.*;
 import com.fangyuanyouyue.order.dto.*;
-import com.fangyuanyouyue.order.dto.adminDto.AdminOrderDetailDto;
-import com.fangyuanyouyue.order.dto.adminDto.AdminOrderDto;
-import com.fangyuanyouyue.order.dto.adminDto.AdminOrderPayDto;
-import com.fangyuanyouyue.order.dto.adminDto.AdminSellerDto;
+import com.fangyuanyouyue.order.dto.adminDto.*;
 import com.fangyuanyouyue.order.model.*;
 import com.fangyuanyouyue.order.param.AdminOrderParam;
 import com.fangyuanyouyue.order.service.*;
@@ -944,8 +941,7 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public Pager orderList(AdminOrderParam param) throws ServiceException {
-        //TODO 后台查看所有用户订单
-
+        //后台查看所有用户订单
         Integer total = orderInfoMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
 
         List<OrderInfo> list = orderInfoMapper.getOrderPage(param.getStart()*param.getLimit(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
@@ -987,5 +983,48 @@ public class OrderServiceImpl implements OrderService{
         pager.setTotal(total);
         pager.setDatas(orderDtos);
         return pager;
+    }
+
+    @Override
+    public Pager companyList(AdminOrderParam param) throws ServiceException {
+        List<Company> list = companyMapper.getList();
+        Integer total = list.size();
+        List<AdminCompanyDto> adminCompanyDtos = AdminCompanyDto.toDtoList(list);
+        Pager pager = new Pager();
+        pager.setTotal(total);
+        pager.setDatas(adminCompanyDtos);
+        return pager;
+    }
+
+    @Override
+    public void addCompany(String number, String name, BigDecimal price) throws ServiceException {
+        Company company = new Company();
+        company.setCompanyNo(number);
+        company.setName(name);
+        company.setPrice(price);
+        company.setAddTime(DateStampUtils.getTimesteamp());
+        company.setStatus(1);
+        companyMapper.insert(company);
+    }
+
+    @Override
+    public void updateCompany(Integer id, String number, String name, BigDecimal price, Integer status) throws ServiceException {
+        Company company = companyMapper.selectByPrimaryKey(id);
+        if(company == null){
+            throw new ServiceException("没找到物流公司！");
+        }
+        if(StringUtils.isNotEmpty(number)){
+            company.setCompanyNo(number);
+        }
+        if(StringUtils.isNotEmpty(name)){
+            company.setName(name);
+        }
+        if(price != null){
+            company.setPrice(price);
+        }
+        if(status != null){
+            company.setStatus(status);
+        }
+        companyMapper.updateByPrimaryKey(company);
     }
 }

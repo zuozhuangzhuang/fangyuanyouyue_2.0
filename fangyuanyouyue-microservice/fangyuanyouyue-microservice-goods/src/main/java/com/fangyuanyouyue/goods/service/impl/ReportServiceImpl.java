@@ -47,6 +47,7 @@ public class ReportServiceImpl implements ReportService{
     @Override
     public void dealReport(Integer id, String content) throws ServiceException {
         //1、删除商品 2、发送信息（content）
+        //TODO  3、扣除被举报用户信誉度 4、给举报用户增加信誉度
         Report report = reportMapper.selectByPrimaryKey(id);
         if(report == null){
             throw new ServiceException("未找到举报信息！");

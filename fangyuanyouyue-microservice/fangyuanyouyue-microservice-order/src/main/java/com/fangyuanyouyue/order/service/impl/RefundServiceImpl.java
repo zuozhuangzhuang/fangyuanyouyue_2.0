@@ -2,12 +2,14 @@ package com.fangyuanyouyue.order.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.order.dao.*;
 import com.fangyuanyouyue.order.dto.*;
 import com.fangyuanyouyue.order.model.*;
+import com.fangyuanyouyue.order.param.AdminOrderParam;
 import com.fangyuanyouyue.order.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -114,7 +116,8 @@ public class RefundServiceImpl implements RefundService{
     }
 
 //    @Override
-//    public List<OrderDto> orderReturnList(Integer userId, Integer start, Integer limit, Integer type) throws ServiceException {
+//    public Pager orderReturnList(AdminOrderParam param) throws ServiceException {
+//        Integer total = orderInfoMapper.countPage()
 //        List<OrderInfo> refundOrder = orderInfoMapper.getRefundOrder(userId, start * limit, limit, type);
 //        ArrayList<OrderDto> orderDtos = new ArrayList<>();
 //        for(OrderInfo orderInfo:refundOrder){//获取订单详情列表
@@ -144,7 +147,10 @@ public class RefundServiceImpl implements RefundService{
 //            orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
 //            orderDtos.add(orderDto);
 //        }
-//        return orderDtos;
+//        Pager pager = new Pager();
+//        pager.setTotal(total);
+//        pager.setDatas(orderDtos);
+//        return pager;
 //    }
 
     @Override

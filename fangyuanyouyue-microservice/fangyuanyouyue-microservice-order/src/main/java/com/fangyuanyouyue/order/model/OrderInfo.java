@@ -43,8 +43,8 @@ public class OrderInfo {
 
     private String headImgUrl;//用户头像
 
-    private Integer sellerIsDelete;//卖家是否删除 1是 2否
+    private Integer sellerIsDelete = 2;//卖家是否删除 1是 2否
 
-    private Integer buyerIsDelete;//买家是否删除 1是 2否
+    private Integer buyerIsDelete = 2;//买家是否删除 1是 2否
     //卖家处理时间 平台处理时间
 }

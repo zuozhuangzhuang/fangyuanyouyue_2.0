@@ -7,17 +7,23 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @ApiModel(value = "后台管理订单参数类")
 @Getter
 @Setter
 @ToString
 public class AdminOrderParam extends BasePageReq{
-    @ApiModelProperty(name = "type", value = "类型", dataType = "int",hidden = true)
-    private Integer type;//类型 goodsInfo：1普通商品 2秒杀商品 goodsCategory：1主图 2次图 goodsCategory：1普通 2热门
-
+    //物流公司编号
     @ApiModelProperty(name = "number", value = "物流公司编号", dataType = "int",hidden = true)
-    private String number;//物流公司编号
+    private String number;
 
-    @ApiModelProperty(name = "orderIds", value = "订单id数组", dataType = "int",hidden = true)
-    private Integer[] orderIds;//订单id数组
+    //物流公司名
+    @ApiModelProperty(name = "number", value = "物流公司编号", dataType = "int",hidden = true)
+    private String name;
+
+    //价格
+    @ApiModelProperty(name = "price", value = "价格", dataType = "BigDecimal",hidden = true)
+    private BigDecimal price;
+
 }

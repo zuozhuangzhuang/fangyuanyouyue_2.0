@@ -126,49 +126,7 @@ public class RefundController extends BaseController{
     }
 
 
-//    @ApiOperation(value = "退货列表", notes = "(OrderDto)退货列表")
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
-//            @ApiImplicitParam(name = "start", value = "分页start", required = true, dataType = "int", paramType = "query"),
-//            @ApiImplicitParam(name = "limit", value = "分页limit", required = true, dataType = "int", paramType = "query"),
-//            @ApiImplicitParam(name = "type", value = "类型 1买家（我买下的） 2卖家（我卖出的）", required = true, dataType = "int", paramType = "query")
-//    })
-//    @PostMapping(value = "/orderReturnList")
-//    @ResponseBody
-//    public BaseResp orderReturnList(OrderParam param) throws IOException {
-//        try {
-//            log.info("----》退货列表《----");
-//            log.info("参数："+param.toString());
-//            //验证用户
-//            if(StringUtils.isEmpty(param.getToken())){
-//                return toError("用户token不能为空！");
-//            }
-//            Integer userId = (Integer)schedualRedisService.get(param.getToken());
-//            String verifyUser = schedualUserService.verifyUserById(userId);
-//            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-//            if((Integer)jsonObject.get("code") != 0){
-//                return toError(jsonObject.getString("report"));
-//            }
-//            if(param.getStart() == null || param.getStart() < 0){
-//                return toError("起始页数错误！");
-//            }
-//            if(param.getLimit() == null || param.getLimit() < 1){
-//                return toError("每页个数错误！");
-//            }
-//            if(param.getType() == null){
-//                return toError("类型不能为空！");
-//            }
-//            //退货列表
-//            List<OrderDto> orderDtos = refundService.orderReturnList(userId, param.getStart(), param.getLimit(), param.getType());
-//            return toSuccess(orderDtos);
-//        } catch (ServiceException e) {
-//            e.printStackTrace();
-//            return toError(e.getMessage());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return toError("系统繁忙，请稍后再试！");
-//        }
-//    }
+
 
 
     @ApiOperation(value = "卖家处理退货", notes = "(void)卖家处理退货")

@@ -5,6 +5,7 @@ import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.order.dto.CompanyDto;
 import com.fangyuanyouyue.order.dto.OrderDto;
 import com.fangyuanyouyue.order.param.AdminOrderParam;
 import com.fangyuanyouyue.order.param.OrderParam;
@@ -43,12 +44,12 @@ public class AdminController extends BaseController{
     private RefundService refundService;
 
 
-    @ApiOperation(value = "查看所有用户订单", notes = "查看所有用户订单",response = BaseResp.class)
+    @ApiOperation(value = "查看所有用户订单", notes = "订单管理、退货管理",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "keyword", value = "搜索词条", required = false, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "status", value = "状态", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "状态 1待支付 2待发货 3待收货 4已完成 5已取消 7退货", required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "startDate", value = "开始日期", required = false, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "endDate", value = "结束日期", required = false, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "orders", value = "排序规则", required = false, dataType = "String", paramType = "query"),
@@ -80,42 +81,6 @@ public class AdminController extends BaseController{
         }
     }
 
-//    @ApiOperation(value = "查看用户退货列表", notes = "查看所有退货列表",response = BaseResp.class)
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
-//            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
-//            @ApiImplicitParam(name = "keyword", value = "搜索词条", required = false, dataType = "String", paramType = "query"),
-//            @ApiImplicitParam(name = "status", value = "状态", required = false, dataType = "int", paramType = "query"),
-//            @ApiImplicitParam(name = "startDate", value = "开始日期", required = false, dataType = "String", paramType = "query"),
-//            @ApiImplicitParam(name = "endDate", value = "结束日期", required = false, dataType = "String", paramType = "query"),
-//            @ApiImplicitParam(name = "orders", value = "排序规则", required = false, dataType = "String", paramType = "query"),
-//            @ApiImplicitParam(name = "ascType", value = "排序类型 1升序 2降序", required = false, dataType = "int", paramType = "query")
-//    })
-//    @PostMapping(value = "/refundList")
-//    @ResponseBody
-//    public BaseResp refundList(AdminOrderParam param) throws IOException {
-//        try {
-//            log.info("----》查看所有用户订单《----");
-//            log.info("参数："+param.toString());
-//            //参数判断
-//            //验证用户
-//            if(param.getStart() == null || param.getStart() < 0){
-//                return toError("起始页数错误！");
-//            }
-//            if(param.getLimit() == null || param.getLimit() < 1){
-//                return toError("每页个数错误！");
-//            }
-//            //购物车商品下单
-//            Pager pager = orderService.orderList(param);
-//            return toPage(pager);
-//        } catch (ServiceException e) {
-//            e.printStackTrace();
-//            return toError(e.getMessage());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return toError("系统繁忙，请稍后再试！");
-//        }
-//    }
 
     @ApiOperation(value = "官方处理退货", notes = "官方处理退货")
     @ApiImplicitParams({
@@ -146,4 +111,83 @@ public class AdminController extends BaseController{
             return toError("系统繁忙，请稍后再试！");
         }
     }
+
+
+    @ApiOperation(value = "物流公司列表", notes = "物流公司列表")
+    @PostMapping(value = "/companyList")
+    @ResponseBody
+    public BaseResp companyList(AdminOrderParam param) throws IOException {
+        try {
+            log.info("----》物流公司列表《----");
+            log.info("参数："+param.toString());
+            Pager pager = orderService.companyList(param);
+            return toPage(pager);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+
+    @ApiOperation(value = "增加物流公司", notes = "增加物流公司")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "number", value = "物流公司编号",required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "name", value = "物流公司名",required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "price", value = "参考价格",required = true, dataType = "BigDecimal", paramType = "query")
+    })
+    @PostMapping(value = "/addCompany")
+    @ResponseBody
+    public BaseResp addCompany(AdminOrderParam param) throws IOException {
+        try {
+            log.info("----》增加物流公司《----");
+            log.info("参数："+param.toString());
+            if(param.getNumber() == null){
+                return toError("物流公司编号不能为空！");
+            }
+            if(param.getName() == null){
+                return toError("物流公司名不能为空！");
+            }
+           orderService.addCompany(param.getNumber(),param.getName(),param.getPrice());
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "修改物流公司信息", notes = "修改、删除物流公司信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "物流公司id",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "number", value = "物流公司编号",required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "name", value = "物流公司名",required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "price", value = "参考价格",required = false, dataType = "BigDecimal", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "状态 1正常 2删除",required = false, dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/updateCompany")
+    @ResponseBody
+    public BaseResp updateCompany(AdminOrderParam param) throws IOException {
+        try {
+            log.info("----》修改物流公司信息《----");
+            log.info("参数："+param.toString());
+            if(param.getId() == null){
+                return toError("物流公司id不能为空！");
+            }
+           orderService.updateCompany(param.getId(),param.getNumber(),param.getName(),param.getPrice(), param.getStatus());
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+
 }
