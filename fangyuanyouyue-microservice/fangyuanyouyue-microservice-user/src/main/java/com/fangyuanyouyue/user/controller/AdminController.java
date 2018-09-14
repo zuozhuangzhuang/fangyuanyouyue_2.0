@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fangyuanyouyue.base.BaseController;
+import com.fangyuanyouyue.base.BasePageReq;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.ReCode;
@@ -93,6 +94,29 @@ public class AdminController extends BaseController {
     }
 
 
+
+
+    @ApiOperation(value = "用户列表", notes = "用户列表",response = BaseResp.class)
+    @GetMapping(value = "/auth/list")
+    @ResponseBody
+    public BaseResp authList(BasePageReq param) throws IOException {
+        try {
+            log.info("后台管理查看认证列表");
+        	log.info("参数："+param.toString());
+            if(param.getStart() == null || param.getStart() < 0){
+                return toError("起始页数错误！");
+            }
+            if(param.getLimit() == null || param.getLimit() < 1){
+                return toError("每页个数错误！");
+            }
+        	Pager pager = userAuthApplyService.getPage(param);
+            return toPage(pager);
+        }catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
     @ApiOperation(value = "修改认证状态", notes = "修改认证状态",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "String", paramType = "query"),
@@ -112,7 +136,7 @@ public class AdminController extends BaseController {
 
                 return toError("状态不对！");
         	}
-
+        	
 
             return toSuccess();
         }catch (Exception e) {
@@ -122,6 +146,29 @@ public class AdminController extends BaseController {
     }
 
 
+
+
+
+    @ApiOperation(value = "认证店铺列表", notes = "认证店铺列表",response = BaseResp.class)
+    @GetMapping(value = "/auth/order/list")
+    @ResponseBody
+    public BaseResp authOrderList(BasePageReq param) throws IOException {
+        try {
+            log.info("后台管理查看认证店铺列表");
+        	log.info("参数："+param.toString());
+            if(param.getStart() == null || param.getStart() < 0){
+                return toError("起始页数错误！");
+            }
+            if(param.getLimit() == null || param.getLimit() < 1){
+                return toError("每页个数错误！");
+            }
+        	Pager pager = userAuthOrderService.getPage(param);
+            return toPage(pager);
+        }catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
 
 
     @ApiOperation(value = "修改认证状态", notes = "修改认证状态",response = BaseResp.class)
@@ -143,7 +190,7 @@ public class AdminController extends BaseController {
 
                 return toError("状态不对！");
         	}
-
+        	
 
             return toSuccess();
         }catch (Exception e) {

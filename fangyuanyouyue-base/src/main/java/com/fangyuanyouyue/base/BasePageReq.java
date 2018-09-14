@@ -14,7 +14,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public abstract class BasePageReq extends BaseReq {
+public class BasePageReq extends BaseReq {
 
 	private static final long serialVersionUID = -4370165388088117479L;
 

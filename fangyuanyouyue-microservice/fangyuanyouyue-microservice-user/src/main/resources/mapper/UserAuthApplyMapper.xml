@@ -139,7 +139,7 @@
     <if test="keyword != null">
       and ( 
         b.name like "%"#{keyword,jdbcType=VARCHAR}"%"
-        or b.identiry like "%"#{keyword,jdbcType=VARCHAR}"%"
+        or b.identity like "%"#{keyword,jdbcType=VARCHAR}"%"
       )
     </if>
     <if test="status != null">
@@ -160,7 +160,7 @@
     <if test="keyword != null">
       and (
         b.name like "%"#{keyword,jdbcType=VARCHAR}"%"
-        or b.identiry like "%"#{keyword,jdbcType=VARCHAR}"%"
+        or b.identity like "%"#{keyword,jdbcType=VARCHAR}"%"
       )
     </if>
     <if test="status != null">
