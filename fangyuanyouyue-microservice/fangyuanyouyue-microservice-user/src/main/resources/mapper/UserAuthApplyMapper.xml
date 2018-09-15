@@ -10,8 +10,6 @@
     <result column="reason" property="reason" jdbcType="VARCHAR" />
     <result column="add_time" property="addTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
-    <result column="identity" jdbcType="VARCHAR" property="identity" />
-    <result column="name" jdbcType="VARCHAR" property="name" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, user_id, status, start_time, end_time, reason, add_time, update_time
@@ -156,11 +154,10 @@
   </select>
   
   <select id="getPage" resultMap="BaseResultMap">
-    select a.*,b.identity,b.name from user_auth_apply a,user_info_ext b where a.user_id=b.id
+    select a.* from user_auth_apply a,user_info b where a.user_id=b.id
     <if test="keyword != null">
       and (
-        b.name like "%"#{keyword,jdbcType=VARCHAR}"%"
-        or b.identity like "%"#{keyword,jdbcType=VARCHAR}"%"
+        b.nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
       )
     </if>
     <if test="status != null">
@@ -176,7 +173,10 @@
     </if>
     
     <if test="orders != null">
-      order by #{orders}
+      order by a.${orders}
+      <if test="ascType != null and ascType == 2">
+        desc
+      </if>
     </if>
     limit #{start},#{limit}
   </select>

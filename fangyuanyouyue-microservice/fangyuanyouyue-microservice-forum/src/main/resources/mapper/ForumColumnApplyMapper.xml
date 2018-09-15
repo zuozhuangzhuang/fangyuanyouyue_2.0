@@ -141,7 +141,7 @@
   
     
   <select id="countPage" parameterType="Integer" resultType="Integer">
-    select count(*) from forum_column_apply where status 1=1
+    select count(*) from forum_column_apply where 1=1
     <if test="keyword != null">
       and ( 
       	column_name like "%"#{keyword,jdbcType=VARCHAR}"%"
@@ -180,7 +180,7 @@
     </if>
     
     <if test="orders != null">
-      order by #{orders}
+      order by ${orders}
     </if>
     limit #{start},#{limit}
   </select>
