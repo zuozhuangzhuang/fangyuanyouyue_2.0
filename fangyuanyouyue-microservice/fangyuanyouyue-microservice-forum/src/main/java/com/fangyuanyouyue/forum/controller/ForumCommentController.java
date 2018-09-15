@@ -3,7 +3,6 @@ package com.fangyuanyouyue.forum.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
-import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.forum.dto.ForumCommentDto;
 import com.fangyuanyouyue.forum.dto.MyForumCommentDto;
@@ -65,11 +64,6 @@ public class ForumCommentController extends BaseController {
 			Integer userId = null;
             if(param.getToken()!=null) {
 				userId = (Integer)schedualRedisService.get(param.getToken());
-//				String verifyUser = schedualUserService.verifyUserById(userId);
-//				JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-//				if((Integer)jsonObject.get("code") != 0){
-//					return toError(jsonObject.getString("report"));
-//				}
             }
 
 			List<ForumCommentDto> dto = forumCommentService.getCommentList(userId,param.getForumId(), param.getStart(),
@@ -108,11 +102,6 @@ public class ForumCommentController extends BaseController {
 			Integer userId = null;
             if(param.getToken()!=null) {
 				userId = (Integer)schedualRedisService.get(param.getToken());
-//				String verifyUser = schedualUserService.verifyUserById(userId);
-//				JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-//				if((Integer)jsonObject.get("code") != 0){
-//					return toError(jsonObject.getString("report"));
-//				}
             }
 
 			List<ForumCommentDto> dto = forumCommentService.getCommentCommentList(userId,param.getCommentId(), param.getStart(),

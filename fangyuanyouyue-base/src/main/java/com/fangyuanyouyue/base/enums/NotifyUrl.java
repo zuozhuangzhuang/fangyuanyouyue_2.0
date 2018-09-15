@@ -43,7 +43,7 @@ auth_wechat_notify("/user/user/notify/wechat"),
     column_alipay_notify("/forum/column/notify/alipay"),
 //    会员订单
     vip_alipay_notify("/wallet/userVip/notify/alipay"),
-    //    充值订单
+//    充值订单
     recharge_alipay_notify("/wallet/wallet/notify/alipay"),
 //    官方认证
     auth_alipay_notify("/user/user/notify/alipay");

@@ -1,17 +1,20 @@
 package com.fangyuanyouyue.forum.service.impl;
 
-import java.util.Date;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.forum.dao.ForumInfoMapper;
 import com.fangyuanyouyue.forum.dao.ForumLikesMapper;
 import com.fangyuanyouyue.forum.dto.ForumLikesDto;
+import com.fangyuanyouyue.forum.model.ForumInfo;
 import com.fangyuanyouyue.forum.model.ForumLikes;
 import com.fangyuanyouyue.forum.service.ForumLikesService;
+import com.fangyuanyouyue.forum.service.SchedualWalletService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+import java.util.List;
 
 
 @Service(value = "forumLikesService")
@@ -20,6 +23,10 @@ public class ForumLikesServiceImpl implements ForumLikesService {
 
     @Autowired
     private ForumLikesMapper forumLikesMapper;
+    @Autowired
+	private SchedualWalletService schedualWalletService;
+    @Autowired
+	private ForumInfoMapper forumInfoMapper;
     
 	@Override
 	public Integer countLikes(Integer forumId) {
@@ -44,6 +51,9 @@ public class ForumLikesServiceImpl implements ForumLikesService {
 				model.setForumId(forumId);
 				model.setAddTime(new Date());
 				forumLikesMapper.insert(model);
+				ForumInfo forumInfo = forumInfoMapper.selectByPrimaryKey(forumId);
+				//新增用户行为
+				schedualWalletService.addUserBehavior(userId,forumInfo.getUserId(),forumId, Status.BUSINESS_TYPE_FORUM.getValue(),Status.BEHAVIOR_TYPE_LIKES.getValue());
 			}
 		}else if(type == 2){
 			if(model == null){

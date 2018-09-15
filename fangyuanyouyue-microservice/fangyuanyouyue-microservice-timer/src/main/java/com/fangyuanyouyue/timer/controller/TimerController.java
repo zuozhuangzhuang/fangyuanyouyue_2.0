@@ -135,5 +135,6 @@ public class TimerController extends BaseController {
 
     //TODO 官方认证自动过期（一年）
 
+    //TODO 每天上午08:00 结算专栏返利，200新增浏览量（当前日期前一天0时到24时新增浏览量）/元，浏览量为奇数时，浏览量-1再计算返利金额，直接返到用户余额，并提示用户，新增余额账单
 
 }

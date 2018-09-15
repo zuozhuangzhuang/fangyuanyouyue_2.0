@@ -129,7 +129,7 @@ public class WalletServiceImpl implements WalletService{
         BigDecimal percent;
         if(vipLevel == null){
             //普通用户
-            percent = new BigDecimal(0.008);
+            percent = new BigDecimal(0.01);
         }else{
             if(vipLevel.intValue() == 1){
                 //铂金会员

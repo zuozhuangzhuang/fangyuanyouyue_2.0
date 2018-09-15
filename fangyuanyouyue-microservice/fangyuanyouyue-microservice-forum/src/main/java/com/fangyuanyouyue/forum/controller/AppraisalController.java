@@ -74,11 +74,6 @@ public class AppraisalController extends BaseController {
 			Integer userId = null;
             if(param.getToken()!=null) {
                 userId = (Integer)schedualRedisService.get(param.getToken());
-//                String verifyUser = schedualUserService.verifyUserById(userId);
-//                JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-//                if((Integer)jsonObject.get("code") != 0){
-//                    return toError(jsonObject.getString("report"));
-//                }
             }
             if(param.getAppraisalId()==null) {
             	return toError("鉴定ID不能为空");
@@ -120,11 +115,6 @@ public class AppraisalController extends BaseController {
             Integer userId = null;
             if(param.getToken()!=null) {
                 userId = (Integer)schedualRedisService.get(param.getToken());
-//                String verifyUser = schedualUserService.verifyUserById(userId);
-//                JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-//                if((Integer)jsonObject.get("code") != 0){
-//                    return toError(jsonObject.getString("report"));
-//                }
             }
             List<AppraisalDetailDto> dto = appraisalDetailService.getAppraisalList(userId,param.getKeyword(),param.getStart(), param.getLimit(),param.getType());
             

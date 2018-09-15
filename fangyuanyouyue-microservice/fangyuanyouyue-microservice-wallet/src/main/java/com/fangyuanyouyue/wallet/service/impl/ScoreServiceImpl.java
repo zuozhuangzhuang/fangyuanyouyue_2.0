@@ -1,5 +1,7 @@
 package com.fangyuanyouyue.wallet.service.impl;
 
+import com.fangyuanyouyue.base.enums.Score;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.wallet.dao.BonusPoolMapper;
 import com.fangyuanyouyue.wallet.dao.UserInfoExtMapper;
@@ -86,5 +88,10 @@ public class ScoreServiceImpl implements ScoreService{
                 return bonus.getBonusName();
             }
         }
+    }
+
+    @Override
+    public void shareHtml(Integer userId) throws ServiceException {
+        walletService.updateScore(userId, Score.SHARE.getScore(), Status.ADD.getValue());
     }
 }

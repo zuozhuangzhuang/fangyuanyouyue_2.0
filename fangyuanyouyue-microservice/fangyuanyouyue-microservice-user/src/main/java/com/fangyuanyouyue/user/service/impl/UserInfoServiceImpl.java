@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.user.dto.*;
 import com.fangyuanyouyue.user.service.*;
 import org.apache.commons.lang.StringUtils;
@@ -69,6 +70,8 @@ public class UserInfoServiceImpl implements UserInfoService {
     private SchedualMessageService schedualMessageService;
     @Autowired
     private UserThirdService userThirdService;
+    @Autowired
+    private SchedualWalletService schedualWalletService;
 
     @Override
     public UserInfo getUserByToken(String token) throws ServiceException {
@@ -142,16 +145,15 @@ public class UserInfoServiceImpl implements UserInfoService {
         //用户扩展信息表
         UserInfoExt userInfoExt = new UserInfoExt();
         userInfoExt.setUserId(user.getId());
-        userInfoExt.setStatus(2);//实名登记状态 1已实名 2未实名
-        userInfoExt.setAuthType(2);//认证状态 0申请中 1已认证 2未认证
-        //TODO 信誉度待定
-        userInfoExt.setCredit(100L);//信誉度
+        userInfoExt.setStatus(StatusEnum.AUTH_REJECT.getCode());
+        userInfoExt.setAuthType(StatusEnum.AUTH_TYPE_REJECT.getCode());
+        userInfoExt.setCredit(0L);
         userInfoExt.setAddTime(DateStampUtils.getTimesteamp());
         userInfoExtMapper.insert(userInfoExt);
         //用户会员系统
         UserVip userVip = new UserVip();
         userVip.setUserId(user.getId());
-        userVip.setStatus(2);//会员状态1已开通 2未开通
+        userVip.setStatus(Status.NOT_VIP.getValue());
         userVip.setAddTime(DateStampUtils.getTimesteamp());
         userVipMapper.insert(userVip);
         //注册通讯账户
@@ -245,16 +247,15 @@ public class UserInfoServiceImpl implements UserInfoService {
             //用户扩展信息表
             UserInfoExt userInfoExt = new UserInfoExt();
             userInfoExt.setUserId(user.getId());
-            userInfoExt.setStatus(2);//实名登记状态 1已实名 2未实名
-            userInfoExt.setAuthType(2);//认证状态 0申请中 1已认证 2未认证
-            //TODO 信誉度待定
-            userInfoExt.setCredit(100L);//信誉度
+            userInfoExt.setStatus(StatusEnum.AUTH_REJECT.getCode());
+            userInfoExt.setAuthType(StatusEnum.AUTH_TYPE_REJECT.getCode());
+            userInfoExt.setCredit(0L);
             userInfoExt.setAddTime(DateStampUtils.getTimesteamp());
             userInfoExtMapper.insert(userInfoExt);
             //用户会员系统
             UserVip userVip = new UserVip();
             userVip.setUserId(user.getId());
-            userVip.setStatus(2);//会员状态1已开通 2未开通
+            userVip.setStatus(Status.NOT_VIP.getValue());
             userVip.setAddTime(DateStampUtils.getTimesteamp());
             userVipMapper.insert(userVip);
             //注册通讯账户
@@ -524,22 +525,21 @@ public class UserInfoServiceImpl implements UserInfoService {
             userThirdParty.setUnionId(param.getUnionId());
             userThirdParty.setMiniOpenId(openid);
              userThirdParty.setSessionKey(session_key);
-            userThirdParty.setType(1);//类型 1微信 2QQ 3微博
+            userThirdParty.setType(StatusEnum.WECHAR.getCode());
             userThirdParty.setAddTime(DateStampUtils.getTimesteamp());
             userThirdPartyMapper.insert(userThirdParty);
             //用户扩展信息表
             UserInfoExt userInfoExt = new UserInfoExt();
             userInfoExt.setUserId(user.getId());
-            userInfoExt.setStatus(2);//实名登记状态 1已实名 2未实名
-            userInfoExt.setAuthType(2);//认证状态 0申请中 1已认证 2未认证
-            //TODO 信誉度待定
-            userInfoExt.setCredit(100L);//信誉度
+            userInfoExt.setStatus(StatusEnum.AUTH_REJECT.getCode());
+            userInfoExt.setAuthType(StatusEnum.AUTH_TYPE_REJECT.getCode());
+            userInfoExt.setCredit(0L);
             userInfoExt.setAddTime(DateStampUtils.getTimesteamp());
             userInfoExtMapper.insert(userInfoExt);
             //用户会员系统
             UserVip userVip = new UserVip();
             userVip.setUserId(user.getId());
-            userVip.setStatus(2);//会员状态 1已开通 2未开通
+            userVip.setStatus(Status.NOT_VIP.getValue());
             userVip.setAddTime(DateStampUtils.getTimesteamp());
             userVipMapper.insert(userVip);
             //注册通讯账户
@@ -665,14 +665,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                     userFans.setToUserId(toUserId);
                     userFans.setUserId(userId);
                     userFansMapper.insert(userFans);
-                    List<UserInfo> list = new ArrayList<>();
-                    Iterator<UserInfo> iterator = list.iterator();
-                    while(iterator.hasNext()){
-                        iterator.remove();
-                    }
-                    //新增粉丝：用户“用户昵称”已关注了您！
-                    schedualMessageService.easemobMessage(toUserId.toString(),
-                            "用户“"+userInfo.getNickName()+"”已关注了您！","1","4","");
+                    schedualWalletService.addUserBehavior(userId,toUserId,toUserId, Status.BUSINESS_TYPE_USER.getValue(),Status.BEHAVIOR_TYPE_FANS.getValue());
                 }else if(type == 1){//取消关注
                     if(userFans == null){
                         throw new ServiceException("未关注，取消关注失败！");

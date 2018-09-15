@@ -1,30 +1,35 @@
 package com.fangyuanyouyue.order.service.impl;
 
-import java.math.BigDecimal;
-import java.util.*;
-
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
+import com.fangyuanyouyue.base.enums.Credit;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
-import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.base.enums.Status;
+import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.base.util.DateStampUtils;
+import com.fangyuanyouyue.base.util.IdGenerator;
 import com.fangyuanyouyue.order.dao.*;
 import com.fangyuanyouyue.order.dto.*;
-import com.fangyuanyouyue.order.dto.adminDto.*;
+import com.fangyuanyouyue.order.dto.adminDto.AdminCompanyDto;
+import com.fangyuanyouyue.order.dto.adminDto.AdminOrderDetailDto;
+import com.fangyuanyouyue.order.dto.adminDto.AdminOrderDto;
+import com.fangyuanyouyue.order.dto.adminDto.AdminOrderPayDto;
 import com.fangyuanyouyue.order.model.*;
 import com.fangyuanyouyue.order.param.AdminOrderParam;
 import com.fangyuanyouyue.order.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.base.util.DateStampUtils;
-import com.fangyuanyouyue.base.util.IdGenerator;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Service(value = "orderService")
 @Transactional(rollbackFor=Exception.class)
@@ -654,18 +659,18 @@ public class OrderServiceImpl implements OrderService{
 
 
                 StringBuffer payInfo = new StringBuffer();
-                if(payType.intValue() == 1){
+                if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
                     //微信支付
                     WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderPay.getPayAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.order_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
 //                    orderPay.setPayNo(wechatPayDto.getSign());
                     //微信，失败不做处理，成功继续拆单生成订单
                     return wechatPayDto;
-                }else if(payType.intValue() == 2){
+                }else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
                     //支付宝支付
                     //支付宝，失败不做处理，成功继续拆单生成订单
                     String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(orderInfo.getOrderNo(), orderInfo.getAmount(),NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.order_alipay_notify.getNotifUrl())).getString("data");
                     payInfo.append(info);
-                }else if(payType.intValue() == 3){
+                }else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()){
                     //余额支付
                     //验证支付密码
                     Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
@@ -680,7 +685,7 @@ public class OrderServiceImpl implements OrderService{
                         updateOrder(orderInfo.getOrderNo(),null,payType);
                         payInfo.append("余额支付成功！");
                     }
-                }else if(payType.intValue() == 4){
+                }else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
                     //小程序支付
                     WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,orderInfo.getOrderNo(), orderPay.getPayAmount(), NotifyUrl.mini_test_notify.getNotifUrl()+NotifyUrl.order_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
                     return wechatPayDto;
@@ -839,16 +844,16 @@ public class OrderServiceImpl implements OrderService{
                     int start = goodsQuality+serviceAttitude;
                     if(start<=3){
                         //-300信誉度
-                        orderComment.setStatus(3);
-                        schedualWalletService.updateCredit(orderInfo.getSellerId(),300L,2);
+                        orderComment.setStatus(Status.EVALUATION_BAD.getValue());
+                        schedualWalletService.updateCredit(orderInfo.getSellerId(), Credit.EVALUATION_BAD.getCredit(), Status.SUB.getValue());
                     }else if(3 < start && start <= 6){
                         //+300信誉度
-                        orderComment.setStatus(2);
-                        schedualWalletService.updateCredit(orderInfo.getSellerId(),300L,1);
+                        orderComment.setStatus(Status.EVALUATION_NORMAL.getValue());
+                        schedualWalletService.updateCredit(orderInfo.getSellerId(),Credit.EVALUATION_NORMAL.getCredit(),Status.ADD.getValue());
                     }else if(6 <= start && start <= 10){
                         //+500信誉度
-                        orderComment.setStatus(1);
-                        schedualWalletService.updateCredit(orderInfo.getSellerId(),500L,1);
+                        orderComment.setStatus(Status.EVALUATION_GOOD.getValue());
+                        schedualWalletService.updateCredit(orderInfo.getSellerId(),Credit.EVALUATION_GOOD.getCredit(),Status.ADD.getValue());
                     }else{
                         throw new ServiceException("分值错误！");
                     }
@@ -917,13 +922,28 @@ public class OrderServiceImpl implements OrderService{
                             isAuction = goodsInfo.getType() == 2?true:false;
                             goodsName.append("【"+goodsInfo.getName()+"】");
                         }
-                        //交易信息：恭喜您！您的商品【大头三年原光】已被买下，点击此处查看订单
-                        //交易信息：恭喜您！您的抢购【大头三年原光】已被买下，点击此处查看订单
+                        //交易信息：恭喜您！您的商品【xxx】已被买下，点击此处查看订单
+                        //交易信息：恭喜您！您的抢购【xxx】已被买下，点击此处查看订单
                         schedualMessageService.easemobMessage(childOrder.getSellerId().toString(),
                                 "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单","3","2",childOrder.getId().toString());
                         //买家新增余额账单
                         schedualWalletService.addUserBalanceDetail(childOrder.getUserId(),childOrder.getAmount(),payType,2,childOrder.getOrderNo(),goodsName.toString(),childOrder.getSellerId(),childOrder.getUserId(),1);
                     }
+                }else{
+                    //获取商品名字列表
+                    List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderInfo.getId());
+                    StringBuffer goodsName = new StringBuffer();
+                    boolean isAuction = false;
+                    for(OrderDetail detail:orderDetails){
+                        GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
+                        isAuction = goodsInfo.getType() == 2?true:false;
+                        goodsName.append("【"+goodsInfo.getName()+"】");
+                    }
+                    //交易信息：恭喜您！您的抢购【xxx】已被买下，点击此处查看订单
+                    schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
+                            "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单","3","2",orderInfo.getId().toString());
+                    //买家新增余额账单
+                    schedualWalletService.addUserBalanceDetail(orderInfo.getUserId(),orderInfo.getAmount(),payType,2,orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),1);
                 }
                 orderInfo.setStatus(2);
                 orderInfoMapper.updateByPrimaryKeySelective(orderInfo);

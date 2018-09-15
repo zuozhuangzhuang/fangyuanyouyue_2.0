@@ -132,7 +132,6 @@
     select * from user_auth_order where order_no = #{orderNo} and status = 1
   </select>
   
-    
   <select id="countPage" parameterType="Integer" resultType="Integer">
     select count(*) from user_auth_order a,user_info b where a.user_id=b.id
     <if test="keyword != null">
@@ -175,7 +174,7 @@
     </if>
     
     <if test="orders != null">
-      order by #{orders}
+      order by ${orders}
     </if>
     limit #{start},#{limit}
   </select>

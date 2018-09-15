@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.IdGenerator;
@@ -237,13 +238,13 @@ public class AppraisalServiceImpl implements AppraisalService{
             throw new ServiceException("订单不存在！");
         }else{
             StringBuffer payInfo = new StringBuffer();
-            if(payType.intValue() == 1){//微信,如果回调失败就不做处理，成功就在回调接口中继续订单支付
+            if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
                 WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderInfo.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.appraisal_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
                 return wechatPayDto;
-            }else if(payType.intValue() == 2){//支付宝,如果回调失败就不做处理，成功就在回调接口中继续订单支付
+            }else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
                 String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(orderInfo.getOrderNo(), orderInfo.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.appraisal_alipay_notify.getNotifUrl())).getString("data");
                 payInfo.append(info);
-            }else if(payType.intValue() == 3) {//余额
+            }else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()) {
                 //验证支付密码
                 Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
                 if (!verifyPayPwd) {
@@ -258,7 +259,7 @@ public class AppraisalServiceImpl implements AppraisalService{
                 //订单支付成功
                 updateOrder(orderInfo.getOrderNo(),null,3);
                 payInfo.append("余额支付成功！");
-            }else if(payType.intValue() == 4){
+            }else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
                 //小程序支付
                 WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,orderInfo.getOrderNo(), orderInfo.getAmount(), NotifyUrl.mini_test_notify.getNotifUrl()+NotifyUrl.appraisal_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
                 return wechatPayDto;

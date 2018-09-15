@@ -1,15 +1,16 @@
 package com.fangyuanyouyue.forum.service.impl;
 
-import java.util.Date;
-
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.fangyuanyouyue.forum.dao.ForumCommentLikesMapper;
+import com.fangyuanyouyue.forum.dao.ForumCommentMapper;
+import com.fangyuanyouyue.forum.model.ForumComment;
 import com.fangyuanyouyue.forum.model.ForumCommentLikes;
 import com.fangyuanyouyue.forum.service.ForumCommentLikesService;
+import com.fangyuanyouyue.forum.service.SchedualWalletService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -19,6 +20,10 @@ public class ForumCommentLikesServiceImpl implements ForumCommentLikesService {
 
     @Autowired
     private ForumCommentLikesMapper forumCommentLikesMapper;
+    @Autowired
+	private SchedualWalletService schedualWalletService;
+    @Autowired
+	private ForumCommentMapper forumCommentMapper;
     
 	@Override
 	public Integer countLikes(Integer commentId) {
@@ -37,6 +42,8 @@ public class ForumCommentLikesServiceImpl implements ForumCommentLikesService {
 				forumCommentLikes.setCommentId(commentId);
 				forumCommentLikes.setAddTime(DateStampUtils.getTimesteamp());
 				forumCommentLikesMapper.insert(forumCommentLikes);
+				ForumComment forumComment = forumCommentMapper.selectByPrimaryKey(commentId);
+				schedualWalletService.addUserBehavior(userId,forumComment.getUserId(),commentId, Status.BUSINESS_TYPE_APPRAILSA_COMMENT.getValue(), Status.BEHAVIOR_TYPE_LIKES.getValue());
 			}
 		}else if(type == 2){
 			if(forumCommentLikes == null){

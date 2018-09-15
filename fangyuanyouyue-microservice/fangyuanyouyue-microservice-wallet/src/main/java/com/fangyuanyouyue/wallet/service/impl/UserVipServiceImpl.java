@@ -3,6 +3,7 @@ package com.fangyuanyouyue.wallet.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
@@ -184,14 +185,13 @@ public class UserVipServiceImpl implements UserVipService{
 
             StringBuffer payInfo = new StringBuffer();
             //支付
-            if(payType.intValue() == 1){//微信,如果回调失败就不做处理，成功就在回调接口中继续生成全民鉴定
+            if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
                 WechatPayDto wechatPayDto = walletService.orderPayByWechat(vipOrder.getOrderNo(), vipOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.vip_wechat_notify.getNotifUrl());
                 return wechatPayDto;
-            }else if(payType.intValue() == 2){//支付宝,如果回调失败就不做处理，成功就在回调接口中继续生成全民鉴定
+            }else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
                 String info = walletService.orderPayByALi(vipOrder.getOrderNo(), vipOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.vip_alipay_notify.getNotifUrl());
                 payInfo.append(info);
-            }else if(payType.intValue() == 3) {//余额
-                //验证支付密码
+            }else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()) {
                 Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
                 if(!verifyPayPwd){
                     throw new ServiceException("支付密码错误！");
@@ -202,7 +202,7 @@ public class UserVipServiceImpl implements UserVipService{
                 updateOrder(vipOrder.getOrderNo(),null,3);
 
                 payInfo.append("余额支付成功！");
-            }else if(payType.intValue() == 4){//小程序支付
+            }else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
                 WechatPayDto wechatPayDto = walletService.orderPayByWechatMini(userId, vipOrder.getOrderNo(), vipOrder.getAmount(), NotifyUrl.mini_test_notify.getNotifUrl() + NotifyUrl.vip_wechat_notify.getNotifUrl());
                 return wechatPayDto;
             }else{

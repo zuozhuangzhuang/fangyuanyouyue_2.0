@@ -26,7 +26,7 @@ public class ForumComment {
 
     private String content;//评论内容
 
-    private Integer status;//状态
+    private Integer status;//状态1显示 2隐藏
 
     private Date addTime;//添加时间
 
