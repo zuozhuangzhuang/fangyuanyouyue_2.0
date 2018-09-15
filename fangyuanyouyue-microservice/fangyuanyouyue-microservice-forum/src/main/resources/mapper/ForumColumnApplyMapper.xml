@@ -170,17 +170,20 @@
     <if test="status != null">
       and a.status = #{status}
     </if>
-    
+
     <if test="startDate != null">
-      and a.add_time &gt; #{startDate}
+      and a.add_time <![CDATA[ > ]]> #{startDate}
     </if>
-    
+
     <if test="endDate != null">
-      and a.add_time &lt; #{endDate}
+      and a.add_time <![CDATA[ <= ]]> #{endDate}
     </if>
     
     <if test="orders != null">
       order by ${orders}
+      <if test="ascType != null and ascType == 2">
+        desc
+      </if>
     </if>
     limit #{start},#{limit}
   </select>
