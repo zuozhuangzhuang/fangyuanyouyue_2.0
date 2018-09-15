@@ -50,7 +50,7 @@ public class AdminController extends BaseController {
 			@ApiImplicitParam(name = "keyword", value = "关键字搜索",required = false, dataType = "String", paramType = "query"),
 			@ApiImplicitParam(name = "status", value = "状态 0申请中 1通过 2未通过",required = true, dataType = "int", paramType = "query")
 	})
-	@PostMapping(value = "/applyList")
+	@GetMapping(value = "/applyList")
 	@ResponseBody
 	public BaseResp applyList(BasePageReq param) throws IOException {
 		try {
@@ -59,10 +59,6 @@ public class AdminController extends BaseController {
             if(param.getStart()==null || param.getStart() < 0 ||param.getLimit()==null || param.getLimit() < 1) {
                 return toError("分页参数错误");
             }
-            if(param.getStatus() == null){
-                return toError("状态错误");
-            }
-            
             Pager pager = forumColumnService.getPageApply(param);
 			//TODO 专栏申请列表
            // List<ForumColumnApply> forumColumnApplies = forumColumnService.applyList(param.getStart(), param.getLimit(), param.getKeyword(), param.getStatus());
