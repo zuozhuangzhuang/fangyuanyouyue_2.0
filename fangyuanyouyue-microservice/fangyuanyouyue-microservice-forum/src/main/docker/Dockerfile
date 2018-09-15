@@ -1,7 +1,7 @@
 FROM alpine:3.4
 
 # Install root filesystem
-ADD ./rootfs /
+ADD fangyuanyouyue-microservice-forum-1.0-SNAPSHOT.jar fangyuanyouyue-microservice-forum.jar
 
 # Install base packages
 RUN apk update && apk add curl bash tree tzdata \
