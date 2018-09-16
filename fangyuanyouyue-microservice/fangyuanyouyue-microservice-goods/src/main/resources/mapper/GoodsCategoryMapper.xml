@@ -177,16 +177,44 @@
     select parent_id from goods_category where id = #{categoryId}
   </select>
 
+  <select id="getPage" resultMap="BaseResultMap">
+    select * from goods_category
+    <where>
+      1=1
+      <if test="keyword != null">
+        and (
+        name like "%"#{keyword,jdbcType=VARCHAR}"%"
+        )
+      </if>
+      <if test="status != null">
+        and status = #{status}
+      </if>
+
+    </where>
+    <if test="orders != null">
+      order by ${orders}
+      <if test="ascType != null and ascType == 2">
+        desc
+      </if>
+    </if>
+    <if test="start != null and limit != null">
+      limit #{start},#{limit}
+    </if>
+  </select>
+  
   <select id="countPage" resultType="Integer">
     select count(*) from goods_category
     <where>
       1=1
+      <if test="keyword != null">
+        and (
+        name like "%"#{keyword,jdbcType=VARCHAR}"%"
+        )
+      </if>
       <if test="status != null">
         and status = #{status}
       </if>
-      <if test="keyword != null and keyword != ''">
-        and( name like "%"#{keyword}"#" or description like "%"#{keyword}"#" or user_id in (select id from user_info where nick_name like "%"#{keyword}"#"))
-      </if>
+
     </where>
   </select>
 </mapper>

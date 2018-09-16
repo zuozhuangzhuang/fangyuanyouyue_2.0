@@ -1,6 +1,8 @@
 package com.fangyuanyouyue.forum.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BasePageReq;
+import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.Credit;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.enums.Score;
@@ -11,6 +13,7 @@ import com.fangyuanyouyue.forum.dao.CollectMapper;
 import com.fangyuanyouyue.forum.dao.ForumColumnMapper;
 import com.fangyuanyouyue.forum.dao.ForumInfoMapper;
 import com.fangyuanyouyue.forum.dao.ForumLikesMapper;
+import com.fangyuanyouyue.forum.dto.AdminForumColumnDto;
 import com.fangyuanyouyue.forum.dto.ForumInfoDto;
 import com.fangyuanyouyue.forum.dto.ForumLikesDto;
 import com.fangyuanyouyue.forum.model.*;
@@ -197,4 +200,20 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 	public void dealReport(Integer id, String content) throws ServiceException {
 		//TODO 1、删除帖子 2、发信息给用户 3、扣除被举报用户信誉度 4、给举报用户增加信誉度
 	}
+	
+
+	@Override
+	public Pager getPage(BasePageReq param,Integer type) {
+
+		Integer total = forumInfoMapper.countPage(type,param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
+		List<ForumInfo> datas = forumInfoMapper.getPage(type,param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders());
+		//计算浏览量
+		
+		Pager pager = new Pager();
+		pager.setTotal(total);
+		pager.setDatas(datas);
+		return pager;
+	}
+
+	
 }

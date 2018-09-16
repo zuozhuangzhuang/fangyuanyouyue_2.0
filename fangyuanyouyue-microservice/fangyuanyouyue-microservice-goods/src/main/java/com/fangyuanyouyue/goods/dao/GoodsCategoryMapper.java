@@ -1,11 +1,11 @@
 package com.fangyuanyouyue.goods.dao;
 
-import com.fangyuanyouyue.goods.model.GoodsCategory;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 
-import java.util.List;
+import com.fangyuanyouyue.goods.model.GoodsCategory;
 
 @Mapper
 public interface GoodsCategoryMapper {
@@ -59,5 +59,9 @@ public interface GoodsCategoryMapper {
      * @return
      */
     int countPage(@Param("keyword")String keyword,@Param("status")Integer status);
+    
+    List<GoodsCategory> getPage(@Param("start") Integer start,@Param("limit") Integer limit,@Param("keyword")String keyword,@Param("status")Integer status,@Param("startDate")String startDate,@Param("endDate")String endDate,@Param("orders")String orders,@Param("ascType")Integer ascType);
+    
+    
 
 }

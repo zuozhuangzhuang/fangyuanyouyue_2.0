@@ -629,7 +629,9 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     public Pager categoryPage(AdminGoodsParam param) throws ServiceException {
         Integer total = goodsCategoryMapper.countPage(param.getKeyword(),param.getStatus());
         //商品分类列表
-        List<GoodsCategoryDto> goodsCategoryDtos = categoryList();
+        param.setOrders("parent_id,id");
+        List<GoodsCategory> goodsCategoryDtos = goodsCategoryMapper.getPage(param.getStart(),param.getLimit(),
+                param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
         Pager pager = new Pager();
         pager.setTotal(total);
         pager.setDatas(goodsCategoryDtos);
@@ -641,7 +643,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         Integer total = goodsInfoMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
         //商品列表
 //        List<GoodsInfo> goodsList = goodsInfoMapper.getGoodsList(null, param.getStatus(), param.getKeyword(), param.getPriceMin(), param.getPriceMax(), param.getSynthesize(), param.getQuality(), param.getStart() * param.getLimit(), param.getLimit(), param.getType(), param.getGoodsCategoryIds());
-        List<GoodsInfo> goodsList = goodsInfoMapper.getGoodsPage(param.getType(),param.getStart()*param.getLimit(),param.getLimit(),
+        List<GoodsInfo> goodsList = goodsInfoMapper.getGoodsPage(param.getType(),param.getStart(),param.getLimit(),
                 param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
         List<GoodsDto> dtos = new ArrayList<>();
         //遍历商品列表，添加到GoodsDtos中

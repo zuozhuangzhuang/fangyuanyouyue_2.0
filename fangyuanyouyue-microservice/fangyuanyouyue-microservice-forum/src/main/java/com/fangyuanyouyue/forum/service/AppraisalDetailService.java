@@ -3,6 +3,8 @@ package com.fangyuanyouyue.forum.service;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.fangyuanyouyue.base.BasePageReq;
+import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.forum.dto.AppraisalDetailDto;
 
@@ -67,4 +69,13 @@ public interface AppraisalDetailService {
      * @throws ServiceException
      */
     boolean applyAppraisal(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException;
+    
+    /**
+     * 获取后台分页数据
+     * @param param
+     * @return
+     */
+    Pager getPage(BasePageReq param);
+    
+    
 }
