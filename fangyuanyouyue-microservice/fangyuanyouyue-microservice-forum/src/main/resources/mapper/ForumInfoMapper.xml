@@ -356,6 +356,9 @@
     
     <if test="orders != null">
       order by a.${orders}
+      <if test="ascType != null and ascType == 2">
+        desc
+      </if>
     </if>
     limit #{start},#{limit}
   </select>
