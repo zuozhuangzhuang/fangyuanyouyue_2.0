@@ -186,13 +186,9 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 		}else{
 			if(forumColumnApply.getStatus() != 0){
 				throw new ServiceException("申请信息状态异常！");
-			}else{
-				if(status == 1){
-//					if(StringUtils.isEmpty(coverImgUrl)){
-//						throw new ServiceException("封面图片地址不能为空");
-//					}
-				if(status.intValue() == Status.YES.getValue()){
-					if(StringUtils.isEmpty(coverImgUrl)){
+			}else {
+				if (status.intValue() == Status.YES.getValue()) {
+					if (StringUtils.isEmpty(coverImgUrl)) {
 						throw new ServiceException("封面图片地址不能为空");
 					}
 					ForumColumn forumColumn = new ForumColumn();

@@ -49,6 +49,7 @@ public interface GoodsAppraisalDetailMapper {
     /**
      * 根据订单ID、status获取鉴定列表
      * @param orderId
+     * @param status
      * @return
      */
     List<GoodsAppraisalDetail> getListByOrderIdStatus(@Param("orderId")Integer orderId,@Param("status")Integer status);
