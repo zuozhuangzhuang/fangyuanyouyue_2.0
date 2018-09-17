@@ -38,6 +38,8 @@ public class AdminForumColumnApplyDto {
 
     private String addTime;//添加时间
 
+    private String typeName;//类型名称
+    
     public AdminForumColumnApplyDto() {
     	
     }
@@ -52,6 +54,7 @@ public class AdminForumColumnApplyDto {
         this.phone = model.getPhone();
         this.nickName = model.getNickName();
         this.headImgUrl = model.getHeadImgUrl();
+        this.typeName = model.getTypeName();
     }
     
     public static List<AdminForumColumnApplyDto> toDtoList(List<ForumColumnApply> list) {

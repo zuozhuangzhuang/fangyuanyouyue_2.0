@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.fangyuanyouyue.forum.model.ForumColumn;
 import com.fangyuanyouyue.forum.model.ForumInfo;
 @Mapper
 public interface ForumInfoMapper {
@@ -39,4 +40,29 @@ public interface ForumInfoMapper {
      */
     List<ForumInfo> selectCollectList(@Param("userId")Integer userId,@Param("start")Integer start,@Param("limit")Integer limit,@Param("collectType")Integer collectType,@Param("type")Integer type,@Param("search")String search);
 
+    /**
+     * 后台分页总数
+     * @param keyword
+     * @param status
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    int countPage(@Param("type")Integer type,@Param("keyword")String keyword,@Param("status")Integer status,@Param("startDate")String startDate,@Param("endDate")String endDate);
+    
+    /**
+     * 后台分页数据
+     * @param start
+     * @param limit
+     * @param keyword
+     * @param status
+     * @param startDate
+     * @param endDate
+     * @param orders
+     * @return
+     */
+    List<ForumInfo> getPage(@Param("type")Integer type,@Param("start") Integer start,@Param("limit") Integer limit,@Param("keyword")String keyword,@Param("status")Integer status,@Param("startDate")String startDate,@Param("endDate")String endDate,@Param("orders")String orders);
+    
+    
+    
 }

@@ -309,7 +309,10 @@
   
     
   <select id="countPage" parameterType="Integer" resultType="Integer">
-    select count(*) from forum_column where 1=1
+    select count(*) from forum_info where 1=1
+    <if test="type != null">
+      and  type=#{type,jdbcType=VARCHAR}
+    </if>
     <if test="keyword != null">
       and ( 
       	name like "%"#{keyword,jdbcType=VARCHAR}"%"
@@ -329,7 +332,10 @@
   </select>
   
   <select id="getPage" resultMap="BaseResultMap">
-    select a.*,b.head_img_url,b.nick_name from forum_column a,user_info b where a.user_id=b.id
+    select a.*,b.head_img_url,b.nick_name from forum_info a,user_info b where a.user_id=b.id
+    <if test="type != null">
+      and  a.type=#{type,jdbcType=VARCHAR}
+    </if>
     <if test="keyword != null">
       and (
         a.name like "%"#{keyword,jdbcType=VARCHAR}"%"
@@ -349,7 +355,7 @@
     </if>
     
     <if test="orders != null">
-      order by ${orders}
+      order by a.${orders}
       <if test="ascType != null and ascType == 2">
         desc
       </if>

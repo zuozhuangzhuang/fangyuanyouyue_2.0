@@ -1,7 +1,9 @@
 package com.fangyuanyouyue.forum.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BasePageReq;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
 import com.fangyuanyouyue.base.enums.Status;
@@ -327,6 +329,20 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 						"用户“"+user.getNickName()+"”看到全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧","7","5",appraisalDetail.getId().toString());
 			}
 		}
+	}
+
+
+	@Override
+	public Pager getPage(BasePageReq param) {
+
+		Integer total = appraisalDetailMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
+		List<AppraisalDetail> datas = appraisalDetailMapper.getPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders());
+		//计算浏览量
+		
+		Pager pager = new Pager();
+		pager.setTotal(total);
+		pager.setDatas(datas);
+		return pager;
 	}
 
 }

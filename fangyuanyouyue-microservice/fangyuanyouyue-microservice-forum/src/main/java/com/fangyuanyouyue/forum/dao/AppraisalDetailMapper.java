@@ -1,6 +1,8 @@
 package com.fangyuanyouyue.forum.dao;
 
 import com.fangyuanyouyue.forum.model.AppraisalDetail;
+import com.fangyuanyouyue.forum.model.ForumInfo;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -69,4 +71,31 @@ public interface AppraisalDetailMapper {
      * @return
      */
     List<AppraisalDetail> selectByStatusEndTime(@Param("status")Integer status, @Param("endTime")Date endTime);
+    
+    /**
+     * 后台分页总数
+     * @param keyword
+     * @param status
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    int countPage(@Param("keyword")String keyword,@Param("status")Integer status,@Param("startDate")String startDate,@Param("endDate")String endDate);
+    
+    /**
+     * 后台分页数据
+     * @param start
+     * @param limit
+     * @param keyword
+     * @param status
+     * @param startDate
+     * @param endDate
+     * @param orders
+     * @return
+     */
+    List<AppraisalDetail> getPage(@Param("start") Integer start,@Param("limit") Integer limit,@Param("keyword")String keyword,@Param("status")Integer status,@Param("startDate")String startDate,@Param("endDate")String endDate,@Param("orders")String orders);
+    
+    
+    
+    
 }

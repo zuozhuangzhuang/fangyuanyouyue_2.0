@@ -180,4 +180,12 @@ public interface OrderService {
      * @throws ServiceException
      */
     void updateCompany(Integer id,String number, String name, BigDecimal price,Integer status) throws ServiceException;
+
+    /**
+     * 获取简单订单列表
+     * @param param
+     * @return
+     * @throws ServiceException
+     */
+	Pager simpleOrderList(AdminOrderParam param) throws ServiceException;
 }

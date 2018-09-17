@@ -1,7 +1,6 @@
 package com.fangyuanyouyue.forum.controller;
 
 import java.io.IOException;
-import java.util.List;
 
 import com.fangyuanyouyue.forum.param.AdminForumParam;
 import com.fangyuanyouyue.forum.service.ForumInfoService;
@@ -9,16 +8,22 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BasePageReq;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.forum.model.ForumColumnApply;
 import com.fangyuanyouyue.forum.param.ForumParam;
+import com.fangyuanyouyue.forum.service.AppraisalDetailService;
 import com.fangyuanyouyue.forum.service.ForumColumnService;
+import com.fangyuanyouyue.forum.service.ForumInfoService;
 import com.fangyuanyouyue.forum.service.SchedualRedisService;
 import com.fangyuanyouyue.forum.service.SchedualUserService;
 
@@ -28,7 +33,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
-@RequestMapping(value = "/adminAppraisal")
+@RequestMapping(value = "/adminForum")
 @Api(description = "首页后台管理Controller")
 @RefreshScope
 public class AdminController extends BaseController {
@@ -42,6 +47,120 @@ public class AdminController extends BaseController {
     private SchedualRedisService schedualRedisService;
     @Autowired
     private ForumInfoService forumInfoService;
+    @Autowired
+    private AppraisalDetailService appraisalDetailService;
+
+
+	@ApiOperation(value = "专栏列表", notes = "专栏列表", response = BaseResp.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "keyword", value = "关键字搜索",required = false, dataType = "String", paramType = "query"),
+	})
+	@GetMapping(value = "/columnList")
+	@ResponseBody
+	public BaseResp columnList(BasePageReq param) throws IOException {
+		try {
+			log.info("----》专栏列表《----");
+			log.info("参数：" + param.toString());
+            if(param.getStart()==null || param.getStart() < 0 ||param.getLimit()==null || param.getLimit() < 1) {
+                return toError("分页参数错误");
+            }
+            Pager pager = forumColumnService.getPage(param);
+			//TODO 专栏申请列表
+           // List<ForumColumnApply> forumColumnApplies = forumColumnService.applyList(param.getStart(), param.getLimit(), param.getKeyword(), param.getStatus());
+
+            return toPage(pager);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return toError("系统繁忙，请稍后再试！");
+		}
+	}
+
+
+	@ApiOperation(value = "帖子列表", notes = "帖子列表", response = BaseResp.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "keyword", value = "关键字搜索",required = false, dataType = "String", paramType = "query"),
+	})
+	@GetMapping(value = "/forumList")
+	@ResponseBody
+	public BaseResp forumList(BasePageReq param) throws IOException {
+		try {
+			log.info("----》帖子列表《----");
+			log.info("参数：" + param.toString());
+            if(param.getStart()==null || param.getStart() < 0 ||param.getLimit()==null || param.getLimit() < 1) {
+                return toError("分页参数错误");
+            }
+            Pager pager = forumInfoService.getPage(param,1);
+			//TODO 专栏申请列表
+           // List<ForumColumnApply> forumColumnApplies = forumColumnService.applyList(param.getStart(), param.getLimit(), param.getKeyword(), param.getStatus());
+
+            return toPage(pager);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return toError("系统繁忙，请稍后再试！");
+		}
+	}
+
+
+
+	@ApiOperation(value = "视频列表", notes = "视频列表", response = BaseResp.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "keyword", value = "关键字搜索",required = false, dataType = "String", paramType = "query"),
+	})
+	@GetMapping(value = "/videoList")
+	@ResponseBody
+	public BaseResp videoList(BasePageReq param) throws IOException {
+		try {
+			log.info("----》帖子列表《----");
+			log.info("参数：" + param.toString());
+            if(param.getStart()==null || param.getStart() < 0 ||param.getLimit()==null || param.getLimit() < 1) {
+                return toError("分页参数错误");
+            }
+            Pager pager = forumInfoService.getPage(param,2);
+			//TODO 专栏申请列表
+           // List<ForumColumnApply> forumColumnApplies = forumColumnService.applyList(param.getStart(), param.getLimit(), param.getKeyword(), param.getStatus());
+
+            return toPage(pager);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return toError("系统繁忙，请稍后再试！");
+		}
+	}
+
+
+
+
+	@ApiOperation(value = "全民鉴定列表", notes = "全民鉴定列表", response = BaseResp.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "keyword", value = "关键字搜索",required = false, dataType = "String", paramType = "query"),
+	})
+	@GetMapping(value = "/appraisalList")
+	@ResponseBody
+	public BaseResp appraisalList(BasePageReq param) throws IOException {
+		try {
+			log.info("----》全民鉴定列表《----");
+			log.info("参数：" + param.toString());
+            if(param.getStart()==null || param.getStart() < 0 ||param.getLimit()==null || param.getLimit() < 1) {
+                return toError("分页参数错误");
+            }
+            Pager pager = appraisalDetailService.getPage(param);
+			//TODO 专栏申请列表
+           // List<ForumColumnApply> forumColumnApplies = forumColumnService.applyList(param.getStart(), param.getLimit(), param.getKeyword(), param.getStatus());
+
+            return toPage(pager);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return toError("系统繁忙，请稍后再试！");
+		}
+	}
+
 
 
 	@ApiOperation(value = "专栏申请列表", notes = "专栏申请列表", response = BaseResp.class)
@@ -81,7 +200,7 @@ public class AdminController extends BaseController {
             @ApiImplicitParam(name = "reason", value = "拒绝理由（拒绝必填）",required = false, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "isChosen", value = "是否精选1是 2否",required = false, dataType = "String", paramType = "query")
     })
-    @PostMapping(value = "/handle")
+    @PostMapping(value = "/handleApply")
     @ResponseBody
     public BaseResp handle(AdminForumParam param) throws IOException {
         try {

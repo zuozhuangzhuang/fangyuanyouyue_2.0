@@ -190,7 +190,7 @@
   
     
   <select id="countPage" parameterType="Integer" resultType="Integer">
-    select count(*) from forum_column where status 1=1
+    select count(*) from forum_column where 1=1
     <if test="keyword != null">
       and ( 
       	name like "%"#{keyword,jdbcType=VARCHAR}"%"
@@ -210,14 +210,14 @@
   </select>
   
   <select id="getPage" resultMap="BaseResultMap">
-    select * from forum_column where 1=1
+    select *,b.name as type_name from forum_column a,forum_column_type b where a.type_id=b.id
     <if test="keyword != null">
       and ( 
-      	nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
+      	a.name like "%"#{keyword,jdbcType=VARCHAR}"%"
       )
     </if>
     <if test="status != null">
-      and status = #{status}
+      and a.status = #{status}
     </if>
 
     <if test="startDate != null">
@@ -229,7 +229,7 @@
     </if>
     
     <if test="orders != null">
-      order by ${orders}
+      order by a.${orders}
       <if test="ascType != null and ascType == 2">
         desc
       </if>

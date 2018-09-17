@@ -161,7 +161,7 @@
   </select>
   
   <select id="getPage" resultMap="BaseResultMap">
-    select a.*,b.nick_name,b.head_img_url,b.phone,c.name as typeName from forum_column_apply a,user_info b,forum_column_type c where a.user_id=b.id and a.type_id=c.id
+    select a.*,b.nick_name,b.head_img_url,b.phone,c.name from forum_column_apply a,user_info b,forum_column_type c where a.user_id=b.id and a.type_id=c.id
     <if test="keyword != null">
       and ( 
       	a.column_name like "%"#{keyword,jdbcType=VARCHAR}"%"

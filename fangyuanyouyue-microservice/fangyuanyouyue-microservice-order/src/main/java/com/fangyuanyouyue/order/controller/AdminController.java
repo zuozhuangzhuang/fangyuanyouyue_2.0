@@ -114,7 +114,7 @@ public class AdminController extends BaseController{
 
 
     @ApiOperation(value = "物流公司列表", notes = "物流公司列表")
-    @PostMapping(value = "/companyList")
+    @GetMapping(value = "/companyList")
     @ResponseBody
     public BaseResp companyList(AdminOrderParam param) throws IOException {
         try {

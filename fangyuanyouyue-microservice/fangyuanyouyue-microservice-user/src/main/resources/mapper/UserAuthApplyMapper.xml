@@ -10,6 +10,9 @@
     <result column="reason" property="reason" jdbcType="VARCHAR" />
     <result column="add_time" property="addTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="reason" property="reason" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, user_id, status, start_time, end_time, reason, add_time, update_time
@@ -154,10 +157,11 @@
   </select>
   
   <select id="getPage" resultMap="BaseResultMap">
-    select a.* from user_auth_apply a,user_info b where a.user_id=b.id
+    select a.*,b.phone,b.nick_name from user_auth_apply a,user_info b where a.user_id=b.id
     <if test="keyword != null">
       and (
         b.nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
+        or b.phone like "%"#{keyword,jdbcType=VARCHAR}"%"
       )
     </if>
     <if test="status != null">

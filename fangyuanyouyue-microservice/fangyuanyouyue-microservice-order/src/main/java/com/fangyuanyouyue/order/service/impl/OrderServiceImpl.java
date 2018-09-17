@@ -1017,6 +1017,19 @@ public class OrderServiceImpl implements OrderService{
         pager.setDatas(orderDtos);
         return pager;
     }
+    
+    @Override
+    public Pager simpleOrderList(AdminOrderParam param) throws ServiceException {
+        //后台查看所有用户订单
+        Integer total = orderInfoMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
+
+        List<OrderInfo> list = orderInfoMapper.getOrderPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+
+        Pager pager = new Pager();
+        pager.setTotal(total);
+        pager.setDatas(list);
+        return pager;
+    }
 
     @Override
     public Pager companyList(AdminOrderParam param) throws ServiceException {
