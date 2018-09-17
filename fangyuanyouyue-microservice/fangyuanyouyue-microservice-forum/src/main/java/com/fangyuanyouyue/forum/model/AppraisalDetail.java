@@ -23,7 +23,7 @@ public class AppraisalDetail {
 
     private Integer sort;//排序
 
-    private Integer status;//状态 1进行中 2结束
+    private Integer status;//状态 1进行中 2结束 3删除
 
     private Date endTime;//结束时间
 

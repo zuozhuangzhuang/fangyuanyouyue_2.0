@@ -24,11 +24,18 @@ public enum Status {
 
     //支付方式 1微信 2支付宝 3余额 4小程序
     PAY_TYPE_WECHAT(1),PAY_TYPE_ALIPAY(2),PAY_TYPE_BALANCE(3),PAY_TYPE_MINI(4),
+
+    //消息类型 1系统消息 2交易消息 3社交消息 4新增粉丝 5邀请我
+    SYSTEM_MESSAGE("1"),SELLER_MESSAGE("2"),SOCIAL_MESSAGE("3"),FANS_MESSAGE("4"),INVITE_MESSAGE("5"),
+
     /**
      * 跳转类型
      * 1系统消息 2商品消息 3订单消息 4视频消息 5帖子消息 6专栏消息 7全民鉴定消息 8商品、抢购评论消息
-     * 9帖子评论消息 10视频评论消息 11全民鉴定评论消息 12会员特权 13钱包余额
+     * 9帖子评论消息 10视频评论消息 11全民鉴定评论消息 12会员特权 13钱包余额 14官方鉴定消息
      */
+    JUMP_TYPE_SYSTEM("1"),JUMP_TYPE_GOODS("2"),JUMP_TYPE_ORDER("3"),JUMP_TYPE_VIDEO("4"),JUMP_TYPE_FORUM("5"),JUMP_TYPE_COLUMN("6"),JUMP_TYPE_APPRAISAL("7"),
+    JUMP_TYPE_GOODS_COMMENT("8"),JUMP_TYPE_FORUM_COMMENT("9"),JUMP_TYPE_VIDEO_COMMENT("10"),JUMP_TYPE_APPRAISAL_COMMENT("11"),JUMP_TYPE_VIP("12"),JUMP_TYPE_WALLET("13"),
+    JUMP_TYPE_PLATFORM_APPRAISAL("14"),
 
     //会员等级 1铂金会员 2至尊会员
     VIP_LEVEL_LOW(1),VIP_LEVEL_HIGH(2),
@@ -56,14 +63,30 @@ public enum Status {
     //议价状态 1申请 2同意 3拒绝 4取消
     BARGAIN_APPLY(1),BARGAIN_AGREE(2),BARGAIN_REFUSE(3),BARGAIN_CANCEL(4),
     ;
-    private final Integer value;
+    private Integer value;
+    private String message;
+
+    Status() {
+    }
 
     Status(Integer value) {
         this.value = value;
+    }
+
+    Status(String message) {
+        this.message = message;
+    }
+
+    Status(Integer value, String message) {
+        this.value = value;
+        this.message = message;
     }
 
     public Integer getValue() {
         return value;
     }
 
+    public String getMessage() {
+        return message;
+    }
 }

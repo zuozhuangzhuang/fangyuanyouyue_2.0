@@ -250,6 +250,7 @@ public class OrderServiceImpl implements OrderService{
                 String goodsMainImg = JSONObject.parseObject(schedualGoodsService.goodsMainImg(goods.getId())).getString("data");
                 orderDetail.setMainImgUrl(goodsMainImg);
                 orderDetail.setAmount(goods.getPrice());
+
                 //计算优惠券（每个商品都可以使用优惠券）
                 Integer couponId = addOrderDetailDto.getCouponId();//优惠券ID
                 orderDetail.setCouponId(couponId);
@@ -298,7 +299,7 @@ public class OrderServiceImpl implements OrderService{
 
             //交易消息：恭喜您！您的商品【大头三年原光】、【xxx】、【xx】已有人下单，点击此处查看订单
             schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
-                    "恭喜您！您的商品"+goodsName.toString()+"已有人下单，点击此处查看订单","3","2",orderInfo.getId().toString());
+                    "恭喜您！您的商品"+goodsName.toString()+"已有人下单，点击此处查看订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER.getMessage(),orderInfo.getId().toString());
         }
         //删除买家购物车内此商品信息:goodsFeign/cartRemove
         Integer[] goodsIds = new Integer[goodsList.size()];
@@ -353,7 +354,7 @@ public class OrderServiceImpl implements OrderService{
                         goodsName.append("【"+goodsInfo.getName()+"】");
                     }
                     schedualMessageService.easemobMessage(info.getSellerId().toString(),
-                            "您的"+(isAuction?"抢购":"商品")+goodsName+"买家已取消订单","3","2",info.getId().toString());
+                            "您的"+(isAuction?"抢购":"商品")+goodsName+"买家已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER.getMessage(),info.getId().toString());
                 }
             }
             //获取此订单内所有商品，更改商品状态为出售中
@@ -370,7 +371,7 @@ public class OrderServiceImpl implements OrderService{
             }
             //给买家发送信息：您未支付的商品【名称】已取消订单
             schedualMessageService.easemobMessage(userId.toString(),
-                    "您未支付的"+(isAuction?"抢购":"商品")+goodsName+"已取消订单","3","2",orderInfo.getId().toString());
+                    "您未支付的"+(isAuction?"抢购":"商品")+goodsName+"已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER.getMessage(),orderInfo.getId().toString());
         }else{
             throw new ServiceException("订单异常！");
         }
@@ -636,7 +637,8 @@ public class OrderServiceImpl implements OrderService{
         //交易消息：恭喜您！您的商品【大头三年原光】已有人下单，点击此处查看订单
         // 交易消息：恭喜您！您的抢购【大头三年原光】已有人下单，点击此处查看订单
         schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
-                "恭喜您！您的"+(goods.getType()==1?"商品【":"抢购【")+goods.getName()+"】已有人下单，点击此处查看订单","3","2",orderInfo.getId().toString());
+                "恭喜您！您的"+(goods.getType()==Status.GOODS.getValue()?"商品【":"抢购【")+goods.getName()+"】已有人下单，点击此处查看订单",
+                Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER.getMessage(),orderInfo.getId().toString());
         return orderDto;
 
     }
@@ -768,6 +770,12 @@ public class OrderServiceImpl implements OrderService{
             if (orderInfo.getStatus() != Status.ORDER_GOODS_SENDED.getValue()) {
                 throw new ServiceException("订单状态异常！");
             } else {
+                if(orderInfo.getIsRefund() == Status.YES.getValue()){
+                    OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderInfo.getId(), 1, null);
+                    if(orderRefund != null){
+                        throw new ServiceException("订单正在退货！");
+                    }
+                }
                 OrderPay orderPay = orderPayMapper.selectByOrderId(orderId);
                 if (orderPay == null) {
                     throw new ServiceException("订单支付信息异常！");
@@ -895,7 +903,7 @@ public class OrderServiceImpl implements OrderService{
                 goodsName.append("【"+goodsInfo.getName()+"】");
             }
             schedualMessageService.easemobMessage(order.getSellerId().toString(),
-                    "您的"+(isAuction?"抢购":"商品")+goodsName+"买家提醒您发货，点击此处查看订单","3","2",orderId.toString());
+                    "您的"+(isAuction?"抢购":"商品")+goodsName+"买家提醒您发货，点击此处查看订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER.getMessage(),orderId.toString());
         }else{
             throw new ServiceException("订单状态错误！");
         }
@@ -938,7 +946,7 @@ public class OrderServiceImpl implements OrderService{
                         //交易信息：恭喜您！您的商品【xxx】已被买下，点击此处查看订单
                         //交易信息：恭喜您！您的抢购【xxx】已被买下，点击此处查看订单
                         schedualMessageService.easemobMessage(childOrder.getSellerId().toString(),
-                                "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单","3","2",childOrder.getId().toString());
+                                "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER.getMessage(),childOrder.getId().toString());
                         //买家新增余额账单
                         schedualWalletService.addUserBalanceDetail(childOrder.getUserId(),childOrder.getAmount(),payType,Status.EXPEND.getValue(),childOrder.getOrderNo(),goodsName.toString(),childOrder.getSellerId(),childOrder.getUserId(),Status.GOODS_INFO.getValue());
                     }
@@ -954,7 +962,7 @@ public class OrderServiceImpl implements OrderService{
                     }
                     //交易信息：恭喜您！您的抢购【xxx】已被买下，点击此处查看订单
                     schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
-                            "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单","3","2",orderInfo.getId().toString());
+                            "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER.getMessage(),orderInfo.getId().toString());
                     //买家新增余额账单
                     schedualWalletService.addUserBalanceDetail(orderInfo.getUserId(),orderInfo.getAmount(),payType,Status.EXPEND.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue());
                 }

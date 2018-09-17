@@ -169,7 +169,7 @@ public class AdminController extends BaseController{
             @ApiImplicitParam(name = "price", value = "参考价格",required = false, dataType = "BigDecimal", paramType = "query"),
             @ApiImplicitParam(name = "status", value = "状态 1正常 2删除",required = false, dataType = "int", paramType = "query")
     })
-    @PostMapping(value = "/updateCompany")
+    @PutMapping(value = "/updateCompany")
     @ResponseBody
     public BaseResp updateCompany(AdminOrderParam param) throws IOException {
         try {

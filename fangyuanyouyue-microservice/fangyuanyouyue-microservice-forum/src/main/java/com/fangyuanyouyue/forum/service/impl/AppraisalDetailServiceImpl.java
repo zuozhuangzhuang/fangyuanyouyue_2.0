@@ -257,7 +257,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 			if(userIds != null && userIds.length > 0){
 				for(Integer toUserId:userIds){
 					schedualMessageService.easemobMessage(toUserId.toString(),
-							"用户“"+user.getNickName()+"”发起全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧","7","5",appraisalDetail.getId().toString());
+							"用户“"+user.getNickName()+"”发起全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧",Status.INVITE_MESSAGE.getMessage(),Status.JUMP_TYPE_APPRAISAL.getMessage(),appraisalDetail.getId().toString());
 				}
 			}
 		}
@@ -308,7 +308,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 		if(userInds != null && userInds.length > 0){
 			for(String toUserId:userInds){
 				schedualMessageService.easemobMessage(toUserId,
-						"用户“"+user.getNickName()+"”发起全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧","7","5",appraisalDetail.getId().toString());
+						"用户“"+user.getNickName()+"”发起全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧",Status.INVITE_MESSAGE.getMessage(),Status.JUMP_TYPE_APPRAISAL.getMessage(),appraisalDetail.getId().toString());
 			}
 		}
 		//余额账单
@@ -326,7 +326,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 		if(userIds != null && userIds.length > 0){
 			for(Integer toUserId:userIds){
 				schedualMessageService.easemobMessage(toUserId.toString(),
-						"用户“"+user.getNickName()+"”看到全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧","7","5",appraisalDetail.getId().toString());
+						"用户“"+user.getNickName()+"”看到全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧",Status.INVITE_MESSAGE.getMessage(),Status.JUMP_TYPE_APPRAISAL.getMessage(),appraisalDetail.getId().toString());
 			}
 		}
 	}

@@ -39,7 +39,7 @@ public class TimerServiceImpl implements TimerService{
                 userAuthApplyMapper.updateByPrimaryKey(apply);
                 userInfoExtMapper.updateByPrimaryKey(userInfoExt);
                 //发送消息
-                schedualMessageService.easemobMessage(apply.getId().toString(),"您的认证店铺已到期！","1","1","");
+                schedualMessageService.easemobMessage(apply.getId().toString(),"您的认证店铺已到期！",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
             }
         }
     }

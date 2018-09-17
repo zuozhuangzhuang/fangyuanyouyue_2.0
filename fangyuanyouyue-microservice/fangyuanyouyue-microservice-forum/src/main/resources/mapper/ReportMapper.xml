@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fangyuanyouyue.forum.dao.ReportMapper" >
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.forum.model.Report" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="reason" property="reason" jdbcType="VARCHAR" />
+    <result column="business_id" property="businessId" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="add_time" property="addTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+    <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, reason, business_id, user_id, add_time, update_time, type, status
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from report
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from report
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.Report" useGeneratedKeys="true" keyProperty="id">
+    insert into report (id, reason, business_id, 
+      user_id, add_time, update_time, 
+      type, status)
+    values (#{id,jdbcType=INTEGER}, #{reason,jdbcType=VARCHAR}, #{businessId,jdbcType=INTEGER}, 
+      #{userId,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{type,jdbcType=INTEGER}, #{status,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.forum.model.Report" useGeneratedKeys="true" keyProperty="id">
+    insert into report
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="reason != null" >
+        reason,
+      </if>
+      <if test="businessId != null" >
+        business_id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="addTime != null" >
+        add_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="reason != null" >
+        #{reason,jdbcType=VARCHAR},
+      </if>
+      <if test="businessId != null" >
+        #{businessId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="addTime != null" >
+        #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.forum.model.Report" >
+    update report
+    <set >
+      <if test="reason != null" >
+        reason = #{reason,jdbcType=VARCHAR},
+      </if>
+      <if test="businessId != null" >
+        business_id = #{businessId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="addTime != null" >
+        add_time = #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.forum.model.Report" >
+    update report
+    set reason = #{reason,jdbcType=VARCHAR},
+      business_id = #{businessId,jdbcType=INTEGER},
+      user_id = #{userId,jdbcType=INTEGER},
+      add_time = #{addTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      type = #{type,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+
+  <select id="countForumPage" resultType="Integer">
+    select count(*) from report a,forum_info b
+    <where>
+      a.business_id = b.id and (a.type = 2 or a.type = 3)
+      <if test="type != null">
+        and b.type = #{type}
+      </if>
+      <if test="status != null">
+        and a.status = #{status}
+      </if>
+      <if test="keyword != null and keyword != ''">
+        and (
+        b.title like "%"#{keyword}"%"
+        or b.content like "%"#{keyword}"%"
+        or a.user_id in (select id from user_info where nick_name like  "%"#{keyword}"%")
+        or b.user_id in (select id from user_info where nick_name like  "%"#{keyword}"%")
+        )
+      </if>
+      <if test="startDate != null and startDate != ''">
+        and a.add_time <![CDATA[ > ]]> #{startDate}
+      </if>
+      <if test="endDate != null and endDate != ''">
+        and a.add_time <![CDATA[ <= ]]> #{endDate}
+      </if>
+    </where>
+  </select>
+  <select id="getForumReportPage" resultMap="BaseResultMap">
+    select a.*,b.title name,c.nick_name,c.head_img_url from report a,forum_info b,user_info c
+    <where>
+      a.business_id = b.id and a.user_id = c.id and (a.type = 2 or a.type = 3)
+      <if test="type != null">
+        and b.type = #{type}
+      </if>
+      <if test="status != null">
+        and a.status = #{status}
+      </if>
+      <if test="keyword != null and keyword != ''">
+        and (
+        b.title like "%"#{keyword}"%"
+        or b.content like "%"#{keyword}"%"
+        or a.user_id in (select id from user_info where nick_name like  "%"#{keyword}"%")
+        or b.user_id in (select id from user_info where nick_name like  "%"#{keyword}"%")
+        )
+      </if>
+      <if test="startDate != null and startDate != ''">
+        and a.add_time <![CDATA[ > ]]> #{startDate}
+      </if>
+      <if test="endDate != null and endDate != ''">
+        and a.add_time <![CDATA[ <= ]]> #{endDate}
+      </if>
+    </where>
+    <if test="orders != null">
+      order by ${orders}
+      <if test="ascType != null and ascType == 2">
+        desc
+      </if>
+    </if>
+    <if test="start != null and limit != null">
+      limit #{start},#{limit}
+    </if>
+  </select>
+
+
+  <select id="countAppraisalPage" resultType="Integer">
+    select count(*) from report a,appraisal_detail b
+    <where>
+      a.business_id = b.id and a.type = 4
+      <if test="status != null">
+        and a.status = #{status}
+      </if>
+      <if test="keyword != null and keyword != ''">
+        and (
+        b.title like "%"#{keyword}"%"
+        or b.content like "%"#{keyword}"%"
+        or a.user_id in (select id from user_info where nick_name like  "%"#{keyword}"%")
+        or b.user_id in (select id from user_info where nick_name like  "%"#{keyword}"%")
+        )
+      </if>
+      <if test="startDate != null and startDate != ''">
+        and a.add_time <![CDATA[ > ]]> #{startDate}
+      </if>
+      <if test="endDate != null and endDate != ''">
+        and a.add_time <![CDATA[ <= ]]> #{endDate}
+      </if>
+    </where>
+  </select>
+  <select id="getAppraisalReportPage" resultMap="BaseResultMap">
+    select a.*,b.title name,c.nick_name,c.head_img_url from report a,appraisal_detail b,user_info c
+    <where>
+      a.business_id = b.id and a.user_id = c.id and a.type = 4
+      <if test="status != null">
+        and a.status = #{status}
+      </if>
+      <if test="keyword != null and keyword != ''">
+        and (
+        b.title like "%"#{keyword}"%"
+        or b.content like "%"#{keyword}"%"
+        or a.user_id in (select id from user_info where nick_name like  "%"#{keyword}"%")
+        or b.user_id in (select id from user_info where nick_name like  "%"#{keyword}"%")
+        )
+      </if>
+      <if test="startDate != null and startDate != ''">
+        and a.add_time <![CDATA[ > ]]> #{startDate}
+      </if>
+      <if test="endDate != null and endDate != ''">
+        and a.add_time <![CDATA[ <= ]]> #{endDate}
+      </if>
+    </where>
+    <if test="orders != null">
+      order by ${orders}
+      <if test="ascType != null and ascType == 2">
+        desc
+      </if>
+    </if>
+    <if test="start != null and limit != null">
+      limit #{start},#{limit}
+    </if>
+  </select>
+</mapper>

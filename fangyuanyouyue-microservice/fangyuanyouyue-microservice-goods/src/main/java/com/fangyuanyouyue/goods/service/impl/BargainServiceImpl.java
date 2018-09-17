@@ -157,7 +157,7 @@ public class BargainServiceImpl implements BargainService{
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(bargainOrder.getGoodsId());
         //议价：恭喜您！您的商品【商品名称】有新的议价，点击此处查看详情
         schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
-                "恭喜您！您的商品【"+goodsInfo.getName()+"】有新的议价，点击此处查看详情","2","2",goodsInfo.getId().toString());
+                "恭喜您！您的商品【"+goodsInfo.getName()+"】有新的议价，点击此处查看详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),goodsInfo.getId().toString());
         //买家新增余额账单
         schedualWalletService.addUserBalanceDetail(goodsBargain.getUserId(),goodsBargain.getPrice(),payType,Status.EXPEND.getValue(),bargainOrder.getOrderNo(),goodsInfo.getName(),goodsInfo.getUserId(),goodsBargain.getUserId(),Status.BARGAIN.getValue());
         return true;
@@ -273,14 +273,14 @@ public class BargainServiceImpl implements BargainService{
                     //如果卖家同意议价，就拒绝此商品剩余的申请中议价
                     orderId = orderInfo.getId();
                     schedualMessageService.easemobMessage(goodsBargain.getUserId().toString(),
-                            "恭喜您！您对商品【"+goodsInfo.getName()+"】的议价卖家已同意，点击此处查看订单详情","3","2",orderId.toString());
+                            "恭喜您！您对商品【"+goodsInfo.getName()+"】的议价卖家已同意，点击此处查看订单详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER.getMessage(),orderId.toString());
                     List<GoodsBargain> goodsBargains = goodsBargainMapper.selectAllByGoodsId(goodsId,Status.BARGAIN_APPLY.getValue());
                     for(GoodsBargain bargain:goodsBargains){
                         bargain.setStatus(Status.BARGAIN_REFUSE.getValue());
                         goodsBargainMapper.updateByPrimaryKey(bargain);
                         //议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
                         schedualMessageService.easemobMessage(bargain.getUserId().toString(),
-                                "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情","2","2",bargain.getGoodsId().toString());
+                                "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),bargain.getGoodsId().toString());
                         //买家新增余额账单
                         schedualWalletService.addUserBalanceDetail(bargain.getUserId(),bargain.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),bargain.getBargainNo(),goodsInfo.getName(),goodsInfo.getUserId(),bargain.getUserId(),Status.BARGAIN.getValue());
                     }
@@ -293,7 +293,7 @@ public class BargainServiceImpl implements BargainService{
                     }
                     //议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
                     schedualMessageService.easemobMessage(goodsBargain.getUserId().toString(),
-                            "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情","2","2",goodsBargain.getGoodsId().toString());
+                            "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),goodsBargain.getGoodsId().toString());
                     //买家新增余额账单
                     schedualWalletService.addUserBalanceDetail(goodsBargain.getUserId(),goodsBargain.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),goodsBargain.getBargainNo(),goodsInfo.getName(),goodsInfo.getUserId(),goodsBargain.getUserId(),Status.BARGAIN.getValue());
                 }else{

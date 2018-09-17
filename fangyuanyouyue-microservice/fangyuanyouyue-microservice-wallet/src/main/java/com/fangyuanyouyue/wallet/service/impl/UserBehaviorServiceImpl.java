@@ -49,7 +49,7 @@ public class UserBehaviorServiceImpl implements UserBehaviorService {
                 UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
                 walletService.updateCredit(toUserId,Credit.FANS.getCredit(),Status.ADD.getValue());
                 schedualMessageService.easemobMessage(toUserId.toString(),
-                        "用户“"+userInfo.getNickName()+"”已关注了您！","1","4","");
+                        "用户“"+userInfo.getNickName()+"”已关注了您！",Status.FANS_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
             }else if(type.intValue() == Status.BEHAVIOR_TYPE_COMMENT.getValue().intValue()){
                 //评论
                 walletService.updateScore(userId,Score.COMMENT.getScore(),Status.ADD.getValue());

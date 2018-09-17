@@ -95,7 +95,7 @@ public class TimerServiceImpl implements TimerService{
                             }
                             //恭喜您！您参与的全民鉴定【名称】，您获得了最高票数！点击查看最终结果吧~
                             schedualMessageService.easemobMessage(detail.getUserId().toString(),
-                                    "恭喜您！您参与的全民鉴定【"+detail.getTitle()+"】，您获得了最高票数！点击查看最终结果吧~","7","1",detail.getId().toString());
+                                    "恭喜您！您参与的全民鉴定【"+detail.getTitle()+"】，您获得了最高票数！点击查看最终结果吧~",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_APPRAISAL.getMessage(),detail.getId().toString());
                             //余额账单
                             //订单号
                             final IdGenerator idg = IdGenerator.INSTANCE;
@@ -106,7 +106,7 @@ public class TimerServiceImpl implements TimerService{
                             appraisalCommentMapper.updateByPrimaryKey(comment);
                             //您参与的全民鉴定【名称】已结束投票，点击查看最终结果吧
                             schedualMessageService.easemobMessage(detail.getUserId().toString(),
-                                    "您参与的全民鉴定【"+detail.getTitle()+"】已结束投票，点击查看最终结果吧","7","1",detail.getId().toString());
+                                    "您参与的全民鉴定【"+detail.getTitle()+"】已结束投票，点击查看最终结果吧",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_APPRAISAL.getMessage(),detail.getId().toString());
                         }
                     }
                 }
@@ -114,7 +114,7 @@ public class TimerServiceImpl implements TimerService{
                 appraisalDetailMapper.updateByPrimaryKey(detail);
                 //您发起的全民鉴定【名称】已结束投票，点击查看最终结果吧
                 schedualMessageService.easemobMessage(detail.getUserId().toString(),
-                        "您发起的全民鉴定【"+detail.getTitle()+"】已结束投票，点击查看最终结果吧","7","1",detail.getId().toString());
+                        "您发起的全民鉴定【"+detail.getTitle()+"】已结束投票，点击查看最终结果吧",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_APPRAISAL.getMessage(),detail.getId().toString());
             }
         }
     }
@@ -136,7 +136,7 @@ public class TimerServiceImpl implements TimerService{
             final IdGenerator idg = IdGenerator.INSTANCE;
             String id = idg.nextId();
             schedualWalletService.addUserBalanceDetail(forumColumn.getUserId(),amount,Status.PAY_TYPE_BALANCE.getValue(),Status.EXPEND.getValue(),id,"专栏每日收益",null,forumColumn.getUserId(),Status.FORUM_COLUMN.getValue());
-            schedualMessageService.easemobMessage(forumColumn.getId().toString(),"您的专栏本日收益为"+amount+"元！已发放至您的余额，点击此处查看您的余额吧","1","13","");
+            schedualMessageService.easemobMessage(forumColumn.getId().toString(),"您的专栏本日收益为"+amount+"元！已发放至您的余额，点击此处查看您的余额吧",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_WALLET.getMessage(),"");
         }
     }
 }

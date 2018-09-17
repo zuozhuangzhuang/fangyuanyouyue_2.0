@@ -193,7 +193,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         if(param.getUserIds() != null && param.getUserIds().length > 0){
             for(Integer toUserId:param.getUserIds()){
                 schedualMessageService.easemobMessage(toUserId.toString(),
-                        "用户“"+user.getNickName()+"”上传"+(goodsInfo.getType()==1?"商品【":"抢购【")+goodsInfo.getName()+"】时邀请了您！点击此处前往查看吧","2","5",goodsInfo.getId().toString());
+                        "用户“"+user.getNickName()+"”上传"+(goodsInfo.getType()==Status.GOODS.getValue()?"商品【":"抢购【")+goodsInfo.getName()+"】时邀请了您！点击此处前往查看吧",Status.INVITE_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),goodsInfo.getId().toString());
             }
         }
 //        return setDtoByGoodsInfo(null,goodsInfo);
@@ -317,7 +317,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                     bargainService.updateBargain(userId,goodsId,bargain.getId(),Status.BARGAIN_REFUSE.getValue());
                     //议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
                     schedualMessageService.easemobMessage(bargain.getUserId().toString(),
-                            "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情","2","2",bargain.getGoodsId().toString());
+                            "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),bargain.getGoodsId().toString());
                 }
                 goodsInfo.setStatus(5);//状态 普通商品 1出售中 2已售出 3已下架（已结束） 5删除
                 goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);

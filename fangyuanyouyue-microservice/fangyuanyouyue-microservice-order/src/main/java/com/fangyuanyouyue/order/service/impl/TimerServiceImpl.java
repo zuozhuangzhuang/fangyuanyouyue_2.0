@@ -80,7 +80,7 @@ public class TimerServiceImpl implements TimerService{
                                 goodsName.append("【"+goodsInfo.getName()+"】");
                             }
                             schedualMessageService.easemobMessage(info.getSellerId().toString(),
-                                    "您的"+(isAuction?"抢购":"商品")+goodsName+"买家超时已取消订单","3","2",info.getId().toString());
+                                    "您的"+(isAuction?"抢购":"商品")+goodsName+"买家超时已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER.getMessage(),info.getId().toString());
                         }
                     }
                     //获取此订单内所有商品，更改商品状态为出售中
@@ -97,7 +97,7 @@ public class TimerServiceImpl implements TimerService{
                     }
                     //给买家发送信息：您未支付的商品【名称】已取消订单
                     schedualMessageService.easemobMessage(orderInfo.getUserId().toString(),
-                            "您超时未支付的"+(isAuction?"抢购":"商品")+goodsName+"已取消订单","3","2",orderInfo.getId().toString());
+                            "您超时未支付的"+(isAuction?"抢购":"商品")+goodsName+"已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER.getMessage(),orderInfo.getId().toString());
                 }
             }
         }
@@ -106,10 +106,16 @@ public class TimerServiceImpl implements TimerService{
     @Override
     public void saveReceiptGoods() throws ServiceException {
         //1、获取所有待收货且发货时间超过12天的订单 2、修改订单状态 3、卖家增加余额 4、买家、卖家增加积分
-        List<OrderPay> orderPays = orderPayMapper.selectByStatus(3, DateUtil.getDateAfterDay(new Date(), -12));
+        List<OrderPay> orderPays = orderPayMapper.selectByStatus(Status.ORDER_GOODS_SENDED.getValue(), DateUtil.getDateAfterDay(new Date(), -12));
         if(orderPays != null && orderPays.size() > 0){
             for(OrderPay orderPay:orderPays){
                 OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderPay.getOrderId());
+                if(orderInfo.getIsRefund() == Status.YES.getValue()){
+                    OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderInfo.getId(), 1, null);
+                    if(orderRefund != null){
+                        continue;
+                    }
+                }
                 //修改订单支付表状态
                 orderPay.setStatus(Status.ORDER_GOODS_COMPLETE.getValue());
                 orderPayMapper.updateByPrimaryKey(orderPay);

@@ -74,4 +74,44 @@ public class AdminControllerTest {
                 .andReturn();
     }
 
+    /**
+     * 官方鉴定列表
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void appraisalList() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.get("/adminGoods/appraisalList")
+//                .param("type","0")
+                .param("start","0")
+                .param("limit","10")
+//                .param("keyword","")
+                //状态 1已处理 2待处理
+//                .param("status","")
+//                .param("startDate","2016-01-01 01:01:01")
+//                .param("endDate","2018-09-12 16:39:00")
+//                .param("orders","add_time")
+//                .param("ascType","2")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 后台处理官方鉴定
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void updateAppraisal() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/adminGoods/updateAppraisal")
+                .param("id","79")
+                .param("content","真的")
+                .param("status","1")
+                .param("isShow","2")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
 }

@@ -174,7 +174,7 @@ public class TimerServiceImpl implements TimerService{
                     //议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
                     GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(bargain.getGoodsId());
                     schedualMessageService.easemobMessage(bargain.getUserId().toString(),
-                            "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情","2","2",bargain.getGoodsId().toString());
+                            "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),bargain.getGoodsId().toString());
                 }
             }
         }

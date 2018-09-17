@@ -53,5 +53,25 @@ public interface GoodsAppraisalDetailMapper {
      * @return
      */
     List<GoodsAppraisalDetail> getListByOrderIdStatus(@Param("orderId")Integer orderId,@Param("status")Integer status);
+    /**
+     * 分页总条数
+     * @return
+     */
+    int countPage(@Param("type") Integer type,@Param("keyword")String keyword,@Param("status")Integer status,@Param("startDate")String startDate,@Param("endDate")String endDate);
 
+    /**
+     * 分页获取官方鉴定列表
+     * @param type
+     * @param start
+     * @param limit
+     * @param keyword
+     * @param status
+     * @param startDate
+     * @param endDate
+     * @param orders
+     * @param ascType
+     * @return
+     */
+    List<GoodsAppraisalDetail> getAppraisalPage(@Param("type") Integer type,@Param("start") Integer start,@Param("limit") Integer limit,@Param("keyword")String keyword,@Param("status")Integer status,
+                                 @Param("startDate")String startDate,@Param("endDate")String endDate,@Param("orders")String orders,@Param("ascType")Integer ascType);
 }
