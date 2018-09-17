@@ -14,8 +14,10 @@ import com.fangyuanyouyue.wallet.service.UserBehaviorService;
 import com.fangyuanyouyue.wallet.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service(value = "userBehaviorService")
+@Transactional(rollbackFor=Exception.class)
 public class UserBehaviorServiceImpl implements UserBehaviorService {
     @Autowired
     private UserInfoMapper userInfoMapper;

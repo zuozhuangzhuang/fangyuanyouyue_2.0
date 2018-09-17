@@ -22,4 +22,6 @@ public class ForumPv {
     private Date addTime;//添加时间
 
     private Integer columnId;//专栏id
+
+    private Integer type;//帖子类型 1帖子 2视频
 }

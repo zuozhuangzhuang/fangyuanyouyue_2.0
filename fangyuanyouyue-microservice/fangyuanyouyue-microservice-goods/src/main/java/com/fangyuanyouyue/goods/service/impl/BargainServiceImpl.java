@@ -116,12 +116,12 @@ public class BargainServiceImpl implements BargainService{
                     if(!verifyPayPwd){
                         throw new ServiceException("支付密码错误！");
                     }else{
-                        BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, bargainOrder.getAmount(), 2)), BaseResp.class);
+                        BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, bargainOrder.getAmount(), Status.SUB.getValue())), BaseResp.class);
                         if(baseResp.getCode() == 1){
                             throw new ServiceException(baseResp.getReport().toString());
                         }
                         payInfo.append("余额支付成功");
-                        updateOrder(bargainOrder.getOrderNo(),null,3);
+                        updateOrder(bargainOrder.getOrderNo(),null,Status.PAY_TYPE_BALANCE.getValue());
                     }
                 }else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
                     WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,bargainOrder.getOrderNo(), bargainOrder.getAmount(),NotifyUrl.mini_test_notify.getNotifUrl()+NotifyUrl.bargain_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
@@ -147,7 +147,7 @@ public class BargainServiceImpl implements BargainService{
         goodsBargain.setPrice(bargainOrder.getAmount());
         goodsBargain.setAddressId(bargainOrder.getAddressId());
         goodsBargain.setReason(bargainOrder.getReason());
-        goodsBargain.setStatus(1);//状态 1申请 2同意 3拒绝 4取消
+        goodsBargain.setStatus(Status.BARGAIN_APPLY.getValue());
         goodsBargain.setAddTime(DateStampUtils.getTimesteamp());
         goodsBargain.setIsDelete(2);//是否删除 1是 2否
         goodsBargain.setBargainNo(orderNo);
@@ -159,7 +159,7 @@ public class BargainServiceImpl implements BargainService{
         schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
                 "恭喜您！您的商品【"+goodsInfo.getName()+"】有新的议价，点击此处查看详情","2","2",goodsInfo.getId().toString());
         //买家新增余额账单
-        schedualWalletService.addUserBalanceDetail(goodsBargain.getUserId(),goodsBargain.getPrice(),payType,2,bargainOrder.getOrderNo(),goodsInfo.getName(),goodsInfo.getUserId(),goodsBargain.getUserId(),3);
+        schedualWalletService.addUserBalanceDetail(goodsBargain.getUserId(),goodsBargain.getPrice(),payType,Status.EXPEND.getValue(),bargainOrder.getOrderNo(),goodsInfo.getName(),goodsInfo.getUserId(),goodsBargain.getUserId(),Status.BARGAIN.getValue());
         return true;
     }
 
@@ -181,26 +181,26 @@ public class BargainServiceImpl implements BargainService{
                 throw new ServiceException("商品已售出！");
             }
             //判断压价状态
-            if(goodsBargain.getStatus().intValue() == 2){
+            if(goodsBargain.getStatus().intValue() == Status.BARGAIN_AGREE.getValue()){
                 throw new ServiceException("已同意压价！");
             }
-            if(goodsBargain.getStatus().intValue() == 3){
+            if(goodsBargain.getStatus().intValue() == Status.BARGAIN_REFUSE.getValue()){
                 throw new ServiceException("已拒绝压价！");
             }
-            if(goodsBargain.getStatus().intValue() == 4){
+            if(goodsBargain.getStatus().intValue() == Status.BARGAIN_CANCEL.getValue()){
                 throw new ServiceException("已取消压价！");
             }
             if(goodsInfo.getUserId().intValue() == userId.intValue()){
                 //卖家处理压价
-                if(status == 4){
+                if(status == Status.BARGAIN_CANCEL.getValue()){
                     throw new ServiceException("卖家不可取消议价！");
                 }
                 //卖家同意后生成订单，拒绝后退回余额
-                if(status.intValue() == 2){//状态 2同意 3拒绝 4取消
+                if(status.intValue() == Status.BARGAIN_AGREE.getValue()){
                     //生成订单
                     //每次提交的鉴定生成一个订单，批量鉴定有多个订单详情
                     OrderInfo orderInfo = new OrderInfo();
-                    orderInfo.setIsResolve(2);//是否拆单 1是 2否
+                    orderInfo.setIsResolve(Status.NO.getValue());
                     orderInfo.setUserId(goodsBargain.getUserId());
                     //订单号
                     final IdGenerator idg = IdGenerator.INSTANCE;
@@ -209,10 +209,10 @@ public class BargainServiceImpl implements BargainService{
 
                     orderInfo.setAmount(goodsInfo.getPrice());//原价
                     orderInfo.setCount(1);
-                    orderInfo.setStatus(2);//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
+                    orderInfo.setStatus(Status.ORDER_GOODS_PAY.getValue());
                     orderInfo.setAddTime(DateStampUtils.getTimesteamp());
                     orderInfo.setSellerId(goodsInfo.getUserId());
-                    orderInfo.setIsRefund(2);
+                    orderInfo.setIsRefund(Status.NO.getValue());
                     orderInfoMapper.insert(orderInfo);
                     //生成订单支付表
                     UserAddressInfo addressInfo = userAddressInfoMapper.selectByPrimaryKey(goodsBargain.getAddressId());
@@ -232,7 +232,7 @@ public class BargainServiceImpl implements BargainService{
                     orderPay.setFreight(new BigDecimal(0));//运费金额(议价默认为0)
                     orderPay.setCount(1);
                     //压价下单默认已支付
-                    orderPay.setStatus(2);//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
+                    orderPay.setStatus(Status.ORDER_GOODS_PAY.getValue());
                     orderPay.setAddTime(DateStampUtils.getTimesteamp());
                     orderPayMapper.insert(orderPay);
 
@@ -274,20 +274,20 @@ public class BargainServiceImpl implements BargainService{
                     orderId = orderInfo.getId();
                     schedualMessageService.easemobMessage(goodsBargain.getUserId().toString(),
                             "恭喜您！您对商品【"+goodsInfo.getName()+"】的议价卖家已同意，点击此处查看订单详情","3","2",orderId.toString());
-                    List<GoodsBargain> goodsBargains = goodsBargainMapper.selectAllByGoodsId(goodsId,1);//状态 1申请 2同意 3拒绝 4取消
+                    List<GoodsBargain> goodsBargains = goodsBargainMapper.selectAllByGoodsId(goodsId,Status.BARGAIN_APPLY.getValue());
                     for(GoodsBargain bargain:goodsBargains){
-                        bargain.setStatus(3);
+                        bargain.setStatus(Status.BARGAIN_REFUSE.getValue());
                         goodsBargainMapper.updateByPrimaryKey(bargain);
                         //议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
                         schedualMessageService.easemobMessage(bargain.getUserId().toString(),
                                 "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情","2","2",bargain.getGoodsId().toString());
                         //买家新增余额账单
-                        schedualWalletService.addUserBalanceDetail(bargain.getUserId(),bargain.getPrice(),3,1,bargain.getBargainNo(),goodsInfo.getName(),goodsInfo.getUserId(),bargain.getUserId(),3);
+                        schedualWalletService.addUserBalanceDetail(bargain.getUserId(),bargain.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),bargain.getBargainNo(),goodsInfo.getName(),goodsInfo.getUserId(),bargain.getUserId(),Status.BARGAIN.getValue());
                     }
-                }else if(status.intValue() == 3){
+                }else if(status.intValue() == Status.BARGAIN_REFUSE.getValue()){
                     //退回余额
                     //调用wallet-service修改余额功能
-                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(goodsBargain.getUserId(), goodsBargain.getPrice(),1)), BaseResp.class);
+                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(goodsBargain.getUserId(), goodsBargain.getPrice(),Status.ADD.getValue())), BaseResp.class);
                     if(baseResp.getCode() == 1){
                         throw new ServiceException(baseResp.getReport().toString());
                     }
@@ -295,23 +295,23 @@ public class BargainServiceImpl implements BargainService{
                     schedualMessageService.easemobMessage(goodsBargain.getUserId().toString(),
                             "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情","2","2",goodsBargain.getGoodsId().toString());
                     //买家新增余额账单
-                    schedualWalletService.addUserBalanceDetail(goodsBargain.getUserId(),goodsBargain.getPrice(),3,1,goodsBargain.getBargainNo(),goodsInfo.getName(),goodsInfo.getUserId(),goodsBargain.getUserId(),3);
+                    schedualWalletService.addUserBalanceDetail(goodsBargain.getUserId(),goodsBargain.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),goodsBargain.getBargainNo(),goodsInfo.getName(),goodsInfo.getUserId(),goodsBargain.getUserId(),Status.BARGAIN.getValue());
                 }else{
                     throw new ServiceException("状态异常！");
                 }
             }else if(goodsBargain.getUserId().intValue() == userId.intValue()){
                 //买家取消压价
-                if(status.intValue() == 2 || status.intValue() == 3){
+                if(status.intValue() == Status.BARGAIN_AGREE.getValue() || status.intValue() == Status.BARGAIN_REFUSE.getValue()){
                     throw new ServiceException("买家不可同意或拒绝议价！");
                 }
                 //退回余额
                 //调用wallet-service修改余额功能
-                BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(goodsBargain.getUserId(), goodsBargain.getPrice(),1)), BaseResp.class);
+                BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(goodsBargain.getUserId(), goodsBargain.getPrice(),Status.ADD.getValue())), BaseResp.class);
                 if(baseResp.getCode() == 1){
                     throw new ServiceException(baseResp.getReport().toString());
                 }
                 //买家新增余额账单
-                schedualWalletService.addUserBalanceDetail(goodsBargain.getUserId(),goodsBargain.getPrice(),3,1,goodsBargain.getBargainNo(),goodsInfo.getName(),goodsInfo.getUserId(),goodsBargain.getUserId(),3);
+                schedualWalletService.addUserBalanceDetail(goodsBargain.getUserId(),goodsBargain.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),goodsBargain.getBargainNo(),goodsInfo.getName(),goodsInfo.getUserId(),goodsBargain.getUserId(),Status.BARGAIN.getValue());
             }else{
                 throw new ServiceException("压价信息异常！");
             }
@@ -363,7 +363,7 @@ public class BargainServiceImpl implements BargainService{
 
             }
             //判断压价信息状态
-            if(goodsBargain.getStatus().intValue() == 4){
+            if(goodsBargain.getStatus().intValue() == Status.BARGAIN_CANCEL.getValue()){
                 throw new ServiceException("压价信息异常！");
             }
 
@@ -443,19 +443,19 @@ public class BargainServiceImpl implements BargainService{
             }
             for(GoodsBargain bargain:goodsBargains){
                 //删除商品内所有议价信息
-                if(bargain.getStatus() == 1){
-                    bargain.setStatus(4);
+                if(bargain.getStatus().intValue() == Status.BARGAIN_APPLY.getValue()){
+                    bargain.setStatus(Status.BARGAIN_CANCEL.getValue());
                     //退回余额
                     //调用wallet-service修改余额功能
-                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),1)), BaseResp.class);
+                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),Status.ADD.getValue())), BaseResp.class);
                     if(baseResp.getCode() == 1){
                         throw new ServiceException(baseResp.getReport().toString());
                     }
-                    updateBargain(userId,goodsId,bargain.getId(),4);
+                    updateBargain(userId,goodsId,bargain.getId(),Status.BARGAIN_CANCEL.getValue());
                     //买家新增余额账单
-                    schedualWalletService.addUserBalanceDetail(bargain.getUserId(),bargain.getPrice(),3,1,bargain.getBargainNo(),goodsInfo.getName(),goodsInfo.getUserId(),bargain.getUserId(),3);
+                    schedualWalletService.addUserBalanceDetail(bargain.getUserId(),bargain.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),bargain.getBargainNo(),"【"+goodsInfo.getName()+"】",goodsInfo.getUserId(),bargain.getUserId(),Status.BARGAIN.getValue());
                 }
-                bargain.setIsDelete(1);//是否删除 1是 2否
+                bargain.setIsDelete(Status.YES.getValue());//是否删除 1是 2否
                 goodsBargainMapper.updateByPrimaryKey(bargain);
             }
         }

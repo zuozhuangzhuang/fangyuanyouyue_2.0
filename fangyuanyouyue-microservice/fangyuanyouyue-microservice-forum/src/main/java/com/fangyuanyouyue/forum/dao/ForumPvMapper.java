@@ -6,6 +6,8 @@ import com.fangyuanyouyue.forum.model.ForumPv;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface ForumPvMapper {
@@ -38,5 +40,11 @@ public interface ForumPvMapper {
      * @param columnId
      * @return
      */
-    Integer getCountByColumnId(@Param("columnId")Integer columnId,@Param("date")Date date);
+    Integer getCountByColumnId(@Param("columnId")Integer columnId,@Param("startTime")Date startTime,@Param("endTime")Date endTime,@Param("type")Integer type);
+
+    /**
+     * 获取每日返利专栏
+     * @return
+     */
+    List<Map<String,Object>> dailyWage();
 }

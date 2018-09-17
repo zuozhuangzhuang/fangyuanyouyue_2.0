@@ -1,8 +1,11 @@
 package com.fangyuanyouyue.wallet.service.impl;
 
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.wallet.constant.StatusEnum;
 import com.fangyuanyouyue.wallet.dao.*;
 import com.fangyuanyouyue.wallet.model.UserInfo;
 import com.fangyuanyouyue.wallet.model.UserVip;
@@ -58,18 +61,18 @@ public class TimerServiceImpl implements TimerService{
                     userVip.setVipLevel(null);
                     userVip.setLevelDesc(null);
                     userVip.setVipType(null);
-                    userVip.setStatus(2);//会员状态 1已开通 2未开通
+                    userVip.setStatus(Status.NOT_VIP.getValue());
                     userVip.setIsSendMessage(null);
                     userVipMapper.updateByPrimaryKey(userVip);
                     //您的会员已到期！点击此处去重新开通~
                     schedualMessageService.easemobMessage(userVip.getUserId().toString(),
                             "您的会员已到期！点击此处去重新开通~","12","1","");
                 }else{
-                    if(userVip.getIsSendMessage() == null || userVip.getIsSendMessage() != 1){//只通知一次
+                    if(userVip.getIsSendMessage() == null || userVip.getIsSendMessage() != StatusEnum.YES.getCode()){//只通知一次
                         //您的会员将于**月**日**时到期。请及时续费哦。 点击此处去续费~
                         schedualMessageService.easemobMessage(userVip.getUserId().toString(),
                                 "您的会员将于"+DateUtil.getFormatDate(userVip.getEndTime(),DateUtil.DATE_FORMT)+"到期。请及时续费哦。 点击此处去续费~","12","1","");
-                        userVip.setIsSendMessage(1);
+                        userVip.setIsSendMessage(StatusEnum.YES.getCode());
                         userVipMapper.updateByPrimaryKeySelective(userVip);
                     }
                 }
@@ -85,7 +88,7 @@ public class TimerServiceImpl implements TimerService{
             for(UserInfo info:all){
                 UserWallet userWallet = userWalletMapper.selectByUserId(info.getId());
                 //积分等级，计算总积分
-               Long score = userWallet.getScore();
+                Long score = userWallet.getScore();
                 WalletServiceImpl.setUserLevel(score, info);
                 userInfoMapper.updateByPrimaryKeySelective(info);
             }

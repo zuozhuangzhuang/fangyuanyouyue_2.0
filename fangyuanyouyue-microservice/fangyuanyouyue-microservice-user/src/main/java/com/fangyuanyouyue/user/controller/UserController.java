@@ -260,7 +260,7 @@ public class UserController extends BaseController {
                 return toError("用户真实姓名不能为空！");
             }
             if(StringUtils.isEmpty(param.getIdentity())){
-                return toError("用户身份照号码不能为空！");
+                return toError("用户身份证号码不能为空！");
             }
             if(StringUtils.isEmpty(param.getToken())){
                 return toError("用户token不能为空！");
@@ -355,7 +355,7 @@ public class UserController extends BaseController {
         }
     }
 
-@ApiOperation(value = "获取合并账号用户信息", notes = "(MergeDto)获取合并账号用户信息:目前只支持三方账户绑定手机号",response = BaseResp.class)
+    @ApiOperation(value = "获取合并账号用户信息", notes = "(MergeDto)获取合并账号用户信息:目前只支持三方账户绑定手机号",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "phone", value = "手机号", required = true, dataType = "String", paramType = "query"),
@@ -690,7 +690,7 @@ public class UserController extends BaseController {
 
             boolean result = schedualRedisService.set(param.getPhone(), code, 600l);
             log.info("缓存结果："+result);
-            
+
             //redisTemplate.opsForValue().set(param.getPhone(),code);
             //redisTemplate.expire(param.getPhone(),60,TimeUnit.SECONDS);
             return toSuccess("发送验证码成功");
@@ -820,7 +820,7 @@ public class UserController extends BaseController {
             if(param.getToUserId() == null){
                 return toError("被关注人不能为空！");
             }
-            
+
             //添加/取消关注
             userInfoService.fansFollow(user.getId(), param.getToUserId(),param.getType());
             if(param.getType() == 0){

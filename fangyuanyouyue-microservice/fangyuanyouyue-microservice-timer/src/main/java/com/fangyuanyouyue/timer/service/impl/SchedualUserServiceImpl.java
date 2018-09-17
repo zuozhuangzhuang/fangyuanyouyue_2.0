@@ -34,4 +34,9 @@ public class SchedualUserServiceImpl implements SchedualUserService{
     public String isAuth(Integer userId) {
         return "验证实名认证失败！";
     }
+
+    @Override
+    public String shopAuthTimeOut() {
+        return "认证店铺自动过期失败！";
+    }
 }

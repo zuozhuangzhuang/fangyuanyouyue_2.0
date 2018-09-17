@@ -53,5 +53,13 @@ public interface UserAuthApplyMapper {
      * @return
      */
     List<UserAuthApply> getPage(@Param("start") Integer start,@Param("limit") Integer limit,@Param("keyword")String keyword,@Param("status")Integer status,@Param("startDate")String startDate,@Param("endDate")String endDate,@Param("orders")String orders,@Param("ascType")Integer ascType);
+
+    /**
+     * 获取超时认证店铺
+     * @param endTime
+     * @param status
+     * @return
+     */
+    List<UserAuthApply> selectByEndTime(@Param("endTime")String endTime,@Param("status")Integer status);
     
 }

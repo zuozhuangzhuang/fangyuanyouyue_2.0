@@ -184,7 +184,7 @@ public class WalletServiceImpl implements WalletService{
 
     @Override
     public void updateScore(Integer userId, Long score,Integer type) throws ServiceException {
-        //TODO 每个用户每天可增加200积分 增加一张用户积分记录表，记录用户积分增加历史，按天筛选，不可超过200分
+        //TODO 每个用户每天可增加500积分 增加一张用户积分记录表，记录用户积分增加历史，按天筛选，不可超过200分
         UserWallet userWallet = userWalletMapper.selectByUserId(userId);
         if(userWallet == null){
             throw new ServiceException("获取钱包信息失败！");
@@ -196,6 +196,7 @@ public class WalletServiceImpl implements WalletService{
                 UserInfo info = userInfoMapper.selectByPrimaryKey(userId);
                 //积分等级，计算总积分
                 setUserLevel(userWallet.getScore(), info);
+                userInfoMapper.updateByPrimaryKeySelective(info);
             }else{//减少积分
                 Long updateScore = userWallet.getPoint()-score;
                 //修改积分后的用户积分余额
@@ -205,7 +206,7 @@ public class WalletServiceImpl implements WalletService{
                 }
                 userWallet.setPoint(updateScore);
             }
-            userWalletMapper.updateByPrimaryKey(userWallet);
+            userWalletMapper.updateByPrimaryKeySelective(userWallet);
         }
     }
 
@@ -312,7 +313,7 @@ public class WalletServiceImpl implements WalletService{
             }else{
                 userInfoExt.setCredit(userInfoExt.getCredit()-credit);
             }
-            userInfoExtMapper.updateByPrimaryKey(userInfoExt);
+            userInfoExtMapper.updateByPrimaryKeySelective(userInfoExt);
         }
     }
 
@@ -329,11 +330,6 @@ public class WalletServiceImpl implements WalletService{
 
 
 
-//    @Value("${alipay_notify}")
-//    private String ALIPAY_NOTIFY;//支付宝后台通知地址
-//
-//    @Value("${wechat_notify}")
-//    private String WECHAT_VIP;//微信后台通知地址
 
     public static void main(String[] args) throws Exception {
         //模拟下单
@@ -413,15 +409,15 @@ public class WalletServiceImpl implements WalletService{
         if(price.doubleValue() < 0.01){
             throw new ServiceException("金额不能小于0.01元");
         }
-        WechatPayDto dto= util.genOrder(orderNo, price.doubleValue()+"", "小方圆-微信在线支付", notifyUrl, "127.0.0.1");
-        if(dto==null|| org.apache.commons.lang3.StringUtils.isEmpty(dto.getPrepayId())||dto.getSign()==null){
+        WechatPayDto dto= util.genOrder(orderNo, price.setScale(2,BigDecimal.ROUND_HALF_UP)+"", "小方圆-微信在线支付", notifyUrl, "127.0.0.1");
+        if(dto==null|| StringUtils.isEmpty(dto.getPrepayId())||dto.getSign()==null){
             throw new ServiceException("在线支付生成订单信息出错！");
         }
         return dto;
     }
 
     @Override
-    public WechatPayDto orderPayByWechatMini(Integer userId, String orderNo, BigDecimal price, String notifyUrl) throws ServiceException {
+    public WechatPayDto orderPayByWechatMini(final Integer userId,final String orderNo,final BigDecimal price,final String notifyUrl) throws ServiceException {
         //根据userId获取三方openId
         UserThirdParty userThirdByUserId = userThirdPartyMapper.getUserThirdByUserId(userId, 1);
         String openId = userThirdByUserId.getMiniOpenId();
@@ -430,8 +426,8 @@ public class WalletServiceImpl implements WalletService{
         if(price.doubleValue() < 0.01){
             throw new ServiceException("金额不能小于0.01元");
         }
-        WechatPayDto dto = util.genOrderMini(openId,orderNo, price.doubleValue()+"", "小方圆-微信小程序支付", notifyUrl, "127.0.0.1");
-        if(dto==null|| org.apache.commons.lang3.StringUtils.isEmpty(dto.getPrepayId())||dto.getSign()==null){
+        WechatPayDto dto = util.genOrderMini(openId,orderNo, price.setScale(2,BigDecimal.ROUND_HALF_UP)+"", "小方圆-微信小程序支付", notifyUrl, "127.0.0.1");
+        if(dto==null|| StringUtils.isEmpty(dto.getPrepayId())||dto.getSign()==null){
             throw new ServiceException("小程序支付生成订单信息出错！");
         }
         return dto;

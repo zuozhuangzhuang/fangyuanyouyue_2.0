@@ -26,7 +26,7 @@ public class OrderInfo {
 
     private Integer count;//商品总数
 
-    private Integer status;//状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除
+    private Integer status;//状态 1待支付 2待发货 3待收货 4已完成 5已取消
 
     private Date addTime;//添加时间
 

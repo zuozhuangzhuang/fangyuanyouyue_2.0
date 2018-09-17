@@ -33,7 +33,7 @@ public class AdminOrderDto {
 
     private BigDecimal totalAmount;//订单总额
 
-    private Integer status;//状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除
+    private Integer status;//状态 1待支付 2待发货 3待收货 4已完成 5已取消
 
     //order_refund
     private Integer returnStatus;//退货状态 1申请退货 2退货成功 3拒绝退货

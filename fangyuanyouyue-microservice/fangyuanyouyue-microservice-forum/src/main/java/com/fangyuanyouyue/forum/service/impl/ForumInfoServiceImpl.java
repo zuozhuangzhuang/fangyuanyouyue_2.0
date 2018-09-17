@@ -68,7 +68,7 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 
 			//增加浏览记录
 			if(userId!=null) {
-				forumPvService.savePv(userId, forumId,forumInfo.getColumnId());
+				forumPvService.savePv(userId, forumId,forumInfo.getType(),forumInfo.getColumnId());
 				//是否点赞
 				ForumLikes forumLikes = forumLikesMapper.selectByForumIdUserId(dto.getForumId(), userId);
 				if(forumLikes != null){

@@ -19,8 +19,9 @@ public interface ForumPvService {
      * 增加浏览量
      * @param userId
      * @param forumId
+     * @param type
      * @param columnId
      */
-    void savePv(Integer userId,Integer forumId,Integer columnId);
+    void savePv(Integer userId,Integer forumId,Integer type,Integer columnId);
 
 }

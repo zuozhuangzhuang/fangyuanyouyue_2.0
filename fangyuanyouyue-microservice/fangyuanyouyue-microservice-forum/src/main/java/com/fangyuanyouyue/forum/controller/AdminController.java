@@ -3,6 +3,7 @@ package com.fangyuanyouyue.forum.controller;
 import java.io.IOException;
 import java.util.List;
 
+import com.fangyuanyouyue.forum.param.AdminForumParam;
 import com.fangyuanyouyue.forum.service.ForumInfoService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -72,26 +73,28 @@ public class AdminController extends BaseController {
 
     @ApiOperation(value = "后台处理专栏申请", notes = "后台处理专栏申请", response = BaseResp.class)
     @ApiImplicitParams({
+
+            @ApiImplicitParam(name = "id", value = "专栏申请id",required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "userId", value = "用户id",required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "applyId", value = "专栏申请id",required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "status", value = "处理状态 1同意 2拒绝",required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "coverImgUrl", value = "封面图片地址（同意必填）",required = false, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "reason", value = "拒绝理由（拒绝必填）",required = false, dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "reason", value = "拒绝理由（拒绝必填）",required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "isChosen", value = "是否精选1是 2否",required = false, dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/handle")
     @ResponseBody
-    public BaseResp handle(ForumParam param) throws IOException {
+    public BaseResp handle(AdminForumParam param) throws IOException {
         try {
             log.info("----》后台处理专栏申请《----");
             log.info("参数：" + param.toString());
-            if(param.getApplyId() == null){
+            if(param.getId() == null){
                 return toError("申请id不能为空！");
             }
             if(param.getStatus() == null){
                 return toError("处理状态不能为空！");
             }
             //处理专栏申请
-            forumColumnService.handle(param.getUserId(),param.getApplyId(),param.getStatus(),param.getCoverImgUrl(),param.getReason());
+            forumColumnService.handle(param.getId(),param.getStatus(),param.getCoverImgUrl(),param.getReason());
 
             return toSuccess();
         } catch (ServiceException e) {

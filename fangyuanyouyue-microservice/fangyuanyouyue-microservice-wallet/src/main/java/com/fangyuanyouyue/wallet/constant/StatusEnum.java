@@ -6,7 +6,7 @@ package com.fangyuanyouyue.wallet.constant;
  *
  */
 public enum StatusEnum {
-	
+	YES(1),NO(2),
 
 	COUPON_NOTUSE(1,"未使用"),
 	COUPON_USED(2,"已使用"),

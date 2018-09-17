@@ -1,4 +1,4 @@
-package com.fangyuanyouyue.forum;
+package com.fangyuanyouyue.user;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,11 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ForumServiceApplication.class)
+@SpringBootTest(classes = UserServiceApplication.class)
 @WebAppConfiguration
 @ContextConfiguration
 @Rollback
-public class TimerControllerTest {
+public class AdminControllerTest {
     @Autowired
     private WebApplicationContext context;
 
@@ -36,26 +36,15 @@ public class TimerControllerTest {
     }
 
     /**
-     * 结算全民鉴定
+     * 修改实名认证状态
      * @throws Exception
      */
     @Test
 //    @Transactional
-    public void appraisalDetail() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/timer/appraisalDetail")
-                .accept(MediaType.APPLICATION_JSON))
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
-    }
-
-    /**
-     * 专栏返利
-     * @throws Exception
-     */
-    @Test
-//    @Transactional
-    public void dailyWage() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/timer/dailyWage")
+    public void authApplyStatus() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/adminUser/auth/status")
+                .param("id","23")
+                .param("status","2")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

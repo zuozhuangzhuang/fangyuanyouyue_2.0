@@ -74,12 +74,12 @@ public interface SchedualWalletService {
      * @param userId
      * @param amount
      * @param payType 支付类型 1微信 2支付宝 3余额 4小程序
-     * @param type 收支类型 1收入 2支出
+     * @param type 收支类型 1收入 2支出 3退款
      * @param orderNo
      * @param title
      * @param sellerId
      * @param buyerId
-     * @param orderType 订单类型 1商品、抢购 2官方鉴定 3商品议价 4全民鉴定 5申请专栏 6充值 7开通、续费会员 8认证店铺
+     * @param orderType 订单类型 1商品、抢购 2官方鉴定 3商品议价 4全民鉴定 5专栏(申请专栏：支出、每日返利：收入、申请被拒：退款) 6充值 7提现 8开通会员 9续费会员 10认证店铺
      * @return
      */
     @RequestMapping(value = "/walletFeign/addUserBalanceDetail",method = RequestMethod.POST)
