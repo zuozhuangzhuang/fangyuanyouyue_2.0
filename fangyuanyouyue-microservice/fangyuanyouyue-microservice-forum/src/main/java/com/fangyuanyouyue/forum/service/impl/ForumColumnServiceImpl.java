@@ -171,7 +171,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 			schedualMessageService.easemobMessage(columnOrder.getUserId().toString(),
 					"您的【"+columnOrder.getName()+"】专栏申请已提交，将于3个工作日内完成审核，请注意消息通知",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
 			//余额账单
-			schedualWalletService.addUserBalanceDetail(columnOrder.getUserId(),columnOrder.getAmount(),payType,Status.EXPEND.getValue(),orderNo,columnOrder.getName(),null,columnOrder.getUserId(),Status.FORUM_COLUMN.getValue());
+			schedualWalletService.addUserBalanceDetail(columnOrder.getUserId(),columnOrder.getAmount(),payType,Status.EXPEND.getValue(),orderNo,"申请专栏【"+columnOrder.getName()+"】",null,columnOrder.getUserId(),Status.FORUM_COLUMN.getValue());
 			return true;
 		}catch (Exception e){
 			throw e;
@@ -210,12 +210,12 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 					forumColumnApply.setReason(reason);
 					//很抱歉您的【专栏名称】专栏审核未通过，可联系客服咨询详情
 					schedualMessageService.easemobMessage(forumColumnApply.getUserId().toString(),
-							"很抱歉您的【专栏名称】专栏审核未通过，可联系客服咨询详情",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
+							"很抱歉您的【"+forumColumnApply.getColumnName()+"】专栏审核未通过，可联系客服咨询详情",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
 					//余额账单
 					//订单号
 					final IdGenerator idg = IdGenerator.INSTANCE;
 					String id = idg.nextId();
-					schedualWalletService.addUserBalanceDetail(forumColumnApply.getUserId(),new BigDecimal(200), Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),id,forumColumnApply.getColumnName(),null,forumColumnApply.getUserId(),Status.FORUM_COLUMN.getValue());
+					schedualWalletService.addUserBalanceDetail(forumColumnApply.getUserId(),new BigDecimal(200), Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),id,"申请【"+forumColumnApply.getColumnName()+"】专栏失败退款",null,forumColumnApply.getUserId(),Status.FORUM_COLUMN.getValue());
 				}else{
 					throw new ServiceException("状态值错误！");
 				}
