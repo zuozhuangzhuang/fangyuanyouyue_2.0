@@ -190,40 +190,12 @@ public class WalletServiceImpl implements WalletService{
         }
     }
 
-    @Override
-    public void updateScore(Integer userId, Long score,Integer type) throws ServiceException {
-        //TODO 每个用户每天可增加500积分 增加一张用户积分记录表，记录用户积分增加历史，按天筛选，不可超过200分
-        UserWallet userWallet = userWalletMapper.selectByUserId(userId);
-        if(userWallet == null){
-            throw new ServiceException("获取钱包信息失败！");
-        }else{
-            if(type == 1){//增加积分 同时增加总积分和积分余额
-                userWallet.setScore(userWallet.getScore()+score);
-                userWallet.setPoint(userWallet.getPoint()+score);
-                //修改用户等级
-                UserInfo info = userInfoMapper.selectByPrimaryKey(userId);
-                //积分等级，计算总积分
-                setUserLevel(userWallet.getScore(), info);
-                userInfoMapper.updateByPrimaryKeySelective(info);
-            }else{//减少积分
-                Long updateScore = userWallet.getPoint()-score;
-                //修改积分后的用户积分余额
-                //如果修改后的积分余额低于0，就返回积分不足
-                if(updateScore < 0){
-                    throw new ServiceException("积分不足！");
-                }
-                userWallet.setPoint(updateScore);
-            }
-            userWalletMapper.updateByPrimaryKeySelective(userWallet);
-        }
-    }
-
     /**
      * 根据用户积分设置用户等级
      * @param score
      * @param info
      */
-    static void setUserLevel(Long score, UserInfo info) {
+    public static void setUserLevel(Long score, UserInfo info) {
         if(score != null) {
             if (0 <= score && score < 500) {//Lv1
                 info.setLevel(1);
@@ -508,7 +480,7 @@ public class WalletServiceImpl implements WalletService{
 
     @Override
     public void addUserBalanceDetail(Integer userId, BigDecimal amount, Integer payType, Integer type, String orderNo, String title,Integer orderType,Integer sellerId,Integer buyerId,String payNo) throws ServiceException {
-        //TODO 确认下单后生成用户和平台收支表信息
+        //确认下单后生成用户和平台收支表信息
         UserWallet userWallet = userWalletMapper.selectByUserId(userId);
 
         UserBalanceDetail userBalance = new UserBalanceDetail();
