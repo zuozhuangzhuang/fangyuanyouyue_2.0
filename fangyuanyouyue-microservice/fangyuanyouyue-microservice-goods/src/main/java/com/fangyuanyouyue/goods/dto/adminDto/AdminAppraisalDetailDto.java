@@ -30,6 +30,8 @@ public class AdminAppraisalDetailDto {
 
     private Integer status;//状态 0申请 1真 2假 3存疑 4待支付(在列表中不显示)
 
+    private String title;//鉴定标题
+
     private BigDecimal price;//鉴定金额
 
     private String description;//描述
@@ -44,6 +46,9 @@ public class AdminAppraisalDetailDto {
 
     private List<AppraisalUrlDto> appraisalUrlDtos;//鉴定图片表DTO数组
 
+    //用户昵称
+    private String nickName;
+
     public AdminAppraisalDetailDto() {
     }
 
@@ -54,6 +59,7 @@ public class AdminAppraisalDetailDto {
         this.goodsId = goodsAppraisalDetail.getGoodsId();
         this.opinion = goodsAppraisalDetail.getOpinion();
         this.status = goodsAppraisalDetail.getStatus();
+        this.title = goodsAppraisalDetail.getTitle();
         this.price = goodsAppraisalDetail.getPrice();
         this.description = goodsAppraisalDetail.getDescription();
 //        if(goodsAppraisalDetail.getSubmitTime() != null){
@@ -62,6 +68,7 @@ public class AdminAppraisalDetailDto {
         this.addTime = DateUtil.getFormatDate(goodsAppraisalDetail.getAddTime(), DateUtil.DATE_FORMT);
 //        this.updateTime = DateUtil.getFormatDate(goodsAppraisalDetail.getUpdateTime(), DateUtil.DATE_FORMT);
         this.type = goodsAppraisalDetail.getType();
+        this.nickName = goodsAppraisalDetail.getNickName();
     }
 
 

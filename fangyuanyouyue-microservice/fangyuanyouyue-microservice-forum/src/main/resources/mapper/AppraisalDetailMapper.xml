@@ -250,7 +250,7 @@
     select
     a.*,b.nick_name,b.head_img_url
     from appraisal_detail a,user_info b
-    where a.user_id=b.id and a.id = #{id,jdbcType=INTEGER} and a.status <![CDATA[ <> ]]> 3 b.status <![CDATA[ <> ]]> 3
+    where a.user_id=b.id and a.id = #{id,jdbcType=INTEGER} and a.status <![CDATA[ <> ]]> 3 and b.status <![CDATA[ <> ]]> 3
   </select>
 
   <select id="selectByStatusEndTime" resultMap="BaseResultMap">

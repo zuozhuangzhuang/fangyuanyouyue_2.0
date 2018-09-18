@@ -90,8 +90,9 @@ public class AppraisalServiceImpl implements AppraisalService{
                         goodsAppraisalDetail.setOrderId(appraisalOrderInfo.getId());
                         goodsAppraisalDetail.setGoodsId(goodsId);
                         goodsAppraisalDetail.setStatus(4);//状态 0申请 1真 2假 3存疑 4待支付(在列表中不显示)
+                        goodsAppraisalDetail.setTitle(goodsInfo.getName());
                         goodsAppraisalDetail.setDescription(goodsInfo.getDescription());
-                        //TODO 根据鉴定费算法 超过2000元0.5%
+                        //根据鉴定费算法 超过2000元0.5%
                         BigDecimal price;
                         if(goodsInfo.getPrice().compareTo(BigDecimal.valueOf(2000)) <= 0){
                             //小于2000元
@@ -132,6 +133,7 @@ public class AppraisalServiceImpl implements AppraisalService{
             goodsAppraisalDetail.setAddTime(DateStampUtils.getTimesteamp());
             goodsAppraisalDetail.setOrderId(appraisalOrderInfo.getId());
             goodsAppraisalDetail.setType(3);//鉴定类型 1商家鉴定 2买家 3普通用户
+            goodsAppraisalDetail.setTitle(title);
             goodsAppraisalDetail.setDescription(description);
             goodsAppraisalDetail.setStatus(4);//状态 0申请 1真 2假 3存疑 4待支付(在列表中不显示)
             //TODO 根据鉴定费算法
