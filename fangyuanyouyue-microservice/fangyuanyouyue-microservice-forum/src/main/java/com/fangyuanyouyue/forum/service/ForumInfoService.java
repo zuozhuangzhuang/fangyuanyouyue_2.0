@@ -53,13 +53,6 @@ public interface ForumInfoService {
 	 */
     void addForum(Integer userId,Integer columnId,String title,String content,String videoUrl,Integer videoLength,String videoImg,Integer type,Integer[] userIds) throws ServiceException;
 
-	/**
-	 * 后台处理举报
-	 * @param id
-	 * @param content
-	 * @throws ServiceException
-	 */
-    void dealReport(Integer id,String content) throws ServiceException;
     
 
     /**

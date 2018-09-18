@@ -26,7 +26,7 @@ public class UserBalanceDetail {
 
     private Integer payType;//支付类型 1微信 2支付宝 3余额 4小程序
 
-    private Integer type;//收支类型 1收入 2支出
+    private Integer type;//收支类型 1收入 2支出 3退款
 
     private Date addTime;//支付时间
 
@@ -36,7 +36,7 @@ public class UserBalanceDetail {
 
     private String orderNo;//订单号
 
-    private Integer orderType;//订单类型 1商品、抢购 2官方鉴定 3商品议价 4全民鉴定 5申请专栏 6充值 7开通、续费会员 8认证店铺
+    private Integer orderType;//订单类型 1商品、抢购 2官方鉴定 3商品议价 4全民鉴定 5专栏(申请专栏：支出、每日返利：收入、申请被拒：退款) 6充值 7提现 8开通会员 9续费会员 10认证店铺
 
     private Integer sellerId;//卖家id
 

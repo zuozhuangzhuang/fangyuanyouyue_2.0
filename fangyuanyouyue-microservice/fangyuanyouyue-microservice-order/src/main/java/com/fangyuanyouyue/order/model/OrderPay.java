@@ -52,7 +52,7 @@ public class OrderPay {
 
     private String remarks;//备注
 
-    private Integer status;//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
+    private Integer status;//状态 1待支付 2待发货 3待收货 4已完成 5已取消
 
     private Date addTime;//添加时间
 

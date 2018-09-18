@@ -9,10 +9,7 @@ import com.fangyuanyouyue.base.enums.Score;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.forum.constants.StatusEnum;
-import com.fangyuanyouyue.forum.dao.CollectMapper;
-import com.fangyuanyouyue.forum.dao.ForumColumnMapper;
-import com.fangyuanyouyue.forum.dao.ForumInfoMapper;
-import com.fangyuanyouyue.forum.dao.ForumLikesMapper;
+import com.fangyuanyouyue.forum.dao.*;
 import com.fangyuanyouyue.forum.dto.AdminForumColumnDto;
 import com.fangyuanyouyue.forum.dto.ForumInfoDto;
 import com.fangyuanyouyue.forum.dto.ForumLikesDto;
@@ -71,7 +68,7 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 
 			//增加浏览记录
 			if(userId!=null) {
-				forumPvService.savePv(userId, forumId,forumInfo.getColumnId());
+				forumPvService.savePv(userId, forumId,forumInfo.getType(),forumInfo.getColumnId());
 				//是否点赞
 				ForumLikes forumLikes = forumLikesMapper.selectByForumIdUserId(dto.getForumId(), userId);
 				if(forumLikes != null){
@@ -165,7 +162,7 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 				forumInfoMapper.insert(forumInfo);
 				//社交消息：您的专栏【专栏标题】有新的帖子，点击此处前往查看吧
 				schedualMessageService.easemobMessage(forumColumn.getUserId().toString(),
-						"您的专栏【"+forumColumn.getName()+"】有新的帖子，点击此处前往查看吧","5","3",forumInfo.getId().toString());
+						"您的专栏【"+forumColumn.getName()+"】有新的帖子，点击此处前往查看吧",Status.SOCIAL_MESSAGE.getMessage(),Status.JUMP_TYPE_FORUM.getMessage(),forumInfo.getId().toString());
 				//增加信誉度
 				schedualWalletService.updateCredit(userId, Credit.ADD_FORUM.getCredit(),Status.ADD.getValue());
 			}
@@ -191,15 +188,12 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 			UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
 			for(Integer toUserId:userIds){
 				schedualMessageService.easemobMessage(toUserId.toString(),
-						"用户“"+user.getNickName()+"”上传"+(forumInfo.getType()==1?"帖子【":"视频【")+forumInfo.getTitle()+"】时邀请了您！点击此处前往查看吧",forumInfo.getType()==1?"5":"4","5",forumInfo.getId().toString());
+						"用户“"+user.getNickName()+"”上传"+(forumInfo.getType()==1?"帖子【":"视频【")+forumInfo.getTitle()+"】时邀请了您！点击此处前往查看吧",Status.SOCIAL_MESSAGE.getMessage(),forumInfo.getType()==1?Status.JUMP_TYPE_FORUM.getMessage():Status.JUMP_TYPE_VIDEO.getMessage(),forumInfo.getId().toString());
 			}
 		}
 	}
 
-	@Override
-	public void dealReport(Integer id, String content) throws ServiceException {
-		//TODO 1、删除帖子 2、发信息给用户 3、扣除被举报用户信誉度 4、给举报用户增加信誉度
-	}
+
 	
 
 	@Override

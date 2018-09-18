@@ -26,7 +26,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping(value = "/timer")
-@Api(description = "首页定时器Controller")
+@Api(description = "首页定时器Controller",hidden = true)
 @RefreshScope
 public class TimerController extends BaseController{
     protected Logger log = Logger.getLogger(this.getClass());
@@ -34,13 +34,29 @@ public class TimerController extends BaseController{
     @Autowired
     private TimerService timerService;
 
-    @ApiOperation(value = "结算全民鉴定", notes = "（void）结算全民鉴定",response = BaseResp.class,hidden = true)
+    @ApiOperation(value = "结算全民鉴定", notes = "（void）结算全民鉴定",response = BaseResp.class)
     @PostMapping(value = "/appraisalEnd")
     @ResponseBody
     public BaseResp appraisalEnd() throws IOException {
         try {
             log.info("----》结算全民鉴定《----");
             timerService.appraisalEnd();
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+    @ApiOperation(value = "专栏返利", notes = "（void）专栏返利",response = BaseResp.class)
+    @PostMapping(value = "/dailyWage")
+    @ResponseBody
+    public BaseResp dailyWage() throws IOException {
+        try {
+            log.info("----》专栏返利《----");
+            timerService.dailyWage();
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();

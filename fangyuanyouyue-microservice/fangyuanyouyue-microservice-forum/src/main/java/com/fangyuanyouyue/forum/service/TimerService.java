@@ -8,4 +8,10 @@ public interface TimerService {
      * @throws ServiceException
      */
     void appraisalEnd() throws ServiceException;
+
+    /**
+     * 专栏返利
+     * @throws ServiceException
+     */
+    void dailyWage() throws ServiceException;
 }

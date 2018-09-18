@@ -324,9 +324,11 @@
         and b.goods_id in (select id from goods_info where name like "%"#{keyword}"%" or description like "%"#{keyword}"%")
       </if>
       <if test="status != null">
-        and a.status = #{status}
         <if test="status == 7">
           and a.is_refund = 1
+        </if>
+        <if test="status != 7">
+          and a.status = #{status} and a.is_refund = 2
         </if>
       </if>
 
@@ -351,9 +353,11 @@
         )
       </if>
       <if test="status != null">
-        and a.status = #{status}
         <if test="status == 7">
           and a.is_refund = 1
+        </if>
+        <if test="status != 7">
+          and a.status = #{status} and a.is_refund = 2
         </if>
       </if>
       <if test="startDate != null and startDate != ''">

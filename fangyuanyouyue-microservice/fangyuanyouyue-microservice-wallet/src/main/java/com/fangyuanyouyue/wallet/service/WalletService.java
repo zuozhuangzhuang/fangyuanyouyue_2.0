@@ -155,11 +155,11 @@ public interface WalletService {
      * 新增用户收支信息
      * @param userId
      * @param amount
-     * @param payType
-     * @param type
+     * @param payType 支付类型 1微信 2支付宝 3余额 4小程序
+     * @param type 收支类型 1收入 2支出 3退款
      * @param orderNo
      * @param title
-     * @param orderType
+     * @param orderType 订单类型 1商品、抢购 2官方鉴定 3商品议价 4全民鉴定 5专栏(申请专栏：支出、每日返利：收入、申请被拒：退款) 6充值 7提现 8开通会员 9续费会员 10认证店铺
      * @param sellerId
      * @param buyerId
      * @throws ServiceException

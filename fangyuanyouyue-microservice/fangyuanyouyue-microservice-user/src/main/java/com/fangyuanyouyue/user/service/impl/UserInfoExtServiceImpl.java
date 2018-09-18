@@ -87,7 +87,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
         }
         //系统消息：您的实名认证申请已提交，将于1个工作日内完成审核，请注意消息通知
         schedualMessageService.easemobMessage(userInfo.getId().toString(),
-                "您的实名认证申请已提交，将于1个工作日内完成审核，请注意消息通知","1","1","");
+                "您的实名认证申请已提交，将于1个工作日内完成审核，请注意消息通知",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
     }
 
     @Override
@@ -129,7 +129,6 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
         if(userInfoExt == null){
             throw new ServiceException("用户扩展信息错误！");
         }else{
-            //认证状态 0申请中 1已认证 2未认证
             if(userInfoExt.getAuthType() == StatusEnum.AUTH_ACCEPT.getCode()){
                 throw new ServiceException("您的官方认证已通过，请勿重复提交！");
             }else if(userInfoExt.getAuthType() == StatusEnum.AUTH_APPLY.getCode()){
@@ -160,13 +159,13 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
                     if(!verifyPayPwd){
                         throw new ServiceException("支付密码错误！");
                     }
-                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, authOrder.getAmount(), 2)), BaseResp.class);
+                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, authOrder.getAmount(), Status.SUB.getValue())), BaseResp.class);
                     if(baseResp.getCode() == 1){
                         throw new ServiceException(baseResp.getReport().toString());
                     }
-                    updateOrder(authOrder.getOrderNo(),null,3);
+                    updateOrder(authOrder.getOrderNo(),null,Status.PAY_TYPE_BALANCE.getValue());
                     payInfo.append("余额支付成功！");
-                }else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){//小程序支付
+                }else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
                     WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,authOrder.getOrderNo(), authOrder.getAmount(), NotifyUrl.mini_test_notify.getNotifUrl()+NotifyUrl.auth_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
                     return wechatPayDto;
                 }else{
@@ -189,7 +188,6 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
             throw new ServiceException("订单不存在！");
         }
         //添加申请记录
-        //TODO 官方认证添加时间限制(后台通过时添加开始时间和结束时间，每次申请默认为一年期限)
         UserAuthApply userAuthApply = new UserAuthApply();
         userAuthApply.setUserId(authOrder.getUserId());
         userAuthApply.setStatus(StatusEnum.AUTH_TYPE_APPLY.getCode());
@@ -203,9 +201,9 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
         authOrder.setStatus(StatusEnum.ORDER_COMPLETE.getCode());
         userAuthOrderMapper.updateByPrimaryKeySelective(authOrder);
         //系统消息：您的认证店铺申请已提交，将于5个工作日内完成审核，请注意消息通知
-        schedualMessageService.easemobMessage(authOrder.getUserId().toString(),"您的认证店铺申请已提交，将于5个工作日内完成审核，请注意消息通知","1","1","");
+        schedualMessageService.easemobMessage(authOrder.getUserId().toString(),"您的认证店铺申请已提交，将于5个工作日内完成审核，请注意消息通知",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
         //买家新增余额账单
-        schedualWalletService.addUserBalanceDetail(authOrder.getUserId(),authOrder.getAmount(),3,1,authOrder.getOrderNo(),"申请认证店铺",null,authOrder.getUserId(),8);
+        schedualWalletService.addUserBalanceDetail(authOrder.getUserId(),authOrder.getAmount(),payType,Status.EXPEND.getValue(),authOrder.getOrderNo(),"申请认证店铺",null,authOrder.getUserId(),Status.SHOP_AUTH.getValue());
         return true;
     }
 
@@ -218,21 +216,27 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
     @Override
     public void updateExtAuth(Integer applyId, Integer status, String content) throws ServiceException {
         IdentityAuthApply apply = identityAuthApplyMapper.selectByPrimaryKey(applyId);
+        if(apply.getStatus().intValue() == StatusEnum.AUTH_ACCEPT.getCode()){
+            throw new ServiceException("此用户已通过实名认证！");
+        }
         UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(apply.getUserId());
         apply.setStatus(status);
-        identityAuthApplyMapper.updateByPrimaryKey(apply);
+        identityAuthApplyMapper.updateByPrimaryKeySelective(apply);
         userInfoExt.setStatus(status);
-        userInfoExtMapper.updateByPrimaryKey(userInfoExt);
         if(status.intValue() == StatusEnum.AUTH_ACCEPT.getCode()){
             //通过
-            schedualWalletService.updateCredit(apply.getUserId(), Credit.EXTAPPLY.getCredit(), Status.ADD.getValue());
+            userInfoExt.setIdentity(apply.getIdentity());
+            userInfoExt.setName(apply.getName());
+            userInfoExt.setCredit(userInfoExt.getCredit()+Credit.EXTAPPLY.getCredit());
+//            schedualWalletService.updateCredit(apply.getUserId(), Credit.EXTAPPLY.getCredit(), Status.ADD.getValue());
             schedualMessageService.easemobMessage(apply.getUserId().toString(),
-                    "恭喜您，您申请的实名认证，已通过官方审核！","1","1","");
+                    "恭喜您，您申请的实名认证，已通过官方审核！",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
         }else{
             //拒绝
             schedualMessageService.easemobMessage(apply.getUserId().toString(),
-                    "很抱歉，您申请的实名认证，官方审核未通过！可重新提交资料再次申请。","1","1","");
+                    "很抱歉，您申请的实名认证，官方审核未通过！可重新提交资料再次申请。",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
         }
+        userInfoExtMapper.updateByPrimaryKeySelective(userInfoExt);
     }
 
     @Override
@@ -263,7 +267,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
     public void updateShopAuth(Integer applyId, Integer status, String content) throws ServiceException {
 
         UserAuthApply model = userAuthApplyMapper.selectByPrimaryKey(applyId);
-
+        model.setStatus(status);
         UserInfoExt ext = userInfoExtMapper.selectByUserId(model.getUserId());
         ext.setAuthType(status);
         userInfoExtMapper.updateByPrimaryKey(ext);
@@ -272,13 +276,18 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
             model.setStartTime(DateStampUtils.getTimesteamp());
             model.setEndTime(DateUtil.getDateAfterYear(DateStampUtils.getTimesteamp(),1));
             schedualMessageService.easemobMessage(model.getUserId().toString(),
-                    "恭喜您，您申请的认证店铺已通过官方审核！您的店铺已添加认证店铺专属标识，快拉您的好友来尽情购买吧！","1","1","");
+                    "恭喜您，您申请的认证店铺已通过官方审核！您的店铺已添加认证店铺专属标识，快拉您的好友来尽情购买吧！",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
         }else{
             model.setReason(content);
             schedualWalletService.updateBalance(ext.getUserId(),new BigDecimal(360),Status.ADD.getValue());
+            //买家新增余额账单
+			//订单号
+			final IdGenerator idg = IdGenerator.INSTANCE;
+			String id = idg.nextId();
+            schedualWalletService.addUserBalanceDetail(model.getUserId(),new BigDecimal(360),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),id,"申请认证店铺失败退款",null,model.getUserId(),Status.SHOP_AUTH.getValue());
             //拒绝
             schedualMessageService.easemobMessage(model.getUserId().toString(),
-                    "很抱歉，您申请的认证店铺未通过官方审核，可联系客服咨询详情。","1","1","");
+                    "很抱歉，您申请的认证店铺未通过官方审核，可联系客服咨询详情。",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
         }
         userAuthApplyMapper.updateByPrimaryKey(model);
     }

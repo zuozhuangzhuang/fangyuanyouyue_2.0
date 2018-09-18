@@ -139,6 +139,8 @@ public class UserInfoServiceImpl implements UserInfoService {
         user.setNickName(param.getNickName());
         user.setStatus(1);//状态 1正常 2冻结
         user.setGender(param.getGender());
+        user.setLastLoginPlatform(param.getLoginPlatform());
+        user.setLastLoginTime(DateStampUtils.getTimesteamp());
         userInfoMapper.insert(user);
         //设置用户token到Redis
         String token = setToken("",user.getId());

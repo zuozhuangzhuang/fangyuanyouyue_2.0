@@ -184,7 +184,10 @@
     </if>
     limit #{start},#{limit}
   </select>
-  
+
+  <select id="selectByEndTime" resultMap="BaseResultMap">
+    select * from user_auth_apply where end_time <![CDATA[ <= ]]> #{endTime} and status = #{status}
+  </select>
   
   
   

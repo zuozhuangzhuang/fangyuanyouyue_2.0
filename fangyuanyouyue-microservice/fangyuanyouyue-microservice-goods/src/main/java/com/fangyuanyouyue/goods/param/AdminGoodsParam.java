@@ -124,4 +124,8 @@ public class AdminGoodsParam extends BasePageReq{
     //视频长度
     @ApiModelProperty(name = "videoLength", value = "视频长度", dataType = "int",hidden = true)
     private Integer videoLength;
+
+    //视频长度
+    @ApiModelProperty(name = "isShow", value = "是否鉴定展示 1是 2否", dataType = "int",hidden = true)
+    private Integer isShow;
 }

@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.forum.constants.StatusEnum;
 import com.fangyuanyouyue.forum.dao.AppraisalCommentLikesMapper;
@@ -81,7 +82,7 @@ public class AppraisalCommentServiceImpl implements AppraisalCommentService {
 				AppraisalDetail appraisalDetail = appraisalDetailMapper.selectDetailByPrimaryKey(param.getAppraisalId());
 				for(Integer toUserId:param.getUserIds()){
 					schedualMessageService.easemobMessage(toUserId.toString(),
-							"用户“"+user.getNickName()+"”参与全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧","7","5",appraisalDetail.getId().toString());
+							"用户“"+user.getNickName()+"”参与全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧", Status.INVITE_MESSAGE.getMessage(),Status.JUMP_TYPE_APPRAISAL.getMessage(),appraisalDetail.getId().toString());
 				}
 			}
 			AppraisalCommentDto dto = new AppraisalCommentDto(model);

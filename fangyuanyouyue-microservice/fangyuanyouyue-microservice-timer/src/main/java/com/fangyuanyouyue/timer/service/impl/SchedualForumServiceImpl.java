@@ -9,4 +9,9 @@ public class SchedualForumServiceImpl implements SchedualForumService{
     public String appraisalEnd() {
         return "全民鉴定结束失败！";
     }
+
+    @Override
+    public String dailyWage() {
+        return "专栏返利失败！";
+    }
 }
