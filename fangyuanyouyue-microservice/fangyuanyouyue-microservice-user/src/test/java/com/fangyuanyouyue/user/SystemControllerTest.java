@@ -22,7 +22,7 @@ import org.springframework.web.context.WebApplicationContext;
 @WebAppConfiguration
 @ContextConfiguration
 @Rollback
-public class AdminControllerTest {
+public class SystemControllerTest {
     @Autowired
     private WebApplicationContext context;
 
@@ -36,30 +36,18 @@ public class AdminControllerTest {
     }
 
     /**
-     * 修改实名认证状态
+     * 意见反馈
      * @throws Exception
      */
     @Test
 //    @Transactional
-    public void authApplyStatus() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/adminUser/auth/status")
-                .param("id","23")
-                .param("status","2")
-                .accept(MediaType.APPLICATION_JSON))
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
-    }
-
-    /**
-     * 意见反馈列表
-     * @throws Exception
-     */
-    @Test
-//    @Transactional
-    public void feedbackList() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/adminUser/feedbackList")
-                .param("start","0")
-                .param("limit","10")
+    public void feedback() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/system/feedback")
+                .param("token","10025FY1537214751447")
+                .param("content","不会用")
+                //类型 1安卓 2iOS 3小程序
+                .param("type","2")
+                .param("version","1.4.1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

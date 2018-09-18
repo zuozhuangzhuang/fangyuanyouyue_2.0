@@ -88,9 +88,10 @@ public interface SchedualWalletService {
      */
     @RequestMapping(value = "/walletFeign/addUserBalanceDetail",method = RequestMethod.POST)
     String addUserBalanceDetail(@RequestParam(value = "userId")Integer userId,@RequestParam(value = "amount")BigDecimal amount,@RequestParam(value = "payType")Integer payType,
-                          @RequestParam(value = "type")Integer type,@RequestParam(value = "orderNo") String orderNo,
-                          @RequestParam(value = "title")String title,@RequestParam(value = "sellerId")Integer sellerId,
-                          @RequestParam(value = "buyerId")Integer buyerId,@RequestParam(value = "orderType")Integer orderType);
+                                @RequestParam(value = "type")Integer type,@RequestParam(value = "orderNo") String orderNo,
+                                @RequestParam(value = "title")String title,@RequestParam(value = "sellerId")Integer sellerId,
+                                @RequestParam(value = "buyerId")Integer buyerId,@RequestParam(value = "orderType")Integer orderType,
+                                @RequestParam(value = "payNo")String payNo);
 
     /**
      * 根据优惠券id计算价格

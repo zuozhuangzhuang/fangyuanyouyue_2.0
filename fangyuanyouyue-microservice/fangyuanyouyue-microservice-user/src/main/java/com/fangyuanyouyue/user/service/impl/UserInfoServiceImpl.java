@@ -1,14 +1,12 @@
 package com.fangyuanyouyue.user.service.impl;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.user.dto.*;
+import com.fangyuanyouyue.user.dto.admin.AdminUserDto;
 import com.fangyuanyouyue.user.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -21,7 +19,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
-import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.base.util.MD5Util;
 import com.fangyuanyouyue.user.constant.StatusEnum;
 import com.fangyuanyouyue.user.dao.IdentityAuthApplyMapper;
@@ -600,21 +597,23 @@ public class UserInfoServiceImpl implements UserInfoService {
         for(ShopDto shopDto:shopDtos){
             //根据用户ID获取前三个商品
             String goodsLists = schedualGoodsService.goodsList(shopDto.getUserId(), 0, 3);
-            System.out.println("goodsLists:"+goodsLists);
+//            System.out.println("goodsLists:"+goodsLists);
             JSONObject jsonObject = JSONObject.parseObject(goodsLists);
-            System.out.println("jsonObject:"+jsonObject);
+//            System.out.println("jsonObject:"+jsonObject);
             JSONArray goodsList = JSONArray.parseArray(jsonObject.getString("data"));
-            for(int i=0;i<goodsList.size();i++){
-                System.out.println("goods:"+goodsList.get(i));
-                JSONObject goods = JSONObject.parseObject(goodsList.get(i).toString());
-                if(i == 0){
-                    shopDto.setImgUrl1(goods.getString("mainUrl"));
-                }else if(i == 1){
-                    shopDto.setImgUrl2(goods.getString("mainUrl"));
-                }else if(i == 2){
-                    shopDto.setImgUrl3(goods.getString("mainUrl"));
-                }else{
-                    throw new ServiceException("");
+            if(goodsList != null && goodsList.size() > 0){
+                for(int i=0;i<goodsList.size();i++){
+    //                System.out.println("goods:"+goodsList.get(i));
+                    JSONObject goods = JSONObject.parseObject(goodsList.get(i).toString());
+                    if(i == 0){
+                        shopDto.setImgUrl1(goods.getString("mainUrl"));
+                    }else if(i == 1){
+                        shopDto.setImgUrl2(goods.getString("mainUrl"));
+                    }else if(i == 2){
+                        shopDto.setImgUrl3(goods.getString("mainUrl"));
+                    }else{
+                        throw new ServiceException("");
+                    }
                 }
             }
         }

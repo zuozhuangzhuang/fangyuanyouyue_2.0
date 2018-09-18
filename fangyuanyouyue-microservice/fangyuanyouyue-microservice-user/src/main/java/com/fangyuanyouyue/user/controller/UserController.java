@@ -741,7 +741,7 @@ public class UserController extends BaseController {
             @ApiImplicitParam(name = "nickName", value = "用户昵称", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "authType", value = "获取认证店铺列表 认证状态 1已认证", dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "authType", value = "获取认证店铺列表 认证状态 2已认证", dataType = "int", paramType = "query")
     })
     @GetMapping(value = "/shopList")
     @ResponseBody

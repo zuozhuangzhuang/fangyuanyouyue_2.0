@@ -80,7 +80,7 @@ public class UserVipServiceImpl implements UserVipService{
                     userVip.setVipNo(date + no);
                     //余额账单
                     walletService.addUserBalanceDetail(vipOrder.getUserId(),vipOrder.getAmount(),payType,Status.EXPEND.getValue(),vipOrder.getOrderNo(),
-                            "开通"+time.toString()+userVip.getLevelDesc(),Status.ADD_VIP.getValue(),null,vipOrder.getUserId());
+                            "开通"+time.toString()+userVip.getLevelDesc(),Status.ADD_VIP.getValue(),null,vipOrder.getUserId(),thirdOrderNo);
                     //系统消息：恭喜您，您开通的1个月/3个月/1年 铂金/至尊 会员已生效，即刻起享受会员专属特权！
                     schedualMessageService.easemobMessage(vipOrder.getUserId().toString(),
                             "恭喜您，您开通的"+time.toString()+userVip.getLevelDesc()+"已生效，即刻起享受会员专属特权！",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
@@ -125,7 +125,7 @@ public class UserVipServiceImpl implements UserVipService{
 
                 //余额账单
                 walletService.addUserBalanceDetail(vipOrder.getUserId(),vipOrder.getAmount(),payType,Status.EXPEND.getValue(),vipOrder.getOrderNo(),
-                        "开通"+time.toString()+userVip.getLevelDesc(),Status.RENEW_VIP.getValue(),null,vipOrder.getUserId());
+                        "开通"+time.toString()+userVip.getLevelDesc(),Status.RENEW_VIP.getValue(),null,vipOrder.getUserId(),thirdOrderNo);
             }
             userVip.setIsSendMessage(null);
             userVipMapper.updateByPrimaryKey(userVip);

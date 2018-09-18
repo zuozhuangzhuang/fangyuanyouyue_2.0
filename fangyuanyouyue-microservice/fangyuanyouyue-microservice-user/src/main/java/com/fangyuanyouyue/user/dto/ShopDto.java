@@ -64,7 +64,7 @@ public class ShopDto {
                 this.creditLevel = 5;
             }
         }
-        this.authtype = (Integer)map.get("auth_type");
+        this.authtype = (Integer)map.get("auth_type") == 2?1:2;
         this.signature = (String)map.get("signature");
     }
 

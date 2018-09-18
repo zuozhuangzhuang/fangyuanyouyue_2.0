@@ -1,4 +1,4 @@
-package com.fangyuanyouyue.wallet.model;
+package com.fangyuanyouyue.wallet.dto.admin;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,13 +8,12 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 平台收支明细表
+ * 平台收支明细表DTO
  */
 @Getter
 @Setter
 @ToString
-public class PlatformFinanceDetail {
-    private Integer id;
+public class AdminPlatformFinanceDetailDto {
 
     private Integer userId;//用户id
 
@@ -40,4 +39,7 @@ public class PlatformFinanceDetail {
 
     private Integer buyerId;//买家id
 
+    private String nickName;//用户昵称
+
+    private String headImgUrl;//用户头像
 }

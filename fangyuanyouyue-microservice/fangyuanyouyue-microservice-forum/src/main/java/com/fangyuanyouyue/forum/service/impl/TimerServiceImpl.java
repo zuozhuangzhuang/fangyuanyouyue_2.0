@@ -76,8 +76,8 @@ public class TimerServiceImpl implements TimerService{
                         //余额账单
                         //订单号
                         final IdGenerator idg = IdGenerator.INSTANCE;
-                        String id = idg.nextId();
-                        schedualWalletService.addUserBalanceDetail(detail.getUserId(),detail.getBonus(), Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),id,detail.getTitle(),detail.getUserId(),null,Status.APPRAISAL.getValue());
+                        String orderNo = idg.nextId();
+                        schedualWalletService.addUserBalanceDetail(detail.getUserId(),detail.getBonus(), Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,detail.getTitle(),detail.getUserId(),null,Status.APPRAISAL.getValue(),orderNo);
                     }
                 }else{
                     for(int i=0;i<comments.size();i++){
@@ -99,8 +99,8 @@ public class TimerServiceImpl implements TimerService{
                             //余额账单
                             //订单号
                             final IdGenerator idg = IdGenerator.INSTANCE;
-                            String id = idg.nextId();
-                            schedualWalletService.addUserBalanceDetail(comment.getUserId(),detail.getBonus(), Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),id,detail.getTitle(),detail.getUserId(),comment.getUserId(),Status.APPRAISAL.getValue());
+                            String orderNo = idg.nextId();
+                            schedualWalletService.addUserBalanceDetail(comment.getUserId(),detail.getBonus(), Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderNo,detail.getTitle(),detail.getUserId(),comment.getUserId(),Status.APPRAISAL.getValue(),orderNo);
                         }else{
                             comment.setIsWinner(StatusEnum.NO.getValue());
                             appraisalCommentMapper.updateByPrimaryKey(comment);
@@ -134,8 +134,8 @@ public class TimerServiceImpl implements TimerService{
             schedualWalletService.updateBalance(forumColumn.getUserId(),amount,Status.ADD.getValue());
             //订单号
             final IdGenerator idg = IdGenerator.INSTANCE;
-            String id = idg.nextId();
-            schedualWalletService.addUserBalanceDetail(forumColumn.getUserId(),amount,Status.PAY_TYPE_BALANCE.getValue(),Status.EXPEND.getValue(),id,"专栏每日收益",null,forumColumn.getUserId(),Status.FORUM_COLUMN.getValue());
+            String orderNo = idg.nextId();
+            schedualWalletService.addUserBalanceDetail(forumColumn.getUserId(),amount,Status.PAY_TYPE_BALANCE.getValue(),Status.EXPEND.getValue(),orderNo,"专栏每日收益",null,forumColumn.getUserId(),Status.FORUM_COLUMN.getValue(),orderNo);
             schedualMessageService.easemobMessage(forumColumn.getId().toString(),"您的专栏本日收益为"+amount+"元！已发放至您的余额，点击此处查看您的余额吧",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_WALLET.getMessage(),"");
         }
     }

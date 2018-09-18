@@ -800,7 +800,7 @@ public class OrderServiceImpl implements OrderService{
                     goodsName.append("【"+goodsInfo.getName()+"】");
                 }
                 //卖家余额账单
-                schedualWalletService.addUserBalanceDetail(orderInfo.getUserId(),orderInfo.getAmount(),Status.PAY_TYPE_BALANCE.getValue(),Status.EXPEND.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue());
+                schedualWalletService.addUserBalanceDetail(orderInfo.getSellerId(),orderInfo.getAmount(),Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),orderInfo.getOrderNo());
                 //卖家增加信誉度
                 if(orderPay.getPayAmount().compareTo(new BigDecimal(2000)) <= 0){
                     schedualWalletService.updateCredit(orderInfo.getSellerId(),Credit.NORMAL_ORDER.getCredit(),Status.ADD.getValue());
@@ -948,7 +948,7 @@ public class OrderServiceImpl implements OrderService{
                         schedualMessageService.easemobMessage(childOrder.getSellerId().toString(),
                                 "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER.getMessage(),childOrder.getId().toString());
                         //买家新增余额账单
-                        schedualWalletService.addUserBalanceDetail(childOrder.getUserId(),childOrder.getAmount(),payType,Status.EXPEND.getValue(),childOrder.getOrderNo(),goodsName.toString(),childOrder.getSellerId(),childOrder.getUserId(),Status.GOODS_INFO.getValue());
+                        schedualWalletService.addUserBalanceDetail(childOrder.getUserId(),childOrder.getAmount(),payType,Status.EXPEND.getValue(),childOrder.getOrderNo(),goodsName.toString(),childOrder.getSellerId(),childOrder.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo);
                     }
                 }else{
                     //获取商品名字列表
@@ -964,7 +964,7 @@ public class OrderServiceImpl implements OrderService{
                     schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
                             "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER.getMessage(),orderInfo.getId().toString());
                     //买家新增余额账单
-                    schedualWalletService.addUserBalanceDetail(orderInfo.getUserId(),orderInfo.getAmount(),payType,Status.EXPEND.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue());
+                    schedualWalletService.addUserBalanceDetail(orderInfo.getUserId(),orderInfo.getAmount(),payType,Status.EXPEND.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo);
                 }
                 orderInfo.setStatus(Status.ORDER_GOODS_PAY.getValue());
                 orderInfoMapper.updateByPrimaryKeySelective(orderInfo);

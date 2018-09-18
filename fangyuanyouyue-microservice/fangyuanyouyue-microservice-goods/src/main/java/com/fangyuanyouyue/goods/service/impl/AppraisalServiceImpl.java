@@ -299,7 +299,7 @@ public class AppraisalServiceImpl implements AppraisalService{
             schedualMessageService.easemobMessage(appraisalOrderInfo.getUserId().toString(),
                     "您的鉴定申请已提交，专家将于两个工作日内给出答复，请注意消息通知",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
             //余额账单
-            schedualWalletService.addUserBalanceDetail(appraisalOrderInfo.getUserId(),appraisalOrderInfo.getAmount(),payType,Status.EXPEND.getValue(),orderNo,"官方鉴定",null,appraisalOrderInfo.getUserId(),Status.PLATFORM_APPRAISAL.getValue());
+            schedualWalletService.addUserBalanceDetail(appraisalOrderInfo.getUserId(),appraisalOrderInfo.getAmount(),payType,Status.EXPEND.getValue(),orderNo,"官方鉴定",null,appraisalOrderInfo.getUserId(),Status.PLATFORM_APPRAISAL.getValue(),thirdOrderNo);
             return true;
         } catch (Exception e){
             throw new ServiceException("官方鉴定申请失败！");
@@ -374,7 +374,7 @@ public class AppraisalServiceImpl implements AppraisalService{
             //订单号
             final IdGenerator idg = IdGenerator.INSTANCE;
             String orderNo = idg.nextId();
-            schedualWalletService.addUserBalanceDetail(goodsAppraisalDetail.getUserId(),goodsAppraisalDetail.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderNo,goodsAppraisalDetail.getTitle(),null,goodsAppraisalDetail.getUserId(),Status.APPRAISAL.getValue());
+            schedualWalletService.addUserBalanceDetail(goodsAppraisalDetail.getUserId(),goodsAppraisalDetail.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderNo,goodsAppraisalDetail.getTitle(),null,goodsAppraisalDetail.getUserId(),Status.APPRAISAL.getValue(),orderNo);
 
             schedualMessageService.easemobMessage(goodsAppraisalDetail.getUserId().toString(),"您申请的鉴定结果为“存疑”鉴定费用已退回您的余额，点击此处查看您的余额吧",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_WALLET.getMessage(),"");
         }else{

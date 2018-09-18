@@ -51,7 +51,7 @@ public class UserInfo {
 
     private Date lastLoginTime;//最后登录时间
 
-    private Integer lastLoginPlatform;//最后登录平台 1安卓 2IOS 3小程序
+    private Integer lastLoginPlatform;//最后登录平台 1安卓 2iOS 3小程序
 
     private Date addTime;//注册时间
 

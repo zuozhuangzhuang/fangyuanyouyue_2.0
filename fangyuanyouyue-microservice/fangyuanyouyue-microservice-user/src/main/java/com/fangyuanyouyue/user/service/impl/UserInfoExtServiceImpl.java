@@ -203,7 +203,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
         //系统消息：您的认证店铺申请已提交，将于5个工作日内完成审核，请注意消息通知
         schedualMessageService.easemobMessage(authOrder.getUserId().toString(),"您的认证店铺申请已提交，将于5个工作日内完成审核，请注意消息通知",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
         //买家新增余额账单
-        schedualWalletService.addUserBalanceDetail(authOrder.getUserId(),authOrder.getAmount(),payType,Status.EXPEND.getValue(),authOrder.getOrderNo(),"申请认证店铺",null,authOrder.getUserId(),Status.SHOP_AUTH.getValue());
+        schedualWalletService.addUserBalanceDetail(authOrder.getUserId(),authOrder.getAmount(),payType,Status.EXPEND.getValue(),orderNo,"申请认证店铺",null,authOrder.getUserId(),Status.SHOP_AUTH.getValue(),thirdOrderNo);
         return true;
     }
 
@@ -283,8 +283,8 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
             //买家新增余额账单
 			//订单号
 			final IdGenerator idg = IdGenerator.INSTANCE;
-			String id = idg.nextId();
-            schedualWalletService.addUserBalanceDetail(model.getUserId(),new BigDecimal(360),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),id,"申请认证店铺失败退款",null,model.getUserId(),Status.SHOP_AUTH.getValue());
+			String orderNo = idg.nextId();
+            schedualWalletService.addUserBalanceDetail(model.getUserId(),new BigDecimal(360),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"申请认证店铺失败退款",null,model.getUserId(),Status.SHOP_AUTH.getValue(),orderNo);
             //拒绝
             schedualMessageService.easemobMessage(model.getUserId().toString(),
                     "很抱歉，您申请的认证店铺未通过官方审核，可联系客服咨询详情。",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");

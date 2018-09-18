@@ -1,7 +1,7 @@
 package com.fangyuanyouyue.base.enums;
 
 /**
- * 这里是 12 1234567 123 12 123
+ * 状态值
  */
 public enum Status {
     YES(1),NO(2),
@@ -62,6 +62,7 @@ public enum Status {
 
     //议价状态 1申请 2同意 3拒绝 4取消
     BARGAIN_APPLY(1),BARGAIN_AGREE(2),BARGAIN_REFUSE(3),BARGAIN_CANCEL(4),
+
     ;
     private Integer value;
     private String message;
