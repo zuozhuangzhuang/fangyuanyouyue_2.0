@@ -132,7 +132,7 @@ public class TimerController extends BaseController {
 
     //TODO 优惠券自动过期
 
-    @Scheduled(cron="* * 0  * * ? ")
+    @Scheduled(cron="0 0 0  * * ? ")
     public BaseResp shopAuthTimeOut() throws IOException {
         try {
             log.info("----》官方认证自动过期《----");
@@ -146,7 +146,7 @@ public class TimerController extends BaseController {
 
 
 
-    @Scheduled(cron="* * 8 * * ? ")
+    @Scheduled(cron="0 0 8 * * ? ")
     public BaseResp dailyWage() throws IOException {
         try {
             log.info("----》专栏返利《----");

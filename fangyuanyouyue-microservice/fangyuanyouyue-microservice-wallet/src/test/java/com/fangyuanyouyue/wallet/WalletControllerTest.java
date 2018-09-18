@@ -115,11 +115,11 @@ public class WalletControllerTest {
 //    @Transactional
     public void billList() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/wallet/billList")
-                .param("token","10045FY1535599469421")
+                .param("token","10025FY1537214751447")
                 .param("start","0")
                 .param("limit","10")
-                .param("date","2018-09")
-                .param("type","")
+//                .param("date","2018-09")
+//                .param("type","")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -149,6 +149,21 @@ public class WalletControllerTest {
     public void getUserCouponList() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/wallet/getUserCouponList")
                 .param("token","10045FY1535599469421")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 按照月份获取用户总收支
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void monthlyBalance() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/wallet/monthlyBalance")
+                .param("token","10025FY1537214751447")
+                .param("date","2018-09")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

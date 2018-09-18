@@ -45,7 +45,7 @@ public class AdminController  extends BaseController {
             @ApiImplicitParam(name = "businessId", value = "业务ID：例：商品id、视频id、积分商城商品id...", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "jumpType", value = "跳转类型 1页面 2链接 3图片（businessId为空）", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "businessType", value = "业务类型 1商品详情、2抢购详情、3帖子详情、4全民鉴定详情、5视频详情、6专栏 7积分商品", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "type", value = "类型 1首页 2商城 3积分商城", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1首页 2商品详情 3积分商城", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "title", value = "描述标题", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "imgUrl", value = "图片地址", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "sort", value = "排序", required = true, dataType = "int", paramType = "query")
@@ -125,7 +125,7 @@ public class AdminController  extends BaseController {
             @ApiImplicitParam(name = "businessId", value = "业务ID：例：商品id、视频id、积分商城商品id...", required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "jumpType", value = "跳转类型 1页面 2链接 3图片（businessId为空）", required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "businessType", value = "业务类型 1商品详情、2抢购详情、3帖子详情、4全民鉴定详情、5视频详情、6专栏 7积分商品", required = false, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "type", value = "类型 1首页 2商城 3积分商城", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1首页 2商品详情 3积分商城", required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "title", value = "描述标题", required = false, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "imgUrl", value = "图片地址", required = false, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "sort", value = "排序", required = false, dataType = "int", paramType = "query"),

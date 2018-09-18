@@ -1,4 +1,4 @@
-package com.fangyuanyouyue.wallet.dto;
+package com.fangyuanyouyue.wallet.dto.admin;
 
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.wallet.model.UserBalanceDetail;
@@ -11,12 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 余额账单Dto
+ * 用户收支信息Dto
  */
 @Getter
 @Setter
 @ToString
-public class UserBalanceDto {
+public class AdminUserBalanceDto {
     private Integer id;//唯一自增ID
 
     private Integer userId;//用户id
@@ -49,10 +49,10 @@ public class UserBalanceDto {
 
     private String payNo;//第三方支付流水号
 
-    public UserBalanceDto() {
+    public AdminUserBalanceDto() {
     }
 
-    public UserBalanceDto(UserBalanceDetail model) {
+    public AdminUserBalanceDto(UserBalanceDetail model) {
         this.id = model.getId();
         this.userId = model.getUserId();
         this.amount = model.getAmount();
@@ -69,13 +69,13 @@ public class UserBalanceDto {
         this.payNo = model.getPayNo();
     }
     
-    public static List<UserBalanceDto> toDtoList(List<UserBalanceDetail> list) {
+    public static List<AdminUserBalanceDto> toDtoList(List<UserBalanceDetail> list) {
         if (list == null) {
             return new ArrayList<>();
         }
-        List<UserBalanceDto> dtolist = new ArrayList<>();
+        List<AdminUserBalanceDto> dtolist = new ArrayList<>();
         for (UserBalanceDetail model : list) {
-            UserBalanceDto dto = new UserBalanceDto(model);
+            AdminUserBalanceDto dto = new AdminUserBalanceDto(model);
             dtolist.add(dto);
         }
         return dtolist;

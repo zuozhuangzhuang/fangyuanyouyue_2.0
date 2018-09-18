@@ -158,7 +158,7 @@ public class AdminController extends BaseController {
 			@ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
 			@ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query"),
 			@ApiImplicitParam(name = "keyword", value = "关键字搜索",required = false, dataType = "String", paramType = "query"),
-			@ApiImplicitParam(name = "status", value = "状态 0申请中 1通过 2未通过",required = true, dataType = "int", paramType = "query")
+			@ApiImplicitParam(name = "status", value = "状态 0申请中 1通过 2未通过",required = false, dataType = "int", paramType = "query")
 	})
 	@GetMapping(value = "/applyList")
 	@ResponseBody
@@ -182,7 +182,7 @@ public class AdminController extends BaseController {
     @ApiImplicitParams({
 
             @ApiImplicitParam(name = "id", value = "专栏申请id",required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "userId", value = "用户id",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "userId", value = "用户id",required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "status", value = "处理状态 1同意 2拒绝",required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "coverImgUrl", value = "封面图片地址（同意必填）",required = false, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "reason", value = "拒绝理由（拒绝必填）",required = false, dataType = "String", paramType = "query"),

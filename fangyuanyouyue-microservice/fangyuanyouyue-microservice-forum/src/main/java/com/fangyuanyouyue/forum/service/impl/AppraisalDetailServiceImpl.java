@@ -312,7 +312,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 			}
 		}
 		//余额账单
-		schedualWalletService.addUserBalanceDetail(argueOrder.getUserId(),argueOrder.getAmount(),payType,Status.EXPEND.getValue(),orderNo,argueOrder.getTitle(),argueOrder.getUserId(),null, Status.APPRAISAL.getValue());
+		schedualWalletService.addUserBalanceDetail(argueOrder.getUserId(),argueOrder.getAmount(),payType,Status.EXPEND.getValue(),orderNo,argueOrder.getTitle(),argueOrder.getUserId(),null, Status.APPRAISAL.getValue(),thirdOrderNo);
 		argueOrder.setStatus(Status.ORDER_COMPLETE.getValue());
 		argueOrderMapper.updateByPrimaryKey(argueOrder);
 		return true;

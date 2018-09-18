@@ -462,7 +462,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         //是否官方认证
         Map<String, Object> goodsUserInfoExtAndVip = goodsInfoMapper.getGoodsUserInfoExtAndVip(goodsId);
         if(goodsUserInfoExtAndVip != null){
-            goodsDto.setAuthType((Integer)goodsUserInfoExtAndVip.get("auth_type"));
+            goodsDto.setAuthType((Integer)goodsUserInfoExtAndVip.get("auth_type") == 2?1:2);
             goodsDto.setVipLevel((Integer)goodsUserInfoExtAndVip.get("vip_level"));
             Long credit = (Long)goodsUserInfoExtAndVip.get("credit");
             goodsDto.setCredit(credit);
@@ -498,7 +498,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         //是否官方认证
         Map<String, Object> goodsUserInfoExtAndVip = goodsInfoMapper.getGoodsUserInfoExtAndVip(goodsId);
         if(goodsUserInfoExtAndVip != null){
-            goodsDto.setAuthType((Integer)goodsUserInfoExtAndVip.get("auth_type"));
+            goodsDto.setAuthType((Integer)goodsUserInfoExtAndVip.get("auth_type") == 2?1:2);
             goodsDto.setVipLevel((Integer)goodsUserInfoExtAndVip.get("vip_level"));
             Long credit = (Long)goodsUserInfoExtAndVip.get("credit");
             goodsDto.setCredit(credit);
