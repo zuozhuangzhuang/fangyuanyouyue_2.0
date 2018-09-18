@@ -3,13 +3,12 @@ package com.fangyuanyouyue.wallet.service.impl;
 import com.fangyuanyouyue.base.enums.Score;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.wallet.dao.BonusPoolMapper;
-import com.fangyuanyouyue.wallet.dao.UserInfoExtMapper;
-import com.fangyuanyouyue.wallet.dao.UserWalletMapper;
+import com.fangyuanyouyue.base.util.DateStampUtils;
+import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.base.util.IdGenerator;
+import com.fangyuanyouyue.wallet.dao.*;
 import com.fangyuanyouyue.wallet.dto.BonusPoolDto;
-import com.fangyuanyouyue.wallet.model.BonusPool;
-import com.fangyuanyouyue.wallet.model.UserInfoExt;
-import com.fangyuanyouyue.wallet.model.UserWallet;
+import com.fangyuanyouyue.wallet.model.*;
 import com.fangyuanyouyue.wallet.service.ScoreService;
 import com.fangyuanyouyue.wallet.service.UserCouponService;
 import com.fangyuanyouyue.wallet.service.WalletService;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -34,6 +34,10 @@ public class ScoreServiceImpl implements ScoreService{
     private WalletService walletService;
     @Autowired
     private UserCouponService userCouponService;
+    @Autowired
+    private UserInfoMapper userInfoMapper;
+    @Autowired
+    private UserScoreDetailMapper userScoreDetailMapper;
 
     @Override
     public List<BonusPoolDto> getBonusPool() throws ServiceException {
@@ -75,11 +79,11 @@ public class ScoreServiceImpl implements ScoreService{
                     }
                 }
                 //扣除积分余额
-                walletService.updateScore(userId,10000L,2);
+                updateScore(userId,10000L,2);
                 //增加用户积分、优惠券
                 if(bonus.getType() == 1){
                     //积分
-                    walletService.updateScore(userId,bonus.getScore(),1);
+                    updateScore(userId,bonus.getScore(),1);
                 }else if(bonus.getType() == 2){
                     //优惠券
                     //保存用户优惠券
@@ -92,6 +96,60 @@ public class ScoreServiceImpl implements ScoreService{
 
     @Override
     public void shareHtml(Integer userId) throws ServiceException {
-        walletService.updateScore(userId, Score.SHARE.getScore(), Status.ADD.getValue());
+        updateScore(userId, Score.SHARE.getScore(), Status.ADD.getValue());
     }
+
+    public static void main(String[] args) {
+        String date = DateUtil.getFormatDate(new Date(),DateUtil.DATE_FORMT_YEAR);
+        System.out.println(date);
+    }
+    @Override
+    public void updateScore(Integer userId, Long score,Integer type) throws ServiceException {
+        //每个用户每天可增加500积分 增加一张用户积分记录表，记录用户积分增加历史，按天筛选，不可超过500分
+        UserWallet userWallet = userWalletMapper.selectByUserId(userId);
+        if(userWallet == null){
+            throw new ServiceException("获取钱包信息失败！");
+        }else{
+            if(type == 1){
+                //判断是否满500积分
+                Long userScore = userScoreDetailMapper.getUserScoreByDay(userId);
+                //大于等于500不再加分，小于500：判断要增加的积分与500的差值，如果今日收益+要增加的积分>500，则增加500-今日收益的积分，否则增加原积分
+                if(userScore != null){
+                    if(userScore >= 500L) {
+                        return;
+                    }else{
+                        if(userScore + score > 500L){
+                            score = 500L - userScore;
+                        }
+                    }
+                }
+                userWallet.setScore(userWallet.getScore()+score);
+                userWallet.setPoint(userWallet.getPoint()+score);
+                //修改用户等级
+                UserInfo info = userInfoMapper.selectByPrimaryKey(userId);
+                //积分等级，计算总积分
+                WalletServiceImpl.setUserLevel(userWallet.getScore(), info);
+                userInfoMapper.updateByPrimaryKeySelective(info);
+            }else{
+                //如果修改后的积分余额低于0，就返回积分不足
+                Long updateScore = userWallet.getPoint()-score;
+                if(updateScore < 0){
+                    throw new ServiceException("积分不足！");
+                }
+                userWallet.setPoint(updateScore);
+            }
+            UserScoreDetail userScoreDetail = new UserScoreDetail();
+            userScoreDetail.setUserId(userId);
+            userScoreDetail.setAddTime(DateStampUtils.getTimesteamp());
+            //订单号
+            final IdGenerator idg = IdGenerator.INSTANCE;
+            String orderNo = idg.nextId();
+            userScoreDetail.setOrderNo(orderNo);
+            userScoreDetail.setScore(score);
+            userScoreDetail.setType(type);
+            userScoreDetailMapper.insert(userScoreDetail);
+            userWalletMapper.updateByPrimaryKeySelective(userWallet);
+        }
+    }
+
 }

@@ -42,7 +42,7 @@ public class FeignControllerTest {
      * @throws Exception
      */
     @Test
-    @Transactional
+//    @Transactional
     public void updateScore() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/walletFeign/updateScore")
                 .param("userId","25")

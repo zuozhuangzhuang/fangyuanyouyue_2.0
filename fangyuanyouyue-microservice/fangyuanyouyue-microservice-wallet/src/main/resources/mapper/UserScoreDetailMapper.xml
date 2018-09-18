@@ -114,4 +114,8 @@
       order_no = #{orderNo,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="getUserScoreByDay" resultType="Long">
+    select sum(score) from user_score_detail where user_id = #{userId} and add_time <![CDATA[ >= ]]> (CURDATE()) and add_time <![CDATA[ < ]]> (CURDATE()+1)
+  </select>
 </mapper>

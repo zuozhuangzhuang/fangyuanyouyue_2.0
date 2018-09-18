@@ -41,6 +41,8 @@ public class FeignController extends BaseController{
     private UserCouponService userCouponService;
     @Autowired
     private UserBehaviorService userBehaviorService;
+    @Autowired
+    private ScoreService scoreService;
 
 
     @PostMapping(value = "/updateScore")
@@ -59,7 +61,7 @@ public class FeignController extends BaseController{
                 return toError("类型错误！");
             }
             //修改积分
-            walletService.updateScore(param.getUserId(),param.getScore(),param.getType());
+            scoreService.updateScore(param.getUserId(),param.getScore(),param.getType());
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();

@@ -2,6 +2,7 @@ package com.fangyuanyouyue.wallet.service.impl;
 
 import java.util.Date;
 
+import com.fangyuanyouyue.wallet.service.ScoreService;
 import com.fangyuanyouyue.wallet.service.UserCouponService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,8 @@ public class PointOrderServiceImpl implements PointOrderService{
     private UserCouponService userCouponService;
     @Autowired
     private WalletService walletService;
+    @Autowired
+	private ScoreService scoreService;
 
 	@Override
 	public void saveOrder(Integer userId, Integer goodsId) throws ServiceException {
@@ -56,7 +59,7 @@ public class PointOrderServiceImpl implements PointOrderService{
 		couponInfoMapper.updateByPrimaryKey(coupon);
 		
 		//扣除积分
-		walletService.updateScore(userId,goods.getPoint(), 2);
+		scoreService.updateScore(userId,goods.getPoint(), 2);
 		
 		//保存订单信息
 		PointOrder order = new PointOrder();

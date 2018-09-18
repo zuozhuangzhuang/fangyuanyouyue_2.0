@@ -10,6 +10,7 @@ import com.fangyuanyouyue.wallet.dao.UserInfoMapper;
 import com.fangyuanyouyue.wallet.model.UserBehavior;
 import com.fangyuanyouyue.wallet.model.UserInfo;
 import com.fangyuanyouyue.wallet.service.SchedualMessageService;
+import com.fangyuanyouyue.wallet.service.ScoreService;
 import com.fangyuanyouyue.wallet.service.UserBehaviorService;
 import com.fangyuanyouyue.wallet.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,8 @@ public class UserBehaviorServiceImpl implements UserBehaviorService {
     private WalletService walletService;
     @Autowired
     private SchedualMessageService schedualMessageService;
+    @Autowired
+    private ScoreService scoreService;
 
     @Override
     public void addUserBehavior(Integer userId, Integer toUserId, Integer businessId, Integer businessType, Integer type) throws ServiceException {
@@ -43,7 +46,7 @@ public class UserBehaviorServiceImpl implements UserBehaviorService {
             userBehaviorMapper.insert(userBehavior);
             //增加积分、信誉度
             if(type.intValue() == Status.BEHAVIOR_TYPE_LIKES.getValue().intValue()){
-                walletService.updateScore(userId,Score.LIKES.getScore(), Status.ADD.getValue());
+                scoreService.updateScore(userId,Score.LIKES.getScore(), Status.ADD.getValue());
                 walletService.updateCredit(toUserId, Credit.LIKES.getCredit(),Status.ADD.getValue());
             }else if(type.intValue() == Status.BEHAVIOR_TYPE_FANS.getValue().intValue()){
                 UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
@@ -52,7 +55,7 @@ public class UserBehaviorServiceImpl implements UserBehaviorService {
                         "用户“"+userInfo.getNickName()+"”已关注了您！",Status.FANS_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
             }else if(type.intValue() == Status.BEHAVIOR_TYPE_COMMENT.getValue().intValue()){
                 //评论
-                walletService.updateScore(userId,Score.COMMENT.getScore(),Status.ADD.getValue());
+                scoreService.updateScore(userId,Score.COMMENT.getScore(),Status.ADD.getValue());
                 walletService.updateCredit(toUserId,Credit.COMMENT.getCredit(),Status.ADD.getValue());
             }
         }else{

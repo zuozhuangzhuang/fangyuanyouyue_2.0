@@ -41,14 +41,6 @@ public interface WalletService {
      */
     WalletDto getWallet(Integer userId) throws ServiceException;
 
-    /**
-     * 修改积分
-     * @param userId
-     * @param score
-     * @param type 1 增加 2减少
-     * @throws ServiceException
-     */
-    void updateScore(Integer userId,Long score,Integer type) throws ServiceException;
 
     /**
      * 修改余额
