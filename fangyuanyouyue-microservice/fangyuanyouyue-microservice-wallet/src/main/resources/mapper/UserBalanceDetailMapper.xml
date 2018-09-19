@@ -17,6 +17,7 @@
     <result column="seller_id" jdbcType="INTEGER" property="sellerId" />
     <result column="buyer_id" jdbcType="INTEGER" property="buyerId" />
     <result column="pay_no" jdbcType="VARCHAR" property="payNo" />
+    <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, amount, befor_amount, after_amount, pay_type, type, add_time, update_time, 
@@ -227,5 +228,74 @@
 
   <select id="monthlyBalance" resultType="Map">
     select sum(amount) amount,type from user_balance_detail where user_id = #{userId} and add_time <![CDATA[ >= ]]> #{startDate} and add_time <![CDATA[ < ]]> #{endDate} group by type
+  </select>
+
+
+  <select id="countPage" parameterType="Integer" resultType="Integer">
+    select count(*) from user_balance_detail a,user_info b where a.user_id=b.id
+    <if test="payType != null">
+      and a.pay_type = #{payType}
+    </if>
+    <if test="type != null">
+      and a.type = #{type}
+    </if>
+    <if test="orderType != null">
+      and a.order_type = #{orderType}
+    </if>
+    <if test="keyword != null">
+      and (
+      a.title like "%"#{keyword}"%"
+      or b.nick_name like "%"#{keyword}"%"
+      or b.phone like "%"#{keyword}"%"
+      )
+    </if>
+    <if test="status != null">
+      and a.status = #{status}
+    </if>
+    <if test="startDate != null">
+      and a.add_time <![CDATA[ > ]]> #{startDate}
+    </if>
+    <if test="endDate != null">
+      and a.add_time <![CDATA[ <= ]]> #{endDate}
+    </if>
+  </select>
+
+  <select id="getPage" resultMap="BaseResultMap">
+    select a.*,b.nick_name from user_balance_detail a,user_info b where a.user_id=b.id
+    <if test="payType != null">
+      and a.pay_type = #{payType}
+    </if>
+    <if test="type != null">
+      and a.type = #{type}
+    </if>
+    <if test="orderType != null">
+      and a.order_type = #{orderType}
+    </if>
+    <if test="keyword != null">
+      and (
+      a.title like "%"#{keyword}"%"
+      or b.nick_name like "%"#{keyword}"%"
+      or b.phone like "%"#{keyword}"%"
+      )
+    </if>
+    <if test="status != null">
+      and a.status = #{status}
+    </if>
+
+    <if test="startDate != null">
+      and a.add_time <![CDATA[ > ]]> #{startDate}
+    </if>
+
+    <if test="endDate != null">
+      and a.add_time <![CDATA[ <= ]]> #{endDate}
+    </if>
+
+    <if test="orders != null">
+      order by a.${orders}
+      <if test="ascType != null and ascType == 2">
+        desc
+      </if>
+    </if>
+    limit #{start},#{limit}
   </select>
 </mapper>

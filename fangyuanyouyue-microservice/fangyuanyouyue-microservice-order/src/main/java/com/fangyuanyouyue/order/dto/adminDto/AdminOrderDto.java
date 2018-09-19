@@ -63,6 +63,7 @@ public class AdminOrderDto {
     public AdminOrderDto(OrderInfo orderInfo) {
         this.userId = orderInfo.getUserId();
         this.nickName = orderInfo.getNickName();
+        this.headImgUrl = orderInfo.getHeadImgUrl();
         this.orderId = orderInfo.getId();
         this.orderNo = orderInfo.getOrderNo();
         this.totalAmount = orderInfo.getAmount();

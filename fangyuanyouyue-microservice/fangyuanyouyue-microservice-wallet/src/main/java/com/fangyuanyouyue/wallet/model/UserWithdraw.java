@@ -28,4 +28,6 @@ public class UserWithdraw {
 
     private String realName;//真实姓名
 
+    private String nickName;//用户昵称
+
 }

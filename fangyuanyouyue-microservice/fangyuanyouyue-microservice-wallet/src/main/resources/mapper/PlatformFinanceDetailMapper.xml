@@ -15,6 +15,7 @@
     <result column="order_type" jdbcType="INTEGER" property="orderType" />
     <result column="seller_id" jdbcType="INTEGER" property="sellerId" />
     <result column="buyer_id" jdbcType="INTEGER" property="buyerId" />
+    <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, amount, order_no, pay_no, pay_type, type, add_time, update_time, title, 

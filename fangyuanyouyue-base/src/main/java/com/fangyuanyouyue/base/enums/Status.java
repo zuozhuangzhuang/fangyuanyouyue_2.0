@@ -51,8 +51,8 @@ public enum Status {
     //(全民鉴定、申请专栏、议价、官方鉴定、充值、开通、续费会员)订单状态 1待支付 2已完成 3已删除
     ORDER_UNPAID(1),ORDER_COMPLETE(2),ORDER_DELETE(3),
 
-    //订单类型 1商品、抢购 2官方鉴定 3商品议价 4全民鉴定 5专栏(申请专栏：支出、每日返利：收入、申请被拒：退款) 6充值 7提现 8开通会员 9续费会员 10认证店铺
-    GOODS_INFO(1),PLATFORM_APPRAISAL(2),BARGAIN(3),APPRAISAL(4),FORUM_COLUMN(5),RECHARGE(6),WITHDRAW(7),ADD_VIP(8),RENEW_VIP(9),SHOP_AUTH(10),
+    //订单类型 1商品、抢购 2官方鉴定 3商品议价 4全民鉴定 5专栏(申请专栏：支出、每日返利：收入、申请被拒：退款) 6充值 7提现 8开通会员 9续费会员 10认证店铺 11系统修改余额
+    GOODS_INFO(1),PLATFORM_APPRAISAL(2),BARGAIN(3),APPRAISAL(4),FORUM_COLUMN(5),RECHARGE(6),WITHDRAW(7),ADD_VIP(8),RENEW_VIP(9),SHOP_AUTH(10),SYSTEM_UPDATE(11),
 
     //收支类型 1收入 2支出 3退款
     INCOME(1),EXPEND(2),REFUND(3),
@@ -63,6 +63,11 @@ public enum Status {
     //议价状态 1申请 2同意 3拒绝 4取消
     BARGAIN_APPLY(1),BARGAIN_AGREE(2),BARGAIN_REFUSE(3),BARGAIN_CANCEL(4),
 
+    //提现状态 1申请中 2同意 3拒绝
+    WITHDRAW_APPLY(1,"申请中"),WITHDRAW_AGGRES(2,"同意"),WITHDRAW_REFUSE(3,"拒绝"),
+
+    //代金券 1未使用 2已使用
+    COUPON_NOTUSE(1,"未使用"),COUPON_USED(2,"已使用"),
     ;
     private Integer value;
     private String message;

@@ -10,6 +10,7 @@
     <result column="content" property="content" jdbcType="VARCHAR" />
     <result column="account" property="account" jdbcType="VARCHAR" />
     <result column="real_name" property="realName" jdbcType="VARCHAR" />
+    <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, user_id, amount, pay_type, status, content, account, real_name
@@ -125,4 +126,62 @@
       real_name = #{realName,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+  <select id="countPage" parameterType="Integer" resultType="Integer">
+    select count(*) from user_withdraw a,user_info b where a.user_id=b.id
+    <if test="payType != null">
+      and a.pay_type = #{payType}
+    </if>
+    <if test="status != null">
+      and a.status = #{status}
+    </if>
+    <if test="keyword != null">
+      and (
+      a.content like "%"#{keyword}"%"
+      or a.account like "%"#{keyword}"%"
+      or a.real_name like "%"#{keyword}"%"
+      or b.nick_name like "%"#{keyword}"%"
+      or b.phone like "%"#{keyword}"%"
+      )
+    </if>
+    <if test="startDate != null">
+      and a.add_time <![CDATA[ > ]]> #{startDate}
+    </if>
+    <if test="endDate != null">
+      and a.add_time <![CDATA[ <= ]]> #{endDate}
+    </if>
+  </select>
+
+  <select id="getPage" resultMap="BaseResultMap">
+    select a.*,b.nick_name from user_withdraw a,user_info b where a.user_id=b.id
+    <if test="payType != null">
+      and a.pay_type = #{payType}
+    </if>
+    <if test="status != null">
+      and a.status = #{status}
+    </if>
+    <if test="keyword != null">
+      and (
+      a.content like "%"#{keyword}"%"
+      or a.account like "%"#{keyword}"%"
+      or a.real_name like "%"#{keyword}"%"
+      or b.nick_name like "%"#{keyword}"%"
+      or b.phone like "%"#{keyword}"%"
+      )
+    </if>
+    <if test="startDate != null">
+      and a.add_time <![CDATA[ > ]]> #{startDate}
+    </if>
+    <if test="endDate != null">
+      and a.add_time <![CDATA[ <= ]]> #{endDate}
+    </if>
+    <if test="orders != null">
+      order by a.${orders}
+      <if test="ascType != null and ascType == 2">
+        desc
+      </if>
+    </if>
+    limit #{start},#{limit}
+  </select>
 </mapper>

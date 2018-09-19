@@ -17,9 +17,12 @@ import com.fangyuanyouyue.wallet.dto.BillMonthDto;
 import com.fangyuanyouyue.wallet.dto.UserBalanceDto;
 import com.fangyuanyouyue.wallet.dto.UserCouponDto;
 import com.fangyuanyouyue.wallet.dto.WalletDto;
+import com.fangyuanyouyue.wallet.dto.admin.AdminUserBalanceDto;
+import com.fangyuanyouyue.wallet.dto.admin.AdminWithdrawDto;
 import com.fangyuanyouyue.wallet.model.*;
 import com.fangyuanyouyue.wallet.param.AdminWalletParam;
 import com.fangyuanyouyue.wallet.service.PlatformFinanceService;
+import com.fangyuanyouyue.wallet.service.SchedualMessageService;
 import com.fangyuanyouyue.wallet.service.UserCouponService;
 import com.fangyuanyouyue.wallet.service.WalletService;
 import org.apache.commons.lang.StringUtils;
@@ -59,6 +62,8 @@ public class WalletServiceImpl implements WalletService{
     private UserThirdPartyMapper userThirdPartyMapper;
     @Autowired
     private PlatformFinanceService platformFinanceService;
+    @Autowired
+    private SchedualMessageService schedualMessageService;
 
     @Override
     public Object recharge(Integer userId, BigDecimal amount, Integer type) throws Exception {
@@ -468,14 +473,25 @@ public class WalletServiceImpl implements WalletService{
         if(userBalanceDetail == null){
             throw new ServiceException("未找到订单!");
         }
-        UserBalanceDto userBalanceDto = new UserBalanceDto(userBalanceDetail);
-        UserInfo info = userInfoMapper.selectByPrimaryKey(userBalanceDetail.getSellerId());
-        //对当前用户来说只有别人的头像
-
-        //1收入 2支出
-
-        userBalanceDto.setImgUrl(info.getHeadImgUrl());
-        return userBalanceDto;
+        UserBalanceDto dto = new UserBalanceDto(userBalanceDetail);
+        UserInfo info;
+        if(dto.getType().intValue() == Status.INCOME.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue()){
+            info = userInfoMapper.selectByPrimaryKey(dto.getBuyerId());
+            dto.setImgUrl(info.getHeadImgUrl());
+        }else if((dto.getType().intValue() == Status.EXPEND.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue())
+                || (dto.getType().intValue() == Status.EXPEND.getValue() && dto.getOrderType().intValue() == Status.BARGAIN.getValue())
+                || (dto.getType().intValue() == Status.REFUND.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue())
+                || (dto.getType().intValue() == Status.REFUND.getValue() && dto.getOrderType().intValue() == Status.BARGAIN.getValue())
+                ){
+            info = userInfoMapper.selectByPrimaryKey(dto.getSellerId());
+            dto.setImgUrl(info.getHeadImgUrl());
+        }else{
+            info = userInfoMapper.selectByPrimaryKey(66);
+        }
+        if(info != null){
+            dto.setImgUrl(info.getHeadImgUrl());
+        }
+        return dto;
     }
 
     @Override
@@ -543,11 +559,69 @@ public class WalletServiceImpl implements WalletService{
     @Override
     public Pager userFinance(AdminWalletParam param) throws ServiceException {
         Integer total = userBalanceDetailMapper.countPage(param.getPayType(),param.getOrderType(),param.getType(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
-        List<UserBalanceDetail> datas = userBalanceDetailMapper.getPage(param.getPayType(),param.getOrderType(),param.getType(),param.getStart()*param.getLimit(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+        List<UserBalanceDetail> details = userBalanceDetailMapper.getPage(param.getPayType(),param.getOrderType(),param.getType(),param.getStart()*param.getLimit(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+        List<AdminUserBalanceDto> datas = AdminUserBalanceDto.toDtoList(details);
         Pager pager = new Pager();
         pager.setTotal(total);
         pager.setDatas(datas);
         return pager;
     }
 
+    @Override
+    public Pager withdrawList(AdminWalletParam param) throws ServiceException {
+        Integer total = userWithdrawMapper.countPage(param.getPayType(),param.getStatus(),param.getKeyword(),param.getStartDate(),param.getEndDate());
+        List<UserWithdraw> userWithdraws = userWithdrawMapper.getPage(param.getPayType(),param.getStatus(),param.getStart()*param.getLimit(),param.getLimit(),param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+        List<AdminWithdrawDto> datas = AdminWithdrawDto.toDtoList(userWithdraws);
+        Pager pager = new Pager();
+        pager.setTotal(total);
+        pager.setDatas(datas);
+        return pager;
+    }
+
+    @Override
+    public void updateWithdraw(Integer id, Integer status,String content) throws ServiceException {
+        UserWithdraw userWithdraw = userWithdrawMapper.selectByPrimaryKey(id);
+        if(userWithdraw == null){
+            throw new ServiceException("未找到申请信息！");
+        }
+        userWithdraw.setStatus(status);
+        userWithdraw.setContent(content);
+        if(status.intValue() == Status.WITHDRAW_AGGRES.getValue()){
+            schedualMessageService.easemobMessage(userWithdraw.getUserId().toString(),"您在小方圆申请￥"+userWithdraw.getAmount()+"的提现申请已通过审核",
+                    Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
+        }else if(status.intValue() == Status.WITHDRAW_REFUSE.getValue()){
+            updateBalance(userWithdraw.getUserId(),userWithdraw.getAmount(),Status.ADD.getValue());
+            //订单号
+            final IdGenerator idg = IdGenerator.INSTANCE;
+            String orderNo = idg.nextId();
+            addUserBalanceDetail(userWithdraw.getUserId(),userWithdraw.getAmount(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"提现拒绝退款",Status.WITHDRAW.getValue(),null,userWithdraw.getUserId(),orderNo);
+            schedualMessageService.easemobMessage(userWithdraw.getUserId().toString(),"您在小方圆申请￥"+userWithdraw.getAmount()+"的提现申请已被拒绝，拒绝原因："+content,
+                    Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
+        }
+    }
+
+    @Override
+    public void updateUserBalance(Integer userId, Integer type, BigDecimal amount) throws ServiceException {
+        UserWallet userWallet = userWalletMapper.selectByUserId(userId);
+        if(userWallet == null){
+            throw new ServiceException("获取钱包信息失败！");
+        }else {
+            if (type.intValue() == Status.ADD.getValue()) {
+                userWallet.setBalance(userWallet.getBalance().add(amount));
+            } else if (type.intValue() == Status.SUB.getValue()) {
+                if (userWallet.getBalance().compareTo(amount) < 0) {//余额小于消费金额
+                    throw new ServiceException("余额不足！");
+                } else {
+                    userWallet.setBalance(userWallet.getBalance().subtract(amount));
+                }
+            } else {
+                throw new ServiceException("类型错误！");
+            }
+            userWalletMapper.updateByPrimaryKey(userWallet);
+            //订单号
+            final IdGenerator idg = IdGenerator.INSTANCE;
+            String orderNo = idg.nextId();
+            addUserBalanceDetail(userId,amount,Status.PAY_TYPE_BALANCE.getValue(),type,orderNo,type==1?"系统增加余额":"系统扣除余额",Status.SYSTEM_UPDATE.getValue(),null,userId,orderNo);
+        }
+    }
 }

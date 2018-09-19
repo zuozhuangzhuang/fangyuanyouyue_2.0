@@ -49,6 +49,8 @@ public class AdminUserBalanceDto {
 
     private String payNo;//第三方支付流水号
 
+    private String nickName;//用户昵称
+
     public AdminUserBalanceDto() {
     }
 
@@ -67,6 +69,7 @@ public class AdminUserBalanceDto {
         this.sellerId = model.getSellerId();
         this.buyerId = model.getBuyerId();
         this.payNo = model.getPayNo();
+        this.nickName = model.getNickName();
     }
     
     public static List<AdminUserBalanceDto> toDtoList(List<UserBalanceDetail> list) {

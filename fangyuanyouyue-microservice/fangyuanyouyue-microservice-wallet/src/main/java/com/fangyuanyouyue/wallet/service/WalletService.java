@@ -179,4 +179,30 @@ public interface WalletService {
      */
     Pager userFinance(AdminWalletParam param) throws ServiceException;
 
+    /**
+     * 提现申请管理
+     * @param param
+     * @return
+     * @throws ServiceException
+     */
+    Pager withdrawList(AdminWalletParam param) throws ServiceException;
+
+    /**
+     * 修改提现申请
+     * @param id
+     * @param status
+     * @param content
+     * @throws ServiceException
+     */
+    void updateWithdraw(Integer id,Integer status,String content) throws ServiceException;
+
+    /**
+     * 编辑用户余额
+     * @param id
+     * @param type
+     * @param amount
+     * @throws ServiceException
+     */
+    void updateUserBalance(Integer id,Integer type,BigDecimal amount) throws ServiceException;
+
 }

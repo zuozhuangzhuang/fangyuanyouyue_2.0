@@ -40,4 +40,6 @@ public class PlatformFinanceDetail {
 
     private Integer buyerId;//买家id
 
+    private String nickName;//用户昵称
+
 }

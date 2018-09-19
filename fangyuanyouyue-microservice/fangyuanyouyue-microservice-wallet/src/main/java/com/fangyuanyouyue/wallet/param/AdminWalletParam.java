@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @ApiModel(value = "系统用户钱包相关参数")
 @Getter
 @Setter
@@ -21,5 +23,11 @@ public class AdminWalletParam extends BasePageReq{
 
     @ApiModelProperty(name = "type", value = "支付类型 1微信 2支付宝 3余额 4小程序", dataType = "int",hidden = true)
     private Integer payType;//支付类型 1微信 2支付宝 3余额 4小程序
+
+    @ApiModelProperty(name = "content", value = "内容", dataType = "String",hidden = true)
+    private String content;//内容
+
+    @ApiModelProperty(name = "amount", value = "金额", dataType = "BigDecimal",hidden = true)
+    private BigDecimal amount;//金额
 
 }

@@ -1,4 +1,4 @@
-package com.fangyuanyouyue.wallet.model;
+package com.fangyuanyouyue.user.model;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,9 +6,8 @@ import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.Date;
-
 /**
- * 用户优惠券表
+ * 用户代金券信息
  */
 @Getter
 @Setter
