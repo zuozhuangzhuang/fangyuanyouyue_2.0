@@ -253,6 +253,11 @@ public class OrderServiceImpl implements OrderService{
 
                 //计算优惠券（每个商品都可以使用优惠券）
                 Integer couponId = addOrderDetailDto.getCouponId();//优惠券ID
+
+                //判断商品所属店铺是否可用优惠券
+                if(!Boolean.valueOf(JSONObject.parseObject(schedualUserService.userIsAuth(goods.getUserId())).getString("data"))){
+                    throw new ServiceException("【"+goods.getName()+"】所属店铺未认证，不可使用优惠券！");
+                }
                 orderDetail.setCouponId(couponId);
                 BigDecimal price = goods.getPrice();
                 if(couponId != null){
@@ -572,6 +577,10 @@ public class OrderServiceImpl implements OrderService{
         BigDecimal amount = goods.getPrice();//原价
         //计算优惠券（每个商品都可以使用优惠券）
         if(couponId != null){
+            //判断商品所属店铺是否可用优惠券
+            if(!Boolean.valueOf(JSONObject.parseObject(schedualUserService.userIsAuth(goods.getUserId())).getString("data"))){
+                throw new ServiceException("【"+goods.getName()+"】所属店铺未认证，不可使用优惠券！");
+            }
             BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.getPriceByCoupon(userId,amount,couponId)), BaseResp.class);
             if(baseResp.getCode() == 1){
                 throw new ServiceException(baseResp.getReport().toString());
@@ -948,7 +957,7 @@ public class OrderServiceImpl implements OrderService{
                         schedualMessageService.easemobMessage(childOrder.getSellerId().toString(),
                                 "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER.getMessage(),childOrder.getId().toString());
                         //买家新增余额账单
-                        schedualWalletService.addUserBalanceDetail(childOrder.getUserId(),childOrder.getAmount(),payType,Status.EXPEND.getValue(),childOrder.getOrderNo(),goodsName.toString(),childOrder.getSellerId(),childOrder.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo);
+                        schedualWalletService.addUserBalanceDetail(childOrder.getUserId(),pay.getPayAmount(),payType,Status.EXPEND.getValue(),childOrder.getOrderNo(),goodsName.toString(),childOrder.getSellerId(),childOrder.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo);
                     }
                 }else{
                     //获取商品名字列表
@@ -964,7 +973,7 @@ public class OrderServiceImpl implements OrderService{
                     schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
                             "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER.getMessage(),orderInfo.getId().toString());
                     //买家新增余额账单
-                    schedualWalletService.addUserBalanceDetail(orderInfo.getUserId(),orderInfo.getAmount(),payType,Status.EXPEND.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo);
+                    schedualWalletService.addUserBalanceDetail(orderInfo.getUserId(),orderPay.getPayAmount(),payType,Status.EXPEND.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo);
                 }
                 orderInfo.setStatus(Status.ORDER_GOODS_PAY.getValue());
                 orderInfoMapper.updateByPrimaryKeySelective(orderInfo);

@@ -30,4 +30,9 @@ public class SchedualUserServiceImpl implements SchedualUserService{
     public String verifyPayPwd(Integer userId, String payPwd) {
         return "验证支付密码失败！";
     }
+
+    @Override
+    public String userIsAuth(Integer userId) {
+        return "获取用户是否官方认证失败！";
+    }
 }

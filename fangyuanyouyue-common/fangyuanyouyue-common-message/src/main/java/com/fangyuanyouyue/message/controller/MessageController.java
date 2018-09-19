@@ -161,19 +161,19 @@ public class MessageController extends BaseController{
             String headImgUrl;
             String nickName;
             String from;
-            if("1".equals(param.getJumpType())){
+            if("1".equals(param.getType())){
                 nickName = "系统消息";
                 from = "65";
                 headImgUrl = "https://xiaofangyuan.oss-cn-shenzhen.aliyuncs.com/pic/2018/09/15/5dd10d47-0a24-4288-a655-7d738da86c30.png";
-            }else if("2".equals(param.getJumpType())){
+            }else if("2".equals(param.getType())){
                 nickName = "交易消息";
                 from = "66";
                 headImgUrl = "https://xiaofangyuan.oss-cn-shenzhen.aliyuncs.com/pic/2018/09/15/cd7397df-feca-4da5-9195-c7bff3b9fb5a.png";
-            }else if("3".equals(param.getJumpType())){
+            }else if("3".equals(param.getType())){
                 nickName = "社交消息";
                 from = "67";
                 headImgUrl = "https://xiaofangyuan.oss-cn-shenzhen.aliyuncs.com/pic/2018/09/15/5e70b69c-41e1-4dc7-bac4-5d1c2c5531de.png";
-            }else if("4".equals(param.getJumpType())){
+            }else if("4".equals(param.getType())){
                 nickName = "新增粉丝";
                 from = "68";
                 headImgUrl = "https://xiaofangyuan.oss-cn-shenzhen.aliyuncs.com/pic/2018/09/15/d98ddd0a-7b01-4842-8bc2-a070e9a37f29.png";

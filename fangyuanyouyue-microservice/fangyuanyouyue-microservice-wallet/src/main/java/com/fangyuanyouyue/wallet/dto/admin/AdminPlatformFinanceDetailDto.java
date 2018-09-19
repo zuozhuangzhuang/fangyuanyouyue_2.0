@@ -1,11 +1,16 @@
 package com.fangyuanyouyue.wallet.dto.admin;
 
+import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.wallet.model.PlatformFinanceDetail;
+import com.fangyuanyouyue.wallet.model.UserBalanceDetail;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 平台收支明细表DTO
@@ -25,9 +30,9 @@ public class AdminPlatformFinanceDetailDto {
 
     private Integer type;//收支类型 1收入 2支出
 
-    private Date addTime;//支付时间
+    private String addTime;//支付时间
 
-    private Date updateTime;//更新时间
+    private String updateTime;//更新时间
 
     private String title;//订单标题
 
@@ -41,5 +46,32 @@ public class AdminPlatformFinanceDetailDto {
 
     private String nickName;//用户昵称
 
-    private String headImgUrl;//用户头像
+    public AdminPlatformFinanceDetailDto(PlatformFinanceDetail detail) {
+        this.userId = detail.getUserId();
+        this.amount = detail.getAmount();
+        this.payNo = detail.getPayNo();
+        this.payType = detail.getPayType();
+        this.type = detail.getType();
+        this.addTime = DateUtil.getFormatDate(detail.getAddTime(),DateUtil.DATE_FORMT);
+        this.updateTime = DateUtil.getFormatDate(detail.getUpdateTime(),DateUtil.DATE_FORMT);
+        this.title = detail.getTitle();
+        this.orderNo = detail.getOrderNo();
+        this.orderType = detail.getOrderType();
+        this.sellerId = detail.getSellerId();
+        this.buyerId = detail.getBuyerId();
+        this.nickName = detail.getNickName();
+    }
+
+
+    public static List<AdminPlatformFinanceDetailDto> toDtoList(List<PlatformFinanceDetail> list) {
+        if (list == null) {
+            return new ArrayList<>();
+        }
+        List<AdminPlatformFinanceDetailDto> dtolist = new ArrayList<>();
+        for (PlatformFinanceDetail model : list) {
+            AdminPlatformFinanceDetailDto dto = new AdminPlatformFinanceDetailDto(model);
+            dtolist.add(dto);
+        }
+        return dtolist;
+    }
 }

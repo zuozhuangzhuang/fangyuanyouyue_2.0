@@ -43,4 +43,6 @@ public class UserBalanceDetail {
     private Integer buyerId;//买家id
 
     private String payNo;//第三方支付流水号
+
+    private String nickName;//用户昵称
 }
