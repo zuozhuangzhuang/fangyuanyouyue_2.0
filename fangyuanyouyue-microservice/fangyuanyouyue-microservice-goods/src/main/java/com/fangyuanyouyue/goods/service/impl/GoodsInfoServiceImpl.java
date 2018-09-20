@@ -126,11 +126,13 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         GoodsInfo goodsInfo = new GoodsInfo();
         goodsInfo.setUserId(userId);
         //是否鉴定根据用户是否官方认证
-        if(Boolean.valueOf(JSONObject.parseObject(schedualUserService.userIsAuth(userId)).getString("data"))){
-            goodsInfo.setIsAppraisal(1);//已认证
-        }else{
-            goodsInfo.setIsAppraisal(2);//未认证
-        }
+//        if(Boolean.valueOf(JSONObject.parseObject(schedualUserService.userIsAuth(userId)).getString("data"))){
+//            goodsInfo.setIsAppraisal(1);//已认证
+//        }else{
+//            goodsInfo.setIsAppraisal(2);//未认证
+//        }
+
+        goodsInfo.setIsAppraisal(Status.NO.getValue());//未认证
         goodsInfo.setName(param.getGoodsInfoName());
         goodsInfo.setDescription(param.getDescription());
         goodsInfo.setPrice(param.getPrice());
@@ -179,11 +181,11 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             }
         }
         //增加积分、信誉度
-        schedualWalletService.updateScore(param.getUserId(), Score.ADD_GOODSINFO.getScore(),Status.ADD.getValue());
+        schedualWalletService.updateScore(userId, Score.ADD_GOODSINFO.getScore(),Status.ADD.getValue());
         if(param.getType() == Status.GOODS.getValue()){
-            schedualWalletService.updateCredit(param.getUserId(), Credit.ADD_GOODSINFO.getCredit(),Status.ADD.getValue());
+            schedualWalletService.updateCredit(userId, Credit.ADD_GOODSINFO.getCredit(),Status.ADD.getValue());
         }else{
-            schedualWalletService.updateCredit(param.getUserId(), Credit.ADD_AUCTION.getCredit(),Status.ADD.getValue());
+            schedualWalletService.updateCredit(userId, Credit.ADD_AUCTION.getCredit(),Status.ADD.getValue());
         }
         //给被邀请的用户发送信息 邀请我：用户“用户昵称”上传商品【商品名称】时邀请了您！点击此处前往查看吧
         //邀请我：用户“用户昵称”上传抢购【抢购名称】时邀请了您！点击此处前往查看吧
@@ -191,7 +193,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         if(param.getUserIds() != null && param.getUserIds().length > 0){
             for(Integer toUserId:param.getUserIds()){
                 schedualMessageService.easemobMessage(toUserId.toString(),
-                        "用户“"+user.getNickName()+"”上传"+(goodsInfo.getType()==1?"商品【":"抢购【")+goodsInfo.getName()+"】时邀请了您！点击此处前往查看吧","2","5",goodsInfo.getId().toString());
+                        "用户“"+user.getNickName()+"”上传"+(goodsInfo.getType()==Status.GOODS.getValue()?"商品【":"抢购【")+goodsInfo.getName()+"】时邀请了您！点击此处前往查看吧",Status.INVITE_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),goodsInfo.getId().toString());
             }
         }
 //        return setDtoByGoodsInfo(null,goodsInfo);
@@ -310,12 +312,12 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 throw new ServiceException("商品不存在或已下架！");
             }else{
                 //取消所有议价
-                List<GoodsBargain> goodsBargains = goodsBargainMapper.selectAllByGoodsId(goodsId,1);//状态 1申请 2同意 3拒绝 4取消
+                List<GoodsBargain> goodsBargains = goodsBargainMapper.selectAllByGoodsId(goodsId,Status.BARGAIN_APPLY.getValue());//状态 1申请 2同意 3拒绝 4取消
                 for(GoodsBargain bargain:goodsBargains){
-                    bargainService.updateBargain(userId,goodsId,bargain.getId(),3);
+                    bargainService.updateBargain(userId,goodsId,bargain.getId(),Status.BARGAIN_REFUSE.getValue());
                     //议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
                     schedualMessageService.easemobMessage(bargain.getUserId().toString(),
-                            "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情","2","2",bargain.getGoodsId().toString());
+                            "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),bargain.getGoodsId().toString());
                 }
                 goodsInfo.setStatus(5);//状态 普通商品 1出售中 2已售出 3已下架（已结束） 5删除
                 goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
@@ -460,7 +462,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         //是否官方认证
         Map<String, Object> goodsUserInfoExtAndVip = goodsInfoMapper.getGoodsUserInfoExtAndVip(goodsId);
         if(goodsUserInfoExtAndVip != null){
-            goodsDto.setAuthType((Integer)goodsUserInfoExtAndVip.get("auth_type"));
+            goodsDto.setAuthType((Integer)goodsUserInfoExtAndVip.get("auth_type") == 2?1:2);
             goodsDto.setVipLevel((Integer)goodsUserInfoExtAndVip.get("vip_level"));
             Long credit = (Long)goodsUserInfoExtAndVip.get("credit");
             goodsDto.setCredit(credit);
@@ -496,7 +498,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         //是否官方认证
         Map<String, Object> goodsUserInfoExtAndVip = goodsInfoMapper.getGoodsUserInfoExtAndVip(goodsId);
         if(goodsUserInfoExtAndVip != null){
-            goodsDto.setAuthType((Integer)goodsUserInfoExtAndVip.get("auth_type"));
+            goodsDto.setAuthType((Integer)goodsUserInfoExtAndVip.get("auth_type") == 2?1:2);
             goodsDto.setVipLevel((Integer)goodsUserInfoExtAndVip.get("vip_level"));
             Long credit = (Long)goodsUserInfoExtAndVip.get("credit");
             goodsDto.setCredit(credit);
@@ -593,7 +595,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 //压价信息
                 List<GoodsBargain> goodsBargains = goodsBargainMapper.selectAllByGoodsId(goodsId,1);//状态 1申请 2同意 3拒绝 4取消
                 for(GoodsBargain bargain:goodsBargains){
-                    bargain.setStatus(3);
+                    bargain.setStatus(Status.BARGAIN_REFUSE.getValue());
                     goodsBargainMapper.updateByPrimaryKeySelective(bargain);
                 }
             }
@@ -731,11 +733,14 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                     }
                 }
             }
-            //如果是已下架的商品或抢购，重新上架
             if(param.getStatus() != null){
                 goodsInfo.setStatus(param.getStatus());//状态 1出售中 2已售出 3已下架（已结束） 5删除
             }
             goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
+            if(param.getStatus().intValue() == 5){
+                //卖家-20信誉度
+                schedualWalletService.updateCredit(goodsInfo.getUserId(),Credit.DELETE_FAKE.getCredit(),Status.SUB.getValue());
+            }
 
         }
     }

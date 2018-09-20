@@ -29,7 +29,7 @@
     delete from identity_auth_apply
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.user.model.IdentityAuthApply" >
+  <insert id="insert" parameterType="com.fangyuanyouyue.user.model.IdentityAuthApply"  useGeneratedKeys="true" keyProperty="id">
     insert into identity_auth_apply (id, user_id, name, 
       identity, identity_img_cover, identity_img_back, 
       reject_desc, status, add_time, 

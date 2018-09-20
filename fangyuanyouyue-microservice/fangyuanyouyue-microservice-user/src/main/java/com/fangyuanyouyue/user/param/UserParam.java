@@ -174,4 +174,10 @@ public class UserParam{
 
 	@ApiModelProperty(name = "payType", value = "支付方式 1微信 2支付宝 3余额 4小程序", dataType = "int",hidden = true)
 	private Integer payType;//支付方式 1微信 2支付宝 3余额 4小程序
+
+	@ApiModelProperty(name = "content", value = "内容", dataType = "String",hidden = true)
+	private String content;//内容
+
+	@ApiModelProperty(name = "vresion", value = "版本", dataType = "String",hidden = true)
+	private String version;//版本
 }

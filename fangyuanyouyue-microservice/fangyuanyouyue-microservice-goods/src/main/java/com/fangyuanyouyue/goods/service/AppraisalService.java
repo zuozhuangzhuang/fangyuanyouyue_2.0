@@ -1,8 +1,10 @@
 package com.fangyuanyouyue.goods.service;
 
+import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.goods.dto.AppraisalDetailDto;
 import com.fangyuanyouyue.goods.dto.AppraisalOrderInfoDto;
+import com.fangyuanyouyue.goods.param.AdminGoodsParam;
 
 import java.util.List;
 
@@ -81,4 +83,22 @@ public interface AppraisalService {
      * @throws ServiceException
      */
     boolean updateOrder(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException;
+
+    /**
+     * 官方鉴定列表
+     * @param param
+     * @return
+     * @throws ServiceException
+     */
+    Pager appraisalList(AdminGoodsParam param) throws ServiceException;
+
+    /**
+     * 后台处理官方鉴定
+     * @param id
+     * @param opinion
+     * @param status
+     * @param isShow
+     * @throws ServiceException
+     */
+    void updateAppraisal(Integer id,Integer status,String opinion,Integer isShow) throws ServiceException;
 }

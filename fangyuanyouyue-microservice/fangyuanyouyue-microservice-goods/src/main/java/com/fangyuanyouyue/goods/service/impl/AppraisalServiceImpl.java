@@ -2,6 +2,7 @@ package com.fangyuanyouyue.goods.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
 import com.fangyuanyouyue.base.enums.Status;
@@ -12,7 +13,9 @@ import com.fangyuanyouyue.goods.dao.*;
 import com.fangyuanyouyue.goods.dto.AppraisalDetailDto;
 import com.fangyuanyouyue.goods.dto.AppraisalOrderInfoDto;
 import com.fangyuanyouyue.goods.dto.AppraisalUrlDto;
+import com.fangyuanyouyue.goods.dto.adminDto.AdminAppraisalDetailDto;
 import com.fangyuanyouyue.goods.model.*;
+import com.fangyuanyouyue.goods.param.AdminGoodsParam;
 import com.fangyuanyouyue.goods.service.AppraisalService;
 import com.fangyuanyouyue.goods.service.SchedualMessageService;
 import com.fangyuanyouyue.goods.service.SchedualUserService;
@@ -23,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,13 +75,13 @@ public class AppraisalServiceImpl implements AppraisalService{
         //用来存放订单详情DTO列表
         if(goodsIds != null && goodsIds.length != 0){//用户对商品提交鉴定
             for(Integer goodsId:goodsIds){
-                GoodsAppraisalDetail goodsAppraisalDetail = goodsAppraisalDetailMapper.selectByUserIdGoodsId(userId, goodsId);
-                if(goodsAppraisalDetail != null){
-                    throw new ServiceException("您已申请过鉴定！");
+                GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
+                if(goodsInfo == null || goodsInfo.getStatus().intValue() == 3 || goodsInfo.getStatus().intValue() == 5){
+                    throw new ServiceException("商品不存在或已下架！");
                 }else{
-                    GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
-                    if(goodsInfo == null || goodsInfo.getStatus().intValue() == 3 || goodsInfo.getStatus().intValue() == 5){
-                        throw new ServiceException("商品不存在或已下架！");
+                    GoodsAppraisalDetail goodsAppraisalDetail = goodsAppraisalDetailMapper.selectByUserIdGoodsId(userId, goodsId);
+                    if(goodsAppraisalDetail != null){
+                        throw new ServiceException("【"+goodsInfo.getName()+"】您已申请过鉴定！");
                     }else{
                         //生成鉴定和订单
                         goodsAppraisalDetail = new GoodsAppraisalDetail();
@@ -86,9 +90,16 @@ public class AppraisalServiceImpl implements AppraisalService{
                         goodsAppraisalDetail.setOrderId(appraisalOrderInfo.getId());
                         goodsAppraisalDetail.setGoodsId(goodsId);
                         goodsAppraisalDetail.setStatus(4);//状态 0申请 1真 2假 3存疑 4待支付(在列表中不显示)
+                        goodsAppraisalDetail.setTitle(goodsInfo.getName());
                         goodsAppraisalDetail.setDescription(goodsInfo.getDescription());
-                        //TODO 根据鉴定费算法
-                        BigDecimal price = new BigDecimal(10);
+                        //根据鉴定费算法 超过2000元0.5%
+                        BigDecimal price;
+                        if(goodsInfo.getPrice().compareTo(BigDecimal.valueOf(2000)) <= 0){
+                            //小于2000元
+                            price = new BigDecimal(10).setScale(2,BigDecimal.ROUND_HALF_UP);
+                        }else{
+                            price = goodsInfo.getPrice().multiply(new BigDecimal(0.005)).setScale(2,BigDecimal.ROUND_HALF_UP);
+                        }
                         goodsAppraisalDetail.setPrice(price);
                         if(goodsInfo.getUserId().intValue() == userId.intValue()){
                             goodsAppraisalDetail.setType(1);//鉴定类型 1商家鉴定 2买家 3普通用户
@@ -122,6 +133,7 @@ public class AppraisalServiceImpl implements AppraisalService{
             goodsAppraisalDetail.setAddTime(DateStampUtils.getTimesteamp());
             goodsAppraisalDetail.setOrderId(appraisalOrderInfo.getId());
             goodsAppraisalDetail.setType(3);//鉴定类型 1商家鉴定 2买家 3普通用户
+            goodsAppraisalDetail.setTitle(title);
             goodsAppraisalDetail.setDescription(description);
             goodsAppraisalDetail.setStatus(4);//状态 0申请 1真 2假 3存疑 4待支付(在列表中不显示)
             //TODO 根据鉴定费算法
@@ -251,13 +263,13 @@ public class AppraisalServiceImpl implements AppraisalService{
                     throw new ServiceException("支付密码错误！");
                 } else {
                     //调用wallet-service修改余额功能
-                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, orderInfo.getAmount(), 2)), BaseResp.class);
+                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, orderInfo.getAmount(), Status.SUB.getValue())), BaseResp.class);
                     if(baseResp.getCode() == 1){
                         throw new ServiceException(baseResp.getReport().toString());
                     }
                 }
                 //订单支付成功
-                updateOrder(orderInfo.getOrderNo(),null,3);
+                updateOrder(orderInfo.getOrderNo(),null,Status.PAY_TYPE_BALANCE.getValue());
                 payInfo.append("余额支付成功！");
             }else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
                 //小程序支付
@@ -285,9 +297,9 @@ public class AppraisalServiceImpl implements AppraisalService{
             }
             //系统消息：您的鉴定申请已提交，专家将于两个工作日内给出答复，请注意消息通知
             schedualMessageService.easemobMessage(appraisalOrderInfo.getUserId().toString(),
-                    "您的鉴定申请已提交，专家将于两个工作日内给出答复，请注意消息通知","1","1","");
+                    "您的鉴定申请已提交，专家将于两个工作日内给出答复，请注意消息通知",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
             //余额账单
-            schedualWalletService.addUserBalanceDetail(appraisalOrderInfo.getUserId(),appraisalOrderInfo.getAmount(),payType,2,orderNo,"官方鉴定",null,appraisalOrderInfo.getUserId(),2);
+            schedualWalletService.addUserBalanceDetail(appraisalOrderInfo.getUserId(),appraisalOrderInfo.getAmount(),payType,Status.EXPEND.getValue(),orderNo,"官方鉴定",null,appraisalOrderInfo.getUserId(),Status.PLATFORM_APPRAISAL.getValue(),thirdOrderNo);
             return true;
         } catch (Exception e){
             throw new ServiceException("官方鉴定申请失败！");
@@ -325,5 +337,49 @@ public class AppraisalServiceImpl implements AppraisalService{
             detadilDtos.add(detailDto);
         }
         return detadilDtos;
+    }
+
+    @Override
+    public Pager appraisalList(AdminGoodsParam param) throws ServiceException {
+        Integer total = goodsAppraisalDetailMapper.countPage(param.getType(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
+        //商品列表
+        List<GoodsAppraisalDetail> appraisalPage = goodsAppraisalDetailMapper.getAppraisalPage(param.getType(),param.getStart(),param.getLimit(),
+                param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+        List<AdminAppraisalDetailDto> dtos = AdminAppraisalDetailDto.toDtoList(appraisalPage);
+        //遍历商品列表，添加到GoodsDtos中
+        Pager pager = new Pager();
+        pager.setTotal(total);
+        pager.setDatas(dtos);
+        return pager;
+    }
+
+    @Override
+    public void updateAppraisal(Integer id, Integer status, String opinion, Integer isShow) throws ServiceException {
+        GoodsAppraisalDetail goodsAppraisalDetail = goodsAppraisalDetailMapper.selectByPrimaryKey(id);
+        if(goodsAppraisalDetail == null){
+            throw new ServiceException("未找到鉴定信息！");
+        }
+        goodsAppraisalDetail.setStatus(status);
+        goodsAppraisalDetail.setIsShow(isShow);
+        goodsAppraisalDetail.setOpinion(opinion);
+        goodsAppraisalDetail.setSubmitTime(DateStampUtils.getTimesteamp());
+        if(status == 1 && goodsAppraisalDetail.getGoodsId() != null){
+            GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsAppraisalDetail.getGoodsId());
+            goodsInfo.setIsAppraisal(Status.YES.getValue());
+            goodsInfoMapper.updateByPrimaryKey(goodsInfo);
+        }
+        if(status == 3){
+            //退还鉴定金
+            schedualWalletService.updateBalance(goodsAppraisalDetail.getUserId(),goodsAppraisalDetail.getPrice(),Status.ADD.getValue());
+            //订单号
+            final IdGenerator idg = IdGenerator.INSTANCE;
+            String orderNo = idg.nextId();
+            schedualWalletService.addUserBalanceDetail(goodsAppraisalDetail.getUserId(),goodsAppraisalDetail.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderNo,goodsAppraisalDetail.getTitle(),null,goodsAppraisalDetail.getUserId(),Status.APPRAISAL.getValue(),orderNo);
+
+            schedualMessageService.easemobMessage(goodsAppraisalDetail.getUserId().toString(),"您申请的鉴定结果为“存疑”鉴定费用已退回您的余额，点击此处查看您的余额吧",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_WALLET.getMessage(),"");
+        }else{
+            schedualMessageService.easemobMessage(goodsAppraisalDetail.getUserId().toString(),"您申请的鉴定已得到官方专家的答复！点击此处前往查看吧",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_PLATFORM_APPRAISAL.getMessage(),goodsAppraisalDetail.getId().toString());
+        }
+        goodsAppraisalDetailMapper.updateByPrimaryKey(goodsAppraisalDetail);
     }
 }

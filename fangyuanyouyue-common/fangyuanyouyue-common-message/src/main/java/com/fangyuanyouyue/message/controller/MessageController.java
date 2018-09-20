@@ -1,9 +1,11 @@
 package com.fangyuanyouyue.message.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.util.CheckCode;
 import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.message.model.UserInfo;
 import com.fangyuanyouyue.message.param.EaseMobParam;
 import com.fangyuanyouyue.message.param.MessageParam;
 import com.fangyuanyouyue.message.service.MessageService;
@@ -155,29 +157,30 @@ public class MessageController extends BaseController{
             log.info("----》环信发送普通消息《----");
             log.info("参数："+param.toString());
 //            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(Integer.valueOf(param.getUserName()))).getString("data")), UserInfo.class);
-            String headImgUrl = "http://pic.baike.soso.com/p/20120419/20120419170638-1137484758.jpg";
+//            String headImgUrl = "http://pic.baike.soso.com/p/20120419/20120419170638-1137484758.jpg";
+            String headImgUrl;
             String nickName;
             String from;
-            if("1".equals(param.getJumpType())){
+            if("1".equals(param.getType())){
                 nickName = "系统消息";
                 from = "65";
-//                headImgUrl = "";
-            }else if("2".equals(param.getJumpType())){
+                headImgUrl = "https://xiaofangyuan.oss-cn-shenzhen.aliyuncs.com/pic/2018/09/15/5dd10d47-0a24-4288-a655-7d738da86c30.png";
+            }else if("2".equals(param.getType())){
                 nickName = "交易消息";
                 from = "66";
-//                headImgUrl = "";
-            }else if("3".equals(param.getJumpType())){
+                headImgUrl = "https://xiaofangyuan.oss-cn-shenzhen.aliyuncs.com/pic/2018/09/15/cd7397df-feca-4da5-9195-c7bff3b9fb5a.png";
+            }else if("3".equals(param.getType())){
                 nickName = "社交消息";
                 from = "67";
-//                headImgUrl = "";
-            }else if("4".equals(param.getJumpType())){
+                headImgUrl = "https://xiaofangyuan.oss-cn-shenzhen.aliyuncs.com/pic/2018/09/15/5e70b69c-41e1-4dc7-bac4-5d1c2c5531de.png";
+            }else if("4".equals(param.getType())){
                 nickName = "新增粉丝";
                 from = "68";
-//                headImgUrl = "";
+                headImgUrl = "https://xiaofangyuan.oss-cn-shenzhen.aliyuncs.com/pic/2018/09/15/d98ddd0a-7b01-4842-8bc2-a070e9a37f29.png";
             }else{
                 nickName = "邀请我";
                 from = "69";
-//                headImgUrl = "";
+                headImgUrl = "https://xiaofangyuan.oss-cn-shenzhen.aliyuncs.com/pic/2018/09/15/3d112104-be4d-4622-80d4-fa2e6585a7b7.png";
             }
             Msg msg = new Msg();
             MsgContent msgContent = new MsgContent();

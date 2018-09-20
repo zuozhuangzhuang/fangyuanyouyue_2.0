@@ -8,6 +8,7 @@ import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.Credit;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
+import com.fangyuanyouyue.base.enums.Score;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
@@ -108,7 +109,7 @@ public class OrderServiceImpl implements OrderService{
         BigDecimal payFreight = new BigDecimal(0);//总邮费，初始为0
         orderInfo.setAmount(amount);
         orderInfo.setCount(0);//商品数量，初始为0
-        orderInfo.setStatus(1);//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
+        orderInfo.setStatus(Status.ORDER_GOODS_PREPAY.getValue());
         orderInfo.setAddTime(new Date());
         orderInfoMapper.insert(orderInfo);
         //生成订单支付表
@@ -126,7 +127,7 @@ public class OrderServiceImpl implements OrderService{
         orderPay.setPayAmount(payAmount);
         orderPay.setFreight(payFreight);//运费金额，初始化为0
         orderPay.setCount(0);//商品数量，初始为0
-        orderPay.setStatus(1);//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
+        orderPay.setStatus(Status.ORDER_GOODS_PREPAY.getValue());
         orderPay.setAddTime(DateStampUtils.getTimesteamp());
         orderPayMapper.insert(orderPay);
         //生成子订单，在总订单中加入价格和邮费，实际支付价格
@@ -180,7 +181,7 @@ public class OrderServiceImpl implements OrderService{
             BigDecimal payFreight = new BigDecimal(0);//总邮费，初始为0
             OrderInfo orderInfo;
             OrderPay orderPay;
-            mainOrder.setIsResolve(2);//是否拆单 1是 2否 无论是否拆单，下单时主订单状态为未拆单，子订单与主订单状态恒相反
+            mainOrder.setIsResolve(Status.NO.getValue());//是否拆单 1是 2否 无论是否拆单，下单时主订单状态为未拆单，子订单与主订单状态恒相反
             //只有一个卖家的情况下不拆单，只生成订单详情表
             if(addOrderDstos.size() == 1){
                 mainOrder.setSellerId(addOrderDto.getSellerId());//卖家ID
@@ -189,7 +190,7 @@ public class OrderServiceImpl implements OrderService{
             }else{
                 //生成总订单，包含多条订单详情
                 orderInfo = new OrderInfo();
-                orderInfo.setIsResolve(1);//是否拆单 1是 2否
+                orderInfo.setIsResolve(Status.YES.getValue());//是否拆单 1是 2否
                 orderInfo.setUserId(mainOrder.getUserId());
                 //订单号
                 final IdGenerator idg = IdGenerator.INSTANCE;
@@ -197,7 +198,7 @@ public class OrderServiceImpl implements OrderService{
                 orderInfo.setOrderNo("1"+id);
                 orderInfo.setAmount(amount);
                 orderInfo.setCount(addOrderDto.getAddOrderDetailDtos().size());
-                orderInfo.setStatus(mainOrder.getStatus());//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
+                orderInfo.setStatus(mainOrder.getStatus());
                 orderInfo.setAddTime(DateStampUtils.getTimesteamp());
                 //主订单ID
                 orderInfo.setMainOrderId(mainOrder.getId());
@@ -219,7 +220,7 @@ public class OrderServiceImpl implements OrderService{
                 orderPay.setPayAmount(payAmount);
                 orderPay.setFreight(payFreight);//运费金额，初始化为0
                 orderPay.setCount(mainOrderPay.getCount());
-                orderPay.setStatus(1);//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
+                orderPay.setStatus(Status.ORDER_GOODS_PREPAY.getValue());
                 orderPay.setAddTime(DateStampUtils.getTimesteamp());
                 orderPayMapper.insert(orderPay);
 
@@ -249,8 +250,14 @@ public class OrderServiceImpl implements OrderService{
                 String goodsMainImg = JSONObject.parseObject(schedualGoodsService.goodsMainImg(goods.getId())).getString("data");
                 orderDetail.setMainImgUrl(goodsMainImg);
                 orderDetail.setAmount(goods.getPrice());
+
                 //计算优惠券（每个商品都可以使用优惠券）
                 Integer couponId = addOrderDetailDto.getCouponId();//优惠券ID
+
+                //判断商品所属店铺是否可用优惠券
+                if(!Boolean.valueOf(JSONObject.parseObject(schedualUserService.userIsAuth(goods.getUserId())).getString("data"))){
+                    throw new ServiceException("【"+goods.getName()+"】所属店铺未认证，不可使用优惠券！");
+                }
                 orderDetail.setCouponId(couponId);
                 BigDecimal price = goods.getPrice();
                 if(couponId != null){
@@ -297,7 +304,7 @@ public class OrderServiceImpl implements OrderService{
 
             //交易消息：恭喜您！您的商品【大头三年原光】、【xxx】、【xx】已有人下单，点击此处查看订单
             schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
-                    "恭喜您！您的商品"+goodsName.toString()+"已有人下单，点击此处查看订单","3","2",orderInfo.getId().toString());
+                    "恭喜您！您的商品"+goodsName.toString()+"已有人下单，点击此处查看订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER.getMessage(),orderInfo.getId().toString());
         }
         //删除买家购物车内此商品信息:goodsFeign/cartRemove
         Integer[] goodsIds = new Integer[goodsList.size()];
@@ -322,12 +329,12 @@ public class OrderServiceImpl implements OrderService{
         OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKeyDetail(orderId);
         OrderPay orderPay = orderPayMapper.selectByOrderId(orderId);
         if(orderInfo != null && orderPay != null){
-            if(orderInfo.getStatus() != 1){
+            if(orderInfo.getStatus() != Status.ORDER_GOODS_PREPAY.getValue()){
                 throw new ServiceException("订单状态异常！");
             }
             //更改总订单状态
-            orderInfo.setStatus(5);//状态 1待支付 2待发货 3待收货 4已完成 5已取消
-            orderPay.setStatus(5);
+            orderInfo.setStatus(Status.ORDER_GOODS_CANCEL.getValue());
+            orderPay.setStatus(Status.ORDER_GOODS_CANCEL.getValue());
             orderInfoMapper.updateByPrimaryKey(orderInfo);
             orderPayMapper.updateByPrimaryKey(orderPay);
             //更改子订单状态
@@ -337,8 +344,8 @@ public class OrderServiceImpl implements OrderService{
                 for(OrderInfo info:orderInfos){
                     OrderPay pay = orderPayMapper.selectByOrderId(info.getId());
                     //更改子订单状态
-                    info.setStatus(5);//状态 1待支付 2待发货 3待收货 4已完成 5已取消  7已申请退货
-                    pay.setStatus(5);
+                    info.setStatus(Status.ORDER_GOODS_CANCEL.getValue());
+                    pay.setStatus(Status.ORDER_GOODS_CANCEL.getValue());
                     orderInfoMapper.updateByPrimaryKey(info);
                     orderPayMapper.updateByPrimaryKey(pay);
                     //给卖家发消息：您的商品【名称】买家已取消订单
@@ -348,11 +355,11 @@ public class OrderServiceImpl implements OrderService{
                     for(OrderDetail detail:orderDetails){
                         GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(
                                 schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
-                        isAuction = goodsInfo.getType() == 2?true:false;
+                        isAuction = goodsInfo.getType().intValue() == Status.AUCTION.getValue()?true:false;
                         goodsName.append("【"+goodsInfo.getName()+"】");
                     }
                     schedualMessageService.easemobMessage(info.getSellerId().toString(),
-                            "您的"+(isAuction?"抢购":"商品")+goodsName+"买家已取消订单","3","2",info.getId().toString());
+                            "您的"+(isAuction?"抢购":"商品")+goodsName+"买家已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER.getMessage(),info.getId().toString());
                 }
             }
             //获取此订单内所有商品，更改商品状态为出售中
@@ -364,12 +371,12 @@ public class OrderServiceImpl implements OrderService{
                 GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(
                         schedualGoodsService.goodsInfo(orderDetail.getGoodsId())).getString("data")), GoodsInfo.class);
 
-                isAuction = goodsInfo.getType() == 2?true:false;
+                isAuction = goodsInfo.getType().intValue() == Status.AUCTION.getValue()?true:false;
                 goodsName.append("【"+goodsInfo.getName()+"】");
             }
             //给买家发送信息：您未支付的商品【名称】已取消订单
             schedualMessageService.easemobMessage(userId.toString(),
-                    "您未支付的"+(isAuction?"抢购":"商品")+goodsName+"已取消订单","3","2",orderInfo.getId().toString());
+                    "您未支付的"+(isAuction?"抢购":"商品")+goodsName+"已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER.getMessage(),orderInfo.getId().toString());
         }else{
             throw new ServiceException("订单异常！");
         }
@@ -380,7 +387,7 @@ public class OrderServiceImpl implements OrderService{
         //根据订单ID获取订单信息
         OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKeyDetail(orderId);
         if(userId.intValue() == orderInfo.getUserId().intValue()){//用户是买家
-            if(orderInfo.getIsResolve().intValue() == 1){//已拆单的主订单
+            if(orderInfo.getIsResolve().intValue() == Status.YES.getValue()){//已拆单的主订单
                 throw new ServiceException("订单状态异常！");
             }
         }
@@ -409,7 +416,7 @@ public class OrderServiceImpl implements OrderService{
             //处理卖家信息
             List<SellerDto> sellerDtos = getSellerDtos(orderDetailDtos);
             orderDto.setSellerDtos(sellerDtos);
-            if(orderInfo.getIsRefund() == 1){
+            if(orderInfo.getIsRefund().intValue() == Status.YES.getValue()){
                 //退货状态
                 OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderInfo.getId(), null,null);
                 orderDto.setReturnStatus(orderRefund.getStatus());
@@ -560,7 +567,7 @@ public class OrderServiceImpl implements OrderService{
         //1.下订单
         //2.下支付订单
         OrderInfo orderInfo = new OrderInfo();
-        orderInfo.setIsResolve(2);//是否拆单 1是 2否
+        orderInfo.setIsResolve(Status.NO.getValue());//是否拆单 1是 2否
         orderInfo.setUserId(userId);
         //订单号
         final IdGenerator idg = IdGenerator.INSTANCE;
@@ -570,6 +577,10 @@ public class OrderServiceImpl implements OrderService{
         BigDecimal amount = goods.getPrice();//原价
         //计算优惠券（每个商品都可以使用优惠券）
         if(couponId != null){
+            //判断商品所属店铺是否可用优惠券
+            if(!Boolean.valueOf(JSONObject.parseObject(schedualUserService.userIsAuth(goods.getUserId())).getString("data"))){
+                throw new ServiceException("【"+goods.getName()+"】所属店铺未认证，不可使用优惠券！");
+            }
             BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.getPriceByCoupon(userId,amount,couponId)), BaseResp.class);
             if(baseResp.getCode() == 1){
                 throw new ServiceException(baseResp.getReport().toString());
@@ -581,7 +592,7 @@ public class OrderServiceImpl implements OrderService{
         BigDecimal payAmount = amount.add(payFreight);//实际支付金额
         orderInfo.setAmount(amount);
         orderInfo.setCount(1);//商品数量，初始为0
-        orderInfo.setStatus(1);//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
+        orderInfo.setStatus(Status.ORDER_GOODS_PREPAY.getValue());
         orderInfo.setAddTime(DateStampUtils.getTimesteamp());
         orderInfo.setSellerId(goods.getUserId());//卖家ID
         orderInfoMapper.insert(orderInfo);
@@ -600,7 +611,7 @@ public class OrderServiceImpl implements OrderService{
         orderPay.setPayAmount(payAmount);
         orderPay.setFreight(payFreight);
         orderPay.setCount(1);//商品数量，初始为0
-        orderPay.setStatus(1);//状态 1待支付 2待发货 3待收货 4已完成 5已取消 7已申请退货
+        orderPay.setStatus(Status.ORDER_GOODS_PREPAY.getValue());
         orderPay.setAddTime(DateStampUtils.getTimesteamp());
         orderPayMapper.insert(orderPay);
         OrderDetail orderDetail = new OrderDetail();
@@ -635,7 +646,8 @@ public class OrderServiceImpl implements OrderService{
         //交易消息：恭喜您！您的商品【大头三年原光】已有人下单，点击此处查看订单
         // 交易消息：恭喜您！您的抢购【大头三年原光】已有人下单，点击此处查看订单
         schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
-                "恭喜您！您的"+(goods.getType()==1?"商品【":"抢购【")+goods.getName()+"】已有人下单，点击此处查看订单","3","2",orderInfo.getId().toString());
+                "恭喜您！您的"+(goods.getType()==Status.GOODS.getValue()?"商品【":"抢购【")+goods.getName()+"】已有人下单，点击此处查看订单",
+                Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER.getMessage(),orderInfo.getId().toString());
         return orderDto;
 
     }
@@ -648,7 +660,7 @@ public class OrderServiceImpl implements OrderService{
         if(orderInfo == null){
             throw new ServiceException("订单不存在！");
         }else{
-            if(orderInfo.getStatus() != 1){//状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除 7已申请退货
+            if(orderInfo.getStatus() != Status.ORDER_GOODS_PREPAY.getValue()){
                 throw new ServiceException("订单状态异常！");
             }else{
                 OrderPay orderPay = orderPayMapper.selectByOrderId(orderId);
@@ -678,7 +690,7 @@ public class OrderServiceImpl implements OrderService{
                         throw new ServiceException("支付密码错误！");
                     }else{
                         //调用wallet-service修改余额功能
-                        BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, orderPay.getPayAmount(), 2)), BaseResp.class);
+                        BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, orderPay.getPayAmount(), Status.SUB.getValue())), BaseResp.class);
                         if(baseResp.getCode() == 1){
                             throw new ServiceException(baseResp.getReport().toString());
                         }
@@ -736,7 +748,7 @@ public class OrderServiceImpl implements OrderService{
         if(orderInfo == null){
             throw new ServiceException("订单不存在！");
         }else{
-            if(orderInfo.getStatus() != 2){//状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除 7已申请退货
+            if(orderInfo.getStatus() != Status.ORDER_GOODS_PAY.getValue()){
                 throw new ServiceException("订单状态异常！");
             }else{
                 OrderPay orderPay = orderPayMapper.selectByOrderId(orderId);
@@ -749,10 +761,10 @@ public class OrderServiceImpl implements OrderService{
 //                orderPay.setLogisticStatus();
                 orderPay.setLogisticCompany(company.getName());
                 orderPay.setLogisticCode(number);
-                orderPay.setStatus(3);
+                orderPay.setStatus(Status.ORDER_GOODS_SENDED.getValue());
                 orderPay.setSendTime(new Date());
                 orderPayMapper.updateByPrimaryKey(orderPay);
-                orderInfo.setStatus(3);
+                orderInfo.setStatus(Status.ORDER_GOODS_SENDED.getValue());
                 orderInfoMapper.updateByPrimaryKey(orderInfo);
             }
         }
@@ -764,30 +776,48 @@ public class OrderServiceImpl implements OrderService{
         if (orderInfo == null) {
             throw new ServiceException("订单不存在！");
         } else {
-            if (orderInfo.getStatus() != 3) {//状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除 7已申请退货
+            if (orderInfo.getStatus() != Status.ORDER_GOODS_SENDED.getValue()) {
                 throw new ServiceException("订单状态异常！");
             } else {
+                if(orderInfo.getIsRefund() == Status.YES.getValue()){
+                    OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderInfo.getId(), 1, null);
+                    if(orderRefund != null){
+                        throw new ServiceException("订单正在退货！");
+                    }
+                }
                 OrderPay orderPay = orderPayMapper.selectByOrderId(orderId);
                 if (orderPay == null) {
                     throw new ServiceException("订单支付信息异常！");
                 }
                 //修改订单支付表状态
-                orderPay.setStatus(4);
+                orderPay.setStatus(Status.ORDER_GOODS_COMPLETE.getValue());
                 orderPayMapper.updateByPrimaryKey(orderPay);
                 //修改订单状态
-                orderInfo.setStatus(4);
+                orderInfo.setStatus(Status.ORDER_GOODS_COMPLETE.getValue());
                 orderInfoMapper.updateByPrimaryKey(orderInfo);
                 //卖家增加余额
-                BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(orderInfo.getSellerId(),orderPay.getPayAmount(),1)), BaseResp.class);
+                BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(orderInfo.getSellerId(),orderPay.getPayAmount(),Status.ADD.getValue())), BaseResp.class);
                 if(baseResp.getCode() == 1){
                     throw new ServiceException(baseResp.getReport().toString());
                 }
-                //卖家成交增加积分
-                if(orderPay.getPayAmount().compareTo(new BigDecimal(2000)) <= 0){//2000以内+20分
-                    schedualWalletService.updateScore(orderInfo.getSellerId(),20L,1);
-                }else{//2000以上+50分
-                    schedualWalletService.updateScore(orderInfo.getSellerId(),50L,1);
+                //商品名称
+                List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderId);
+                StringBuffer goodsName = new StringBuffer();
+                for(OrderDetail detail:orderDetails){
+                    //获取商品、抢购信息
+                    GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
+                    goodsName.append("【"+goodsInfo.getName()+"】");
                 }
+                //卖家余额账单
+                schedualWalletService.addUserBalanceDetail(orderInfo.getSellerId(),orderInfo.getAmount(),Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),orderInfo.getOrderNo());
+                //卖家增加信誉度
+                if(orderPay.getPayAmount().compareTo(new BigDecimal(2000)) <= 0){
+                    schedualWalletService.updateCredit(orderInfo.getSellerId(),Credit.NORMAL_ORDER.getCredit(),Status.ADD.getValue());
+                }else {
+                    schedualWalletService.updateCredit(orderInfo.getSellerId(), Credit.BIG_ORDER.getCredit(), Status.ADD.getValue());
+                }
+                //卖家增加积分
+                schedualWalletService.updateScore(orderInfo.getSellerId(), Score.getScore(orderPay.getPayAmount()), Status.ADD.getValue());
             }
         }
     }
@@ -805,13 +835,13 @@ public class OrderServiceImpl implements OrderService{
             if (orderInfo == null) {
                 throw new ServiceException("订单不存在！");
             } else {
-                if(orderInfo.getStatus().intValue() == 4 || orderInfo.getStatus().intValue() == 5){
+                if(orderInfo.getStatus().intValue() == Status.ORDER_GOODS_COMPLETE.getValue() || orderInfo.getStatus().intValue() == Status.ORDER_GOODS_CANCEL.getValue()){
                     if(userId.intValue() == orderInfo.getUserId().intValue()){
                         //买家
-                        orderInfo.setBuyerIsDelete(1);
+                        orderInfo.setBuyerIsDelete(Status.YES.getValue());
                     }else if(userId.intValue() == orderInfo.getSellerId().intValue()){
                         //卖家
-                        orderInfo.setSellerIsDelete(1);
+                        orderInfo.setSellerIsDelete(Status.YES.getValue());
                     }
                     orderInfoMapper.updateByPrimaryKey(orderInfo);
                 }else{
@@ -830,8 +860,8 @@ public class OrderServiceImpl implements OrderService{
             if(orderInfo.getUserId().intValue() != userId.intValue()){
                 throw new ServiceException("没有权限评论！");
             }
-            //状态 1待支付 2待发货 3待收货 4已完成 5已取消 6已删除
-            if (orderInfo.getStatus().intValue() == 4) {
+            //状态 1待支付 2待发货 3待收货 4已完成 5已取消
+            if (orderInfo.getStatus().intValue() == Status.ORDER_GOODS_COMPLETE.getValue()) {
                 OrderComment orderComment = orderCommentMapper.selectByOrder(orderId);
                 if(orderComment != null){
                     throw new ServiceException("订单已评价");
@@ -869,7 +899,7 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public void reminder(Integer userId, Integer orderId) throws ServiceException {
         OrderInfo order = orderInfoMapper.getOrderByUserIdOrderId(orderId, userId);
-        if(order != null && order.getStatus() == 2){
+        if(order != null && order.getStatus() == Status.ORDER_GOODS_PAY.getValue()){
             List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(order.getId());
 
             //给卖家发送信息 您的商品【商品名称】、【xxx】、【xx】买家提醒您发货，点击此处查看订单
@@ -878,11 +908,11 @@ public class OrderServiceImpl implements OrderService{
             boolean isAuction = false;
             for(OrderDetail detail:orderDetails){
                 GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
-                isAuction = goodsInfo.getType() == 2?true:false;
+                isAuction = goodsInfo.getType().intValue() == Status.AUCTION.getValue()?true:false;
                 goodsName.append("【"+goodsInfo.getName()+"】");
             }
             schedualMessageService.easemobMessage(order.getSellerId().toString(),
-                    "您的"+(isAuction?"抢购":"商品")+goodsName+"买家提醒您发货，点击此处查看订单","3","2",orderId.toString());
+                    "您的"+(isAuction?"抢购":"商品")+goodsName+"买家提醒您发货，点击此处查看订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER.getMessage(),orderId.toString());
         }else{
             throw new ServiceException("订单状态错误！");
         }
@@ -894,23 +924,23 @@ public class OrderServiceImpl implements OrderService{
         if(orderInfo == null){
             throw new ServiceException("订单不存在！");
         }else{
-            if(orderInfo.getStatus() != 1){
+            if(orderInfo.getStatus() != Status.ORDER_GOODS_PREPAY.getValue()){
                 throw new ServiceException("订单状态错误！");
             }else{
                 OrderPay orderPay = orderPayMapper.selectByOrderId(orderInfo.getId());
                 //拆单
                 if(orderInfo.getSellerId() == null){//订单为合并主订单，进行拆单
-                    orderInfo.setIsResolve(1);//是否拆单 1是 2否
+                    orderInfo.setIsResolve(Status.YES.getValue());//是否拆单 1是 2否
                     //获取子订单
                     List<OrderInfo> orderInfos = orderInfoMapper.selectChildOrderByOrderId(orderInfo.getUserId(), orderInfo.getId());
                     for(OrderInfo childOrder:orderInfos){
-                        childOrder.setIsResolve(2);
-                        childOrder.setStatus(2);
+                        childOrder.setIsResolve(Status.NO.getValue());
+                        childOrder.setStatus(Status.ORDER_GOODS_PAY.getValue());
                         orderInfoMapper.updateByPrimaryKey(childOrder);
                         OrderPay pay = orderPayMapper.selectByOrderId(childOrder.getId());
                         pay.setPayType(payType);
                         pay.setPayTime(DateStampUtils.getTimesteamp());
-                        pay.setStatus(2);
+                        pay.setStatus(Status.ORDER_GOODS_PAY.getValue());
                         orderPayMapper.updateByPrimaryKey(pay);
 
                         //获取商品名字列表
@@ -919,15 +949,15 @@ public class OrderServiceImpl implements OrderService{
                         boolean isAuction = false;
                         for(OrderDetail detail:orderDetails){
                             GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
-                            isAuction = goodsInfo.getType() == 2?true:false;
+                            isAuction = goodsInfo.getType().intValue() == Status.AUCTION.getValue()?true:false;
                             goodsName.append("【"+goodsInfo.getName()+"】");
                         }
                         //交易信息：恭喜您！您的商品【xxx】已被买下，点击此处查看订单
                         //交易信息：恭喜您！您的抢购【xxx】已被买下，点击此处查看订单
                         schedualMessageService.easemobMessage(childOrder.getSellerId().toString(),
-                                "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单","3","2",childOrder.getId().toString());
+                                "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER.getMessage(),childOrder.getId().toString());
                         //买家新增余额账单
-                        schedualWalletService.addUserBalanceDetail(childOrder.getUserId(),childOrder.getAmount(),payType,2,childOrder.getOrderNo(),goodsName.toString(),childOrder.getSellerId(),childOrder.getUserId(),1);
+                        schedualWalletService.addUserBalanceDetail(childOrder.getUserId(),pay.getPayAmount(),payType,Status.EXPEND.getValue(),childOrder.getOrderNo(),goodsName.toString(),childOrder.getSellerId(),childOrder.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo);
                     }
                 }else{
                     //获取商品名字列表
@@ -936,21 +966,21 @@ public class OrderServiceImpl implements OrderService{
                     boolean isAuction = false;
                     for(OrderDetail detail:orderDetails){
                         GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
-                        isAuction = goodsInfo.getType() == 2?true:false;
+                        isAuction = goodsInfo.getType().intValue() == Status.AUCTION.getValue()?true:false;
                         goodsName.append("【"+goodsInfo.getName()+"】");
                     }
                     //交易信息：恭喜您！您的抢购【xxx】已被买下，点击此处查看订单
                     schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
-                            "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单","3","2",orderInfo.getId().toString());
+                            "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER.getMessage(),orderInfo.getId().toString());
                     //买家新增余额账单
-                    schedualWalletService.addUserBalanceDetail(orderInfo.getUserId(),orderInfo.getAmount(),payType,2,orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),1);
+                    schedualWalletService.addUserBalanceDetail(orderInfo.getUserId(),orderPay.getPayAmount(),payType,Status.EXPEND.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo);
                 }
-                orderInfo.setStatus(2);
+                orderInfo.setStatus(Status.ORDER_GOODS_PAY.getValue());
                 orderInfoMapper.updateByPrimaryKeySelective(orderInfo);
 
                 orderPay.setPayType(payType);
                 orderPay.setPayTime(DateStampUtils.getTimesteamp());
-                orderPay.setStatus(2);
+                orderPay.setStatus(Status.ORDER_GOODS_PAY.getValue());
                 orderPayMapper.updateByPrimaryKeySelective(orderPay);
 
 

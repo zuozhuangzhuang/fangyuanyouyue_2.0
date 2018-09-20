@@ -27,4 +27,10 @@ public interface SchedualUserService {
 
     @RequestMapping(value = "/userFeign/isAuth",method = RequestMethod.POST)
     String isAuth(@RequestParam(value = "userId") Integer userId);
+
+
+    @RequestMapping(value = "/timer/shopAuthTimeOut",method = RequestMethod.POST)
+    String shopAuthTimeOut();
+
+
 }

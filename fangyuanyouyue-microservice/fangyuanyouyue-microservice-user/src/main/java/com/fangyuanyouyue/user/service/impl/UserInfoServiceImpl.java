@@ -1,14 +1,14 @@
 package com.fangyuanyouyue.user.service.impl;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import com.fangyuanyouyue.base.enums.Status;
+import com.fangyuanyouyue.user.dao.*;
 import com.fangyuanyouyue.user.dto.*;
+import com.fangyuanyouyue.user.dto.admin.AdminUserDto;
+import com.fangyuanyouyue.user.model.*;
 import com.fangyuanyouyue.user.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -21,22 +21,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
-import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.base.util.MD5Util;
 import com.fangyuanyouyue.user.constant.StatusEnum;
-import com.fangyuanyouyue.user.dao.IdentityAuthApplyMapper;
-import com.fangyuanyouyue.user.dao.UserFansMapper;
-import com.fangyuanyouyue.user.dao.UserInfoExtMapper;
-import com.fangyuanyouyue.user.dao.UserInfoMapper;
-import com.fangyuanyouyue.user.dao.UserThirdPartyMapper;
-import com.fangyuanyouyue.user.dao.UserVipMapper;
-import com.fangyuanyouyue.user.dao.UserWalletMapper;
-import com.fangyuanyouyue.user.model.UserFans;
-import com.fangyuanyouyue.user.model.UserInfo;
-import com.fangyuanyouyue.user.model.UserInfoExt;
-import com.fangyuanyouyue.user.model.UserThirdParty;
-import com.fangyuanyouyue.user.model.UserVip;
-import com.fangyuanyouyue.user.model.UserWallet;
 import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.param.UserParam;
 
@@ -72,6 +58,10 @@ public class UserInfoServiceImpl implements UserInfoService {
     private UserThirdService userThirdService;
     @Autowired
     private SchedualWalletService schedualWalletService;
+    @Autowired
+    private UserCouponMapper userCouponMapper;
+    @Autowired
+    private CouponInfoMapper couponInfoMapper;
 
     @Override
     public UserInfo getUserByToken(String token) throws ServiceException {
@@ -139,6 +129,8 @@ public class UserInfoServiceImpl implements UserInfoService {
         user.setNickName(param.getNickName());
         user.setStatus(1);//状态 1正常 2冻结
         user.setGender(param.getGender());
+        user.setLastLoginPlatform(param.getLoginPlatform());
+        user.setLastLoginTime(DateStampUtils.getTimesteamp());
         userInfoMapper.insert(user);
         //设置用户token到Redis
         String token = setToken("",user.getId());
@@ -170,9 +162,43 @@ public class UserInfoServiceImpl implements UserInfoService {
         userWalletMapper.insert(userWallet);
         //初始化用户钱包
         UserDto userDto = setUserDtoByInfo(token,user);
+        //新增优惠券 两张:1 剩下的各一张:23456
+        registSaveUserCoupon(user.getId());
         return userDto;
     }
 
+    /**
+     * 用户注册送代金券
+     * @param userId
+     * @throws ServiceException
+     */
+    void registSaveUserCoupon(Integer userId) throws ServiceException{
+        //TODO 1、获取注册赠送的代金券
+        saveUserCoupon(userId,1);
+        saveUserCoupon(userId,1);
+        saveUserCoupon(userId,2);
+        saveUserCoupon(userId,3);
+        saveUserCoupon(userId,4);
+        saveUserCoupon(userId,5);
+        saveUserCoupon(userId,6);
+        schedualMessageService.easemobMessage(userId.toString(),"恭喜您！您已获得注册即送新手代金券礼包，内含880元代金券！点击前往查看吧~",
+                Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_WALLET.getMessage(),"");
+    }
+
+    /**
+     * 用户新增优惠券
+     * @param userId
+     * @param couponId
+     * @throws ServiceException
+     */
+    void saveUserCoupon(Integer userId,Integer couponId) throws ServiceException{
+        UserCoupon userCoupon = new UserCoupon();
+        userCoupon.setUserId(userId);
+        userCoupon.setCouponId(couponId);
+        userCoupon.setStatus(Status.COUPON_NOTUSE.getValue());
+        userCoupon.setAddTime(DateStampUtils.getTimesteamp());
+        userCouponMapper.insert(userCoupon);
+    }
     @Override
     public UserDto login(String phone,String loginPwd,Integer lastLoginPlatform) throws ServiceException{
         UserInfo user = userInfoMapper.getUserByPhone(phone);
@@ -272,6 +298,8 @@ public class UserInfoServiceImpl implements UserInfoService {
             userWallet.setAppraisalCount(1);//普通用户只有1次免费鉴定
             userWalletMapper.insert(userWallet);
             UserDto userDto = setUserDtoByInfo(token,user);
+            //送优惠券
+            registSaveUserCoupon(user.getId());
             return userDto;
         }else{
             //记录用户登录时间，登录平台，最后一次登录
@@ -555,6 +583,8 @@ public class UserInfoServiceImpl implements UserInfoService {
             userWallet.setAppraisalCount(1);//普通用户只有1次免费鉴定
             userWalletMapper.insert(userWallet);
             UserDto userDto = setUserDtoByInfo(token,user);
+            //送优惠券
+            registSaveUserCoupon(user.getId());
             return userDto;
         }else{
             UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userThirdParty.getUserId());
@@ -598,21 +628,23 @@ public class UserInfoServiceImpl implements UserInfoService {
         for(ShopDto shopDto:shopDtos){
             //根据用户ID获取前三个商品
             String goodsLists = schedualGoodsService.goodsList(shopDto.getUserId(), 0, 3);
-            System.out.println("goodsLists:"+goodsLists);
+//            System.out.println("goodsLists:"+goodsLists);
             JSONObject jsonObject = JSONObject.parseObject(goodsLists);
-            System.out.println("jsonObject:"+jsonObject);
+//            System.out.println("jsonObject:"+jsonObject);
             JSONArray goodsList = JSONArray.parseArray(jsonObject.getString("data"));
-            for(int i=0;i<goodsList.size();i++){
-                System.out.println("goods:"+goodsList.get(i));
-                JSONObject goods = JSONObject.parseObject(goodsList.get(i).toString());
-                if(i == 0){
-                    shopDto.setImgUrl1(goods.getString("mainUrl"));
-                }else if(i == 1){
-                    shopDto.setImgUrl2(goods.getString("mainUrl"));
-                }else if(i == 2){
-                    shopDto.setImgUrl3(goods.getString("mainUrl"));
-                }else{
-                    throw new ServiceException("");
+            if(goodsList != null && goodsList.size() > 0){
+                for(int i=0;i<goodsList.size();i++){
+    //                System.out.println("goods:"+goodsList.get(i));
+                    JSONObject goods = JSONObject.parseObject(goodsList.get(i).toString());
+                    if(i == 0){
+                        shopDto.setImgUrl1(goods.getString("mainUrl"));
+                    }else if(i == 1){
+                        shopDto.setImgUrl2(goods.getString("mainUrl"));
+                    }else if(i == 2){
+                        shopDto.setImgUrl3(goods.getString("mainUrl"));
+                    }else{
+                        throw new ServiceException("");
+                    }
                 }
             }
         }

@@ -16,7 +16,7 @@ import java.util.Date;
 public class UserCoupon {
     private Integer id;
 
-    private Integer userId;
+    private Integer userId;//用户id
 
     private Integer couponId;//优惠券ID
 

@@ -40,9 +40,22 @@ public class TimerControllerTest {
      * @throws Exception
      */
     @Test
-    @Transactional
+//    @Transactional
     public void appraisalDetail() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/timer/appraisalDetail")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 专栏返利
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void dailyWage() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/timer/dailyWage")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

@@ -16,10 +16,12 @@
     <result column="order_type" jdbcType="INTEGER" property="orderType" />
     <result column="seller_id" jdbcType="INTEGER" property="sellerId" />
     <result column="buyer_id" jdbcType="INTEGER" property="buyerId" />
+    <result column="pay_no" jdbcType="VARCHAR" property="payNo" />
+    <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, amount, befor_amount, after_amount, pay_type, type, add_time, update_time, 
-    title, order_no, order_type, seller_id, buyer_id
+    title, order_no, order_type, seller_id, buyer_id, pay_no
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -36,12 +38,14 @@
       befor_amount, after_amount, pay_type, 
       type, add_time, update_time, 
       title, order_no, order_type, 
-      seller_id, buyer_id)
+      seller_id, buyer_id, pay_no
+      )
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{amount,jdbcType=DECIMAL}, 
       #{beforAmount,jdbcType=DECIMAL}, #{afterAmount,jdbcType=DECIMAL}, #{payType,jdbcType=INTEGER}, 
       #{type,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
       #{title,jdbcType=VARCHAR}, #{orderNo,jdbcType=VARCHAR}, #{orderType,jdbcType=INTEGER}, 
-      #{sellerId,jdbcType=INTEGER}, #{buyerId,jdbcType=INTEGER})
+      #{sellerId,jdbcType=INTEGER}, #{buyerId,jdbcType=INTEGER}, #{payNo,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.fangyuanyouyue.wallet.model.UserBalanceDetail" useGeneratedKeys="true" keyProperty="id">
     insert into user_balance_detail
@@ -88,6 +92,9 @@
       <if test="buyerId != null">
         buyer_id,
       </if>
+      <if test="payNo != null">
+        pay_no,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -131,6 +138,9 @@
       </if>
       <if test="buyerId != null">
         #{buyerId,jdbcType=INTEGER},
+      </if>
+      <if test="payNo != null">
+        #{payNo,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -176,6 +186,9 @@
       <if test="buyerId != null">
         buyer_id = #{buyerId,jdbcType=INTEGER},
       </if>
+      <if test="payNo != null">
+        pay_no = #{payNo,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -193,12 +206,16 @@
       order_no = #{orderNo,jdbcType=VARCHAR},
       order_type = #{orderType,jdbcType=INTEGER},
       seller_id = #{sellerId,jdbcType=INTEGER},
-      buyer_id = #{buyerId,jdbcType=INTEGER}
+      buyer_id = #{buyerId,jdbcType=INTEGER},
+      pay_no = #{payNo,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
   <select id="selectByUserIdType" resultMap="BaseResultMap">
-    select * from user_balance_detail where user_id = #{userId} and add_time <![CDATA[ <= ]]> #{searchDate}
+    select * from user_balance_detail where user_id = #{userId}
+    <if test="searchDate != null and searchDate != ''">
+      and add_time <![CDATA[ <= ]]> #{searchDate}
+    </if>
     <if test="type != null">
       and type = #{type}
     </if>
@@ -207,5 +224,78 @@
 
   <select id="selectByUserIdOrderNo" resultMap="BaseResultMap">
     select * from user_balance_detail where user_id = #{userId} and order_no = #{orderNo}
+  </select>
+
+  <select id="monthlyBalance" resultType="Map">
+    select sum(amount) amount,type from user_balance_detail where user_id = #{userId} and add_time <![CDATA[ >= ]]> #{startDate} and add_time <![CDATA[ < ]]> #{endDate} group by type
+  </select>
+
+
+  <select id="countPage" parameterType="Integer" resultType="Integer">
+    select count(*) from user_balance_detail a,user_info b where a.user_id=b.id
+    <if test="payType != null">
+      and a.pay_type = #{payType}
+    </if>
+    <if test="type != null">
+      and a.type = #{type}
+    </if>
+    <if test="orderType != null">
+      and a.order_type = #{orderType}
+    </if>
+    <if test="keyword != null">
+      and (
+      a.title like "%"#{keyword}"%"
+      or b.nick_name like "%"#{keyword}"%"
+      or b.phone like "%"#{keyword}"%"
+      )
+    </if>
+    <if test="status != null">
+      and a.status = #{status}
+    </if>
+    <if test="startDate != null">
+      and a.add_time <![CDATA[ > ]]> #{startDate}
+    </if>
+    <if test="endDate != null">
+      and a.add_time <![CDATA[ <= ]]> #{endDate}
+    </if>
+  </select>
+
+  <select id="getPage" resultMap="BaseResultMap">
+    select a.*,b.nick_name from user_balance_detail a,user_info b where a.user_id=b.id
+    <if test="payType != null">
+      and a.pay_type = #{payType}
+    </if>
+    <if test="type != null">
+      and a.type = #{type}
+    </if>
+    <if test="orderType != null">
+      and a.order_type = #{orderType}
+    </if>
+    <if test="keyword != null">
+      and (
+      a.title like "%"#{keyword}"%"
+      or b.nick_name like "%"#{keyword}"%"
+      or b.phone like "%"#{keyword}"%"
+      )
+    </if>
+    <if test="status != null">
+      and a.status = #{status}
+    </if>
+
+    <if test="startDate != null">
+      and a.add_time <![CDATA[ > ]]> #{startDate}
+    </if>
+
+    <if test="endDate != null">
+      and a.add_time <![CDATA[ <= ]]> #{endDate}
+    </if>
+
+    <if test="orders != null">
+      order by a.${orders}
+      <if test="ascType != null and ascType == 2">
+        desc
+      </if>
+    </if>
+    limit #{start},#{limit}
   </select>
 </mapper>

@@ -29,8 +29,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import static javafx.scene.input.KeyCode.I;
-
 
 @Service(value = "appraisalDetailService")
 @Transactional(rollbackFor=Exception.class)
@@ -183,7 +181,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 			String id = idg.nextId();
 			argueOrder.setOrderNo(id);
 			argueOrder.setAmount(bonus);
-			argueOrder.setStatus(1);
+			argueOrder.setStatus(Status.ORDER_UNPAID.getValue());
 			argueOrder.setAddTime(DateStampUtils.getTimesteamp());
 			argueOrder.setTitle(title);
 			argueOrder.setContent(content);
@@ -223,14 +221,14 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 				if(!verifyPayPwd){
 					throw new ServiceException("支付密码错误！");
 				}else{
-					BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, bonus, 2)), BaseResp.class);
+					BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, bonus, Status.SUB.getValue())), BaseResp.class);
 					if(baseResp.getCode() == 1){
 						throw new ServiceException(baseResp.getReport().toString());
 					}
 				}
 				payInfo.append("余额支付成功！");
 				//生成全民鉴定信息
-				applyAppraisal(argueOrder.getOrderNo(),null,3);
+				applyAppraisal(argueOrder.getOrderNo(),null,Status.PAY_TYPE_BALANCE.getValue());
 			}else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
 				WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,argueOrder.getOrderNo(), argueOrder.getAmount(), NotifyUrl.mini_test_notify.getNotifUrl()+NotifyUrl.argue_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
 				return wechatPayDto;
@@ -245,7 +243,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 			if(StringUtils.isNotEmpty(content)){
 				appraisalDetail.setContent(content);
 			}
-			appraisalDetail.setStatus(1);//状态 1进行中 2结束
+			appraisalDetail.setStatus(StatusEnum.UNDERWAY.getValue());
 			//结束时间为7天后
 			appraisalDetail.setEndTime(DateUtil.getDateAfterDay(DateStampUtils.getTimesteamp(),7));
 			appraisalDetail.setAddTime(DateStampUtils.getTimesteamp());
@@ -259,7 +257,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 			if(userIds != null && userIds.length > 0){
 				for(Integer toUserId:userIds){
 					schedualMessageService.easemobMessage(toUserId.toString(),
-							"用户“"+user.getNickName()+"”发起全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧","7","5",appraisalDetail.getId().toString());
+							"用户“"+user.getNickName()+"”发起全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧",Status.INVITE_MESSAGE.getMessage(),Status.JUMP_TYPE_APPRAISAL.getMessage(),appraisalDetail.getId().toString());
 				}
 			}
 		}
@@ -295,7 +293,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 		appraisalDetail.setUserId(argueOrder.getUserId());
 		appraisalDetail.setTitle(argueOrder.getTitle());
 		appraisalDetail.setContent(argueOrder.getContent());
-		appraisalDetail.setStatus(1);//状态 1进行中 2结束
+		appraisalDetail.setStatus(StatusEnum.UNDERWAY.getValue());//状态 1进行中 2结束
 		//结束时间为7天后
 		appraisalDetail.setEndTime(DateUtil.getDateAfterDay(DateStampUtils.getTimesteamp(),7));
 		appraisalDetail.setAddTime(DateStampUtils.getTimesteamp());
@@ -310,13 +308,13 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 		if(userInds != null && userInds.length > 0){
 			for(String toUserId:userInds){
 				schedualMessageService.easemobMessage(toUserId,
-						"用户“"+user.getNickName()+"”发起全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧","7","5",appraisalDetail.getId().toString());
+						"用户“"+user.getNickName()+"”发起全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧",Status.INVITE_MESSAGE.getMessage(),Status.JUMP_TYPE_APPRAISAL.getMessage(),appraisalDetail.getId().toString());
 			}
 		}
-		argueOrder.setStatus(2);
-		argueOrderMapper.updateByPrimaryKey(argueOrder);
 		//余额账单
-		schedualWalletService.addUserBalanceDetail(user.getId(),argueOrder.getAmount(),payType,2,orderNo,appraisalDetail.getTitle(),null,user.getId(),4);
+		schedualWalletService.addUserBalanceDetail(argueOrder.getUserId(),argueOrder.getAmount(),payType,Status.EXPEND.getValue(),orderNo,argueOrder.getTitle(),argueOrder.getUserId(),null, Status.APPRAISAL.getValue(),thirdOrderNo);
+		argueOrder.setStatus(Status.ORDER_COMPLETE.getValue());
+		argueOrderMapper.updateByPrimaryKey(argueOrder);
 		return true;
 	}
 
@@ -328,7 +326,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 		if(userIds != null && userIds.length > 0){
 			for(Integer toUserId:userIds){
 				schedualMessageService.easemobMessage(toUserId.toString(),
-						"用户“"+user.getNickName()+"”看到全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧","7","5",appraisalDetail.getId().toString());
+						"用户“"+user.getNickName()+"”看到全民鉴定【"+appraisalDetail.getTitle()+"】时邀请了您！点击此处前往查看吧",Status.INVITE_MESSAGE.getMessage(),Status.JUMP_TYPE_APPRAISAL.getMessage(),appraisalDetail.getId().toString());
 			}
 		}
 	}

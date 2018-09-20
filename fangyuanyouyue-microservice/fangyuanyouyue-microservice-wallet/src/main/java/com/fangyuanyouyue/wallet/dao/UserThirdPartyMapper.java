@@ -20,8 +20,9 @@ public interface UserThirdPartyMapper {
 
     /**
      * 根据用户ID获取用户第三方信息
+     * @param userId
+     * @param type
      * @return
-     * @param id
      */
     UserThirdParty getUserThirdByUserId(@Param("userId") Integer userId, @Param("type")Integer type);
 }

@@ -14,13 +14,16 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="user_id" jdbcType="INTEGER" property="userId" />
     <result column="is_show" jdbcType="INTEGER" property="isShow" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="is_show" jdbcType="INTEGER" property="isShow" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.goods.model.GoodsAppraisalDetail">
     <result column="description" jdbcType="LONGVARCHAR" property="description" />
   </resultMap>
   <sql id="Base_Column_List">
     id, order_id, goods_id, opinion, status, price, submit_time, type, add_time, update_time, 
-    user_id, is_show
+    user_id, is_show, title
   </sql>
   <sql id="Blob_Column_List">
     description
@@ -42,14 +45,14 @@
       opinion, status, price, 
       submit_time, type, add_time, 
       update_time, user_id, is_show, 
-      description)
+      title, description)
     values (#{id,jdbcType=INTEGER}, #{orderId,jdbcType=INTEGER}, #{goodsId,jdbcType=INTEGER}, 
       #{opinion,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{price,jdbcType=DECIMAL}, 
       #{submitTime,jdbcType=TIMESTAMP}, #{type,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP}, #{userId,jdbcType=INTEGER}, #{isShow,jdbcType=INTEGER}, 
-      #{description,jdbcType=LONGVARCHAR})
+      #{title,jdbcType=VARCHAR}, #{description,jdbcType=LONGVARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.goods.model.GoodsAppraisalDetail">
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.goods.model.GoodsAppraisalDetail" useGeneratedKeys="true" keyProperty="id">
     insert into goods_appraisal_detail
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -87,6 +90,9 @@
       </if>
       <if test="isShow != null">
         is_show,
+      </if>
+      <if test="title != null">
+        title,
       </if>
       <if test="description != null">
         description,
@@ -129,6 +135,9 @@
       <if test="isShow != null">
         #{isShow,jdbcType=INTEGER},
       </if>
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
+      </if>
       <if test="description != null">
         #{description,jdbcType=LONGVARCHAR},
       </if>
@@ -170,6 +179,9 @@
       <if test="isShow != null">
         is_show = #{isShow,jdbcType=INTEGER},
       </if>
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
+      </if>
       <if test="description != null">
         description = #{description,jdbcType=LONGVARCHAR},
       </if>
@@ -189,6 +201,7 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       user_id = #{userId,jdbcType=INTEGER},
       is_show = #{isShow,jdbcType=INTEGER},
+      title = #{title,jdbcType=VARCHAR},
       description = #{description,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -204,7 +217,8 @@
       add_time = #{addTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       user_id = #{userId,jdbcType=INTEGER},
-      is_show = #{isShow,jdbcType=INTEGER}
+      is_show = #{isShow,jdbcType=INTEGER},
+      title = #{title,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
@@ -247,5 +261,59 @@
         and status = #{status}
       </if>
     </where>
+  </select>
+
+
+  <select id="countPage" resultType="Integer">
+    select count(*) from goods_appraisal_detail
+    <where>
+      status <![CDATA[ <> ]]> 4
+      <if test="type != null">
+        and type = #{type}
+      </if>
+      <if test="status != null">
+        and status = #{status}
+      </if>
+      <if test="keyword != null and keyword != ''">
+        and(description like "%"#{keyword}"#" or user_id in (select id from user_info where nick_name like "%"#{keyword}"#"))
+      </if>
+      <if test="startDate != null">
+        and add_time <![CDATA[ > ]]> #{startDate}
+      </if>
+      <if test="endDate != null">
+        and add_time <![CDATA[ <= ]]> #{endDate}
+      </if>
+    </where>
+  </select>
+
+  <select id="getAppraisalPage" resultMap="BaseResultMap">
+    select a.*,b.nick_name from goods_appraisal_detail a,user_info b
+    <where>
+      a.status <![CDATA[ <> ]]> 4 and a.user_id = b.id
+      <if test="type != null">
+        and a.type = #{type}
+      </if>
+      <if test="status != null">
+        and a.status = #{status}
+      </if>
+      <if test="keyword != null and keyword != ''">
+        and(a.title like "%"#{keyword}"#" or a.description like "%"#{keyword}"#" or a.user_id in (select id from user_info where nick_name like "%"#{keyword}"#"))
+      </if>
+      <if test="startDate != null">
+        and a.add_time <![CDATA[ > ]]> #{startDate}
+      </if>
+      <if test="endDate != null">
+        and a.add_time <![CDATA[ <= ]]> #{endDate}
+      </if>
+    </where>
+    <if test="orders != null">
+      order by ${orders}
+      <if test="ascType != null and ascType == 2">
+        desc
+      </if>
+    </if>
+    <if test="limit != null and start != null">
+      limit #{start},#{limit}
+    </if>
   </select>
 </mapper>

@@ -16,4 +16,11 @@ public interface SchedualForumService {
     @RequestMapping(value = "/timer/appraisalEnd",method = RequestMethod.POST)
     String appraisalEnd();
 
+    /**
+     * 专栏返利
+     * @return
+     */
+    @RequestMapping(value = "/timer/dailyWage",method = RequestMethod.POST)
+    String dailyWage();
+
 }

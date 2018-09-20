@@ -1,7 +1,9 @@
 package com.fangyuanyouyue.wallet.service.impl;
 
+import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
@@ -11,10 +13,16 @@ import com.fangyuanyouyue.base.util.WechatUtil.PayCommonUtil;
 import com.fangyuanyouyue.base.util.alipay.util.GenOrderUtil;
 import com.fangyuanyouyue.base.util.wechat.pay.WechatPay;
 import com.fangyuanyouyue.wallet.dao.*;
+import com.fangyuanyouyue.wallet.dto.BillMonthDto;
 import com.fangyuanyouyue.wallet.dto.UserBalanceDto;
 import com.fangyuanyouyue.wallet.dto.UserCouponDto;
 import com.fangyuanyouyue.wallet.dto.WalletDto;
+import com.fangyuanyouyue.wallet.dto.admin.AdminUserBalanceDto;
+import com.fangyuanyouyue.wallet.dto.admin.AdminWithdrawDto;
 import com.fangyuanyouyue.wallet.model.*;
+import com.fangyuanyouyue.wallet.param.AdminWalletParam;
+import com.fangyuanyouyue.wallet.service.PlatformFinanceService;
+import com.fangyuanyouyue.wallet.service.SchedualMessageService;
 import com.fangyuanyouyue.wallet.service.UserCouponService;
 import com.fangyuanyouyue.wallet.service.WalletService;
 import org.apache.commons.lang.StringUtils;
@@ -25,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 
 @Service(value = "walletService")
@@ -51,6 +60,10 @@ public class WalletServiceImpl implements WalletService{
     private UserCouponService userCouponService;
     @Autowired
     private UserThirdPartyMapper userThirdPartyMapper;
+    @Autowired
+    private PlatformFinanceService platformFinanceService;
+    @Autowired
+    private SchedualMessageService schedualMessageService;
 
     @Override
     public Object recharge(Integer userId, BigDecimal amount, Integer type) throws Exception {
@@ -182,39 +195,12 @@ public class WalletServiceImpl implements WalletService{
         }
     }
 
-    @Override
-    public void updateScore(Integer userId, Long score,Integer type) throws ServiceException {
-        //TODO 每个用户每天可增加200积分 增加一张用户积分记录表，记录用户积分增加历史，按天筛选，不可超过200分
-        UserWallet userWallet = userWalletMapper.selectByUserId(userId);
-        if(userWallet == null){
-            throw new ServiceException("获取钱包信息失败！");
-        }else{
-            if(type == 1){//增加积分 同时增加总积分和积分余额
-                userWallet.setScore(userWallet.getScore()+score);
-                userWallet.setPoint(userWallet.getPoint()+score);
-                //修改用户等级
-                UserInfo info = userInfoMapper.selectByPrimaryKey(userId);
-                //积分等级，计算总积分
-                setUserLevel(userWallet.getScore(), info);
-            }else{//减少积分
-                Long updateScore = userWallet.getPoint()-score;
-                //修改积分后的用户积分余额
-                //如果修改后的积分余额低于0，就返回积分不足
-                if(updateScore < 0){
-                    throw new ServiceException("积分不足！");
-                }
-                userWallet.setPoint(updateScore);
-            }
-            userWalletMapper.updateByPrimaryKey(userWallet);
-        }
-    }
-
     /**
      * 根据用户积分设置用户等级
      * @param score
      * @param info
      */
-    static void setUserLevel(Long score, UserInfo info) {
+    public static void setUserLevel(Long score, UserInfo info) {
         if(score != null) {
             if (0 <= score && score < 500) {//Lv1
                 info.setLevel(1);
@@ -287,7 +273,7 @@ public class WalletServiceImpl implements WalletService{
 
     @Override
     public void updateAppraisalCount(Integer userId, Integer count) throws ServiceException {
-        //TODO 只做了减少次数，后期可支持 增加次数
+        //只做了减少次数，后期可支持 增加次数
         UserWallet userWallet = userWalletMapper.selectByUserId(userId);
         if(userWallet == null){
             throw new ServiceException("获取钱包信息失败！");
@@ -312,7 +298,7 @@ public class WalletServiceImpl implements WalletService{
             }else{
                 userInfoExt.setCredit(userInfoExt.getCredit()-credit);
             }
-            userInfoExtMapper.updateByPrimaryKey(userInfoExt);
+            userInfoExtMapper.updateByPrimaryKeySelective(userInfoExt);
         }
     }
 
@@ -329,11 +315,6 @@ public class WalletServiceImpl implements WalletService{
 
 
 
-//    @Value("${alipay_notify}")
-//    private String ALIPAY_NOTIFY;//支付宝后台通知地址
-//
-//    @Value("${wechat_notify}")
-//    private String WECHAT_VIP;//微信后台通知地址
 
     public static void main(String[] args) throws Exception {
         //模拟下单
@@ -385,25 +366,25 @@ public class WalletServiceImpl implements WalletService{
 //            e.printStackTrace();
 //        }
 
-        SortedMap<Object, Object> parameters = PayCommonUtil.getWXPrePayID("","","1234"); // 获取预付单，此处已做封装，需要工具类
-        parameters.put("body", "小方圆-微信在线支付");
-        parameters.put("spbill_create_ip", "127.0.0.1");
-        parameters.put("out_trade_no", "2015080612534612");
-        parameters.put("total_fee", "1"); // 测试时，每次支付一分钱，微信支付所传的金额是以分为单位的，因此实际开发中需要x100
-        // parameters.put("total_fee", orders.getOrderAmount()*100+""); // 上线后，将此代码放开
-
-        // 设置签名
-        String sign = PayCommonUtil.createSign("UTF-8", parameters);
-        parameters.put("sign", sign);
-        // 封装请求参数结束
-
-        String requestXML = PayCommonUtil.getRequestXml(parameters); // 获取xml结果
-        System.out.println("封装请求参数是：" + requestXML);
-        // 调用统一下单接口
-        String result = PayCommonUtil.httpsRequest("https://api.mch.weixin.qq.com/pay/unifiedorder", "POST", requestXML);
-        System.out.println("调用统一下单接口：" + result);
-        WechatPayDto parMap = PayCommonUtil.startWXPay(result);
-        System.out.println("最终的map是：" + parMap.toString());
+//        SortedMap<Object, Object> parameters = PayCommonUtil.getWXPrePayID("","","1234"); // 获取预付单，此处已做封装，需要工具类
+//        parameters.put("body", "小方圆-微信在线支付");
+//        parameters.put("spbill_create_ip", "127.0.0.1");
+//        parameters.put("out_trade_no", "2015080612534612");
+//        parameters.put("total_fee", "1"); // 测试时，每次支付一分钱，微信支付所传的金额是以分为单位的，因此实际开发中需要x100
+//        // parameters.put("total_fee", orders.getOrderAmount()*100+""); // 上线后，将此代码放开
+//
+//        // 设置签名
+//        String sign = PayCommonUtil.createSign("UTF-8", parameters);
+//        parameters.put("sign", sign);
+//        // 封装请求参数结束
+//
+//        String requestXML = PayCommonUtil.getRequestXml(parameters); // 获取xml结果
+//        System.out.println("封装请求参数是：" + requestXML);
+//        // 调用统一下单接口
+//        String result = PayCommonUtil.httpsRequest("https://api.mch.weixin.qq.com/pay/unifiedorder", "POST", requestXML);
+//        System.out.println("调用统一下单接口：" + result);
+//        WechatPayDto parMap = PayCommonUtil.startWXPay(result);
+//        System.out.println("最终的map是：" + parMap.toString());
     }
 
     @Override
@@ -413,15 +394,15 @@ public class WalletServiceImpl implements WalletService{
         if(price.doubleValue() < 0.01){
             throw new ServiceException("金额不能小于0.01元");
         }
-        WechatPayDto dto= util.genOrder(orderNo, price.doubleValue()+"", "小方圆-微信在线支付", notifyUrl, "127.0.0.1");
-        if(dto==null|| org.apache.commons.lang3.StringUtils.isEmpty(dto.getPrepayId())||dto.getSign()==null){
+        WechatPayDto dto= util.genOrder(orderNo, price.setScale(2,BigDecimal.ROUND_HALF_UP)+"", "小方圆-微信在线支付", notifyUrl, "127.0.0.1");
+        if(dto==null|| StringUtils.isEmpty(dto.getPrepayId())||dto.getSign()==null){
             throw new ServiceException("在线支付生成订单信息出错！");
         }
         return dto;
     }
 
     @Override
-    public WechatPayDto orderPayByWechatMini(Integer userId, String orderNo, BigDecimal price, String notifyUrl) throws ServiceException {
+    public WechatPayDto orderPayByWechatMini(final Integer userId,final String orderNo,final BigDecimal price,final String notifyUrl) throws ServiceException {
         //根据userId获取三方openId
         UserThirdParty userThirdByUserId = userThirdPartyMapper.getUserThirdByUserId(userId, 1);
         String openId = userThirdByUserId.getMiniOpenId();
@@ -430,8 +411,8 @@ public class WalletServiceImpl implements WalletService{
         if(price.doubleValue() < 0.01){
             throw new ServiceException("金额不能小于0.01元");
         }
-        WechatPayDto dto = util.genOrderMini(openId,orderNo, price.doubleValue()+"", "小方圆-微信小程序支付", notifyUrl, "127.0.0.1");
-        if(dto==null|| org.apache.commons.lang3.StringUtils.isEmpty(dto.getPrepayId())||dto.getSign()==null){
+        WechatPayDto dto = util.genOrderMini(openId,orderNo, price.setScale(2,BigDecimal.ROUND_HALF_UP)+"", "小方圆-微信小程序支付", notifyUrl, "127.0.0.1");
+        if(dto==null|| StringUtils.isEmpty(dto.getPrepayId())||dto.getSign()==null){
             throw new ServiceException("小程序支付生成订单信息出错！");
         }
         return dto;
@@ -452,20 +433,34 @@ public class WalletServiceImpl implements WalletService{
     public List<UserBalanceDto> billList(Integer userId, Integer start, Integer limit, Integer type, String date) throws ServiceException {
 //        List<BillMonthDto> billMonthDtos = new ArrayList<>();
         //按月份筛选余额账单列表
-        Date searchDate = new Date();
-        if(StringUtils.isNotEmpty(date)){
-            searchDate = DateUtil.getTimestamp(date,DateUtil.DATE_FORMT_MONTH);
-        }
-        List<UserBalanceDetail> userBalanceDetails = userBalanceDetailMapper.selectByUserIdType(userId, start * limit, limit, type, searchDate);
+//        Date searchDate = new Date();
+//        if(StringUtils.isNotEmpty(date)){
+//            searchDate = DateUtil.getTimestamp(date,DateUtil.DATE_FORMT_MONTH);
+//        }
+        List<UserBalanceDetail> userBalanceDetails = userBalanceDetailMapper.selectByUserIdType(userId, start * limit, limit, type, date);
         List<UserBalanceDto> dtoList = UserBalanceDto.toDtoList(userBalanceDetails);
         for(UserBalanceDto dto:dtoList){
-            if(dto.getSellerId() != null){
-                UserInfo info = userInfoMapper.selectByPrimaryKey(dto.getSellerId());
-                //对当前用户来说只有别人的头像
-
-                //1收入 2支出
+            UserInfo info;
+            if(dto.getType().intValue() == Status.INCOME.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue()){
+                info = userInfoMapper.selectByPrimaryKey(dto.getBuyerId());
+                dto.setImgUrl(info.getHeadImgUrl());
+            }else if((dto.getType().intValue() == Status.EXPEND.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue())
+                    || (dto.getType().intValue() == Status.EXPEND.getValue() && dto.getOrderType().intValue() == Status.BARGAIN.getValue())
+                    || (dto.getType().intValue() == Status.REFUND.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue())
+                    || (dto.getType().intValue() == Status.REFUND.getValue() && dto.getOrderType().intValue() == Status.BARGAIN.getValue())
+                    ){
+                info = userInfoMapper.selectByPrimaryKey(dto.getSellerId());
+                dto.setImgUrl(info.getHeadImgUrl());
+            }else{
+               info = userInfoMapper.selectByPrimaryKey(66);
+            }
+            if(info != null){
                 dto.setImgUrl(info.getHeadImgUrl());
             }
+//            if(dto.getSellerId() != null){
+//                UserInfo info = userInfoMapper.selectByPrimaryKey(dto.getSellerId());
+//                dto.setImgUrl(info.getHeadImgUrl());
+//            }
         }
 //        BillMonthDto billMonthDto = new BillMonthDto();
         return dtoList;
@@ -478,19 +473,30 @@ public class WalletServiceImpl implements WalletService{
         if(userBalanceDetail == null){
             throw new ServiceException("未找到订单!");
         }
-        UserBalanceDto userBalanceDto = new UserBalanceDto(userBalanceDetail);
-        UserInfo info = userInfoMapper.selectByPrimaryKey(userBalanceDetail.getSellerId());
-        //对当前用户来说只有别人的头像
-
-        //1收入 2支出
-
-        userBalanceDto.setImgUrl(info.getHeadImgUrl());
-        return userBalanceDto;
+        UserBalanceDto dto = new UserBalanceDto(userBalanceDetail);
+        UserInfo info;
+        if(dto.getType().intValue() == Status.INCOME.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue()){
+            info = userInfoMapper.selectByPrimaryKey(dto.getBuyerId());
+            dto.setImgUrl(info.getHeadImgUrl());
+        }else if((dto.getType().intValue() == Status.EXPEND.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue())
+                || (dto.getType().intValue() == Status.EXPEND.getValue() && dto.getOrderType().intValue() == Status.BARGAIN.getValue())
+                || (dto.getType().intValue() == Status.REFUND.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue())
+                || (dto.getType().intValue() == Status.REFUND.getValue() && dto.getOrderType().intValue() == Status.BARGAIN.getValue())
+                ){
+            info = userInfoMapper.selectByPrimaryKey(dto.getSellerId());
+            dto.setImgUrl(info.getHeadImgUrl());
+        }else{
+            info = userInfoMapper.selectByPrimaryKey(66);
+        }
+        if(info != null){
+            dto.setImgUrl(info.getHeadImgUrl());
+        }
+        return dto;
     }
 
     @Override
-    public void addUserBalanceDetail(Integer userId, BigDecimal amount, Integer payType, Integer type, String orderNo, String title,Integer orderType,Integer sellerId,Integer buyerId) throws ServiceException {
-        //TODO 确认下单后生成用户和平台收支表信息
+    public void addUserBalanceDetail(Integer userId, BigDecimal amount, Integer payType, Integer type, String orderNo, String title,Integer orderType,Integer sellerId,Integer buyerId,String payNo) throws ServiceException {
+        //确认下单后生成用户和平台收支表信息
         UserWallet userWallet = userWalletMapper.selectByUserId(userId);
 
         UserBalanceDetail userBalance = new UserBalanceDetail();
@@ -504,7 +510,9 @@ public class WalletServiceImpl implements WalletService{
         userBalance.setOrderType(orderType);
         userBalance.setSellerId(sellerId);
         userBalance.setBuyerId(buyerId);
+        userBalance.setPayNo(payNo);
         userBalanceDetailMapper.insert(userBalance);
+        platformFinanceService.saveFinace(userId,amount,payType,type,orderNo,title,orderType,sellerId, buyerId,payNo);
 
     }
 
@@ -520,5 +528,100 @@ public class WalletServiceImpl implements WalletService{
         //充值
         updateBalance(userRechargeDetail.getUserId(),userRechargeDetail.getAmount(),1);
         return true;
+    }
+
+    @Override
+    public BillMonthDto monthlyBalance(Integer userId, String startDate) throws ServiceException {
+        String endDate = DateUtil.getFormatDate(DateUtil.getDateAfterMonth(DateUtil.getDate(startDate,DateUtil.DATE_FORMT_MONTH),1),DateUtil.DATE_FORMT_MONTH);
+        List<Map<String, Object>> monthlyBalance = userBalanceDetailMapper.monthlyBalance(userId, startDate,endDate);
+        BillMonthDto billMonthDto = new BillMonthDto();
+        BigDecimal income = new BigDecimal(0).setScale(2,BigDecimal.ROUND_HALF_UP);
+        BigDecimal disburse = new BigDecimal(0).setScale(2,BigDecimal.ROUND_HALF_UP);
+        if(monthlyBalance != null && monthlyBalance.size() > 0){
+            for(Map<String,Object> map:monthlyBalance){
+                if((int)map.get("type") == 1){
+                    income = income.add((BigDecimal) map.get("amount"));
+                }
+                if((int)map.get("type") == 2){
+                    disburse = disburse.add((BigDecimal) map.get("amount"));
+                }
+                if((int)map.get("type") == 3){
+                    income = income.add((BigDecimal) map.get("amount"));
+                }
+            }
+        }
+        billMonthDto.setIncome(income);
+        billMonthDto.setDisburse(disburse);
+        return billMonthDto;
+    }
+
+
+    @Override
+    public Pager userFinance(AdminWalletParam param) throws ServiceException {
+        Integer total = userBalanceDetailMapper.countPage(param.getPayType(),param.getOrderType(),param.getType(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
+        List<UserBalanceDetail> details = userBalanceDetailMapper.getPage(param.getPayType(),param.getOrderType(),param.getType(),param.getStart()*param.getLimit(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+        List<AdminUserBalanceDto> datas = AdminUserBalanceDto.toDtoList(details);
+        Pager pager = new Pager();
+        pager.setTotal(total);
+        pager.setDatas(datas);
+        return pager;
+    }
+
+    @Override
+    public Pager withdrawList(AdminWalletParam param) throws ServiceException {
+        Integer total = userWithdrawMapper.countPage(param.getPayType(),param.getStatus(),param.getKeyword(),param.getStartDate(),param.getEndDate());
+        List<UserWithdraw> userWithdraws = userWithdrawMapper.getPage(param.getPayType(),param.getStatus(),param.getStart()*param.getLimit(),param.getLimit(),param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+        List<AdminWithdrawDto> datas = AdminWithdrawDto.toDtoList(userWithdraws);
+        Pager pager = new Pager();
+        pager.setTotal(total);
+        pager.setDatas(datas);
+        return pager;
+    }
+
+    @Override
+    public void updateWithdraw(Integer id, Integer status,String content) throws ServiceException {
+        UserWithdraw userWithdraw = userWithdrawMapper.selectByPrimaryKey(id);
+        if(userWithdraw == null){
+            throw new ServiceException("未找到申请信息！");
+        }
+        userWithdraw.setStatus(status);
+        userWithdraw.setContent(content);
+        if(status.intValue() == Status.WITHDRAW_AGGRES.getValue()){
+            schedualMessageService.easemobMessage(userWithdraw.getUserId().toString(),"您在小方圆申请￥"+userWithdraw.getAmount()+"的提现申请已通过审核",
+                    Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
+        }else if(status.intValue() == Status.WITHDRAW_REFUSE.getValue()){
+            updateBalance(userWithdraw.getUserId(),userWithdraw.getAmount(),Status.ADD.getValue());
+            //订单号
+            final IdGenerator idg = IdGenerator.INSTANCE;
+            String orderNo = idg.nextId();
+            addUserBalanceDetail(userWithdraw.getUserId(),userWithdraw.getAmount(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"提现拒绝退款",Status.WITHDRAW.getValue(),null,userWithdraw.getUserId(),orderNo);
+            schedualMessageService.easemobMessage(userWithdraw.getUserId().toString(),"您在小方圆申请￥"+userWithdraw.getAmount()+"的提现申请已被拒绝，拒绝原因："+content,
+                    Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
+        }
+    }
+
+    @Override
+    public void updateUserBalance(Integer userId, Integer type, BigDecimal amount) throws ServiceException {
+        UserWallet userWallet = userWalletMapper.selectByUserId(userId);
+        if(userWallet == null){
+            throw new ServiceException("获取钱包信息失败！");
+        }else {
+            if (type.intValue() == Status.ADD.getValue()) {
+                userWallet.setBalance(userWallet.getBalance().add(amount));
+            } else if (type.intValue() == Status.SUB.getValue()) {
+                if (userWallet.getBalance().compareTo(amount) < 0) {//余额小于消费金额
+                    throw new ServiceException("余额不足！");
+                } else {
+                    userWallet.setBalance(userWallet.getBalance().subtract(amount));
+                }
+            } else {
+                throw new ServiceException("类型错误！");
+            }
+            userWalletMapper.updateByPrimaryKey(userWallet);
+            //订单号
+            final IdGenerator idg = IdGenerator.INSTANCE;
+            String orderNo = idg.nextId();
+            addUserBalanceDetail(userId,amount,Status.PAY_TYPE_BALANCE.getValue(),type,orderNo,type==1?"系统增加余额":"系统扣除余额",Status.SYSTEM_UPDATE.getValue(),null,userId,orderNo);
+        }
     }
 }

@@ -3,7 +3,6 @@ package com.fangyuanyouyue.user.service;
 import com.fangyuanyouyue.base.BasePageReq;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.user.dto.AdminUserDto;
 
 /**
  * 实名认证相关接口

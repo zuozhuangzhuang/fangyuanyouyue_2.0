@@ -25,4 +25,6 @@ public interface SchedualUserService {
     @RequestMapping(value = "/userFeign/verifyPayPwd",method = RequestMethod.POST)
     String verifyPayPwd(@RequestParam(value = "userId")Integer userId, @RequestParam(value = "payPwd") String payPwd);
 
+    @RequestMapping(value = "/userFeign/userIsAuth",method = RequestMethod.POST)
+    String userIsAuth(@RequestParam(value = "userId") Integer userId);
 }

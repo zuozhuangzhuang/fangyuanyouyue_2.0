@@ -1,100 +1,113 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.fangyuanyouyue.forum.dao.ForumPvMapper" >
-  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.forum.model.ForumPv" >
-    <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="user_id" property="userId" jdbcType="INTEGER" />
-    <result column="forum_id" property="forumId" jdbcType="INTEGER" />
-    <result column="add_time" property="addTime" jdbcType="TIMESTAMP" />
-    <result column="column_id" property="columnId" jdbcType="INTEGER" />
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangyuanyouyue.forum.dao.ForumPvMapper">
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.forum.model.ForumPv">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="forum_id" jdbcType="INTEGER" property="forumId" />
+    <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
+    <result column="column_id" jdbcType="INTEGER" property="columnId" />
+    <result column="type" jdbcType="INTEGER" property="type" />
   </resultMap>
-  <sql id="Base_Column_List" >
-    id, user_id, forum_id, add_time, column_id
+  <sql id="Base_Column_List">
+    id, user_id, forum_id, add_time, column_id, type
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from forum_pv
     where id = #{id,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from forum_pv
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ForumPv" useGeneratedKeys="true" keyProperty="id">
     insert into forum_pv (id, user_id, forum_id, 
-      add_time, column_id)
+      add_time, column_id, type
+      )
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{forumId,jdbcType=INTEGER}, 
-      #{addTime,jdbcType=TIMESTAMP}, #{columnId,jdbcType=INTEGER})
+      #{addTime,jdbcType=TIMESTAMP}, #{columnId,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}
+      )
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.forum.model.ForumPv" >
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.forum.model.ForumPv" useGeneratedKeys="true" keyProperty="id">
     insert into forum_pv
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         id,
       </if>
-      <if test="userId != null" >
+      <if test="userId != null">
         user_id,
       </if>
-      <if test="forumId != null" >
+      <if test="forumId != null">
         forum_id,
       </if>
-      <if test="addTime != null" >
+      <if test="addTime != null">
         add_time,
       </if>
-      <if test="columnId != null" >
+      <if test="columnId != null">
         column_id,
       </if>
+      <if test="type != null">
+        type,
+      </if>
     </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         #{id,jdbcType=INTEGER},
       </if>
-      <if test="userId != null" >
+      <if test="userId != null">
         #{userId,jdbcType=INTEGER},
       </if>
-      <if test="forumId != null" >
+      <if test="forumId != null">
         #{forumId,jdbcType=INTEGER},
       </if>
-      <if test="addTime != null" >
+      <if test="addTime != null">
         #{addTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="columnId != null" >
+      <if test="columnId != null">
         #{columnId,jdbcType=INTEGER},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.forum.model.ForumPv" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.forum.model.ForumPv">
     update forum_pv
-    <set >
-      <if test="userId != null" >
+    <set>
+      <if test="userId != null">
         user_id = #{userId,jdbcType=INTEGER},
       </if>
-      <if test="forumId != null" >
+      <if test="forumId != null">
         forum_id = #{forumId,jdbcType=INTEGER},
       </if>
-      <if test="addTime != null" >
+      <if test="addTime != null">
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="columnId != null" >
+      <if test="columnId != null">
         column_id = #{columnId,jdbcType=INTEGER},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.forum.model.ForumPv" >
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.forum.model.ForumPv">
     update forum_pv
     set user_id = #{userId,jdbcType=INTEGER},
       forum_id = #{forumId,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      column_id = #{columnId,jdbcType=INTEGER}
+      column_id = #{columnId,jdbcType=INTEGER},
+      type = #{type,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <select id="countById" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
+  <select id="countById" parameterType="java.lang.Integer" resultType="java.lang.Integer">
     select count(*) from forum_pv where forum_id = #{forumId,jdbcType=INTEGER}
   </select>
   
-  <select id="countByUserId" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
+  <select id="countByUserId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
     select count(*) from forum_pv where forum_id = #{forumId,jdbcType=INTEGER} and user_id = #{userId,jdbcType=INTEGER}
   </select>
 
@@ -103,6 +116,13 @@
   </select>
 
   <select id="getCountByColumnId" resultType="Integer">
-    select count(*) from forum_pv where column_id = #{columnId} and add_time <![CDATA[ >= ]]> #{date}
+    select count(*) from forum_pv where column_id = #{columnId} and add_time <![CDATA[ >= ]]> #{startTime} and type = #{type}
+    <if test="endTime != null and endTime != ''">
+      and add_time <![CDATA[ < ]]> #{endTime}
+    </if>
+  </select>
+  
+  <select id="dailyWage" resultType="Map">
+    select count(*) count,column_id columnId from forum_pv where add_time <![CDATA[ >= ]]> (CURDATE()-1) and add_time <![CDATA[ < ]]> CURDATE() and type = 1
   </select>
 </mapper>

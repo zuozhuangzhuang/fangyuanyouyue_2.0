@@ -2,6 +2,7 @@ package com.fangyuanyouyue.goods.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.goods.dao.*;
@@ -162,18 +163,18 @@ public class TimerServiceImpl implements TimerService{
                 //24h未处理的议价申请就拒绝
                 if((System.currentTimeMillis() - bargain.getAddTime().getTime()) > 24*60*60*1000){
 //                if((new Date().getTime() - bargain.getAddTime().getTime()) > 3*60*1000){
-                    bargain.setStatus(3);//状态 2同意 3拒绝 4取消
+                    bargain.setStatus(Status.BARGAIN_REFUSE.getValue());//状态 2同意 3拒绝 4取消
                     goodsBargainMapper.updateByPrimaryKey(bargain);
                     //退回余额
                     //调用wallet-service修改余额功能
-                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),1)), BaseResp.class);
+                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),Status.ADD.getValue())), BaseResp.class);
                     if(baseResp.getCode() == 1){
                         throw new ServiceException(baseResp.getReport().toString());
                     }
                     //议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
                     GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(bargain.getGoodsId());
                     schedualMessageService.easemobMessage(bargain.getUserId().toString(),
-                            "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情","2","2",bargain.getGoodsId().toString());
+                            "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),bargain.getGoodsId().toString());
                 }
             }
         }

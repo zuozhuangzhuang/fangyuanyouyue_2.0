@@ -509,6 +509,43 @@ public class WalletController extends BaseController{
         }
     }
 
+    @ApiOperation(value = "按照月份获取用户总收支", notes = "(BillMonthDto)按照月份获取用户总收支",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "date", value = "日期，例如：2018-08",  required = true,dataType = "String", paramType = "query")
+    })
+    @PostMapping(value = "/monthlyBalance")
+    @ResponseBody
+    public BaseResp monthlyBalance(WalletParam param) throws IOException {
+        try {
+            log.info("----》按照月份获取用户总收支《----");
+            log.info("参数："+param.toString());
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError("用户token不能为空！");
+            }
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            String verifyUser = schedualUserService.verifyUserById(userId);
+            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+            if(jsonObject != null && (Integer)jsonObject.get("code") != 0){
+                return toError(jsonObject.getString("report"));
+            }
+
+            if(StringUtils.isEmpty(param.getDate())){
+                return toError("日期不能为空！");
+            }
+            //按照月份获取用户总收支
+            BillMonthDto dto = walletService.monthlyBalance(userId, param.getDate());
+            return toSuccess(dto);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
 
     @ApiOperation(value = "获取用户的优惠券列表", notes = "(UserCouponDto)根据用户id获取优惠券列表")
     @ApiImplicitParams({

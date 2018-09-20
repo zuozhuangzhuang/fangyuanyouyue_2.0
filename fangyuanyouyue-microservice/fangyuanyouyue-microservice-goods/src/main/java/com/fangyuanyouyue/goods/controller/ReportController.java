@@ -43,7 +43,7 @@ public class ReportController extends BaseController {
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "businessId", value = "举报对象id", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "reason", value = "举报原因", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "type", value = "举报类型 1商品、抢购 2视频 3帖子 4全民鉴定 5用户", required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "type", value = "举报类型 1商品、抢购 2视频 3帖子 4全民鉴定", required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/reportGoods")
     @ResponseBody

@@ -3,10 +3,7 @@ package com.fangyuanyouyue.timer.controller;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.util.DateUtil;
-import com.fangyuanyouyue.timer.service.SchedualForumService;
-import com.fangyuanyouyue.timer.service.SchedualGoodsService;
-import com.fangyuanyouyue.timer.service.SchedualOrderService;
-import com.fangyuanyouyue.timer.service.SchedualWalletService;
+import com.fangyuanyouyue.timer.service.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -30,6 +27,8 @@ public class TimerController extends BaseController {
     private SchedualWalletService schedualWalletService;
     @Autowired
     private SchedualForumService schedualForumService;
+    @Autowired
+    private SchedualUserService schedualUserService;
 
     @Scheduled(cron="0 * *  * * ? ")
     public BaseResp depreciate() throws IOException {
@@ -69,17 +68,17 @@ public class TimerController extends BaseController {
         }
     }
 
-    @Scheduled(cron="0 * *  * * ? ")
-    public BaseResp updateLevel() throws IOException {
-        try {
-            log.info("----》修改用户等级《----");
-            schedualWalletService.updateLevel();
-            return toSuccess();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return toError("系统繁忙，请稍后再试！");
-        }
-    }
+//    @Scheduled(cron="0 * *  * * ? ")
+//    public BaseResp updateLevel() throws IOException {
+//        try {
+//            log.info("----》修改用户等级《----");
+//            schedualWalletService.updateLevel();
+//            return toSuccess();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return toError("系统繁忙，请稍后再试！");
+//        }
+//    }
 
 
     @Scheduled(cron="0 * *  * * ? ")
@@ -133,8 +132,31 @@ public class TimerController extends BaseController {
 
     //TODO 优惠券自动过期
 
-    //TODO 官方认证自动过期（一年）
+    @Scheduled(cron="0 0 0  * * ? ")
+    public BaseResp shopAuthTimeOut() throws IOException {
+        try {
+            log.info("----》官方认证自动过期《----");
+            schedualUserService.shopAuthTimeOut();
+            return toSuccess();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
 
-    //TODO 每天上午08:00 结算专栏返利，200新增浏览量（当前日期前一天0时到24时新增浏览量）/元，浏览量为奇数时，浏览量-1再计算返利金额，直接返到用户余额，并提示用户，新增余额账单
+
+
+    @Scheduled(cron="0 0 8 * * ? ")
+    public BaseResp dailyWage() throws IOException {
+        try {
+            log.info("----》专栏返利《----");
+            schedualForumService.dailyWage();
+            return toSuccess();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
 
 }

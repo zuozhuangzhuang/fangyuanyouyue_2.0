@@ -1,4 +1,4 @@
-package com.fangyuanyouyue.user.dto;
+package com.fangyuanyouyue.user.dto.admin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,7 +87,7 @@ public class AdminUserDto {
 
     public static List<AdminUserDto> toDtoList(List<UserInfo> list) {
         if (list == null) {
-            return null;
+            return new ArrayList<>();
         }
         List<AdminUserDto> dtolist = new ArrayList<>();
         for (UserInfo model : list) {

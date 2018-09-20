@@ -6,6 +6,7 @@ import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.goods.dto.adminDto.AdminBannerDto;
 import com.fangyuanyouyue.goods.param.AdminGoodsParam;
+import com.fangyuanyouyue.goods.service.AppraisalService;
 import com.fangyuanyouyue.goods.service.BannerService;
 import com.fangyuanyouyue.goods.service.GoodsInfoService;
 import com.fangyuanyouyue.goods.service.ReportService;
@@ -35,7 +36,8 @@ public class AdminController  extends BaseController {
     private GoodsInfoService goodsInfoService;
     @Autowired
     private ReportService reportService;
-
+    @Autowired
+    private AppraisalService appraisalService;
 
     //TODO 新增首页轮播图
     @ApiOperation(value = "新增首页轮播图", notes = "(BannerIndex)新增首页轮播图",response = BaseResp.class)
@@ -43,7 +45,7 @@ public class AdminController  extends BaseController {
             @ApiImplicitParam(name = "businessId", value = "业务ID：例：商品id、视频id、积分商城商品id...", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "jumpType", value = "跳转类型 1页面 2链接 3图片（businessId为空）", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "businessType", value = "业务类型 1商品详情、2抢购详情、3帖子详情、4全民鉴定详情、5视频详情、6专栏 7积分商品", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "type", value = "类型 1首页 2商城 3积分商城", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1首页 2商品详情 3积分商城", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "title", value = "描述标题", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "imgUrl", value = "图片地址", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "sort", value = "排序", required = true, dataType = "int", paramType = "query")
@@ -123,7 +125,7 @@ public class AdminController  extends BaseController {
             @ApiImplicitParam(name = "businessId", value = "业务ID：例：商品id、视频id、积分商城商品id...", required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "jumpType", value = "跳转类型 1页面 2链接 3图片（businessId为空）", required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "businessType", value = "业务类型 1商品详情、2抢购详情、3帖子详情、4全民鉴定详情、5视频详情、6专栏 7积分商品", required = false, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "type", value = "类型 1首页 2商城 3积分商城", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1首页 2商品详情 3积分商城", required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "title", value = "描述标题", required = false, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "imgUrl", value = "图片地址", required = false, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "sort", value = "排序", required = false, dataType = "int", paramType = "query"),
@@ -348,8 +350,78 @@ public class AdminController  extends BaseController {
         try {
             log.info("----》获取举报商品列表《----");
             log.info("参数："+param.toString());
+            if(param.getStart() == null || param.getStart() < 0){
+                return toError("起始页数错误！");
+            }
+            if(param.getLimit() == null || param.getLimit() < 1){
+                return toError("每页个数错误！");
+            }
             Pager pager = reportService.getGoodsReportPage(param);
             return toPage(pager);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+
+    @ApiOperation(value = "官方鉴定列表", notes = "官方鉴定列表",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "type", value = "鉴定类型 1商家鉴定 2买家 3普通用户", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "keyword", value = "搜索词条", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "状态 0申请 1真 2假 3存疑", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "startDate", value = "开始日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "endDate", value = "结束日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orders", value = "排序规则", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "ascType", value = "排序类型 1升序 2降序", required = false, dataType = "int", paramType = "query")
+    })
+    @GetMapping(value = "/appraisalList")
+    @ResponseBody
+    public BaseResp appraisalList(AdminGoodsParam param) throws IOException {
+        try {
+            log.info("----》官方鉴定列表《----");
+            log.info("参数："+param.toString());
+            if(param.getStart() == null || param.getStart() < 0){
+                return toError("起始页数错误！");
+            }
+            if(param.getLimit() == null || param.getLimit() < 1){
+                return toError("每页个数错误！");
+            }
+            Pager pager = appraisalService.appraisalList(param);
+            return toPage(pager);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+
+    }
+
+    @ApiOperation(value = "后台处理官方鉴定", notes = "后台处理官方鉴定",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "官方鉴定", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "content", value = "处理原因", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "状态 1真 2假 3存疑", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "isShow", value = "是否鉴定展示 1是 2否", required = true, dataType = "int", paramType = "query")
+    })
+    @PutMapping(value = "/updateAppraisal")
+    @ResponseBody
+    public BaseResp updateAppraisal(AdminGoodsParam param) throws IOException {
+        try {
+            log.info("----》后台处理官方鉴定《----");
+            log.info("参数："+param.toString());
+            if(param.getId() == null){
+                return toError("id不能为空！");
+            }
+            appraisalService.updateAppraisal(param.getId(),param.getStatus(),param.getContent(),param.getIsShow());
+            return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());

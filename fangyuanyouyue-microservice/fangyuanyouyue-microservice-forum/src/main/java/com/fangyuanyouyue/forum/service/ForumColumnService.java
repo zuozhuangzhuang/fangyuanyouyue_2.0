@@ -56,14 +56,13 @@ public interface ForumColumnService {
 
 	/**
 	 * 处理专栏申请
-	 * @param userId
 	 * @param applyId
 	 * @param status
 	 * @param coverImgUrl
 	 * @param reason
 	 * @throws ServiceException
 	 */
-	void handle(Integer userId,Integer applyId,Integer status,String coverImgUrl,String reason) throws ServiceException;
+	void handle(Integer applyId,Integer status,String coverImgUrl,String reason) throws ServiceException;
 
 	/**
 	 * 专栏申请列表

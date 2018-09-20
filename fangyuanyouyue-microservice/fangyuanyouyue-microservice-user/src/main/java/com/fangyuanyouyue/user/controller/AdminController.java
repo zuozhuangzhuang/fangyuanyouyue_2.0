@@ -2,6 +2,7 @@ package com.fangyuanyouyue.user.controller;
 
 import java.io.IOException;
 
+import com.fangyuanyouyue.user.service.SystemService;
 import com.fangyuanyouyue.user.service.UserInfoExtService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,8 @@ public class AdminController extends BaseController {
     private UserInfoService userInfoService;
     @Autowired
     private UserInfoExtService userInfoExtService;
+    @Autowired
+    private SystemService systemService;
 
     @ApiOperation(value = "用户列表", notes = "用户列表",response = BaseResp.class)
     @ApiImplicitParams({
@@ -210,5 +213,37 @@ public class AdminController extends BaseController {
         }
     }
 
+
+
+    @ApiOperation(value = "意见反馈列表", notes = "意见反馈列表",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "keyword", value = "搜索词条", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "startDate", value = "开始日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "endDate", value = "结束日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orders", value = "排序规则", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "ascType", value = "排序类型 1升序 2降序", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1安卓 2iOS 3小程序", required = false, dataType = "int", paramType = "query")
+    })
+    @GetMapping(value = "/feedbackList")
+    @ResponseBody
+    public BaseResp feedbackList(AdminUserParam param) throws IOException {
+        try {
+            log.info("意见反馈列表");
+            log.info("参数："+param.toString());
+            if(param.getStart() == null || param.getStart() < 0){
+                return toError("起始页数错误！");
+            }
+            if(param.getLimit() == null || param.getLimit() < 1){
+                return toError("每页个数错误！");
+            }
+            Pager pager = systemService.feedbackList(param);
+            return toPage(pager);
+        }catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
 
 }

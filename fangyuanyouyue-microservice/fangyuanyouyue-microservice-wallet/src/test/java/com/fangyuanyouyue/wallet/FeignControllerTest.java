@@ -42,7 +42,7 @@ public class FeignControllerTest {
      * @throws Exception
      */
     @Test
-    @Transactional
+//    @Transactional
     public void updateScore() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/walletFeign/updateScore")
                 .param("userId","25")
@@ -163,13 +163,13 @@ public class FeignControllerTest {
                 .param("amount","10.00")
                 //支付类型 1微信 2支付宝 3余额 4小程序
                 .param("payType","1")
-                //收支类型 1收入 2支出
+                //收支类型 1收入 2支出 3退款
                 .param("type","1")
                 .param("orderNo","")
                 .param("title","")
                 .param("sellerId","")
                 .param("buyerId","")
-                //订单类型 1商品、抢购 2官方鉴定 3商品议价 4全民鉴定 5申请专栏 6充值 7开通、续费会员 8认证店铺
+                //订单类型 1商品、抢购 2官方鉴定 3商品议价 4全民鉴定 5专栏(申请专栏：支出、每日返利：收入、申请被拒：退款) 6充值 7提现 8开通会员 9续费会员 10认证店铺
                 .param("orderType", "1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())

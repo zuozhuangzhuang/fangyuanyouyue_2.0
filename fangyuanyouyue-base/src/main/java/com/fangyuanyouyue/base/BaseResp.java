@@ -1,5 +1,9 @@
 package com.fangyuanyouyue.base;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.io.Serializable;
 
 /**
@@ -7,6 +11,9 @@ import java.io.Serializable;
  * @author wuzhimin
  *
  */
+@Getter
+@Setter
+@ToString
 public class BaseResp implements Serializable {
 
 	/**
@@ -23,36 +30,4 @@ public class BaseResp implements Serializable {
 	// 数据
 	private Object data;
 
-	public Integer getCode() {
-		return code;
-	}
-
-	public void setCode(Integer code) {
-		this.code = code;
-	}
-
-	public String getReport() {
-		return report;
-	}
-
-	public void setReport(String report) {
-		this.report = report;
-	}
-
-	public Object getData() {
-		return data;
-	}
-
-	public void setData(Object data) {
-		this.data = data;
-	}
-
-	@Override
-	public String toString() {
-		return "BaseResp{" +
-				"code=" + code +
-				", report='" + report + '\'' +
-				", data=" + data +
-				'}';
-	}
 }

@@ -34,7 +34,7 @@ public class SchedualWalletServiceImpl implements SchedualWalletService{
     }
 
     @Override
-    public String addUserBalanceDetail(Integer userId, BigDecimal amount, Integer payType, Integer type, String orderNo, String title, Integer sellerId, Integer buyerId, Integer orderType) {
+    public String addUserBalanceDetail(Integer userId, BigDecimal amount, Integer payType, Integer type, String orderNo, String title, Integer sellerId, Integer buyerId, Integer orderType,String payNo) {
         return "新增用户收支信息失败！";
     }
 

@@ -1,10 +1,12 @@
 package com.fangyuanyouyue.wallet.service;
 
+import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.wallet.dto.BillMonthDto;
 import com.fangyuanyouyue.wallet.dto.UserBalanceDto;
 import com.fangyuanyouyue.wallet.dto.WalletDto;
+import com.fangyuanyouyue.wallet.param.AdminWalletParam;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -39,14 +41,6 @@ public interface WalletService {
      */
     WalletDto getWallet(Integer userId) throws ServiceException;
 
-    /**
-     * 修改积分
-     * @param userId
-     * @param score
-     * @param type 1 增加 2减少
-     * @throws ServiceException
-     */
-    void updateScore(Integer userId,Long score,Integer type) throws ServiceException;
 
     /**
      * 修改余额
@@ -155,14 +149,60 @@ public interface WalletService {
      * 新增用户收支信息
      * @param userId
      * @param amount
-     * @param payType
-     * @param type
+     * @param payType 支付类型 1微信 2支付宝 3余额 4小程序
+     * @param type 收支类型 1收入 2支出 3退款
      * @param orderNo
      * @param title
-     * @param orderType
+     * @param orderType 订单类型 1商品、抢购 2官方鉴定 3商品议价 4全民鉴定 5专栏(申请专栏：支出、每日返利：收入、申请被拒：退款) 6充值 7提现 8开通会员 9续费会员 10认证店铺
      * @param sellerId
      * @param buyerId
+     * @param payNo
      * @throws ServiceException
      */
-    void addUserBalanceDetail(Integer userId,BigDecimal amount,Integer payType,Integer type, String orderNo, String title,Integer orderType,Integer sellerId,Integer buyerId) throws ServiceException;
+    void addUserBalanceDetail(Integer userId,BigDecimal amount,Integer payType,Integer type, String orderNo, String title,Integer orderType,Integer sellerId,Integer buyerId,String payNo) throws ServiceException;
+
+    /**
+     * 按照月份获取用户总收支
+     * @param userId
+     * @param date
+     * @return
+     * @throws ServiceException
+     */
+    BillMonthDto monthlyBalance(Integer userId,String date) throws ServiceException;
+
+
+    /**
+     * 后台查看用户收支信息
+     * @param param
+     * @return
+     * @throws ServiceException
+     */
+    Pager userFinance(AdminWalletParam param) throws ServiceException;
+
+    /**
+     * 提现申请管理
+     * @param param
+     * @return
+     * @throws ServiceException
+     */
+    Pager withdrawList(AdminWalletParam param) throws ServiceException;
+
+    /**
+     * 修改提现申请
+     * @param id
+     * @param status
+     * @param content
+     * @throws ServiceException
+     */
+    void updateWithdraw(Integer id,Integer status,String content) throws ServiceException;
+
+    /**
+     * 编辑用户余额
+     * @param id
+     * @param type
+     * @param amount
+     * @throws ServiceException
+     */
+    void updateUserBalance(Integer id,Integer type,BigDecimal amount) throws ServiceException;
+
 }

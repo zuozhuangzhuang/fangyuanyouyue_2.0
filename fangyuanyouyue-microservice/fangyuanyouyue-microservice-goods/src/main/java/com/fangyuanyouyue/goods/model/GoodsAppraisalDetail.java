@@ -40,4 +40,8 @@ public class GoodsAppraisalDetail {
     private Integer isShow;//是否鉴定展示 1是 2否
 
     private Integer userId;//用户ID
+
+    //用户昵称
+    private String nickName;
+
 }

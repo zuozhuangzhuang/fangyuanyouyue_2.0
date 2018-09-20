@@ -41,6 +41,8 @@ public class FeignController extends BaseController{
     private UserCouponService userCouponService;
     @Autowired
     private UserBehaviorService userBehaviorService;
+    @Autowired
+    private ScoreService scoreService;
 
 
     @PostMapping(value = "/updateScore")
@@ -59,7 +61,7 @@ public class FeignController extends BaseController{
                 return toError("类型错误！");
             }
             //修改积分
-            walletService.updateScore(param.getUserId(),param.getScore(),param.getType());
+            scoreService.updateScore(param.getUserId(),param.getScore(),param.getType());
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
@@ -259,11 +261,11 @@ public class FeignController extends BaseController{
     @ApiOperation(value = "新增用户收支信息", notes = "(void)新增用户收支信息",hidden = true)
     @PostMapping(value = "/addUserBalanceDetail")
     @ResponseBody
-    public BaseResp addUserBalanceDetail(Integer userId,BigDecimal amount,Integer payType,Integer type, String orderNo, String title,Integer sellerId,Integer buyerId,Integer orderType) throws IOException {
+    public BaseResp addUserBalanceDetail(Integer userId,BigDecimal amount,Integer payType,Integer type, String orderNo, String title,Integer sellerId,Integer buyerId,Integer orderType,String payNo) throws IOException {
         try {
             log.info("----》新增用户收支信息《----");
             //新增用户收支信息
-            walletService.addUserBalanceDetail(userId,amount,payType,type,orderNo,title,orderType,sellerId,buyerId);
+            walletService.addUserBalanceDetail(userId,amount,payType,type,orderNo,title,orderType,sellerId,buyerId,payNo);
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();

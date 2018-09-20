@@ -6,6 +6,7 @@ import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
@@ -124,7 +125,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 						throw new ServiceException("支付密码错误！");
 					} else {
 						//调用wallet-service修改余额功能,成为栏主200元/人
-						BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, new BigDecimal(200), 2)), BaseResp.class);
+						BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, new BigDecimal(200), Status.SUB.getValue())), BaseResp.class);
 						if (baseResp.getCode() == 1) {
 							throw new ServiceException(baseResp.getReport().toString());
 						}
@@ -163,11 +164,14 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 			//修改订单状态
 			columnOrder.setStatus(2);
 			columnOrderMapper.updateByPrimaryKey(columnOrder);
+			//订单号
+			final IdGenerator idg = IdGenerator.INSTANCE;
+			String id = idg.nextId();
 			//系统消息：您的【专栏名称】专栏申请已提交，将于3个工作日内完成审核，请注意消息通知
 			schedualMessageService.easemobMessage(columnOrder.getUserId().toString(),
-					"您的【"+columnOrder.getName()+"】专栏申请已提交，将于3个工作日内完成审核，请注意消息通知","1","1","");
+					"您的【"+columnOrder.getName()+"】专栏申请已提交，将于3个工作日内完成审核，请注意消息通知",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
 			//余额账单
-			schedualWalletService.addUserBalanceDetail(columnOrder.getUserId(),columnOrder.getAmount(),payType,2,orderNo,columnOrder.getName(),null,columnOrder.getUserId(),5);
+			schedualWalletService.addUserBalanceDetail(columnOrder.getUserId(),columnOrder.getAmount(),payType,Status.EXPEND.getValue(),orderNo,"申请专栏【"+columnOrder.getName()+"】",null,columnOrder.getUserId(),Status.FORUM_COLUMN.getValue(),thirdOrderNo);
 			return true;
 		}catch (Exception e){
 			throw e;
@@ -175,38 +179,43 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 	}
 
 	@Override
-	public void handle(Integer userId, Integer applyId, Integer status,String coverImgUrl,String reason) throws ServiceException {
+	public void handle(Integer applyId, Integer status,String coverImgUrl,String reason) throws ServiceException {
 		ForumColumnApply forumColumnApply = forumColumnApplyMapper.selectByPrimaryKey(applyId);
 		if(forumColumnApply == null){
 			throw new ServiceException("申请信息不存在！");
 		}else{
 			if(forumColumnApply.getStatus() != 0){
 				throw new ServiceException("申请信息状态异常！");
-			}else{
-				if(status == 1){
-//					if(StringUtils.isEmpty(coverImgUrl)){
-//						throw new ServiceException("封面图片地址不能为空");
-//					}
+			}else {
+				if (status.intValue() == Status.YES.getValue()) {
+					if (StringUtils.isEmpty(coverImgUrl)) {
+						throw new ServiceException("封面图片地址不能为空");
+					}
 					ForumColumn forumColumn = new ForumColumn();
 					forumColumn.setUserId(forumColumnApply.getUserId());
 					forumColumn.setName(forumColumnApply.getColumnName());
 					forumColumn.setCoverImgUrl(coverImgUrl);
 					forumColumn.setFansCount(0);
 					forumColumn.setAddTime(DateStampUtils.getTimesteamp());
-					forumColumn.setIsChosen(2);//是否精选1是 2否
+					forumColumn.setIsChosen(Status.NO.getValue());//是否精选1是 2否
 					forumColumn.setTypeId(forumColumnApply.getTypeId());
 					forumColumnMapper.insert(forumColumn);
 					//系统消息：您的【专栏名称】专栏申请已提交，将于3个工作日内完成审核，请注意消息通知
 					schedualMessageService.easemobMessage(forumColumnApply.getUserId().toString(),
-							"恭喜您，您申请的专栏已通过官方审核！快拉您的好友一起来交流学习吧~","6","1",forumColumn.getId().toString());
-				}else if(status == 2){
+							"恭喜您，您申请的专栏已通过官方审核！快拉您的好友一起来交流学习吧~",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_COLUMN.getMessage(),forumColumn.getId().toString());
+				}else if(status.intValue() == Status.NO.getValue()){
 					if(StringUtils.isEmpty(reason)){
 						throw new ServiceException("拒绝原因不能为空");
 					}
 					forumColumnApply.setReason(reason);
 					//很抱歉您的【专栏名称】专栏审核未通过，可联系客服咨询详情
 					schedualMessageService.easemobMessage(forumColumnApply.getUserId().toString(),
-							"很抱歉您的【专栏名称】专栏审核未通过，可联系客服咨询详情","1","1","");
+							"很抱歉您的【"+forumColumnApply.getColumnName()+"】专栏审核未通过，可联系客服咨询详情",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
+					//余额账单
+					//订单号
+					final IdGenerator idg = IdGenerator.INSTANCE;
+					String orderNo = idg.nextId();
+					schedualWalletService.addUserBalanceDetail(forumColumnApply.getUserId(),new BigDecimal(200), Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"申请【"+forumColumnApply.getColumnName()+"】专栏失败退款",null,forumColumnApply.getUserId(),Status.FORUM_COLUMN.getValue(),orderNo);
 				}else{
 					throw new ServiceException("状态值错误！");
 				}
@@ -234,7 +243,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 		MyColumnDto myColumnDto = new MyColumnDto();
 		List<ForumInfoDto> forumList = forumInfoService.getForumList(userId,forumColumn.getId(), null, 1, null, start, limit, 1, null);
 		Date date = DateUtil.getTimestamp(DateUtil.getCurrentTime(),DateUtil.DATE_FORMT_YEAR);
-		Integer countByColumnId = forumPvMapper.getCountByColumnId(forumColumn.getId(), date);
+		Integer countByColumnId = forumPvMapper.getCountByColumnId(forumColumn.getId(), date,null,1);
 		myColumnDto.setColumnId(forumColumn.getId());
 		myColumnDto.setName(forumColumn.getName());
 		myColumnDto.setTodayPvCount(countByColumnId);

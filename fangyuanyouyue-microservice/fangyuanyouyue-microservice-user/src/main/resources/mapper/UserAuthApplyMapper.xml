@@ -136,11 +136,11 @@
   
     
   <select id="countPage" parameterType="Integer" resultType="Integer">
-    select count(*) from user_auth_apply a,user_info_ext b where a.user_id=b.id
+    select count(*) from user_auth_apply a,user_info b where a.user_id=b.id
     <if test="keyword != null">
-      and ( 
-        b.name like "%"#{keyword,jdbcType=VARCHAR}"%"
-        or b.identity like "%"#{keyword,jdbcType=VARCHAR}"%"
+      and (
+        b.nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
+        or b.phone like "%"#{keyword,jdbcType=VARCHAR}"%"
       )
     </if>
     <if test="status != null">
@@ -184,7 +184,10 @@
     </if>
     limit #{start},#{limit}
   </select>
-  
+
+  <select id="selectByEndTime" resultMap="BaseResultMap">
+    select * from user_auth_apply where end_time <![CDATA[ <= ]]> #{endTime} and status = #{status}
+  </select>
   
   
   
