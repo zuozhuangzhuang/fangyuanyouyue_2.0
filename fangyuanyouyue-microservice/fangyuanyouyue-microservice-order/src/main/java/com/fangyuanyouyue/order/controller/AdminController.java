@@ -144,13 +144,22 @@ public class AdminController extends BaseController{
         try {
             log.info("----》增加物流公司《----");
             log.info("参数："+param.toString());
+            
             if(param.getNumber() == null){
                 return toError("物流公司编号不能为空！");
             }
             if(param.getName() == null){
                 return toError("物流公司名不能为空！");
             }
-           orderService.addCompany(param.getNumber(),param.getName(),param.getPrice());
+
+            if(param.getId()!=null&&param.getId()>0) {
+
+                orderService.updateCompany(param.getId(),param.getNumber(),param.getName(),param.getPrice(), param.getStatus());
+            }else {
+                orderService.addCompany(param.getNumber(),param.getName(),param.getPrice());
+            	
+            }
+            
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();

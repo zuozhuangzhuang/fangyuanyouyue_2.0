@@ -240,7 +240,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
 
         Integer total = userAuthApplyMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
 
-        List<IdentityAuthApply> datas = identityAuthApplyMapper.getPage(param.getStart()*param.getLimit(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+        List<IdentityAuthApply> datas = identityAuthApplyMapper.getPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
         Pager pager = new Pager();
         pager.setTotal(total);
         pager.setDatas(datas);
