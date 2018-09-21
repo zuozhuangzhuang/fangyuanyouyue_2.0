@@ -48,4 +48,17 @@ public class TimerControllerTest {
                 .andReturn();
     }
 
+    /**
+     * 送优惠券
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void sendCoupon() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/timer/sendCoupon")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
 }

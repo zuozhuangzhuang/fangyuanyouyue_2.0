@@ -68,6 +68,12 @@ public enum Status {
 
     //代金券 1未使用 2已使用
     COUPON_NOTUSE(1,"未使用"),COUPON_USED(2,"已使用"),
+
+    //用户状态 1正常 2冻结 3删除
+    USER_FROZEN(2),USER_DELETE(3),
+
+    //限制余额状态 0限制 1未限制
+    IS_CONFINED(0),NOT_CONFINED(1),
     ;
     private Integer value;
     private String message;

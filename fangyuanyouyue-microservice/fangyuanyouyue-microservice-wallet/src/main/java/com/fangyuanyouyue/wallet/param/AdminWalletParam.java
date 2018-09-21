@@ -30,4 +30,10 @@ public class AdminWalletParam extends BasePageReq{
     @ApiModelProperty(name = "amount", value = "金额", dataType = "BigDecimal",hidden = true)
     private BigDecimal amount;//金额
 
+    @ApiModelProperty(name = "vipLevel", value = "会员等级", dataType = "int",hidden = true)
+    private Integer vipLevel;//会员等级
+
+    @ApiModelProperty(name = "vipType", value = "会员类型", dataType = "int",hidden = true)
+    private Integer vipType;//会员类型
+
 }

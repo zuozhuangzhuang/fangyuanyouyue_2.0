@@ -3,6 +3,7 @@ package com.fangyuanyouyue.wallet.service;
 import com.fangyuanyouyue.base.exception.ServiceException;
 
 import javax.xml.ws.Service;
+import java.text.ParseException;
 
 public interface TimerService {
     /**
@@ -16,4 +17,10 @@ public interface TimerService {
      * @throws ServiceException
      */
     void updateLevel() throws ServiceException;
+
+    /**
+     * 送优惠券
+     * @throws ServiceException
+     */
+    void sendCoupon() throws ServiceException, ParseException;
 }

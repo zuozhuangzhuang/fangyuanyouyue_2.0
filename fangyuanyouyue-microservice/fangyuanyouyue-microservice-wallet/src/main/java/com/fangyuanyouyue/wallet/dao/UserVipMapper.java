@@ -34,4 +34,10 @@ public interface UserVipMapper {
      * @return
      */
     List<UserVip> selectByEndTime(@Param("endTime")Date endTime);
+
+    /**
+     * 查询所有年费会员
+     * @return
+     */
+    List<UserVip> selectUserVipYear();
 }

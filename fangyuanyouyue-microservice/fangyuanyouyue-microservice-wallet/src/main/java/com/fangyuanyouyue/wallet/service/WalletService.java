@@ -205,4 +205,20 @@ public interface WalletService {
      */
     void updateUserBalance(Integer id,Integer type,BigDecimal amount) throws ServiceException;
 
+    /**
+     * 修改用户冻结状态
+     * @param id
+     * @param status
+     * @param amount
+     * @throws ServiceException
+     */
+    void updateUserFrozen(Integer id,Integer status,BigDecimal amount) throws ServiceException;
+
+    /**
+     * 后台设置限制用户使用余额
+     * @param userId
+     * @param status
+     * @throws ServiceException
+     */
+    void confinedUser(Integer userId,Integer status) throws ServiceException;
 }

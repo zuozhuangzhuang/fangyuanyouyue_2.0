@@ -267,6 +267,9 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
     public void updateShopAuth(Integer applyId, Integer status, String content) throws ServiceException {
 
         UserAuthApply model = userAuthApplyMapper.selectByPrimaryKey(applyId);
+        if(model == null){
+            throw new ServiceException("未找到申请信息！");
+        }
         model.setStatus(status);
         UserInfoExt ext = userInfoExtMapper.selectByUserId(model.getUserId());
         ext.setAuthType(status);

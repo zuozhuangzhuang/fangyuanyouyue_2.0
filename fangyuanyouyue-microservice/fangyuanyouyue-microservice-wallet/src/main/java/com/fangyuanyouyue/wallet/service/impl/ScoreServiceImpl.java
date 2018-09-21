@@ -11,6 +11,7 @@ import com.fangyuanyouyue.wallet.dto.BonusPoolDto;
 import com.fangyuanyouyue.wallet.model.*;
 import com.fangyuanyouyue.wallet.service.ScoreService;
 import com.fangyuanyouyue.wallet.service.UserCouponService;
+import com.fangyuanyouyue.wallet.service.UserVipService;
 import com.fangyuanyouyue.wallet.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,8 @@ public class ScoreServiceImpl implements ScoreService{
     private UserInfoMapper userInfoMapper;
     @Autowired
     private UserScoreDetailMapper userScoreDetailMapper;
+    @Autowired
+    private UserVipMapper userVipMapper;
 
     @Override
     public List<BonusPoolDto> getBonusPool() throws ServiceException {
@@ -113,15 +116,43 @@ public class ScoreServiceImpl implements ScoreService{
             if(type == 1){
                 //判断是否满500积分
                 Long userScore = userScoreDetailMapper.getUserScoreByDay(userId);
+                //铂金2倍 至尊4倍
+                UserVip userVip = userVipMapper.selectByUserId(userId);
+
                 //大于等于500不再加分，小于500：判断要增加的积分与500的差值，如果今日收益+要增加的积分>500，则增加500-今日收益的积分，否则增加原积分
                 if(userScore != null){
-                    if(userScore >= 500L) {
-                        return;
+                    if(userVip.getStatus().intValue() == Status.IS_VIP.getValue()){
+                        if(userVip.getVipLevel().intValue() == Status.VIP_LEVEL_LOW.getValue()){
+                            score = score * 2;
+                            if(userScore >= 1000L) {
+                                return;
+                            }else{
+                                if(userScore + score > 1000L){
+                                    score = 1000L - userScore;
+                                }
+                            }
+
+                        }else{
+                            score = score * 4;
+                            if(userScore >= 2000L) {
+                                return;
+                            }else{
+                                if(userScore + score > 2000L){
+                                    score = 2000L - userScore;
+                                }
+                            }
+
+                        }
                     }else{
-                        if(userScore + score > 500L){
-                            score = 500L - userScore;
+                        if(userScore >= 500L) {
+                            return;
+                        }else{
+                            if(userScore + score > 500L){
+                                score = 500L - userScore;
+                            }
                         }
                     }
+
                 }
                 userWallet.setScore(userWallet.getScore()+score);
                 userWallet.setPoint(userWallet.getPoint()+score);

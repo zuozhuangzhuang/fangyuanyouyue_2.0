@@ -7,7 +7,7 @@ import lombok.ToString;
 import java.util.Date;
 
 /**
- * 平台收支明细表
+ * 限制使用余额用户表
  */
 @Getter
 @Setter
