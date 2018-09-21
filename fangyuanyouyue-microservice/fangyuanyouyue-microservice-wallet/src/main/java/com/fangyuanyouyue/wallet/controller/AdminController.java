@@ -9,6 +9,7 @@ import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.wallet.dto.admin.AdminWithdrawDto;
 import com.fangyuanyouyue.wallet.param.AdminWalletParam;
 import com.fangyuanyouyue.wallet.service.PlatformFinanceService;
+import com.fangyuanyouyue.wallet.service.UserVipService;
 import com.fangyuanyouyue.wallet.service.WalletService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -34,6 +35,8 @@ public class AdminController extends BaseController{
     private PlatformFinanceService platformFinanceService;
     @Autowired
     private WalletService walletService;
+    @Autowired
+    private UserVipService userVipService;
 
 
     @ApiOperation(value = "查看平台收支", notes = "查看平台收支",response = BaseResp.class)
@@ -158,6 +161,9 @@ public class AdminController extends BaseController{
         try {
             log.info("修改提现申请");
             log.info("参数："+param.toString());
+            if(param.getId() == null){
+                return toError("申请信息id不能为空！");
+            }
             if(param.getStart() == null || param.getStart() < 0){
                 return toError("起始页数错误！");
             }
@@ -187,6 +193,9 @@ public class AdminController extends BaseController{
         try {
             log.info("----》编辑用户余额《----");
             log.info("参数："+param.toString());
+            if(param.getId() == null){
+                return toError("用户id不能为空！");
+            }
             if(param.getType()==null){
                 return toError("操作类型不能为空！");
             }
@@ -206,6 +215,94 @@ public class AdminController extends BaseController{
         }
     }
 
-    //TODO 冻结用户余额
-    //TODO 修改用户扩展信息
+
+    @ApiOperation(value = "修改冻结用户余额", notes = "修改冻结用户余额",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1冻结余额 2解除冻结金额", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "amount", value = "金额", required = false, dataType = "String", paramType = "query")
+    })
+    @PostMapping(value = "/updateUserConfined")
+    @ResponseBody
+    public BaseResp updateUserConfined(AdminWalletParam param) throws IOException {
+        try {
+            log.info("----》修改冻结用户余额《----");
+            log.info("参数："+param.toString());
+            if(param.getId() == null){
+                return toError("用户id不能为空！");
+            }
+            if(param.getType()==null){
+                return toError("操作类型不能为空！");
+            }
+            if(param.getAmount()==null){
+                return toError("金额不能为空");
+            }
+
+            walletService.updateUserFrozen(param.getId(),param.getType(),param.getAmount());
+
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统错误！");
+        }
+    }
+
+    @ApiOperation(value = "后台设置限制余额用户", notes = "后台设置限制余额用户",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "状态 1限制 2解除限制",  required = true,dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/confinedUser")
+    @ResponseBody
+    public BaseResp confinedUser(AdminWalletParam param) throws IOException {
+        try {
+            log.info("后台设置限制用户使用余额");
+            log.info(param.toString());
+            if(param.getId() == null){
+                return toError("用户id不能为空！");
+            }
+            if(param.getType() == null){
+                return toError("状态不能为空！");
+            }
+            walletService.confinedUser(param.getId(), param.getStatus());
+            return toSuccess();
+        }catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
+
+    @ApiOperation(value = "修改用户会员信息", notes = "修改用户会员信息",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "vipLevel", value = "会员等级 1铂金会员 2至尊会员",  required = true,dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "vipType", value = "会员类型 1一个月 2三个月 3一年会员",  required = true,dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/updateUserVip")
+    @ResponseBody
+    public BaseResp updateUserVip(AdminWalletParam param) throws IOException {
+        try {
+            log.info("修改用户会员信息");
+            log.info(param.toString());
+            if(param.getId() == null){
+                return toError("用户id不能为空！");
+            }
+            if(param.getVipLevel()==null){
+                return toError("会员等级不能为空！");
+            }
+            if(param.getVipType() == null){
+                return toError("会员类型不能为空！");
+            }
+            userVipService.updateUserVip(param.getId(), param.getVipLevel(),param.getVipType());
+            return toSuccess();
+        }catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
 }

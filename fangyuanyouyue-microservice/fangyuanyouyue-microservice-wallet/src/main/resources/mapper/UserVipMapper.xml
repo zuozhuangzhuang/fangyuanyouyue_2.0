@@ -188,4 +188,8 @@
   <select id="selectByEndTime" parameterType="Date" resultMap="BaseResultMap">
     select * from user_vip where end_time <![CDATA[ < ]]> #{endTime} and status = 1
   </select>
+
+  <select id="selectUserVipYear" resultMap="BaseResultMap">
+    select * from user_vip where vip_type = 3
+  </select>
 </mapper>

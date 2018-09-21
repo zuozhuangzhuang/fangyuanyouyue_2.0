@@ -82,4 +82,21 @@ public class TimerController extends BaseController {
         }
     }
 
+    @ApiOperation(value = "送优惠券", notes = "(void)送优惠券",response = BaseResp.class)
+    @PostMapping(value = "/sendCoupon")
+    @ResponseBody
+    public BaseResp sendCoupon() throws IOException {
+        try {
+            log.info("----》送优惠券《----");
+            timerService.sendCoupon();
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
 }

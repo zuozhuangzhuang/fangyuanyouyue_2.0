@@ -129,6 +129,12 @@ public class TimerServiceImpl implements TimerService{
                 goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
                 return;
             }
+            //抢购降价历史
+            GoodsIntervalHistory history = new GoodsIntervalHistory();
+            history.setGoodsId(goodsInfo.getId());
+            history.setAddTime(DateStampUtils.getTimesteamp());
+            history.setMarkdown(goodsInfo.getMarkdown());
+            history.setPreviousPrice(goodsInfo.getPrice());
             //应该降价数值
             BigDecimal shouldDown = goodsInfo.getMarkdown();
             //降价后价格
@@ -139,12 +145,6 @@ public class TimerServiceImpl implements TimerService{
             }else{
                 goodsInfo.setPrice(price);
             }
-            //抢购降价历史
-            GoodsIntervalHistory history = new GoodsIntervalHistory();
-            history.setGoodsId(goodsInfo.getId());
-            history.setAddTime(DateStampUtils.getTimesteamp());
-            history.setMarkdown(goodsInfo.getMarkdown());
-            history.setPreviousPrice(goodsInfo.getPrice());
             goodsInfo.setLastIntervalTime(nowTime);
             goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
             goodsIntervalHistoryMapper.insert(history);

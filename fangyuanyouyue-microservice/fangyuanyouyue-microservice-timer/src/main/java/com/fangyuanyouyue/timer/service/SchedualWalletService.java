@@ -67,4 +67,11 @@ public interface SchedualWalletService {
     String addUserBehavior(@RequestParam(value = "userId") Integer userId,@RequestParam(value = "toUserId") Integer toUserId,@RequestParam(value = "businessId") Integer businessId,
                            @RequestParam(value = "businessType") Integer businessType,@RequestParam(value = "type") Integer type);
 
+    /**
+     * 送优惠券
+     * @return
+     */
+    @RequestMapping(value = "/timer/sendCoupon",method = RequestMethod.POST)
+    String sendCoupon();
+
 }

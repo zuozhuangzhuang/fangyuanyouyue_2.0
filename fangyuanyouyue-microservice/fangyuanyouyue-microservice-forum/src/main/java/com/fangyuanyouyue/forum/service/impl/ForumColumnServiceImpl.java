@@ -85,7 +85,6 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 
 	@Override
 	public Object addColumn(Integer userId, Integer typeId,String name,Integer payType,String payPwd) throws ServiceException {
-		//如果已申请的用户超过50人，就必须要存在payType，前50人申请不需要支付
 		//name已存在的申请时返回
 		if(forumColumnMapper.selectByName(name)!=null){
 			throw new ServiceException("专栏名已存在！");
@@ -101,7 +100,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 				ColumnOrder columnOrder = new ColumnOrder();
 				columnOrder.setAmount(new BigDecimal(200));
 				columnOrder.setUserId(userId);
-				columnOrder.setStatus(1);//状态 1待支付 2已完成 3已删除
+				columnOrder.setStatus(Status.ORDER_UNPAID.getValue());//状态 1待支付 2已完成 3已删除
 				columnOrder.setAddTime(DateStampUtils.getTimesteamp());
 				columnOrder.setTypeId(typeId);
 				columnOrder.setName(name);
@@ -132,7 +131,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 					}
 					payInfo.append("余额支付成功！");
 					//生成申请记录
-					applyColumn(columnOrder.getOrderNo(), null, 3);
+					applyColumn(columnOrder.getOrderNo(), null, Status.PAY_TYPE_BALANCE.getValue());
 				}else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
 					WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.mini_test_notify.getNotifUrl()+NotifyUrl.column_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
 					return wechatPayDto;
@@ -162,7 +161,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 			forumColumnApply.setAddTime(DateStampUtils.getTimesteamp());
 			forumColumnApplyMapper.insert(forumColumnApply);
 			//修改订单状态
-			columnOrder.setStatus(2);
+			columnOrder.setStatus(Status.ORDER_COMPLETE.getValue());
 			columnOrderMapper.updateByPrimaryKey(columnOrder);
 			//订单号
 			final IdGenerator idg = IdGenerator.INSTANCE;

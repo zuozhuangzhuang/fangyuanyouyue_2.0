@@ -24,4 +24,13 @@ public interface UserVipService {
      * @throws ServiceException
      */
     boolean updateOrder(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException;
+
+    /**
+     *
+     * @param userId
+     * @param vipLevel 会员等级 1铂金会员 2至尊会员
+     * @param vipType 会员类型 1一个月 2三个月 3一年会员
+     * @throws ServiceException
+     */
+    void updateUserVip(Integer userId,Integer vipLevel,Integer vipType) throws ServiceException;
 }

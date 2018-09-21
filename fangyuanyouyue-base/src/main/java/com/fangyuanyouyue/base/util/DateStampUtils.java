@@ -363,9 +363,9 @@ public class DateStampUtils {
 	 */
 	public static Timestamp getTimesteamp(){
 		Date date = new Date();
-		System.out.println("new Date()："+DateUtil.getFormatDate(date,DateUtil.DATE_FORMT));
+//		System.out.println("new Date()："+DateUtil.getFormatDate(date,DateUtil.DATE_FORMT));
 		Timestamp timestamp = new Timestamp(date.getTime());
-		System.out.println("DateStampUtils.getTimesteamp()："+DateUtil.getFormatDate(timestamp,DateUtil.DATE_FORMT));
+//		System.out.println("DateStampUtils.getTimesteamp()："+DateUtil.getFormatDate(timestamp,DateUtil.DATE_FORMT));
 		return timestamp;
 	}
 }

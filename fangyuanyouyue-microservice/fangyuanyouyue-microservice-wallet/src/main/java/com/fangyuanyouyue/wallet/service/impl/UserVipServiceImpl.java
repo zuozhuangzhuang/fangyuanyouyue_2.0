@@ -8,14 +8,13 @@ import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.base.util.IdGenerator;
+import com.fangyuanyouyue.wallet.dao.UserVipCouponDetailMapper;
 import com.fangyuanyouyue.wallet.dao.UserVipMapper;
 import com.fangyuanyouyue.wallet.dao.VipOrderMapper;
 import com.fangyuanyouyue.wallet.model.UserVip;
+import com.fangyuanyouyue.wallet.model.UserVipCouponDetail;
 import com.fangyuanyouyue.wallet.model.VipOrder;
-import com.fangyuanyouyue.wallet.service.SchedualMessageService;
-import com.fangyuanyouyue.wallet.service.SchedualUserService;
-import com.fangyuanyouyue.wallet.service.UserVipService;
-import com.fangyuanyouyue.wallet.service.WalletService;
+import com.fangyuanyouyue.wallet.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +37,10 @@ public class UserVipServiceImpl implements UserVipService{
     private WalletService walletService;
     @Autowired
     private SchedualUserService schedualUserService;
+    @Autowired
+    private UserCouponService userCouponService;
+    @Autowired
+    private UserVipCouponDetailMapper userVipCouponDetailMapper;
 
     @Override
     public boolean updateOrder(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException {
@@ -65,7 +68,6 @@ public class UserVipServiceImpl implements UserVipService{
                     }else if(vipOrder.getVipType().intValue() == Status.VIP_TYPE_THREE_MONTH.getValue()){
                         userVip.setEndTime(DateUtil.getDateAfterMonth(DateStampUtils.getTimesteamp(),3));
                     }else if(vipOrder.getVipType().intValue() == Status.VIP_TYPE_ONE_YEAR.getValue()){
-                        //TODO 送优惠券
                         userVip.setEndTime(DateUtil.getDateAfterYear(DateStampUtils.getTimesteamp(),1));
                     }else{
                         throw new ServiceException("会员类型错误！");
@@ -78,6 +80,26 @@ public class UserVipServiceImpl implements UserVipService{
                     int no = 111111 + userVip.getId();
                     String date = DateUtil.getFormatDate(DateStampUtils.getTimesteamp(),"yyMMdd");
                     userVip.setVipNo(date + no);
+                    //开通会员送第一个月优惠券
+                    if(vipOrder.getVipType().intValue() == Status.VIP_TYPE_ONE_YEAR.getValue()){
+                        if(vipOrder.getVipLevel().intValue() == Status.VIP_LEVEL_LOW.getValue()){
+                            userCouponService.insertUserCoupon(userVip.getUserId(),1);
+                            userCouponService.insertUserCoupon(userVip.getUserId(),2);
+                        }else{
+                            userCouponService.insertUserCoupon(userVip.getUserId(),1);
+                            userCouponService.insertUserCoupon(userVip.getUserId(),2);
+                            userCouponService.insertUserCoupon(userVip.getUserId(),3);
+                        }
+                        UserVipCouponDetail userVipCouponDetail = new UserVipCouponDetail();
+                        userVipCouponDetail.setUserId(userVip.getUserId());
+                        userVipCouponDetail.setAddTime(DateStampUtils.getTimesteamp());
+                        userVipCouponDetail.setVipLevel(userVip.getVipLevel());
+                        userVipCouponDetail.setVipStartTime(userVip.getStartTime());
+                        userVipCouponDetail.setCount(1);
+                        userVipCouponDetailMapper.insert(userVipCouponDetail);
+                        schedualMessageService.easemobMessage(vipOrder.getUserId().toString(),
+                                "您本月赠送的代金券已到账，点击前往查看~",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_WALLET.getMessage(),"");
+                    }
                     //余额账单
                     walletService.addUserBalanceDetail(vipOrder.getUserId(),vipOrder.getAmount(),payType,Status.EXPEND.getValue(),vipOrder.getOrderNo(),
                             "开通"+time.toString()+userVip.getLevelDesc(),Status.ADD_VIP.getValue(),null,vipOrder.getUserId(),thirdOrderNo);
@@ -96,7 +118,6 @@ public class UserVipServiceImpl implements UserVipService{
                     }else if(vipOrder.getVipType().intValue() == Status.VIP_TYPE_THREE_MONTH.getValue()){
                             userVip.setEndTime(DateUtil.getDateAfterMonth(userVip.getEndTime(),3));
                     }else if(vipOrder.getVipType().intValue() == Status.VIP_TYPE_ONE_YEAR.getValue()){
-                            //TODO 送优惠券
                             userVip.setEndTime(DateUtil.getDateAfterYear(userVip.getEndTime(),1));
                     }else{
                             throw new ServiceException("会员类型错误！");
@@ -112,7 +133,6 @@ public class UserVipServiceImpl implements UserVipService{
                     }else if(vipOrder.getVipType().intValue() == Status.VIP_TYPE_THREE_MONTH.getValue()){
                         userVip.setEndTime(DateUtil.getDateAfterMonth(DateStampUtils.getTimesteamp(),3));
                     }else if(vipOrder.getVipType().intValue() == Status.VIP_TYPE_ONE_YEAR.getValue()){
-                        //TODO 送优惠券
                         userVip.setEndTime(DateUtil.getDateAfterYear(DateStampUtils.getTimesteamp(),1));
                     }else{
                         throw new ServiceException("会员类型错误！");
@@ -216,7 +236,11 @@ public class UserVipServiceImpl implements UserVipService{
         }
     }
 
-    public static void main(String[] args) {
-        System.out.println(DateUtil.getFormatDate(DateStampUtils.getTimesteamp()));
+    @Override
+    public void updateUserVip(Integer userId, Integer vipLevel, Integer vipType) throws ServiceException {
+        UserVip userVip = userVipMapper.selectByUserId(userId);
+        userVip.setVipLevel(vipLevel);
+        userVip.setVipType(vipType);
+        userVipMapper.updateByPrimaryKey(userVip);
     }
 }

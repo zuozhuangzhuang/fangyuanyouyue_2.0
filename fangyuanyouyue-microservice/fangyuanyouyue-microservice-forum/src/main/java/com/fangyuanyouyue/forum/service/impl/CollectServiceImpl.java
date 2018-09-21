@@ -103,6 +103,11 @@ public class CollectServiceImpl implements CollectService{
             List<ForumInfo> forumInfos = forumInfoMapper.selectCollectList(userId, start * limit, limit, collectType,collectType == 4?1:2,search);
             for(ForumInfo info:forumInfos) {
                 ForumInfoDto dto = new ForumInfoDto(info);
+                //是否收藏
+                Collect collect = collectMapper.selectByCollectIdType(userId, info.getId(), info.getType() == 2?3:4);
+                if(collect != null){
+                    dto.setIsCollect(StatusEnum.YES.getValue());
+                }
                 //计算点赞数
                 Integer likesCount = forumLikesService.countLikes(info.getId());
                 dto.setLikesCount(likesCount);

@@ -77,7 +77,7 @@ public class ForumColumnController extends BaseController {
 		}
 	}
 
-	@ApiOperation(value = "精选专栏", notes = "获取精选专栏", response = BaseResp.class)
+	@ApiOperation(value = "精选专栏", notes = "(ForumColumnDto)获取精选专栏", response = BaseResp.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
 			@ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query")

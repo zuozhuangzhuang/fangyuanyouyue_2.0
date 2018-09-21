@@ -140,19 +140,23 @@ public class WalletServiceImpl implements WalletService{
         Integer vipLevel = userVip.getVipLevel();//会员等级
         BigDecimal charge;//手续费
         BigDecimal percent;
-        if(vipLevel == null){
-            //普通用户
-            percent = new BigDecimal(0.01);
+        if(amount.compareTo(new BigDecimal(200)) <= 0){
+            charge = new BigDecimal(2);
         }else{
-            if(vipLevel.intValue() == 1){
-                //铂金会员
-                percent = new BigDecimal(0.008);
+            if(vipLevel == null){
+                //普通用户
+                percent = new BigDecimal(0.01);
             }else{
-                //至尊会员
-                percent = new BigDecimal(0.006);
+                if(vipLevel.intValue() == 1){
+                    //铂金会员
+                    percent = new BigDecimal(0.008);
+                }else{
+                    //至尊会员
+                    percent = new BigDecimal(0.006);
+                }
             }
+            charge = amount.multiply(percent);
         }
-        charge = amount.multiply(percent);
         amount = amount.add(charge);
         //扣除余额 type 类型 1充值 2消费 payType 支付类型 1微信 2支付宝 3余额
         updateBalance(userId,amount,2);
@@ -452,7 +456,7 @@ public class WalletServiceImpl implements WalletService{
                 info = userInfoMapper.selectByPrimaryKey(dto.getSellerId());
                 dto.setImgUrl(info.getHeadImgUrl());
             }else{
-               info = userInfoMapper.selectByPrimaryKey(66);
+                info = userInfoMapper.selectByPrimaryKey(66);
             }
             if(info != null){
                 dto.setImgUrl(info.getHeadImgUrl());
@@ -622,6 +626,48 @@ public class WalletServiceImpl implements WalletService{
             final IdGenerator idg = IdGenerator.INSTANCE;
             String orderNo = idg.nextId();
             addUserBalanceDetail(userId,amount,Status.PAY_TYPE_BALANCE.getValue(),type,orderNo,type==1?"系统增加余额":"系统扣除余额",Status.SYSTEM_UPDATE.getValue(),null,userId,orderNo);
+        }
+    }
+
+    @Override
+    public void updateUserFrozen(Integer id, Integer status,BigDecimal amount) throws ServiceException {
+        UserWallet userWallet = userWalletMapper.selectByUserId(id);
+        if(userWallet == null){
+            throw new ServiceException("获取钱包信息失败！");
+        }else {
+            if(status.intValue() == Status.YES.getValue()){
+                userWallet.setBalanceFrozen(userWallet.getBalanceFrozen().add(amount));
+                userWallet.setBalance(userWallet.getBalance().subtract(amount));
+            }else{
+                userWallet.setBalanceFrozen(userWallet.getBalanceFrozen().subtract(amount));
+                userWallet.setBalance(userWallet.getBalance().add(amount));
+            }
+            userWalletMapper.updateByPrimaryKey(userWallet);
+        }
+    }
+
+    @Override
+    public void confinedUser(Integer userId, Integer status) throws ServiceException {
+        ConfinedUser confinedUser = confinedUserMapper.selectByUserIdStatus(userId, null);
+        if(confinedUser != null){
+            if(confinedUser.getStatus().intValue() == Status.IS_CONFINED.getValue()){
+                if(status == Status.NO.getValue()){
+                    confinedUser.setStatus(Status.NOT_CONFINED.getValue());
+                }
+            }else{
+                if(status == Status.YES.getValue()){
+                    confinedUser.setStatus(Status.IS_CONFINED.getValue());
+                }
+            }
+            confinedUserMapper.updateByPrimaryKey(confinedUser);
+        }else{
+            if(status == Status.YES.getValue()){
+                confinedUser = new ConfinedUser();
+                confinedUser.setUserId(userId);
+                confinedUser.setStatus(Status.IS_CONFINED.getValue());
+                confinedUser.setAddTime(DateStampUtils.getTimesteamp());
+                confinedUserMapper.insert(confinedUser);
+            }
         }
     }
 }

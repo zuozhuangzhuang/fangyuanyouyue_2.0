@@ -130,7 +130,6 @@ public class TimerController extends BaseController {
         }
     }
 
-    //TODO 优惠券自动过期
 
     @Scheduled(cron="0 0 0  * * ? ")
     public BaseResp shopAuthTimeOut() throws IOException {
@@ -158,5 +157,19 @@ public class TimerController extends BaseController {
         }
     }
 
+
+    @Scheduled(cron="0 * * * * ? ")
+    public BaseResp sendCoupon() throws IOException {
+        try {
+            //年会员定时每个月送优惠券
+            log.info("----》送优惠券《----");
+            schedualWalletService.sendCoupon();
+            return toSuccess();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+    //TODO 优惠券自动过期
 
 }

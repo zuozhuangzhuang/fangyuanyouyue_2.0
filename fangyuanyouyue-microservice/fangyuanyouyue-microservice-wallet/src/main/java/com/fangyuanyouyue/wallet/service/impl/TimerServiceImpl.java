@@ -9,14 +9,18 @@ import com.fangyuanyouyue.wallet.constant.StatusEnum;
 import com.fangyuanyouyue.wallet.dao.*;
 import com.fangyuanyouyue.wallet.model.UserInfo;
 import com.fangyuanyouyue.wallet.model.UserVip;
+import com.fangyuanyouyue.wallet.model.UserVipCouponDetail;
 import com.fangyuanyouyue.wallet.model.UserWallet;
 import com.fangyuanyouyue.wallet.service.SchedualMessageService;
 import com.fangyuanyouyue.wallet.service.TimerService;
+import com.fangyuanyouyue.wallet.service.UserCouponService;
 import com.fangyuanyouyue.wallet.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -43,6 +47,10 @@ public class TimerServiceImpl implements TimerService{
     private UserBalanceDetailMapper userBalanceDetailMapper;
     @Autowired
     private UserInfoMapper userInfoMapper;
+    @Autowired
+    private UserCouponService userCouponService;
+    @Autowired
+    private UserVipCouponDetailMapper userVipCouponDetailMapper;
 
 
 
@@ -91,6 +99,48 @@ public class TimerServiceImpl implements TimerService{
                 Long score = userWallet.getScore();
                 WalletServiceImpl.setUserLevel(score, info);
                 userInfoMapper.updateByPrimaryKeySelective(info);
+            }
+        }
+    }
+
+    @Override
+    public void sendCoupon() throws ServiceException, ParseException {
+        //1、获取所有年会员用户 2、判断是否满足条件 3、铂金会员每个月送5元+20元，至尊会员每个月送5元+20元+50元
+        List<UserVip> userVips = userVipMapper.selectUserVipYear();
+        if(userVips != null && userVips.size() > 0){
+            //判断用户是否该发放优惠券
+            for(UserVip userVip:userVips){
+                //应发优惠券次数
+                int monthsBetween = DateUtil.monthsBetween(userVip.getStartTime(), DateStampUtils.getTimesteamp());
+                //已发优惠券次数
+                int count = userVipCouponDetailMapper.selectDetailByUserId(userVip.getUserId(),userVip.getStartTime());
+                //应发 > 0 && 应发 > 已发
+                if(monthsBetween > 0 && monthsBetween>count){
+                    UserInfo info = userInfoMapper.selectByPrimaryKey(userVip.getUserId());
+                    System.out.println("用户“"+info.getNickName()+"”发"+(monthsBetween-count)+"次代金券");
+                    for(int i=0;i<(monthsBetween-count);i++){
+                        if(userVip.getVipType().intValue() == Status.VIP_TYPE_ONE_YEAR.getValue()){
+                            if(userVip.getVipLevel().intValue() == Status.VIP_LEVEL_LOW.getValue()){
+                                userCouponService.insertUserCoupon(userVip.getUserId(),1);
+                                userCouponService.insertUserCoupon(userVip.getUserId(),2);
+                            }else{
+                                userCouponService.insertUserCoupon(userVip.getUserId(),1);
+                                userCouponService.insertUserCoupon(userVip.getUserId(),2);
+                                userCouponService.insertUserCoupon(userVip.getUserId(),3);
+                            }
+                            //新增领取记录
+                            UserVipCouponDetail userVipCouponDetail = new UserVipCouponDetail();
+                            userVipCouponDetail.setUserId(userVip.getUserId());
+                            userVipCouponDetail.setAddTime(DateStampUtils.getTimesteamp());
+                            userVipCouponDetail.setVipLevel(userVip.getVipLevel());
+                            userVipCouponDetail.setVipStartTime(userVip.getStartTime());
+                            userVipCouponDetail.setCount(count+1);
+                            userVipCouponDetailMapper.insert(userVipCouponDetail);
+                            schedualMessageService.easemobMessage(userVip.getUserId().toString(),
+                                    "您本月赠送的代金券已到账，点击前往查看~",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_WALLET.getMessage(),"");
+                        }
+                    }
+                }
             }
         }
     }
