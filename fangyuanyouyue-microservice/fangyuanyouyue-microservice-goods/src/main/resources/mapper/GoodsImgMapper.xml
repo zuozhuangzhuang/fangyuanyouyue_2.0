@@ -107,6 +107,11 @@
   <select id="getImgsByGoodsId" parameterType="Integer" resultMap="BaseResultMap">
     select * from goods_img where goods_id = #{goodsId,jdbcType=INTEGER}
   </select>
+  
+  <select id="getMainImg" parameterType="Integer" resultMap="BaseResultMap">
+    select * from goods_img where goods_id = #{goodsId,jdbcType=INTEGER} and type=1
+  </select>
+  
   <delete id="deleteByGoodsId" parameterType="Integer">
     delete from goods_img where goods_id = #{goodsId}
   </delete>

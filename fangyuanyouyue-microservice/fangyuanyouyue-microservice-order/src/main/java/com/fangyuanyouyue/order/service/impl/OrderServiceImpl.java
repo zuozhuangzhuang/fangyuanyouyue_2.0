@@ -1013,7 +1013,7 @@ public class OrderServiceImpl implements OrderService{
         //后台查看所有用户订单
         Integer total = orderInfoMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
 
-        List<OrderInfo> list = orderInfoMapper.getOrderPage(param.getStart()*param.getLimit(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+        List<OrderInfo> list = orderInfoMapper.getOrderPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
         List<AdminOrderDto> orderDtos = new ArrayList<>();
         for(OrderInfo info:list){
             AdminOrderDto orderDto = new AdminOrderDto(info);
@@ -1022,18 +1022,31 @@ public class OrderServiceImpl implements OrderService{
             List<OrderDetail> orderDetails;
             if(info.getSellerId() == null){
                 orderDetails = orderDetailMapper.selectByMainOrderId(orderDto.getOrderId());
+                orderDto.setSeller("多卖家");
             }else{
                 orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
+
+                //获取卖家信息
+                UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(info.getSellerId())).getString("data")), UserInfo.class);
+
+                orderDto.setSeller(seller.getPhone()+"<br>"+seller.getNickName());
             }
             ArrayList<AdminOrderDetailDto> orderDetailDtos = AdminOrderDetailDto.toDtoList(orderDetails);
+            String orderDetail = "";
+            for(AdminOrderDetailDto detail:orderDetailDtos) {
+            	orderDetail += "【"+detail.getGoodsName() + "】x1 <br>";
+            }
+            orderDto.setOrderDetail(orderDetail);
+            orderDto.setTotalCount(orderDetailDtos.size());
+            
             //卖家信息DTO
-            List sellerDtos = new ArrayList<>();
-            sellerDtos.addAll(getSellerDtos(OrderDetailDto.toDtoList(orderDetails)));
+           // List sellerDtos = new ArrayList<>();
+            //sellerDtos.addAll(getSellerDtos(OrderDetailDto.toDtoList(orderDetails)));
             //订单支付表
             OrderPay orderPay = orderPayMapper.selectByOrderId(orderDto.getOrderId());
             AdminOrderPayDto orderPayDto = new AdminOrderPayDto(orderPay);
             orderDto.setOrderPayDto(orderPayDto);
-            orderDto.setSellerDtos(sellerDtos);
+            //orderDto.setSellerDtos(sellerDtos);
             orderDto.setOrderDetailDtos(orderDetailDtos);
             if(orderDto.getIsRefund() == 1){
                 //退货状态
@@ -1042,10 +1055,10 @@ public class OrderServiceImpl implements OrderService{
                 orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
             }
             //是否评价
-            OrderComment orderComment = orderCommentMapper.selectByOrder(orderDto.getOrderId());
-            if(orderComment != null){
-                orderDto.setIsEvaluation(1);
-            }
+            //OrderComment orderComment = orderCommentMapper.selectByOrder(orderDto.getOrderId());
+            //if(orderComment != null){
+            //    orderDto.setIsEvaluation(1);
+           // }
             orderDtos.add(orderDto);
         }
         Pager pager = new Pager();

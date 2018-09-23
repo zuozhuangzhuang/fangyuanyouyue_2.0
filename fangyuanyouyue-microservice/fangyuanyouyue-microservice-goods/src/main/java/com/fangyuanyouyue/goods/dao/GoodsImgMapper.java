@@ -26,6 +26,10 @@ public interface GoodsImgMapper {
      * @return
      */
     List<GoodsImg> getImgsByGoodsId(Integer goodsId);
+    
+
+    List<GoodsImg> getMainImg(Integer goodsId);
+    
 
     /**
      * 根据商品ID删除图片信息

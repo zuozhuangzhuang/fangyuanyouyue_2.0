@@ -663,7 +663,32 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         List<GoodsDto> dtos = new ArrayList<>();
         //遍历商品列表，添加到GoodsDtos中
         for (GoodsInfo goodsInfo:goodsList) {
-            GoodsDto goodsDto = setDtoByGoodsInfo(null,goodsInfo);
+            GoodsDto goodsDto = new GoodsDto(goodsInfo);
+
+            List<GoodsImg> goodsImgs = goodsImgMapper.getImgsByGoodsId(goodsInfo.getId());
+//            String mainImgUrl = null;
+//            for(GoodsImg goodsImg:goodsImgs){
+//                if(goodsImg.getType() == 1){
+//                    mainImgUrl = goodsImg.getImgUrl();
+//                }
+//                if(goodsImg.getType() == 3){
+//                	mainImgUrl = goodsImg.getImgUrl();
+//                }
+//            }
+//            goodsDto.setMainUrl(mainImgUrl);
+            
+            goodsDto.setGoodsImgDtos(GoodsImgDto.toDtoList(goodsImgs));
+            
+            //获取卖家信息
+            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(goodsInfo.getUserId())).getString("data")), UserInfo.class);
+            goodsDto.setHeadImgUrl(user.getHeadImgUrl());
+            goodsDto.setNickName(user.getNickName());
+            goodsDto.setUserId(user.getId());
+            String ret = schedualUserService.userIsAuth(goodsInfo.getUserId());
+            goodsDto.setAuthType(1);
+            if(JSONObject.parseObject(ret).getIntValue("code")==0&&JSONObject.parseObject(ret).getBoolean("data")) {
+                goodsDto.setAuthType(2);
+            }
             dtos.add(goodsDto);
         }
         Pager pager = new Pager();

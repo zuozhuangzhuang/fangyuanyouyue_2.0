@@ -26,7 +26,7 @@ public class PlatformFinanceServiceImpl implements PlatformFinanceService {
 
         Integer total = platformFinanceDetailMapper.countPage(param.getPayType(),param.getOrderType(),param.getType(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
 
-        List<PlatformFinanceDetail> details = platformFinanceDetailMapper.getPage(param.getPayType(),param.getOrderType(),param.getType(),param.getStart()*param.getLimit(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+        List<PlatformFinanceDetail> details = platformFinanceDetailMapper.getPage(param.getPayType(),param.getOrderType(),param.getType(),param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
         List<AdminPlatformFinanceDetailDto> datas = AdminPlatformFinanceDetailDto.toDtoList(details);
         Pager pager = new Pager();
         pager.setTotal(total);

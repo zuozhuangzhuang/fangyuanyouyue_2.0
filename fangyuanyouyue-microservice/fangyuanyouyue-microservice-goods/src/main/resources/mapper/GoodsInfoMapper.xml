@@ -449,7 +449,7 @@
                 and status = #{status}
             </if>
             <if test="keyword != null and keyword != ''">
-                and( name like "%"#{keyword}"#" or description like "%"#{keyword}"#" or user_id in (select id from user_info where nick_name like "%"#{keyword}"#"))
+                and( name like "%"#{keyword}"%" or description like "%"#{keyword}"%" )
             </if>
             <if test="startDate != null">
                 and add_time <![CDATA[ > ]]> #{startDate}
@@ -471,7 +471,7 @@
                 and status = #{status}
             </if>
             <if test="keyword != null and keyword != ''">
-                and( name like "%"#{keyword}"#" or description like "%"#{keyword}"#" or user_id in (select id from user_info where nick_name like "%"#{keyword}"#"))
+                and( name like "%"#{keyword}"%" or description like "%"#{keyword}"%" )
             </if>
             <if test="startDate != null">
                 and add_time <![CDATA[ > ]]> #{startDate}

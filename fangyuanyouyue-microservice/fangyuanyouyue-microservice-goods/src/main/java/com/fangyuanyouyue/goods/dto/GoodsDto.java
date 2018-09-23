@@ -115,6 +115,32 @@ public class GoodsDto {
 
     public GoodsDto() {
     }
+    
+    public GoodsDto(GoodsInfo goodsInfo) {
+
+        this.goodsId = goodsInfo.getId();
+        this.userId = goodsInfo.getUserId();
+        this.name = goodsInfo.getName();
+        this.description = goodsInfo.getDescription();
+        this.price = goodsInfo.getPrice();
+        this.postage = goodsInfo.getPostage();
+        this.sort = goodsInfo.getSort();
+        this.label = goodsInfo.getLabel();
+        this.type = goodsInfo.getType();
+        this.status = goodsInfo.getStatus();
+        this.floorPrice = goodsInfo.getFloorPrice();
+        this.intervalTime = goodsInfo.getIntervalTime();
+        this.markdown = goodsInfo.getMarkdown();
+        if(goodsInfo.getLastIntervalTime() != null){
+            this.lastIntervalTime = DateUtil.getFormatDate(goodsInfo.getLastIntervalTime(), DateUtil.DATE_FORMT);
+        }
+        this.isAppraisal = goodsInfo.getIsAppraisal();
+        this.addTime = DateUtil.getFormatDate(goodsInfo.getAddTime(), DateUtil.DATE_FORMT);
+        this.updateTime = DateUtil.getFormatDate(goodsInfo.getUpdateTime(), DateUtil.DATE_FORMT);
+        this.videoUrl = goodsInfo.getVideoUrl();
+        this.videoLength = goodsInfo.getVideoLength();
+        this.startPrice = goodsInfo.getStartPrice();
+    }
 
     public GoodsDto(UserInfo user, GoodsInfo goodsInfo, List<GoodsImg> goodsImgs, List<GoodsCorrelation> goodsCorrelations, List<GoodsCommentDto> goodsCommentDtos) {
         if(user != null){

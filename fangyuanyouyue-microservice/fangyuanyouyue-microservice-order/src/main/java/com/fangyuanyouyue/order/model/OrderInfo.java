@@ -43,6 +43,8 @@ public class OrderInfo {
 
     private String headImgUrl;//用户头像
 
+    private String phone;//用户手机
+
     private Integer sellerIsDelete = 2;//卖家是否删除 1是 2否
 
     private Integer buyerIsDelete = 2;//买家是否删除 1是 2否
