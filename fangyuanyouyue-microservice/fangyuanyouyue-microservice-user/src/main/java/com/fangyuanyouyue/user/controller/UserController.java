@@ -396,7 +396,7 @@ public class UserController extends BaseController {
     @ApiOperation(value = "找回密码", notes = "(void)找回密码",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "phone", value = "用户手机", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "newPwd", value = "新密码密码，md5加密，32位小写字母",required = true, dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "newPwd", value = "新密码，md5加密，32位小写字母",required = true, dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/resetPwd")
     @ResponseBody
@@ -426,7 +426,7 @@ public class UserController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "loginPwd", value = "登录密码，md5加密，32位小写字母", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "newPwd", value = "新密码密码，md5加密，32位小写字母",required = true, dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "newPwd", value = "新密码，md5加密，32位小写字母",required = true, dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/updatePwd")
     @ResponseBody
@@ -682,10 +682,10 @@ public class UserController extends BaseController {
 
             }
             //调用短信系统发送短信
-            JSONObject jsonObject = JSONObject.parseObject(schedualMessageService.sendCode(param.getPhone(),param.getType()));
-            String code = jsonObject.getString("data");
+//            JSONObject jsonObject = JSONObject.parseObject(schedualMessageService.sendCode(param.getPhone(),param.getType()));
+//            String code = jsonObject.getString("data");
             //TODO 开发期间固定1234
-//            String code = "1234";
+            String code = "1234";
             log.info("code---:"+code);
 
             boolean result = schedualRedisService.set(param.getPhone(), code, 600l);

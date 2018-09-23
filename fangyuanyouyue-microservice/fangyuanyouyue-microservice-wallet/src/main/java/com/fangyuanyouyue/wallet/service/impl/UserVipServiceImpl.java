@@ -3,6 +3,7 @@ package com.fangyuanyouyue.wallet.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
@@ -107,7 +108,8 @@ public class UserVipServiceImpl implements UserVipService{
                     schedualMessageService.easemobMessage(vipOrder.getUserId().toString(),
                             "恭喜您，您开通的"+time.toString()+userVip.getLevelDesc()+"已生效，即刻起享受会员专属特权！",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
                 }
-            }else{//续费
+            }else{
+                //续费
                 if(userVip.getStatus() == Status.NOT_VIP.getValue()){//未开通
                     throw new ServiceException("请开通会员！");
                 }
@@ -214,12 +216,12 @@ public class UserVipServiceImpl implements UserVipService{
             }else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()) {
                 Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
                 if(!verifyPayPwd){
-                    throw new ServiceException("支付密码错误！");
+                    throw new ServiceException(ReCode.PAYMENT_PASSWORD_ERROR.getValue(),ReCode.PAYMENT_PASSWORD_ERROR.getMessage());
                 }
                 //余额支付
                 walletService.updateBalance(userId,vipOrder.getAmount(),Status.SUB.getValue());
                 //修改用户会员信息
-                updateOrder(vipOrder.getOrderNo(),null,3);
+                updateOrder(vipOrder.getOrderNo(),null,Status.PAY_TYPE_BALANCE.getValue());
 
                 payInfo.append("余额支付成功！");
             }else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
@@ -237,10 +239,93 @@ public class UserVipServiceImpl implements UserVipService{
     }
 
     @Override
-    public void updateUserVip(Integer userId, Integer vipLevel, Integer vipType) throws ServiceException {
+    public void updateUserVip(Integer userId, Integer vipLevel, Integer vipType,Integer type) throws ServiceException {
         UserVip userVip = userVipMapper.selectByUserId(userId);
-        userVip.setVipLevel(vipLevel);
-        userVip.setVipType(vipType);
+        if(type.intValue() == 1){
+            if(userVip.getStatus().intValue() == Status.IS_VIP.getValue()){//已开通
+                throw new ServiceException("已开通会员！");
+            }
+            //计算结束时间
+            if(vipType.intValue() == Status.VIP_TYPE_ONE_MONTH.getValue()){
+                userVip.setEndTime(DateUtil.getDateAfterMonth(DateStampUtils.getTimesteamp(),1));
+            }else if(vipType.intValue() == Status.VIP_TYPE_THREE_MONTH.getValue()){
+                userVip.setEndTime(DateUtil.getDateAfterMonth(DateStampUtils.getTimesteamp(),3));
+            }else if(vipType.intValue() == Status.VIP_TYPE_ONE_YEAR.getValue()){
+                userVip.setEndTime(DateUtil.getDateAfterYear(DateStampUtils.getTimesteamp(),1));
+            }else{
+                throw new ServiceException("会员类型错误！");
+            }
+            userVip.setVipLevel(vipLevel);//会员等级 1铂金会员 2至尊会员
+            userVip.setLevelDesc(vipLevel == 1?"铂金会员":"至尊会员");
+            userVip.setVipType(vipType);//会员类型 1一个月 2三个月 3一年会员
+            userVip.setStatus(Status.IS_VIP.getValue());//会员状态 1已开通 2未开通
+            //TODO 生成NO.xxxx :年月日 基数与开通顺序的和，例：180912123457
+            int no = 111111 + userVip.getId();
+            String date = DateUtil.getFormatDate(DateStampUtils.getTimesteamp(),"yyMMdd");
+            userVip.setVipNo(date + no);
+            //开通会员送第一个月优惠券
+            if(vipType.intValue() == Status.VIP_TYPE_ONE_YEAR.getValue()){
+                if(vipLevel.intValue() == Status.VIP_LEVEL_LOW.getValue()){
+                    userCouponService.insertUserCoupon(userVip.getUserId(),1);
+                    userCouponService.insertUserCoupon(userVip.getUserId(),2);
+                }else{
+                    userCouponService.insertUserCoupon(userVip.getUserId(),1);
+                    userCouponService.insertUserCoupon(userVip.getUserId(),2);
+                    userCouponService.insertUserCoupon(userVip.getUserId(),3);
+                }
+                UserVipCouponDetail userVipCouponDetail = new UserVipCouponDetail();
+                userVipCouponDetail.setUserId(userVip.getUserId());
+                userVipCouponDetail.setAddTime(DateStampUtils.getTimesteamp());
+                userVipCouponDetail.setVipLevel(userVip.getVipLevel());
+                userVipCouponDetail.setVipStartTime(userVip.getStartTime());
+                userVipCouponDetail.setCount(1);
+                userVipCouponDetailMapper.insert(userVipCouponDetail);
+                schedualMessageService.easemobMessage(userId.toString(),
+                        "您本月赠送的代金券已到账，点击前往查看~",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_WALLET.getMessage(),"");
+            }
+        }else{
+            if(userVip.getStatus() == Status.NOT_VIP.getValue()){//未开通
+                throw new ServiceException("请开通会员！");
+            }
+            if(userVip.getVipLevel().intValue() == vipLevel){//续费相同等级会员
+                //计算结束时间
+                if(vipType.intValue() == Status.VIP_TYPE_ONE_MONTH.getValue()){
+                    userVip.setEndTime(DateUtil.getDateAfterMonth(userVip.getEndTime(),1));
+                }else if(vipType.intValue() == Status.VIP_TYPE_THREE_MONTH.getValue()){
+                    userVip.setEndTime(DateUtil.getDateAfterMonth(userVip.getEndTime(),3));
+                }else if(vipType.intValue() == Status.VIP_TYPE_ONE_YEAR.getValue()){
+                    userVip.setEndTime(DateUtil.getDateAfterYear(userVip.getEndTime(),1));
+                }else{
+                    throw new ServiceException("会员类型错误！");
+                }
+                userVip.setStatus(Status.IS_VIP.getValue());//会员状态 1已开通 2未开通
+            }else{
+                //覆盖原会员信息
+                //开始时间：当前时间
+                userVip.setStartTime(DateStampUtils.getTimesteamp());
+                //计算结束时间
+                if(vipType.intValue() == Status.VIP_TYPE_ONE_MONTH.getValue()){
+                    userVip.setEndTime(DateUtil.getDateAfterMonth(DateStampUtils.getTimesteamp(),1));
+                }else if(vipType.intValue() == Status.VIP_TYPE_THREE_MONTH.getValue()){
+                    userVip.setEndTime(DateUtil.getDateAfterMonth(DateStampUtils.getTimesteamp(),3));
+                }else if(vipType.intValue() == Status.VIP_TYPE_ONE_YEAR.getValue()){
+                    userVip.setEndTime(DateUtil.getDateAfterYear(DateStampUtils.getTimesteamp(),1));
+                }else{
+                    throw new ServiceException("会员类型错误！");
+                }
+                userVip.setVipLevel(vipLevel);//会员等级 1铂金会员 2至尊会员
+                userVip.setLevelDesc(vipLevel.intValue() == Status.VIP_LEVEL_LOW.getValue()?"铂金会员":"至尊会员");
+                userVip.setVipType(vipType);//会员类型 1一个月 2三个月 3一年会员
+                userVip.setStatus(Status.IS_VIP.getValue());//会员状态 1已开通 2未开通
+            }
+        }
+        userVip.setIsSendMessage(null);
         userVipMapper.updateByPrimaryKey(userVip);
+    }
+
+    @Override
+    public boolean isUserVip(Integer userId) throws ServiceException {
+        UserVip userVip = userVipMapper.selectByUserId(userId);
+        return userVip.getStatus().intValue() == Status.IS_VIP.getValue()?true:false;
     }
 }

@@ -51,13 +51,17 @@ public class AdminController extends BaseController {
 
 	@ApiOperation(value = "专栏列表", notes = "专栏列表", response = BaseResp.class)
 	@ApiImplicitParams({
-			@ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "keyword", value = "关键字搜索",required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "keyword", value = "搜索词条", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "startDate", value = "开始日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "endDate", value = "结束日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orders", value = "排序规则", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "ascType", value = "排序类型 1升序 2降序", required = false, dataType = "int", paramType = "query")
 	})
 	@GetMapping(value = "/columnList")
 	@ResponseBody
-	public BaseResp columnList(BasePageReq param) throws IOException {
+	public BaseResp columnList(AdminForumParam param) throws IOException {
 		try {
 			log.info("----》专栏列表《----");
 			log.info("参数：" + param.toString());
@@ -74,11 +78,15 @@ public class AdminController extends BaseController {
 	}
 
 
-	@ApiOperation(value = "帖子列表", notes = "帖子列表", response = BaseResp.class)
+	@ApiOperation(value = "帖子列表", notes = "(ForumInfoDto)帖子列表", response = BaseResp.class)
 	@ApiImplicitParams({
-			@ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "keyword", value = "关键字搜索",required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "keyword", value = "搜索词条", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "startDate", value = "开始日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "endDate", value = "结束日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orders", value = "排序规则", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "ascType", value = "排序类型 1升序 2降序", required = false, dataType = "int", paramType = "query")
 	})
 	@GetMapping(value = "/forumList")
 	@ResponseBody
@@ -100,11 +108,15 @@ public class AdminController extends BaseController {
 
 
 
-	@ApiOperation(value = "视频列表", notes = "视频列表", response = BaseResp.class)
+	@ApiOperation(value = "视频列表", notes = "(ForumInfoDto)视频列表", response = BaseResp.class)
 	@ApiImplicitParams({
-			@ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "keyword", value = "关键字搜索",required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "keyword", value = "搜索词条", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "startDate", value = "开始日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "endDate", value = "结束日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orders", value = "排序规则", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "ascType", value = "排序类型 1升序 2降序", required = false, dataType = "int", paramType = "query")
 	})
 	@GetMapping(value = "/videoList")
 	@ResponseBody
@@ -129,9 +141,13 @@ public class AdminController extends BaseController {
 
 	@ApiOperation(value = "全民鉴定列表", notes = "全民鉴定列表", response = BaseResp.class)
 	@ApiImplicitParams({
-			@ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "keyword", value = "关键字搜索",required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "keyword", value = "搜索词条", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "startDate", value = "开始日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "endDate", value = "结束日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orders", value = "排序规则", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "ascType", value = "排序类型 1升序 2降序", required = false, dataType = "int", paramType = "query")
 	})
 	@GetMapping(value = "/appraisalList")
 	@ResponseBody
@@ -155,10 +171,13 @@ public class AdminController extends BaseController {
 
 	@ApiOperation(value = "专栏申请列表", notes = "专栏申请列表", response = BaseResp.class)
 	@ApiImplicitParams({
-			@ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "keyword", value = "关键字搜索",required = false, dataType = "String", paramType = "query"),
-			@ApiImplicitParam(name = "status", value = "状态 0申请中 1通过 2未通过",required = false, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "keyword", value = "搜索词条", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "startDate", value = "开始日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "endDate", value = "结束日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orders", value = "排序规则", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "ascType", value = "排序类型 1升序 2降序", required = false, dataType = "int", paramType = "query")
 	})
 	@GetMapping(value = "/applyList")
 	@ResponseBody
@@ -285,4 +304,32 @@ public class AdminController extends BaseController {
             return toError("系统繁忙，请稍后再试！");
         }
     }
+
+
+    @ApiOperation(value = "修改专栏", notes = "修改专栏", response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "专栏id", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "name", value = "专栏名字",required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "coverImgUrl", value = "封面图片地址",required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "isChosen", value = "是否精选1是 2否",required = false, dataType = "String", paramType = "query")
+    })
+    @PostMapping(value = "/updateColumn")
+    @ResponseBody
+    public BaseResp updateColumn(AdminForumParam param) throws IOException {
+        try {
+            log.info("----》修改专栏《----");
+            log.info("参数：" + param.toString());
+            if(param.getId() == null){
+                return toError("专栏id不能为空！");
+            }
+            forumColumnService.updateColumn(param.getId(),param.getName(), param.getCoverImgUrl(),param.getIsChosen());
+
+            return toSuccess();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+
 }

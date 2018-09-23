@@ -157,7 +157,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
                 }else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()) {
                     boolean verifyPayPwd = verifyPayPwd(userId, payPwd);
                     if(!verifyPayPwd){
-                        throw new ServiceException("支付密码错误！");
+                        throw new ServiceException(ReCode.PAYMENT_PASSWORD_ERROR.getValue(),ReCode.PAYMENT_PASSWORD_ERROR.getMessage());
                     }
                     BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, authOrder.getAmount(), Status.SUB.getValue())), BaseResp.class);
                     if(baseResp.getCode() == 1){

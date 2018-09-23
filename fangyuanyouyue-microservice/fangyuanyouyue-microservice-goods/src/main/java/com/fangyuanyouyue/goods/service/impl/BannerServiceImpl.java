@@ -41,20 +41,30 @@ public class BannerServiceImpl implements BannerService{
 
     @Override
     public void deleteBanner(Integer bannerId) throws ServiceException {
-
+        bannerIndexMapper.deleteByPrimaryKey(bannerId);
     }
 
     @Override
-    public AdminBannerDto updateBanner(AdminGoodsParam param) throws ServiceException {
+    public void updateBanner(AdminGoodsParam param) throws ServiceException {
         BannerIndex bannerIndex = bannerIndexMapper.selectByPrimaryKey(param.getId());
         if(bannerIndex == null){
             throw new ServiceException("获取轮播图失败！");
         }else{
-            bannerIndex.setType(param.getType());
-            bannerIndex.setBusinessId(param.getBusinessId());
-            bannerIndex.setImgUrl(param.getImgUrl());
-            bannerIndex.setJumpType(param.getJumpType());
-            bannerIndex.setBusinessType(param.getBusinessType());
+            if(param.getType() != null){
+                bannerIndex.setType(param.getType());
+            }
+            if(param.getBusinessId() != null){
+                bannerIndex.setBusinessId(param.getBusinessId());
+            }
+            if(StringUtils.isNotEmpty(param.getImgUrl())){
+                bannerIndex.setImgUrl(param.getImgUrl());
+            }
+            if(param.getJumpType() != null){
+                bannerIndex.setJumpType(param.getJumpType());
+            }
+            if(param.getBusinessType() != null){
+                bannerIndex.setBusinessType(param.getBusinessType());
+            }
             if(StringUtils.isNotEmpty(param.getTitle())){
                 bannerIndex.setTitle(param.getTitle());
             }
@@ -64,15 +74,17 @@ public class BannerServiceImpl implements BannerService{
             if(param.getStatus() != null){
                 bannerIndex.setStatus(param.getStatus());
             }
-            bannerIndexMapper.updateByPrimaryKeySelective(bannerIndex);
-            return new AdminBannerDto(bannerIndex);
+            bannerIndexMapper.updateByPrimaryKey(bannerIndex);
         }
     }
 
     @Override
     public Pager bannerList(AdminGoodsParam param) throws ServiceException {
-        List<BannerIndex> banners = bannerIndexMapper.getBanner(param.getType());
-        Integer total = 0;
+        Integer total = bannerIndexMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
+
+        List<BannerIndex> banners = bannerIndexMapper.getPage(param.getType(),param.getJumpType(),param.getBusinessType(),param.getStart(),param.getLimit(),
+                param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+
         List<AdminBannerDto> bannerIndexDtos = AdminBannerDto.toDtoList(banners);
         Pager pager = new Pager();
         pager.setTotal(total);

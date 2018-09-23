@@ -37,6 +37,29 @@ public class AdminControllerTest {
 
 
     /**
+     * 获取商品列表
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void goodsList() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.get("/adminGoods/goodsList")
+//                .param("type","")
+                .param("start","0")
+                .param("limit","10")
+//                .param("keyword","")
+                //状态 1已处理 2待处理
+//                .param("status","")
+//                .param("startDate","2016-01-01 01:01:01")
+//                .param("endDate","2018-09-12 16:39:00")
+//                .param("orders","add_time")
+//                .param("ascType","2")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
      * 后台处理举报
      * @throws Exception
      */

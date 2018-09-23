@@ -39,7 +39,6 @@ public class AdminController  extends BaseController {
     @Autowired
     private AppraisalService appraisalService;
 
-    //新增首页轮播图
     @ApiOperation(value = "新增首页轮播图", notes = "(BannerIndex)新增首页轮播图",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "businessId", value = "业务ID：例：商品id、视频id、积分商城商品id...", required = false, dataType = "int", paramType = "query"),
@@ -91,7 +90,6 @@ public class AdminController  extends BaseController {
     }
 
 
-    //TODO 删除轮播图
     @ApiOperation(value = "删除轮播图", notes = "删除轮播图",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "bannerId", value = "轮播图ID", required = true, dataType = "int", paramType = "query")
@@ -118,7 +116,6 @@ public class AdminController  extends BaseController {
         }
     }
 
-    //TODO 修改首页轮播图
     @ApiOperation(value = "修改首页轮播图", notes = "(BannerIndex)修改首页轮播图",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "轮播图ID", required = true, dataType = "int", paramType = "query"),
@@ -140,23 +137,10 @@ public class AdminController  extends BaseController {
             if(param.getId() == null){
                 return toError("id不能为空！");
             }
-            if (StringUtils.isEmpty(param.getImgUrl())) {
-                return toError( "图片地址不能为空！");
-            }
-            if (param.getBusinessId() == null) {
-                return toError( "业务ID不能为空！");
-            }
-            if (param.getType() == null) {
-                return toError( "业务类型不能为空！");
-            }
-            if (param.getJumpType() == null) {
-                return toError( "跳转类型不能为空！");
-
-            }
             //修改首页轮播图
-            AdminBannerDto dto = bannerService.updateBanner(param);
+            bannerService.updateBanner(param);
 
-            return toSuccess(dto);
+            return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
@@ -166,9 +150,11 @@ public class AdminController  extends BaseController {
         }
     }
 
-    //TODO 查看首页轮播图列表
-    @ApiOperation(value = "查看首页轮播图列表", notes = "查看首页轮播图列表",response = BaseResp.class)
+    @ApiOperation(value = "查看轮播图列表", notes = "查看首页轮播图列表",response = BaseResp.class)
     @ApiImplicitParams({
+            @ApiImplicitParam(name = "jumpType", value = "跳转类型 1页面 2链接 3图片（businessId为空）", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "businessType", value = "业务类型 1商品详情、2抢购详情、3帖子详情、4全民鉴定详情、5视频详情、6专栏 7积分商品", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1首页 2商品详情 3积分商城", required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "keyword", value = "搜索词条", required = false, dataType = "String", paramType = "query"),
@@ -204,13 +190,53 @@ public class AdminController  extends BaseController {
     }
 
 
-    //TODO 增加商品分类
+    @ApiOperation(value = "增加商品分类", notes = "增加商品分类",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "parentId", value = "上级id", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "name", value = "类目名称", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "imgUrl", value = "图片地址", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "sort", value = "排序", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1普通 2热门", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "状态 0正常 1禁用", required = false, dataType = "int", paramType = "query")
+    })
+    @PutMapping(value = "/addCategory")
+    @ResponseBody
+    public BaseResp addCategory(AdminGoodsParam param) throws IOException {
+        try {
+            log.info("----》增加商品分类《----");
+            log.info("参数："+param.toString());
+            //获取分类列表
+            goodsInfoService.addCategory(param);
+            return toSuccess();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
 
-    //TODO 删除商品分类
 
-    //TODO 修改商品分类
+    @ApiOperation(value = "修改分类信息", notes = "修改分类信息",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "分类信息id", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1普通 2热门", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "状态 0正常 1禁用 2删除", required = false, dataType = "int", paramType = "query")
+    })
+    @PutMapping(value = "/updateCategory")
+    @ResponseBody
+    public BaseResp updateCategory(AdminGoodsParam param) throws IOException {
+        try {
+            log.info("----》修改分类信息《----");
+            log.info("参数："+param.toString());
+            //获取分类列表
+            goodsInfoService.updateCategory(param.getId(),param.getType(),param.getStatus());
+            return toSuccess();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
 
-    //TODO 查看商品分类列表
+
     @ApiOperation(value = "查看商品分类列表", notes = "查看商品分类列表",response = BaseResp.class)
     @GetMapping(value = "/categoryList")
     @ResponseBody
@@ -253,7 +279,7 @@ public class AdminController  extends BaseController {
             if(param.getLimit() == null || param.getLimit() < 1){
                 return toError("每页个数错误！");
             }
-            //获取分类列表
+            //获取商品列表
             Pager pager = goodsInfoService.getGoodsPage(param);
             return toPage(pager);
         } catch (Exception e) {
@@ -266,19 +292,9 @@ public class AdminController  extends BaseController {
     @ApiOperation(value = "后台管理修改商品、抢购", notes = "(void)后台管理修改商品、抢购",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "商品ID", required = true,dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "name", value = "商品名称", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "goodsCategoryIds", value = "商品分类数组（同一商品可多种分类）",allowMultiple = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "description", value = "商品描述(详情)",  dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "price", value = "商品价格",  dataType = "BigDecimal", paramType = "query"),
-            @ApiImplicitParam(name = "postage", value = "运费",  dataType = "BigDecimal", paramType = "query"),
-            @ApiImplicitParam(name = "label", value = "标签", dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "floorPrice", value = "最低价", dataType = "BigDecimal", paramType = "query"),
-            @ApiImplicitParam(name = "intervalTime", value = "降价时间间隔", dataType = "date", paramType = "query"),
-            @ApiImplicitParam(name = "markdown", value = "降价幅度", dataType = "BigDecimal", paramType = "query"),
-            @ApiImplicitParam(name = "imgUrls", value = "商品图片路径数组",allowMultiple = true,dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "videoUrl", value = "视频路径",dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "videoImg", value = "视频截图路径",dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "status", value = "商品状态 1出售中 2已售出 3已下架（已结束） 5删除",dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "isAppraisal", value = "是否官方鉴定 1已鉴定 2未鉴定",dataType = "int", paramType = "query"),
     })
     @PutMapping(value = "/updateGoods")
     @ResponseBody
@@ -289,7 +305,7 @@ public class AdminController  extends BaseController {
             if(param.getId() == null){
                 return toError("id不能为空！");
             }
-            goodsInfoService.updateGoods(param);
+            goodsInfoService.adminUpdateGoods(param.getId(),param.getGoodsCategoryIds(),param.getStatus(),param.getIsAppraisal());
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();

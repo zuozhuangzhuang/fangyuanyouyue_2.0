@@ -29,7 +29,7 @@ public interface BannerService {
      * @return
      * @throws ServiceException
      */
-    AdminBannerDto updateBanner(AdminGoodsParam param) throws ServiceException;
+    void updateBanner(AdminGoodsParam param) throws ServiceException;
 
     /**
      * 查看首页轮播图列表

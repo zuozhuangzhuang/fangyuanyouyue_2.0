@@ -3,6 +3,7 @@ package com.fangyuanyouyue.wallet.service.impl;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
@@ -123,7 +124,7 @@ public class WalletServiceImpl implements WalletService{
                 throw new ServiceException("请先设置支付密码再提现");
             }
             if(MD5Util.verify(MD5Util.MD5(payPwd),userInfoExt.getPayPwd()) == false){
-                throw new ServiceException("支付密码错误！");
+                throw new ServiceException(ReCode.PAYMENT_PASSWORD_ERROR.getValue(),ReCode.PAYMENT_PASSWORD_ERROR.getMessage());
             }
             userWithdraw.setAccount(account);
             userWithdraw.setRealName(realName);
@@ -253,7 +254,7 @@ public class WalletServiceImpl implements WalletService{
                     throw new ServiceException("此用户被限制使用余额提现！");
                 }
                 if(userWallet.getBalance().compareTo(amount) < 0){//余额小于消费金额
-                    throw new ServiceException("余额不足！");
+                    throw new ServiceException(ReCode.INSUFFICIENT_FUND.getValue(),ReCode.INSUFFICIENT_FUND.getMessage());
                 }else{
                     userWallet.setBalance(userWallet.getBalance().subtract(amount));
                 }
@@ -614,7 +615,7 @@ public class WalletServiceImpl implements WalletService{
                 userWallet.setBalance(userWallet.getBalance().add(amount));
             } else if (type.intValue() == Status.SUB.getValue()) {
                 if (userWallet.getBalance().compareTo(amount) < 0) {//余额小于消费金额
-                    throw new ServiceException("余额不足！");
+                    throw new ServiceException(ReCode.INSUFFICIENT_FUND.getValue(),ReCode.INSUFFICIENT_FUND.getMessage());
                 } else {
                     userWallet.setBalance(userWallet.getBalance().subtract(amount));
                 }

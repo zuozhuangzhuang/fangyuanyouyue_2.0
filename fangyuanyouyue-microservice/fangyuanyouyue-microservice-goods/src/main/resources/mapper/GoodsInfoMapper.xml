@@ -442,6 +442,9 @@
         select count(*) from goods_info
         <where>
             1=1
+            <if test="type != null">
+                and type = #{type}
+            </if>
             <if test="status != null">
                 and status = #{status}
             </if>

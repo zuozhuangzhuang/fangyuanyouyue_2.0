@@ -6,10 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
-import com.fangyuanyouyue.base.enums.Credit;
-import com.fangyuanyouyue.base.enums.NotifyUrl;
-import com.fangyuanyouyue.base.enums.Score;
-import com.fangyuanyouyue.base.enums.Status;
+import com.fangyuanyouyue.base.enums.*;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.IdGenerator;
@@ -55,6 +52,8 @@ public class OrderServiceImpl implements OrderService{
     private OrderCommentMapper orderCommentMapper;
     @Autowired
     private SchedualMessageService schedualMessageService;
+    @Autowired
+    private UserBehaviorMapper userBehaviorMapper;
 
     @Override
     public OrderDto saveOrderByCart(String token,String sellerString, Integer userId, Integer addressId) throws ServiceException {
@@ -541,7 +540,34 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    public OrderDto saveOrder(String token,Integer goodsId,Integer couponId,Integer userId,Integer addressId) throws ServiceException {
+    public OrderDto saveOrder(String token,Integer goodsId,Integer couponId,Integer userId,Integer addressId,Integer type) throws ServiceException {
+        //获取商品信息
+        GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(goodsId)).getString("data")),GoodsInfo.class);
+        if (goods.getStatus() != 1) {//状态 1出售中 2已售出 3已下架（已结束） 5删除
+            throw new ServiceException("商品状态异常！");
+        }
+        if(goods.getUserId().intValue() == userId.intValue()){
+            throw new ServiceException("不可以对自己的商品进行下单！");
+        }
+
+        if(type.intValue() == Status.AUCTION.getValue()){
+            //非会员只能免费抢购一次，会员可无限制抢购——验证是否为会员
+            if(!Boolean.valueOf(JSONObject.parseObject(schedualWalletService.isUserVip(userId)).getString("data"))){
+                List<UserBehavior> userBehaviors = userBehaviorMapper.selectByUserIdType(userId, Status.BUY_AUCTION.getValue());
+                if(userBehaviors != null && userBehaviors.size() > 0){
+                    throw new ServiceException("非会员只能免费抢购一次！");
+                }else{
+                    UserBehavior userBehavior = new UserBehavior();
+                    userBehavior.setUserId(userId);
+                    userBehavior.setBusinessId(goodsId);
+                    userBehavior.setBusinessType(Status.BUSINESS_TYPE_GOODS.getValue());
+                    userBehavior.setType(Status.BUY_AUCTION.getValue());
+                    userBehavior.setToUserId(goods.getUserId());
+                    userBehavior.setAddTime(DateStampUtils.getTimesteamp());
+                    userBehaviorMapper.insert(userBehavior);
+                }
+            }
+        }
         //获取收货地址
         String result = schedualUserService.getAddressList(token,addressId);
         JSONArray addressArray = JSONArray.parseArray(JSONObject.parseObject(result).getString("data"));
@@ -556,14 +582,7 @@ public class OrderServiceImpl implements OrderService{
             throw new  ServiceException("收货地址异常，请先更新地址");
         }
 
-        //获取商品信息
-        GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(goodsId)).getString("data")),GoodsInfo.class);
-        if (goods.getStatus() != 1) {//状态 1出售中 2已售出 3已下架（已结束） 5删除
-            throw new ServiceException("商品状态异常！");
-        }
-        if(goods.getUserId().intValue() == userId.intValue()){
-            throw new ServiceException("不可以对自己的商品进行下单！");
-        }
+
         //1.下订单
         //2.下支付订单
         OrderInfo orderInfo = new OrderInfo();
@@ -687,7 +706,7 @@ public class OrderServiceImpl implements OrderService{
                     //验证支付密码
                     Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
                     if(!verifyPayPwd){
-                        throw new ServiceException("支付密码错误！");
+                        throw new ServiceException(ReCode.PAYMENT_PASSWORD_ERROR.getValue(),ReCode.PAYMENT_PASSWORD_ERROR.getMessage());
                     }else{
                         //调用wallet-service修改余额功能
                         BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, orderPay.getPayAmount(), Status.SUB.getValue())), BaseResp.class);

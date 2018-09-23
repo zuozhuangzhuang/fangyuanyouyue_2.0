@@ -1,10 +1,11 @@
-package com.fangyuanyouyue.wallet.model;
+package com.fangyuanyouyue.order.model;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.util.Date;
+
 /**
  * 用户行为表
  */

@@ -200,7 +200,8 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 	public Pager getPage(BasePageReq param,Integer type) {
 
 		Integer total = forumInfoMapper.countPage(type,param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
-		List<ForumInfo> datas = forumInfoMapper.getPage(type,param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders());
+		List<ForumInfo> forumInfos = forumInfoMapper.getPage(type,param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+		List<ForumInfoDto> datas = ForumInfoDto.toDtoList(forumInfos);
 		//计算浏览量
 		
 		Pager pager = new Pager();

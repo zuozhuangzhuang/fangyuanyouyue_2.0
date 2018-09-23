@@ -24,4 +24,7 @@ public class AdminForumParam extends BasePageReq{
 
     @ApiModelProperty(name = "isChosen", value = "是否精选1是 2否", dataType = "int",hidden = true)
     private Integer isChosen;//是否精选1是 2否
+
+    @ApiModelProperty(name = "name", value = "名称", dataType = "String",hidden = true)
+    private String name;//名称
 }

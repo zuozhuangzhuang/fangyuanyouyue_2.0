@@ -121,7 +121,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 				}else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()) {
 					Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
 					if (!verifyPayPwd) {
-						throw new ServiceException("支付密码错误！");
+						throw new ServiceException(ReCode.PAYMENT_PASSWORD_ERROR.getValue(),ReCode.PAYMENT_PASSWORD_ERROR.getMessage());
 					} else {
 						//调用wallet-service修改余额功能,成为栏主200元/人
 						BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, new BigDecimal(200), Status.SUB.getValue())), BaseResp.class);
@@ -255,7 +255,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 	public Pager getPage(BasePageReq param) {
 
 		Integer total = forumColumnMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
-		List<ForumColumn> datas = forumColumnMapper.getPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders());
+		List<ForumColumn> datas = forumColumnMapper.getPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
 		Pager pager = new Pager();
 		pager.setTotal(total);
 		pager.setDatas(AdminForumColumnDto.toDtoList(datas));
@@ -268,12 +268,26 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 	public Pager getPageApply(BasePageReq param) {
 
 		Integer total = forumColumnApplyMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
-		List<ForumColumnApply> datas = forumColumnApplyMapper.getPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders());
+		List<ForumColumnApply> datas = forumColumnApplyMapper.getPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
 		Pager pager = new Pager();
 		pager.setTotal(total);
 		pager.setDatas(AdminForumColumnApplyDto.toDtoList(datas));
 		return pager;
 	}
 
-
+    @Override
+    public void updateColumn(Integer columnId, String name, String coverImgUrl, Integer isChosen) throws ServiceException {
+        ForumColumn forumColumn = forumColumnMapper.selectByPrimaryKey(columnId);
+        if(forumColumn == null){
+            throw new ServiceException("未找到专栏！");
+        }
+        if(StringUtils.isNotEmpty(name)){
+            forumColumn.setName(name);
+        }
+        if(StringUtils.isNotEmpty(coverImgUrl)){
+            forumColumn.setCoverImgUrl(coverImgUrl);
+        }
+        forumColumn.setIsChosen(isChosen);
+        forumColumnMapper.updateByPrimaryKey(forumColumn);
+    }
 }

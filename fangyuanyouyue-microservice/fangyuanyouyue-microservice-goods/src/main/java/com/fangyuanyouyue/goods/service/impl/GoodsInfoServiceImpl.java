@@ -590,6 +590,9 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         if(goodsInfo == null){
             throw new ServiceException("获取商品失败！");
         }else{
+            if(goodsInfo.getType().intValue() == Status.AUCTION.getValue()){
+                goodsInfo.setLastIntervalTime(DateStampUtils.getTimesteamp());
+            }
             if(status == 2){//已售出
                 //拒绝此商品的所有议价
                 //压价信息
@@ -642,7 +645,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
 
     @Override
     public Pager getGoodsPage(AdminGoodsParam param) throws ServiceException {
-        Integer total = goodsInfoMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
+        Integer total = goodsInfoMapper.countPage(param.getType(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
         //商品列表
 //        List<GoodsInfo> goodsList = goodsInfoMapper.getGoodsList(null, param.getStatus(), param.getKeyword(), param.getPriceMin(), param.getPriceMax(), param.getSynthesize(), param.getQuality(), param.getStart() * param.getLimit(), param.getLimit(), param.getType(), param.getGoodsCategoryIds());
         List<GoodsInfo> goodsList = goodsInfoMapper.getGoodsPage(param.getType(),param.getStart(),param.getLimit(),
@@ -743,5 +746,42 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             }
 
         }
+    }
+
+    @Override
+    public void updateCategory(Integer categoryId, Integer type, Integer status) throws ServiceException {
+        if(status == 2){
+            goodsCategoryMapper.deleteByPrimaryKey(categoryId);
+        }else{
+            GoodsCategory goodsCategory = goodsCategoryMapper.selectByPrimaryKey(categoryId);
+            if(goodsCategory == null){
+                throw new ServiceException("未找到分类信息！");
+            }
+            if(type != null){
+                goodsCategory.setType(type);
+            }
+            if(status != null){
+                goodsCategory.setStatus(status);
+            }
+            goodsCategoryMapper.updateByPrimaryKey(goodsCategory);
+        }
+    }
+
+    @Override
+    public void addCategory(AdminGoodsParam param) throws ServiceException {
+        GoodsCategory goodsCategory = new GoodsCategory();
+        goodsCategory.setParentId(param.getParentId());
+        goodsCategory.setName(param.getName());
+        goodsCategory.setImgUrl(param.getImgUrl());
+        goodsCategory.setSort(param.getSort());
+        goodsCategory.setType(param.getType());
+        goodsCategory.setStatus(param.getStatus());
+        goodsCategory.setAddTime(DateStampUtils.getTimesteamp());
+        goodsCategoryMapper.insert(goodsCategory);
+    }
+
+    @Override
+    public void adminUpdateGoods(Integer goodsId, Integer[] goodsCategoryIds, Integer status, Integer isAppraisal) throws ServiceException {
+
     }
 }

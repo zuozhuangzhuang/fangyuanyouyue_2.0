@@ -58,10 +58,11 @@ public interface OrderService {
      * @param couponId
      * @param userId
      * @param addressId
+     * @param type
      * @return
      * @throws ServiceException
      */
-    OrderDto saveOrder(String token,Integer goodsId,Integer couponId,Integer userId,Integer addressId) throws ServiceException;
+    OrderDto saveOrder(String token,Integer goodsId,Integer couponId,Integer userId,Integer addressId,Integer type) throws ServiceException;
 
     /**
      * 订单支付

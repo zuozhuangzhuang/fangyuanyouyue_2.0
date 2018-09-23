@@ -25,9 +25,9 @@ public class GoodsCategory {
 
     private Integer type;//类型 1普通 2热门
 
-    private Integer status;//状态
+    private Integer status;//状态 0正常 1禁用
 
-    private Integer searchCount;//搜索次数
+    private Integer searchCount = 0;//搜索次数
 
     private Date addTime;//添加时间
 

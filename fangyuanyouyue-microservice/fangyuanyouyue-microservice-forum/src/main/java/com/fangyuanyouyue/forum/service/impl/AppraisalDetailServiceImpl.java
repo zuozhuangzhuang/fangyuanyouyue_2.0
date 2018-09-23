@@ -6,6 +6,7 @@ import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
@@ -219,7 +220,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 			}else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()){
 				Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
 				if(!verifyPayPwd){
-					throw new ServiceException("支付密码错误！");
+					throw new ServiceException(ReCode.PAYMENT_PASSWORD_ERROR.getValue(),ReCode.PAYMENT_PASSWORD_ERROR.getMessage());
 				}else{
 					BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, bonus, Status.SUB.getValue())), BaseResp.class);
 					if(baseResp.getCode() == 1){
@@ -336,7 +337,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 	public Pager getPage(BasePageReq param) {
 
 		Integer total = appraisalDetailMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
-		List<AppraisalDetail> datas = appraisalDetailMapper.getPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders());
+		List<AppraisalDetail> datas = appraisalDetailMapper.getPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
 		//计算浏览量
 		
 		Pager pager = new Pager();
