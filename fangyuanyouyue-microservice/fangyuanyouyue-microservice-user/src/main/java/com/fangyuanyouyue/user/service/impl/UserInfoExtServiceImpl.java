@@ -14,6 +14,7 @@ import com.fangyuanyouyue.base.util.IdGenerator;
 import com.fangyuanyouyue.base.util.MD5Util;
 import com.fangyuanyouyue.user.constant.StatusEnum;
 import com.fangyuanyouyue.user.dao.*;
+import com.fangyuanyouyue.user.dto.admin.AdminIdentityAuthApplyDto;
 import com.fangyuanyouyue.user.model.*;
 import com.fangyuanyouyue.user.service.SchedualMessageService;
 import com.fangyuanyouyue.user.service.SchedualWalletService;
@@ -233,6 +234,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
                     "恭喜您，您申请的实名认证，已通过官方审核！",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
         }else{
             //拒绝
+        	apply.setStatus(status);
             schedualMessageService.easemobMessage(apply.getUserId().toString(),
                     "很抱歉，您申请的实名认证，官方审核未通过！可重新提交资料再次申请。",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
         }
@@ -242,19 +244,19 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
     @Override
     public Pager getExtAuthPage(BasePageReq param) {
 
-        Integer total = userAuthApplyMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
+        Integer total = identityAuthApplyMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
 
         List<IdentityAuthApply> datas = identityAuthApplyMapper.getPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
         Pager pager = new Pager();
         pager.setTotal(total);
-        pager.setDatas(datas);
+        pager.setDatas(AdminIdentityAuthApplyDto.toDtoList(datas));
         return pager;
     }
 
     @Override
     public Pager getShopAuthPage(BasePageReq param) {
 
-        Integer total = identityAuthApplyMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
+        Integer total = userAuthApplyMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
 
         List<UserAuthApply> datas = userAuthApplyMapper.getPage(param.getStart()*param.getLimit(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
         Pager pager = new Pager();

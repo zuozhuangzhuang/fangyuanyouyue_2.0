@@ -159,7 +159,7 @@
 
 
   <select id="countPage" parameterType="Integer" resultType="Integer">
-    select count(*) from user_auth_order a,user_info b where a.user_id=b.id
+    select count(*) from identity_auth_apply a,user_info b where a.user_id=b.id
     <if test="keyword != null">
       and (
       b.phone like "%"#{keyword,jdbcType=VARCHAR}"%"
@@ -169,13 +169,13 @@
     <if test="status != null">
       and a.status = #{status}
     </if>
-    <if test="startDate != null">
-      and a.add_time <![CDATA[ > ]]> #{startDate}
-    </if>
+      <if test="startDate != null">
+        and add_time <![CDATA[ > ]]> #{startDate}
+      </if>
 
-    <if test="endDate != null">
-      and a.add_time <![CDATA[ <= ]]> #{endDate}
-    </if>
+      <if test="endDate != null">
+        and add_time <![CDATA[ <= ]]> #{endDate}
+      </if>
 
   </select>
 

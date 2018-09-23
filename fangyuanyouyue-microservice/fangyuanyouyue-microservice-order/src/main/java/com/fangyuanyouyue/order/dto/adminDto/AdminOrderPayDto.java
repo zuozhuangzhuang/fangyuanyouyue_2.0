@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import static org.mockito.Mockito.doNothing;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,8 @@ public class AdminOrderPayDto {
     private String area;//区域
 
     private String address;//详细地址
+    
+    private String receiver;//详细收货信息
 
     private String postCode;//邮政编码
 
@@ -58,10 +62,13 @@ public class AdminOrderPayDto {
 
     private String logisticCompany;//物流公司
 
+    private Integer payType; //支付方式/支付类型 1微信 2支付宝 3余额 4小程序
+    
     public AdminOrderPayDto() {
     }
 
     public AdminOrderPayDto(OrderPay orderPay) {
+    	this.payType = orderPay.getPayType();
         this.orderId = orderPay.getOrderId();
         this.receiverName = orderPay.getReceiverName();
         this.receiverPhone = orderPay.getReceiverPhone();
@@ -84,6 +91,7 @@ public class AdminOrderPayDto {
         }
         this.logisticCode = orderPay.getLogisticCode();
         this.logisticCompany = orderPay.getLogisticCompany();
+        this.receiver =  this.receiverName+" "+this.receiverPhone+"<br>" + this.province+this.city+this.area+this.address;
     }
 
     public static ArrayList<AdminOrderPayDto> toDtoList(List<OrderPay> list) {

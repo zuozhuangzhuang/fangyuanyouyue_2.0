@@ -110,7 +110,7 @@ public interface GoodsInfoMapper {
      * 分页总条数
      * @return
      */
-    int countPage(@Param("keyword")String keyword,@Param("status")Integer status,@Param("startDate")String startDate,@Param("endDate")String endDate);
+    int countPage(@Param("type")Integer type,@Param("keyword")String keyword,@Param("status")Integer status,@Param("startDate")String startDate,@Param("endDate")String endDate);
 
     /**
      * 分页获取商品\抢购列表

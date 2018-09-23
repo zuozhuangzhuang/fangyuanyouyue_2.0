@@ -19,6 +19,7 @@
     <result column="buyer_is_delete" jdbcType="INTEGER" property="buyerIsDelete" />
     <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
     <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, main_order_id, order_no, amount, count, status, add_time, seller_id, 
@@ -342,7 +343,7 @@
   </select>
 
   <select id="getOrderPage" resultMap="BaseResultMap">
-    select DISTINCT a.*,c.nick_name,c.head_img_url from order_info a,order_detail b,user_info c,goods_info d
+    select DISTINCT a.*,c.nick_name,c.head_img_url,c.phone from order_info a,order_detail b,user_info c,goods_info d
     <where>
       (a.id = b.order_id or a.id = b.main_order_id) and a.is_resolve = 2 and a.user_id = c.id and b.goods_id = d.id
       <if test="keyword != null and keyword != ''">
