@@ -507,6 +507,12 @@ public class WalletServiceImpl implements WalletService{
         UserBalanceDetail userBalance = new UserBalanceDetail();
         userBalance.setUserId(userId);
         userBalance.setAmount(amount);
+        if(type.equals(Status.EXPEND.getValue())){
+            userBalance.setBeforAmount(userWallet.getBalance().add(amount));
+        }else{
+            userBalance.setBeforAmount(userWallet.getBalance().subtract(amount));
+        }
+        userBalance.setAfterAmount(userWallet.getBalance());
         userBalance.setPayType(payType);
         userBalance.setType(type);
         userBalance.setAddTime(DateStampUtils.getTimesteamp());
