@@ -563,7 +563,7 @@ public class WalletServiceImpl implements WalletService{
     @Override
     public Pager userFinance(AdminWalletParam param) throws ServiceException {
         Integer total = userBalanceDetailMapper.countPage(param.getPayType(),param.getOrderType(),param.getType(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
-        List<UserBalanceDetail> details = userBalanceDetailMapper.getPage(param.getPayType(),param.getOrderType(),param.getType(),param.getStart()*param.getLimit(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+        List<UserBalanceDetail> details = userBalanceDetailMapper.getPage(param.getPayType(),param.getOrderType(),param.getType(),param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
         List<AdminUserBalanceDto> datas = AdminUserBalanceDto.toDtoList(details);
         Pager pager = new Pager();
         pager.setTotal(total);
@@ -574,7 +574,7 @@ public class WalletServiceImpl implements WalletService{
     @Override
     public Pager withdrawList(AdminWalletParam param) throws ServiceException {
         Integer total = userWithdrawMapper.countPage(param.getPayType(),param.getStatus(),param.getKeyword(),param.getStartDate(),param.getEndDate());
-        List<UserWithdraw> userWithdraws = userWithdrawMapper.getPage(param.getPayType(),param.getStatus(),param.getStart()*param.getLimit(),param.getLimit(),param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+        List<UserWithdraw> userWithdraws = userWithdrawMapper.getPage(param.getPayType(),param.getStatus(),param.getStart(),param.getLimit(),param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
         List<AdminWithdrawDto> datas = AdminWithdrawDto.toDtoList(userWithdraws);
         Pager pager = new Pager();
         pager.setTotal(total);
