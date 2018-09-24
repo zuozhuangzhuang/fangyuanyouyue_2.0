@@ -26,7 +26,6 @@ import io.swagger.annotations.ApiOperation;
 @Controller
 @RequestMapping(value = "/system")
 @RefreshScope
-@CrossOrigin
 public class AdminLoginController extends BaseController {
     protected Logger log = Logger.getLogger(this.getClass());
     @Autowired
