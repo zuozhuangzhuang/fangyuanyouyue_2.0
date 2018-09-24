@@ -80,6 +80,45 @@ public class AdminController extends BaseController{
             return toError("系统繁忙，请稍后再试！");
         }
     }
+    
+    
+
+    @ApiOperation(value = "查看退货订单", notes = "订单退货",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "keyword", value = "搜索词条", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "状态 1待支付 2待发货 3待收货 4已完成 5已取消 7退货", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "startDate", value = "开始日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "endDate", value = "结束日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orders", value = "排序规则", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "ascType", value = "排序类型 1升序 2降序", required = false, dataType = "int", paramType = "query")
+    })
+    @GetMapping(value = "/refundList")
+    @ResponseBody
+    public BaseResp refundList(AdminOrderParam param) throws IOException {
+        try {
+            log.info("----》查看所有用户订单《----");
+            log.info("参数："+param.toString());
+            //参数判断
+            //验证用户
+            if(param.getStart() == null || param.getStart() < 0){
+                return toError("起始页数错误！");
+            }
+            if(param.getLimit() == null || param.getLimit() < 1){
+                return toError("每页个数错误！");
+            }
+            //查看所有用户订单
+            Pager pager = refundService.refundList(param);
+            return toPage(pager);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
 
 
     @ApiOperation(value = "官方处理退货", notes = "官方处理退货")

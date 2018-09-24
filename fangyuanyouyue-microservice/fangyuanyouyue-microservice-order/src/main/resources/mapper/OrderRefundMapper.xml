@@ -21,6 +21,7 @@
     <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
     <result column="deal_time" jdbcType="TIMESTAMP" property="dealTime" />
     <result column="platform_reason" jdbcType="VARCHAR" property="platformReason" />
+    <result column="order_no" jdbcType="VARCHAR" property="orderNo" />
   </resultMap>
   <sql id="Base_Column_List">
     id, order_id, reason, service_no, pic1, pic2, pic3, pic4, pic5, pic6, status, add_time, 
@@ -268,5 +269,52 @@
         and status = #{status}
       </if>
     </where>
+  </select>
+  
+
+  <select id="countPage" resultType="Integer">
+    select count(*) from order_refund a,order_info b
+    <where>
+      a.order_id = b.id
+      <if test="keyword != null">
+      </if>
+      <if test="status != null">
+       and a.status = #{status}
+      </if>
+
+      <if test="startDate != null">
+        and a.add_time <![CDATA[ > ]]> #{startDate}
+      </if>
+      <if test="endDate != null">
+        and a.add_time <![CDATA[ <= ]]> #{endDate}
+      </if>
+    </where>
+  </select>
+
+  <select id="getPage" resultMap="BaseResultMap">
+    select *,b.order_no from order_refund a,order_info b
+    <where>
+      a.order_id = b.id
+      <if test="keyword != null and keyword != ''">
+      </if>
+      <if test="status != null">
+       and a.status = #{status}
+      </if>
+      <if test="startDate != null and startDate != ''">
+        and a.add_time <![CDATA[ > ]]> #{startDate}
+      </if>
+      <if test="endDate != null and endDate != ''">
+        and a.add_time <![CDATA[ <= ]]> #{endDate}
+      </if>
+    </where>
+    <if test="orders != null">
+      order by a.${orders}
+      <if test="ascType != null and ascType == 2">
+        desc
+      </if>
+    </if>
+    <if test="start != null and limit != null">
+      limit #{start},#{limit}
+    </if>
   </select>
 </mapper>

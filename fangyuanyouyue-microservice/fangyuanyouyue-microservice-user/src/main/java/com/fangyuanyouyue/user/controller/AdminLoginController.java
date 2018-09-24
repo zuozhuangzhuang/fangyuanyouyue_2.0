@@ -44,10 +44,16 @@ public class AdminLoginController extends BaseController {
     public BaseResp delete(String loginCode,String password) throws IOException {
         try {
             log.info("后台后台登录 - "+loginCode);
-        	HashMap map = new HashMap<String,String>();
-        	map.put("token", "abcdefg");
-            return toSuccess(map);
-        	//return toError("账号或密码有误");
+            
+            //测试登录
+            if(loginCode.equals("admin")&&password.equals("123456")) {
+            	HashMap map = new HashMap<String,String>();
+            	map.put("token", "abcdefg");
+                return toSuccess(map);
+            }else {
+            	return toError("账号或密码有误");
+            }
+            
         }catch (Exception e) {
             e.printStackTrace();
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");

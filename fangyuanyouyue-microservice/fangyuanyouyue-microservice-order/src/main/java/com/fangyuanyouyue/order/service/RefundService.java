@@ -58,4 +58,14 @@ public interface RefundService {
      * @throws ServiceException
      */
     void platformDealReturns(Integer userId, Integer orderId, String reason, Integer status) throws ServiceException;
+    
+
+    /**
+     * 退货列表
+     * @param param
+     * @return
+     * @throws ServiceException
+     */
+    Pager refundList(AdminOrderParam param) throws ServiceException;
+    
 }

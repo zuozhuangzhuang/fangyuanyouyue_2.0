@@ -15,6 +15,7 @@ import com.fangyuanyouyue.base.util.MD5Util;
 import com.fangyuanyouyue.user.constant.StatusEnum;
 import com.fangyuanyouyue.user.dao.*;
 import com.fangyuanyouyue.user.dto.admin.AdminIdentityAuthApplyDto;
+import com.fangyuanyouyue.user.dto.admin.AdminUserAuthApplyDto;
 import com.fangyuanyouyue.user.model.*;
 import com.fangyuanyouyue.user.service.SchedualMessageService;
 import com.fangyuanyouyue.user.service.SchedualWalletService;
@@ -261,7 +262,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
         List<UserAuthApply> datas = userAuthApplyMapper.getPage(param.getStart()*param.getLimit(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
         Pager pager = new Pager();
         pager.setTotal(total);
-        pager.setDatas(datas);
+        pager.setDatas(AdminUserAuthApplyDto.toDtoList(datas));
         return pager;
     }
 

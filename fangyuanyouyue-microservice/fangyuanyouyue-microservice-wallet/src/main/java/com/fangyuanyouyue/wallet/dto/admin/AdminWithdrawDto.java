@@ -1,5 +1,6 @@
 package com.fangyuanyouyue.wallet.dto.admin;
 
+import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.wallet.model.PlatformFinanceDetail;
 import com.fangyuanyouyue.wallet.model.UserWithdraw;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * 用户提现信息Dto
  */
@@ -17,6 +19,8 @@ import java.util.List;
 @Setter
 @ToString
 public class AdminWithdrawDto {
+	
+	private	Integer id;
 
     private Integer userId;//用户id
 
@@ -33,8 +37,11 @@ public class AdminWithdrawDto {
     private String realName;//真实姓名
 
     private String nickName;//用户昵称
+    
+    private String addTime;
 
     public AdminWithdrawDto(UserWithdraw withdraw) {
+    	this.id = withdraw.getId();
         this.userId = withdraw.getUserId();
         this.amount = withdraw.getAmount();
         this.payType = withdraw.getPayType();
@@ -43,6 +50,7 @@ public class AdminWithdrawDto {
         this.account = withdraw.getAccount();
         this.realName = withdraw.getRealName();
         this.nickName = withdraw.getNickName();
+        //this.addTime = DateUtil.getFormatDate(withdraw.getAddTime(), DateUtil.DATE_FORMT);
     }
 
 

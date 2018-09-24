@@ -45,6 +45,9 @@ public class AdminReportDto {
 
     //举报类型 1商品\抢购 2视频 3帖子 4全民鉴定
     private Integer type;
+    
+    //举报原因
+    private String reason;
 
     public AdminReportDto() {
     }
@@ -60,6 +63,7 @@ public class AdminReportDto {
         this.updateTime = DateUtil.getFormatDate(report.getUpdateTime(),DateUtil.DATE_FORMT);
         this.status = report.getStatus();
         this.type = report.getType();
+        this.reason = report.getReason();
     }
 
     public static ArrayList<AdminReportDto> toDtoList(List<Report> list) {

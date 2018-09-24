@@ -48,4 +48,6 @@ public class ForumInfo {
     private String headImgUrl;//用户头像
 
     private Integer pvCount;//帖子浏览量基数，展示浏览量为基数＋浏览量个数
+    
+    private String columnName;//专栏名称
 }

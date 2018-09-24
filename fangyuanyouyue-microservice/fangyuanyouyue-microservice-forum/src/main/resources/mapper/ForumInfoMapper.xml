@@ -19,6 +19,7 @@
     <result column="pv_count" jdbcType="INTEGER" property="pvCount" />
     <result column="nick_name" jdbcType="VARCHAR" property="nickName"/>
     <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl"/>
+    <result column="column_name" jdbcType="VARCHAR" property="columnName"/>
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.forum.model.ForumInfo">
     <result column="content" jdbcType="LONGVARCHAR" property="content" />
@@ -331,8 +332,40 @@
     
   </select>
   
+  <select id="getPageVideo" resultMap="BaseResultMap">
+    select a.*,b.head_img_url,b.nick_name  from forum_info a,user_info b where a.user_id=b.id 
+    <if test="type != null">
+      and  a.type=#{type,jdbcType=VARCHAR}
+    </if>
+    <if test="keyword != null">
+      and (
+        a.name like "%"#{keyword,jdbcType=VARCHAR}"%"
+        or b.nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
+      )
+    </if>
+    <if test="status != null">
+      and a.status = #{status}
+    </if>
+    
+    <if test="startDate != null">
+      and a.add_time <![CDATA[ > ]]> #{startDate}
+    </if>
+    
+    <if test="endDate != null">
+      and a.add_time <![CDATA[ <= ]]> #{endDate}
+    </if>
+    
+    <if test="orders != null">
+      order by a.${orders}
+      <if test="ascType != null and ascType == 2">
+        desc
+      </if>
+    </if>
+    limit #{start},#{limit}
+  </select>
+  
   <select id="getPage" resultMap="BaseResultMap">
-    select a.*,b.head_img_url,b.nick_name from forum_info a,user_info b where a.user_id=b.id
+    select a.*,b.head_img_url,b.nick_name,c.name as column_name from forum_info a,user_info b,forum_column c where a.user_id=b.id and a.column_id=c.id
     <if test="type != null">
       and  a.type=#{type,jdbcType=VARCHAR}
     </if>

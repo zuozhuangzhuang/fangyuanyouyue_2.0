@@ -2,13 +2,10 @@ package com.fangyuanyouyue.user.controller;
 
 import java.io.IOException;
 
-import com.fangyuanyouyue.user.service.SystemService;
-import com.fangyuanyouyue.user.service.UserInfoExtService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +17,8 @@ import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.user.param.AdminUserParam;
+import com.fangyuanyouyue.user.service.SystemService;
+import com.fangyuanyouyue.user.service.UserInfoExtService;
 import com.fangyuanyouyue.user.service.UserInfoService;
 
 import io.swagger.annotations.Api;
@@ -31,7 +30,6 @@ import io.swagger.annotations.ApiOperation;
 @Controller
 @RequestMapping(value = "/adminUser")
 @RefreshScope
-@CrossOrigin
 public class AdminController extends BaseController {
     protected Logger log = Logger.getLogger(this.getClass());
     @Autowired

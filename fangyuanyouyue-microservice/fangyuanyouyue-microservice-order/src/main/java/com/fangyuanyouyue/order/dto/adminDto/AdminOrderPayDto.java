@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import static org.mockito.Mockito.doNothing;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;

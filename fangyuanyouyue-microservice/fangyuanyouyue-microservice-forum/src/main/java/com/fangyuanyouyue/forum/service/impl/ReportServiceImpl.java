@@ -39,7 +39,7 @@ public class ReportServiceImpl implements ReportService{
     @Override
     public Pager getForumReportPage(AdminForumParam param) throws ServiceException {
         Integer total = reportMapper.countForumPage(param.getType(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
-        List<Report> list = reportMapper.getForumReportPage(param.getType(),param.getStart()*param.getLimit(),param.getLimit(),
+        List<Report> list = reportMapper.getForumReportPage(param.getType(),param.getStart(),param.getLimit(),
                 param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
         ArrayList<AdminReportDto> datas = AdminReportDto.toDtoList(list);
         Pager pager = new Pager();
@@ -52,7 +52,7 @@ public class ReportServiceImpl implements ReportService{
     @Override
     public Pager getAppraisalReportPage(AdminForumParam param) throws ServiceException {
         Integer total = reportMapper.countAppraisalPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
-        List<Report> list = reportMapper.getAppraisalReportPage(param.getStart()*param.getLimit(),param.getLimit(),
+        List<Report> list = reportMapper.getAppraisalReportPage(param.getStart(),param.getLimit(),
                 param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
         ArrayList<AdminReportDto> datas = AdminReportDto.toDtoList(list);
         Pager pager = new Pager();
