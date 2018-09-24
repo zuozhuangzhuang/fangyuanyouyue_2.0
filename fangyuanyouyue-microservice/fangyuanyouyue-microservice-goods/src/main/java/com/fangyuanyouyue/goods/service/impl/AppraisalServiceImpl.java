@@ -137,7 +137,6 @@ public class AppraisalServiceImpl implements AppraisalService{
             goodsAppraisalDetail.setTitle(title);
             goodsAppraisalDetail.setDescription(description);
             goodsAppraisalDetail.setStatus(4);//状态 0申请 1真 2假 3存疑 4待支付(在列表中不显示)
-            //TODO 根据鉴定费算法
             BigDecimal price = new BigDecimal(10);//自己上传图片或视频收费10元
             if(appraisalCount > 0){//免费鉴定
                 goodsAppraisalDetail.setStatus(0);

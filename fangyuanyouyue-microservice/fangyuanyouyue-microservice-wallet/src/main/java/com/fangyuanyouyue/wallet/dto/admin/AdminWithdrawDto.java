@@ -38,7 +38,7 @@ public class AdminWithdrawDto {
 
     private String nickName;//用户昵称
     
-    private String addTime;
+    private String addTime;//添加时间
 
     public AdminWithdrawDto(UserWithdraw withdraw) {
     	this.id = withdraw.getId();
@@ -50,7 +50,7 @@ public class AdminWithdrawDto {
         this.account = withdraw.getAccount();
         this.realName = withdraw.getRealName();
         this.nickName = withdraw.getNickName();
-        //this.addTime = DateUtil.getFormatDate(withdraw.getAddTime(), DateUtil.DATE_FORMT);
+        this.addTime = DateUtil.getFormatDate(withdraw.getAddTime(), DateUtil.DATE_FORMT);
     }
 
 

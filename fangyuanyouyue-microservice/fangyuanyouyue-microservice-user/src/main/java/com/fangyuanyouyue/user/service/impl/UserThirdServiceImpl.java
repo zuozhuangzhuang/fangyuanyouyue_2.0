@@ -77,7 +77,7 @@ public class UserThirdServiceImpl implements UserThirdService {
     //合并账号
     @Override
     public void accountMerge(String token, String phone, String unionId, Integer type, String loginPwd) throws ServiceException {
-        //TODO 1、修改手机用户的密码 2、修改三方用户的userId 3、修改数据表中userId（钱包表：合并、会员表：合并、） 4、清除双方token，让用户重新登录
+        //1、修改手机用户的密码 2、修改三方用户的userId 3、修改数据表中userId（钱包表：合并、会员表：合并、） 4、清除双方token，让用户重新登录
         //当前用户
         UserInfo user = userInfoService.getUserByToken(token);
         UserThirdParty userThird = userThirdPartyMapper.getUserThirdByUserId(user.getId(),type);

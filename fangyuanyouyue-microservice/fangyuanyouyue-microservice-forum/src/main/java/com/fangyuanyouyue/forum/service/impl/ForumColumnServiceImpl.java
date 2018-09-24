@@ -227,7 +227,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 
 	@Override
 	public List<ForumColumnApply> applyList(Integer start, Integer limit, String keyword,Integer status) throws ServiceException {
-		//TODO 专栏申请列表
+		//专栏申请列表
 		List<ForumColumnApply> forumColumnApplies = forumColumnApplyMapper.selectApplyList(start * limit, limit, keyword,status);
 		return forumColumnApplies;
 	}

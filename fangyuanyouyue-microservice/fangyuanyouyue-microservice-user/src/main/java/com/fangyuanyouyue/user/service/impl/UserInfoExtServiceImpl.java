@@ -235,7 +235,6 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
                     "恭喜您，您申请的实名认证，已通过官方审核！",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
         }else{
             //拒绝
-        	apply.setStatus(status);
             schedualMessageService.easemobMessage(apply.getUserId().toString(),
                     "很抱歉，您申请的实名认证，官方审核未通过！可重新提交资料再次申请。",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
         }

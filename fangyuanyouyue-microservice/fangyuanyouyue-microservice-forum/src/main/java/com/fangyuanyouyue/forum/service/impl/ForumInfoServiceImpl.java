@@ -203,9 +203,9 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 		Integer total = forumInfoMapper.countPage(type,param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
 		List<ForumInfo> datas = new ArrayList<ForumInfo>();
 		if(type.intValue()==2) {
-			datas = forumInfoMapper.getPageVideo(type,param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders());
+			datas = forumInfoMapper.getPageVideo(type,param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
 		}else {
-			datas = forumInfoMapper.getPage(type,param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders());
+			datas = forumInfoMapper.getPage(type,param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
 		}
 		//计算浏览量
 		List<AdminForumInfoDto> dtos = new ArrayList<AdminForumInfoDto>();

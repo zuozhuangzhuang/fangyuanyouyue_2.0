@@ -5,6 +5,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.math.BigDecimal;
+import java.util.Date;
+
 /**
  * 用户钱包表
  */
@@ -30,4 +32,5 @@ public class UserWithdraw {
 
     private String nickName;//用户昵称
 
+    private Date addTime;//添加时间
 }
