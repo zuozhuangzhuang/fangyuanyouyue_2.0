@@ -1,6 +1,10 @@
 package com.fangyuanyouyue.order.dao;
 
+import com.fangyuanyouyue.order.model.OrderInfo;
 import com.fangyuanyouyue.order.model.OrderRefund;
+
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -26,4 +30,29 @@ public interface OrderRefundMapper {
      * @return
      */
     OrderRefund selectByOrderIdStatus(@Param("orderId")Integer orderId, @Param("status")Integer status,@Param("sellerReturnStatus")Integer sellerReturnStatus);
+    /**
+     * 分页总条数
+     * @param keyword
+     * @param status
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    Integer countPage(@Param("keyword")String keyword,@Param("status")Integer status,@Param("startDate")String startDate,@Param("endDate")String endDate);
+
+    /**
+     * 分页获取订单
+     * @param start
+     * @param limit
+     * @param keyword
+     * @param status
+     * @param startDate
+     * @param endDate
+     * @param orders
+     * @param ascType
+     * @return
+     */
+    List<OrderRefund> getPage(@Param("start") Integer start,
+                                 @Param("limit") Integer limit,@Param("keyword")String keyword,@Param("status")Integer status,
+                                 @Param("startDate")String startDate,@Param("endDate")String endDate,@Param("orders")String orders,@Param("ascType")Integer ascType);
 }

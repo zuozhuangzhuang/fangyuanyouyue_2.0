@@ -31,6 +31,8 @@ public class AdminOrderDto {
     private String phone;//买家电话
     
     private String seller;
+    
+    private String buyer;
 
     private Integer orderId;//订单ID
 
@@ -73,7 +75,8 @@ public class AdminOrderDto {
 
     public AdminOrderDto(OrderInfo orderInfo) {
         this.userId = orderInfo.getUserId();
-        this.nickName = orderInfo.getPhone()+"<br>"+orderInfo.getNickName();
+        this.nickName = orderInfo.getNickName();
+        this.buyer = orderInfo.getPhone()+"<br>"+orderInfo.getNickName();
         this.headImgUrl = orderInfo.getHeadImgUrl();
         this.phone = orderInfo.getPhone();
         this.orderId = orderInfo.getId();

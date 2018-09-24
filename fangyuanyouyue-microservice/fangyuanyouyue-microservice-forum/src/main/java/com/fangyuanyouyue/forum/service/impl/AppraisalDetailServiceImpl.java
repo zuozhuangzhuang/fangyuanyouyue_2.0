@@ -1,5 +1,14 @@
 package com.fangyuanyouyue.forum.service.impl;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BasePageReq;
 import com.fangyuanyouyue.base.BaseResp;
@@ -12,22 +21,26 @@ import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.base.util.IdGenerator;
 import com.fangyuanyouyue.forum.constants.StatusEnum;
-import com.fangyuanyouyue.forum.dao.*;
+import com.fangyuanyouyue.forum.dao.AppraisalCommentMapper;
+import com.fangyuanyouyue.forum.dao.AppraisalDetailMapper;
+import com.fangyuanyouyue.forum.dao.AppraisalImgMapper;
+import com.fangyuanyouyue.forum.dao.AppraisalLikesMapper;
+import com.fangyuanyouyue.forum.dao.ArgueOrderMapper;
+import com.fangyuanyouyue.forum.dao.CollectMapper;
+import com.fangyuanyouyue.forum.dto.AdminAppraisalDetailDto;
 import com.fangyuanyouyue.forum.dto.AppraisalDetailDto;
 import com.fangyuanyouyue.forum.dto.AppraisalImgDto;
-import com.fangyuanyouyue.forum.model.*;
+import com.fangyuanyouyue.forum.model.AppraisalComment;
+import com.fangyuanyouyue.forum.model.AppraisalDetail;
+import com.fangyuanyouyue.forum.model.AppraisalImg;
+import com.fangyuanyouyue.forum.model.AppraisalLikes;
+import com.fangyuanyouyue.forum.model.ArgueOrder;
+import com.fangyuanyouyue.forum.model.Collect;
+import com.fangyuanyouyue.forum.model.UserInfo;
 import com.fangyuanyouyue.forum.service.AppraisalDetailService;
 import com.fangyuanyouyue.forum.service.SchedualMessageService;
 import com.fangyuanyouyue.forum.service.SchedualUserService;
 import com.fangyuanyouyue.forum.service.SchedualWalletService;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Service(value = "appraisalDetailService")
@@ -338,10 +351,19 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 		Integer total = appraisalDetailMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
 		List<AppraisalDetail> datas = appraisalDetailMapper.getPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders());
 		//计算浏览量
+		List<AdminAppraisalDetailDto> dtos = new ArrayList<AdminAppraisalDetailDto>();
+		for(AppraisalDetail model:datas) {
+			AdminAppraisalDetailDto dto = new AdminAppraisalDetailDto(model);
+			//鉴定图片列表
+			List<AppraisalImg> appraisalImgs = appraisalImgMapper.selectListByAppraisal(model.getId());
+			dto.setImgDtos(AppraisalImgDto.toDtoList(appraisalImgs));
+			
+			dtos.add(dto);
+		}
 		
 		Pager pager = new Pager();
 		pager.setTotal(total);
-		pager.setDatas(datas);
+		pager.setDatas(dtos);
 		return pager;
 	}
 

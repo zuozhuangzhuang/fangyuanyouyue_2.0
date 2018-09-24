@@ -1,7 +1,13 @@
 package com.fangyuanyouyue.order.dto.adminDto;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.order.model.OrderRefund;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -18,6 +24,8 @@ public class AdminOrderRefundDto {
     private Integer userId;//退货申请用户id
 
     private Integer orderId;//订单id
+
+    private String orderNo;//订单号
 
     private String reason;//申请理由
 
@@ -49,12 +57,15 @@ public class AdminOrderRefundDto {
 
     private String dealTime;//卖家处理时间
 
-    private String platformReason;//平台处理原因
+    private String platformReason;//平台处理原因]
+    
+    private ArrayList<HashMap<String,String>> imgs = new ArrayList<HashMap<String,String>>();
 
     public AdminOrderRefundDto() {
     }
 
     public AdminOrderRefundDto(OrderRefund refund) {
+    	this.orderNo = refund.getOrderNo();
         this.id = refund.getId();
         this.userId = refund.getUserId();
         this.orderId = refund.getOrderId();
@@ -66,6 +77,14 @@ public class AdminOrderRefundDto {
         this.pic4 = refund.getPic4();
         this.pic5 = refund.getPic5();
         this.pic6 = refund.getPic6();
+        
+        setImg(this.pic1);
+        setImg(this.pic2);
+        setImg(this.pic3);
+        setImg(this.pic4);
+        setImg(this.pic5);
+        setImg(this.pic6);
+        
         this.status = refund.getStatus();
         this.sellerReturnStatus = refund.getSellerReturnStatus();
         this.refuseReason = refund.getRefuseReason();
@@ -78,5 +97,25 @@ public class AdminOrderRefundDto {
             this.dealTime = DateUtil.getFormatDate(refund.getDealTime(), DateUtil.DATE_FORMT);
         }
         this.platformReason = refund.getPlatformReason();
+    }
+    
+    private void setImg(String pic) {
+    	if(pic!=null) {
+        	HashMap<String,String> map = new HashMap<>();
+        	map.put("imgUrl", pic);
+        	imgs.add(map);
+    	}
+    }
+
+    public static ArrayList<AdminOrderRefundDto> toDtoList(List<OrderRefund> list) {
+        if (list == null) {
+            return null;
+        }
+        ArrayList<AdminOrderRefundDto> dtolist = new ArrayList<>();
+        for (OrderRefund model : list) {
+        	AdminOrderRefundDto dto = new AdminOrderRefundDto(model);
+            dtolist.add(dto);
+        }
+        return dtolist;
     }
 }

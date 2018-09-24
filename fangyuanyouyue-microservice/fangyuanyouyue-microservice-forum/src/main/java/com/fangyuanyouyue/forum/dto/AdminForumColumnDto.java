@@ -3,6 +3,7 @@ package com.fangyuanyouyue.forum.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.forum.model.ForumColumn;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,10 +24,20 @@ public class AdminForumColumnDto {
     private String typeName;//类型名称
 
     private String name;//专栏名称
+    
+    private String nickName;//栏主名称
 
     private String coverImgUrl;//封面图
 
-    private Integer fansCount = 0;//粉丝数量
+    private Integer totalCount = 0;//总数量
+
+    private Integer realCount = 0;//真实数量
+
+    private Integer baseCount = 0;//基础数量
+
+    private Integer isChosen;//是否精选1是 2否
+
+    private String addTime;
 
     public AdminForumColumnDto() {
     	
@@ -36,9 +47,11 @@ public class AdminForumColumnDto {
         this.id = forumInfo.getId();
         this.name = forumInfo.getName();
         this.coverImgUrl = forumInfo.getCoverImgUrl();
-        this.fansCount = forumInfo.getFansCount();
         this.typeId = forumInfo.getTypeId();
         this.typeName = forumInfo.getTypeName();
+        this.nickName = forumInfo.getNickName();
+        this.isChosen = forumInfo.getIsChosen();
+        this.addTime = DateUtil.getFormatDate(forumInfo.getAddTime(), DateUtil.DATE_FORMT);
     }
     public static List<AdminForumColumnDto> toDtoList(List<ForumColumn> list) {
         if (list == null) {

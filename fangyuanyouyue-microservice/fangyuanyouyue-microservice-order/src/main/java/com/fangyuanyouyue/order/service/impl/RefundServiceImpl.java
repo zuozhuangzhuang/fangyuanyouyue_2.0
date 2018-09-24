@@ -10,6 +10,8 @@ import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.order.dao.*;
 import com.fangyuanyouyue.order.dto.*;
+import com.fangyuanyouyue.order.dto.adminDto.AdminCompanyDto;
+import com.fangyuanyouyue.order.dto.adminDto.AdminOrderRefundDto;
 import com.fangyuanyouyue.order.model.*;
 import com.fangyuanyouyue.order.param.AdminOrderParam;
 import com.fangyuanyouyue.order.service.*;
@@ -248,4 +250,16 @@ public class RefundServiceImpl implements RefundService{
             return orderRefundDto;
         }
     }
+    
+
+    @Override
+    public Pager refundList(AdminOrderParam param) throws ServiceException {
+        List<OrderRefund> list = orderRefundMapper.getPage(param.getStart(), param.getLimit(), param.getKeyword(), param.getStatus(), param.getStartDate(), param.getEndDate(), param.getOrders(),param.getAscType());
+        Integer total = orderRefundMapper.countPage(param.getKeyword(), param.getStatus(), param.getStartDate(), param.getEndDate());
+        Pager pager = new Pager();
+        pager.setTotal(total);
+        pager.setDatas(AdminOrderRefundDto.toDtoList(list));
+        return pager;
+    }
+    
 }

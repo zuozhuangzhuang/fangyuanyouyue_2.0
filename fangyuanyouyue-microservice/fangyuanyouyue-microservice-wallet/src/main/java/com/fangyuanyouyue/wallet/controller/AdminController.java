@@ -155,7 +155,7 @@ public class AdminController extends BaseController{
             @ApiImplicitParam(name = "status", value = "状态 2同意 3拒绝", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "content", value = "处理原因", required = false, dataType = "String", paramType = "query")
     })
-    @GetMapping(value = "/updateWithdraw")
+    @PostMapping(value = "/updateWithdraw")
     @ResponseBody
     public BaseResp updateWithdraw(AdminWalletParam param) throws IOException {
         try {
@@ -163,12 +163,6 @@ public class AdminController extends BaseController{
             log.info("参数："+param.toString());
             if(param.getId() == null){
                 return toError("申请信息id不能为空！");
-            }
-            if(param.getStart() == null || param.getStart() < 0){
-                return toError("起始页数错误！");
-            }
-            if(param.getLimit() == null || param.getLimit() < 1){
-                return toError("每页个数错误！");
             }
             walletService.updateWithdraw(param.getId(),param.getStatus(),param.getContent());
             return toSuccess();

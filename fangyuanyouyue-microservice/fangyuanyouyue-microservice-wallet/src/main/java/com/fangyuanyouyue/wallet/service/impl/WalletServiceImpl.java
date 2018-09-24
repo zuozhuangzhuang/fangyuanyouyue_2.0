@@ -602,6 +602,7 @@ public class WalletServiceImpl implements WalletService{
             schedualMessageService.easemobMessage(userWithdraw.getUserId().toString(),"您在小方圆申请￥"+userWithdraw.getAmount()+"的提现申请已被拒绝，拒绝原因："+content,
                     Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
         }
+        userWithdrawMapper.updateByPrimaryKey(userWithdraw);
     }
 
     @Override

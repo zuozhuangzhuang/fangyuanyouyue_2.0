@@ -50,6 +50,8 @@ public class OrderRefund {
     private Date dealTime;//卖家处理时间
 
     private String platformReason;//平台处理原因
+    
+    private String orderNo;//订单号
 
     //TODO 后台处理人员id
 }

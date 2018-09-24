@@ -11,6 +11,7 @@ import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.forum.constants.StatusEnum;
 import com.fangyuanyouyue.forum.dao.*;
 import com.fangyuanyouyue.forum.dto.AdminForumColumnDto;
+import com.fangyuanyouyue.forum.dto.AdminForumInfoDto;
 import com.fangyuanyouyue.forum.dto.ForumInfoDto;
 import com.fangyuanyouyue.forum.dto.ForumLikesDto;
 import com.fangyuanyouyue.forum.model.*;
@@ -200,14 +201,26 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 	public Pager getPage(BasePageReq param,Integer type) {
 
 		Integer total = forumInfoMapper.countPage(type,param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
-		List<ForumInfo> datas = forumInfoMapper.getPage(type,param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders());
+		List<ForumInfo> datas = new ArrayList<ForumInfo>();
+		if(type.intValue()==2) {
+			datas = forumInfoMapper.getPageVideo(type,param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders());
+		}else {
+			datas = forumInfoMapper.getPage(type,param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders());
+		}
 		//计算浏览量
+		List<AdminForumInfoDto> dtos = new ArrayList<AdminForumInfoDto>();
+		for(ForumInfo info:datas) {
+			AdminForumInfoDto dto = new AdminForumInfoDto(info);
+			dtos.add(dto);
+		}
 		
 		Pager pager = new Pager();
 		pager.setTotal(total);
-		pager.setDatas(datas);
+		pager.setDatas(dtos);
 		return pager;
 	}
+	
+	
 
 	
 }

@@ -12,6 +12,7 @@
     <result column="is_chosen" jdbcType="INTEGER" property="isChosen" />
     <result column="type_id" jdbcType="INTEGER" property="typeId" />
     <result column="type_name" jdbcType="VARCHAR" property="typeName" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, name, cover_img_url, fans_count, add_time, update_time, is_chosen, type_id
@@ -210,7 +211,7 @@
   </select>
   
   <select id="getPage" resultMap="BaseResultMap">
-    select *,b.name as type_name from forum_column a,forum_column_type b where a.type_id=b.id
+    select *,b.name as type_name,c.nick_name from forum_column a,forum_column_type b,user_info c where a.type_id=b.id and a.user_id=c.id
     <if test="keyword != null">
       and ( 
       	a.name like "%"#{keyword,jdbcType=VARCHAR}"%"
