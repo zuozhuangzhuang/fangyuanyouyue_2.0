@@ -51,4 +51,9 @@ public class SchedualWalletServiceImpl implements SchedualWalletService{
     public String addUserBehavior(Integer userId, Integer toUserId, Integer businessId, Integer businessType, Integer type) {
         return "新增用户行为失败！";
     }
+
+    @Override
+    public String isUserVip(Integer userId) {
+        return "验证用户是否会员失败！";
+    }
 }

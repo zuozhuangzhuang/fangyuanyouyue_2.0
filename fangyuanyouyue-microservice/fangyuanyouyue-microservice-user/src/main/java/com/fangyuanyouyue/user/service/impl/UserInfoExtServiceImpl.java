@@ -159,7 +159,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
                 }else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()) {
                     boolean verifyPayPwd = verifyPayPwd(userId, payPwd);
                     if(!verifyPayPwd){
-                        throw new ServiceException("支付密码错误！");
+                        throw new ServiceException(ReCode.PAYMENT_PASSWORD_ERROR.getValue(),ReCode.PAYMENT_PASSWORD_ERROR.getMessage());
                     }
                     BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, authOrder.getAmount(), Status.SUB.getValue())), BaseResp.class);
                     if(baseResp.getCode() == 1){
@@ -235,7 +235,6 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
                     "恭喜您，您申请的实名认证，已通过官方审核！",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
         }else{
             //拒绝
-        	apply.setStatus(status);
             schedualMessageService.easemobMessage(apply.getUserId().toString(),
                     "很抱歉，您申请的实名认证，官方审核未通过！可重新提交资料再次申请。",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
         }

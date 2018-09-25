@@ -27,8 +27,6 @@ import java.util.List;
 public class FeignController extends BaseController{
     protected Logger log = Logger.getLogger(this.getClass());
 
-    protected Logger alipayLoglog = Logger.getLogger("alipayLog");
-    protected Logger wechatLog = Logger.getLogger("wechatLog");
     @Autowired
     private WalletService walletService;
     @Autowired
@@ -43,6 +41,8 @@ public class FeignController extends BaseController{
     private UserBehaviorService userBehaviorService;
     @Autowired
     private ScoreService scoreService;
+    @Autowired
+    private UserVipService userVipService;
 
 
     @PostMapping(value = "/updateScore")
@@ -335,6 +335,27 @@ public class FeignController extends BaseController{
         }
     }
 
+
+    @ApiOperation(value = "验证用户是否是会员", notes = "验证用户是否是会员",hidden = true)
+    @PostMapping(value = "/isUserVip")
+    @ResponseBody
+    public BaseResp isUserVip(Integer userId) throws IOException {
+        try {
+            log.info("----》验证用户是否是会员《----");
+            if(userId == null){
+                return toError("用户id不能为空！");
+            }
+            //新增用户行为
+            boolean isUserVip = userVipService.isUserVip(userId);
+            return toSuccess(isUserVip);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
 
 
 

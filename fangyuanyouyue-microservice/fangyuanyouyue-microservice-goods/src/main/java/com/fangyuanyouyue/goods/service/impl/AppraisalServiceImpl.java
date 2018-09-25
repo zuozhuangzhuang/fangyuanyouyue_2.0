@@ -5,6 +5,7 @@ import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
@@ -136,7 +137,6 @@ public class AppraisalServiceImpl implements AppraisalService{
             goodsAppraisalDetail.setTitle(title);
             goodsAppraisalDetail.setDescription(description);
             goodsAppraisalDetail.setStatus(4);//状态 0申请 1真 2假 3存疑 4待支付(在列表中不显示)
-            //TODO 根据鉴定费算法
             BigDecimal price = new BigDecimal(10);//自己上传图片或视频收费10元
             if(appraisalCount > 0){//免费鉴定
                 goodsAppraisalDetail.setStatus(0);
@@ -260,7 +260,7 @@ public class AppraisalServiceImpl implements AppraisalService{
                 //验证支付密码
                 Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
                 if (!verifyPayPwd) {
-                    throw new ServiceException("支付密码错误！");
+                    throw new ServiceException(ReCode.PAYMENT_PASSWORD_ERROR.getValue(),ReCode.PAYMENT_PASSWORD_ERROR.getMessage());
                 } else {
                     //调用wallet-service修改余额功能
                     BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, orderInfo.getAmount(), Status.SUB.getValue())), BaseResp.class);

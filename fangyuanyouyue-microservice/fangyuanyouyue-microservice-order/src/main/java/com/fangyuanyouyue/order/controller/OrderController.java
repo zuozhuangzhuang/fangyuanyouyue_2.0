@@ -250,12 +250,8 @@ public class OrderController extends BaseController{
             if(jsonObject != null && (Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            if(param.getType().intValue() == 2){
-                //TODO 非会员只能免费抢购一次，会员可无限制抢购——验证是否为会员
-
-            }
             //商品/抢购直接下单
-            OrderDto orderDto = orderService.saveOrder(param.getToken(),param.getGoodsId(),param.getCouponId(), userId, param.getAddressId());
+            OrderDto orderDto = orderService.saveOrder(param.getToken(),param.getGoodsId(),param.getCouponId(), userId, param.getAddressId(),param.getType());
             return toSuccess(orderDto);
         } catch (ServiceException e) {
             e.printStackTrace();

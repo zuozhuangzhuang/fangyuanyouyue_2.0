@@ -98,7 +98,7 @@ public interface SchedualWalletService {
      * @param toUserId 行为对象所属用户id
      * @param businessId 对象id
      * @param businessType 对象类型 1用户 2商品、抢购 3商品、抢购评论 4帖子、视频 5帖子、视频评论 6全民鉴定 7全民鉴定评论
-     * @param type 行为类型 1点赞 2关注用户 3评论
+     * @param type 行为类型 1点赞 2关注用户 3评论 4购买抢购
      * @return
      */
     @RequestMapping(value = "/walletFeign/addUserBehavior",method = RequestMethod.POST)

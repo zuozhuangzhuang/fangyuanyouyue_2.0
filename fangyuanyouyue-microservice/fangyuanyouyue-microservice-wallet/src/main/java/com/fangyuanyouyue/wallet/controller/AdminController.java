@@ -274,7 +274,8 @@ public class AdminController extends BaseController{
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "vipLevel", value = "会员等级 1铂金会员 2至尊会员",  required = true,dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "vipType", value = "会员类型 1一个月 2三个月 3一年会员",  required = true,dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "vipType", value = "会员类型 1一个月 2三个月 3一年会员",  required = true,dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1开通 2续费",required = true, dataType = "int", paramType = "query"),
     })
     @PostMapping(value = "/updateUserVip")
     @ResponseBody
@@ -291,7 +292,10 @@ public class AdminController extends BaseController{
             if(param.getVipType() == null){
                 return toError("会员类型不能为空！");
             }
-            userVipService.updateUserVip(param.getId(), param.getVipLevel(),param.getVipType());
+            if(param.getType() == null){
+                return toError("类型不能为空！");
+            }
+            userVipService.updateUserVip(param.getId(), param.getVipLevel(),param.getVipType(),param.getType());
             return toSuccess();
         }catch (Exception e) {
             e.printStackTrace();

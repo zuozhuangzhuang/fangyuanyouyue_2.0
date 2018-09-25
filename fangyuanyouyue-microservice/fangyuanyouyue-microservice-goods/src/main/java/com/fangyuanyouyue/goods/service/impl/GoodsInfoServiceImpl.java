@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.goods.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.Credit;
 import com.fangyuanyouyue.base.enums.Status;
@@ -590,6 +591,9 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         if(goodsInfo == null){
             throw new ServiceException("获取商品失败！");
         }else{
+            if(goodsInfo.getType().intValue() == Status.AUCTION.getValue()){
+                goodsInfo.setLastIntervalTime(DateStampUtils.getTimesteamp());
+            }
             if(status == 2){//已售出
                 //拒绝此商品的所有议价
                 //压价信息
@@ -597,6 +601,15 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 for(GoodsBargain bargain:goodsBargains){
                     bargain.setStatus(Status.BARGAIN_REFUSE.getValue());
                     goodsBargainMapper.updateByPrimaryKeySelective(bargain);
+                    //退回余额
+                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),Status.ADD.getValue())), BaseResp.class);
+                    if(baseResp.getCode() == 1){
+                        throw new ServiceException(baseResp.getReport().toString());
+                    }
+                    //买家新增余额账单
+                    schedualWalletService.addUserBalanceDetail(bargain.getUserId(),bargain.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),bargain.getBargainNo(),"【"+goodsInfo.getName()+"】",goodsInfo.getUserId(),bargain.getUserId(),Status.BARGAIN.getValue(),bargain.getBargainNo());
+                    schedualMessageService.easemobMessage(bargain.getUserId().toString(),
+                            "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),bargain.getGoodsId().toString());
                 }
             }
             goodsInfo.setStatus(status);
@@ -768,5 +781,42 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             }
 
         }
+    }
+
+    @Override
+    public void updateCategory(Integer categoryId, Integer type, Integer status) throws ServiceException {
+        if(status == 2){
+            goodsCategoryMapper.deleteByPrimaryKey(categoryId);
+        }else{
+            GoodsCategory goodsCategory = goodsCategoryMapper.selectByPrimaryKey(categoryId);
+            if(goodsCategory == null){
+                throw new ServiceException("未找到分类信息！");
+            }
+            if(type != null){
+                goodsCategory.setType(type);
+            }
+            if(status != null){
+                goodsCategory.setStatus(status);
+            }
+            goodsCategoryMapper.updateByPrimaryKey(goodsCategory);
+        }
+    }
+
+    @Override
+    public void addCategory(AdminGoodsParam param) throws ServiceException {
+        GoodsCategory goodsCategory = new GoodsCategory();
+        goodsCategory.setParentId(param.getParentId());
+        goodsCategory.setName(param.getName());
+        goodsCategory.setImgUrl(param.getImgUrl());
+        goodsCategory.setSort(param.getSort());
+        goodsCategory.setType(param.getType());
+        goodsCategory.setStatus(param.getStatus());
+        goodsCategory.setAddTime(DateStampUtils.getTimesteamp());
+        goodsCategoryMapper.insert(goodsCategory);
+    }
+
+    @Override
+    public void adminUpdateGoods(Integer goodsId, Integer[] goodsCategoryIds, Integer status, Integer isAppraisal) throws ServiceException {
+
     }
 }

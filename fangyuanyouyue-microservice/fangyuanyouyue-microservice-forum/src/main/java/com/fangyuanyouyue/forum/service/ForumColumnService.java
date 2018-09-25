@@ -110,6 +110,15 @@ public interface ForumColumnService {
      * @return
      */
     Pager getPageApply(BasePageReq param);
-    
+
+	/**
+	 * 修改专栏
+	 * @param columnId
+	 * @param name
+	 * @param coverImgUrl
+	 * @param isChosen
+	 * @throws ServiceException
+	 */
+    void updateColumn(Integer columnId,String name,String coverImgUrl,Integer isChosen) throws ServiceException;
     
 }

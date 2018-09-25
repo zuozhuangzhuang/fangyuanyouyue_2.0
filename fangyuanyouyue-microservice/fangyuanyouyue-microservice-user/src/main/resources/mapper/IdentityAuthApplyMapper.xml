@@ -170,11 +170,11 @@
       and a.status = #{status}
     </if>
       <if test="startDate != null">
-        and add_time <![CDATA[ > ]]> #{startDate}
+        and a.add_time <![CDATA[ > ]]> #{startDate}
       </if>
 
       <if test="endDate != null">
-        and add_time <![CDATA[ <= ]]> #{endDate}
+        and a.add_time <![CDATA[ <= ]]> #{endDate}
       </if>
 
   </select>

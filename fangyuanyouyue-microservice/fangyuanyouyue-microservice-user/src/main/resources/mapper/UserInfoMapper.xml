@@ -329,7 +329,7 @@
   </select>
   
   <select id="countPage" parameterType="Integer" resultType="Integer">
-    select count(*) from user_info where status <![CDATA[ <> ]]> 3
+    select count(*) from user_info
     <if test="keyword != null">
       and ( 
       	nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"

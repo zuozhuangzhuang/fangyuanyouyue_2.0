@@ -63,7 +63,7 @@ public class TimerServiceImpl implements TimerService{
         //1、获取所有出售中抢购  2、判断当前价格是否高于最低价 3、判断是否超出最后一次降价时间
         // type 类型 1普通商品 2抢购商品
         // status 状态 1出售中 2已售出 3已下架（已结束） 5删除
-        List<GoodsInfo> goodsInfos = goodsInfoMapper.selectListByTypeStatus(2, 1);
+        List<GoodsInfo> goodsInfos = goodsInfoMapper.selectListByTypeStatus(Status.AUCTION.getValue(), 1);
         if(goodsInfos != null && goodsInfos.size()>0){
             for(GoodsInfo goodsInfo:goodsInfos){
                 if(goodsInfo.getPrice().compareTo(goodsInfo.getFloorPrice())>=0){

@@ -156,4 +156,30 @@ public interface GoodsInfoService {
      * @throws ServiceException
      */
     void updateGoods(AdminGoodsParam param) throws ServiceException;
+
+    /**
+     * 修改分类信息
+     * @param categoryId
+     * @param type
+     * @param status
+     * @throws ServiceException
+     */
+    void updateCategory(Integer categoryId,Integer type,Integer status) throws ServiceException;
+
+    /**
+     * 增加商品分类
+     * @param param
+     * @throws ServiceException
+     */
+    void addCategory(AdminGoodsParam param) throws ServiceException;
+
+    /**
+     * 后台管理修改商品、抢购
+     * @param goodsId
+     * @param goodsCategoryIds
+     * @param status
+     * @param isAppraisal
+     * @throws ServiceException
+     */
+    void adminUpdateGoods(Integer goodsId,Integer[] goodsCategoryIds,Integer status,Integer isAppraisal) throws ServiceException;
 }

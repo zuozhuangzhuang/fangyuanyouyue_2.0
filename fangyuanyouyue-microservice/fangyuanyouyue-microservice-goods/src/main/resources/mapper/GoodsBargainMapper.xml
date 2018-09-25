@@ -208,7 +208,7 @@
         and (b.name like "%"#{search}"%" or b.description like "%"#{search}"%" or c.nick_name like "%"#{search}"%")
       </if>
     </where>
-    order by a.add_time desc
+    order by a.add_time desc limit #{start},#{limit}
   </select>
 
   <select id="selectByStatus" parameterType="Integer" resultMap="BaseResultMap">

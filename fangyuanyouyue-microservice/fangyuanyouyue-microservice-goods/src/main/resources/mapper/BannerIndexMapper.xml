@@ -166,4 +166,58 @@
   <select id="getBanner" parameterType="Integer" resultMap="BaseResultMap">
     select * from banner_index where status = 1 and type = #{type,jdbcType=INTEGER} order by sort desc
   </select>
+
+
+  <select id="countPage" resultType="Integer">
+    select count(*) from banner_index
+    <where>
+      1=1
+      <if test="status != null">
+        and status = #{status}
+      </if>
+      <if test="type != null">
+        and type = #{type}
+      </if>
+      <if test="keyword != null and keyword != ''">
+        and title like "%"#{keyword}"%"
+      </if>
+      <if test="startDate != null">
+        and add_time <![CDATA[ > ]]> #{startDate}
+      </if>
+      <if test="endDate != null">
+        and add_time <![CDATA[ <= ]]> #{endDate}
+      </if>
+    </where>
+  </select>
+
+  <select id="getPage" resultMap="BaseResultMap">
+    select * from banner_index
+    <where>
+      1=1
+      <if test="status != null">
+        and status = #{status}
+      </if>
+      <if test="type != null">
+        and type = #{type}
+      </if>
+      <if test="keyword != null and keyword != ''">
+        and title like "%"#{keyword}"%"
+      </if>
+      <if test="startDate != null">
+        and add_time <![CDATA[ > ]]> #{startDate}
+      </if>
+      <if test="endDate != null">
+        and add_time <![CDATA[ <= ]]> #{endDate}
+      </if>
+    </where>
+    <if test="orders != null">
+      order by ${orders}
+      <if test="ascType != null and ascType == 2">
+        desc
+      </if>
+    </if>
+    <if test="limit != null and start != null">
+      limit #{start},#{limit}
+    </if>
+  </select>
 </mapper>
