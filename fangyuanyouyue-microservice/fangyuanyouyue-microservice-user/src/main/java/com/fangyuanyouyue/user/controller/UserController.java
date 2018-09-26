@@ -335,12 +335,10 @@ public class UserController extends BaseController {
                 UserInfo userByNickName = userInfoService.getUserByNickName(param.getNickName());
                 if(userByNickName != null){
                     return toError("昵称已存在！");
-                }
-                if(!param.getNickName().equals(user.getNickName())) {//用户修改了昵称
-                    //TODO 昵称筛选
-//                    if(param){
-//
-//                    }
+                }else{
+                    if(param.getNickName().contains("方圆") || param.getNickName().contains("官方")){
+                        return toError("昵称包含敏感词！");
+                    }
                 }
             }
             //完善资料
@@ -682,10 +680,10 @@ public class UserController extends BaseController {
 
             }
             //调用短信系统发送短信
-//            JSONObject jsonObject = JSONObject.parseObject(schedualMessageService.sendCode(param.getPhone(),param.getType()));
-//            String code = jsonObject.getString("data");
-            //TODO 开发期间固定1234
-            String code = "1234";
+            JSONObject jsonObject = JSONObject.parseObject(schedualMessageService.sendCode(param.getPhone(),param.getType()));
+            String code = jsonObject.getString("data");
+//            TODO 开发期间固定1234
+//            String code = "1234";
             log.info("code---:"+code);
 
             boolean result = schedualRedisService.set(param.getPhone(), code, 600l);
