@@ -1,7 +1,11 @@
 package com.fangyuanyouyue.user.dao;
 
+import com.fangyuanyouyue.user.model.UserInfo;
 import com.fangyuanyouyue.user.model.UserNickNameDetail;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 @Mapper
 public interface UserNickNameDetailMapper {
@@ -16,4 +20,27 @@ public interface UserNickNameDetailMapper {
     int updateByPrimaryKeySelective(UserNickNameDetail record);
 
     int updateByPrimaryKey(UserNickNameDetail record);
+
+    /**
+     * 分页总条数
+     * @param keyword
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    int countPage(@Param("keyword")String keyword,  @Param("startDate")String startDate, @Param("endDate")String endDate);
+
+    /**
+     * 分页获取
+     * @param start
+     * @param limit
+     * @param keyword
+     * @param startDate
+     * @param endDate
+     * @param orders
+     * @param ascType
+     * @return
+     */
+    List<UserNickNameDetail> getPage(@Param("start") Integer start, @Param("limit") Integer limit, @Param("keyword")String keyword, @Param("startDate")String startDate, @Param("endDate")String endDate, @Param("orders")String orders, @Param("ascType")Integer ascType);
+
 }

@@ -17,7 +17,7 @@ public enum Credit {
     //被评论+2
     COMMENT(2L),
     //举报核实+20
-    REPORT_VERIFY(20l),
+    REPORT_VERIFY(20L),
     //被举报核实-40
     REPORT_VERIFYED(40L),
     //被官方删假帖-20

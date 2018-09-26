@@ -21,6 +21,10 @@
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
         <result column="video_length" jdbcType="INTEGER" property="videoLength" />
         <result column="start_price" jdbcType="DECIMAL" property="startPrice" />
+        <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+        <result column="head_img_url" property="headImgUrl" jdbcType="VARCHAR" />
+        <result column="address" property="userAddress" jdbcType="VARCHAR" />
+        <result column="level" property="level" jdbcType="INTEGER" />
     </resultMap>
     <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.goods.model.GoodsInfo">
         <result column="description" jdbcType="LONGVARCHAR" property="description" />
@@ -351,7 +355,7 @@
                 ))
             </if>
         </where>
-        order by a.sort desc,
+        order by a.sort,
         <if test="synthesize != null">
             <if test="synthesize == 1">
 
@@ -491,6 +495,12 @@
         </if>
     </select>
 
+    <select id="selectByPrimaryKeyDetail" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+        select
+        a.*,b.nick_name,b.head_img_url,b.address,b.level
+        from goods_info a,user_info b
+        where a.user_id=b.id and a.id = #{id,jdbcType=INTEGER}
+    </select>
     <!--<select id="choice" resultMap="">-->
 
     <!--</select>-->

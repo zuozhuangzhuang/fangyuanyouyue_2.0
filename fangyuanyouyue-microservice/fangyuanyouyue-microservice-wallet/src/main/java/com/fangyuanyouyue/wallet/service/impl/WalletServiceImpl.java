@@ -659,17 +659,17 @@ public class WalletServiceImpl implements WalletService{
         ConfinedUser confinedUser = confinedUserMapper.selectByUserIdStatus(userId, null);
         if(confinedUser != null){
             if(confinedUser.getStatus().intValue() == Status.IS_CONFINED.getValue()){
-                if(status == Status.NO.getValue()){
+                if(status.equals(Status.NO.getValue())){
                     confinedUser.setStatus(Status.NOT_CONFINED.getValue());
                 }
             }else{
-                if(status == Status.YES.getValue()){
+                if(status.equals(Status.YES.getValue())){
                     confinedUser.setStatus(Status.IS_CONFINED.getValue());
                 }
             }
             confinedUserMapper.updateByPrimaryKey(confinedUser);
         }else{
-            if(status == Status.YES.getValue()){
+            if(status.equals(Status.YES.getValue())){
                 confinedUser = new ConfinedUser();
                 confinedUser.setUserId(userId);
                 confinedUser.setStatus(Status.IS_CONFINED.getValue());

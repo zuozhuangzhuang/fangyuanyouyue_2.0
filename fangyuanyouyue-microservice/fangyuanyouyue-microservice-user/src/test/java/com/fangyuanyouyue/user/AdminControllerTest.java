@@ -65,4 +65,19 @@ public class AdminControllerTest {
                 .andReturn();
     }
 
+    /**
+     * 用户昵称修改记录表
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void nickNameList() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.get("/adminUser/nickNameList")
+                .param("start","0")
+                .param("limit","10")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
 }

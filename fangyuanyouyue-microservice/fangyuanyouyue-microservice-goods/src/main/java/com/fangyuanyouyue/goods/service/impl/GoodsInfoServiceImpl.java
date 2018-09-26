@@ -19,6 +19,7 @@ import com.fangyuanyouyue.goods.service.*;
 import com.github.pagehelper.PageHelper;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,19 +93,24 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
 
     @Override
     public List<GoodsDto> getGoodsInfoList(GoodsParam param) throws ServiceException{
-        if(StringUtils.isNotEmpty(param.getSearch())){
-            HotSearch hotSearch = hotSearchMapper.selectByName(param.getSearch());
-            if(hotSearch == null){
-                hotSearch = new HotSearch();
-                hotSearch.setAddTime(DateStampUtils.getTimesteamp());
-                hotSearch.setName(param.getSearch());
-                hotSearch.setCount(1);
-                hotSearchMapper.insert(hotSearch);
-            }else{
-                hotSearch.setCount(hotSearch.getCount()+1);
-                hotSearchMapper.updateByPrimaryKeySelective(hotSearch);
+        try{
+            if(StringUtils.isNotEmpty(param.getSearch())){
+                HotSearch hotSearch = hotSearchMapper.selectByName(param.getSearch());
+                if(hotSearch == null){
+                    hotSearch = new HotSearch();
+                    hotSearch.setAddTime(DateStampUtils.getTimesteamp());
+                    hotSearch.setName(param.getSearch());
+                    hotSearch.setCount(1);
+                    hotSearchMapper.insert(hotSearch);
+                }else{
+                    hotSearch.setCount(hotSearch.getCount()+1);
+                    hotSearchMapper.updateByPrimaryKeySelective(hotSearch);
+                }
             }
+        }catch (DuplicateKeyException e){
+            e.printStackTrace();
         }
+
         List<GoodsInfo> goodsInfos =goodsInfoMapper.getGoodsList(param.getUserId(),param.getStatus(),param.getSearch(),
                 param.getPriceMin(),param.getPriceMax(),param.getSynthesize(),param.getQuality(),param.getStart()*param.getLimit(),param.getLimit(),param.getType(),param.getGoodsCategoryIds());
         //分类热度加一
@@ -464,6 +470,8 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         Map<String, Object> goodsUserInfoExtAndVip = goodsInfoMapper.getGoodsUserInfoExtAndVip(goodsId);
         if(goodsUserInfoExtAndVip != null){
             goodsDto.setAuthType((Integer)goodsUserInfoExtAndVip.get("auth_type") == 2?1:2);
+            //已认证=可用，未认证=不可用
+            goodsDto.setIsCoupon(goodsDto.getAuthType());
             goodsDto.setVipLevel((Integer)goodsUserInfoExtAndVip.get("vip_level"));
             Long credit = (Long)goodsUserInfoExtAndVip.get("credit");
             goodsDto.setCredit(credit);
@@ -500,6 +508,8 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         Map<String, Object> goodsUserInfoExtAndVip = goodsInfoMapper.getGoodsUserInfoExtAndVip(goodsId);
         if(goodsUserInfoExtAndVip != null){
             goodsDto.setAuthType((Integer)goodsUserInfoExtAndVip.get("auth_type") == 2?1:2);
+            //已认证=可用，未认证=不可用
+            goodsDto.setIsCoupon(goodsDto.getAuthType());
             goodsDto.setVipLevel((Integer)goodsUserInfoExtAndVip.get("vip_level"));
             Long credit = (Long)goodsUserInfoExtAndVip.get("credit");
             goodsDto.setCredit(credit);
@@ -617,27 +627,6 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         }
     }
 
-//    @Override
-//    public void report(Integer userId, Integer businessId, String reason,Integer type) throws ServiceException {
-//        GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId,type);
-//
-//        if(goodsInfo == null){
-//            throw new ServiceException("获取商品失败！");
-//        }else{
-//            //判断商品状态
-//            ReportGoods reportGoods = reportGoodsMapper.selectByUserIdGoodsId(userId,goodsId);
-//            if(reportGoods != null){
-//                throw new ServiceException("您已举报过此商品！");
-//            }else{
-//                reportGoods = new ReportGoods();
-//                reportGoods.setAddTime(DateStampUtils.getTimesteamp());
-//                reportGoods.setGoodsId(goodsId);
-//                reportGoods.setReason(reason);
-//                reportGoods.setUserId(userId);
-//                reportGoodsMapper.insert(reportGoods);
-//            }
-//        }
-//    }
 
 
     @Override
@@ -657,13 +646,12 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     public Pager getGoodsPage(AdminGoodsParam param) throws ServiceException {
         Integer total = goodsInfoMapper.countPage(param.getType(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
         //商品列表
-//        List<GoodsInfo> goodsList = goodsInfoMapper.getGoodsList(null, param.getStatus(), param.getKeyword(), param.getPriceMin(), param.getPriceMax(), param.getSynthesize(), param.getQuality(), param.getStart() * param.getLimit(), param.getLimit(), param.getType(), param.getGoodsCategoryIds());
         List<GoodsInfo> goodsList = goodsInfoMapper.getGoodsPage(param.getType(),param.getStart(),param.getLimit(),
                 param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
-        List<GoodsDto> dtos = new ArrayList<>();
+        List<AdminGoodsDto> dtos = new ArrayList<>();
         //遍历商品列表，添加到GoodsDtos中
         for (GoodsInfo goodsInfo:goodsList) {
-            GoodsDto goodsDto = new GoodsDto(goodsInfo);
+            AdminGoodsDto goodsDto = new AdminGoodsDto(goodsInfo);
 
             List<GoodsImg> goodsImgs = goodsImgMapper.getImgsByGoodsId(goodsInfo.getId());
 //            String mainImgUrl = null;
@@ -683,11 +671,9 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(goodsInfo.getUserId())).getString("data")), UserInfo.class);
             goodsDto.setHeadImgUrl(user.getHeadImgUrl());
             goodsDto.setNickName(user.getNickName());
-            goodsDto.setUserId(user.getId());
             String ret = schedualUserService.userIsAuth(goodsInfo.getUserId());
-            goodsDto.setAuthType(1);
             if(JSONObject.parseObject(ret).getIntValue("code")==0&&JSONObject.parseObject(ret).getBoolean("data")) {
-                goodsDto.setAuthType(2);
+                goodsDto.setAuthType(1);
             }
             dtos.add(goodsDto);
         }
@@ -704,44 +690,10 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             throw new ServiceException("商品不存在！");
         }else{
             //修改商品信息
-            if(StringUtils.isNotEmpty(param.getName())){
-                goodsInfo.setName(param.getName());
-            }
-            if(StringUtils.isNotEmpty(param.getDescription())){
-                goodsInfo.setDescription(param.getDescription());
-            }
-            if(param.getPrice() != null){
-                goodsInfo.setPrice(param.getPrice());
-                goodsInfo.setStartPrice(param.getPrice());
-            }
-            if(param.getPostage() != null){
-                goodsInfo.setPostage(param.getPostage());
-            }
-            if(StringUtils.isNotEmpty(param.getLabel())){
-                goodsInfo.setLabel(param.getLabel());
-            }
             if(param.getSort() != null){
                 goodsInfo.setSort(param.getSort());
             }
-            if(param.getFloorPrice() != null){
-                goodsInfo.setFloorPrice(param.getFloorPrice());
-            }
-            if(param.getIntervalTime() != null){
-                goodsInfo.setIntervalTime(param.getIntervalTime());
-            }
-            if(param.getMarkdown() != null){
-                goodsInfo.setMarkdown(param.getMarkdown());
-            }
-            if(StringUtils.isNotEmpty(param.getVideoUrl())){
-                goodsInfo.setVideoUrl(param.getVideoUrl());
-                if(param.getVideoLength() != null){
-                    goodsInfo.setVideoLength(param.getVideoLength());
-                }
-            }
-            //视频截图路径
-            if(StringUtils.isNotEmpty(param.getVideoImg())){
-                saveGoodsPicOne(goodsInfo.getId(),param.getVideoImg(),3,1);
-            }
+            //允许后台修改商品所属分类
             if(param.getGoodsCategoryIds() != null && param.getGoodsCategoryIds().length > 0){
                 //删除旧商品分类关联表
                 List<GoodsCorrelation> goodsCorrelations = goodsCorrelationMapper.getCorrelationsByGoodsId(goodsInfo.getId());
@@ -758,21 +710,11 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                     goodsCorrelationMapper.insert(goodsCorrelation);
                 }
             }
-            //新增商品图片信息
-            //每个图片储存一条商品图片表信息
-            if(param.getImgUrls() != null && param.getImgUrls().length > 0){
-                //删除旧商品图片信息
-                goodsImgMapper.deleteByGoodsId(goodsInfo.getId());
-                for(int i=0;i<param.getImgUrls().length;i++){
-                    if(i == 0){
-                        saveGoodsPicOne(goodsInfo.getId(),param.getImgUrls()[i],1,i+1);
-                    }else{
-                        saveGoodsPicOne(goodsInfo.getId(),param.getImgUrls()[i],2,i+1);
-                    }
-                }
-            }
             if(param.getStatus() != null){
                 goodsInfo.setStatus(param.getStatus());//状态 1出售中 2已售出 3已下架（已结束） 5删除
+            }
+            if(param.getIsAppraisal() != null){
+                goodsInfo.setIsAppraisal(param.getIsAppraisal());
             }
             goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
             if(param.getStatus().intValue() == 5){
@@ -784,7 +726,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     }
 
     @Override
-    public void updateCategory(Integer categoryId, Integer type, Integer status) throws ServiceException {
+    public void updateCategory(Integer categoryId,Integer parentId,String name,String imgUrl,Integer sort,Integer type,Integer status) throws ServiceException {
         if(status == 2){
             goodsCategoryMapper.deleteByPrimaryKey(categoryId);
         }else{
@@ -792,13 +734,25 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             if(goodsCategory == null){
                 throw new ServiceException("未找到分类信息！");
             }
+            if(parentId != null){
+                goodsCategory.setParentId(parentId);
+            }
+            if(StringUtils.isNotEmpty(name)){
+                goodsCategory.setName(name);
+            }
+            if(StringUtils.isNotEmpty(imgUrl)){
+                goodsCategory.setImgUrl(imgUrl);
+            }
+            if(sort != null){
+                goodsCategory.setSort(sort);
+            }
             if(type != null){
                 goodsCategory.setType(type);
             }
             if(status != null){
                 goodsCategory.setStatus(status);
             }
-            goodsCategoryMapper.updateByPrimaryKey(goodsCategory);
+            goodsCategoryMapper.updateByPrimaryKeySelective(goodsCategory);
         }
     }
 
@@ -816,7 +770,28 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     }
 
     @Override
-    public void adminUpdateGoods(Integer goodsId, Integer[] goodsCategoryIds, Integer status, Integer isAppraisal) throws ServiceException {
+    public AdminGoodsDto adminGoodsDetail(Integer goodsId) throws ServiceException {
+        GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
+        AdminGoodsDto goodsDto = new AdminGoodsDto(goodsInfo);
 
+        //图片
+        List<GoodsImg> goodsImgs = goodsImgMapper.getImgsByGoodsId(goodsInfo.getId());
+
+        goodsDto.setGoodsImgDtos(GoodsImgDto.toDtoList(goodsImgs));
+
+        //获取卖家信息
+        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(goodsInfo.getUserId())).getString("data")), UserInfo.class);
+        goodsDto.setHeadImgUrl(user.getHeadImgUrl());
+        goodsDto.setNickName(user.getNickName());
+        String ret = schedualUserService.userIsAuth(goodsInfo.getUserId());
+        if(JSONObject.parseObject(ret).getIntValue("code")==0&&JSONObject.parseObject(ret).getBoolean("data")) {
+            goodsDto.setAuthType(1);
+        }
+        //分类
+        List<GoodsCorrelationDto> goodsCorrelationDtos = GoodsCorrelationDto.toDtoList(goodsCorrelationMapper.getCorrelationsByGoodsId(goodsInfo.getId()));
+        goodsDto.setGoodsCorrelations(goodsCorrelationDtos);
+
+        goodsDto.setCommentCount(goodsCommentMapper.selectCount(goodsInfo.getId()));
+        return goodsDto;
     }
 }

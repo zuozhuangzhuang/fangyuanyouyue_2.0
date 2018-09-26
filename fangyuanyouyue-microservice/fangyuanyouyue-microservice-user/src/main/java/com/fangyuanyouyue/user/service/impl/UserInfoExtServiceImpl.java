@@ -67,9 +67,9 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
         if(identityAuthApply != null){
             //identityAuthApply:已申请过 状态 1申请 2通过 3拒绝(这里不查询拒绝的情况）
             //userInfoExt 实名登记状态 1已实名 2未实名
-            if(identityAuthApply.getStatus() == StatusEnum.AUTH_APPLY.getCode() && userInfoExt.getStatus() != null && userInfoExt.getStatus() == StatusEnum.AUTH_APPLY.getCode()){
+            if(identityAuthApply.getStatus().equals(StatusEnum.AUTH_APPLY.getCode()) && userInfoExt.getStatus() != null && userInfoExt.getStatus().equals(StatusEnum.AUTH_APPLY.getCode())){
                 throw new ServiceException("您已提交过实名认证，请耐心等待！");
-            }else if(identityAuthApply.getStatus() == StatusEnum.AUTH_ACCEPT.getCode() && userInfoExt.getStatus() != null && userInfoExt.getStatus() == StatusEnum.AUTH_ACCEPT.getCode()){
+            }else if(identityAuthApply.getStatus().equals(StatusEnum.AUTH_ACCEPT.getCode()) && userInfoExt.getStatus() != null && userInfoExt.getStatus().equals(StatusEnum.AUTH_ACCEPT.getCode())){
                 throw new ServiceException("您的实名认证已通过，请勿重复提交！");
             }
         }else{
@@ -98,7 +98,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
         if(userInfoExt == null){
             throw new ServiceException("用户扩展信息错误！");
         }
-        return userInfoExt.getAuthType() == StatusEnum.AUTH_ACCEPT.getCode();
+        return userInfoExt.getAuthType().equals(StatusEnum.AUTH_ACCEPT.getCode());
     }
 
     @Override
@@ -118,7 +118,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
         //根据用户ID获取实名认证申请信息
         IdentityAuthApply identityAuthApply = identityAuthApplyMapper.selectByUserId(userId);
         //已申请过 状态 1申请 2通过 3拒绝
-        if(identityAuthApply != null && identityAuthApply.getStatus() == StatusEnum.AUTH_ACCEPT.getCode() && userInfoExt.getStatus().intValue() == StatusEnum.AUTH_ACCEPT.getCode()) {
+        if(identityAuthApply != null && identityAuthApply.getStatus().equals(StatusEnum.AUTH_ACCEPT.getCode()) && userInfoExt.getStatus().intValue() == StatusEnum.AUTH_ACCEPT.getCode()) {
             return true;
         }else{
             return false;
@@ -131,9 +131,9 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
         if(userInfoExt == null){
             throw new ServiceException("用户扩展信息错误！");
         }else{
-            if(userInfoExt.getAuthType() == StatusEnum.AUTH_ACCEPT.getCode()){
+            if(userInfoExt.getAuthType().equals(StatusEnum.AUTH_ACCEPT.getCode())){
                 throw new ServiceException("您的官方认证已通过，请勿重复提交！");
-            }else if(userInfoExt.getAuthType() == StatusEnum.AUTH_APPLY.getCode()){
+            }else if(userInfoExt.getAuthType().equals(StatusEnum.AUTH_APPLY.getCode())){
                 throw new ServiceException("您已提交官方认证，请耐心等待！");
             }else{
                 //下单

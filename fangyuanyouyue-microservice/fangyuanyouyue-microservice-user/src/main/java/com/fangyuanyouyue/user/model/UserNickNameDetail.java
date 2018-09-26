@@ -22,4 +22,6 @@ public class UserNickNameDetail {
     private String newNickName;//修改后昵称
 
     private Date addTime;//添加时间
+
+    private String nickName;//用户当前昵称
 }

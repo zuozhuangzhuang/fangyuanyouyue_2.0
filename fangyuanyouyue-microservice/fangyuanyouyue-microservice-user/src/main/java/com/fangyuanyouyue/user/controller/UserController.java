@@ -3,6 +3,7 @@ package com.fangyuanyouyue.user.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.model.WxPayResult;
 import com.fangyuanyouyue.base.util.AES;
@@ -325,9 +326,9 @@ public class UserController extends BaseController {
                     MergeDto mergeDto = userThirdService.judgeMerge(param.getToken(), null, param.getPhone(),null);
                     if(mergeDto == null){
                         //可以合并账号
-                        return toError(2,"此手机号已被注册，是否合并账号！");
+                        return toError(ReCode.IS_MERGE.getValue(),ReCode.IS_MERGE.getMessage());
                     }
-                    return toError("此手机号已被注册！");
+                    return toError("该手机已被其他帐号绑定，请不要重复绑定！");
                 }
             }
             //用户昵称不可以重复
@@ -492,6 +493,11 @@ public class UserController extends BaseController {
             }
             UserInfo oldUser = userInfoService.getUserByPhone(param.getPhone());
             if(oldUser != null){
+                MergeDto mergeDto = userThirdService.judgeMerge(param.getToken(), null, param.getPhone(),null);
+                if(mergeDto == null){
+                    //可以合并账号
+                    return toError(ReCode.IS_MERGE.getValue(),ReCode.IS_MERGE.getMessage());
+                }
                 return toError("该手机已被其他帐号绑定，请不要重复绑定！");
             }
             //修改绑定手机
@@ -680,10 +686,10 @@ public class UserController extends BaseController {
 
             }
             //调用短信系统发送短信
-            JSONObject jsonObject = JSONObject.parseObject(schedualMessageService.sendCode(param.getPhone(),param.getType()));
-            String code = jsonObject.getString("data");
+//            JSONObject jsonObject = JSONObject.parseObject(schedualMessageService.sendCode(param.getPhone(),param.getType()));
+//            String code = jsonObject.getString("data");
 //            TODO 开发期间固定1234
-//            String code = "1234";
+            String code = "1234";
             log.info("code---:"+code);
 
             boolean result = schedualRedisService.set(param.getPhone(), code, 600l);

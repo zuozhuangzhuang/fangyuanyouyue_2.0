@@ -4,10 +4,12 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.user.dao.*;
 import com.fangyuanyouyue.user.dto.*;
 import com.fangyuanyouyue.user.dto.admin.AdminUserDto;
+import com.fangyuanyouyue.user.dto.admin.AdminUserNickNameDetailDto;
 import com.fangyuanyouyue.user.model.*;
 import com.fangyuanyouyue.user.service.*;
 import org.apache.commons.lang.StringUtils;
@@ -62,6 +64,8 @@ public class UserInfoServiceImpl implements UserInfoService {
     private UserCouponMapper userCouponMapper;
     @Autowired
     private CouponInfoMapper couponInfoMapper;
+    @Autowired
+    private UserNickNameDetailMapper userNickNameDetailMapper;
 
     @Override
     public UserInfo getUserByToken(String token) throws ServiceException {
@@ -343,7 +347,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                     MergeDto mergeDto = userThirdService.judgeMerge(token,unionId,null,type);
                     if(mergeDto != null){
                         //可以合并账号
-                        throw new ServiceException(2,"已存在三方用户，此三方用户未绑定手机号，是否合并用户！");
+                        throw new ServiceException(ReCode.IS_MERGE.getValue(),ReCode.IS_MERGE.getMessage());
                     }else{
                         throw new ServiceException("已绑定其他用户！");
                     }
@@ -395,6 +399,13 @@ public class UserInfoServiceImpl implements UserInfoService {
             }
             if(StringUtils.isNotEmpty(param.getNickName())){
                 userInfo.setNickName(param.getNickName());
+                //修改昵称记录
+                UserNickNameDetail userNickNameDetail = new UserNickNameDetail();
+                userNickNameDetail.setUserId(userInfo.getId());
+                userNickNameDetail.setOldNickName(userInfo.getNickName());
+                userNickNameDetail.setNewNickName(param.getNickName());
+                userNickNameDetail.setAddTime(DateStampUtils.getTimesteamp());
+                userNickNameDetailMapper.insert(userNickNameDetail);
             }
             // 保存头像
             if(StringUtils.isNotEmpty(param.getHeadImgUrl())){
@@ -791,5 +802,15 @@ public class UserInfoServiceImpl implements UserInfoService {
         return shopDtos;
     }
 
+    @Override
+    public Pager nickNameList(AdminUserParam param) throws ServiceException {
 
+        Integer total = userNickNameDetailMapper.countPage(param.getKeyword(),param.getStartDate(),param.getEndDate());
+
+        List<UserNickNameDetail> datas = userNickNameDetailMapper.getPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+        Pager pager = new Pager();
+        pager.setTotal(total);
+        pager.setDatas(AdminUserNickNameDetailDto.toDtoList(datas));
+        return pager;
+    }
 }

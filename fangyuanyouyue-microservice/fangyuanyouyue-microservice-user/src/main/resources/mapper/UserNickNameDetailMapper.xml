@@ -7,6 +7,7 @@
     <result column="old_nick_name" property="oldNickName" jdbcType="VARCHAR" />
     <result column="new_nick_name" property="newNickName" jdbcType="VARCHAR" />
     <result column="add_time" property="addTime" jdbcType="TIMESTAMP" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, user_id, old_nick_name, new_nick_name, add_time
@@ -21,13 +22,13 @@
     delete from user_nick_name_detail
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.user.model.UserNickNameDetail" >
+  <insert id="insert" parameterType="com.fangyuanyouyue.user.model.UserNickNameDetail" useGeneratedKeys="true" keyProperty="id" >
     insert into user_nick_name_detail (id, user_id, old_nick_name, 
       new_nick_name, add_time)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{oldNickName,jdbcType=VARCHAR}, 
       #{newNickName,jdbcType=VARCHAR}, #{addTime,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.user.model.UserNickNameDetail" >
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.user.model.UserNickNameDetail" useGeneratedKeys="true" keyProperty="id">
     insert into user_nick_name_detail
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -90,4 +91,57 @@
       add_time = #{addTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+  <select id="countPage" parameterType="Integer" resultType="Integer">
+    select count(*) from user_nick_name_detail a,user_info b where a.user_id = b.id
+    <if test="keyword != null">
+      and (
+      a.old_nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
+      or a.new_nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
+      or b.nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
+      or b.phone like "%"#{keyword,jdbcType=VARCHAR}"%"
+      )
+    </if>
+    <if test="startDate != null">
+      and a.add_time <![CDATA[ > ]]> #{startDate}
+    </if>
+
+    <if test="endDate != null">
+      and a.add_time <![CDATA[ <= ]]> #{endDate}
+    </if>
+
+  </select>
+
+  <select id="getPage" resultMap="BaseResultMap">
+    select a.*,b.nick_name from user_nick_name_detail a,user_info b
+    <where>
+      a.user_id = b.id
+      <if test="keyword != null">
+        and (
+        a.old_nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
+        or a.new_nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
+        or b.nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
+        or b.phone like "%"#{keyword,jdbcType=VARCHAR}"%"
+        )
+      </if>
+      <if test="startDate != null">
+        and a.add_time <![CDATA[ > ]]> #{startDate}
+      </if>
+
+      <if test="endDate != null">
+        and a.add_time <![CDATA[ <= ]]> #{endDate}
+      </if>
+    </where>
+    <if test="orders != null">
+      order by a.${orders}
+      <if test="ascType != null and ascType == 2">
+        desc
+      </if>
+    </if>
+    <if test="start != null and limit != null">
+      limit #{start},#{limit}
+    </if>
+  </select>
+
 </mapper>
