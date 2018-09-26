@@ -225,7 +225,7 @@
         and a.user_id = #{userId}
       </if>
       <if test="status != null and status != 0 and status != 7">
-        and a.status = #{status} and a.is_refund = 2
+        and a.status = #{status}
       </if>
       <if test="status != null and status == 7">
         and a.is_refund = 1
