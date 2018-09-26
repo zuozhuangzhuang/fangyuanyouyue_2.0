@@ -114,6 +114,7 @@ public class WalletServiceImpl implements WalletService{
         userWithdraw.setAmount(amount);
         userWithdraw.setPayType(type);
         userWithdraw.setStatus(1);
+        userWithdraw.setAddTime(DateStampUtils.getTimesteamp());
 
         UserInfoExt userInfoExt = userInfoExtMapper.selectUserInfoExtByUserId(userId);
         if(type != 1){//提现方式 1微信 2支付宝
