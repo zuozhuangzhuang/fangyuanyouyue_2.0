@@ -225,7 +225,7 @@
         and a.user_id = #{userId}
       </if>
       <if test="status != null and status != 0 and status != 7">
-        and a.status = #{status} and a.is_refund = 2
+        and a.status = #{status}
       </if>
       <if test="status != null and status == 7">
         and a.is_refund = 1
@@ -348,8 +348,7 @@
       (a.id = b.order_id or a.id = b.main_order_id) and a.is_resolve = 2 and a.user_id = c.id and b.goods_id = d.id
       <if test="keyword != null and keyword != ''">
         and (
-          b.goods_id in
-            (select id from goods_info where name like "%"#{keyword}"%" or description like "%"#{keyword}"%")
+          d.name like "%"#{keyword}"%"
           or c.nick_name like "%"#{keyword}"%"
         )
       </if>

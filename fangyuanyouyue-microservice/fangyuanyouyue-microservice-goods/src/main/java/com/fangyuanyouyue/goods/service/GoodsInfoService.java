@@ -9,6 +9,7 @@ import com.fangyuanyouyue.goods.dto.GoodsCategoryDto;
 import com.fangyuanyouyue.goods.dto.GoodsDto;
 import com.fangyuanyouyue.goods.dto.GoodsQuickSearchDto;
 import com.fangyuanyouyue.goods.dto.SearchDto;
+import com.fangyuanyouyue.goods.dto.adminDto.AdminGoodsDto;
 import com.fangyuanyouyue.goods.model.BannerIndex;
 import com.fangyuanyouyue.goods.model.GoodsInfo;
 import com.fangyuanyouyue.goods.param.AdminGoodsParam;
@@ -125,15 +126,6 @@ public interface GoodsInfoService {
      */
     void updateGoodsStatus(Integer goodsId,Integer status) throws ServiceException;
 
-    /**
-     * 举报商品
-     * @param userId
-     * @param businessId
-     * @param reason
-     * @param reason
-     * @throws ServiceException
-     */
-//    void report(Integer userId,Integer businessId,String reason,Integer type) throws ServiceException;
 
     /**
      * 查看商品分类列表
@@ -143,7 +135,7 @@ public interface GoodsInfoService {
      */
     Pager categoryPage(AdminGoodsParam param) throws ServiceException;
     /**
-     * 获取商品列表
+     * 后台获取商品列表
      * @param param
      * @return
      * @throws ServiceException
@@ -164,7 +156,7 @@ public interface GoodsInfoService {
      * @param status
      * @throws ServiceException
      */
-    void updateCategory(Integer categoryId,Integer type,Integer status) throws ServiceException;
+    void updateCategory(Integer categoryId,Integer parentId,String name,String imgUrl,Integer sort,Integer type,Integer status) throws ServiceException;
 
     /**
      * 增加商品分类
@@ -174,12 +166,10 @@ public interface GoodsInfoService {
     void addCategory(AdminGoodsParam param) throws ServiceException;
 
     /**
-     * 后台管理修改商品、抢购
+     * 查看商品详情
      * @param goodsId
-     * @param goodsCategoryIds
-     * @param status
-     * @param isAppraisal
+     * @return
      * @throws ServiceException
      */
-    void adminUpdateGoods(Integer goodsId,Integer[] goodsCategoryIds,Integer status,Integer isAppraisal) throws ServiceException;
+    AdminGoodsDto adminGoodsDetail(Integer goodsId) throws ServiceException;
 }

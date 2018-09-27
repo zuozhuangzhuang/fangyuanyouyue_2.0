@@ -253,13 +253,13 @@ public class OrderServiceImpl implements OrderService{
                 //计算优惠券（每个商品都可以使用优惠券）
                 Integer couponId = addOrderDetailDto.getCouponId();//优惠券ID
 
-                //判断商品所属店铺是否可用优惠券
-                if(!Boolean.valueOf(JSONObject.parseObject(schedualUserService.userIsAuth(goods.getUserId())).getString("data"))){
-                    throw new ServiceException("【"+goods.getName()+"】所属店铺未认证，不可使用优惠券！");
-                }
-                orderDetail.setCouponId(couponId);
                 BigDecimal price = goods.getPrice();
                 if(couponId != null){
+                    //判断商品所属店铺是否可用优惠券
+                    if(!Boolean.valueOf(JSONObject.parseObject(schedualUserService.userIsAuth(goods.getUserId())).getString("data"))){
+                        throw new ServiceException("【"+goods.getName()+"】所属店铺未认证，不可使用优惠券！");
+                    }
+                    orderDetail.setCouponId(couponId);
                     BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.getPriceByCoupon(orderInfo.getUserId(),price,couponId)), BaseResp.class);
                     if(baseResp.getCode() == 1){
                         throw new ServiceException(baseResp.getReport().toString());
@@ -699,7 +699,7 @@ public class OrderServiceImpl implements OrderService{
                 }else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
                     //支付宝支付
                     //支付宝，失败不做处理，成功继续拆单生成订单
-                    String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(orderInfo.getOrderNo(), orderInfo.getAmount(),NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.order_alipay_notify.getNotifUrl())).getString("data");
+                    String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(orderInfo.getOrderNo(), orderPay.getPayAmount(),NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.order_alipay_notify.getNotifUrl())).getString("data");
                     payInfo.append(info);
                 }else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()){
                     //余额支付
@@ -1122,4 +1122,54 @@ public class OrderServiceImpl implements OrderService{
         }
         companyMapper.updateByPrimaryKey(company);
     }
+
+    @Override
+    public AdminOrderDto adminOrderDetail(Integer orderId) throws ServiceException {
+        OrderInfo info = orderInfoMapper.selectByPrimaryKey(orderId);
+        AdminOrderDto orderDto = new AdminOrderDto(info);
+        //获取订单详情列表
+        //如果是没有拆单的订单根据主订单获取，拆了单的根据订单id获取
+        List<OrderDetail> orderDetails;
+        if(info.getSellerId() == null){
+            orderDetails = orderDetailMapper.selectByMainOrderId(orderDto.getOrderId());
+            orderDto.setSeller("多卖家");
+        }else{
+            orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
+
+            //获取卖家信息
+            UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(info.getSellerId())).getString("data")), UserInfo.class);
+
+            orderDto.setSeller(seller.getPhone()+"<br>"+seller.getNickName());
+        }
+        ArrayList<AdminOrderDetailDto> orderDetailDtos = AdminOrderDetailDto.toDtoList(orderDetails);
+        String orderDetail = "";
+        for(AdminOrderDetailDto detail:orderDetailDtos) {
+            orderDetail += "【"+detail.getGoodsName() + "】x1 <br>";
+        }
+        orderDto.setOrderDetail(orderDetail);
+        orderDto.setTotalCount(orderDetailDtos.size());
+
+        //卖家信息DTO
+        // List sellerDtos = new ArrayList<>();
+        //sellerDtos.addAll(getSellerDtos(OrderDetailDto.toDtoList(orderDetails)));
+        //订单支付表
+        OrderPay orderPay = orderPayMapper.selectByOrderId(orderDto.getOrderId());
+        AdminOrderPayDto orderPayDto = new AdminOrderPayDto(orderPay);
+        orderDto.setOrderPayDto(orderPayDto);
+        //orderDto.setSellerDtos(sellerDtos);
+        orderDto.setOrderDetailDtos(orderDetailDtos);
+        if(orderDto.getIsRefund() == 1){
+            //退货状态
+            OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null,null);
+            orderDto.setReturnStatus(orderRefund.getStatus());
+            orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
+        }
+        //是否评价
+        //OrderComment orderComment = orderCommentMapper.selectByOrder(orderDto.getOrderId());
+        //if(orderComment != null){
+        //    orderDto.setIsEvaluation(1);
+        // }
+        return orderDto;
+    }
+
 }

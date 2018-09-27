@@ -7,6 +7,7 @@ import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.order.dto.CompanyDto;
 import com.fangyuanyouyue.order.dto.OrderDto;
+import com.fangyuanyouyue.order.dto.adminDto.AdminOrderDto;
 import com.fangyuanyouyue.order.param.AdminOrderParam;
 
 public interface OrderService {
@@ -189,4 +190,12 @@ public interface OrderService {
      * @throws ServiceException
      */
 	Pager simpleOrderList(AdminOrderParam param) throws ServiceException;
+
+    /**
+     * 后台获取订单详情
+     * @param id
+     * @return
+     * @throws ServiceException
+     */
+	AdminOrderDto adminOrderDetail(Integer id) throws ServiceException;
 }

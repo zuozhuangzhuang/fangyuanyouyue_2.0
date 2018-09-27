@@ -3,6 +3,7 @@ package com.fangyuanyouyue.user.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.model.WxPayResult;
 import com.fangyuanyouyue.base.util.AES;
@@ -86,6 +87,9 @@ public class UserController extends BaseController {
             }
             if (StringUtils.isEmpty(param.getNickName())) {
                 return toError("用户昵称不能为空！");
+            }
+            if(param.getNickName().contains("方圆") || param.getNickName().contains("官方")){
+                return toError("昵称包含敏感词！");
             }
             UserInfo userInfoByName = userInfoService.getUserByNickName(param.getNickName());
             if(userInfoByName != null){
@@ -181,6 +185,9 @@ public class UserController extends BaseController {
             }
             if(param.getType() == null){
                 return toError("三方类型不能为空！");
+            }
+            if(StringUtils.isEmpty(param.getThirdNickName())){
+                return toError("第三方账号昵称不能为空！");
             }
             //APP三方注册/登录
             param.setRegType(1);//注册来源 1app 2微信小程序
@@ -325,9 +332,9 @@ public class UserController extends BaseController {
                     MergeDto mergeDto = userThirdService.judgeMerge(param.getToken(), null, param.getPhone(),null);
                     if(mergeDto == null){
                         //可以合并账号
-                        return toError(2,"此手机号已被注册，是否合并账号！");
+                        return toError(ReCode.IS_MERGE.getValue(),ReCode.IS_MERGE.getMessage());
                     }
-                    return toError("此手机号已被注册！");
+                    return toError("该手机已被其他帐号绑定，请不要重复绑定！");
                 }
             }
             //用户昵称不可以重复
@@ -492,6 +499,11 @@ public class UserController extends BaseController {
             }
             UserInfo oldUser = userInfoService.getUserByPhone(param.getPhone());
             if(oldUser != null){
+                MergeDto mergeDto = userThirdService.judgeMerge(param.getToken(), null, param.getPhone(),null);
+                if(mergeDto == null){
+                    //可以合并账号
+                    return toError(ReCode.IS_MERGE.getValue(),ReCode.IS_MERGE.getMessage());
+                }
                 return toError("该手机已被其他帐号绑定，请不要重复绑定！");
             }
             //修改绑定手机
@@ -561,6 +573,9 @@ public class UserController extends BaseController {
         try{
             log.info("----》小程序登录《----");
             log.info("参数："+param.toString());
+            if(StringUtils.isEmpty(param.getThirdNickName())){
+                return toError("第三方账号昵称不能为空！");
+            }
             //微信的接口
             String url = "https://api.weixin.qq.com/sns/jscode2session?appid="+WeChatSession.APPID+
                     "&secret="+WeChatSession.SECRET+"&js_code="+ param.getCode() +"&grant_type=authorization_code";
@@ -680,10 +695,10 @@ public class UserController extends BaseController {
 
             }
             //调用短信系统发送短信
-            JSONObject jsonObject = JSONObject.parseObject(schedualMessageService.sendCode(param.getPhone(),param.getType()));
-            String code = jsonObject.getString("data");
+//            JSONObject jsonObject = JSONObject.parseObject(schedualMessageService.sendCode(param.getPhone(),param.getType()));
+//            String code = jsonObject.getString("data");
 //            TODO 开发期间固定1234
-//            String code = "1234";
+            String code = "1234";
             log.info("code---:"+code);
 
             boolean result = schedualRedisService.set(param.getPhone(), code, 600l);

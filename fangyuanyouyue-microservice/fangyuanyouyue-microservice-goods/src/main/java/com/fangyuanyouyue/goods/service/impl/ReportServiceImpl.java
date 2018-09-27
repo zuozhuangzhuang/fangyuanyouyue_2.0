@@ -74,9 +74,9 @@ public class ReportServiceImpl implements ReportService{
             schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
                     "很抱歉，您的"+(goodsInfo.getType().intValue()==Status.GOODS.getValue()?"商品【":"抢购【")+goodsInfo.getName()+"】被多用户举报，并经官方核实。已被删除，删除理由："+content+"。点击查看详情",
                     Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),goodsInfo.getId().toString());
+            report.setStatus(Status.YES.getValue());
+            reportMapper.updateByPrimaryKey(report);
         }
-        report.setStatus(Status.YES.getValue());
-        reportMapper.updateByPrimaryKey(report);
     }
 
     @Override

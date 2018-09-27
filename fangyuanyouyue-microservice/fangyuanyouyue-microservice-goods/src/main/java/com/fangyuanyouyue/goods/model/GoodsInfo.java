@@ -27,7 +27,7 @@ public class GoodsInfo {
 
     private BigDecimal postage;//运费
 
-    private Integer sort;//排序
+    private Integer sort=2;//排序 1置顶 2默认
 
     private String label;//标签
 

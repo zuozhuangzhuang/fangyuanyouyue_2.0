@@ -205,4 +205,12 @@ public interface UserInfoService {
      */
     List<ShopDto> getUserByName(String search,Integer start,Integer limit) throws ServiceException;
 
+    /**
+     * 用户昵称修改记录表
+     * @param param
+     * @return
+     * @throws ServiceException
+     */
+    Pager nickNameList(AdminUserParam param) throws ServiceException;
+
 }

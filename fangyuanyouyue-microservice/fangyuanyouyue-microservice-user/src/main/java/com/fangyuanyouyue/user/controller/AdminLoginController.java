@@ -45,7 +45,7 @@ public class AdminLoginController extends BaseController {
             log.info("后台后台登录 - "+loginCode);
             
             //测试登录
-            if(loginCode.equals("admin")&&password.equals("123456")) {
+            if("admin".equals(loginCode) && "123456".equals(password)) {
             	HashMap map = new HashMap<String,String>();
             	map.put("token", "abcdefg");
                 return toSuccess(map);

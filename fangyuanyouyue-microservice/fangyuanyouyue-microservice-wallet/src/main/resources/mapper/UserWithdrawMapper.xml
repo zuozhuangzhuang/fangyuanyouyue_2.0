@@ -11,6 +11,7 @@
     <result column="account" jdbcType="VARCHAR" property="account" />
     <result column="real_name" jdbcType="VARCHAR" property="realName" />
     <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
+    <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, amount, pay_type, status, content, account, real_name, add_time

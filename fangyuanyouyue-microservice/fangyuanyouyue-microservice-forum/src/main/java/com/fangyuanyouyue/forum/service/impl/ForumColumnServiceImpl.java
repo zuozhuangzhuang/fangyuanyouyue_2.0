@@ -290,4 +290,10 @@ public class ForumColumnServiceImpl implements ForumColumnService {
         forumColumn.setIsChosen(isChosen);
         forumColumnMapper.updateByPrimaryKey(forumColumn);
     }
+
+	@Override
+	public boolean isHasColumn(Integer userId) throws ServiceException {
+		ForumColumn forumColumn = forumColumnMapper.selectByUserId(userId);
+		return forumColumn!=null;
+	}
 }

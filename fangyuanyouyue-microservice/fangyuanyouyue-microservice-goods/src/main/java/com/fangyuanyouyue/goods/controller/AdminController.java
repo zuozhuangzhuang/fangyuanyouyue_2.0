@@ -5,6 +5,7 @@ import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.goods.dto.adminDto.AdminBannerDto;
+import com.fangyuanyouyue.goods.dto.adminDto.AdminGoodsDto;
 import com.fangyuanyouyue.goods.param.AdminGoodsParam;
 import com.fangyuanyouyue.goods.service.AppraisalService;
 import com.fangyuanyouyue.goods.service.BannerService;
@@ -218,6 +219,10 @@ public class AdminController  extends BaseController {
     @ApiOperation(value = "修改分类信息", notes = "修改分类信息",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "分类信息id", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "parentId", value = "父类id", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "name", value = "分类名字", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "imgUrl", value = "图片地址", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "sort", value = "排序", required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "type", value = "类型 1普通 2热门", required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "status", value = "状态 0正常 1禁用 2删除", required = false, dataType = "int", paramType = "query")
     })
@@ -228,7 +233,7 @@ public class AdminController  extends BaseController {
             log.info("----》修改分类信息《----");
             log.info("参数："+param.toString());
             //获取分类列表
-            goodsInfoService.updateCategory(param.getId(),param.getType(),param.getStatus());
+            goodsInfoService.updateCategory(param.getId(),param.getParentId(), param.getName(),param.getImgUrl(), param.getSort(),param.getType(),param.getStatus());
             return toSuccess();
         } catch (Exception e) {
             e.printStackTrace();
@@ -254,7 +259,7 @@ public class AdminController  extends BaseController {
     }
 
 
-    //TODO 获取商品列表
+    //获取商品列表
     @ApiOperation(value = "获取商品、抢购列表", notes = "获取商品、抢购列表",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "类型 1商品 2抢购", required = false, dataType = "int", paramType = "query"),
@@ -289,12 +294,35 @@ public class AdminController  extends BaseController {
     }
 
 
+    @ApiOperation(value = "查看商品详情", notes = "查看商品详情",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "商品ID", required = true, dataType = "int", paramType = "query")
+    })
+    @GetMapping(value = "/goodsDetail")
+    @ResponseBody
+    public BaseResp goodsDetail(AdminGoodsParam param) throws IOException {
+        try {
+            log.info("----》查看商品详情《----");
+            log.info("参数："+param.toString());
+            if(param.getId() == null){
+                return toError("商品id不能为空！");
+            }
+            //获取商品详情
+            AdminGoodsDto dto = goodsInfoService.adminGoodsDetail(param.getId());
+            return toSuccess(dto);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
     @ApiOperation(value = "后台管理修改商品、抢购", notes = "(void)后台管理修改商品、抢购",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "商品ID", required = true,dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "goodsCategoryIds", value = "商品分类数组（同一商品可多种分类）",allowMultiple = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "status", value = "商品状态 1出售中 2已售出 3已下架（已结束） 5删除",dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "isAppraisal", value = "是否官方鉴定 1已鉴定 2未鉴定",dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "sort", value = "（置顶、取消）商品排序 1置顶 2默认",dataType = "int", paramType = "query")
     })
     @PutMapping(value = "/updateGoods")
     @ResponseBody
@@ -305,7 +333,7 @@ public class AdminController  extends BaseController {
             if(param.getId() == null){
                 return toError("id不能为空！");
             }
-            goodsInfoService.adminUpdateGoods(param.getId(),param.getGoodsCategoryIds(),param.getStatus(),param.getIsAppraisal());
+            goodsInfoService.updateGoods(param);
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();

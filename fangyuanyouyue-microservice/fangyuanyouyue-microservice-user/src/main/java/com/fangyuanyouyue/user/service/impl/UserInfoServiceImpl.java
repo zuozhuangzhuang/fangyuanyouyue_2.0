@@ -4,10 +4,12 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.user.dao.*;
 import com.fangyuanyouyue.user.dto.*;
 import com.fangyuanyouyue.user.dto.admin.AdminUserDto;
+import com.fangyuanyouyue.user.dto.admin.AdminUserNickNameDetailDto;
 import com.fangyuanyouyue.user.model.*;
 import com.fangyuanyouyue.user.service.*;
 import org.apache.commons.lang.StringUtils;
@@ -62,6 +64,10 @@ public class UserInfoServiceImpl implements UserInfoService {
     private UserCouponMapper userCouponMapper;
     @Autowired
     private CouponInfoMapper couponInfoMapper;
+    @Autowired
+    private UserNickNameDetailMapper userNickNameDetailMapper;
+    @Autowired
+    private SchedualForumService schedualForumService;
 
     @Override
     public UserInfo getUserByToken(String token) throws ServiceException {
@@ -238,17 +244,14 @@ public class UserInfoServiceImpl implements UserInfoService {
     public UserDto thirdLogin(UserParam param) throws ServiceException {
         //根据第三方唯一ID和类型获取第三方登录信息
         UserThirdParty userThirdParty = userThirdPartyMapper.getUserByThirdNoType(param.getUnionId(),param.getType());
+        String nickName = param.getThirdNickName().replace("方圆","**").replace("官方","**");
         if(userThirdParty == null){
             log.info("三方注册");
             //注册
             //初始化用户信息
             UserInfo user = new UserInfo();
-            if(StringUtils.isEmpty(param.getThirdNickName())){
-                throw new ServiceException("第三方账号昵称不能为空！");
-            }else{
-                //第三方昵称末尾加随机数
-                user.setNickName(param.getThirdNickName()+"-"+((int)(Math.random() * 9000) + 1000));
-            }
+            //第三方昵称末尾加随机数
+            user.setNickName(nickName+"-"+((int)(Math.random() * 9000) + 1000));
             user.setHeadImgUrl(param.getThirdHeadImgUrl());
             user.setRegType(param.getRegType());
             user.setRegPlatform(param.getLoginPlatform());
@@ -343,7 +346,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                     MergeDto mergeDto = userThirdService.judgeMerge(token,unionId,null,type);
                     if(mergeDto != null){
                         //可以合并账号
-                        throw new ServiceException(2,"已存在三方用户，此三方用户未绑定手机号，是否合并用户！");
+                        throw new ServiceException(ReCode.IS_MERGE.getValue(),ReCode.IS_MERGE.getMessage());
                     }else{
                         throw new ServiceException("已绑定其他用户！");
                     }
@@ -395,6 +398,13 @@ public class UserInfoServiceImpl implements UserInfoService {
             }
             if(StringUtils.isNotEmpty(param.getNickName())){
                 userInfo.setNickName(param.getNickName());
+                //修改昵称记录
+                UserNickNameDetail userNickNameDetail = new UserNickNameDetail();
+                userNickNameDetail.setUserId(userInfo.getId());
+                userNickNameDetail.setOldNickName(userInfo.getNickName());
+                userNickNameDetail.setNewNickName(param.getNickName());
+                userNickNameDetail.setAddTime(DateStampUtils.getTimesteamp());
+                userNickNameDetailMapper.insert(userNickNameDetail);
             }
             // 保存头像
             if(StringUtils.isNotEmpty(param.getHeadImgUrl())){
@@ -497,6 +507,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 userDto.setFansCount(userFansMapper.fansCount(user.getId()));
                 userDto.setCollectCount(userFansMapper.collectCount(user.getId()));
             }
+            userDto.setIsHasColumn(JSONObject.parseObject(schedualForumService.isHasColumn(user.getId())).getBoolean("data")==true?1:2);
             return userDto;
         }
     }
@@ -529,11 +540,12 @@ public class UserInfoServiceImpl implements UserInfoService {
         //用户登录
         //根据unionId和type获取用户第三方登录信息
         UserThirdParty userThirdParty = userThirdPartyMapper.getUserByThirdNoType(param.getUnionId(),1);
+        String nickName = param.getThirdNickName().replace("方圆","**").replace("官方","**");
         if(userThirdParty == null){
             //如果用户为空，注册
             //初始化用户信息
             UserInfo user = new UserInfo();
-            user.setNickName(param.getThirdNickName()+"-"+((int)(Math.random() * 9000) + 1000));
+            user.setNickName(nickName+"-"+((int)(Math.random() * 9000) + 1000));
             user.setHeadImgUrl(param.getThirdHeadImgUrl());
             user.setRegType(2);//注册来源 1app 2微信小程序
             user.setRegPlatform(3);//注册平台 1安卓 2iOS 3小程序
@@ -791,5 +803,15 @@ public class UserInfoServiceImpl implements UserInfoService {
         return shopDtos;
     }
 
+    @Override
+    public Pager nickNameList(AdminUserParam param) throws ServiceException {
 
+        Integer total = userNickNameDetailMapper.countPage(param.getKeyword(),param.getStartDate(),param.getEndDate());
+
+        List<UserNickNameDetail> datas = userNickNameDetailMapper.getPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+        Pager pager = new Pager();
+        pager.setTotal(total);
+        pager.setDatas(AdminUserNickNameDetailDto.toDtoList(datas));
+        return pager;
+    }
 }

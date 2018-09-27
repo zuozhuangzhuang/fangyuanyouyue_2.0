@@ -114,6 +114,7 @@ public class WalletServiceImpl implements WalletService{
         userWithdraw.setAmount(amount);
         userWithdraw.setPayType(type);
         userWithdraw.setStatus(1);
+        userWithdraw.setAddTime(DateStampUtils.getTimesteamp());
 
         UserInfoExt userInfoExt = userInfoExtMapper.selectUserInfoExtByUserId(userId);
         if(type != 1){//提现方式 1微信 2支付宝
@@ -161,6 +162,10 @@ public class WalletServiceImpl implements WalletService{
         amount = amount.add(charge);
         //扣除余额 type 类型 1充值 2消费 payType 支付类型 1微信 2支付宝 3余额
         updateBalance(userId,amount,2);
+        //订单号
+        final IdGenerator idg = IdGenerator.INSTANCE;
+        String orderNo = idg.nextId();
+        addUserBalanceDetail(userId,amount,Status.PAY_TYPE_BALANCE.getValue(),Status.EXPEND.getValue(),orderNo,"用户提现",Status.WITHDRAW.getValue(),null,userId,orderNo);
     }
 
 
@@ -659,17 +664,17 @@ public class WalletServiceImpl implements WalletService{
         ConfinedUser confinedUser = confinedUserMapper.selectByUserIdStatus(userId, null);
         if(confinedUser != null){
             if(confinedUser.getStatus().intValue() == Status.IS_CONFINED.getValue()){
-                if(status == Status.NO.getValue()){
+                if(status.equals(Status.NO.getValue())){
                     confinedUser.setStatus(Status.NOT_CONFINED.getValue());
                 }
             }else{
-                if(status == Status.YES.getValue()){
+                if(status.equals(Status.YES.getValue())){
                     confinedUser.setStatus(Status.IS_CONFINED.getValue());
                 }
             }
             confinedUserMapper.updateByPrimaryKey(confinedUser);
         }else{
-            if(status == Status.YES.getValue()){
+            if(status.equals(Status.YES.getValue())){
                 confinedUser = new ConfinedUser();
                 confinedUser.setUserId(userId);
                 confinedUser.setStatus(Status.IS_CONFINED.getValue());

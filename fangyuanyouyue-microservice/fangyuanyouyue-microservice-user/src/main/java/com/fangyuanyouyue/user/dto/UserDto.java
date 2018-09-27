@@ -68,6 +68,8 @@ public class UserDto {
 
     private Integer isLoginPwd;//是否已设置登录密码 1是 2否
 
+    private Integer isHasColumn = 2;//是否拥有专栏 1是 2否
+
 
     public UserDto() {
     }

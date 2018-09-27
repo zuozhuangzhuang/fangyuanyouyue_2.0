@@ -76,7 +76,7 @@ public class TimerServiceImpl implements TimerService{
                     schedualMessageService.easemobMessage(userVip.getUserId().toString(),
                             "您的会员已到期！点击此处去重新开通~",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_VIP.getMessage(),"");
                 }else{
-                    if(userVip.getIsSendMessage() == null || userVip.getIsSendMessage() != StatusEnum.YES.getCode()){//只通知一次
+                    if(userVip.getIsSendMessage() == null || !userVip.getIsSendMessage().equals(StatusEnum.YES.getCode())){//只通知一次
                         //您的会员将于**月**日**时到期。请及时续费哦。 点击此处去续费~
                         schedualMessageService.easemobMessage(userVip.getUserId().toString(),
                                 "您的会员将于"+DateUtil.getFormatDate(userVip.getEndTime(),DateUtil.DATE_FORMT)+"到期。请及时续费哦。 点击此处去续费~",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_VIP.getMessage(),"");

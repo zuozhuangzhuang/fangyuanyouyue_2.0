@@ -120,5 +120,12 @@ public interface ForumColumnService {
 	 * @throws ServiceException
 	 */
     void updateColumn(Integer columnId,String name,String coverImgUrl,Integer isChosen) throws ServiceException;
-    
+
+	/**
+	 * 是否拥有专栏
+	 * @param userId
+	 * @return
+	 * @throws ServiceException
+	 */
+    boolean isHasColumn(Integer userId) throws ServiceException;
 }

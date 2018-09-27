@@ -7,6 +7,7 @@ import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.order.dto.CompanyDto;
 import com.fangyuanyouyue.order.dto.OrderDto;
+import com.fangyuanyouyue.order.dto.adminDto.AdminOrderDto;
 import com.fangyuanyouyue.order.param.AdminOrderParam;
 import com.fangyuanyouyue.order.param.OrderParam;
 import com.fangyuanyouyue.order.service.*;
@@ -236,6 +237,34 @@ public class AdminController extends BaseController{
             return toError("系统繁忙，请稍后再试！");
         }
     }
+
+
+    @ApiOperation(value = "后台获取订单详情", notes = "(AdminOrderDto)订单详情",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "订单ID",required = true, dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/orderDetail")
+    @ResponseBody
+    public BaseResp orderDetail(AdminOrderParam param) throws IOException {
+        try {
+            log.info("----》后台获取订单详情《----");
+            log.info("参数："+param.toString());
+            //参数判断
+            if(param.getId()==null){
+                return toError("订单ID不能为空！");
+            }
+            //订单详情
+            AdminOrderDto orderDto = orderService.adminOrderDetail(param.getId());
+            return toSuccess(orderDto);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
 
 
 }

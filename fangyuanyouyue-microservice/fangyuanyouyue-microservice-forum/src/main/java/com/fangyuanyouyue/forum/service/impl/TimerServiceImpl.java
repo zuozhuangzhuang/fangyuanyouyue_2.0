@@ -135,8 +135,8 @@ public class TimerServiceImpl implements TimerService{
             //订单号
             final IdGenerator idg = IdGenerator.INSTANCE;
             String orderNo = idg.nextId();
-            schedualWalletService.addUserBalanceDetail(forumColumn.getUserId(),amount,Status.PAY_TYPE_BALANCE.getValue(),Status.EXPEND.getValue(),orderNo,"专栏每日收益",null,forumColumn.getUserId(),Status.FORUM_COLUMN.getValue(),orderNo);
-            schedualMessageService.easemobMessage(forumColumn.getId().toString(),"您的专栏本日收益为"+amount+"元！已发放至您的余额，点击此处查看您的余额吧",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_WALLET.getMessage(),"");
+            schedualWalletService.addUserBalanceDetail(forumColumn.getUserId(),amount,Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderNo,"专栏每日收益",null,forumColumn.getUserId(),Status.FORUM_COLUMN.getValue(),orderNo);
+            schedualMessageService.easemobMessage(forumColumn.getUserId().toString(),"您的专栏本日收益为"+amount+"元！已发放至您的余额，点击此处查看您的余额吧",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_WALLET.getMessage(),"");
         }
     }
 }

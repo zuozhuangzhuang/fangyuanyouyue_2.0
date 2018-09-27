@@ -151,7 +151,9 @@ public class CartServiceImpl implements CartService {
     @Override
     public List<GoodsDto> choice(Integer userId, Integer start, Integer limit) throws ServiceException {
         //根据用户购物车内的商品分类等获取精选商品列表
+        //TODO 1、根据商品分类 2、根据会员等级排序
         List<GoodsInfo> goodsInfos = goodsInfoMapper.getGoodsList(null, 1, null, null, null, null, null, start * limit, limit, null, null);
+//        List<GoodsInfo> goodsInfos1 = goodsInfoMapper.choice(null, 1, null, null, null, null, null, start * limit, limit, null, null);
         List<GoodsDto> goodsDtos = new ArrayList<>();
         for (GoodsInfo goodsInfo : goodsInfos) {
             goodsDtos.add(setDtoByGoodsInfo(goodsInfo));
