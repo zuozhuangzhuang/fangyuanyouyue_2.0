@@ -88,11 +88,11 @@ public class ForumCommentServiceImpl implements ForumCommentService {
 		//社交消息：您的视频【视频标题】有新的评论，点击此处前往查看吧
 		if(forumInfo.getType() == 1){
 			schedualMessageService.easemobMessage(forumInfo.getUserId().toString(),
-					"您的帖子【"+forumInfo.getTitle()+"】有新的评论，点击此处前往查看吧",Status.SOCIAL_MESSAGE.getMessage(),Status.JUMP_TYPE_FORUM_COMMENT.getMessage(),forumId.toString());
+					"您的帖子【"+forumInfo.getTitle()+"】有新的评论，点击此处前往查看吧",Status.SOCIAL_MESSAGE.getMessage(),Status.JUMP_TYPE_FORUM.getMessage(),forumId.toString());
 
 		}else{
 			schedualMessageService.easemobMessage(forumInfo.getUserId().toString(),
-					"您的视频【"+forumInfo.getTitle()+"】有新的评论，点击此处前往查看吧",Status.SOCIAL_MESSAGE.getMessage(),Status.JUMP_TYPE_VIDEO_COMMENT.getMessage(),forumId.toString());
+					"您的视频【"+forumInfo.getTitle()+"】有新的评论，点击此处前往查看吧",Status.SOCIAL_MESSAGE.getMessage(),Status.JUMP_TYPE_VIDEO.getMessage(),forumId.toString());
 		}
 		//新增用户行为
 		schedualWalletService.addUserBehavior(userId,forumInfo.getUserId(),forumId, Status.BUSINESS_TYPE_FORUM.getValue(),Status.BEHAVIOR_TYPE_COMMENT.getValue());

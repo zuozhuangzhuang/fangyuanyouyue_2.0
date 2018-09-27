@@ -61,62 +61,66 @@ public class TimerServiceImpl implements TimerService{
     @Override
     public void depreciate() throws ServiceException {
         //1、获取所有出售中抢购  2、判断当前价格是否高于最低价 3、判断是否超出最后一次降价时间
-        // type 类型 1普通商品 2抢购商品
         // status 状态 1出售中 2已售出 3已下架（已结束） 5删除
         List<GoodsInfo> goodsInfos = goodsInfoMapper.selectListByTypeStatus(Status.AUCTION.getValue(), 1);
         if(goodsInfos != null && goodsInfos.size()>0){
             for(GoodsInfo goodsInfo:goodsInfos){
-                if(goodsInfo.getPrice().compareTo(goodsInfo.getFloorPrice())>=0){
-                    //当前价格 > 最低价
-                    if(goodsInfo.getLastIntervalTime() == null){
-                        //最后一次降价时间为空 = 第一次降价
-                        if((goodsInfo.getAddTime().getTime()+goodsInfo.getIntervalTime()*1000) <= System.currentTimeMillis()) {
-                            //降价时间间隔
-                            long markDown = goodsInfo.getIntervalTime() * 1000;
-                            //最后一次降价时间
-                            long lastIntervalTime = goodsInfo.getAddTime().getTime();
-                            //当前时间
-                            Date nowTime = DateStampUtils.getTimesteamp();
-                            long nowTime2 = System.currentTimeMillis();
-                            long nowTime3 = System.currentTimeMillis() - lastIntervalTime;
+                getPriceDown(goodsInfo);
+            }
+        }
+    }
 
-                            System.out.println("降价时间间隔：" + markDown);
-                            System.out.println("最后一次降价时间：" + lastIntervalTime);
-                            System.out.println("当前时间1：" + nowTime.getTime());
-                            System.out.println("当前时间2：" + nowTime2);
-                            System.out.println("间隔：" + nowTime3);
-                            //最后一次降价时间 + 降价时间段 > 当前时间 = 降价
-                            //(当前时间-最后一次降价时间)/降价时间间隔=应该降价次数
-                            //降价次数*降价幅度
-                            long  number =(System.currentTimeMillis() - lastIntervalTime) / markDown;
-                            System.out.println("降价次数："+number);
-                            addIntervaHistory(goodsInfo, nowTime, number);
-                        }
-                    }else{
-                        //最后一次降价时间 + 降价时间段 <= 当前时间 = 降价
-                        if((goodsInfo.getLastIntervalTime().getTime()+goodsInfo.getIntervalTime()*1000) <= System.currentTimeMillis()){
-                            long lastIntervalTime = goodsInfo.getLastIntervalTime() == null?goodsInfo.getAddTime().getTime():goodsInfo.getLastIntervalTime().getTime();//最后一次降价时间
-                            //降价时间间隔
-                            long markDown = goodsInfo.getIntervalTime()*1000;
-                            //当前时间
-                            Date nowTime = DateStampUtils.getTimesteamp();
-                            System.out.println("最后一次降价时间："+lastIntervalTime);
-                            System.out.println("降价时间间隔："+markDown);
-                            System.out.println("当前时间："+nowTime.getTime());
-                            //(当前时间-最后一次降价时间)/降价时间间隔 = 应该降价次数
-                            long  number = (nowTime.getTime()-lastIntervalTime)/markDown;
-                            System.out.println("降价次数："+number);
-                            addIntervaHistory(goodsInfo, nowTime, number);
-                        }
-                    }
-                }/*else if(goodsInfo.getPrice().compareTo(goodsInfo.getFloorPrice()) == 0){
+    @Override
+    public void getPriceDown(GoodsInfo goodsInfo) throws ServiceException{
+        if(goodsInfo.getPrice().compareTo(goodsInfo.getFloorPrice())>=0){
+            //当前价格 > 最低价
+            if(goodsInfo.getLastIntervalTime() == null){
+                //最后一次降价时间为空 = 第一次降价
+                if((goodsInfo.getAddTime().getTime()+goodsInfo.getIntervalTime()*1000) <= System.currentTimeMillis()) {
+                    //降价时间间隔
+                    long markDown = goodsInfo.getIntervalTime() * 1000;
+                    //最后一次降价时间
+                    long lastIntervalTime = goodsInfo.getAddTime().getTime();
+                    //当前时间
+                    Date nowTime = DateStampUtils.getTimesteamp();
+                    long nowTime2 = System.currentTimeMillis();
+                    long nowTime3 = System.currentTimeMillis() - lastIntervalTime;
+
+                    System.out.println("降价时间间隔：" + markDown);
+                    System.out.println("最后一次降价时间：" + lastIntervalTime);
+                    System.out.println("当前时间1：" + nowTime.getTime());
+                    System.out.println("当前时间2：" + nowTime2);
+                    System.out.println("间隔：" + nowTime3);
+                    //最后一次降价时间 + 降价时间段 > 当前时间 = 降价
+                    //(当前时间-最后一次降价时间)/降价时间间隔=应该降价次数
+                    //降价次数*降价幅度
+                    long  number =(System.currentTimeMillis() - lastIntervalTime) / markDown;
+                    System.out.println("降价次数："+number);
+                    addIntervaHistory(goodsInfo, nowTime, number);
+                }
+            }else{
+                //最后一次降价时间 + 降价时间段 <= 当前时间 = 降价
+                if((goodsInfo.getLastIntervalTime().getTime()+goodsInfo.getIntervalTime()*1000) <= System.currentTimeMillis()){
+                    long lastIntervalTime = goodsInfo.getLastIntervalTime() == null?goodsInfo.getAddTime().getTime():goodsInfo.getLastIntervalTime().getTime();//最后一次降价时间
+                    //降价时间间隔
+                    long markDown = goodsInfo.getIntervalTime()*1000;
+                    //当前时间
+                    Date nowTime = DateStampUtils.getTimesteamp();
+                    System.out.println("最后一次降价时间："+lastIntervalTime);
+                    System.out.println("降价时间间隔："+markDown);
+                    System.out.println("当前时间："+nowTime.getTime());
+                    //(当前时间-最后一次降价时间)/降价时间间隔 = 应该降价次数
+                    long  number = (nowTime.getTime()-lastIntervalTime)/markDown;
+                    System.out.println("降价次数："+number);
+                    addIntervaHistory(goodsInfo, nowTime, number);
+                }
+            }/*else if(goodsInfo.getPrice().compareTo(goodsInfo.getFloorPrice()) == 0){
                     if ((goodsInfo.getLastIntervalTime().getTime() + goodsInfo.getIntervalTime() * 1000) <= System.currentTimeMillis()) {
                         //（当前价格 == 最低价 && 最后一次降价时间+降价间隔 <= 当前时间） = 下架
                         goodsInfo.setStatus(3);
                         goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
                     }
                 }*/
-            }
         }
     }
 

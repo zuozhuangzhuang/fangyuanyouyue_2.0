@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -67,6 +68,8 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     private GoodsIntervalHistoryMapper goodsIntervalHistoryMapper;
     @Autowired
     private SchedualWalletService schedualWalletService;
+    @Autowired
+    private TimerService timerService;
 
     @Override
     public GoodsInfo selectByPrimaryKey(Integer id) throws ServiceException{
@@ -199,8 +202,15 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
         if(param.getUserIds() != null && param.getUserIds().length > 0){
             for(Integer toUserId:param.getUserIds()){
-                schedualMessageService.easemobMessage(toUserId.toString(),
-                        "用户“"+user.getNickName()+"”上传"+(goodsInfo.getType()==Status.GOODS.getValue()?"商品【":"抢购【")+goodsInfo.getName()+"】时邀请了您！点击此处前往查看吧",Status.INVITE_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),goodsInfo.getId().toString());
+                if(goodsInfo.getType()==Status.GOODS.getValue()){
+                    schedualMessageService.easemobMessage(toUserId.toString(),
+                            "用户“"+user.getNickName()+"”上传商品【"+goodsInfo.getName()+"】时邀请了您！点击此处前往查看吧",Status.INVITE_MESSAGE.getMessage(),
+                            Status.JUMP_TYPE_GOODS.getMessage(),goodsInfo.getId().toString());
+                }else{
+                    schedualMessageService.easemobMessage(toUserId.toString(),
+                            "用户“"+user.getNickName()+"”上传抢购【"+goodsInfo.getName()+"】时邀请了您！点击此处前往查看吧",Status.INVITE_MESSAGE.getMessage(),
+                            Status.JUMP_TYPE_AUCTION.getMessage(),goodsInfo.getId().toString());
+                }
             }
         }
 //        return setDtoByGoodsInfo(null,goodsInfo);
@@ -442,6 +452,10 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         //是否收藏/关注 1未关注未收藏（商品/抢购） 2已关注未收藏(抢购) 3未关注已收藏（商品/抢购） 4已关注已收藏(抢购)
         if(goodsInfos != null && goodsInfos.size() > 0){//如果goodsInfos大于多条，说明存在多条收藏状态
             goodsInfo = goodsInfos.get(0);
+            //抢购降价
+            if(goodsInfo.getType().equals(Status.AUCTION.getValue())){
+                timerService.getPriceDown(goodsInfo);
+            }
             goodsDto = setDtoByGoodsInfo(userId,goodsInfo);
             //如果有两条，说明即收藏，又关注
             if(goodsInfos.size()>1){
@@ -460,6 +474,10 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             }
         }else{
             goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
+            //抢购降价
+            if(goodsInfo.getType().equals(Status.AUCTION.getValue())){
+                timerService.getPriceDown(goodsInfo);
+            }
             goodsDto = setDtoByGoodsInfo(userId,goodsInfo);
             goodsDto.setIsCollect(1);
         }
@@ -502,6 +520,10 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
         if(goodsInfo == null){
             throw new ServiceException("商品不存在或已下架！");
+        }
+        //抢购降价
+        if(goodsInfo.getType().equals(Status.AUCTION.getValue())){
+            timerService.getPriceDown(goodsInfo);
         }
         GoodsDto goodsDto = setDtoByGoodsInfo(null,goodsInfo);
         //是否官方认证

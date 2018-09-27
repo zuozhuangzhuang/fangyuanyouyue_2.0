@@ -42,7 +42,7 @@ public class TimerControllerTest {
     @Test
 //    @Transactional
     public void appraisalDetail() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/timer/appraisalDetail")
+        mvc.perform(MockMvcRequestBuilders.post("/timer/appraisalEnd")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

@@ -71,9 +71,16 @@ public class ReportServiceImpl implements ReportService{
             //被举报-40
             schedualWalletService.updateCredit(goodsInfo.getUserId(), Credit.REPORT_VERIFYED.getCredit(),Status.SUB.getValue());
             //很抱歉，您的商品/抢购【名称】被多用户举报，并经官方核实。已被删除，删除理由：￥@……#%￥&#%￥……@。点击查看详情
-            schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
-                    "很抱歉，您的"+(goodsInfo.getType().intValue()==Status.GOODS.getValue()?"商品【":"抢购【")+goodsInfo.getName()+"】被多用户举报，并经官方核实。已被删除，删除理由："+content+"。点击查看详情",
-                    Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),goodsInfo.getId().toString());
+            if(goodsInfo.getType().intValue()==Status.GOODS.getValue()){
+                schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
+                        "很抱歉，您的商品【"+goodsInfo.getName()+"】被多用户举报，并经官方核实。已被删除，删除理由："+content+"。点击查看详情",
+                        Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),goodsInfo.getId().toString());
+            }else{
+                schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
+                        "很抱歉，您的抢购【"+goodsInfo.getName()+"】被多用户举报，并经官方核实。已被删除，删除理由："+content+"。点击查看详情",
+                        Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_AUCTION.getMessage(),goodsInfo.getId().toString());
+            }
+
             report.setStatus(Status.YES.getValue());
             reportMapper.updateByPrimaryKey(report);
         }

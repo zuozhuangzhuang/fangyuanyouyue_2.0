@@ -68,8 +68,15 @@ public class CommentServiceImpl implements CommentService{
         //社交消息：您的商品【商品名称】有新的评论，点击此处前往查看吧
         //社交消息：您的抢购【抢购名称】有新的评论，点击此处前往查看吧
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(param.getGoodsId());
-        schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
-                "您的"+(goodsInfo.getType().equals(Status.GOODS.getValue()) ?"商品【":"抢购【")+goodsInfo.getName()+"】有新的评论，点击此处前往查看吧",Status.SOCIAL_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS_COMMENT.getMessage(),goodsInfo.getId().toString());
+        if(goodsInfo.getType().equals(Status.GOODS.getValue())){
+            schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
+                    "您的商品【"+goodsInfo.getName()+"】有新的评论，点击此处前往查看吧",
+                    Status.SOCIAL_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),goodsInfo.getId().toString());
+        }else{
+            schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
+                    "您的抢购【"+goodsInfo.getName()+"】有新的评论，点击此处前往查看吧",
+                    Status.SOCIAL_MESSAGE.getMessage(),Status.JUMP_TYPE_AUCTION.getMessage(),goodsInfo.getId().toString());
+        }
         if(param.getCommentId() != null){
             //回复
             GoodsComment comment = goodsCommentMapper.selectByPrimaryKey(param.getCommentId());

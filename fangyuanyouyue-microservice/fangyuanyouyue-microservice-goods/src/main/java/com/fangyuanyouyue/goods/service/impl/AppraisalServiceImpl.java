@@ -115,9 +115,10 @@ public class AppraisalServiceImpl implements AppraisalService{
                             addAppraisalImg(goodsInfo.getVideoUrl(),goodsAppraisalDetail.getId(),2);
                         }
                         for(GoodsImg goodsImg:imgsByGoodsId){//商品图片s
-                            addAppraisalImg(goodsImg.getImgUrl(),goodsAppraisalDetail.getId(),1);
                             if(goodsImg.getType().intValue() == 3){//视频截图图片
                                 addAppraisalImg(goodsImg.getImgUrl(),goodsAppraisalDetail.getId(),3);
+                            }else{
+                                addAppraisalImg(goodsImg.getImgUrl(),goodsAppraisalDetail.getId(),1);
                             }
                         }
                         //订单总金额
@@ -365,8 +366,11 @@ public class AppraisalServiceImpl implements AppraisalService{
         goodsAppraisalDetail.setSubmitTime(DateStampUtils.getTimesteamp());
         if(status == 1 && goodsAppraisalDetail.getGoodsId() != null){
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsAppraisalDetail.getGoodsId());
-            goodsInfo.setIsAppraisal(Status.YES.getValue());
-            goodsInfoMapper.updateByPrimaryKey(goodsInfo);
+            //卖家申请的才可以展示鉴标识
+            if(goodsInfo.getUserId().equals(goodsAppraisalDetail.getUserId())){
+                goodsInfo.setIsAppraisal(Status.YES.getValue());
+                goodsInfoMapper.updateByPrimaryKey(goodsInfo);
+            }
         }
         if(status == 3){
             //退还鉴定金
@@ -378,7 +382,7 @@ public class AppraisalServiceImpl implements AppraisalService{
 
             schedualMessageService.easemobMessage(goodsAppraisalDetail.getUserId().toString(),"您申请的鉴定结果为“存疑”鉴定费用已退回您的余额，点击此处查看您的余额吧",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_WALLET.getMessage(),"");
         }else{
-            schedualMessageService.easemobMessage(goodsAppraisalDetail.getUserId().toString(),"您申请的鉴定已得到官方专家的答复！点击此处前往查看吧",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_PLATFORM_APPRAISAL.getMessage(),goodsAppraisalDetail.getId().toString());
+            schedualMessageService.easemobMessage(goodsAppraisalDetail.getUserId().toString(),"您申请的鉴定已得到官方专家的答复！点击此处前往查看吧",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_PLATFORM_APPRAISAL.getMessage(),"");
         }
         goodsAppraisalDetailMapper.updateByPrimaryKey(goodsAppraisalDetail);
     }

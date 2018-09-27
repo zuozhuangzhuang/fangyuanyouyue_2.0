@@ -201,7 +201,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 					forumColumnMapper.insert(forumColumn);
 					//系统消息：您的【专栏名称】专栏申请已提交，将于3个工作日内完成审核，请注意消息通知
 					schedualMessageService.easemobMessage(forumColumnApply.getUserId().toString(),
-							"恭喜您，您申请的专栏已通过官方审核！快拉您的好友一起来交流学习吧~",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_COLUMN.getMessage(),forumColumn.getId().toString());
+							"恭喜您，您申请的专栏已通过官方审核！快拉您的好友一起来交流学习吧~",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),forumColumn.getId().toString());
 				}else if(status.intValue() == Status.NO.getValue()){
 					if(StringUtils.isEmpty(reason)){
 						throw new ServiceException("拒绝原因不能为空");

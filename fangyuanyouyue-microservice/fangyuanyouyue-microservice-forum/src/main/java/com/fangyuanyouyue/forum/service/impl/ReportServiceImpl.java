@@ -91,7 +91,7 @@ public class ReportServiceImpl implements ReportService{
             schedualWalletService.updateCredit(detail.getUserId(), Credit.REPORT_VERIFYED.getCredit(),Status.SUB.getValue());
             //很抱歉，您的帖子/视频/全民鉴定【名称】被多用户举报，并经官方核实。已被删除，删除理由：￥@……#%￥&#%￥……@
             schedualMessageService.easemobMessage(detail.getUserId().toString(),
-                    "很抱歉，您的全民鉴定【"+detail.getTitle()+"】被多用户举报，并经官方核实。已被删除，删除理由："+content, Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_APPRAISAL.getMessage(),"");
+                    "很抱歉，您的全民鉴定【"+detail.getTitle()+"】被多用户举报，并经官方核实。已被删除，删除理由："+content, Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
         }
         report.setStatus(1);
         reportMapper.updateByPrimaryKeySelective(report);

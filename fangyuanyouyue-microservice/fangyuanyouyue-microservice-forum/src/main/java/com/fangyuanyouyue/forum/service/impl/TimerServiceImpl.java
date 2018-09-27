@@ -94,7 +94,7 @@ public class TimerServiceImpl implements TimerService{
                                 }
                             }
                             //恭喜您！您参与的全民鉴定【名称】，您获得了最高票数！点击查看最终结果吧~
-                            schedualMessageService.easemobMessage(detail.getUserId().toString(),
+                            schedualMessageService.easemobMessage(comment.getUserId().toString(),
                                     "恭喜您！您参与的全民鉴定【"+detail.getTitle()+"】，您获得了最高票数！点击查看最终结果吧~",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_APPRAISAL.getMessage(),detail.getId().toString());
                             //余额账单
                             //订单号
@@ -105,7 +105,7 @@ public class TimerServiceImpl implements TimerService{
                             comment.setIsWinner(StatusEnum.NO.getValue());
                             appraisalCommentMapper.updateByPrimaryKey(comment);
                             //您参与的全民鉴定【名称】已结束投票，点击查看最终结果吧
-                            schedualMessageService.easemobMessage(detail.getUserId().toString(),
+                            schedualMessageService.easemobMessage(comment.getUserId().toString(),
                                     "您参与的全民鉴定【"+detail.getTitle()+"】已结束投票，点击查看最终结果吧",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_APPRAISAL.getMessage(),detail.getId().toString());
                         }
                     }

@@ -48,4 +48,11 @@ public interface AppraisalCommentService {
      */
     AppraisalCommentDto saveComment(Integer userId,AppraisalParam param) throws ServiceException;
 
+    /**
+     * 删除全民鉴定评论
+     * @param userId
+     * @param commentId
+     * @throws ServiceException
+     */
+    void deleteComment(Integer userId,Integer commentId) throws ServiceException;
 }

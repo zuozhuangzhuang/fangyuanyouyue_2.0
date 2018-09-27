@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.goods.service;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.goods.model.GoodsInfo;
 
 public interface TimerService {
     /**
@@ -14,4 +15,11 @@ public interface TimerService {
      * @throws ServiceException
      */
     void refuseBargain() throws ServiceException;
+
+    /**
+     * 抢购降价
+     * @param goodsInfo
+     * @throws ServiceException
+     */
+    void getPriceDown(GoodsInfo goodsInfo) throws ServiceException;
 }

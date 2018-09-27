@@ -80,7 +80,7 @@ public class TimerServiceImpl implements TimerService{
                                 goodsName.append("【"+goodsInfo.getName()+"】");
                             }
                             schedualMessageService.easemobMessage(info.getSellerId().toString(),
-                                    "您的"+(isAuction?"抢购":"商品")+goodsName+"买家超时已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER.getMessage(),info.getId().toString());
+                                    "您的"+(isAuction?"抢购":"商品")+goodsName+"买家超时已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),info.getId().toString());
                         }
                     }
                     //获取此订单内所有商品，更改商品状态为出售中
@@ -97,7 +97,7 @@ public class TimerServiceImpl implements TimerService{
                     }
                     //给买家发送信息：您未支付的商品【名称】已取消订单
                     schedualMessageService.easemobMessage(orderInfo.getUserId().toString(),
-                            "您超时未支付的"+(isAuction?"抢购":"商品")+goodsName+"已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER.getMessage(),orderInfo.getId().toString());
+                            "您超时未支付的"+(isAuction?"抢购":"商品")+goodsName+"已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),orderInfo.getId().toString());
                 }
             }
         }

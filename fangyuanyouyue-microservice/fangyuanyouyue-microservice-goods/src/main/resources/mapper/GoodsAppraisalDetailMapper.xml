@@ -240,10 +240,11 @@
       <if test="orderId != null">
         and order_id = #{orderId}
       </if>
-      <if test="start != null and limit != null">
-        order by submit_time desc,add_time desc limit #{start},#{limit}
-      </if>
     </where>
+    order by submit_time desc,add_time desc
+    <if test="start != null and limit != null">
+      limit #{start},#{limit}
+    </if>
   </select>
 
   <select id="getListByStatus" parameterType="Integer" resultMap="BaseResultMap">
