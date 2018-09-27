@@ -88,6 +88,9 @@ public class UserController extends BaseController {
             if (StringUtils.isEmpty(param.getNickName())) {
                 return toError("用户昵称不能为空！");
             }
+            if(param.getNickName().contains("方圆") || param.getNickName().contains("官方")){
+                return toError("昵称包含敏感词！");
+            }
             UserInfo userInfoByName = userInfoService.getUserByNickName(param.getNickName());
             if(userInfoByName != null){
                 return toError("用户昵称已存在！");
@@ -182,6 +185,9 @@ public class UserController extends BaseController {
             }
             if(param.getType() == null){
                 return toError("三方类型不能为空！");
+            }
+            if(StringUtils.isEmpty(param.getThirdNickName())){
+                return toError("第三方账号昵称不能为空！");
             }
             //APP三方注册/登录
             param.setRegType(1);//注册来源 1app 2微信小程序
@@ -567,6 +573,9 @@ public class UserController extends BaseController {
         try{
             log.info("----》小程序登录《----");
             log.info("参数："+param.toString());
+            if(StringUtils.isEmpty(param.getThirdNickName())){
+                return toError("第三方账号昵称不能为空！");
+            }
             //微信的接口
             String url = "https://api.weixin.qq.com/sns/jscode2session?appid="+WeChatSession.APPID+
                     "&secret="+WeChatSession.SECRET+"&js_code="+ param.getCode() +"&grant_type=authorization_code";

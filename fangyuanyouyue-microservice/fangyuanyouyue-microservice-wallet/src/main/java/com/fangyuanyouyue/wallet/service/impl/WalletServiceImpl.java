@@ -162,6 +162,10 @@ public class WalletServiceImpl implements WalletService{
         amount = amount.add(charge);
         //扣除余额 type 类型 1充值 2消费 payType 支付类型 1微信 2支付宝 3余额
         updateBalance(userId,amount,2);
+        //订单号
+        final IdGenerator idg = IdGenerator.INSTANCE;
+        String orderNo = idg.nextId();
+        addUserBalanceDetail(userId,amount,Status.PAY_TYPE_BALANCE.getValue(),Status.EXPEND.getValue(),orderNo,"用户提现",Status.WITHDRAW.getValue(),null,userId,orderNo);
     }
 
 

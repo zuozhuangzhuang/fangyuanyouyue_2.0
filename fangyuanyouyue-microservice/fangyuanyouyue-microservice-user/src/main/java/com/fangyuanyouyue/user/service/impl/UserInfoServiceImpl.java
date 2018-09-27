@@ -66,6 +66,8 @@ public class UserInfoServiceImpl implements UserInfoService {
     private CouponInfoMapper couponInfoMapper;
     @Autowired
     private UserNickNameDetailMapper userNickNameDetailMapper;
+    @Autowired
+    private SchedualForumService schedualForumService;
 
     @Override
     public UserInfo getUserByToken(String token) throws ServiceException {
@@ -242,17 +244,14 @@ public class UserInfoServiceImpl implements UserInfoService {
     public UserDto thirdLogin(UserParam param) throws ServiceException {
         //根据第三方唯一ID和类型获取第三方登录信息
         UserThirdParty userThirdParty = userThirdPartyMapper.getUserByThirdNoType(param.getUnionId(),param.getType());
+        String nickName = param.getThirdNickName().replace("方圆","**").replace("官方","**");
         if(userThirdParty == null){
             log.info("三方注册");
             //注册
             //初始化用户信息
             UserInfo user = new UserInfo();
-            if(StringUtils.isEmpty(param.getThirdNickName())){
-                throw new ServiceException("第三方账号昵称不能为空！");
-            }else{
-                //第三方昵称末尾加随机数
-                user.setNickName(param.getThirdNickName()+"-"+((int)(Math.random() * 9000) + 1000));
-            }
+            //第三方昵称末尾加随机数
+            user.setNickName(nickName+"-"+((int)(Math.random() * 9000) + 1000));
             user.setHeadImgUrl(param.getThirdHeadImgUrl());
             user.setRegType(param.getRegType());
             user.setRegPlatform(param.getLoginPlatform());
@@ -508,6 +507,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 userDto.setFansCount(userFansMapper.fansCount(user.getId()));
                 userDto.setCollectCount(userFansMapper.collectCount(user.getId()));
             }
+            userDto.setIsHasColumn(JSONObject.parseObject(schedualForumService.isHasColumn(user.getId())).getBoolean("data")==true?1:2);
             return userDto;
         }
     }
@@ -540,11 +540,12 @@ public class UserInfoServiceImpl implements UserInfoService {
         //用户登录
         //根据unionId和type获取用户第三方登录信息
         UserThirdParty userThirdParty = userThirdPartyMapper.getUserByThirdNoType(param.getUnionId(),1);
+        String nickName = param.getThirdNickName().replace("方圆","**").replace("官方","**");
         if(userThirdParty == null){
             //如果用户为空，注册
             //初始化用户信息
             UserInfo user = new UserInfo();
-            user.setNickName(param.getThirdNickName()+"-"+((int)(Math.random() * 9000) + 1000));
+            user.setNickName(nickName+"-"+((int)(Math.random() * 9000) + 1000));
             user.setHeadImgUrl(param.getThirdHeadImgUrl());
             user.setRegType(2);//注册来源 1app 2微信小程序
             user.setRegPlatform(3);//注册平台 1安卓 2iOS 3小程序
