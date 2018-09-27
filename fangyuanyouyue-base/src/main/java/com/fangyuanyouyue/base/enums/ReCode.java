@@ -8,7 +8,7 @@ public enum ReCode {
 	
 	SUCCESS(0,"操作成功"),
 	FAILD(1,"操作失败"),
-	IS_MERGE(2,"此手机号已被注册，是否合并账号！"),
+	IS_MERGE(2,"此手机号已被注册，是否合并账号？"),
 	PASSWORD_ERROR(3,"登录密码错误"),
 	PAYMENT_PASSWORD_ERROR(4,"支付密码错误"),
 	INSUFFICIENT_FUND(5,"余额不足"),

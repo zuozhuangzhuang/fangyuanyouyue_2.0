@@ -1,4 +1,4 @@
-package com.fangyuanyouyue.forum.dto;
+package com.fangyuanyouyue.forum.dto.admin;
 
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.forum.model.Report;

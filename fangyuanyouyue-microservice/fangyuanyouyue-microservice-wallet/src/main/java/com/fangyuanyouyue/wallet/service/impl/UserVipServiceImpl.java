@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.wallet.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
 import com.fangyuanyouyue.base.enums.ReCode;
@@ -12,17 +13,18 @@ import com.fangyuanyouyue.base.util.IdGenerator;
 import com.fangyuanyouyue.wallet.dao.UserVipCouponDetailMapper;
 import com.fangyuanyouyue.wallet.dao.UserVipMapper;
 import com.fangyuanyouyue.wallet.dao.VipOrderMapper;
+import com.fangyuanyouyue.wallet.dto.admin.AdminVipDto;
 import com.fangyuanyouyue.wallet.model.UserVip;
 import com.fangyuanyouyue.wallet.model.UserVipCouponDetail;
 import com.fangyuanyouyue.wallet.model.VipOrder;
+import com.fangyuanyouyue.wallet.param.AdminWalletParam;
 import com.fangyuanyouyue.wallet.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.List;
 
 @Service(value = "userVipService")
 @Transactional(rollbackFor=Exception.class)
@@ -241,7 +243,7 @@ public class UserVipServiceImpl implements UserVipService{
     @Override
     public void updateUserVip(Integer userId, Integer vipLevel, Integer vipType,Integer type) throws ServiceException {
         UserVip userVip = userVipMapper.selectByUserId(userId);
-        if(type.intValue() == 1){
+        if(type.equals(1)){
             if(userVip.getStatus().intValue() == Status.IS_VIP.getValue()){//已开通
                 throw new ServiceException("已开通会员！");
             }
@@ -283,7 +285,7 @@ public class UserVipServiceImpl implements UserVipService{
                 schedualMessageService.easemobMessage(userId.toString(),
                         "您本月赠送的代金券已到账，点击前往查看~",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_WALLET.getMessage(),"");
             }
-        }else{
+        }else if(type.equals(2)){
             if(userVip.getStatus() == Status.NOT_VIP.getValue()){//未开通
                 throw new ServiceException("请开通会员！");
             }
@@ -318,6 +320,17 @@ public class UserVipServiceImpl implements UserVipService{
                 userVip.setVipType(vipType);//会员类型 1一个月 2三个月 3一年会员
                 userVip.setStatus(Status.IS_VIP.getValue());//会员状态 1已开通 2未开通
             }
+        }else if(type.equals(3)){
+            //取消会员
+            userVip.setStartTime(null);
+            userVip.setEndTime(null);
+            userVip.setVipLevel(null);
+            userVip.setLevelDesc(null);
+            userVip.setVipType(null);
+            userVip.setStatus(Status.NOT_VIP.getValue());
+            userVipMapper.updateByPrimaryKey(userVip);
+        }else{
+            throw new ServiceException("类型错误！");
         }
         userVip.setIsSendMessage(null);
         userVipMapper.updateByPrimaryKey(userVip);
@@ -327,5 +340,16 @@ public class UserVipServiceImpl implements UserVipService{
     public boolean isUserVip(Integer userId) throws ServiceException {
         UserVip userVip = userVipMapper.selectByUserId(userId);
         return userVip.getStatus().intValue() == Status.IS_VIP.getValue()?true:false;
+    }
+
+    @Override
+    public Pager vipList(AdminWalletParam param) throws ServiceException {
+        Integer total = userVipMapper.countPage(param.getVipLevel(),param.getVipType(),param.getIsSendMessage(),param.getKeyword(),param.getStartDate(),param.getEndDate());
+        List<UserVip> userWithdraws = userVipMapper.getPage(param.getVipLevel(),param.getVipType(),param.getIsSendMessage(),param.getStart(),param.getLimit(),param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+        List<AdminVipDto> datas = AdminVipDto.toDtoList(userWithdraws);
+        Pager pager = new Pager();
+        pager.setTotal(total);
+        pager.setDatas(datas);
+        return pager;
     }
 }

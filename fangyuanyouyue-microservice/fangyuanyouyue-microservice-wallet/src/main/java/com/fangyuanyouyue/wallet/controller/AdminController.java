@@ -253,7 +253,7 @@ public class AdminController extends BaseController{
     @ResponseBody
     public BaseResp confinedUser(AdminWalletParam param) throws IOException {
         try {
-            log.info("后台设置限制用户使用余额");
+            log.info("----》后台设置限制用户使用余额《----");
             log.info(param.toString());
             if(param.getId() == null){
                 return toError("用户id不能为空！");
@@ -275,13 +275,13 @@ public class AdminController extends BaseController{
             @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "vipLevel", value = "会员等级 1铂金会员 2至尊会员",  required = true,dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "vipType", value = "会员类型 1一个月 2三个月 3一年会员",  required = true,dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "type", value = "类型 1开通 2续费",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1开通 2续费 3取消",required = true, dataType = "int", paramType = "query"),
     })
     @PostMapping(value = "/updateUserVip")
     @ResponseBody
     public BaseResp updateUserVip(AdminWalletParam param) throws IOException {
         try {
-            log.info("修改用户会员信息");
+            log.info("----》修改用户会员信息《----");
             log.info(param.toString());
             if(param.getId() == null){
                 return toError("用户id不能为空！");
@@ -302,5 +302,46 @@ public class AdminController extends BaseController{
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
         }
     }
+
+    @ApiOperation(value = "会员列表", notes = "会员列表",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "keyword", value = "搜索词条", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "startDate", value = "开始日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "endDate", value = "结束日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orders", value = "排序规则", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "ascType", value = "排序类型 1升序 2降序", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "vipLevel", value = "会员等级 1铂金会员 2至尊会员", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "vipType", value = "会员类型 1一个月 2三个月 3一年会员", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "isSendMessage", value = "是否发送7天后到期信息 1是 2否", required = false, dataType = "int", paramType = "query")
+    })
+    @GetMapping(value = "/vipList")
+    @ResponseBody
+    public BaseResp vipList(AdminWalletParam param) throws IOException {
+        try {
+            log.info("----》会员列表《----");
+            log.info("参数："+param.toString());
+            if(param.getStart() == null || param.getStart() < 0){
+                return toError("起始页数错误！");
+            }
+            if(param.getLimit() == null || param.getLimit() < 1){
+                return toError("每页个数错误！");
+            }
+
+            Pager pager = userVipService.vipList(param);
+            return toPage(pager);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        }catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+
+
+
 
 }

@@ -40,4 +40,34 @@ public interface UserVipMapper {
      * @return
      */
     List<UserVip> selectUserVipYear();
+
+    /**
+     * 分页总条数
+     * @param vipLevel
+     * @param vipType
+     * @param isSendMessage
+     * @param keyword
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    int countPage(@Param("vipLevel")Integer vipLevel,@Param("vipType")Integer vipType,@Param("isSendMessage")Integer isSendMessage,@Param("keyword")String keyword, @Param("startDate")String startDate, @Param("endDate")String endDate);
+
+    /**
+     * 分页获取会员列表
+     * @param vipLevel
+     * @param vipType
+     * @param isSendMessage
+     * @param start
+     * @param limit
+     * @param keyword
+     * @param startDate
+     * @param endDate
+     * @param orders
+     * @param ascType
+     * @return
+     */
+    List<UserVip> getPage(@Param("vipLevel")Integer vipLevel,@Param("vipType")Integer vipType,@Param("isSendMessage")Integer isSendMessage, @Param("start") Integer start,
+                              @Param("limit") Integer limit, @Param("keyword")String keyword,
+                              @Param("startDate")String startDate, @Param("endDate")String endDate, @Param("orders")String orders, @Param("ascType")Integer ascType);
 }

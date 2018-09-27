@@ -28,7 +28,7 @@ import com.fangyuanyouyue.forum.dao.AppraisalImgMapper;
 import com.fangyuanyouyue.forum.dao.AppraisalLikesMapper;
 import com.fangyuanyouyue.forum.dao.ArgueOrderMapper;
 import com.fangyuanyouyue.forum.dao.CollectMapper;
-import com.fangyuanyouyue.forum.dto.AdminAppraisalDetailDto;
+import com.fangyuanyouyue.forum.dto.admin.AdminAppraisalDetailDto;
 import com.fangyuanyouyue.forum.dto.AppraisalDetailDto;
 import com.fangyuanyouyue.forum.dto.AppraisalImgDto;
 import com.fangyuanyouyue.forum.model.AppraisalComment;

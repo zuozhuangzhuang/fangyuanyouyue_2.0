@@ -1,10 +1,11 @@
-package com.fangyuanyouyue.forum.dto;
+package com.fangyuanyouyue.forum.dto.admin;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.forum.dto.AppraisalImgDto;
 import com.fangyuanyouyue.forum.model.AppraisalDetail;
 
 import lombok.Getter;

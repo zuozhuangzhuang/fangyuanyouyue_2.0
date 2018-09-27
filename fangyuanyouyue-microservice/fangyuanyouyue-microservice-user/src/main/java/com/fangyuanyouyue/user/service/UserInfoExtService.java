@@ -105,4 +105,13 @@ public interface UserInfoExtService {
      * @throws ServiceException
      */
     void updateShopAuth(Integer id,Integer status,String content) throws ServiceException;
+
+    /**
+     * 修改用户粉丝基数
+     * @param userId
+     * @param count
+     * @param type
+     * @throws ServiceException
+     */
+    void updateFansCount(Integer userId,Integer count,Integer type) throws ServiceException;
 }

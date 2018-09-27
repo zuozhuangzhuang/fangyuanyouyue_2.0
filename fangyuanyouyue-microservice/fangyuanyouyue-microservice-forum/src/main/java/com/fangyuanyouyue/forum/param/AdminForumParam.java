@@ -27,4 +27,13 @@ public class AdminForumParam extends BasePageReq{
 
     @ApiModelProperty(name = "name", value = "名称", dataType = "String",hidden = true)
     private String name;//名称
+
+    //修改数量
+    @ApiModelProperty(name = "count", value = "修改数量", dataType = "int",hidden = true)
+    private Integer count;
+
+    //排列
+    @ApiModelProperty(name = "sort", value = "排列", dataType = "int",hidden = true)
+    private Integer sort;
+
 }

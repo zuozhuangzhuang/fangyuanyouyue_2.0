@@ -192,6 +192,7 @@ public class MessageController extends BaseController{
             ext.put("headImgUrl",headImgUrl);//默认为系统头像
             ext.put("jumpType",param.getJumpType());
             ext.put("businessId",param.getBusinessId());
+            ext.put("type",param.getType());
             /*
                 from        :来源
                 target      :目标

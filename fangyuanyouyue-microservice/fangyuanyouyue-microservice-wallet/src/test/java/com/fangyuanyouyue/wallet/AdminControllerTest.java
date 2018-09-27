@@ -53,4 +53,20 @@ public class AdminControllerTest {
     }
 
 
+    /**
+     * 会员列表
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void vipList() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.get("/adminWallet/vipList")
+                .param("start","0")
+                .param("limit","100")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+
 }

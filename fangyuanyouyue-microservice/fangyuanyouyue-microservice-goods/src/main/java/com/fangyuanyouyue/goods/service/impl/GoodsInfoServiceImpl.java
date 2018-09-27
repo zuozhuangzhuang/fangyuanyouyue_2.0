@@ -452,6 +452,9 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         //是否收藏/关注 1未关注未收藏（商品/抢购） 2已关注未收藏(抢购) 3未关注已收藏（商品/抢购） 4已关注已收藏(抢购)
         if(goodsInfos != null && goodsInfos.size() > 0){//如果goodsInfos大于多条，说明存在多条收藏状态
             goodsInfo = goodsInfos.get(0);
+            if(goodsInfo == null){
+                throw new ServiceException("未找到商品、抢购！");
+            }
             //抢购降价
             if(goodsInfo.getType().equals(Status.AUCTION.getValue())){
                 timerService.getPriceDown(goodsInfo);
@@ -474,6 +477,9 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             }
         }else{
             goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
+            if(goodsInfo == null){
+                throw new ServiceException("未找到商品、抢购！");
+            }
             //抢购降价
             if(goodsInfo.getType().equals(Status.AUCTION.getValue())){
                 timerService.getPriceDown(goodsInfo);

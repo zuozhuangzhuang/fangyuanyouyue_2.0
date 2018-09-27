@@ -2,6 +2,7 @@ package com.fangyuanyouyue.forum.controller;
 
 import java.io.IOException;
 
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.forum.param.AdminForumParam;
 import com.fangyuanyouyue.forum.service.*;
 import org.apache.commons.lang.StringUtils;
@@ -311,7 +312,7 @@ public class AdminController extends BaseController {
             @ApiImplicitParam(name = "id", value = "专栏id", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "name", value = "专栏名字",required = false, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "coverImgUrl", value = "封面图片地址",required = false, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "isChosen", value = "是否精选1是 2否",required = false, dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "isChosen", value = "是否精选 1是 2否",required = false, dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/updateColumn")
     @ResponseBody
@@ -331,5 +332,55 @@ public class AdminController extends BaseController {
         }
     }
 
+
+
+    @ApiOperation(value = "修改帖子、视频", notes = "精选帖子、置顶视频、删除帖子视频", response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "帖子、视频id", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "sort", value = "排列优先级 1置顶 2默认排序",required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "isChosen", value = "是否精选 1是 2否",required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "状态 1显示 2删除",required = false, dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/updateForum")
+    @ResponseBody
+    public BaseResp updateForum(AdminForumParam param) throws IOException {
+        try {
+            log.info("----》修改帖子、视频《----");
+            log.info("参数：" + param.toString());
+            if(param.getId() == null){
+                return toError("帖子、视频id不能为空！");
+            }
+            forumInfoService.updateForum(param.getId(),param.getSort(),param.getIsChosen(),param.getStatus());
+
+            return toSuccess();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+
+    @ApiOperation(value = "编辑浏览量基数", notes = "编辑浏览量基数",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "视频、帖子id", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "count", value = "修改数量", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1增加 2减少", required = true, dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/updateFansCount")
+    @ResponseBody
+    public BaseResp updateFansCount(AdminForumParam param) throws IOException {
+        try {
+            log.info("----》编辑浏览量基数《----");
+            log.info("参数："+param.toString());
+            if(param.getId() == null){
+                return toError("帖子、视频id不能为空！");
+            }
+            forumInfoService.updatePvCount(param.getId(),param.getCount(),param.getType());
+            return toSuccess();
+        }catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
 
 }

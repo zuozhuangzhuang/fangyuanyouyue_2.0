@@ -292,7 +292,7 @@
   </select>
 
   <select id="getPage" resultMap="BaseResultMap">
-    select *,b.order_no from order_refund a,order_info b
+    select a.*,b.order_no from order_refund a,order_info b
     <where>
       a.order_id = b.id
       <if test="keyword != null and keyword != ''">

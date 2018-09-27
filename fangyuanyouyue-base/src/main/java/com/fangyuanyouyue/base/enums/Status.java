@@ -19,6 +19,9 @@ public enum Status {
     //1商品 2抢购
     GOODS(1),AUCTION(2),
 
+    //1帖子 2视频
+    FORUM(1),VIDEO(2),
+
     //1好评 2中评 3差评
     EVALUATION_GOOD(1),EVALUATION_NORMAL(2),EVALUATION_BAD(3),
 

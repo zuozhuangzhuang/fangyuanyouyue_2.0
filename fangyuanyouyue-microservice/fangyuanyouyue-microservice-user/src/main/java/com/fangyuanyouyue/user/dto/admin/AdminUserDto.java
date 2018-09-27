@@ -3,6 +3,7 @@ package com.fangyuanyouyue.user.dto.admin;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.user.model.UserInfo;
 
@@ -72,6 +73,9 @@ public class AdminUserDto {
     
     private Integer status;
 
+    private Integer fansBaseCount;//粉丝基数
+
+
     public AdminUserDto(UserInfo model) {
     	this.id = model.getId();
     	this.nickName = model.getNickName();
@@ -83,7 +87,9 @@ public class AdminUserDto {
     	this.address = model.getAddress();
     	this.level = model.getLevel();
     	this.status = model.getStatus();
+        this.contact = model.getContact();
     }
+
 
     public static List<AdminUserDto> toDtoList(List<UserInfo> list) {
         if (list == null) {

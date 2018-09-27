@@ -1,6 +1,8 @@
 package com.fangyuanyouyue.wallet.service;
 
+import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.wallet.param.AdminWalletParam;
 
 public interface UserVipService {
     /**
@@ -42,4 +44,12 @@ public interface UserVipService {
      * @throws ServiceException
      */
     boolean isUserVip(Integer userId) throws ServiceException;
+
+    /**
+     * 会员列表
+     * @param param
+     * @return
+     * @throws ServiceException
+     */
+    Pager vipList(AdminWalletParam param) throws ServiceException;
 }

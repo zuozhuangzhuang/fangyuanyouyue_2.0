@@ -397,7 +397,6 @@ public class UserInfoServiceImpl implements UserInfoService {
                 userInfo.setEmail(param.getEmail());
             }
             if(StringUtils.isNotEmpty(param.getNickName())){
-                userInfo.setNickName(param.getNickName());
                 //修改昵称记录
                 UserNickNameDetail userNickNameDetail = new UserNickNameDetail();
                 userNickNameDetail.setUserId(userInfo.getId());
@@ -405,6 +404,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 userNickNameDetail.setNewNickName(param.getNickName());
                 userNickNameDetail.setAddTime(DateStampUtils.getTimesteamp());
                 userNickNameDetailMapper.insert(userNickNameDetail);
+                userInfo.setNickName(param.getNickName());
             }
             // 保存头像
             if(StringUtils.isNotEmpty(param.getHeadImgUrl())){
@@ -504,7 +504,8 @@ public class UserInfoServiceImpl implements UserInfoService {
                 }
                 //免费鉴定次数
                 userDto.setAppraisalCount(userWallet.getAppraisalCount());
-                userDto.setFansCount(userFansMapper.fansCount(user.getId()));
+                //粉丝数+粉丝基数
+                userDto.setFansCount(userFansMapper.fansCount(user.getId())+userInfoExt.getFansCount());
                 userDto.setCollectCount(userFansMapper.collectCount(user.getId()));
             }
             userDto.setIsHasColumn(JSONObject.parseObject(schedualForumService.isHasColumn(user.getId())).getBoolean("data")==true?1:2);
@@ -676,8 +677,6 @@ public class UserInfoServiceImpl implements UserInfoService {
             throw new ServiceException("用户不存在！");
         }else{
             UserDto userDto = setUserDtoByInfo("",userInfo);
-            userDto.setFansCount(userFansMapper.fansCount(userId));
-            userDto.setCollectCount(userFansMapper.collectCount(userId));
             //判断token用户是否关注userId用户
             if(userByToken != null){
                 UserFans userFans = userFansMapper.selectByUserIdToUserId(userByToken.getId(),userId);

@@ -1,4 +1,4 @@
-package com.fangyuanyouyue.forum.dto;
+package com.fangyuanyouyue.forum.dto.admin;
 
 import java.util.ArrayList;
 import java.util.List;

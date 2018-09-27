@@ -8,7 +8,7 @@ import com.fangyuanyouyue.forum.constants.StatusEnum;
 import com.fangyuanyouyue.forum.dao.AppraisalDetailMapper;
 import com.fangyuanyouyue.forum.dao.ForumInfoMapper;
 import com.fangyuanyouyue.forum.dao.ReportMapper;
-import com.fangyuanyouyue.forum.dto.AdminReportDto;
+import com.fangyuanyouyue.forum.dto.admin.AdminReportDto;
 import com.fangyuanyouyue.forum.model.AppraisalDetail;
 import com.fangyuanyouyue.forum.model.ForumInfo;
 import com.fangyuanyouyue.forum.model.Report;

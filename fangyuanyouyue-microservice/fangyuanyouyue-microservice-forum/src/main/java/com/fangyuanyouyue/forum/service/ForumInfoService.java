@@ -61,7 +61,23 @@ public interface ForumInfoService {
      * @return
      */
     Pager getPage(BasePageReq param,Integer type);
-    
-    
-    
+
+	/**
+	 * 修改帖子、视频
+	 * @param forumId
+	 * @param sort
+	 * @param isChosen
+	 * @param status
+	 * @throws ServiceException
+	 */
+    void updateForum(Integer forumId,Integer sort,Integer isChosen,Integer status) throws ServiceException;
+
+	/**
+	 * 编辑浏览量基数
+	 * @param forumId
+	 * @param count
+	 * @param type
+	 * @throws ServiceException
+	 */
+    void updatePvCount(Integer forumId,Integer count,Integer type) throws ServiceException;
 }

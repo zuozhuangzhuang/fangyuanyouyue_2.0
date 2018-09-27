@@ -33,5 +33,6 @@ public class UserInfoExt {
 
     private Date updateTime;//更新时间
 
+    private Integer fansCount;//用户粉丝基数
 
 }

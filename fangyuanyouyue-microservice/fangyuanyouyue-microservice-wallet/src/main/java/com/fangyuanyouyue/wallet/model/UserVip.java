@@ -36,4 +36,9 @@ public class UserVip {
     private String vipNo;//会员号
 
     private Integer isSendMessage;//是否发送7天后到期信息 1是 2否
+
+    private String nickName;//昵称
+
+    private String headImgUrl;//头像图片地址
+
 }

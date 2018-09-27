@@ -25,7 +25,7 @@ public class ForumInfo {
 
     private String label;//标签
 
-    private Integer sort;//排列优先级
+    private Integer sort=2;//排列优先级 1置顶 2默认排序
 
     private Integer type;//帖子类型 1帖子 2视频
 

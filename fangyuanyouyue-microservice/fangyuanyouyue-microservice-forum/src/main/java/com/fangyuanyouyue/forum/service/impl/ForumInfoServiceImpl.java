@@ -10,10 +10,8 @@ import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.forum.constants.StatusEnum;
 import com.fangyuanyouyue.forum.dao.*;
-import com.fangyuanyouyue.forum.dto.AdminForumColumnDto;
-import com.fangyuanyouyue.forum.dto.AdminForumInfoDto;
+import com.fangyuanyouyue.forum.dto.admin.AdminForumInfoDto;
 import com.fangyuanyouyue.forum.dto.ForumInfoDto;
-import com.fangyuanyouyue.forum.dto.ForumLikesDto;
 import com.fangyuanyouyue.forum.model.*;
 import com.fangyuanyouyue.forum.service.*;
 import org.apache.commons.lang.StringUtils;
@@ -23,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 
 @Service(value = "forumInfoService")
@@ -220,5 +217,43 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 		return pager;
 	}
 
-	
+	@Override
+	public void updateForum(Integer forumId, Integer sort, Integer isChosen,Integer status) throws ServiceException {
+		ForumInfo forumInfo = forumInfoMapper.selectByPrimaryKey(forumId);
+		if(forumInfo == null){
+			throw new ServiceException("未找到视频、帖子！");
+		}
+		if(forumInfo.getType().equals(Status.FORUM.getValue())){
+			forumInfo.setIsChosen(isChosen);
+		}else{
+
+		}
+		if(sort != null){
+			forumInfo.setSort(sort);
+		}
+		if(status != null){
+			forumInfo.setStatus(status);
+		}
+		forumInfoMapper.updateByPrimaryKey(forumInfo);
+	}
+
+	@Override
+	public void updatePvCount(Integer forumId, Integer count, Integer type) throws ServiceException {
+		ForumInfo forumInfo = forumInfoMapper.selectByPrimaryKey(forumId);
+		if(forumInfo == null){
+			throw new ServiceException("未找到视频、帖子！");
+		}
+		if(type.equals(Status.ADD.getValue())){
+			forumInfo.setPvCount(forumInfo.getPvCount()+count);
+		}else if(type.equals(Status.SUB.getValue())){
+			if(forumInfo.getPvCount().compareTo(count)<0){
+				forumInfo.setPvCount(0);
+			}else{
+				forumInfo.setPvCount(forumInfo.getPvCount()-count);
+			}
+		}else{
+			throw new ServiceException("类型错误！");
+		}
+		forumInfoMapper.updateByPrimaryKey(forumInfo);
+	}
 }

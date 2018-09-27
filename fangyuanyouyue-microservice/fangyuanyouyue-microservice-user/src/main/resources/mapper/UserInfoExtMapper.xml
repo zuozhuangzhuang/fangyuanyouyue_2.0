@@ -8,16 +8,18 @@
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="pay_pwd" jdbcType="VARCHAR" property="payPwd" />
     <result column="status" jdbcType="INTEGER" property="status" />
-    <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
     <result column="auth_type" jdbcType="INTEGER" property="authType" />
+    <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="credit" jdbcType="BIGINT" property="credit" />
+    <result column="fans_count" jdbcType="INTEGER" property="fansCount" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, user_id, identity, name, pay_pwd, status, auth_type, add_time, update_time, credit
+    id, user_id, identity, name, pay_pwd, status, auth_type, add_time, update_time, credit, 
+    fans_count
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select
+    select 
     <include refid="Base_Column_List" />
     from user_info_ext
     where id = #{id,jdbcType=INTEGER}
@@ -26,15 +28,15 @@
     delete from user_info_ext
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.user.model.UserInfoExt">
-    insert into user_info_ext (id, user_id, identity,
-    name, pay_pwd, status,
-    auth_type, add_time, update_time,
-    credit)
-    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{identity,jdbcType=VARCHAR},
-    #{name,jdbcType=VARCHAR}, #{payPwd,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},
-    #{authType,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
-    #{credit,jdbcType=BIGINT})
+  <insert id="insert" parameterType="com.fangyuanyouyue.user.model.UserInfoExt" useGeneratedKeys="true" keyProperty="id">
+    insert into user_info_ext (id, user_id, identity, 
+      name, pay_pwd, status, 
+      auth_type, add_time, update_time, 
+      credit, fans_count)
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{identity,jdbcType=VARCHAR}, 
+      #{name,jdbcType=VARCHAR}, #{payPwd,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+      #{authType,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{credit,jdbcType=BIGINT}, #{fansCount,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.fangyuanyouyue.user.model.UserInfoExt" useGeneratedKeys="true" keyProperty="id">
     insert into user_info_ext
@@ -69,6 +71,9 @@
       <if test="credit != null">
         credit,
       </if>
+      <if test="fansCount != null">
+        fans_count,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -100,6 +105,9 @@
       </if>
       <if test="credit != null">
         #{credit,jdbcType=BIGINT},
+      </if>
+      <if test="fansCount != null">
+        #{fansCount,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -133,6 +141,9 @@
       <if test="credit != null">
         credit = #{credit,jdbcType=BIGINT},
       </if>
+      <if test="fansCount != null">
+        fans_count = #{fansCount,jdbcType=INTEGER},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -146,7 +157,8 @@
       auth_type = #{authType,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      credit = #{credit,jdbcType=BIGINT}
+      credit = #{credit,jdbcType=BIGINT},
+      fans_count = #{fansCount,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
 

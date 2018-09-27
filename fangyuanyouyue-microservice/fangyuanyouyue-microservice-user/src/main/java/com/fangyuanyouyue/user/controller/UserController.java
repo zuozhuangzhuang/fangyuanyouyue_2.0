@@ -518,7 +518,7 @@ public class UserController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "合并账号", notes = "(String)合并账号",response = BaseResp.class)
+    @ApiOperation(value = "合并账号", notes = "(void)合并账号",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "phone", value = "手机号(只支持三方账户绑定手机号)", required = true, dataType = "String", paramType = "query"),
@@ -547,7 +547,7 @@ public class UserController extends BaseController {
             }
             //合并账号,1、手机号绑定三方账号 （暂不支持）2、三方账号绑定手机号
             userThirdService.accountMerge(param.getToken(),param.getPhone(),param.getUnionId(),param.getType(),param.getLoginPwd());
-            return toSuccess("账号已合并，请重新登录！");
+            return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
@@ -695,10 +695,10 @@ public class UserController extends BaseController {
 
             }
             //调用短信系统发送短信
-            JSONObject jsonObject = JSONObject.parseObject(schedualMessageService.sendCode(param.getPhone(),param.getType()));
-            String code = jsonObject.getString("data");
+//            JSONObject jsonObject = JSONObject.parseObject(schedualMessageService.sendCode(param.getPhone(),param.getType()));
+//            String code = jsonObject.getString("data");
 //            TODO 开发期间固定1234
-//            String code = "1234";
+            String code = "1234";
             log.info("code---:"+code);
 
             boolean result = schedualRedisService.set(param.getPhone(), code, 600l);

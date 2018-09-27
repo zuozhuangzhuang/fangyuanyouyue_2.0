@@ -275,4 +275,28 @@ public class AdminController extends BaseController {
         }
     }
 
+
+    @ApiOperation(value = "编辑用户粉丝基数", notes = "编辑用户粉丝基数",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "count", value = "修改数量", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1增加 2减少", required = true, dataType = "int", paramType = "query")
+    })
+    @GetMapping(value = "/updateFansCount")
+    @ResponseBody
+    public BaseResp updateFansCount(AdminUserParam param) throws IOException {
+        try {
+            log.info("编辑用户粉丝基数");
+            log.info("参数："+param.toString());
+            if(param.getId() == null){
+                return toError("用户id不能为空！");
+            }
+            userInfoExtService.updateFansCount(param.getId(),param.getCount(),param.getType());
+            return toSuccess();
+        }catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
 }

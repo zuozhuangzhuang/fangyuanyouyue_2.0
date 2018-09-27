@@ -50,4 +50,37 @@ public class AdminControllerTest {
                 .andReturn();
     }
 
+    /**
+     * 修改帖子、视频
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void updateForum() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/adminForum/updateForum")
+                .param("id", "50")
+                .param("sort", "1")
+//                .param("isChosen", "")
+//                .param("status", "")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 编辑浏览量基数
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void updateFansCount() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/adminForum/updateFansCount")
+                .param("id", "130")
+                .param("count", "100000")
+                .param("type", "1")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
 }

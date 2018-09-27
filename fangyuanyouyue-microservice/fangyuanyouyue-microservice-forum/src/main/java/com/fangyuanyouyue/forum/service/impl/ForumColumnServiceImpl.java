@@ -14,6 +14,8 @@ import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.base.util.IdGenerator;
 import com.fangyuanyouyue.forum.dao.*;
 import com.fangyuanyouyue.forum.dto.*;
+import com.fangyuanyouyue.forum.dto.admin.AdminForumColumnApplyDto;
+import com.fangyuanyouyue.forum.dto.admin.AdminForumColumnDto;
 import com.fangyuanyouyue.forum.model.ColumnOrder;
 import com.fangyuanyouyue.forum.model.ForumColumn;
 import com.fangyuanyouyue.forum.model.ForumColumnApply;

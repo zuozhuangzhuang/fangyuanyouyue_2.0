@@ -80,4 +80,20 @@ public class AdminControllerTest {
                 .andReturn();
     }
 
+    /**
+     * 用户昵称修改记录表
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void updateFansCount() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.get("/adminUser/updateFansCount")
+                .param("id","25")
+                .param("count","1000")
+                .param("type","1")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
 }

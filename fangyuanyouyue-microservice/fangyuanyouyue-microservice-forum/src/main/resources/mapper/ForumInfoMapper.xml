@@ -280,7 +280,7 @@
     <if test="searchType != null and searchType == 1">
       and (a.pv_count + (select count(*) from forum_pv where forum_id = a.id) >= 10000)
     </if>
-    order by a.update_time desc
+    order by a.sort,a.update_time desc
     limit #{start},#{limit}
   </select>
 

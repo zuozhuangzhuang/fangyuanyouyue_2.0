@@ -14,6 +14,8 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="vip_no" jdbcType="VARCHAR" property="vipNo" />
     <result column="is_send_message" jdbcType="INTEGER" property="isSendMessage" />
+    <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+    <result column="head_img_url" property="headImgUrl" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, start_time, end_time, vip_level, level_desc, vip_type, status, add_time, 
@@ -191,5 +193,70 @@
 
   <select id="selectUserVipYear" resultMap="BaseResultMap">
     select * from user_vip where vip_type = 3
+  </select>
+
+
+
+  <select id="countPage" resultType="Integer">
+    select count(*) from user_vip a,user_info b
+    <where>
+      a.user_id = b.id and a.status = 1
+      <if test="keyword != null">
+        and (b.nick_name like "%"#{keyword}"%"
+        or b.phone like "%"#{keyword}"%"
+        or a.vip_no like "%"#{keyword}"%")
+      </if>
+      <if test="vipLevel != null">
+        and a.vip_level = #{vipLevel}
+      </if>
+      <if test="vipType != null">
+        and a.vip_type = #{vipType}
+      </if>
+      <if test="isSendMessage != null">
+        and a.is_send_message = #{isSendMessage}
+      </if>
+      <if test="startDate != null">
+        and a.add_time <![CDATA[ > ]]> #{startDate}
+      </if>
+      <if test="endDate != null">
+        and a.add_time <![CDATA[ <= ]]> #{endDate}
+      </if>
+    </where>
+  </select>
+
+  <select id="getPage" resultMap="BaseResultMap">
+    select a.*,b.nick_name,b.head_img_url from user_vip a,user_info b
+    <where>
+      a.user_id = b.id and a.status = 1
+      <if test="keyword != null">
+        and (b.nick_name like "%"#{keyword}"%"
+        or b.phone like "%"#{keyword}"%"
+        or a.vip_no like "%"#{keyword}"%")
+      </if>
+      <if test="vipLevel != null">
+        and a.vip_level = #{vipLevel}
+      </if>
+      <if test="vipType != null">
+        and a.vip_type = #{vipType}
+      </if>
+      <if test="isSendMessage != null">
+        and a.is_send_message = #{isSendMessage}
+      </if>
+      <if test="startDate != null and startDate != ''">
+        and a.add_time <![CDATA[ > ]]> #{startDate}
+      </if>
+      <if test="endDate != null and endDate != ''">
+        and a.add_time <![CDATA[ <= ]]> #{endDate}
+      </if>
+    </where>
+    <if test="orders != null">
+      order by a.${orders}
+      <if test="ascType != null and ascType == 2">
+        desc
+      </if>
+    </if>
+    <if test="start != null and limit != null">
+      limit #{start},#{limit}
+    </if>
   </select>
 </mapper>

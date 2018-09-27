@@ -36,4 +36,7 @@ public class AdminWalletParam extends BasePageReq{
     @ApiModelProperty(name = "vipType", value = "会员类型", dataType = "int",hidden = true)
     private Integer vipType;//会员类型
 
+    @ApiModelProperty(name = "isSendMessage", value = "是否发送7天后到期信息 1是 2否", dataType = "int",hidden = true)
+    private Integer isSendMessage;//是否发送7天后到期信息 1是 2否
+
 }
