@@ -1,8 +1,6 @@
 package com.fangyuanyouyue.goods.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.fangyuanyouyue.goods.dao.*;
 import com.fangyuanyouyue.goods.dto.GoodsCommentDto;
@@ -150,10 +148,18 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public List<GoodsDto> choice(Integer userId, Integer start, Integer limit) throws ServiceException {
-        //根据用户购物车内的商品分类等获取精选商品列表
-        //TODO 1、根据商品分类 2、根据会员等级排序
-        List<GoodsInfo> goodsInfos = goodsInfoMapper.getGoodsList(null, 1, null, null, null, null, null, start * limit, limit, null, null);
-//        List<GoodsInfo> goodsInfos1 = goodsInfoMapper.choice(null, 1, null, null, null, null, null, start * limit, limit, null, null);
+        //1、根据商品分类 2、根据会员等级排序
+        CartInfo cartInfo = cartInfoMapper.selectByUserId(userId);
+        List<CartDetail> cartDetails = cartDetailMapper.selectByCartId(cartInfo.getId());
+        //获取购物车内所有商品分类并去重
+        Set<Integer> set = new HashSet<>();
+        for(CartDetail detail:cartDetails){
+            List<Integer> integers = goodsCorrelationMapper.selectCategoryIdByGoodsId(detail.getGoodsId());
+            set.addAll(integers);
+        }
+        List<Integer> goodsCategoryIds = new ArrayList<>();
+        goodsCategoryIds.addAll(set);
+        List<GoodsInfo> goodsInfos = goodsInfoMapper.selectByCategoryIds(goodsCategoryIds, start * limit, limit);
         List<GoodsDto> goodsDtos = new ArrayList<>();
         for (GoodsInfo goodsInfo : goodsInfos) {
             goodsDtos.add(setDtoByGoodsInfo(goodsInfo));
