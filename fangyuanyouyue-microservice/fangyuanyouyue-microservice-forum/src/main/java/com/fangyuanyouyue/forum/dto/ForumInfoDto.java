@@ -50,6 +50,10 @@ public class ForumInfoDto {
     
     private Integer likesCount = 0;//点赞数量
 
+    private Integer isChosen;
+
+    private Integer sort;
+    
     private Integer viewCount = 0;//浏览数量
     
     private Integer isCollect = StatusEnum.NO.getValue(); //是否收藏
@@ -75,6 +79,8 @@ public class ForumInfoDto {
         this.videoImg = forumInfo.getVideoImg();
         this.nickName = forumInfo.getNickName();
         this.headImgUrl = forumInfo.getHeadImgUrl();
+        this.isChosen = forumInfo.getIsChosen();
+        this.sort = forumInfo.getSort();
     }
     
     public static List<ForumInfoDto> toDtoList(List<ForumInfo> list) {

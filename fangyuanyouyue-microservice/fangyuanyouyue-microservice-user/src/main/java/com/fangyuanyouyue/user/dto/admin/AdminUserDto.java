@@ -1,9 +1,9 @@
 package com.fangyuanyouyue.user.dto.admin;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.user.model.UserInfo;
 
@@ -42,6 +42,8 @@ public class AdminUserDto {
     private String contact;//联系电话
 
     private Integer level;//用户等级
+    
+    private BigDecimal balance;
 
 
     //UserVip

@@ -738,6 +738,18 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                     goodsCorrelationMapper.insert(goodsCorrelation);
                 }
             }
+
+            if(param.getIsAppraisal() != null){
+                goodsInfo.setIsAppraisal(param.getIsAppraisal());
+            }
+
+            if(param.getName() != null){
+                goodsInfo.setName(param.getName());
+            }
+
+            if(param.getDescription() != null){
+                goodsInfo.setDescription(param.getDescription());
+            }
             if(param.getStatus() != null){
                 goodsInfo.setStatus(param.getStatus());//状态 1出售中 2已售出 3已下架（已结束） 5删除
             }
@@ -745,7 +757,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 goodsInfo.setIsAppraisal(param.getIsAppraisal());
             }
             goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
-            if(param.getStatus().intValue() == 5){
+            if(param.getStatus()!=null&&param.getStatus().intValue() == 5){
                 //卖家-20信誉度
                 schedualWalletService.updateCredit(goodsInfo.getUserId(),Credit.DELETE_FAKE.getCredit(),Status.SUB.getValue());
             }

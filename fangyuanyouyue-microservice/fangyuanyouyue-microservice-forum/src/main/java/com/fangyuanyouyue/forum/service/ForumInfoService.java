@@ -70,7 +70,7 @@ public interface ForumInfoService {
 	 * @param status
 	 * @throws ServiceException
 	 */
-    void updateForum(Integer forumId,Integer sort,Integer isChosen,Integer status) throws ServiceException;
+    void updateForum(Integer forumId,Integer sort,Integer isChosen,Integer status,String title) throws ServiceException;
 
 	/**
 	 * 编辑浏览量基数

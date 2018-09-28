@@ -17,6 +17,7 @@ import com.fangyuanyouyue.user.dao.*;
 import com.fangyuanyouyue.user.dto.admin.AdminIdentityAuthApplyDto;
 import com.fangyuanyouyue.user.dto.admin.AdminUserAuthApplyDto;
 import com.fangyuanyouyue.user.model.*;
+import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.service.SchedualMessageService;
 import com.fangyuanyouyue.user.service.SchedualWalletService;
 import io.swagger.annotations.Api;
@@ -297,23 +298,4 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
         userAuthApplyMapper.updateByPrimaryKey(model);
     }
 
-    @Override
-    public void updateFansCount(Integer userId, Integer count, Integer type) throws ServiceException {
-        UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(userId);
-        if(userInfoExt == null){
-            throw new ServiceException("未找到用户信息！");
-        }
-        if(type.equals(Status.ADD.getValue())){
-            userInfoExt.setFansCount(userInfoExt.getFansCount()+count);
-        }else if(type.equals(Status.SUB.getValue())){
-            if(userInfoExt.getFansCount().compareTo(count) < 0){
-                userInfoExt.setFansCount(0);
-            }else{
-                userInfoExt.setFansCount(userInfoExt.getFansCount()-count);
-            }
-        }else{
-            throw new ServiceException("类型错误！");
-        }
-        userInfoExtMapper.updateByPrimaryKey(userInfoExt);
-    }
 }

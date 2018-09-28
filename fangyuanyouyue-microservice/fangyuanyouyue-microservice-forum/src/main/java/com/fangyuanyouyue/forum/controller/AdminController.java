@@ -350,7 +350,7 @@ public class AdminController extends BaseController {
             if(param.getId() == null){
                 return toError("帖子、视频id不能为空！");
             }
-            forumInfoService.updateForum(param.getId(),param.getSort(),param.getIsChosen(),param.getStatus());
+            forumInfoService.updateForum(param.getId(),param.getSort(),param.getIsChosen(),param.getStatus(),param.getTitle());
 
             return toSuccess();
         } catch (Exception e) {
