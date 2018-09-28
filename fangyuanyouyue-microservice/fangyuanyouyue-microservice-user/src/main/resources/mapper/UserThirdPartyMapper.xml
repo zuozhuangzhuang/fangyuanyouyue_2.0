@@ -179,6 +179,9 @@
     select * from user_third_party where union_id = #{unionId,jdbcType=VARCHAR} and type = #{type,jdbcType=INTEGER}
   </select>
   <select id="getUserThirdByUserId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from user_third_party where user_id = #{userId} and type = #{type}
+    select * from user_third_party where user_id = #{userId}
+    <if test="type != null">
+      and type = #{type}
+    </if>
   </select>
 </mapper>

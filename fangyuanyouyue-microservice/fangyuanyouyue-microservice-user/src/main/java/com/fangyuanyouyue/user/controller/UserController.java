@@ -171,7 +171,8 @@ public class UserController extends BaseController {
             @ApiImplicitParam(name = "thirdHeadImgUrl", value = "第三方账号头像地址",required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "gender", value = "性别，1男 2女 0不确定", required = true,dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "loginPlatform", value = "登录平台 1安卓 2iOS 3小程序",required = true,  dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "unionId", value = "第三方唯一ID", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "unionId", value = "第三方唯一unionId", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "openId", value = "第三方唯一openId", required = false, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "type", value = "类型 1微信 2QQ 3微博", required = true, dataType = "int", paramType = "query"),
     })
     @PostMapping(value = "/thirdLogin")
@@ -949,6 +950,9 @@ public class UserController extends BaseController {
             }
             if(param.getPayType() == null){
                 return toError("支付方式不能为空！");
+            }
+            if(!userInfoExtService.isAuth(user.getId())){
+                return toError("用户未实名认证！");
             }
             //申请官方认证
             Object info = userInfoExtService.authType(user.getId(), param.getPayType(), param.getPayPwd());

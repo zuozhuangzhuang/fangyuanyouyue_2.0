@@ -50,7 +50,7 @@ public class UserThirdServiceImpl implements UserThirdService {
             //绑定手机
             //手机用户
             UserInfo phoneUser = userInfoService.getUserByPhone(phone);
-            UserThirdParty phoneThird = userThirdPartyMapper.getUserThirdByUserId(phoneUser.getId(),type);
+            UserThirdParty phoneThird = userThirdPartyMapper.getUserThirdByUserId(phoneUser.getId(),userThird.getType());
             if(StringUtils.isEmpty(user.getPhone()) && phoneThird == null){
                 mergeDto.setToUserId(phoneUser.getId());
                 mergeDto.setToUserNickName(phoneUser.getNickName());
@@ -81,11 +81,14 @@ public class UserThirdServiceImpl implements UserThirdService {
         //当前用户
         UserInfo user = userInfoService.getUserByToken(token);
         UserThirdParty userThird = userThirdPartyMapper.getUserThirdByUserId(user.getId(),type);
+        if(userThird == null){
+            throw new ServiceException("未找到用户！");
+        }
         if(unionId == null){
             //三方用户发起+绑定手机用户 = 新·手机用户
 
             UserInfo phoneUser = userInfoService.getUserByPhone(phone);
-            UserThirdParty phoneThird = userThirdPartyMapper.getUserThirdByUserId(phoneUser.getId(),type);
+            UserThirdParty phoneThird = userThirdPartyMapper.getUserThirdByUserId(phoneUser.getId(),userThird.getType());
             if(StringUtils.isEmpty(user.getPhone()) && phoneThird == null){
                 //修改手机用户的密码
                 phoneUser.setLoginPwd(MD5Util.generate(MD5Util.MD5(loginPwd)));

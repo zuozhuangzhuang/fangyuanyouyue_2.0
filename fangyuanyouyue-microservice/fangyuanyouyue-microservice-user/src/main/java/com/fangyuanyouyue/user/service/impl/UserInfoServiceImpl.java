@@ -271,6 +271,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             userThirdParty.setNickName(param.getThirdNickName());
             userThirdParty.setHeadImgUrl(param.getThirdHeadImgUrl());
             userThirdParty.setUnionId(param.getUnionId());
+            userThirdParty.setAppOpenId(param.getOpenId());
             userThirdParty.setType(param.getType());
             userThirdParty.setAddTime(DateStampUtils.getTimesteamp());
             userThirdPartyMapper.insert(userThirdParty);

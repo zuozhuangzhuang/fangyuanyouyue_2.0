@@ -139,8 +139,11 @@ public class UserParam{
 	@ApiModelProperty(name = "addressId", value = "地址ID", dataType = "int",hidden = true)
 	private Integer addressId;//地址ID
 
-	@ApiModelProperty(name = "unionId", value = "第三方唯一ID", dataType = "String",hidden = true)
-	private String unionId;//第三方唯一ID
+	@ApiModelProperty(name = "unionId", value = "第三方唯一unionId", dataType = "String",hidden = true)
+	private String unionId;//第三方唯一unionId
+
+	@ApiModelProperty(name = "openId", value = "第三方唯一openId", dataType = "String",hidden = true)
+	private String openId;//第三方唯一openId
 
 	@ApiModelProperty(name = "thirdNickName", value = "第三方账号昵称", dataType = "String",hidden = true)
 	private String thirdNickName;//第三方账号昵称
