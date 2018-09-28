@@ -330,7 +330,7 @@ public class UserController extends BaseController {
                 UserInfo userByPhone = userInfoService.getUserByPhone(param.getPhone());
                 if(userByPhone != null){
                     MergeDto mergeDto = userThirdService.judgeMerge(param.getToken(), null, param.getPhone(),null);
-                    if(mergeDto == null){
+                    if(mergeDto != null){
                         //可以合并账号
                         return toError(ReCode.IS_MERGE.getValue(),ReCode.IS_MERGE.getMessage());
                     }
@@ -430,7 +430,7 @@ public class UserController extends BaseController {
     @ApiOperation(value = "修改密码", notes = "(void)修改密码",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "loginPwd", value = "登录密码，md5加密，32位小写字母", required = true, dataType = "String", paramType = "query"),
+//            @ApiImplicitParam(name = "loginPwd", value = "登录密码，md5加密，32位小写字母", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "newPwd", value = "新密码，md5加密，32位小写字母",required = true, dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/updatePwd")
@@ -453,9 +453,9 @@ public class UserController extends BaseController {
                 return toError("第三方用户不可修改密码！");
             }
             //判断旧密码是否正确
-            if(!MD5Util.verify(MD5Util.MD5(param.getLoginPwd()),user.getLoginPwd())){
-                return toError("旧密码不正确！");
-            }
+//            if(!MD5Util.verify(MD5Util.MD5(param.getLoginPwd()),user.getLoginPwd())){
+//                return toError("旧密码不正确！");
+//            }
             //修改密码
             userInfoService.updatePwd(param.getToken(),param.getNewPwd());
             return toSuccess("修改密码成功");
@@ -500,7 +500,7 @@ public class UserController extends BaseController {
             UserInfo oldUser = userInfoService.getUserByPhone(param.getPhone());
             if(oldUser != null){
                 MergeDto mergeDto = userThirdService.judgeMerge(param.getToken(), null, param.getPhone(),null);
-                if(mergeDto == null){
+                if(mergeDto != null){
                     //可以合并账号
                     return toError(ReCode.IS_MERGE.getValue(),ReCode.IS_MERGE.getMessage());
                 }
@@ -666,13 +666,13 @@ public class UserController extends BaseController {
             }
             //验证用户
             //根据手机号获取用户，如果存在，则说明为旧手机号,调用user-service
-            UserInfo userInfo=userInfoService.getUserByPhone(param.getPhone());
+            UserInfo userByPhone=userInfoService.getUserByPhone(param.getPhone());
             if(PhoneCodeEnum.TYPE_REGIST.getCode() == param.getType()){//使用手机号注册新用户
-                if(userInfo != null){
+                if(userByPhone != null){
                     return toError("此手机号已被注册！");
                 }
             }else if(PhoneCodeEnum.TYPE_FINDPWD.getCode() == param.getType()){//为1 找回密码
-                if(userInfo == null){
+                if(userByPhone == null){
                     return toError("用户不存在，请注册！");
                 }
             }else if(PhoneCodeEnum.TYPE_SET_PAY_PWD.getCode() == param.getType()){//2 设置支付密码
@@ -685,6 +685,10 @@ public class UserController extends BaseController {
 //                    }
 //                }
             }else if(PhoneCodeEnum.TYPE_NEW_PHONE.getCode() == param.getType()){//为4绑定新手机
+                //防止有合并账号情况，所以不做判断
+//                if(userByPhone != null){
+//                    return toError("该手机已被其他帐号绑定，请不要重复绑定！");
+//                }
             }else if(PhoneCodeEnum.TYPE_AUTH.getCode() == param.getType()){//为5认证店铺
 				/*if(count == 0){
 					return toError("此手机号尚未注册！");

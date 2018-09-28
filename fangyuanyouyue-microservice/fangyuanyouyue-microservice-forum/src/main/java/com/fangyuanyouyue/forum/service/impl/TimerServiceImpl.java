@@ -123,20 +123,22 @@ public class TimerServiceImpl implements TimerService{
     public void dailyWage() throws ServiceException {
         //每天上午08:00 结算专栏返利，200新增浏览量（当前日期前一天0时到24时新增浏览量）/元，浏览量为奇数时，浏览量-1再计算返利金额，直接返到用户余额，并提示用户，新增余额账单
         List<Map<String,Object>> forumPvs = forumPvMapper.dailyWage();
-        for(Map forumPv:forumPvs){
-            ForumColumn forumColumn = forumColumnMapper.selectByPrimaryKey((int)forumPv.get("columnId"));
-            long count = (long)forumPv.get("count");
-            if(count % 2 != 0){
-                //奇数
-                count-=1;
+        if(forumPvs != null && forumPvs.size() > 0){
+            for(Map forumPv:forumPvs){
+                ForumColumn forumColumn = forumColumnMapper.selectByPrimaryKey((int)forumPv.get("columnId"));
+                long count = (long)forumPv.get("count");
+                if(count % 2 != 0){
+                    //奇数
+                    count-=1;
+                }
+                BigDecimal amount = new BigDecimal(count).multiply(new BigDecimal(0.005)).setScale(2,BigDecimal.ROUND_HALF_UP);
+                schedualWalletService.updateBalance(forumColumn.getUserId(),amount,Status.ADD.getValue());
+                //订单号
+                final IdGenerator idg = IdGenerator.INSTANCE;
+                String orderNo = idg.nextId();
+                schedualWalletService.addUserBalanceDetail(forumColumn.getUserId(),amount,Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderNo,"专栏每日收益",null,forumColumn.getUserId(),Status.FORUM_COLUMN.getValue(),orderNo);
+                schedualMessageService.easemobMessage(forumColumn.getUserId().toString(),"您的专栏本日收益为"+amount+"元！已发放至您的余额，点击此处查看您的余额吧",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_WALLET.getMessage(),"");
             }
-            BigDecimal amount = new BigDecimal(count).multiply(new BigDecimal(0.005)).setScale(2,BigDecimal.ROUND_HALF_UP);
-            schedualWalletService.updateBalance(forumColumn.getUserId(),amount,Status.ADD.getValue());
-            //订单号
-            final IdGenerator idg = IdGenerator.INSTANCE;
-            String orderNo = idg.nextId();
-            schedualWalletService.addUserBalanceDetail(forumColumn.getUserId(),amount,Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderNo,"专栏每日收益",null,forumColumn.getUserId(),Status.FORUM_COLUMN.getValue(),orderNo);
-            schedualMessageService.easemobMessage(forumColumn.getUserId().toString(),"您的专栏本日收益为"+amount+"元！已发放至您的余额，点击此处查看您的余额吧",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_WALLET.getMessage(),"");
         }
     }
 }

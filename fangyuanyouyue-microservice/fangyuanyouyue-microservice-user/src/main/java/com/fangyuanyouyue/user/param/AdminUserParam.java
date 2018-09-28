@@ -18,10 +18,6 @@ public class AdminUserParam extends BasePageReq{
 	 */
 	private static final long serialVersionUID = 1198374192047731064L;
 
-	//用户id
-	@ApiModelProperty(name = "userId", value = "用户id", dataType = "int",hidden = true)
-	private Integer userId;
-
 	//类型
 	@ApiModelProperty(name = "type", value = "类型", dataType = "int",hidden = true)
 	private Integer type;
@@ -49,5 +45,25 @@ public class AdminUserParam extends BasePageReq{
 	//修改数量
 	@ApiModelProperty(name = "count", value = "修改数量", dataType = "int",hidden = true)
 	private Integer count;
+
+	//版本号
+	@ApiModelProperty(name = "versionNo", value = "版本号", dataType = "int",hidden = true)
+	private Integer versionNo;
+
+	//版本描述
+	@ApiModelProperty(name = "versionDesc", value = "版本描述", dataType = "String",hidden = true)
+	private String versionDesc;
+
+	//版本名称
+	@ApiModelProperty(name = "versionName", value = "版本名称", dataType = "String",hidden = true)
+	private String versionName;
+
+	//apk文件
+	@ApiModelProperty(name = "file", value = "apk文件", dataType = "file",hidden = true)
+	private MultipartFile file;
+
+	//安卓包名
+	@ApiModelProperty(name = "packageName", value = "安卓包名", dataType = "String",hidden = true)
+	private String packageName;
 
 }

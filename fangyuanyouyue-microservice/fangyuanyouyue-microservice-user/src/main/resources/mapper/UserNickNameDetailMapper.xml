@@ -95,6 +95,9 @@
 
   <select id="countPage" parameterType="Integer" resultType="Integer">
     select count(*) from user_nick_name_detail a,user_info b where a.user_id = b.id
+    <if test="id != null">
+      and b.id = #{id}
+    </if>
     <if test="keyword != null">
       and (
       a.old_nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
@@ -117,6 +120,9 @@
     select a.*,b.nick_name from user_nick_name_detail a,user_info b
     <where>
       a.user_id = b.id
+      <if test="id != null">
+        and b.id = #{id}
+      </if>
       <if test="keyword != null">
         and (
         a.old_nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"

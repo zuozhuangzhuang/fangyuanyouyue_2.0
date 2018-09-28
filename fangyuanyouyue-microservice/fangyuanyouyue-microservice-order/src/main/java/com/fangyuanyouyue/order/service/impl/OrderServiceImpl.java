@@ -385,6 +385,9 @@ public class OrderServiceImpl implements OrderService{
     public OrderDto orderDetail(Integer userId, Integer orderId) throws ServiceException {
         //根据订单ID获取订单信息
         OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKeyDetail(orderId);
+        if(orderInfo == null){
+            throw new ServiceException("未找到订单");
+        }
         if(userId.intValue() == orderInfo.getUserId().intValue()){//用户是买家
             if(orderInfo.getIsResolve().intValue() == Status.YES.getValue()){//已拆单的主订单
                 throw new ServiceException("订单状态异常！");
@@ -812,6 +815,7 @@ public class OrderServiceImpl implements OrderService{
                 orderPay.setStatus(Status.ORDER_GOODS_COMPLETE.getValue());
                 orderPayMapper.updateByPrimaryKey(orderPay);
                 //修改订单状态
+                orderInfo.setReceiveTime(DateStampUtils.getTimesteamp());
                 orderInfo.setStatus(Status.ORDER_GOODS_COMPLETE.getValue());
                 orderInfoMapper.updateByPrimaryKey(orderInfo);
                 //卖家增加余额

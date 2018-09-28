@@ -23,15 +23,17 @@ public interface UserNickNameDetailMapper {
 
     /**
      * 分页总条数
+     * @param id
      * @param keyword
      * @param startDate
      * @param endDate
      * @return
      */
-    int countPage(@Param("keyword")String keyword,  @Param("startDate")String startDate, @Param("endDate")String endDate);
+    int countPage(@Param("id")Integer id,@Param("keyword")String keyword,  @Param("startDate")String startDate, @Param("endDate")String endDate);
 
     /**
      * 分页获取
+     * @param id
      * @param start
      * @param limit
      * @param keyword
@@ -41,6 +43,6 @@ public interface UserNickNameDetailMapper {
      * @param ascType
      * @return
      */
-    List<UserNickNameDetail> getPage(@Param("start") Integer start, @Param("limit") Integer limit, @Param("keyword")String keyword, @Param("startDate")String startDate, @Param("endDate")String endDate, @Param("orders")String orders, @Param("ascType")Integer ascType);
+    List<UserNickNameDetail> getPage(@Param("id")Integer id,@Param("start") Integer start, @Param("limit") Integer limit, @Param("keyword")String keyword, @Param("startDate")String startDate, @Param("endDate")String endDate, @Param("orders")String orders, @Param("ascType")Integer ascType);
 
 }

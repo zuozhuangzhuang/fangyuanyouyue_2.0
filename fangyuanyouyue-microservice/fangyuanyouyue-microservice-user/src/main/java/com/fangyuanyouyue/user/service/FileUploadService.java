@@ -20,4 +20,22 @@ public interface FileUploadService {
      * @throws ServiceException
      */
     String uploadVideo(MultipartFile file) throws ServiceException;
+
+    /**
+     * 上传文件，获取地址
+     * @param file
+     * @param fileUrl
+     * @param fileName
+     * @return
+     * @throws ServiceException
+     */
+    String uploadFile(MultipartFile file, String fileUrl, String fileName) throws ServiceException;
+
+    /**
+     * 获取文件名
+     * @param fileName
+     * @return
+     * @throws ServiceException
+     */
+    String getFileName(String fileName) throws ServiceException;
 }

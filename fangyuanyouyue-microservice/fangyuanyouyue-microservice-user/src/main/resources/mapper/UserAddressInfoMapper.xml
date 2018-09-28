@@ -41,7 +41,7 @@
       #{type,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.user.model.UserAddressInfo" >
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.user.model.UserAddressInfo"  useGeneratedKeys="true" keyProperty="id">
     insert into user_address_info
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >

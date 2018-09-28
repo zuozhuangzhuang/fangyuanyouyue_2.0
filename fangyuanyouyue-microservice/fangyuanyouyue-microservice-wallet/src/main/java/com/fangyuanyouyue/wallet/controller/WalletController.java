@@ -391,7 +391,7 @@ public class WalletController extends BaseController{
     @ApiOperation(value = "修改支付密码", notes = "(void)修改支付密码",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "payPwd", value = "旧支付密码", required = true, dataType = "String", paramType = "query"),
+//            @ApiImplicitParam(name = "payPwd", value = "旧支付密码", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "newPwd", value = "新支付密码", required = true, dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/updatePayPwd")
@@ -410,9 +410,9 @@ public class WalletController extends BaseController{
             if(jsonObject != null && (Integer)jsonObject.get("code") != 0){
                 return toError(jsonObject.getString("report"));
             }
-            if(StringUtils.isEmpty(param.getPayPwd())){
-                return toError("旧支付密码不能为空！");
-            }
+//            if(StringUtils.isEmpty(param.getPayPwd())){
+//                return toError("旧支付密码不能为空！");
+//            }
             if(StringUtils.isEmpty(param.getNewPwd())){
                 return toError("新支付密码不能为空！");
             }

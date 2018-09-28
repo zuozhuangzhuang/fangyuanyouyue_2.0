@@ -28,7 +28,7 @@
     delete from coupon_info
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.user.model.CouponInfo" >
+  <insert id="insert" parameterType="com.fangyuanyouyue.user.model.CouponInfo"  useGeneratedKeys="true" keyProperty="id">
     insert into coupon_info (id, coupon_type, coupon_code, 
       coupon_amount, condition_amount, count, 
       start_time, end_time, status, 
@@ -38,7 +38,7 @@
       #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER}, 
       #{updateTime,jdbcType=TIMESTAMP}, #{addTime,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.user.model.CouponInfo" >
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.user.model.CouponInfo"  useGeneratedKeys="true" keyProperty="id">
     insert into coupon_info
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >

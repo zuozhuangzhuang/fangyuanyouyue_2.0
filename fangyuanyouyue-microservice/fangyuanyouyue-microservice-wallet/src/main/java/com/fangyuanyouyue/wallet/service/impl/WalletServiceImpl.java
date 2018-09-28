@@ -316,9 +316,9 @@ public class WalletServiceImpl implements WalletService{
     public void updatePayPwd(Integer userId, String payPwd, String newPwd) throws ServiceException {
         UserInfoExt userInfoExt = userInfoExtMapper.selectUserInfoExtByUserId(userId);
         //判断旧密码是否正确
-        if(!MD5Util.verify(MD5Util.MD5(payPwd),userInfoExt.getPayPwd())){
-            throw new ServiceException("旧密码不正确！");
-        }
+//        if(!MD5Util.verify(MD5Util.MD5(payPwd),userInfoExt.getPayPwd())){
+//            throw new ServiceException("旧密码不正确！");
+//        }
         userInfoExt.setPayPwd(MD5Util.generate(MD5Util.MD5(newPwd)));
         userInfoExtMapper.updateByPrimaryKeySelective(userInfoExt);
     }

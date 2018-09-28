@@ -22,7 +22,7 @@ import org.springframework.web.context.WebApplicationContext;
 @WebAppConfiguration
 @ContextConfiguration
 @Rollback
-public class AdminControllerTest {
+public class AdminUserControllerTest {
     @Autowired
     private WebApplicationContext context;
 
@@ -73,6 +73,7 @@ public class AdminControllerTest {
 //    @Transactional
     public void nickNameList() throws Exception {
         mvc.perform(MockMvcRequestBuilders.get("/adminUser/nickNameList")
+                .param("id","101")
                 .param("start","0")
                 .param("limit","10")
                 .accept(MediaType.APPLICATION_JSON))
@@ -81,7 +82,7 @@ public class AdminControllerTest {
     }
 
     /**
-     * 用户昵称修改记录表
+     * 编辑用户粉丝基数
      * @throws Exception
      */
     @Test

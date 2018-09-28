@@ -123,6 +123,6 @@
   </select>
   
   <select id="dailyWage" resultType="Map">
-    select count(*) count,column_id columnId from forum_pv where add_time <![CDATA[ >= ]]> (CURDATE()-1) and add_time <![CDATA[ < ]]> CURDATE() and type = 1
+    select count(*) count,column_id columnId from forum_pv where add_time <![CDATA[ >= ]]> (CURDATE()-1) and add_time <![CDATA[ < ]]> CURDATE() and type = 1 group by column_id
   </select>
 </mapper>

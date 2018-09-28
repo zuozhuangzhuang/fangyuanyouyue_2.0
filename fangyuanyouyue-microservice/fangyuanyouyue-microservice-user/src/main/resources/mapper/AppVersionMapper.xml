@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangyuanyouyue.user.dao.AppVersionMapper">
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.user.model.AppVersion">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="version_no" jdbcType="INTEGER" property="versionNo" />
+    <result column="version_desc" jdbcType="VARCHAR" property="versionDesc" />
+    <result column="version_name" jdbcType="VARCHAR" property="versionName" />
+    <result column="version_url" jdbcType="VARCHAR" property="versionUrl" />
+    <result column="package_name" jdbcType="VARCHAR" property="packageName" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, version_no, version_desc, version_name, version_url, package_name, type, add_time, 
+    update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from app_version
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from app_version
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.fangyuanyouyue.user.model.AppVersion" useGeneratedKeys="true" keyProperty="id">
+    insert into app_version (id, version_no, version_desc, 
+      version_name, version_url, package_name, 
+      type, add_time, update_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{versionNo,jdbcType=INTEGER}, #{versionDesc,jdbcType=VARCHAR}, 
+      #{versionName,jdbcType=VARCHAR}, #{versionUrl,jdbcType=VARCHAR}, #{packageName,jdbcType=VARCHAR}, 
+      #{type,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.user.model.AppVersion" useGeneratedKeys="true" keyProperty="id">
+    insert into app_version
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="versionNo != null">
+        version_no,
+      </if>
+      <if test="versionDesc != null">
+        version_desc,
+      </if>
+      <if test="versionName != null">
+        version_name,
+      </if>
+      <if test="versionUrl != null">
+        version_url,
+      </if>
+      <if test="packageName != null">
+        package_name,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="addTime != null">
+        add_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="versionNo != null">
+        #{versionNo,jdbcType=INTEGER},
+      </if>
+      <if test="versionDesc != null">
+        #{versionDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="versionName != null">
+        #{versionName,jdbcType=VARCHAR},
+      </if>
+      <if test="versionUrl != null">
+        #{versionUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="packageName != null">
+        #{packageName,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="addTime != null">
+        #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.user.model.AppVersion">
+    update app_version
+    <set>
+      <if test="versionNo != null">
+        version_no = #{versionNo,jdbcType=INTEGER},
+      </if>
+      <if test="versionDesc != null">
+        version_desc = #{versionDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="versionName != null">
+        version_name = #{versionName,jdbcType=VARCHAR},
+      </if>
+      <if test="versionUrl != null">
+        version_url = #{versionUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="packageName != null">
+        package_name = #{packageName,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="addTime != null">
+        add_time = #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.user.model.AppVersion">
+    update app_version
+    set version_no = #{versionNo,jdbcType=INTEGER},
+      version_desc = #{versionDesc,jdbcType=VARCHAR},
+      version_name = #{versionName,jdbcType=VARCHAR},
+      version_url = #{versionUrl,jdbcType=VARCHAR},
+      package_name = #{packageName,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
+      add_time = #{addTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="getVersion" resultMap="BaseResultMap">
+    select * from app_version order by version_desc desc limit 0,1
+  </select>
+
+
+  <select id="countPage" parameterType="Integer" resultType="Integer">
+    select count(*) from app_version where 1=1
+    <if test="keyword != null">
+      and (
+      version_desc like "%"#{keyword,jdbcType=VARCHAR}"%"
+      or version_name like "%"#{keyword,jdbcType=VARCHAR}"%"
+      or package_name like "%"#{keyword,jdbcType=VARCHAR}"%"
+      )
+    </if>
+    <if test="startDate != null">
+      and add_time <![CDATA[ > ]]> #{startDate}
+    </if>
+    <if test="endDate != null">
+      and add_time <![CDATA[ <= ]]> #{endDate}
+    </if>
+  </select>
+
+  <select id="getPage" resultMap="BaseResultMap">
+    select * from app_version
+    <where>
+      1=1
+      <if test="keyword != null">
+        and (
+        version_desc like "%"#{keyword,jdbcType=VARCHAR}"%"
+        or version_name like "%"#{keyword,jdbcType=VARCHAR}"%"
+        or package_name like "%"#{keyword,jdbcType=VARCHAR}"%"
+        )
+      </if>
+      <if test="startDate != null">
+        and add_time <![CDATA[ > ]]> #{startDate}
+      </if>
+      <if test="endDate != null">
+        and add_time <![CDATA[ <= ]]> #{endDate}
+      </if>
+    </where>
+    <if test="orders != null">
+      order by ${orders}
+      <if test="ascType != null and ascType == 2">
+        desc
+      </if>
+    </if>
+    <if test="start != null and limit != null">
+      limit #{start},#{limit}
+    </if>
+  </select>
+</mapper>

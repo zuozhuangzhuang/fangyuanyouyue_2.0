@@ -77,7 +77,8 @@ public class FileUploadServiceImpl implements FileUploadService{
      * @param fileName
      * @return
      */
-    private String uploadFile(MultipartFile file, String fileUrl, String fileName) {
+    @Override
+    public String uploadFile(MultipartFile file, String fileUrl, String fileName) {
         try{
             OSSClient ossClient = new OSSClient(endpoint, accessKeyId, accessKeySecret);
             // 上传文件流file
@@ -96,7 +97,8 @@ public class FileUploadServiceImpl implements FileUploadService{
      * @param fileName
      * @return
      */
-    private String getFileName(String fileName) {
+    @Override
+    public String getFileName(String fileName) throws ServiceException{
         int dotIndex = fileName.lastIndexOf(".");
         String suffix = fileName.substring(dotIndex);
         fileName = UUID.randomUUID()+suffix;

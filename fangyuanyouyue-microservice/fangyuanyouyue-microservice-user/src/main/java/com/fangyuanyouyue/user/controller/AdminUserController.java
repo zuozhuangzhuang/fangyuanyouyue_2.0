@@ -6,10 +6,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BasePageReq;
@@ -26,11 +23,13 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 
+import javax.servlet.http.HttpSession;
+
 @Api(description = "用户后台管理系统Controller")
 @Controller
 @RequestMapping(value = "/adminUser")
 @RefreshScope
-public class AdminController extends BaseController {
+public class AdminUserController extends BaseController {
     protected Logger log = Logger.getLogger(this.getClass());
     @Autowired
     private UserInfoService userInfoService;
@@ -245,8 +244,9 @@ public class AdminController extends BaseController {
     }
 
 
-    @ApiOperation(value = "用户昵称修改记录表", notes = "用户昵称修改记录表",response = BaseResp.class)
+    @ApiOperation(value = "用户昵称修改记录", notes = "用户昵称修改记录",response = BaseResp.class)
     @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "用户id", required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "keyword", value = "搜索词条", required = false, dataType = "String", paramType = "query"),
@@ -259,7 +259,7 @@ public class AdminController extends BaseController {
     @ResponseBody
     public BaseResp nickNameList(AdminUserParam param) throws IOException {
         try {
-            log.info("用户昵称修改记录表");
+            log.info("用户昵称修改记录");
             log.info("参数："+param.toString());
             if(param.getStart() == null || param.getStart() < 0){
                 return toError("起始页数错误！");
@@ -298,5 +298,4 @@ public class AdminController extends BaseController {
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
         }
     }
-
 }

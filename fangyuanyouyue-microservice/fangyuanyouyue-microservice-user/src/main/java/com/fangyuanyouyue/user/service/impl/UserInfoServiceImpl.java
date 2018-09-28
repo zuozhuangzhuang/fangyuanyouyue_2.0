@@ -805,9 +805,9 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Override
     public Pager nickNameList(AdminUserParam param) throws ServiceException {
 
-        Integer total = userNickNameDetailMapper.countPage(param.getKeyword(),param.getStartDate(),param.getEndDate());
+        Integer total = userNickNameDetailMapper.countPage(param.getId(),param.getKeyword(),param.getStartDate(),param.getEndDate());
 
-        List<UserNickNameDetail> datas = userNickNameDetailMapper.getPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+        List<UserNickNameDetail> datas = userNickNameDetailMapper.getPage(param.getId(),param.getStart(),param.getLimit(),param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
         Pager pager = new Pager();
         pager.setTotal(total);
         pager.setDatas(AdminUserNickNameDetailDto.toDtoList(datas));
