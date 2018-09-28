@@ -67,4 +67,10 @@ public interface UserInfoMapper {
      * @return
      */
     List<Map<String,Object>> getUserByName(@Param("nickName") String nickName,@Param("start") Integer start,@Param("limit") Integer limit);
+
+    /**
+     * 获取所有注册环信用户
+     * @return
+     */
+    List<UserInfo> findAllHxUser();
 }

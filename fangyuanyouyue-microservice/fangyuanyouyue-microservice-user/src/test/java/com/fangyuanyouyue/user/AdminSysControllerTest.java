@@ -49,4 +49,18 @@ public class AdminSysControllerTest {
                 .andReturn();
     }
 
+    /**
+     * 发送系统消息
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void sendMessage() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/system/sendMessage")
+                .param("content","测试一下发送系统消息！")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
 }

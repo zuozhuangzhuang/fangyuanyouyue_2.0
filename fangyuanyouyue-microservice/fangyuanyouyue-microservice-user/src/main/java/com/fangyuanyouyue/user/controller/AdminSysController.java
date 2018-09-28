@@ -9,6 +9,7 @@ import com.fangyuanyouyue.user.dto.AppVersionDto;
 import com.fangyuanyouyue.user.dto.admin.AdminAppVersionDto;
 import com.fangyuanyouyue.user.model.AppVersion;
 import com.fangyuanyouyue.user.param.AdminUserParam;
+import com.fangyuanyouyue.user.service.SystemService;
 import com.fangyuanyouyue.user.service.VersionService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -37,6 +38,8 @@ public class AdminSysController extends BaseController {
     private UserInfoService userInfoService;
     @Autowired
     private VersionService versionService;
+    @Autowired
+    private SystemService systemService;
 
 
 
@@ -197,6 +200,30 @@ public class AdminSysController extends BaseController {
                 return toError("版本文件id不能为空！");
             }
             versionService.versionDelete(param.getId());
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统错误！");
+        }
+    }
+
+    @ApiOperation(value = "发送系统消息", notes = "发送系统消息",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "content", value = "消息体", required = true, dataType = "String", paramType = "query")
+    })
+    @PostMapping(value = "/sendMessage")
+    @ResponseBody
+    public BaseResp sendMessage(AdminUserParam param) throws IOException {
+        try {
+            log.info("----》发送系统消息《----");
+            log.info("参数："+param.toString());
+            if(StringUtils.isEmpty(param.getContent())){
+                return toError("消息体不能为空！");
+            }
+            systemService.sendMessage(param.getContent());
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();

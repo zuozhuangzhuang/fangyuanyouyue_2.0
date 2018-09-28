@@ -392,4 +392,8 @@
       limit #{start},#{limit}
     </if>
   </select>
+
+  <select id="findAllHxUser" resultMap="BaseResultMap">
+    select * from user_info where is_reg_hx = 1
+  </select>
 </mapper>

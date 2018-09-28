@@ -22,4 +22,11 @@ public interface SystemService {
      * @throws ServiceException
      */
     Pager feedbackList(AdminUserParam param) throws ServiceException;
+
+    /**
+     * 发送系统消息
+     * @param content
+     * @throws ServiceException
+     */
+    void sendMessage(String content) throws ServiceException;
 }
