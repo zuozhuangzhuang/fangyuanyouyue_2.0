@@ -218,15 +218,16 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 	}
 
 	@Override
-	public void updateForum(Integer forumId, Integer sort, Integer isChosen,Integer status) throws ServiceException {
+	public void updateForum(Integer forumId, Integer sort, Integer isChosen,Integer status,String title) throws ServiceException {
 		ForumInfo forumInfo = forumInfoMapper.selectByPrimaryKey(forumId);
 		if(forumInfo == null){
 			throw new ServiceException("未找到视频、帖子！");
 		}
-		if(forumInfo.getType().equals(Status.FORUM.getValue())){
+		if(isChosen!=null){
 			forumInfo.setIsChosen(isChosen);
-		}else{
-
+		}
+		if(title!=null) {
+			forumInfo.setTitle(title);
 		}
 		if(sort != null){
 			forumInfo.setSort(sort);

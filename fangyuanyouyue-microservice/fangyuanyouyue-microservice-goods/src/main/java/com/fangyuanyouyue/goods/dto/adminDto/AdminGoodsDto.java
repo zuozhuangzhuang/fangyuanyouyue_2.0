@@ -42,7 +42,7 @@ public class AdminGoodsDto {
 
     private Integer authType=2;//官方认证状态 1已认证 2未认证
 
-    private Integer isAppraisal;//是否官方鉴定 1已鉴定 2未鉴定
+    private Integer isAppraisal=2;//是否官方鉴定 1已鉴定 2未鉴定
 
     private String addTime;//发布时间
 
@@ -100,11 +100,11 @@ public class AdminGoodsDto {
         }
         this.addTime = DateUtil.getFormatDate(goodsInfo.getAddTime(),DateUtil.DATE_FORMT);
         this.updateTime = DateUtil.getFormatDate(goodsInfo.getUpdateTime(),DateUtil.DATE_FORMT);
-        this.goodsImgDtos = goodsImgDtos;
         this.type = goodsInfo.getType();
         this.userId = goodsInfo.getUserId();
         this.name = goodsInfo.getName();
         this.startPrice = goodsInfo.getStartPrice();
+        this.isAppraisal = goodsInfo.getIsAppraisal();
     }
 
 

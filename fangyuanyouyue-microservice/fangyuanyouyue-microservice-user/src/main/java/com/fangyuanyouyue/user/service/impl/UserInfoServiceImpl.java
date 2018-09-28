@@ -1,17 +1,10 @@
 package com.fangyuanyouyue.user.service.impl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.fangyuanyouyue.base.enums.ReCode;
-import com.fangyuanyouyue.base.enums.Status;
-import com.fangyuanyouyue.user.dao.*;
-import com.fangyuanyouyue.user.dto.*;
-import com.fangyuanyouyue.user.dto.admin.AdminUserDto;
-import com.fangyuanyouyue.user.dto.admin.AdminUserNickNameDetailDto;
-import com.fangyuanyouyue.user.model.*;
-import com.fangyuanyouyue.user.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +14,47 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.Pager;
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.MD5Util;
 import com.fangyuanyouyue.user.constant.StatusEnum;
+import com.fangyuanyouyue.user.dao.CouponInfoMapper;
+import com.fangyuanyouyue.user.dao.IdentityAuthApplyMapper;
+import com.fangyuanyouyue.user.dao.UserCouponMapper;
+import com.fangyuanyouyue.user.dao.UserFansMapper;
+import com.fangyuanyouyue.user.dao.UserInfoExtMapper;
+import com.fangyuanyouyue.user.dao.UserInfoMapper;
+import com.fangyuanyouyue.user.dao.UserNickNameDetailMapper;
+import com.fangyuanyouyue.user.dao.UserThirdPartyMapper;
+import com.fangyuanyouyue.user.dao.UserVipMapper;
+import com.fangyuanyouyue.user.dao.UserWalletMapper;
+import com.fangyuanyouyue.user.dto.MergeDto;
+import com.fangyuanyouyue.user.dto.ShopDto;
+import com.fangyuanyouyue.user.dto.UserDto;
+import com.fangyuanyouyue.user.dto.UserFansDto;
+import com.fangyuanyouyue.user.dto.WaitProcessDto;
+import com.fangyuanyouyue.user.dto.admin.AdminUserDto;
+import com.fangyuanyouyue.user.dto.admin.AdminUserNickNameDetailDto;
+import com.fangyuanyouyue.user.model.UserCoupon;
+import com.fangyuanyouyue.user.model.UserFans;
+import com.fangyuanyouyue.user.model.UserInfo;
+import com.fangyuanyouyue.user.model.UserInfoExt;
+import com.fangyuanyouyue.user.model.UserNickNameDetail;
+import com.fangyuanyouyue.user.model.UserThirdParty;
+import com.fangyuanyouyue.user.model.UserVip;
+import com.fangyuanyouyue.user.model.UserWallet;
 import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.param.UserParam;
+import com.fangyuanyouyue.user.service.SchedualForumService;
+import com.fangyuanyouyue.user.service.SchedualGoodsService;
+import com.fangyuanyouyue.user.service.SchedualMessageService;
+import com.fangyuanyouyue.user.service.SchedualOrderService;
+import com.fangyuanyouyue.user.service.SchedualRedisService;
+import com.fangyuanyouyue.user.service.SchedualWalletService;
+import com.fangyuanyouyue.user.service.UserInfoService;
+import com.fangyuanyouyue.user.service.UserThirdService;
 
 import feign.RetryableException;
 
@@ -782,9 +810,27 @@ public class UserInfoServiceImpl implements UserInfoService {
 		Integer total = userInfoMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
 
 		List<UserInfo> datas = userInfoMapper.getPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+		ArrayList<AdminUserDto> dtos = new ArrayList<AdminUserDto>();
+		for(UserInfo info:datas) {
+			AdminUserDto dto = new AdminUserDto(info);
+			UserInfoExt ext = userInfoExtMapper.selectByUserId(info.getId());
+			dto.setFansBaseCount(ext.getFansCount());
+			dto.setAuthType(ext.getAuthType());
+			
+			UserWallet wallet = userWalletMapper.selectByUserId(info.getId());
+			dto.setBalance(wallet.getBalance());
+			
+			UserVip vip = userVipMapper.getUserVipByUserId(info.getId());
+			dto.setVipLevel(vip.getVipLevel());
+			dto.setVipStatus(vip.getStatus());
+			dto.setVipLevelDesc(vip.getLevelDesc());
+			
+			dtos.add(dto);
+			
+		}
 		Pager pager = new Pager();
 		pager.setTotal(total);
-		pager.setDatas(AdminUserDto.toDtoList(datas));
+		pager.setDatas(dtos);
 		return pager;
 	}
 
@@ -816,4 +862,27 @@ public class UserInfoServiceImpl implements UserInfoService {
         pager.setDatas(AdminUserNickNameDetailDto.toDtoList(datas));
         return pager;
     }
+    
+    
+
+    @Override
+    public void updateUserInfo(AdminUserParam param) throws ServiceException {
+    	UserInfo userInfo = userInfoMapper.selectByPrimaryKey(param.getId());
+        UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(param.getId());
+        if(userInfoExt == null || userInfo==null){
+            throw new ServiceException("未找到用户信息！");
+        }
+        if(param.getCount()!=null) {
+        	userInfoExt.setFansCount(param.getCount());
+        }
+        if(param.getStatus()!=null) {
+        	userInfo.setStatus(param.getStatus());
+        }
+        if(param.getAuthType()!=null) {
+        	userInfoExt.setAuthType(param.getAuthType());
+        }
+        userInfoMapper.updateByPrimaryKey(userInfo);
+        userInfoExtMapper.updateByPrimaryKey(userInfoExt);
+    }
+    
 }

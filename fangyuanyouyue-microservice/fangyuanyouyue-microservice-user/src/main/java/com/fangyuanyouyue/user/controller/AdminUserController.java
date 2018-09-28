@@ -301,7 +301,7 @@ public class AdminUserController extends BaseController {
             @ApiImplicitParam(name = "count", value = "修改数量", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "type", value = "类型 1增加 2减少", required = true, dataType = "int", paramType = "query")
     })
-    @GetMapping(value = "/updateFansCount")
+    @PutMapping(value = "/updateUser")
     @ResponseBody
     public BaseResp updateFansCount(AdminUserParam param) throws IOException {
         try {
@@ -310,7 +310,7 @@ public class AdminUserController extends BaseController {
             if(param.getId() == null){
                 return toError("用户id不能为空！");
             }
-            userInfoExtService.updateFansCount(param.getId(),param.getCount(),param.getType());
+            userInfoService.updateUserInfo(param);
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();

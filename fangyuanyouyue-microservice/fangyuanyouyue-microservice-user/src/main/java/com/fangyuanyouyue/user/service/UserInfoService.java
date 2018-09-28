@@ -9,6 +9,7 @@ import com.fangyuanyouyue.user.dto.UserDto;
 import com.fangyuanyouyue.user.dto.UserFansDto;
 import com.fangyuanyouyue.user.dto.WaitProcessDto;
 import com.fangyuanyouyue.user.model.UserInfo;
+import com.fangyuanyouyue.user.model.UserInfoExt;
 import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.param.UserParam;
 
@@ -212,5 +213,8 @@ public interface UserInfoService {
      * @throws ServiceException
      */
     Pager nickNameList(AdminUserParam param) throws ServiceException;
+    
+
+    public void updateUserInfo(AdminUserParam param) throws ServiceException;
 
 }

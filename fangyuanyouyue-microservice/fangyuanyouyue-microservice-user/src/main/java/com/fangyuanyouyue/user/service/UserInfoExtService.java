@@ -3,6 +3,7 @@ package com.fangyuanyouyue.user.service;
 import com.fangyuanyouyue.base.BasePageReq;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.user.param.AdminUserParam;
 
 /**
  * 实名认证相关接口
@@ -106,12 +107,5 @@ public interface UserInfoExtService {
      */
     void updateShopAuth(Integer id,Integer status,String content) throws ServiceException;
 
-    /**
-     * 修改用户粉丝基数
-     * @param userId
-     * @param count
-     * @param type
-     * @throws ServiceException
-     */
-    void updateFansCount(Integer userId,Integer count,Integer type) throws ServiceException;
+
 }

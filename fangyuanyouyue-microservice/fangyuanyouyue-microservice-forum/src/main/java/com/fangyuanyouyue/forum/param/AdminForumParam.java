@@ -36,4 +36,8 @@ public class AdminForumParam extends BasePageReq{
     @ApiModelProperty(name = "sort", value = "排列", dataType = "int",hidden = true)
     private Integer sort;
 
+    //排列
+    @ApiModelProperty(name = "title", value = "标题", dataType = "String",hidden = true)
+    private String title;
+
 }

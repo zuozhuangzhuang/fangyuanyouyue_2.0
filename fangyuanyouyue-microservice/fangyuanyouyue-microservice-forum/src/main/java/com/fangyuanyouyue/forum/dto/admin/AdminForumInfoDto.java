@@ -50,6 +50,11 @@ public class AdminForumInfoDto {
     private Integer baseCount = 0;//基础数量
     
     private String columnName;//专栏名称
+
+    private Integer isChosen;
+
+    private Integer sort;
+    
     
     public AdminForumInfoDto() {
     	
@@ -70,6 +75,8 @@ public class AdminForumInfoDto {
         this.headImgUrl = forumInfo.getHeadImgUrl();
         this.baseCount = forumInfo.getPvCount();
         this.columnName = forumInfo.getColumnName();
+        this.isChosen = forumInfo.getIsChosen();
+        this.sort = forumInfo.getSort();
     }
     
     public static List<AdminForumInfoDto> toDtoList(List<ForumInfo> list) {
