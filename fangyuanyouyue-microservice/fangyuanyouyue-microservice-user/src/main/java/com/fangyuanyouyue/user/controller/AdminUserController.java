@@ -2,6 +2,7 @@ package com.fangyuanyouyue.user.controller;
 
 import java.io.IOException;
 
+import com.fangyuanyouyue.base.exception.ServiceException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -117,6 +118,9 @@ public class AdminUserController extends BaseController {
             }
         	Pager pager = userInfoExtService.getExtAuthPage(param);
             return toPage(pager);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         }catch (Exception e) {
             e.printStackTrace();
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
@@ -144,6 +148,9 @@ public class AdminUserController extends BaseController {
 
 
             return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         }catch (Exception e) {
             e.printStackTrace();
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
@@ -176,6 +183,9 @@ public class AdminUserController extends BaseController {
             }
         	Pager pager = userInfoExtService.getShopAuthPage(param);
             return toPage(pager);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         }catch (Exception e) {
             e.printStackTrace();
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
@@ -204,6 +214,9 @@ public class AdminUserController extends BaseController {
 
 
             return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         }catch (Exception e) {
             e.printStackTrace();
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
@@ -237,6 +250,9 @@ public class AdminUserController extends BaseController {
             }
             Pager pager = systemService.feedbackList(param);
             return toPage(pager);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         }catch (Exception e) {
             e.printStackTrace();
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
@@ -269,6 +285,9 @@ public class AdminUserController extends BaseController {
             }
             Pager pager = userInfoService.nickNameList(param);
             return toPage(pager);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         }catch (Exception e) {
             e.printStackTrace();
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
@@ -293,6 +312,9 @@ public class AdminUserController extends BaseController {
             }
             userInfoExtService.updateFansCount(param.getId(),param.getCount(),param.getType());
             return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         }catch (Exception e) {
             e.printStackTrace();
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
