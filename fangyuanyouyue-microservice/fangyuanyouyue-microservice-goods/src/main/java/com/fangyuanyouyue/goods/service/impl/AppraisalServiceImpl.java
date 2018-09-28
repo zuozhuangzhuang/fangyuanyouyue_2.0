@@ -104,7 +104,6 @@ public class AppraisalServiceImpl implements AppraisalService{
                         goodsAppraisalDetail.setPrice(price);
                         if(goodsInfo.getUserId().intValue() == userId.intValue()){
                             goodsAppraisalDetail.setType(1);//鉴定类型 1商家鉴定 2买家 3普通用户
-                            goodsInfo.setIsAppraisal(2);//是否鉴定 1未鉴定 2已鉴定
                         }else{
                             goodsAppraisalDetail.setType(2);
                         }
@@ -378,7 +377,7 @@ public class AppraisalServiceImpl implements AppraisalService{
             //订单号
             final IdGenerator idg = IdGenerator.INSTANCE;
             String orderNo = idg.nextId();
-            schedualWalletService.addUserBalanceDetail(goodsAppraisalDetail.getUserId(),goodsAppraisalDetail.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderNo,goodsAppraisalDetail.getTitle(),null,goodsAppraisalDetail.getUserId(),Status.APPRAISAL.getValue(),orderNo);
+            schedualWalletService.addUserBalanceDetail(goodsAppraisalDetail.getUserId(),goodsAppraisalDetail.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,goodsAppraisalDetail.getTitle(),null,goodsAppraisalDetail.getUserId(),Status.APPRAISAL.getValue(),orderNo);
 
             schedualMessageService.easemobMessage(goodsAppraisalDetail.getUserId().toString(),"您申请的鉴定结果为“存疑”鉴定费用已退回您的余额，点击此处查看您的余额吧",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_WALLET.getMessage(),"");
         }else{

@@ -89,7 +89,7 @@ public class UserController extends BaseController {
                 return toError("用户昵称不能为空！");
             }
             if(param.getNickName().contains("方圆") || param.getNickName().contains("官方")){
-                return toError("昵称包含敏感词！");
+//                return toError("昵称包含敏感词！");
             }
             UserInfo userInfoByName = userInfoService.getUserByNickName(param.getNickName());
             if(userInfoByName != null){
@@ -344,7 +344,7 @@ public class UserController extends BaseController {
                     return toError("昵称已存在！");
                 }else{
                     if(param.getNickName().contains("方圆") || param.getNickName().contains("官方")){
-                        return toError("昵称包含敏感词！");
+//                        return toError("昵称包含敏感词！");
                     }
                 }
             }

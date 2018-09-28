@@ -42,7 +42,7 @@ public class GoodsInfo {
 
     private Date lastIntervalTime;//最后一次降价时间
 
-    private Integer isAppraisal;//是否官方鉴定 1未鉴定 2已鉴定
+    private Integer isAppraisal;//是否官方鉴定 1已鉴定 2未鉴定
 
     private String videoUrl;//视频路径
 

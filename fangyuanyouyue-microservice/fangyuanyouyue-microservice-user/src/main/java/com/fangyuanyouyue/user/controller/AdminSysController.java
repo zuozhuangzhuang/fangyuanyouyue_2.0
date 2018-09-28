@@ -69,24 +69,6 @@ public class AdminSysController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "版本更新", notes = "版本更新",response = BaseResp.class)
-    @GetMapping(value = "/versionUpdate")
-    @ResponseBody
-    public BaseResp versionUpdate() throws IOException {
-        try {
-            log.info("----》版本更新《----");
-
-            AppVersionDto dto= versionService.getVersion();
-
-            return toSuccess(dto);
-        } catch (ServiceException e) {
-            e.printStackTrace();
-            return toError(e.getMessage());
-        }catch (Exception e) {
-            e.printStackTrace();
-            return toError("系统繁忙，请稍后再试！");
-        }
-    }
 
     @ApiOperation(value = "版本更新列表", notes = "版本更新列表",response = BaseResp.class)
     @ApiImplicitParams({

@@ -244,7 +244,8 @@ public class UserInfoServiceImpl implements UserInfoService {
     public UserDto thirdLogin(UserParam param) throws ServiceException {
         //根据第三方唯一ID和类型获取第三方登录信息
         UserThirdParty userThirdParty = userThirdPartyMapper.getUserByThirdNoType(param.getUnionId(),param.getType());
-        String nickName = param.getThirdNickName().replace("方圆","**").replace("官方","**");
+//        String nickName = param.getThirdNickName().replace("方圆","**").replace("官方","**");
+        String nickName = param.getThirdNickName();
         if(userThirdParty == null){
             log.info("三方注册");
             //注册
@@ -541,7 +542,8 @@ public class UserInfoServiceImpl implements UserInfoService {
         //用户登录
         //根据unionId和type获取用户第三方登录信息
         UserThirdParty userThirdParty = userThirdPartyMapper.getUserByThirdNoType(param.getUnionId(),1);
-        String nickName = param.getThirdNickName().replace("方圆","**").replace("官方","**");
+//        String nickName = param.getThirdNickName().replace("方圆","**").replace("官方","**");
+        String nickName = param.getThirdNickName();
         if(userThirdParty == null){
             //如果用户为空，注册
             //初始化用户信息

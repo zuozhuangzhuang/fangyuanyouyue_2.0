@@ -2,10 +2,13 @@ package com.fangyuanyouyue.user.controller;
 
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.user.dto.AppVersionDto;
 import com.fangyuanyouyue.user.model.UserInfo;
 import com.fangyuanyouyue.user.param.UserParam;
 import com.fangyuanyouyue.user.service.SystemService;
 import com.fangyuanyouyue.user.service.UserInfoService;
+import com.fangyuanyouyue.user.service.VersionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -15,10 +18,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -33,6 +33,8 @@ public class SystemController extends BaseController{
     private UserInfoService userInfoService;
     @Autowired
     private SystemService systemService;
+    @Autowired
+    private VersionService versionService;
 
     @ApiOperation(value = "意见反馈", notes = "(void)意见反馈",response = BaseResp.class)
     @ApiImplicitParams({
@@ -69,6 +71,26 @@ public class SystemController extends BaseController{
             systemService.feedback(user.getId(),param.getContent(),param.getType(),param.getVersion());
             return toSuccess();
         } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+
+    @ApiOperation(value = "版本更新", notes = "版本更新",response = BaseResp.class)
+    @GetMapping(value = "/versionUpdate")
+    @ResponseBody
+    public BaseResp versionUpdate() throws IOException {
+        try {
+            log.info("----》版本更新《----");
+
+            AppVersionDto dto= versionService.getVersion();
+
+            return toSuccess(dto);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        }catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
         }
