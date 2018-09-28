@@ -68,7 +68,7 @@ public class UserDto {
 
     private Integer isLoginPwd;//是否已设置登录密码 1是 2否
 
-    private Integer isHasColumn = 2;//是否拥有专栏 1是 2否
+    private Integer isHasColumn = 2;//拥有专栏状态 1已拥有专栏 2未拥有、未申请专栏 3拥有申请中专栏
 
 
     public UserDto() {

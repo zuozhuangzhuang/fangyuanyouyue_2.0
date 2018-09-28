@@ -95,6 +95,10 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 		if(forumColumnType == null){
 			throw new ServiceException("分类异常！");
 		}else{
+			ForumColumnApply forumColumnApply = forumColumnApplyMapper.selectApplyByUserId(userId);
+			if(forumColumnApply != null){
+				throw new ServiceException("您已申请专栏【"+forumColumnApply.getColumnName()+"】，正在审核中，请耐心等待。");
+			}
 			ForumColumn forumColumn = forumColumnMapper.selectByUserId(userId);
 			if(forumColumn != null){
 				throw new ServiceException("每位用户只能申请一个专栏！");
@@ -203,7 +207,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 					forumColumnMapper.insert(forumColumn);
 					//系统消息：您的【专栏名称】专栏申请已提交，将于3个工作日内完成审核，请注意消息通知
 					schedualMessageService.easemobMessage(forumColumnApply.getUserId().toString(),
-							"恭喜您，您申请的专栏已通过官方审核！快拉您的好友一起来交流学习吧~",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),forumColumn.getId().toString());
+							"恭喜您，您申请的专栏已通过官方审核！快拉您的好友一起来交流学习吧~",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_COLUMN_AGREE.getMessage(),forumColumn.getId().toString());
 				}else if(status.intValue() == Status.NO.getValue()){
 					if(StringUtils.isEmpty(reason)){
 						throw new ServiceException("拒绝原因不能为空");
@@ -294,8 +298,15 @@ public class ForumColumnServiceImpl implements ForumColumnService {
     }
 
 	@Override
-	public boolean isHasColumn(Integer userId) throws ServiceException {
+	public Integer isHasColumn(Integer userId) throws ServiceException {
 		ForumColumn forumColumn = forumColumnMapper.selectByUserId(userId);
-		return forumColumn!=null;
+		ForumColumnApply forumColumnApply = forumColumnApplyMapper.selectApplyByUserId(userId);
+		if(forumColumn != null){
+			return 1;
+		}else if(forumColumnApply != null){
+			return 3;
+		}else{
+			return 2;
+		}
 	}
 }

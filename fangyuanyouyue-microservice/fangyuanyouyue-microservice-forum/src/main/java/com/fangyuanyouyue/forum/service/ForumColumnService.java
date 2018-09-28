@@ -127,5 +127,5 @@ public interface ForumColumnService {
 	 * @return
 	 * @throws ServiceException
 	 */
-    boolean isHasColumn(Integer userId) throws ServiceException;
+	Integer isHasColumn(Integer userId) throws ServiceException;
 }

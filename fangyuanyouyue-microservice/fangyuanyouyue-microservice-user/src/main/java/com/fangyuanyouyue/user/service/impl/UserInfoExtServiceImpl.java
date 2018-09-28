@@ -232,7 +232,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
             userInfoExt.setCredit(userInfoExt.getCredit()+Credit.EXTAPPLY.getCredit());
 //            schedualWalletService.updateCredit(apply.getUserId(), Credit.EXTAPPLY.getCredit(), Status.ADD.getValue());
             schedualMessageService.easemobMessage(apply.getUserId().toString(),
-                    "恭喜您，您申请的实名认证，已通过官方审核！",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
+                    "恭喜您，您申请的实名认证，已通过官方审核！",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_EXT_AGREE.getMessage(),"");
         }else{
             //拒绝
             schedualMessageService.easemobMessage(apply.getUserId().toString(),
@@ -281,7 +281,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
             model.setStartTime(DateStampUtils.getTimesteamp());
             model.setEndTime(DateUtil.getDateAfterYear(DateStampUtils.getTimesteamp(),1));
             schedualMessageService.easemobMessage(model.getUserId().toString(),
-                    "恭喜您，您申请的认证店铺已通过官方审核！您的店铺已添加认证店铺专属标识，快拉您的好友来尽情购买吧！",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
+                    "恭喜您，您申请的认证店铺已通过官方审核！您的店铺已添加认证店铺专属标识，快拉您的好友来尽情购买吧！",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_AUTH_TYPE_AGREE.getMessage(),"");
         }else{
             model.setReason(content);
             schedualWalletService.updateBalance(ext.getUserId(),new BigDecimal(360),Status.ADD.getValue());

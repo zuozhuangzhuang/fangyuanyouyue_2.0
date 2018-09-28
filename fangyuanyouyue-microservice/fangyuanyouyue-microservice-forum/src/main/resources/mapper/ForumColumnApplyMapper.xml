@@ -188,5 +188,7 @@
     limit #{start},#{limit}
   </select>
   
-  
+  <select id="selectApplyByUserId" resultMap="BaseResultMap">
+    select * from forum_column_apply where user_id = #{userId} and status = 0
+  </select>
 </mapper>

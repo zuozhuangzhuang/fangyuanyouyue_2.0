@@ -508,7 +508,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 userDto.setFansCount(userFansMapper.fansCount(user.getId())+userInfoExt.getFansCount());
                 userDto.setCollectCount(userFansMapper.collectCount(user.getId()));
             }
-            userDto.setIsHasColumn(JSONObject.parseObject(schedualForumService.isHasColumn(user.getId())).getBoolean("data")==true?1:2);
+            userDto.setIsHasColumn(JSONObject.parseObject(schedualForumService.isHasColumn(user.getId())).getIntValue("data"));
             return userDto;
         }
     }

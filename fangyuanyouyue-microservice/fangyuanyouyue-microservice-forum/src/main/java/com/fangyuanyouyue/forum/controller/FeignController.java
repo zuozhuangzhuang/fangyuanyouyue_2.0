@@ -44,7 +44,7 @@ public class FeignController extends BaseController{
                 return toError("用户id不能为空！");
             }
             //获取专栏信息
-            boolean isHasColumn = forumColumnService.isHasColumn(userId);
+            Integer isHasColumn = forumColumnService.isHasColumn(userId);
             return toSuccess(isHasColumn);
         } catch (ServiceException e) {
             e.printStackTrace();

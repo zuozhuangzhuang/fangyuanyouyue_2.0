@@ -745,7 +745,7 @@ public class UserController extends BaseController {
             if(StringUtils.isEmpty(code) || !code.equals(param.getCode())){
                 return toError("验证码错误！");
             }
-
+            //TODO 使验证码失效
             return toSuccess("验证验证码成功");
         } catch (Exception e) {
             e.printStackTrace();
