@@ -80,4 +80,18 @@ public interface ForumInfoService {
 	 * @throws ServiceException
 	 */
     void updatePvCount(Integer forumId,Integer count,Integer type) throws ServiceException;
+
+
+	/**
+	 * 每小时统计一次今日商品、抢购
+	 * @throws ServiceException
+	 */
+	Integer processTodayForum()throws ServiceException;
+
+	/**
+	 * 每小时统计一次总商品、抢购
+	 * @throws ServiceException
+	 */
+	Integer processAllForum()throws ServiceException;
+
 }

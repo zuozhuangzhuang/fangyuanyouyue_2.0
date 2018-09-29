@@ -21,6 +21,7 @@ import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.service.SchedualMessageService;
 import com.fangyuanyouyue.user.service.SchedualWalletService;
 import io.swagger.annotations.Api;
+import org.apache.commons.lang.StringUtils;
 import org.bytedeco.javacpp.presets.opencv_core;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,6 +55,8 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
     private UserAuthOrderMapper userAuthOrderMapper;
     @Autowired
     private UserAuthApplyMapper userAuthApplyMapper;
+    @Autowired
+    private UserInfoMapper userInfoMapper;
 
     @Override
     public void certification(String token, String name, String identity, String identityImgCoverUrl, String identityImgBackUrl) throws ServiceException {
@@ -104,6 +107,9 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
 
     @Override
     public boolean verifyPayPwd(Integer userId, String payPwd) throws ServiceException {
+        if(StringUtils.isEmpty(payPwd)){
+            throw new ServiceException("支付密码不能为空！");
+        }
         UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(userId);
         if(userInfoExt == null){
             throw new ServiceException("用户扩展信息错误！");
@@ -128,6 +134,10 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
 
     @Override
     public Object authType(Integer userId,Integer payType,String payPwd) throws ServiceException {
+        UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
+        if(StringUtils.isEmpty(userInfo.getPhone())){
+            throw new ServiceException("未绑定手机号！");
+        }
         UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(userId);
         if(userInfoExt == null){
             throw new ServiceException("用户扩展信息错误！");
@@ -219,6 +229,9 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
     @Override
     public void updateExtAuth(Integer applyId, Integer status, String content) throws ServiceException {
         IdentityAuthApply apply = identityAuthApplyMapper.selectByPrimaryKey(applyId);
+        if(apply == null){
+            throw new ServiceException("未找到申请信息！");
+        }
         if(apply.getStatus().intValue() == StatusEnum.AUTH_ACCEPT.getCode()){
             throw new ServiceException("此用户已通过实名认证！");
         }

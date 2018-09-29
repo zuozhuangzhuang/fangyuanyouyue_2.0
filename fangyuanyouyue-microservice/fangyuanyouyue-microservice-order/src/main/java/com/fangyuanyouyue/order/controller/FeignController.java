@@ -69,4 +69,54 @@ public class FeignController extends BaseController{
         }
     }
 
+    @ApiOperation(value = "统计今日订单", notes = "(void)统计今日订单",hidden = true)
+    @PostMapping(value = "/processTodayOrder")
+    @ResponseBody
+    public BaseResp processTodayOrder(Integer status) throws IOException {
+        try {
+            log.info("----》统计今日订单《----");
+            Integer allCount = orderService.processTodayOrder(status);
+            return toSuccess(allCount);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "统计总订单", notes = "(void)统计总订单",hidden = true)
+    @PostMapping(value = "/processAllOrder")
+    @ResponseBody
+    public BaseResp processAllOrder(Integer status) throws IOException {
+        try {
+            log.info("----》统计总订单《----");
+            Integer allCount = orderService.processAllOrder(status);
+            return toSuccess(allCount);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+//    @ApiOperation(value = "每天统计一次本月订单", notes = "(void)每天统计一次本月订单",hidden = true)
+//    @PostMapping(value = "/processMonthOrder")
+//    @ResponseBody
+//    public BaseResp processMonthOrder() throws IOException {
+//        try {
+//            log.info("----》每天统计一次本月订单《----");
+//            timerService.processMonthOrder();
+//            return toSuccess();
+//        } catch (ServiceException e) {
+//            e.printStackTrace();
+//            return toError(e.getMessage());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return toError("系统繁忙，请稍后再试！");
+//        }
+//    }
 }

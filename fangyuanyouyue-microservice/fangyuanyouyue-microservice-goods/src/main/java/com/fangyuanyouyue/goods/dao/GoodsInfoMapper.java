@@ -128,4 +128,22 @@ public interface GoodsInfoMapper {
     List<GoodsInfo> getGoodsPage(@Param("type")Integer type,@Param("start") Integer start,
                             @Param("limit") Integer limit,@Param("keyword")String keyword,@Param("status")Integer status,
                             @Param("startDate")String startDate,@Param("endDate")String endDate,@Param("orders")String orders,@Param("ascType")Integer ascType);
+
+    /**
+     * 获取今日上传商品、抢购数量
+     * @return
+     */
+    Integer getTodayGoodsCount();
+
+    /**
+     * 获取全部商品、抢购数量
+     * @return
+     */
+    Integer getAllGoodsCount();
+
+    /**
+     * 获取本月上传商品、抢购数量
+     * @return
+     */
+//    Integer getMonthGoodsCount();
 }

@@ -53,6 +53,11 @@ public class AppraisalServiceImpl implements AppraisalService{
 
     @Override
     public AppraisalOrderInfoDto addAppraisal(Integer userId, Integer[] goodsIds, String title, String description, String[] imgUrls, String videoUrl,String videoImg) throws ServiceException {
+        //验证手机号
+        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
+        if(StringUtils.isEmpty(user.getPhone())){
+            throw new ServiceException("未绑定手机号！");
+        }
         //只有我要鉴定才可以用免费鉴定
         //生成订单
         //每次提交的鉴定生成一个订单，批量鉴定有多个订单详情

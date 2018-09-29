@@ -1,14 +1,15 @@
 package com.fangyuanyouyue.order.service;
 
-import java.math.BigDecimal;
-import java.util.List;
-
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.order.dto.CompanyDto;
 import com.fangyuanyouyue.order.dto.OrderDto;
 import com.fangyuanyouyue.order.dto.adminDto.AdminOrderDto;
+import com.fangyuanyouyue.order.dto.adminDto.AdminOrderProcessDto;
 import com.fangyuanyouyue.order.param.AdminOrderParam;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 public interface OrderService {
     /**
@@ -198,4 +199,37 @@ public interface OrderService {
      * @throws ServiceException
      */
 	AdminOrderDto adminOrderDetail(Integer id) throws ServiceException;
+
+    /**
+     * 后台统计订单
+     * @param status
+     * @param startDate
+     * @param endDate
+     * @return
+     * @throws ServiceException
+     */
+	AdminOrderProcessDto getOrderProcess(Integer status, String startDate,String endDate) throws ServiceException;
+
+
+    /**
+     * 每小时统计一次今日订单
+     * @param status
+     * @throws ServiceException
+     */
+    Integer processTodayOrder(Integer status)throws ServiceException;
+
+    /**
+     * 每小时统计一次总订单
+     * @param status
+     * @throws ServiceException
+     */
+    Integer processAllOrder(Integer status)throws ServiceException;
+
+    /**
+     * 每天统计一次本月订单
+     * @param status
+     * @throws ServiceException
+     */
+    void processMonthOrder(Integer status)throws ServiceException;
+
 }

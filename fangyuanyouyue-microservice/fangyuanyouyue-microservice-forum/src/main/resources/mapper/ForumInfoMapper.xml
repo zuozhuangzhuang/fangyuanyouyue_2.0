@@ -395,6 +395,14 @@
     </if>
     limit #{start},#{limit}
   </select>
-  
+
+
+  <select id="getTodayForumCount" resultType="Integer">
+    select count(id) count from forum_info where add_time <![CDATA[ >= ]]> CURDATE() and add_time <![CDATA[ < ]]> (CURDATE()+1)
+  </select>
+
+  <select id="getAllForumCount" resultType="Integer">
+    select count(id) count from forum_info
+  </select>
 
 </mapper>

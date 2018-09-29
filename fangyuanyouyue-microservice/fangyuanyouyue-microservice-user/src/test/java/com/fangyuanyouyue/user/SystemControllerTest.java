@@ -53,4 +53,17 @@ public class SystemControllerTest {
                 .andReturn();
     }
 
+    /**
+     * 获取统计信息
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void getProcess() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/system/getProcess")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
 }

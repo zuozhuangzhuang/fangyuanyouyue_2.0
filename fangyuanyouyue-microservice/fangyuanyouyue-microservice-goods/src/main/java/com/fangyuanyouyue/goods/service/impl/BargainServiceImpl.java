@@ -62,6 +62,11 @@ public class BargainServiceImpl implements BargainService{
 
     @Override
     public Object addBargain(Integer userId, Integer goodsId, BigDecimal price, String reason,Integer addressId,String payPwd,Integer payType) throws ServiceException {
+        //验证手机号
+        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
+        if(StringUtils.isEmpty(user.getPhone())){
+            throw new ServiceException("未绑定手机号！");
+        }
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
         if(goodsInfo == null || goodsInfo.getStatus().intValue() == 3 || goodsInfo.getStatus().intValue() == 5){
             throw new ServiceException("商品不存在或已下架！");

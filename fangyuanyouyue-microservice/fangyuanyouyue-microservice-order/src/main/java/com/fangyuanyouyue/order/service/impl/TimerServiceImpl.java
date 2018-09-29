@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service(value = "timerService")
 @Transactional(rollbackFor=Exception.class)
@@ -41,6 +42,8 @@ public class TimerServiceImpl implements TimerService{
     private OrderCommentMapper orderCommentMapper;
     @Autowired
     private SchedualMessageService schedualMessageService;
+    @Autowired
+    private SchedualRedisService schedualRedisService;
 
     @Override
     public void cancelOrder() throws ServiceException {
@@ -58,31 +61,6 @@ public class TimerServiceImpl implements TimerService{
                     orderPay.setStatus(Status.ORDER_GOODS_CANCEL.getValue());
                     orderInfoMapper.updateByPrimaryKey(orderInfo);
                     orderPayMapper.updateByPrimaryKey(orderPay);
-                    //更改子订单状态
-                    List<OrderInfo> orderInfos = orderInfoMapper.selectChildOrderByOrderId(orderInfo.getUserId(), orderInfo.getId());
-                    if(orderInfos != null){
-                        //存在子订单
-                        for(OrderInfo info:orderInfos){
-                            OrderPay pay = orderPayMapper.selectByOrderId(info.getId());
-                            //更改子订单状态
-                            info.setStatus(Status.ORDER_GOODS_CANCEL.getValue());
-                            pay.setStatus(Status.ORDER_GOODS_CANCEL.getValue());
-                            orderInfoMapper.updateByPrimaryKey(info);
-                            orderPayMapper.updateByPrimaryKey(pay);
-                            //给卖家发消息：您的商品【名称】买家已取消订单
-                            List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(info.getId());
-                            StringBuffer goodsName = new StringBuffer();
-                            boolean isAuction = false;//是否是抢购
-                            for(OrderDetail detail:orderDetails){
-                                GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(
-                                        schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
-                                isAuction = goodsInfo.getType().intValue() == Status.AUCTION.getValue()?true:false;
-                                goodsName.append("【"+goodsInfo.getName()+"】");
-                            }
-                            schedualMessageService.easemobMessage(info.getSellerId().toString(),
-                                    "您的"+(isAuction?"抢购":"商品")+goodsName+"买家超时已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),info.getId().toString());
-                        }
-                    }
                     //获取此订单内所有商品，更改商品状态为出售中
                     List<OrderDetail> orderDetails = orderDetailMapper.selectByMainOrderId(orderInfo.getId());
                     StringBuffer goodsName = new StringBuffer();
@@ -94,6 +72,34 @@ public class TimerServiceImpl implements TimerService{
 
                         isAuction = goodsInfo.getType().intValue() == Status.AUCTION.getValue()?true:false;
                         goodsName.append("【"+goodsInfo.getName()+"】");
+                    }
+                    //更改子订单状态
+                    List<OrderInfo> orderInfos = orderInfoMapper.selectChildOrderByOrderId(orderInfo.getUserId(), orderInfo.getId());
+                    if(orderInfos != null && orderInfos.size() > 0){
+                        //存在子订单
+                        for(OrderInfo info:orderInfos){
+                            OrderPay pay = orderPayMapper.selectByOrderId(info.getId());
+                            //更改子订单状态
+                            info.setStatus(Status.ORDER_GOODS_CANCEL.getValue());
+                            pay.setStatus(Status.ORDER_GOODS_CANCEL.getValue());
+                            orderInfoMapper.updateByPrimaryKey(info);
+                            orderPayMapper.updateByPrimaryKey(pay);
+                            //给卖家发消息：您的商品【名称】买家已取消订单
+                            List<OrderDetail> details = orderDetailMapper.selectByOrderId(info.getId());
+                            StringBuffer name = new StringBuffer();
+                            boolean auction = false;//是否是抢购
+                            for(OrderDetail detail:details){
+                                GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(
+                                        schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
+                                auction = goodsInfo.getType().intValue() == Status.AUCTION.getValue()?true:false;
+                                name.append("【"+goodsInfo.getName()+"】");
+                            }
+                            schedualMessageService.easemobMessage(info.getSellerId().toString(),
+                                    "您的"+(auction?"抢购":"商品")+name+"买家超时已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),info.getId().toString());
+                        }
+                    }else{
+                        schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
+                                "您的"+(isAuction?"抢购":"商品")+goodsName+"买家超时已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),orderInfo.getId().toString());
                     }
                     //给买家发送信息：您未支付的商品【名称】已取消订单
                     schedualMessageService.easemobMessage(orderInfo.getUserId().toString(),

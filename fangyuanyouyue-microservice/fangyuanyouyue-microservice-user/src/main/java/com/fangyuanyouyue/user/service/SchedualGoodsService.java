@@ -18,4 +18,19 @@ public interface SchedualGoodsService {
 
     @RequestMapping(value = "/goodsFeign/getProcess",method = RequestMethod.POST)
     String getProcess(@RequestParam(value = "userId") Integer userId);
+
+
+    /**
+     * 统计今日商品
+     * @return
+     */
+    @RequestMapping(value = "/goodsFeign/processTodayGoods",method = RequestMethod.POST)
+    String processTodayGoods();
+
+    /**
+     * 统计总商品
+     * @return
+     */
+    @RequestMapping(value = "/goodsFeign/processAllGoods",method = RequestMethod.POST)
+    String processAllGoods();
 }

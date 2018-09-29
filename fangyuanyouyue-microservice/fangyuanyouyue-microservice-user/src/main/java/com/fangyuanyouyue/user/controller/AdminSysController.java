@@ -7,6 +7,7 @@ import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.user.dto.AppVersionDto;
 import com.fangyuanyouyue.user.dto.admin.AdminAppVersionDto;
+import com.fangyuanyouyue.user.dto.admin.AdminProcessDto;
 import com.fangyuanyouyue.user.model.AppVersion;
 import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.service.SystemService;
@@ -207,6 +208,22 @@ public class AdminSysController extends BaseController {
             }
             systemService.sendMessage(param.getContent());
             return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统错误！");
+        }
+    }
+    @ApiOperation(value = "获取统计信息", notes = "(AdminProcessDto)获取统计信息",response = BaseResp.class)
+    @PostMapping(value = "/getProcess")
+    @ResponseBody
+    public BaseResp getProcess() throws IOException {
+        try {
+            log.info("----》获取统计信息《----");
+            AdminProcessDto process = systemService.getProcess();
+            return toSuccess(process);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());

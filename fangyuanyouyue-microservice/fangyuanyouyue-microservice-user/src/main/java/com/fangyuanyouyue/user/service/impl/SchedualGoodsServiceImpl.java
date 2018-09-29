@@ -19,4 +19,14 @@ public class SchedualGoodsServiceImpl implements SchedualGoodsService{
     public String getProcess(Integer key) {
         return "获取统计数据失败！";
     }
+
+    @Override
+    public String processTodayGoods() {
+        return "失败！";
+    }
+
+    @Override
+    public String processAllGoods() {
+        return "失败";
+    }
 }

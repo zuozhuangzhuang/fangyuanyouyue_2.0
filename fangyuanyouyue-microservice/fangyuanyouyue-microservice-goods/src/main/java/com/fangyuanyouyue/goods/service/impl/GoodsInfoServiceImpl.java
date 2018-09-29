@@ -132,6 +132,11 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
 
     @Override
     public void addGoods(Integer userId,String nickName,GoodsParam param) throws ServiceException {
+        //验证手机号
+        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
+        if(StringUtils.isEmpty(user.getPhone())){
+            throw new ServiceException("未绑定手机号！");
+        }
         //商品表 goods_info
         GoodsInfo goodsInfo = new GoodsInfo();
         goodsInfo.setUserId(userId);
@@ -199,7 +204,6 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         }
         //给被邀请的用户发送信息 邀请我：用户“用户昵称”上传商品【商品名称】时邀请了您！点击此处前往查看吧
         //邀请我：用户“用户昵称”上传抢购【抢购名称】时邀请了您！点击此处前往查看吧
-        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
         if(param.getUserIds() != null && param.getUserIds().length > 0){
             for(Integer toUserId:param.getUserIds()){
                 if(goodsInfo.getType()==Status.GOODS.getValue()){
@@ -834,4 +838,29 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         goodsDto.setCommentCount(goodsCommentMapper.selectCount(goodsInfo.getId()));
         return goodsDto;
     }
+
+
+
+
+    @Override
+    public Integer processTodayGoods() throws ServiceException {
+        Integer todayGoodsCount = goodsInfoMapper.getTodayGoodsCount();
+        return todayGoodsCount;
+    }
+
+    @Override
+    public Integer processAllGoods() throws ServiceException {
+        Integer allGoodsCount = goodsInfoMapper.getAllGoodsCount();
+        return allGoodsCount;
+    }
+
+//    @Override
+//    public Integer processMonthGoods() throws ServiceException {
+//        List<Map<Integer, Integer>> monthGoodsCount = goodsInfoMapper.getMonthGoodsCount();
+//        if(monthGoodsCount != null && monthGoodsCount.size() > 0){
+//            for(Map<Integer, Integer> map:monthGoodsCount){
+//                System.out.println(map.toString());
+//            }
+//        }
+//    }
 }

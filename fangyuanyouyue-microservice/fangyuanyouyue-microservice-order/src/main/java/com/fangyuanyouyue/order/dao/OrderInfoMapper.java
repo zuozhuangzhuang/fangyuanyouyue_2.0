@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface OrderInfoMapper {
@@ -115,4 +116,24 @@ public interface OrderInfoMapper {
     List<OrderInfo> getOrderPage(@Param("start") Integer start,
                                  @Param("limit") Integer limit,@Param("keyword")String keyword,@Param("status")Integer status,
                                  @Param("startDate")String startDate,@Param("endDate")String endDate,@Param("orders")String orders,@Param("ascType")Integer ascType);
+
+    /**
+     * 获取今日订单
+     * @return
+     */
+    Integer getTodayOrderCount(@Param("status")Integer status);
+
+    /**
+     * 获取总订单
+     * @return
+     */
+    Integer getAllOrderCount(@Param("status")Integer status);
+
+    /**
+     * 获取当月订单
+     * @return
+     */
+    Integer getMonthOrderCount(@Param("status")Integer status);
+
+
 }

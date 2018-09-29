@@ -4,9 +4,11 @@ import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.forum.service.ForumColumnService;
+import com.fangyuanyouyue.forum.service.ForumInfoService;
 import com.fangyuanyouyue.forum.service.SchedualRedisService;
 import com.fangyuanyouyue.forum.service.SchedualUserService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -29,6 +31,8 @@ public class FeignController extends BaseController{
     private SchedualRedisService schedualRedisService;
     @Autowired
     private ForumColumnService forumColumnService;
+    @Autowired
+    private ForumInfoService forumInfoService;
 
 
 
@@ -54,4 +58,40 @@ public class FeignController extends BaseController{
             return toError("系统繁忙，请稍后再试！");
         }
     }
+
+
+    @ApiOperation(value = "统计今日帖子", notes = "(void)统计今日帖子",hidden = true)
+    @PostMapping(value = "/processTodayForum")
+    @ResponseBody
+    public BaseResp processTodayForum() throws IOException {
+        try {
+            log.info("----》统计今日帖子《----");
+            Integer count = forumInfoService.processTodayForum();
+            return toSuccess(count);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "统计总帖子", notes = "(void)统计总帖子",hidden = true)
+    @PostMapping(value = "/processAllForum")
+    @ResponseBody
+    public BaseResp processAllForum() throws IOException {
+        try {
+            log.info("----》统计总帖子《----");
+            Integer count = forumInfoService.processAllForum();
+            return toSuccess(count);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
 }

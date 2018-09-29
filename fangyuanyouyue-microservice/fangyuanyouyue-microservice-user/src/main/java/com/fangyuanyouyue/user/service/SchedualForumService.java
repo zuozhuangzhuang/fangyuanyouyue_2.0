@@ -18,4 +18,17 @@ public interface SchedualForumService {
     @RequestMapping(value = "/forumFeign/isHasColumn",method = RequestMethod.POST)
     String isHasColumn(@RequestParam(value = "userId") Integer userId);
 
+    /**
+     * 统计今日商品
+     * @return
+     */
+    @RequestMapping(value = "/forumFeign/processTodayForum",method = RequestMethod.POST)
+    String processTodayForum();
+
+    /**
+     * 统计总商品
+     * @return
+     */
+    @RequestMapping(value = "/forumFeign/processAllForum",method = RequestMethod.POST)
+    String processAllForum();
 }

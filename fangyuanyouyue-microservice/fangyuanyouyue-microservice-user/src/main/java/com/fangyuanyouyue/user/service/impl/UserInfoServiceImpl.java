@@ -824,7 +824,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 			dto.setVipLevel(vip.getVipLevel());
 			dto.setVipStatus(vip.getStatus());
 			dto.setVipLevelDesc(vip.getLevelDesc());
-			
+            dto.setFansBaseCount(ext.getFansCount());
 			dtos.add(dto);
 			
 		}

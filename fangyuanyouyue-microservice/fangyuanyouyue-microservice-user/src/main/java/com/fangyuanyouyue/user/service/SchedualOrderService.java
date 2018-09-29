@@ -14,4 +14,19 @@ public interface SchedualOrderService {
     @RequestMapping(value = "/orderFeign/getProcess",method = RequestMethod.POST)
     String getProcess(@RequestParam(value = "userId") Integer userId, @RequestParam(value = "type") Integer type);
 
+
+    /**
+     * 每小时统计一次今日订单
+     * @return
+     */
+    @RequestMapping(value = "/orderFeign/processTodayOrder",method = RequestMethod.POST)
+    String processTodayOrder();
+
+    /**
+     * 每小时统计一次总订单
+     * @return
+     */
+    @RequestMapping(value = "/orderFeign/processAllOrder",method = RequestMethod.POST)
+    String processAllOrder();
+
 }

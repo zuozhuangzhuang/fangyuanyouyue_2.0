@@ -201,7 +201,7 @@ public class AdminController extends BaseController {
     @ApiOperation(value = "后台处理专栏申请", notes = "后台处理专栏申请", response = BaseResp.class)
     @ApiImplicitParams({
 
-            @ApiImplicitParam(name = "id", value = "专栏申请id",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "applyId", value = "专栏申请id",required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "userId", value = "用户id",required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "status", value = "处理状态 1同意 2拒绝",required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "coverImgUrl", value = "封面图片地址（同意必填）",required = false, dataType = "String", paramType = "query"),
@@ -214,14 +214,14 @@ public class AdminController extends BaseController {
         try {
             log.info("----》后台处理专栏申请《----");
             log.info("参数：" + param.toString());
-            if(param.getId() == null){
+            if(param.getApplyId() == null){
                 return toError("申请id不能为空！");
             }
             if(param.getStatus() == null){
                 return toError("处理状态不能为空！");
             }
             //处理专栏申请
-            forumColumnService.handle(param.getId(),param.getStatus(),param.getCoverImgUrl(),param.getReason());
+            forumColumnService.handle(param.getApplyId(),param.getStatus(),param.getCoverImgUrl(),param.getReason());
 
             return toSuccess();
         } catch (ServiceException e) {

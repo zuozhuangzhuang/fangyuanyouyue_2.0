@@ -16,10 +16,7 @@ import com.fangyuanyouyue.forum.dao.*;
 import com.fangyuanyouyue.forum.dto.*;
 import com.fangyuanyouyue.forum.dto.admin.AdminForumColumnApplyDto;
 import com.fangyuanyouyue.forum.dto.admin.AdminForumColumnDto;
-import com.fangyuanyouyue.forum.model.ColumnOrder;
-import com.fangyuanyouyue.forum.model.ForumColumn;
-import com.fangyuanyouyue.forum.model.ForumColumnApply;
-import com.fangyuanyouyue.forum.model.ForumColumnType;
+import com.fangyuanyouyue.forum.model.*;
 import com.fangyuanyouyue.forum.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,6 +84,11 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 
 	@Override
 	public Object addColumn(Integer userId, Integer typeId,String name,Integer payType,String payPwd) throws ServiceException {
+		//验证手机号
+		UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
+		if(StringUtils.isEmpty(user.getPhone())){
+			throw new ServiceException("未绑定手机号！");
+		}
 		//name已存在的申请时返回
 		if(forumColumnMapper.selectByName(name)!=null){
 			throw new ServiceException("专栏名已存在！");

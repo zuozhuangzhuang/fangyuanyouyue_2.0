@@ -1,11 +1,18 @@
 package com.fangyuanyouyue.user.service.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Base64;
 import java.util.UUID;
 
+import com.fangyuanyouyue.base.util.HttpUtil;
 import com.fangyuanyouyue.base.util.WaterMarkUtils;
 import com.fangyuanyouyue.user.model.UserInfo;
 import com.fangyuanyouyue.user.service.UserInfoService;
+import com.fangyuanyouyue.user.utils.HttpUtils;
 import org.apache.tomcat.jni.File;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,5 +113,60 @@ public class FileUploadServiceImpl implements FileUploadService{
         return date + fileName;
     }
 
+    /**
+     * 转移旧图片
+     * @param fileUrl 旧图片路径
+     * @param fileName 文件名
+     * @return
+     */
+     String transferFile(String fileUrl, String fileName) {
+        try{
+            OSSClient ossClient = new OSSClient(endpoint, accessKeyId, accessKeySecret);
+            // 上传文件流file
+            ossClient.putObject(bucket, fileName, getInputStream(fileUrl));
+            // 关闭client
+            ossClient.shutdown();
+            fileUrl = ossPath+fileName;
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return fileUrl;
+    }
 
+    /**
+     * GET请求获取输入流
+     * @param imgUrl
+     * @return
+     * @throws IOException
+     */
+    public static InputStream getInputStream(String imgUrl) throws IOException {
+        InputStream inputStream=null;
+        HttpURLConnection httpurlconn=null;
+        try {
+            URL url=new URL(imgUrl);
+            if(url!=null) {
+                httpurlconn=(HttpURLConnection) url.openConnection();
+                //设置连接超时时间
+                httpurlconn.setConnectTimeout(3000);
+                //表示使用GET方式请求
+                httpurlconn.setRequestMethod("GET");
+                int responsecode=httpurlconn.getResponseCode();
+                if(responsecode==200)
+                {
+                    //从服务返回一个输入流
+                    inputStream=httpurlconn.getInputStream();
+                }
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return inputStream;
+    }
+
+    public static void main(String[] args) throws ServiceException {
+        FileUploadServiceImpl fileUploadService = new FileUploadServiceImpl();
+        String fileName = fileUploadService.getFileName("001.jpg");
+        String newUrl = fileUploadService.transferFile("http://app.fangyuanyouyue.com/static/pic/default/001.jpg", "pic"+fileName);
+        System.out.println(newUrl);
+    }
 }

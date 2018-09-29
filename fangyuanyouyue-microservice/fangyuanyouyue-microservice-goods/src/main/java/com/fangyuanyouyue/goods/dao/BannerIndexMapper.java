@@ -31,7 +31,7 @@ public interface BannerIndexMapper {
      * 分页总条数
      * @return
      */
-    int countPage(@Param("keyword")String keyword, @Param("status")Integer status, @Param("startDate")String startDate, @Param("endDate")String endDate);
+    int countPage(@Param("type")Integer type,@Param("jumpType")Integer jumpType,@Param("businessType")Integer businessType,@Param("keyword")String keyword, @Param("status")Integer status, @Param("startDate")String startDate, @Param("endDate")String endDate);
 
     /**
      * 分页获取轮播图列表

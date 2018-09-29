@@ -396,4 +396,19 @@
   <select id="findAllHxUser" resultMap="BaseResultMap">
     select * from user_info where is_reg_hx = 1
   </select>
+
+
+
+  <select id="getTodayUserCount" resultType="Integer">
+    select count(id) count from user_info where add_time <![CDATA[ >= ]]> CURDATE() and add_time <![CDATA[ < ]]> (CURDATE()+1)
+  </select>
+
+  <select id="getAllUserCount" resultType="Integer">
+    select count(id) count from user_info
+  </select>
+
+  <!--<select id="getMonthUserCount" resultType="Integer">
+    select count(*) count from user_info where date_format(add_time,'%Y-%m')=date_format(now(),'%Y-%m')
+  </select>-->
+
 </mapper>

@@ -138,6 +138,11 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 
 	@Override
 	public void addForum(Integer userId, Integer columnId, String title, String content,String videoUrl,Integer videoLength, String videoImg, Integer type,Integer[] userIds) throws ServiceException {
+		//验证手机号
+		UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
+		if(StringUtils.isEmpty(user.getPhone())){
+			throw new ServiceException("未绑定手机号！");
+		}
 		ForumInfo forumInfo = new ForumInfo();
 		forumInfo.setUserId(userId);
 		forumInfo.setTitle(title);
@@ -183,7 +188,6 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 		if(userIds != null && userIds.length > 0){
 			//邀请我：用户“用户昵称”上传帖子【帖子名称】时邀请了您！点击此处前往查看吧
 			//邀请我：用户“用户昵称”上传视频【视频名称】时邀请了您！点击此处前往查看吧
-			UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
 			for(Integer toUserId:userIds){
 				schedualMessageService.easemobMessage(toUserId.toString(),
 						"用户“"+user.getNickName()+"”上传"+(forumInfo.getType()==1?"帖子【":"视频【")+forumInfo.getTitle()+"】时邀请了您！点击此处前往查看吧",Status.SOCIAL_MESSAGE.getMessage(),forumInfo.getType()==1?Status.JUMP_TYPE_FORUM.getMessage():Status.JUMP_TYPE_VIDEO.getMessage(),forumInfo.getId().toString());
@@ -256,5 +260,17 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 			throw new ServiceException("类型错误！");
 		}
 		forumInfoMapper.updateByPrimaryKey(forumInfo);
+	}
+
+	@Override
+	public Integer processTodayForum() throws ServiceException {
+		Integer todayForumCount = forumInfoMapper.getTodayForumCount();
+		return todayForumCount;
+	}
+
+	@Override
+	public Integer processAllForum() throws ServiceException {
+		Integer allForumCount = forumInfoMapper.getAllForumCount();
+		return allForumCount;
 	}
 }

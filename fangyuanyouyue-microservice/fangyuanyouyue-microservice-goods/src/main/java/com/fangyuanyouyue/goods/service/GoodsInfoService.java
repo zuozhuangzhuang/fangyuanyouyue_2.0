@@ -172,4 +172,25 @@ public interface GoodsInfoService {
      * @throws ServiceException
      */
     AdminGoodsDto adminGoodsDetail(Integer goodsId) throws ServiceException;
+
+
+
+    /**
+     * 每小时统计一次今日商品、抢购
+     * @throws ServiceException
+     */
+    Integer processTodayGoods()throws ServiceException;
+
+    /**
+     * 每小时统计一次总商品、抢购
+     * @throws ServiceException
+     */
+    Integer processAllGoods()throws ServiceException;
+
+    /**
+     * 每天统计一次本月商品、抢购
+     * @throws ServiceException
+     */
+//    Integer processMonthGoods()throws ServiceException;
+
 }

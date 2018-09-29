@@ -14,7 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 @RunWith(SpringRunner.class)
@@ -22,7 +21,7 @@ import org.springframework.web.context.WebApplicationContext;
 @WebAppConfiguration
 @ContextConfiguration
 @Rollback
-public class TimerControllerTest {
+public class FeignControllerTest {
     @Autowired
     private WebApplicationContext context;
 
@@ -35,18 +34,44 @@ public class TimerControllerTest {
                 .build();
     }
 
-
     /**
-     * 商品下单
+     * 统计今日订单
      * @throws Exception
      */
-//    @Test
+    @Test
 //    @Transactional
-//    public void updateOrderRefund() throws Exception {
-//        mvc.perform(MockMvcRequestBuilders.post("/timer/updateOrderRefund")
+    public void processTodayOrder() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/orderFeign/processTodayOrder")
+//                .param("status","1")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 统计总订单
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void processAllOrder() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/orderFeign/processAllOrder")
+//                .param("status","1")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+//    /**
+//     * 每天统计一次本月订单
+//     * @throws Exception
+//     */
+//    @Test
+////    @Transactional
+//    public void processMonthOrder() throws Exception {
+//        mvc.perform(MockMvcRequestBuilders.post("/timer/processMonthOrder")
 //                .accept(MediaType.APPLICATION_JSON))
 //                .andDo(MockMvcResultHandlers.print())
 //                .andReturn();
 //    }
-
 }

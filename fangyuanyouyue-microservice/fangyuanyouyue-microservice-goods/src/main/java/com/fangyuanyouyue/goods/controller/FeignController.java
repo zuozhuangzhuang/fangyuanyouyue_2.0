@@ -8,6 +8,7 @@ import com.fangyuanyouyue.goods.model.GoodsInfo;
 import com.fangyuanyouyue.goods.param.GoodsParam;
 import com.fangyuanyouyue.goods.service.*;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -150,4 +151,40 @@ public class FeignController extends BaseController{
             return toError("系统繁忙，请稍后再试！");
         }
     }
+
+
+    @ApiOperation(value = "统计今日商品", notes = "(void)统计今日商品",hidden = true)
+    @PostMapping(value = "/processTodayGoods")
+    @ResponseBody
+    public BaseResp processTodayGoods() throws IOException {
+        try {
+            log.info("----》统计今日商品《----");
+            Integer count = goodsInfoService.processTodayGoods();
+            return toSuccess(count);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "统计总商品", notes = "(void)统计总商品",hidden = true)
+    @PostMapping(value = "/processAllGoods")
+    @ResponseBody
+    public BaseResp processAllGoods() throws IOException {
+        try {
+            log.info("----》统计总商品《----");
+            Integer count = goodsInfoService.processAllGoods();
+            return toSuccess(count);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
 }

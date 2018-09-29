@@ -12,10 +12,7 @@ import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.IdGenerator;
 import com.fangyuanyouyue.order.dao.*;
 import com.fangyuanyouyue.order.dto.*;
-import com.fangyuanyouyue.order.dto.adminDto.AdminCompanyDto;
-import com.fangyuanyouyue.order.dto.adminDto.AdminOrderDetailDto;
-import com.fangyuanyouyue.order.dto.adminDto.AdminOrderDto;
-import com.fangyuanyouyue.order.dto.adminDto.AdminOrderPayDto;
+import com.fangyuanyouyue.order.dto.adminDto.*;
 import com.fangyuanyouyue.order.model.*;
 import com.fangyuanyouyue.order.param.AdminOrderParam;
 import com.fangyuanyouyue.order.service.*;
@@ -28,6 +25,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service(value = "orderService")
 @Transactional(rollbackFor=Exception.class)
@@ -58,6 +56,11 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public OrderDto saveOrderByCart(String token,String sellerString, Integer userId, Integer addressId) throws ServiceException {
         // FIXME: 2018/8/5 事务处理（如果提交多个商品，前面的商品状态正常，且正常生成订单后修改状态，再出现异常，前面的商品状态不会rollback）
+        //验证手机号
+        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
+        if(StringUtils.isEmpty(user.getPhone())){
+            throw new ServiceException("未绑定手机号！");
+        }
         //获取收货地址
         String result = schedualUserService.getAddressList(token,addressId);
         JSONArray addressArray = JSONArray.parseArray(JSONObject.parseObject(result).getString("data"));
@@ -336,33 +339,8 @@ public class OrderServiceImpl implements OrderService{
             orderPay.setStatus(Status.ORDER_GOODS_CANCEL.getValue());
             orderInfoMapper.updateByPrimaryKey(orderInfo);
             orderPayMapper.updateByPrimaryKey(orderPay);
-            //更改子订单状态
-            List<OrderInfo> orderInfos = orderInfoMapper.selectChildOrderByOrderId(userId, orderId);
-            if(orderInfos != null){
-                //存在子订单
-                for(OrderInfo info:orderInfos){
-                    OrderPay pay = orderPayMapper.selectByOrderId(info.getId());
-                    //更改子订单状态
-                    info.setStatus(Status.ORDER_GOODS_CANCEL.getValue());
-                    pay.setStatus(Status.ORDER_GOODS_CANCEL.getValue());
-                    orderInfoMapper.updateByPrimaryKey(info);
-                    orderPayMapper.updateByPrimaryKey(pay);
-                    //给卖家发消息：您的商品【名称】买家已取消订单
-                    List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(info.getId());
-                    StringBuffer goodsName = new StringBuffer();
-                    boolean isAuction = false;//是否是抢购
-                    for(OrderDetail detail:orderDetails){
-                        GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(
-                                schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
-                        isAuction = goodsInfo.getType().intValue() == Status.AUCTION.getValue()?true:false;
-                        goodsName.append("【"+goodsInfo.getName()+"】");
-                    }
-                    schedualMessageService.easemobMessage(info.getSellerId().toString(),
-                            "您的"+(isAuction?"抢购":"商品")+goodsName+"买家已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),info.getId().toString());
-                }
-            }
             //获取此订单内所有商品，更改商品状态为出售中
-            List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderId);
+            List<OrderDetail> orderDetails = orderDetailMapper.selectByMainOrderId(orderId);
             StringBuffer goodsName = new StringBuffer();
             boolean isAuction = false;
             for(OrderDetail orderDetail:orderDetails){
@@ -373,6 +351,35 @@ public class OrderServiceImpl implements OrderService{
                 isAuction = goodsInfo.getType().intValue() == Status.AUCTION.getValue()?true:false;
                 goodsName.append("【"+goodsInfo.getName()+"】");
             }
+            //更改子订单状态
+            List<OrderInfo> orderInfos = orderInfoMapper.selectChildOrderByOrderId(userId, orderId);
+            if(orderInfos != null && orderInfos.size() > 0){
+                //存在子订单
+                for(OrderInfo info:orderInfos){
+                    OrderPay pay = orderPayMapper.selectByOrderId(info.getId());
+                    //更改子订单状态
+                    info.setStatus(Status.ORDER_GOODS_CANCEL.getValue());
+                    pay.setStatus(Status.ORDER_GOODS_CANCEL.getValue());
+                    orderInfoMapper.updateByPrimaryKey(info);
+                    orderPayMapper.updateByPrimaryKey(pay);
+                    //给卖家发消息：您的商品【名称】买家已取消订单
+                    List<OrderDetail> details = orderDetailMapper.selectByOrderId(info.getId());
+                    StringBuffer name = new StringBuffer();
+                    boolean auction = false;//是否是抢购
+                    for(OrderDetail detail:details){
+                        GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(
+                                schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
+                        auction = goodsInfo.getType().intValue() == Status.AUCTION.getValue()?true:false;
+                        name.append("【"+goodsInfo.getName()+"】");
+                    }
+                    schedualMessageService.easemobMessage(info.getSellerId().toString(),
+                            "您的"+(auction?"抢购":"商品")+name+"买家已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),info.getId().toString());
+                }
+            }else{
+                schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
+                        "您的"+(isAuction?"抢购":"商品")+goodsName+"买家已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),orderInfo.getId().toString());
+            }
+
             //给买家发送信息：您未支付的商品【名称】已取消订单
             schedualMessageService.easemobMessage(userId.toString(),
                     "您未支付的"+(isAuction?"抢购":"商品")+goodsName+"已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),orderInfo.getId().toString());
@@ -544,6 +551,11 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public OrderDto saveOrder(String token,Integer goodsId,Integer couponId,Integer userId,Integer addressId,Integer type) throws ServiceException {
+        //验证手机号
+        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
+        if(StringUtils.isEmpty(user.getPhone())){
+            throw new ServiceException("未绑定手机号！");
+        }
         //获取商品信息
         GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(goodsId)).getString("data")),GoodsInfo.class);
         if (goods.getStatus() != 1) {//状态 1出售中 2已售出 3已下架（已结束） 5删除
@@ -1176,4 +1188,30 @@ public class OrderServiceImpl implements OrderService{
         return orderDto;
     }
 
+
+    @Override
+    public AdminOrderProcessDto getOrderProcess(Integer status, String startDate, String endDate) throws ServiceException {
+
+        AdminOrderProcessDto dto = new AdminOrderProcessDto();
+        //TODO 从redis中获取统计数据
+        return null;
+    }
+
+
+    @Override
+    public Integer processTodayOrder(Integer status) throws ServiceException {
+        Integer todayOrderCount = orderInfoMapper.getTodayOrderCount(status);
+        return todayOrderCount;
+    }
+
+    @Override
+    public Integer processAllOrder(Integer status) throws ServiceException {
+        Integer allOrderCount = orderInfoMapper.getAllOrderCount(status);
+        return allOrderCount;
+    }
+
+    @Override
+    public void processMonthOrder(Integer status) throws ServiceException {
+        Integer monthOrderCount = orderInfoMapper.getMonthOrderCount(status);
+    }
 }

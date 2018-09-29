@@ -2,6 +2,7 @@ package com.fangyuanyouyue.user.service;
 
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.user.dto.admin.AdminProcessDto;
 import com.fangyuanyouyue.user.param.AdminUserParam;
 
 public interface SystemService {
@@ -29,4 +30,29 @@ public interface SystemService {
      * @throws ServiceException
      */
     void sendMessage(String content) throws ServiceException;
+
+    /**
+     * 获取统计信息
+     * @return
+     * @throws ServiceException
+     */
+    AdminProcessDto getProcess() throws ServiceException;
+
+    /**
+     * 每小时统计一次今日注册用户
+     * @throws ServiceException
+     */
+    Integer processTodayUser() throws ServiceException;
+
+    /**
+     * 每小时统计一次总注册用户
+     * @throws ServiceException
+     */
+    Integer processAllUser() throws ServiceException;
+
+    /**
+     * 每天统计一次本月注册用户
+     * @throws ServiceException
+     */
+//    Integer processMonthUser() throws ServiceException;
 }

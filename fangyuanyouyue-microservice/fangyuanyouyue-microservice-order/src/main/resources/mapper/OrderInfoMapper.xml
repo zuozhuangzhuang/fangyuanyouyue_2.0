@@ -377,4 +377,27 @@
       limit #{start},#{limit}
     </if>
   </select>
+
+  <select id="getTodayOrderCount" resultType="Integer">
+    select count(*) count from order_info where add_time <![CDATA[ >= ]]> CURDATE() and add_time <![CDATA[ < ]]> (CURDATE()+1) and is_resolve=2
+    <if test="status != null">
+      and status = #{status}
+    </if>
+  </select>
+
+  <select id="getAllOrderCount" resultType="Integer">
+    select count(*) count from order_info where is_resolve=2
+    <if test="status != null">
+      and status = #{status}
+    </if>
+  </select>
+
+  <select id="getMonthOrderCount" resultType="Integer">
+    select count(*) count from order_info where date_format(add_time,'%Y-%m')=date_format(now(),'%Y-%m')
+    <if test="status != null">
+      and status = #{status}
+    </if>
+  </select>
+
+
 </mapper>

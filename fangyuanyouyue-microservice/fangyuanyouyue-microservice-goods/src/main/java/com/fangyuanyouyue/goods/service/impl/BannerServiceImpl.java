@@ -80,7 +80,7 @@ public class BannerServiceImpl implements BannerService{
 
     @Override
     public Pager bannerList(AdminGoodsParam param) throws ServiceException {
-        Integer total = bannerIndexMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
+        Integer total = bannerIndexMapper.countPage(param.getType(),param.getJumpType(),param.getBusinessType(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
 
         List<BannerIndex> banners = bannerIndexMapper.getPage(param.getType(),param.getJumpType(),param.getBusinessType(),param.getStart(),param.getLimit(),
                 param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());

@@ -73,4 +73,22 @@ public interface UserInfoMapper {
      * @return
      */
     List<UserInfo> findAllHxUser();
+
+    /**
+     * 获取当日注册用户
+     * @return
+     */
+    Integer getTodayUserCount();
+
+    /**
+     * 获取全部用户数量
+     * @return
+     */
+    Integer getAllUserCount();
+
+    /**
+     * 获取本月注册用户数量
+     * @return
+     */
+//    Integer getMonthUserCount();
 }

@@ -501,7 +501,17 @@
         from goods_info a,user_info b
         where a.user_id=b.id and a.id = #{id,jdbcType=INTEGER}
     </select>
-    <!--<select id="choice" resultMap="">-->
 
-    <!--</select>-->
+    <select id="getTodayGoodsCount" resultType="Integer">
+        select count(id) count from goods_info where add_time <![CDATA[ >= ]]> CURDATE() and add_time <![CDATA[ < ]]> (CURDATE()+1)
+    </select>
+
+    <select id="getAllGoodsCount" resultType="Integer">
+        select count(id) count from goods_info
+    </select>
+
+    <!--<select id="getMonthGoodsCount" resultType="Integer">
+        select count(*) count,type from goods_info where date_format(add_time,'%Y-%m')=date_format(now(),'%Y-%m') group by type
+    </select>-->
+
 </mapper>

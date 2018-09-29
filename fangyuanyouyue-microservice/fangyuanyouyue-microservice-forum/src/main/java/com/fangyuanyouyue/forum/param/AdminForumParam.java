@@ -13,6 +13,9 @@ import lombok.ToString;
 @ToString
 public class AdminForumParam extends BasePageReq{
 
+    @ApiModelProperty(name = "applyId", value = "专栏申请id", dataType = "int",hidden = true)
+    private Integer applyId;//专栏申请id
+
     @ApiModelProperty(name = "coverImgUrl", value = "封面图片地址", dataType = "String",hidden = true)
     private String coverImgUrl;//封面图片地址
 
