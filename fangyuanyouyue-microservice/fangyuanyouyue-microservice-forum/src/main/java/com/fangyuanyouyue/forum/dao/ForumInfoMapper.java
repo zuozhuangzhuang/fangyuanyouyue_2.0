@@ -5,7 +5,6 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import com.fangyuanyouyue.forum.model.ForumColumn;
 import com.fangyuanyouyue.forum.model.ForumInfo;
 @Mapper
 public interface ForumInfoMapper {

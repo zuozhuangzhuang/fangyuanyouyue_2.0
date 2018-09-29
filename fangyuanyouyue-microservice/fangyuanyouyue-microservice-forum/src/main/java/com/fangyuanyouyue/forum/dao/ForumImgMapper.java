@@ -2,8 +2,9 @@ package com.fangyuanyouyue.forum.dao;
 
 import java.util.List;
 
-import com.fangyuanyouyue.forum.model.ForumImg;
 import org.apache.ibatis.annotations.Mapper;
+
+import com.fangyuanyouyue.forum.model.ForumImg;
 
 @Mapper
 public interface ForumImgMapper {

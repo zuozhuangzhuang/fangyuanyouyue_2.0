@@ -1,13 +1,14 @@
 package com.fangyuanyouyue.forum.dto;
 
-import com.fangyuanyouyue.forum.model.ForumColumnType;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import com.fangyuanyouyue.forum.model.ForumColumnType;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * 论坛专栏类型

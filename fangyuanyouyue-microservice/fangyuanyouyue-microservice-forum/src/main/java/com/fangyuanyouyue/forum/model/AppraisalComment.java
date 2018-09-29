@@ -1,11 +1,11 @@
 package com.fangyuanyouyue.forum.model;
 
+import java.sql.Timestamp;
+import java.util.Date;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.sql.Timestamp;
-import java.util.Date;
 
 /**
  * 鉴定评论

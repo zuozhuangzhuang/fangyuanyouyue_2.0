@@ -1,13 +1,13 @@
 package com.fangyuanyouyue.forum.dao;
 
-import org.apache.ibatis.annotations.Mapper;
-
-import com.fangyuanyouyue.forum.model.ForumPv;
-import org.apache.ibatis.annotations.Param;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import com.fangyuanyouyue.forum.model.ForumPv;
 
 @Mapper
 public interface ForumPvMapper {

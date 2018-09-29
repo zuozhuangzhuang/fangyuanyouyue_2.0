@@ -1045,12 +1045,12 @@ public class OrderServiceImpl implements OrderService{
                 //获取卖家信息
                 UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(info.getSellerId())).getString("data")), UserInfo.class);
 
-                orderDto.setSeller(seller.getPhone()+"<br>"+seller.getNickName());
+                orderDto.setSeller(seller.getPhone()+"\n"+seller.getNickName());
             }
             ArrayList<AdminOrderDetailDto> orderDetailDtos = AdminOrderDetailDto.toDtoList(orderDetails);
             String orderDetail = "";
             for(AdminOrderDetailDto detail:orderDetailDtos) {
-            	orderDetail += "【"+detail.getGoodsName() + "】x1 <br>";
+            	orderDetail += "【"+detail.getGoodsName() + "】\n";
             }
             orderDto.setOrderDetail(orderDetail);
             orderDto.setTotalCount(orderDetailDtos.size());

@@ -1,11 +1,11 @@
 package com.fangyuanyouyue.forum.model;
 
+import java.math.BigDecimal;
+import java.util.Date;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.math.BigDecimal;
-import java.util.Date;
 /**
  * 全民鉴定订单
  */

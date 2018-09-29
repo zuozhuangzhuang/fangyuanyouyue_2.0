@@ -1,9 +1,9 @@
 package com.fangyuanyouyue.forum.dao;
 
-import com.fangyuanyouyue.forum.model.AppraisalLikes;
-import com.fangyuanyouyue.forum.model.ForumLikes;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import com.fangyuanyouyue.forum.model.AppraisalLikes;
 
 @Mapper
 public interface AppraisalLikesMapper {

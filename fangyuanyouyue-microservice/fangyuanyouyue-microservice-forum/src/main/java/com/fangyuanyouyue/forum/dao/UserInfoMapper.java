@@ -1,7 +1,8 @@
 package com.fangyuanyouyue.forum.dao;
 
-import com.fangyuanyouyue.forum.model.UserInfo;
 import org.apache.ibatis.annotations.Mapper;
+
+import com.fangyuanyouyue.forum.model.UserInfo;
 
 @Mapper
 public interface UserInfoMapper {

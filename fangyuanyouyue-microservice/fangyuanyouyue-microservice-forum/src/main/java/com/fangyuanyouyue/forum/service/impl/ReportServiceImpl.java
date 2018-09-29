@@ -1,5 +1,11 @@
 package com.fangyuanyouyue.forum.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.Credit;
 import com.fangyuanyouyue.base.enums.Status;
@@ -16,11 +22,6 @@ import com.fangyuanyouyue.forum.param.AdminForumParam;
 import com.fangyuanyouyue.forum.service.ReportService;
 import com.fangyuanyouyue.forum.service.SchedualMessageService;
 import com.fangyuanyouyue.forum.service.SchedualWalletService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service(value = "reportService")
 public class ReportServiceImpl implements ReportService{

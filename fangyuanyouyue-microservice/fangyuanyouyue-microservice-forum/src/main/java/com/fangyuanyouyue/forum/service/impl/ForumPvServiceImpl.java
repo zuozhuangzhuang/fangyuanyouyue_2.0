@@ -2,15 +2,14 @@ package com.fangyuanyouyue.forum.service.impl;
 
 import java.util.Date;
 
-import com.fangyuanyouyue.forum.dao.ForumInfoMapper;
-import com.fangyuanyouyue.forum.model.ForumInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.fangyuanyouyue.forum.dao.ForumInfoMapper;
 import com.fangyuanyouyue.forum.dao.ForumPvMapper;
 import com.fangyuanyouyue.forum.model.ForumPv;
 import com.fangyuanyouyue.forum.service.ForumPvService;
-import org.springframework.transaction.annotation.Transactional;
 
 
 @Service(value = "forumPvService")

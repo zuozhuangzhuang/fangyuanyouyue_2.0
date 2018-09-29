@@ -7,20 +7,26 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.base.model.WxPayResult;
-import com.fangyuanyouyue.base.util.WechatUtil.WXPayUtil;
-import com.fangyuanyouyue.base.util.alipay.util.AlipayNotify;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
-import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.base.model.WxPayResult;
+import com.fangyuanyouyue.base.util.WechatUtil.WXPayUtil;
+import com.fangyuanyouyue.base.util.alipay.util.AlipayNotify;
 import com.fangyuanyouyue.forum.dto.AppraisalCommentDto;
 import com.fangyuanyouyue.forum.dto.AppraisalDetailDto;
 import com.fangyuanyouyue.forum.param.AppraisalParam;
@@ -35,9 +41,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping(value = "/appraisal")

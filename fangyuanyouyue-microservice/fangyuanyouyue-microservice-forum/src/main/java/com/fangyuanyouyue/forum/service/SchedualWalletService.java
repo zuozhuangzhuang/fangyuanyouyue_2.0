@@ -1,13 +1,14 @@
 package com.fangyuanyouyue.forum.service;
 
-import com.fangyuanyouyue.forum.service.impl.SchedualWalletServiceImpl;
+import java.math.BigDecimal;
+
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.math.BigDecimal;
+import com.fangyuanyouyue.forum.service.impl.SchedualWalletServiceImpl;
 
 @FeignClient(value = "wallet-service",fallback = SchedualWalletServiceImpl.class)
 @Component

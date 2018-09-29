@@ -1,7 +1,8 @@
 package com.fangyuanyouyue.forum.service.impl;
 
-import com.fangyuanyouyue.forum.service.SchedualUserService;
 import org.springframework.stereotype.Component;
+
+import com.fangyuanyouyue.forum.service.SchedualUserService;
 
 @Component
 public class SchedualUserServiceImpl implements SchedualUserService{

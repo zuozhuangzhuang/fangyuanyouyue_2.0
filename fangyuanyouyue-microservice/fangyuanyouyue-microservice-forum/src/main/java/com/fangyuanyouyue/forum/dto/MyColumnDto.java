@@ -1,10 +1,10 @@
 package com.fangyuanyouyue.forum.dto;
 
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.List;
 
 /**
  * 我是栏主DTO

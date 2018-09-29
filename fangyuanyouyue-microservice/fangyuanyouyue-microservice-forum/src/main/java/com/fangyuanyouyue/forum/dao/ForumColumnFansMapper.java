@@ -1,7 +1,8 @@
 package com.fangyuanyouyue.forum.dao;
 
-import com.fangyuanyouyue.forum.model.ForumColumnFans;
 import org.apache.ibatis.annotations.Mapper;
+
+import com.fangyuanyouyue.forum.model.ForumColumnFans;
 
 @Mapper
 public interface ForumColumnFansMapper {

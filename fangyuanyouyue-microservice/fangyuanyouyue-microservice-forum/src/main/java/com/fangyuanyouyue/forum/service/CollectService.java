@@ -1,9 +1,8 @@
 package com.fangyuanyouyue.forum.service;
 
-import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.forum.dto.AppraisalDetailDto;
-
 import java.util.List;
+
+import com.fangyuanyouyue.base.exception.ServiceException;
 
 public interface CollectService {
     /**

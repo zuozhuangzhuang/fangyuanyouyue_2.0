@@ -1,12 +1,13 @@
 package com.fangyuanyouyue.forum.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fangyuanyouyue.forum.model.AppraisalImg;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**

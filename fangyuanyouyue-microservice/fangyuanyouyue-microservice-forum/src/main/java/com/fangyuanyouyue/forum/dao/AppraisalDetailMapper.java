@@ -1,13 +1,12 @@
 package com.fangyuanyouyue.forum.dao;
 
-import com.fangyuanyouyue.forum.model.AppraisalDetail;
-import com.fangyuanyouyue.forum.model.ForumInfo;
+import java.util.Date;
+import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.Date;
-import java.util.List;
+import com.fangyuanyouyue.forum.model.AppraisalDetail;
 
 @Mapper
 public interface AppraisalDetailMapper {

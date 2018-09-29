@@ -1,13 +1,14 @@
 package com.fangyuanyouyue.forum.dto.admin;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.forum.model.Report;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 帖子、视频、全民鉴定举报信息Dto

@@ -1,8 +1,9 @@
 package com.fangyuanyouyue.forum.dao;
 
-import com.fangyuanyouyue.forum.model.Collect;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import com.fangyuanyouyue.forum.model.Collect;
 
 @Mapper
 public interface CollectMapper {

@@ -1,19 +1,7 @@
 package com.fangyuanyouyue.forum.controller;
 
-import com.alibaba.fastjson.JSONObject;
-import com.fangyuanyouyue.base.BaseController;
-import com.fangyuanyouyue.base.BaseResp;
-import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.forum.dto.AppraisalDetailDto;
-import com.fangyuanyouyue.forum.param.AppraisalParam;
-import com.fangyuanyouyue.forum.service.ForumLikesService;
-import com.fangyuanyouyue.forum.service.SchedualRedisService;
-import com.fangyuanyouyue.forum.service.SchedualUserService;
-import com.fangyuanyouyue.forum.service.TimerService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -22,7 +10,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
+import com.fangyuanyouyue.base.BaseController;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.forum.service.TimerService;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping(value = "/timer")

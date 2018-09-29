@@ -1,12 +1,12 @@
 package com.fangyuanyouyue.forum.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * 我的评论列表帖子、视频Dto

@@ -4,11 +4,11 @@ import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fangyuanyouyue.forum.dao.AppraisalPvMapper;
 import com.fangyuanyouyue.forum.model.AppraisalPv;
 import com.fangyuanyouyue.forum.service.AppraisalPvService;
-import org.springframework.transaction.annotation.Transactional;
 
 
 @Service(value = "appraisalPvService")

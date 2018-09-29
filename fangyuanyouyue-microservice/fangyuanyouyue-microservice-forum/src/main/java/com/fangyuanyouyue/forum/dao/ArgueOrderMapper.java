@@ -1,8 +1,9 @@
 package com.fangyuanyouyue.forum.dao;
 
-import com.fangyuanyouyue.forum.model.ArgueOrder;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import com.fangyuanyouyue.forum.model.ArgueOrder;
 
 @Mapper
 public interface ArgueOrderMapper {

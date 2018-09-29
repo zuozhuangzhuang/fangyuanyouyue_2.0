@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.forum.param;
 
 import com.fangyuanyouyue.base.BasePageReq;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;

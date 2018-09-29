@@ -41,6 +41,8 @@ public class AdminOrderPayDto {
 
     private BigDecimal payAmount;//实际支付金额
 
+    private String payNo;
+
     private BigDecimal freight;//运费金额
 
     private Integer count;//商品总数
@@ -89,7 +91,8 @@ public class AdminOrderPayDto {
         }
         this.logisticCode = orderPay.getLogisticCode();
         this.logisticCompany = orderPay.getLogisticCompany();
-        this.receiver =  this.receiverName+" "+this.receiverPhone+"<br>" + this.province+this.city+this.area+this.address;
+        this.receiver =  this.receiverName+" "+this.receiverPhone+"\n" + this.province+this.city+this.area+this.address;
+        this.payNo = orderPay.getPayNo();
     }
 
     public static ArrayList<AdminOrderPayDto> toDtoList(List<OrderPay> list) {

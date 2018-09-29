@@ -1,11 +1,11 @@
 package com.fangyuanyouyue.forum.dao;
 
-import com.fangyuanyouyue.forum.model.ForumColumn;
-import com.fangyuanyouyue.forum.model.ForumColumnApply;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
+import com.fangyuanyouyue.forum.model.ForumColumnApply;
 
 @Mapper
 public interface ForumColumnApplyMapper {

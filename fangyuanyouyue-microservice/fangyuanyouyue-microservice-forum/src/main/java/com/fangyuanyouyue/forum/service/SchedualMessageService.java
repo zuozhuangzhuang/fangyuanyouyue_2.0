@@ -1,11 +1,12 @@
 package com.fangyuanyouyue.forum.service;
 
-import com.fangyuanyouyue.forum.service.impl.SchedualMessageServiceImpl;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.fangyuanyouyue.forum.service.impl.SchedualMessageServiceImpl;
 
 @FeignClient(value = "message-service",fallback = SchedualMessageServiceImpl.class)
 @Component

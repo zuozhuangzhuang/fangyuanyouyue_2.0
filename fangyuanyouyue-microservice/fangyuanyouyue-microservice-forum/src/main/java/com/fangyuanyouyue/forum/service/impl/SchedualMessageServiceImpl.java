@@ -1,7 +1,8 @@
 package com.fangyuanyouyue.forum.service.impl;
 
-import com.fangyuanyouyue.forum.service.SchedualMessageService;
 import org.springframework.stereotype.Component;
+
+import com.fangyuanyouyue.forum.service.SchedualMessageService;
 
 @Component
 public class SchedualMessageServiceImpl implements SchedualMessageService {

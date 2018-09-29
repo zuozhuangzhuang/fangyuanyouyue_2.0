@@ -1,9 +1,10 @@
 package com.fangyuanyouyue.forum.dao;
 
-import com.fangyuanyouyue.forum.model.ForumColumnType;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.List;
+import com.fangyuanyouyue.forum.model.ForumColumnType;
 
 @Mapper
 public interface ForumColumnTypeMapper {
