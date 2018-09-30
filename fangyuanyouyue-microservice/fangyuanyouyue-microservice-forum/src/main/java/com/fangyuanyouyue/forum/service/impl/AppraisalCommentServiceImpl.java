@@ -53,6 +53,9 @@ public class AppraisalCommentServiceImpl implements AppraisalCommentService {
 	public List<AppraisalCommentDto> getAppraisalCommentList(Integer userId,Integer appraisalId, Integer start, Integer limit)
 			throws ServiceException {
 		AppraisalDetail detail = appraisalDetailMapper.selectByPrimaryKey(appraisalId);
+		if(detail == null || detail.getStatus().equals(Status.DELETE.getValue())){
+			throw new ServiceException("未找到全民鉴定！");
+		}
 		List<AppraisalComment> list = appraisalCommentMapper.selectByAppraisalId(appraisalId, start*limit, limit);
 		List<AppraisalCommentDto> dtos = AppraisalCommentDto.toDtoList(list);
 		for(AppraisalCommentDto dto:dtos){
@@ -73,10 +76,10 @@ public class AppraisalCommentServiceImpl implements AppraisalCommentService {
 	@Override
 	public AppraisalCommentDto saveComment(Integer userId,AppraisalParam param) throws ServiceException{
 		AppraisalDetail detail = appraisalDetailMapper.selectByPrimaryKey(param.getAppraisalId());
-		if(detail == null){
+		if(detail == null || detail.getStatus().equals(Status.DELETE.getValue())){
 			throw new ServiceException("未找到鉴定！");
 		}else{
-			if(detail.getStatus() == 2){
+			if(detail.getStatus().equals(Status.END.getValue())){
 				throw new ServiceException("鉴定已结束！");
 			}
 		}
@@ -88,6 +91,7 @@ public class AppraisalCommentServiceImpl implements AppraisalCommentService {
 			model.setViewpoint(param.getViewpoint());
 			model.setContent(param.getContent());
 			model.setAddTime(DateStampUtils.getTimesteamp());
+			model.setStatus(Status.SHOW.getValue());
 			appraisalCommentMapper.insert(model);
 			if(param.getUserIds() != null && param.getUserIds().length > 0){
 				//邀请我：用户“用户昵称”参与全民鉴定【全民鉴定名称】时邀请了您！点击此处前往查看吧
@@ -114,12 +118,13 @@ public class AppraisalCommentServiceImpl implements AppraisalCommentService {
 	@Override
 	public void deleteComment(Integer userId, Integer commentId) throws ServiceException {
 		AppraisalComment comment = appraisalCommentMapper.selectByPrimaryKey(commentId);
-		if(comment == null){
+		if(comment == null || Status.HIDE.getValue().equals(comment.getStatus())){
 			throw new ServiceException("未找到评论");
 		}
 		if(!comment.getUserId().equals(userId)){
 			throw new ServiceException("您无权删除此评论！");
 		}
-		appraisalCommentMapper.deleteByPrimaryKey(commentId);
+		comment.setStatus(Status.HIDE.getValue());
+		appraisalCommentMapper.updateByPrimaryKey(comment);
 	}
 }

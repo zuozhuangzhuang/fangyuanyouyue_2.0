@@ -161,4 +161,7 @@ public class GoodsParam{
 
     @ApiModelProperty(name = "videoLength", value = "视频长度", dataType = "int",hidden = true)
     private Integer videoLength;//视频长度
+
+    @ApiModelProperty(name = "ids", value = "id数组", dataType = "int",hidden = true)
+    private Integer[] ids;//id数组
 }

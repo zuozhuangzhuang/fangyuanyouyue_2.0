@@ -77,6 +77,9 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 	@Override
 	public AppraisalDetailDto getAppraisalDetail(Integer userId,Integer appraisalId) throws ServiceException {
 		AppraisalDetail model = appraisalDetailMapper.selectDetailByPrimaryKey(appraisalId);
+		if(model == null || model.getStatus().equals(Status.DELETE.getValue())){
+			throw new ServiceException("未找到全民鉴定！");
+		}
 		AppraisalDetailDto dto = new AppraisalDetailDto(model);
 		//评论数量
 		Integer commentCount = appraisalCommentServiceImpl.countComment(appraisalId);
@@ -225,10 +228,10 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 
 			//支付
 			if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
-				WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(argueOrder.getOrderNo(), argueOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.argue_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+				WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(argueOrder.getOrderNo(), argueOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.argue_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
 				return wechatPayDto;
 			}else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
-				String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(argueOrder.getOrderNo(), argueOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.argue_alipay_notify.getNotifUrl())).getString("data");
+				String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(argueOrder.getOrderNo(), argueOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.argue_alipay_notify.getNotifUrl())).getString("data");
 				payInfo.append(info);
 			}else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()){
 				Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
@@ -244,7 +247,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 				//生成全民鉴定信息
 				applyAppraisal(argueOrder.getOrderNo(),null,Status.PAY_TYPE_BALANCE.getValue());
 			}else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
-				WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,argueOrder.getOrderNo(), argueOrder.getAmount(), NotifyUrl.mini_test_notify.getNotifUrl()+NotifyUrl.argue_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+				WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,argueOrder.getOrderNo(), argueOrder.getAmount(), NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.argue_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
 				return wechatPayDto;
 			}else{
 				throw new ServiceException("支付方式错误！");
@@ -328,6 +331,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 		//余额账单
 		schedualWalletService.addUserBalanceDetail(argueOrder.getUserId(),argueOrder.getAmount(),payType,Status.EXPEND.getValue(),orderNo,argueOrder.getTitle(),argueOrder.getUserId(),null, Status.APPRAISAL.getValue(),thirdOrderNo);
 		argueOrder.setStatus(Status.ORDER_COMPLETE.getValue());
+		argueOrder.setPayNo(thirdOrderNo);
 		argueOrderMapper.updateByPrimaryKey(argueOrder);
 		return true;
 	}
@@ -335,6 +339,9 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 	@Override
 	public void invite(Integer userId,Integer appraisalId, Integer[] userIds) throws ServiceException {
 		AppraisalDetail appraisalDetail = appraisalDetailMapper.selectByPrimaryKey(appraisalId);
+		if(!appraisalDetail.getStatus().equals(Status.BEING.getValue())){
+			throw new ServiceException("全民鉴定状态异常！");
+		}
 		//邀请我：用户“用户昵称”发起全民鉴定【全名鉴定名称】时邀请了您！点击此处前往查看吧
 		UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
 		if(userIds != null && userIds.length > 0){
@@ -368,4 +375,24 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 		return pager;
 	}
 
+	@Override
+	public void deleteAppraisal(Integer userId, Integer[] ids) throws ServiceException {
+		for(Integer id:ids){
+			AppraisalDetail detail = appraisalDetailMapper.selectByPrimaryKey(id);
+			if(detail == null || detail.getStatus().equals(Status.DELETE.getValue())){
+				throw new ServiceException("未找到全民鉴定！");
+			}else{
+				if(!detail.getStatus().equals(Status.END.getValue())){
+					throw new ServiceException("全民鉴定未结束！");
+				}else{
+					if(detail.getUserId().equals(userId)){
+						detail.setStatus(Status.DELETE.getValue());
+						appraisalDetailMapper.updateByPrimaryKey(detail);
+					}else{
+						throw new ServiceException("无权删除！");
+					}
+				}
+			}
+		}
+	}
 }

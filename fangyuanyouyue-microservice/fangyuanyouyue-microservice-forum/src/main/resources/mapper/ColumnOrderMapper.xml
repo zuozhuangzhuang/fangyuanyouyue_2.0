@@ -11,9 +11,10 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="type_id" jdbcType="INTEGER" property="typeId" />
     <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="pay_no" jdbcType="VARCHAR" property="payNo" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, user_id, order_no, amount, status, add_time, update_time, type_id, name
+    id, user_id, order_no, amount, status, add_time, update_time, type_id, name, pay_no
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -28,14 +29,14 @@
   <insert id="insert" parameterType="com.fangyuanyouyue.forum.model.ColumnOrder" useGeneratedKeys="true" keyProperty="id">
     insert into column_order (id, user_id, order_no, 
       amount, status, add_time, 
-      update_time, type_id, name
-      )
+      update_time, type_id, name, 
+      pay_no)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{orderNo,jdbcType=VARCHAR}, 
       #{amount,jdbcType=DECIMAL}, #{status,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{typeId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}
-      )
+      #{updateTime,jdbcType=TIMESTAMP}, #{typeId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, 
+      #{payNo,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.forum.model.ColumnOrder">
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.forum.model.ColumnOrder" useGeneratedKeys="true" keyProperty="id">
     insert into column_order
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -64,6 +65,9 @@
       </if>
       <if test="name != null">
         name,
+      </if>
+      <if test="payNo != null">
+        pay_no,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -94,6 +98,9 @@
       <if test="name != null">
         #{name,jdbcType=VARCHAR},
       </if>
+      <if test="payNo != null">
+        #{payNo,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.forum.model.ColumnOrder">
@@ -123,6 +130,9 @@
       <if test="name != null">
         name = #{name,jdbcType=VARCHAR},
       </if>
+      <if test="payNo != null">
+        pay_no = #{payNo,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -135,7 +145,8 @@
       add_time = #{addTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       type_id = #{typeId,jdbcType=INTEGER},
-      name = #{name,jdbcType=VARCHAR}
+      name = #{name,jdbcType=VARCHAR},
+      pay_no = #{payNo,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 

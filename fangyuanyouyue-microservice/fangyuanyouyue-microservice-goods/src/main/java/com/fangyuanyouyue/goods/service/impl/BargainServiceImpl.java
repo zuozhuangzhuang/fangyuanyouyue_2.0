@@ -108,10 +108,10 @@ public class BargainServiceImpl implements BargainService{
 
                 StringBuffer payInfo = new StringBuffer();
                 if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
-                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(bargainOrder.getOrderNo(), bargainOrder.getAmount(),NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.bargain_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(bargainOrder.getOrderNo(), bargainOrder.getAmount(),NotifyUrl.notify.getNotifUrl()+NotifyUrl.bargain_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
                     return wechatPayDto;
                 }else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
-                    String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(bargainOrder.getOrderNo(), bargainOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.bargain_alipay_notify.getNotifUrl())).getString("data");
+                    String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(bargainOrder.getOrderNo(), bargainOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.bargain_alipay_notify.getNotifUrl())).getString("data");
                     payInfo.append(info);
                 }else if(payType == Status.PAY_TYPE_BALANCE.getValue()){
                     if(StringUtils.isEmpty(payPwd)){
@@ -130,7 +130,7 @@ public class BargainServiceImpl implements BargainService{
                         updateOrder(bargainOrder.getOrderNo(),null,Status.PAY_TYPE_BALANCE.getValue());
                     }
                 }else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
-                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,bargainOrder.getOrderNo(), bargainOrder.getAmount(),NotifyUrl.mini_test_notify.getNotifUrl()+NotifyUrl.bargain_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,bargainOrder.getOrderNo(), bargainOrder.getAmount(),NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.bargain_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
                     return wechatPayDto;
                 }else{
                     throw new ServiceException("支付方式错误！");
@@ -159,13 +159,14 @@ public class BargainServiceImpl implements BargainService{
         goodsBargain.setBargainNo(orderNo);
         goodsBargainMapper.insert(goodsBargain);
         bargainOrder.setStatus(2);
+        bargainOrder.setPayNo(thridOrderNo);
         bargainOrderMapper.updateByPrimaryKeySelective(bargainOrder);
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(bargainOrder.getGoodsId());
         //议价：恭喜您！您的商品【商品名称】有新的议价，点击此处查看详情
         schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
                 "恭喜您！您的商品【"+goodsInfo.getName()+"】有新的议价，点击此处查看详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),goodsInfo.getId().toString());
         //买家新增余额账单
-        schedualWalletService.addUserBalanceDetail(goodsBargain.getUserId(),goodsBargain.getPrice(),payType,Status.EXPEND.getValue(),bargainOrder.getOrderNo(),goodsInfo.getName(),goodsInfo.getUserId(),goodsBargain.getUserId(),Status.BARGAIN.getValue(),orderNo);
+        schedualWalletService.addUserBalanceDetail(goodsBargain.getUserId(),goodsBargain.getPrice(),payType,Status.EXPEND.getValue(),orderNo,goodsInfo.getName(),goodsInfo.getUserId(),goodsBargain.getUserId(),Status.BARGAIN.getValue(),thridOrderNo);
         return true;
     }
 

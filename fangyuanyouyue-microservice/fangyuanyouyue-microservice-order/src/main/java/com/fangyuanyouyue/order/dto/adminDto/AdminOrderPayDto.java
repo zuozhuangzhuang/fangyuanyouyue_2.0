@@ -41,8 +41,6 @@ public class AdminOrderPayDto {
 
     private BigDecimal payAmount;//实际支付金额
 
-    private String payNo;
-
     private BigDecimal freight;//运费金额
 
     private Integer count;//商品总数
@@ -63,7 +61,9 @@ public class AdminOrderPayDto {
     private String logisticCompany;//物流公司
 
     private Integer payType; //支付方式/支付类型 1微信 2支付宝 3余额 4小程序
-    
+
+    private String payNo;//支付流水号
+
     public AdminOrderPayDto() {
     }
 

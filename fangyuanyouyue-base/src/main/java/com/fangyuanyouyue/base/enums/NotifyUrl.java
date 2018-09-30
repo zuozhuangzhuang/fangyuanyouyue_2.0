@@ -10,7 +10,10 @@ public enum NotifyUrl {
     test_notify("http://zuul.fangyuanyouyue.com"),
     mini_test_notify("https://miniprogram.fangyuanyouyue.com"),
 //    生产环境
-    prod_notify(""),
+    prod_notify("http://gateway.fangyuanyouyue.com"),
+
+    notify(test_notify.getNotifUrl()),
+    mini_notify(mini_test_notify.getNotifUrl()),
 
 //    微信支付回调接口
 //    商品议价

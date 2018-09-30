@@ -154,6 +154,7 @@ public class UserVipServiceImpl implements UserVipService{
             userVip.setIsSendMessage(null);
             userVipMapper.updateByPrimaryKey(userVip);
             vipOrder.setStatus(Status.ORDER_COMPLETE.getValue());
+            vipOrder.setPayNo(thirdOrderNo);
             vipOrderMapper.updateByPrimaryKey(vipOrder);
             return true;
         }
@@ -210,10 +211,10 @@ public class UserVipServiceImpl implements UserVipService{
             StringBuffer payInfo = new StringBuffer();
             //支付
             if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
-                WechatPayDto wechatPayDto = walletService.orderPayByWechat(vipOrder.getOrderNo(), vipOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.vip_wechat_notify.getNotifUrl());
+                WechatPayDto wechatPayDto = walletService.orderPayByWechat(vipOrder.getOrderNo(), vipOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.vip_wechat_notify.getNotifUrl());
                 return wechatPayDto;
             }else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
-                String info = walletService.orderPayByALi(vipOrder.getOrderNo(), vipOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.vip_alipay_notify.getNotifUrl());
+                String info = walletService.orderPayByALi(vipOrder.getOrderNo(), vipOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.vip_alipay_notify.getNotifUrl());
                 payInfo.append(info);
             }else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()) {
                 Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
@@ -227,7 +228,7 @@ public class UserVipServiceImpl implements UserVipService{
 
                 payInfo.append("余额支付成功！");
             }else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
-                WechatPayDto wechatPayDto = walletService.orderPayByWechatMini(userId, vipOrder.getOrderNo(), vipOrder.getAmount(), NotifyUrl.mini_test_notify.getNotifUrl() + NotifyUrl.vip_wechat_notify.getNotifUrl());
+                WechatPayDto wechatPayDto = walletService.orderPayByWechatMini(userId, vipOrder.getOrderNo(), vipOrder.getAmount(), NotifyUrl.mini_notify.getNotifUrl() + NotifyUrl.vip_wechat_notify.getNotifUrl());
                 return wechatPayDto;
             }else{
                 throw new ServiceException("支付方式错误！");

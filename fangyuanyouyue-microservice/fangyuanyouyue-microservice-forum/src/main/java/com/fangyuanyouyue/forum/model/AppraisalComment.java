@@ -38,7 +38,7 @@ public class AppraisalComment {
 
     private Integer isWinner;//观点是否获胜 1是 2否
 
-    private Integer status;//状态
+    private Integer status;//状态 1显示 2隐藏
 
     private Timestamp addTime;//添加时间
 

@@ -144,7 +144,7 @@
     select
     a.*,b.nick_name,b.head_img_url
     from forum_comment a,user_info b
-    where a.user_id=b.id and forum_id=#{forumId} and b.status <![CDATA[ <> ]]> 3
+    where a.user_id=b.id and forum_id=#{forumId} and b.status <![CDATA[ <> ]]> 3 and a.status <![CDATA[ <> ]]> 2
     and a.comment_id is null
     order by (select count(id) from forum_comment_likes where comment_id = a.id) desc,a.add_time desc
     limit #{start},#{limit}
@@ -153,13 +153,13 @@
     select
     a.*,b.nick_name,b.head_img_url
     from forum_comment a,user_info b
-    where a.user_id=b.id and a.comment_id=#{commentId} and b.status <![CDATA[ <> ]]> 3
+    where a.user_id=b.id and a.comment_id=#{commentId} and b.s tatus <![CDATA[ <> ]]> 3 and a.status <![CDATA[ <> ]]> 2
     order by (select count(id) from forum_comment_likes where comment_id = a.id) desc,a.add_time desc
     limit #{start},#{limit}
   </select>
 
   <select id="selectByUserId" parameterType="Integer" resultType="Map">
-    select a.content as commentContent,b.id,b.title,b.content,b.video_img from forum_comment a,forum_info b where a.forum_id = b.id and a.user_id = #{userId} and a.status = 1 and b.type = #{type} order by a.add_time desc limit #{start},#{limit}
+    select a.content as commentContent,b.id,b.title,b.content,b.video_img from forum_comment a,forum_info b where a.forum_id = b.id and a.status = 1 and b.status =1 and a.user_id = #{userId} and b.type = #{type} order by a.add_time desc limit #{start},#{limit}
   </select>
 
 </mapper>

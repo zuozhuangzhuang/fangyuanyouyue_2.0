@@ -162,10 +162,10 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
 
                 StringBuffer payInfo = new StringBuffer();
                 if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
-                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(authOrder.getOrderNo(), authOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.auth_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(authOrder.getOrderNo(), authOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.auth_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
                     return wechatPayDto;
                 }else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
-                    String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(authOrder.getOrderNo(), authOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.auth_alipay_notify.getNotifUrl())).getString("data");
+                    String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(authOrder.getOrderNo(), authOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.auth_alipay_notify.getNotifUrl())).getString("data");
                     payInfo.append(info);
                 }else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()) {
                     boolean verifyPayPwd = verifyPayPwd(userId, payPwd);
@@ -179,7 +179,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
                     updateOrder(authOrder.getOrderNo(),null,Status.PAY_TYPE_BALANCE.getValue());
                     payInfo.append("余额支付成功！");
                 }else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
-                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,authOrder.getOrderNo(), authOrder.getAmount(), NotifyUrl.mini_test_notify.getNotifUrl()+NotifyUrl.auth_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,authOrder.getOrderNo(), authOrder.getAmount(), NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.auth_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
                     return wechatPayDto;
                 }else{
                     throw new ServiceException("支付方式错误！");
@@ -212,6 +212,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
         userInfoExt.setAuthType(StatusEnum.AUTH_TYPE_APPLY.getCode());
         userInfoExtMapper.updateByPrimaryKey(userInfoExt);
         authOrder.setStatus(StatusEnum.ORDER_COMPLETE.getCode());
+        authOrder.setPayNo(thirdOrderNo);
         userAuthOrderMapper.updateByPrimaryKeySelective(authOrder);
         //系统消息：您的认证店铺申请已提交，将于5个工作日内完成审核，请注意消息通知
         schedualMessageService.easemobMessage(authOrder.getUserId().toString(),"您的认证店铺申请已提交，将于5个工作日内完成审核，请注意消息通知",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");

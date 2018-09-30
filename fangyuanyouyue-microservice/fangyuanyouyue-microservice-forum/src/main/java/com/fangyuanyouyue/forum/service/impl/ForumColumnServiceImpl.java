@@ -137,10 +137,10 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 				StringBuffer payInfo = new StringBuffer();
 				//支付
 				if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
-					WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.column_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+					WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.column_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
 					return wechatPayDto;
 				}else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
-					String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.column_alipay_notify.getNotifUrl())).getString("data");
+					String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.column_alipay_notify.getNotifUrl())).getString("data");
 					payInfo.append(info);
 				}else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()) {
 					Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
@@ -157,7 +157,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 					//生成申请记录
 					applyColumn(columnOrder.getOrderNo(), null, Status.PAY_TYPE_BALANCE.getValue());
 				}else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
-					WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.mini_test_notify.getNotifUrl()+NotifyUrl.column_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+					WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.column_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
 					return wechatPayDto;
 				}else{
 					throw new ServiceException("支付方式错误！");
@@ -186,6 +186,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 			forumColumnApplyMapper.insert(forumColumnApply);
 			//修改订单状态
 			columnOrder.setStatus(Status.ORDER_COMPLETE.getValue());
+			columnOrder.setPayNo(thirdOrderNo);
 			columnOrderMapper.updateByPrimaryKey(columnOrder);
 			//订单号
 			final IdGenerator idg = IdGenerator.INSTANCE;

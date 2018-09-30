@@ -33,4 +33,6 @@ public class BargainOrder {
     private Integer addressId;//收货地址ID
 
     private String reason;//议价理由
+
+    private String payNo;//支付流水号
 }

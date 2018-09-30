@@ -81,6 +81,11 @@ public enum Status {
 
     //限制余额状态 0限制 1未限制
     IS_CONFINED(0),NOT_CONFINED(1),
+
+    //帖子、视频、评论 状态 1显示 2隐藏
+    SHOW(1),HIDE(2),
+    //状态 1进行中 2结束 3删除
+    BEING(1),END(2),DELETE(3),
     ;
     private Integer value;
     private String message;

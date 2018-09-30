@@ -94,4 +94,11 @@ public interface ForumInfoService {
 	 */
 	Integer processAllForum()throws ServiceException;
 
+	/**
+	 * 删除帖子/视频
+	 * @param userId
+	 * @param ids
+	 * @throws ServiceException
+	 */
+	void deleteForum(Integer userId,Integer[] ids) throws ServiceException;
 }

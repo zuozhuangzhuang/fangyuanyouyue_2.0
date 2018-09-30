@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fangyuanyouyue.forum.param.ForumParam;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,11 +83,7 @@ public class AppraisalController extends BaseController {
             	return toError("鉴定ID不能为空");
             }
             AppraisalDetailDto dto = appraisalDetailService.getAppraisalDetail(userId,param.getAppraisalId());
-            
-            if(dto==null) {
-            	return toError("找不到该鉴定");
-            }
-            
+
             return toSuccess(dto);
         } catch (ServiceException e) {
             e.printStackTrace();
@@ -647,6 +644,42 @@ public class AppraisalController extends BaseController {
         }
     }
 
+
+    @ApiOperation(value = "删除全民鉴定", notes = "删除全民鉴定",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token",required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "ids", value = "id数组",required = true,allowMultiple = true,dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/deleteAppraisal")
+    @ResponseBody
+    public BaseResp deleteAppraisal(AppraisalParam param) throws IOException {
+        try {
+            log.info("----》删除全民鉴定《----");
+            log.info("参数：" + param.toString());
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError("用户token不能为空！");
+            }
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            String verifyUser = schedualUserService.verifyUserById(userId);
+            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
+            if((Integer)jsonObject.get("code") != 0){
+                return toError(jsonObject.getString("report"));
+            }
+            if(param.getIds() == null || param.getIds().length <1){
+                return toError("id数组不能为空！");
+            }
+            //删除全民鉴定
+            appraisalDetailService.deleteAppraisal(userId,param.getIds());
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
 
 
 }

@@ -76,6 +76,7 @@ public class AppraisalServiceImpl implements AppraisalService{
             appraisalOrderInfo.setCount(goodsIds.length);
         }
         appraisalOrderInfo.setAddTime(DateStampUtils.getTimesteamp());
+        appraisalOrderInfo.setStatus(Status.ORDER_UNPAID.getValue());
         appraisalOrderInfoMapper.insert(appraisalOrderInfo);
         List<String> goodsNames = new ArrayList<>();
         //用来存放订单详情DTO列表
@@ -236,8 +237,8 @@ public class AppraisalServiceImpl implements AppraisalService{
     public AppraisalDetailDto appraisalDetail(Integer userId, Integer detailId) throws ServiceException {
         //获取鉴定详情
         GoodsAppraisalDetail detail = goodsAppraisalDetailMapper.selectByPrimaryKey(detailId);
-        if(detail == null){
-            throw new ServiceException("鉴定详情不存在！");
+        if(detail == null || detail.getStatus().equals(5)){
+            throw new ServiceException("未找到鉴定信息！");
         }
         AppraisalDetailDto detailDto = new AppraisalDetailDto(detail);
         //获取鉴定图片列表
@@ -256,10 +257,10 @@ public class AppraisalServiceImpl implements AppraisalService{
         }else{
             StringBuffer payInfo = new StringBuffer();
             if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
-                WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderInfo.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.appraisal_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+                WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderInfo.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.appraisal_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
                 return wechatPayDto;
             }else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
-                String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(orderInfo.getOrderNo(), orderInfo.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.appraisal_alipay_notify.getNotifUrl())).getString("data");
+                String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(orderInfo.getOrderNo(), orderInfo.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.appraisal_alipay_notify.getNotifUrl())).getString("data");
                 payInfo.append(info);
             }else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()) {
                 //验证支付密码
@@ -278,7 +279,7 @@ public class AppraisalServiceImpl implements AppraisalService{
                 payInfo.append("余额支付成功！");
             }else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
                 //小程序支付
-                WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,orderInfo.getOrderNo(), orderInfo.getAmount(), NotifyUrl.mini_test_notify.getNotifUrl()+NotifyUrl.appraisal_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+                WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,orderInfo.getOrderNo(), orderInfo.getAmount(), NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.appraisal_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
                 return wechatPayDto;
             }else{
                     throw new ServiceException("支付类型错误！");
@@ -295,6 +296,9 @@ public class AppraisalServiceImpl implements AppraisalService{
             if(appraisalOrderInfo == null){
                 throw new ServiceException("订单不存在！");
             }
+            appraisalOrderInfo.setPayNo(thirdOrderNo);
+            appraisalOrderInfo.setStatus(Status.ORDER_COMPLETE.getValue());
+            appraisalOrderInfoMapper.updateByPrimaryKey(appraisalOrderInfo);
             List<GoodsAppraisalDetail> listByOrderIdStatus = goodsAppraisalDetailMapper.getListByOrderIdStatus(appraisalOrderInfo.getId(), 4);
             for(GoodsAppraisalDetail detail:listByOrderIdStatus){
                 detail.setStatus(0);//支付后修改为申请中
@@ -361,7 +365,7 @@ public class AppraisalServiceImpl implements AppraisalService{
     @Override
     public void updateAppraisal(Integer id, Integer status, String opinion, Integer isShow) throws ServiceException {
         GoodsAppraisalDetail goodsAppraisalDetail = goodsAppraisalDetailMapper.selectByPrimaryKey(id);
-        if(goodsAppraisalDetail == null){
+        if(goodsAppraisalDetail == null || goodsAppraisalDetail.getStatus().equals(5)){
             throw new ServiceException("未找到鉴定信息！");
         }
         goodsAppraisalDetail.setStatus(status);
@@ -389,5 +393,22 @@ public class AppraisalServiceImpl implements AppraisalService{
             schedualMessageService.easemobMessage(goodsAppraisalDetail.getUserId().toString(),"您申请的鉴定已得到官方专家的答复！点击此处前往查看吧",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_PLATFORM_APPRAISAL.getMessage(),"");
         }
         goodsAppraisalDetailMapper.updateByPrimaryKey(goodsAppraisalDetail);
+    }
+
+    @Override
+    public void deleteAppraisal(Integer userId, Integer[] ids) throws ServiceException {
+        for(Integer id:ids){
+            GoodsAppraisalDetail detail = goodsAppraisalDetailMapper.selectByPrimaryKey(id);
+            if(detail == null || detail.getStatus().equals(5)){
+                throw new ServiceException("未找到鉴定信息！");
+            }else{
+                if(detail.getUserId().equals(userId)){
+                    detail.setStatus(5);
+                    goodsAppraisalDetailMapper.updateByPrimaryKey(detail);
+                }else{
+                    throw new ServiceException("无权删除！");
+                }
+            }
+        }
     }
 }

@@ -1,16 +1,9 @@
 package com.fangyuanyouyue.forum.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.Credit;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.forum.constants.StatusEnum;
 import com.fangyuanyouyue.forum.dao.AppraisalDetailMapper;
 import com.fangyuanyouyue.forum.dao.ForumInfoMapper;
 import com.fangyuanyouyue.forum.dao.ReportMapper;
@@ -22,6 +15,11 @@ import com.fangyuanyouyue.forum.param.AdminForumParam;
 import com.fangyuanyouyue.forum.service.ReportService;
 import com.fangyuanyouyue.forum.service.SchedualMessageService;
 import com.fangyuanyouyue.forum.service.SchedualWalletService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service(value = "reportService")
 public class ReportServiceImpl implements ReportService{
@@ -75,7 +73,7 @@ public class ReportServiceImpl implements ReportService{
         if(report.getType() == 2 || report.getType() == 3){
             ForumInfo forumInfo = forumInfoMapper.selectByPrimaryKey(report.getBusinessId());
             //删除帖子、视频
-            forumInfo.setStatus(2);
+            forumInfo.setStatus(Status.HIDE.getValue());
             forumInfoMapper.updateByPrimaryKey(forumInfo);
             //被举报-40
             schedualWalletService.updateCredit(forumInfo.getUserId(), Credit.REPORT_VERIFYED.getCredit(),Status.SUB.getValue());
@@ -86,7 +84,7 @@ public class ReportServiceImpl implements ReportService{
         }else if(report.getType() == 4){
             AppraisalDetail detail = appraisalDetailMapper.selectByPrimaryKey(report.getBusinessId());
             //删除全民鉴定
-            detail.setStatus(StatusEnum.DELETE.getValue());
+            detail.setStatus(Status.DELETE.getValue());
             appraisalDetailMapper.updateByPrimaryKey(detail);
             //被举报-40
             schedualWalletService.updateCredit(detail.getUserId(), Credit.REPORT_VERIFYED.getCredit(),Status.SUB.getValue());
@@ -94,7 +92,7 @@ public class ReportServiceImpl implements ReportService{
             schedualMessageService.easemobMessage(detail.getUserId().toString(),
                     "很抱歉，您的全民鉴定【"+detail.getTitle()+"】被多用户举报，并经官方核实。已被删除，删除理由："+content, Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
         }
-        report.setStatus(1);
+        report.setStatus(Status.YES.getValue());
         reportMapper.updateByPrimaryKeySelective(report);
     }
 }

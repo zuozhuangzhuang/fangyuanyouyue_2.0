@@ -61,4 +61,12 @@ public interface ForumCommentService {
 	 */
     List<MyForumCommentDto> myComments(Integer userId, Integer statr, Integer limit, Integer type) throws ServiceException;
 
+	/**
+	 * 删除帖子/视频评论
+	 * @param userId
+	 * @param ids
+	 * @throws ServiceException
+	 */
+    void deleteForumComment(Integer userId,Integer[] ids) throws ServiceException;
+
 }
