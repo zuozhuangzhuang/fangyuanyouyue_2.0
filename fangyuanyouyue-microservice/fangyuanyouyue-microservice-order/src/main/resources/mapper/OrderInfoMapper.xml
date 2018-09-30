@@ -318,12 +318,15 @@
 
 
   <select id="countPage" resultType="Integer">
-    select count(*) from order_info a,order_detail b
+    select count(*) from order_info a,order_detail b,user_info c,goods_info d
     <where>
-      1=1
-      <if test="keyword != null">
-        and b.goods_id in (select id from goods_info where name like "%"#{keyword}"%" or description like "%"#{keyword}"%")
-      </if>
+        (a.id = b.order_id or a.id = b.main_order_id) and a.is_resolve = 2 and a.user_id = c.id and b.goods_id = d.id
+        <if test="keyword != null and keyword != ''">
+            and (
+            d.name like "%"#{keyword}"%"
+            or c.nick_name like "%"#{keyword}"%"
+            )
+        </if>
       <if test="status != null">
         <if test="status == 7">
           and a.is_refund = 1
@@ -332,7 +335,6 @@
           and a.status = #{status} and a.is_refund = 2
         </if>
       </if>
-
       <if test="startDate != null">
         and a.add_time <![CDATA[ > ]]> #{startDate}
       </if>

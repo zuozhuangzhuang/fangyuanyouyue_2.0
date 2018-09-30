@@ -128,7 +128,7 @@ public class FeignControllerTest {
                 .param("orderNo","25")
                 .param("price","100")
                 //回调地址
-                .param("notifyUrl",NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.order_wechat_notify.getNotifUrl())
+                .param("notifyUrl",NotifyUrl.notify.getNotifUrl()+NotifyUrl.order_wechat_notify.getNotifUrl())
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
@@ -145,7 +145,7 @@ public class FeignControllerTest {
                 .param("orderNo","25")
                 .param("price","1.00")
                 //回调地址
-                .param("notifyUrl", NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.order_wechat_notify.getNotifUrl())
+                .param("notifyUrl", NotifyUrl.notify.getNotifUrl()+NotifyUrl.order_wechat_notify.getNotifUrl())
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

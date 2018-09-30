@@ -76,6 +76,12 @@ public interface AppraisalDetailService {
      * @return
      */
     Pager getPage(BasePageReq param);
-    
-    
+
+    /**
+     * 删除全民鉴定
+     * @param userId
+     * @param ids
+     * @throws ServiceException
+     */
+    void deleteAppraisal(Integer userId,Integer[] ids) throws ServiceException;
 }

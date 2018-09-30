@@ -30,4 +30,6 @@ public class ColumnOrder {
     private Integer typeId;//专栏分类id
 
     private String name;//专栏名称
+
+    private String payNo;//支付流水号
 }

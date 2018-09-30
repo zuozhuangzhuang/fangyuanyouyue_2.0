@@ -29,4 +29,6 @@ public class AppraisalOrderInfo {
     private Date updateTime;//更新时间
 
     private Integer status;//状态 1待支付 2已完成 3已删除
+
+    private String payNo;//支付流水号
 }

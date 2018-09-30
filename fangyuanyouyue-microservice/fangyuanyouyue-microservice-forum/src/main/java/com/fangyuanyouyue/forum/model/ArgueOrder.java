@@ -34,4 +34,6 @@ public class ArgueOrder {
     private String content;//内容描述
 
     private String imgUrls;//全民鉴定图片信息
+
+    private String payNo;//支付流水号
 }

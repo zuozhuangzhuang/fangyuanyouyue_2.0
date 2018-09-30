@@ -70,7 +70,7 @@ public class ForumCommentServiceImpl implements ForumCommentService {
 	@Override
 	public ForumCommentDto saveComment(Integer userId, Integer forumId, String content, Integer commentId) throws ServiceException{
 		ForumInfo forumInfo = forumInfoMapper.selectDetailByPrimaryKey(forumId);
-		if(forumInfo == null){
+		if(forumInfo == null || forumInfo.getStatus().equals(Status.HIDE.getValue())){
 			throw new ServiceException("找不到帖子或视频！");
 		}
 		ForumComment model = new ForumComment();
@@ -138,5 +138,22 @@ public class ForumCommentServiceImpl implements ForumCommentService {
 		List<Map> forumComments = forumCommentMapper.selectByUserId(userId, statr * limit, limit, type);
 		List<MyForumCommentDto> myForumCommentDtos = MyForumCommentDto.toDtoList(forumComments);
 		return myForumCommentDtos;
+	}
+
+	@Override
+	public void deleteForumComment(Integer userId, Integer[] ids) throws ServiceException {
+		for(Integer commentId:ids){
+			ForumComment forumComment = forumCommentMapper.selectByPrimaryKey(commentId);
+			if(forumComment == null || forumComment.getStatus().equals(Status.HIDE.getValue())){
+				throw new ServiceException("未找到评论！");
+			}else{
+				if(forumComment.getUserId().equals(userId)){
+					forumComment.setStatus(Status.HIDE.getValue());
+					forumCommentMapper.updateByPrimaryKey(forumComment);
+				}else{
+					throw new ServiceException("无权删除！");
+				}
+			}
+		}
 	}
 }

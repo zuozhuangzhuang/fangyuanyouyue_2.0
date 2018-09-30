@@ -35,5 +35,7 @@ public class VipOrder {
 
     private Integer type;//订单类型 1开通 2续费
 
+    private String payNo;//支付流水号
+
 
 }

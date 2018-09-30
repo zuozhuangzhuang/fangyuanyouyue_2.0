@@ -707,14 +707,14 @@ public class OrderServiceImpl implements OrderService{
                 StringBuffer payInfo = new StringBuffer();
                 if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
                     //微信支付
-                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderPay.getPayAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.order_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderPay.getPayAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.order_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
 //                    orderPay.setPayNo(wechatPayDto.getSign());
                     //微信，失败不做处理，成功继续拆单生成订单
                     return wechatPayDto;
                 }else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
                     //支付宝支付
                     //支付宝，失败不做处理，成功继续拆单生成订单
-                    String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(orderInfo.getOrderNo(), orderPay.getPayAmount(),NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.order_alipay_notify.getNotifUrl())).getString("data");
+                    String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(orderInfo.getOrderNo(), orderPay.getPayAmount(),NotifyUrl.notify.getNotifUrl()+NotifyUrl.order_alipay_notify.getNotifUrl())).getString("data");
                     payInfo.append(info);
                 }else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()){
                     //余额支付
@@ -733,7 +733,7 @@ public class OrderServiceImpl implements OrderService{
                     }
                 }else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
                     //小程序支付
-                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,orderInfo.getOrderNo(), orderPay.getPayAmount(), NotifyUrl.mini_test_notify.getNotifUrl()+NotifyUrl.order_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,orderInfo.getOrderNo(), orderPay.getPayAmount(), NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.order_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
                     return wechatPayDto;
                 }else{
                     throw new ServiceException("支付类型错误！");
@@ -976,6 +976,7 @@ public class OrderServiceImpl implements OrderService{
                         pay.setPayType(payType);
                         pay.setPayTime(DateStampUtils.getTimesteamp());
                         pay.setStatus(Status.ORDER_GOODS_PAY.getValue());
+                        pay.setPayNo(thirdOrderNo);
                         orderPayMapper.updateByPrimaryKey(pay);
 
                         //获取商品名字列表
@@ -1016,6 +1017,7 @@ public class OrderServiceImpl implements OrderService{
                 orderPay.setPayType(payType);
                 orderPay.setPayTime(DateStampUtils.getTimesteamp());
                 orderPay.setStatus(Status.ORDER_GOODS_PAY.getValue());
+                orderPay.setPayNo(thirdOrderNo);
                 orderPayMapper.updateByPrimaryKeySelective(orderPay);
 
 

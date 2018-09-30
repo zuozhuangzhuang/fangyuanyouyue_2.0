@@ -12,6 +12,9 @@ import lombok.ToString;
 @ToString
 public class ForumParam{
 	//公用
+	@ApiModelProperty(name = "ids", value = "id数组", dataType = "int",hidden = true)
+	private Integer[] ids; //id数组
+
 	@ApiModelProperty(name = "start", value = "起始页", dataType = "int",hidden = true)
 	private Integer start; // 起始页
 

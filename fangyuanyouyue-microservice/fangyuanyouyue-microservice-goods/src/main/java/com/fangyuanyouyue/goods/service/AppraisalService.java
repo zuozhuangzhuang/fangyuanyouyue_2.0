@@ -101,4 +101,12 @@ public interface AppraisalService {
      * @throws ServiceException
      */
     void updateAppraisal(Integer id,Integer status,String opinion,Integer isShow) throws ServiceException;
+
+    /**
+     * 删除官方鉴定
+     * @param userId
+     * @param ids
+     * @throws ServiceException
+     */
+    void deleteAppraisal(Integer userId,Integer[] ids) throws ServiceException;
 }

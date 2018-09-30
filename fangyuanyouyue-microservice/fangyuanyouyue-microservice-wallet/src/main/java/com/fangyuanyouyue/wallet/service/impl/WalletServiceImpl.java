@@ -87,14 +87,14 @@ public class WalletServiceImpl implements WalletService{
 
         if(type.intValue() == 1){
             //微信
-            WechatPayDto wechatPayDto = orderPayByWechat(userRechargeDetail.getPayNo(), userRechargeDetail.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.recharge_wechat_notify.getNotifUrl());
+            WechatPayDto wechatPayDto = orderPayByWechat(userRechargeDetail.getPayNo(), userRechargeDetail.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.recharge_wechat_notify.getNotifUrl());
             return wechatPayDto;
         }else if(type.intValue() == 2){
             //支付宝
-            String aliPay = orderPayByALi(userRechargeDetail.getPayNo(), userRechargeDetail.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.recharge_alipay_notify.getNotifUrl());
+            String aliPay = orderPayByALi(userRechargeDetail.getPayNo(), userRechargeDetail.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.recharge_alipay_notify.getNotifUrl());
             return aliPay;
         }else if(type.intValue() == 4){//小程序支付
-            WechatPayDto wechatPayDto = orderPayByWechatMini(userId, userRechargeDetail.getPayNo(), userRechargeDetail.getAmount(), NotifyUrl.mini_test_notify.getNotifUrl()+NotifyUrl.recharge_wechat_notify.getNotifUrl());
+            WechatPayDto wechatPayDto = orderPayByWechatMini(userId, userRechargeDetail.getPayNo(), userRechargeDetail.getAmount(), NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.recharge_wechat_notify.getNotifUrl());
             return wechatPayDto;
         }else{
             throw new ServiceException("充值类型错误！");

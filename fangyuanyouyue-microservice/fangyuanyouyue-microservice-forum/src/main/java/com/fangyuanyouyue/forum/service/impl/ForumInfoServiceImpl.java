@@ -67,8 +67,9 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 	public ForumInfoDto getForumInfoById(Integer forumId,Integer userId) throws ServiceException {
 
 		ForumInfo forumInfo = forumInfoMapper.selectDetailByPrimaryKey(forumId);
-
-		if(forumInfo!=null) {
+		if(forumInfo == null || forumInfo.getStatus().equals(Status.HIDE.getValue())){
+			throw new ServiceException("未找到视频、帖子！");
+		} else {
 			ForumInfoDto dto = new ForumInfoDto(forumInfo);
 			//计算点赞数
 			Integer	 likesCount = forumLikesService.countLikes(forumId);
@@ -101,8 +102,6 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 			Integer pvCount = forumPvService.countPv(forumId);
 			dto.setViewCount(pvCount+forumInfo.getPvCount());
 			return dto;
-		}else{
-			throw new ServiceException("获取信息失败！");
 		}
 	}
 
@@ -238,7 +237,7 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 	@Override
 	public void updateForum(Integer forumId, Integer sort, Integer isChosen,Integer status,String title) throws ServiceException {
 		ForumInfo forumInfo = forumInfoMapper.selectByPrimaryKey(forumId);
-		if(forumInfo == null){
+		if(forumInfo == null || forumInfo.getStatus().equals(Status.HIDE.getValue())){
 			throw new ServiceException("未找到视频、帖子！");
 		}
 		if(isChosen!=null){
@@ -259,7 +258,7 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 	@Override
 	public void updatePvCount(Integer forumId, Integer count, Integer type) throws ServiceException {
 		ForumInfo forumInfo = forumInfoMapper.selectByPrimaryKey(forumId);
-		if(forumInfo == null){
+		if(forumInfo == null || forumInfo.getStatus().equals(Status.HIDE.getValue())){
 			throw new ServiceException("未找到视频、帖子！");
 		}
 		if(type.equals(Status.ADD.getValue())){
@@ -286,5 +285,22 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 	public Integer processAllForum() throws ServiceException {
 		Integer allForumCount = forumInfoMapper.getAllForumCount();
 		return allForumCount;
+	}
+
+	@Override
+	public void deleteForum(Integer userId, Integer[] ids) throws ServiceException {
+		for(Integer id:ids){
+			ForumInfo forumInfo = forumInfoMapper.selectByPrimaryKey(id);
+			if(forumInfo == null || forumInfo.getStatus().equals(Status.HIDE.getValue())){
+				throw new ServiceException("未找到帖子、视频！");
+			}else{
+				if(forumInfo.getUserId().equals(userId)){
+					forumInfo.setStatus(Status.HIDE.getValue());
+					forumInfoMapper.updateByPrimaryKey(forumInfo);
+				}else{
+					throw new ServiceException("无权删除！");
+				}
+			}
+		}
 	}
 }
