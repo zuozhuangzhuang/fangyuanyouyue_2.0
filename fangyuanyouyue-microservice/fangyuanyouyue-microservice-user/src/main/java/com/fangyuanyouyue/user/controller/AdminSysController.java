@@ -216,6 +216,7 @@ public class AdminSysController extends BaseController {
             return toError("系统错误！");
         }
     }
+
     @ApiOperation(value = "获取统计信息", notes = "(AdminProcessDto)获取统计信息",response = BaseResp.class)
     @PostMapping(value = "/getProcess")
     @ResponseBody
@@ -224,6 +225,33 @@ public class AdminSysController extends BaseController {
             log.info("----》获取统计信息《----");
             AdminProcessDto process = systemService.getProcess();
             return toSuccess(process);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统错误！");
+        }
+    }
+
+    @ApiOperation(value = "系统消息历史列表", notes = "系统消息历史列表",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "keyword", value = "搜索词条", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "startDate", value = "开始日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "endDate", value = "结束日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orders", value = "排序规则", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "ascType", value = "排序类型 1升序 2降序", required = false, dataType = "int", paramType = "query")
+    })
+    @GetMapping(value = "/sysMsgList")
+    @ResponseBody
+    public BaseResp sysMsgList(AdminUserParam param) throws IOException {
+        try {
+            log.info("----》系统消息历史列表《----");
+            log.info("参数："+param.toString());
+            Pager pager = systemService.sysMsgList(param);
+            return toPage(pager);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());

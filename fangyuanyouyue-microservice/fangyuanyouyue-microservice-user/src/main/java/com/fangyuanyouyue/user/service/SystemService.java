@@ -55,4 +55,12 @@ public interface SystemService {
      * @throws ServiceException
      */
 //    Integer processMonthUser() throws ServiceException;
+
+    /**
+     * 系统消息历史列表
+     * @param param
+     * @return
+     * @throws ServiceException
+     */
+    Pager sysMsgList(AdminUserParam param) throws ServiceException;
 }

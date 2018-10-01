@@ -27,10 +27,9 @@ public interface FeedbackMapper {
      * @param keyword
      * @param startDate
      * @param endDate
-     * @param type
      * @return
      */
-    int countPage(@Param("keyword")String keyword, @Param("startDate")String startDate, @Param("endDate")String endDate, @Param("type")Integer type);
+    int countPage(@Param("keyword")String keyword, @Param("startDate")String startDate, @Param("endDate")String endDate);
 
     /**
      * 分页获取
@@ -41,8 +40,7 @@ public interface FeedbackMapper {
      * @param endDate
      * @param orders
      * @param ascType
-     * @param type
      * @return
      */
-    List<Feedback> getPage(@Param("start") Integer start, @Param("limit") Integer limit, @Param("keyword")String keyword, @Param("startDate")String startDate, @Param("endDate")String endDate, @Param("orders")String orders, @Param("ascType")Integer ascType, @Param("type")Integer type);
+    List<Feedback> getPage(@Param("start") Integer start, @Param("limit") Integer limit, @Param("keyword")String keyword, @Param("startDate")String startDate, @Param("endDate")String endDate, @Param("orders")String orders, @Param("ascType")Integer ascType);
 }

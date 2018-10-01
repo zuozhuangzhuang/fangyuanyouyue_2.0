@@ -12,16 +12,16 @@
     <result column="title" jdbcType="VARCHAR" property="title" />
     <result column="to_users" jdbcType="VARCHAR" property="toUsers" />
     <result column="pay_no" jdbcType="VARCHAR" property="payNo" />
+    <result column="img_urls" jdbcType="VARCHAR" property="imgUrls" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.forum.model.ArgueOrder">
     <result column="content" jdbcType="LONGVARCHAR" property="content" />
-    <result column="img_urls" jdbcType="LONGVARCHAR" property="imgUrls" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, user_id, order_no, amount, status, add_time, update_time, title, to_users, pay_no
+    id, user_id, order_no, amount, status, add_time, update_time, title, to_users, pay_no, img_urls
   </sql>
   <sql id="Blob_Column_List">
-    content, img_urls
+    content
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
     select 
@@ -44,7 +44,7 @@
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{orderNo,jdbcType=VARCHAR}, 
       #{amount,jdbcType=DECIMAL}, #{status,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP}, #{title,jdbcType=VARCHAR}, #{toUsers,jdbcType=VARCHAR}, 
-      #{payNo,jdbcType=VARCHAR}, #{content,jdbcType=LONGVARCHAR}, #{imgUrls,jdbcType=LONGVARCHAR}
+      #{payNo,jdbcType=VARCHAR}, #{content,jdbcType=LONGVARCHAR}, #{imgUrls,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.fangyuanyouyue.forum.model.ArgueOrder" useGeneratedKeys="true" keyProperty="id">
@@ -122,7 +122,7 @@
         #{content,jdbcType=LONGVARCHAR},
       </if>
       <if test="imgUrls != null">
-        #{imgUrls,jdbcType=LONGVARCHAR},
+        #{imgUrls,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -160,7 +160,7 @@
         content = #{content,jdbcType=LONGVARCHAR},
       </if>
       <if test="imgUrls != null">
-        img_urls = #{imgUrls,jdbcType=LONGVARCHAR},
+        img_urls = #{imgUrls,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -177,7 +177,7 @@
       to_users = #{toUsers,jdbcType=VARCHAR},
       pay_no = #{payNo,jdbcType=VARCHAR},
       content = #{content,jdbcType=LONGVARCHAR},
-      img_urls = #{imgUrls,jdbcType=LONGVARCHAR}
+      img_urls = #{imgUrls,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.forum.model.ArgueOrder">
@@ -190,7 +190,9 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       title = #{title,jdbcType=VARCHAR},
       to_users = #{toUsers,jdbcType=VARCHAR},
-      pay_no = #{payNo,jdbcType=VARCHAR}
+      pay_no = #{payNo,jdbcType=VARCHAR},
+      content = #{content,jdbcType=LONGVARCHAR},
+      img_urls = #{imgUrls,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
