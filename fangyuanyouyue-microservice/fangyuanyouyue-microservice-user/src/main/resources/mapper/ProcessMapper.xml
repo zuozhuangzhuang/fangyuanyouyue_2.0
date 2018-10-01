@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fangyuanyouyue.user.dao.ProcessMapper" >
+    <select id="getYestoryUser" resultType="Integer">
+        select count(id) from user_info where add_time <![CDATA[ >= ]]> (CURDATE()-1) and add_time <![CDATA[ < ]]> CURDATE()
+    </select>
+    <select id="getYestoryGoods" resultType="Integer">
+        select count(id) from goods_info where add_time <![CDATA[ >= ]]> (CURDATE()-1) and add_time <![CDATA[ < ]]> CURDATE() and type = 1
+    </select>
+    <select id="getYestoryAuction" resultType="Integer">
+        select count(id) from goods_info where add_time <![CDATA[ >= ]]> (CURDATE()-1) and add_time <![CDATA[ < ]]> CURDATE() and type = 2
+    </select>
+    <select id="getYestoryPlatfomAppraisal" resultType="Integer">
+        select count(id) from goods_appraisal_detail where add_time <![CDATA[ >= ]]> (CURDATE()-1) and add_time <![CDATA[ < ]]> CURDATE() and status <![CDATA[ < ]]> 4
+    </select>
+    <select id="getYestoryOrder" resultType="Integer">
+        select count(id) from order_info where add_time <![CDATA[ >= ]]> (CURDATE()-1) and add_time <![CDATA[ < ]]> CURDATE()
+    </select>
+    <select id="getYestoryForum" resultType="Integer">
+        select count(id) from forum_info where add_time <![CDATA[ >= ]]> (CURDATE()-1) and add_time <![CDATA[ < ]]> CURDATE() and type = 1
+    </select>
+    <select id="getYestoryVideo" resultType="Integer">
+        select count(id) from forum_info where add_time <![CDATA[ >= ]]> (CURDATE()-1) and add_time <![CDATA[ < ]]> CURDATE() and type = 2
+    </select>
+    <select id="getYestoryAppraisal" resultType="Integer">
+        select count(id) from appraisal_detail where add_time <![CDATA[ >= ]]> (CURDATE()-1) and add_time <![CDATA[ < ]]> CURDATE()
+    </select>
+    <select id="getYestoryVip" resultType="Integer">
+        select count(id) from vip_order where add_time <![CDATA[ >= ]]> (CURDATE()-1) and add_time <![CDATA[ < ]]> CURDATE() and status = 2
+    </select>
+    <select id="getYestoryIncome" resultType="BigDecimal">
+        select sum(amount) from platform_finance_detail where add_time <![CDATA[ >= ]]> (CURDATE()-1) and add_time <![CDATA[ < ]]> CURDATE() and type = 1
+    </select>
+    <select id="getYestoryExpend" resultType="BigDecimal">
+        select sum(amount) from platform_finance_detail where add_time <![CDATA[ >= ]]> (CURDATE()-1) and add_time <![CDATA[ < ]]> CURDATE() and type = 2
+    </select>
+</mapper>

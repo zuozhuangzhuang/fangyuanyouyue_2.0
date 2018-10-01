@@ -39,4 +39,9 @@ public class SchedualUserServiceImpl implements SchedualUserService{
     public String shopAuthTimeOut() {
         return "认证店铺自动过期失败！";
     }
+
+    @Override
+    public String dailyStatistics() {
+        return "统计数据失败！";
+    }
 }

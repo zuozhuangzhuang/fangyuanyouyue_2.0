@@ -1212,8 +1212,4 @@ public class OrderServiceImpl implements OrderService{
         return allOrderCount;
     }
 
-    @Override
-    public void processMonthOrder(Integer status) throws ServiceException {
-        Integer monthOrderCount = orderInfoMapper.getMonthOrderCount(status);
-    }
 }

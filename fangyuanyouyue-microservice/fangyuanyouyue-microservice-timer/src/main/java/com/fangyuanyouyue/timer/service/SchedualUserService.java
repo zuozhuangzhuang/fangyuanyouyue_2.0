@@ -32,5 +32,8 @@ public interface SchedualUserService {
     @RequestMapping(value = "/timer/shopAuthTimeOut",method = RequestMethod.POST)
     String shopAuthTimeOut();
 
+    @RequestMapping(value = "/timer/dailyStatistics",method = RequestMethod.POST)
+    String dailyStatistics();
+
 
 }
