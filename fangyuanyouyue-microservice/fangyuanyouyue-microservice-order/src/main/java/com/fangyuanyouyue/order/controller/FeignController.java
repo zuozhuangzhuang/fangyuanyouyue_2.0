@@ -103,20 +103,4 @@ public class FeignController extends BaseController{
         }
     }
 
-//    @ApiOperation(value = "每天统计一次本月订单", notes = "(void)每天统计一次本月订单",hidden = true)
-//    @PostMapping(value = "/processMonthOrder")
-//    @ResponseBody
-//    public BaseResp processMonthOrder() throws IOException {
-//        try {
-//            log.info("----》每天统计一次本月订单《----");
-//            timerService.processMonthOrder();
-//            return toSuccess();
-//        } catch (ServiceException e) {
-//            e.printStackTrace();
-//            return toError(e.getMessage());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return toError("系统繁忙，请稍后再试！");
-//        }
-//    }
 }

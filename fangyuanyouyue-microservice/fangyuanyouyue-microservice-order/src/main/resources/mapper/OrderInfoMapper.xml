@@ -394,12 +394,5 @@
     </if>
   </select>
 
-  <select id="getMonthOrderCount" resultType="Integer">
-    select count(*) count from order_info where date_format(add_time,'%Y-%m')=date_format(now(),'%Y-%m')
-    <if test="status != null">
-      and status = #{status}
-    </if>
-  </select>
-
 
 </mapper>

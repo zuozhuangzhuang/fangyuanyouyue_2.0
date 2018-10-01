@@ -8,4 +8,10 @@ public interface TimerService {
      * @throws ServiceException
      */
     void shopAuthTimeOut() throws ServiceException;
+
+    /**
+     * 每日统计数据
+     * @throws ServiceException
+     */
+    void dailyStatistics() throws ServiceException;
 }

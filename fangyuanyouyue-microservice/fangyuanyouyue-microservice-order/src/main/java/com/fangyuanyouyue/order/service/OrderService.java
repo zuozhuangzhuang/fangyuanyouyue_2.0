@@ -225,11 +225,5 @@ public interface OrderService {
      */
     Integer processAllOrder(Integer status)throws ServiceException;
 
-    /**
-     * 每天统计一次本月订单
-     * @param status
-     * @throws ServiceException
-     */
-    void processMonthOrder(Integer status)throws ServiceException;
 
 }

@@ -65,5 +65,18 @@ public class SystemControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
+    /**
+     * 获取统计信息
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void getProcessList() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/system/getProcessList")
+                .param("count","7")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
 
 }

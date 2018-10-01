@@ -40,7 +40,7 @@ public class AppraisalComment {
 
     private Integer status;//状态 1显示 2隐藏
 
-    private Timestamp addTime;//添加时间
+    private Date addTime;//添加时间
 
     private Date updateTime;//修改时间
 

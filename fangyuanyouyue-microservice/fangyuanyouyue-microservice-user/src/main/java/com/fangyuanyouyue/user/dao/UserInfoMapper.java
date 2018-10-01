@@ -87,8 +87,8 @@ public interface UserInfoMapper {
     Integer getAllUserCount();
 
     /**
-     * 获取本月注册用户数量
+     * 获取昨日注册用户数量
      * @return
      */
-//    Integer getMonthUserCount();
+    Integer processYesterdayUser();
 }

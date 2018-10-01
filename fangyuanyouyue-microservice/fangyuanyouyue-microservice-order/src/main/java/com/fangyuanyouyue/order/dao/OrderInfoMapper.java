@@ -129,11 +129,5 @@ public interface OrderInfoMapper {
      */
     Integer getAllOrderCount(@Param("status")Integer status);
 
-    /**
-     * 获取当月订单
-     * @return
-     */
-    Integer getMonthOrderCount(@Param("status")Integer status);
-
 
 }

@@ -2,11 +2,13 @@ package com.fangyuanyouyue.user.controller;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.user.dto.AppVersionDto;
 import com.fangyuanyouyue.user.dto.admin.AdminAppVersionDto;
+import com.fangyuanyouyue.user.dto.admin.AdminDailyStatisticsDto;
 import com.fangyuanyouyue.user.dto.admin.AdminProcessDto;
 import com.fangyuanyouyue.user.model.AppVersion;
 import com.fangyuanyouyue.user.param.AdminUserParam;
@@ -261,4 +263,27 @@ public class AdminSysController extends BaseController {
         }
     }
 
+
+    @ApiOperation(value = "获取统计列表", notes = "(AdminProcessDto)获取统计列表",response = BaseResp.class) @ApiImplicitParams({
+            @ApiImplicitParam(name = "count", value = "天数", required = true, dataType = "int", paramType = "query"),
+    })
+    @PostMapping(value = "/getProcessList")
+    @ResponseBody
+    public BaseResp getProcessList(AdminUserParam param) throws IOException {
+        try {
+            log.info("----》获取统计列表《----");
+            log.info("参数："+param.toString());
+            if(param.getCount() == null){
+                return toError("天数不能为空！");
+            }
+            List<AdminDailyStatisticsDto> processList = systemService.getProcessList(param.getCount());
+            return toSuccess(processList);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统错误！");
+        }
+    }
 }
