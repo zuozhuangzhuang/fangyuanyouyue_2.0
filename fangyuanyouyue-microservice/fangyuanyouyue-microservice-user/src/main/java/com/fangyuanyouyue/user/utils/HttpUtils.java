@@ -15,7 +15,6 @@ public class HttpUtils {
 
 
     public HttpUtils() {
-        // TODO Auto-generated constructor stub
     }
 
     public static void saveImagestodisk() throws IOException
@@ -66,7 +65,6 @@ public class HttpUtils {
                 }
             }
         } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return inputStream;
@@ -78,11 +76,9 @@ public class HttpUtils {
      * @param args
      */
     public static void main(String[] args) {
-        // TODO Auto-generated method stub
         try {
             saveImagestodisk();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 

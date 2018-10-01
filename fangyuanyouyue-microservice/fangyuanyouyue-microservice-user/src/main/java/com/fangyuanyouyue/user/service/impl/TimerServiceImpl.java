@@ -36,8 +36,8 @@ public class TimerServiceImpl implements TimerService{
                 apply.setReason("官方认证到期");
                 UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(apply.getUserId());
                 userInfoExt.setAuthType(StatusEnum.AUTH_TYPE_REJECT.getCode());
-                userAuthApplyMapper.updateByPrimaryKey(apply);
-                userInfoExtMapper.updateByPrimaryKey(userInfoExt);
+                userAuthApplyMapper.updateByPrimaryKeySelective(apply);
+                userInfoExtMapper.updateByPrimaryKeySelective(userInfoExt);
                 //发送消息
                 schedualMessageService.easemobMessage(apply.getUserId().toString(),"您的认证店铺已到期！",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
             }

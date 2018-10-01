@@ -74,7 +74,7 @@ public class BannerServiceImpl implements BannerService{
             if(param.getStatus() != null){
                 bannerIndex.setStatus(param.getStatus());
             }
-            bannerIndexMapper.updateByPrimaryKey(bannerIndex);
+            bannerIndexMapper.updateByPrimaryKeySelective(bannerIndex);
         }
     }
 
