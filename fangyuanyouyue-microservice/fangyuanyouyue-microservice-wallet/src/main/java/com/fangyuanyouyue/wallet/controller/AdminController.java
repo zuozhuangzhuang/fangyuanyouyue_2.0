@@ -5,6 +5,7 @@ import com.fangyuanyouyue.base.BasePageReq;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.wallet.dto.admin.AdminWithdrawDto;
 import com.fangyuanyouyue.wallet.param.AdminWalletParam;
@@ -15,6 +16,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -163,6 +165,11 @@ public class AdminController extends BaseController{
             log.info("参数："+param.toString());
             if(param.getId() == null){
                 return toError("申请信息id不能为空！");
+            }
+            if(param.getStatus().equals(Status.WITHDRAW_REFUSE.getValue())){
+                if(StringUtils.isEmpty(param.getContent())){
+                    return toError("拒绝原因不能为空！");
+                }
             }
             walletService.updateWithdraw(param.getId(),param.getStatus(),param.getContent());
             return toSuccess();
