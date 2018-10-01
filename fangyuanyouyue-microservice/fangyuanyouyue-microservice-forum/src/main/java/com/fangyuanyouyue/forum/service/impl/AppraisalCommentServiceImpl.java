@@ -64,7 +64,7 @@ public class AppraisalCommentServiceImpl implements AppraisalCommentService {
 			if(appraisalCommentLikes != null){
 				dto.setIsLikes(StatusEnum.YES.getValue());
 			}
-			if(detail.getStatus().equals(2)){
+			if(userId.equals(dto.getUserId()) || detail.getStatus().equals(Status.END.getValue())){
 				//点赞数量
 				Integer likesCount = appraisalCommentLikesService.countCommentLikes(dto.getCommentId());
 				dto.setLikesCount(likesCount);
@@ -77,12 +77,12 @@ public class AppraisalCommentServiceImpl implements AppraisalCommentService {
 	public AppraisalCommentDto saveComment(Integer userId,AppraisalParam param) throws ServiceException{
 		AppraisalDetail detail = appraisalDetailMapper.selectByPrimaryKey(param.getAppraisalId());
 		if(detail == null || detail.getStatus().equals(Status.DELETE.getValue())){
-			throw new ServiceException("未找到鉴定！");
-		}else{
-			if(detail.getStatus().equals(Status.END.getValue())){
-				throw new ServiceException("鉴定已结束！");
-			}
+			throw new ServiceException("未找到全民鉴定！");
 		}
+        if(detail.getStatus().equals(Status.END.getValue())){
+            throw new ServiceException("全民鉴定已结束！");
+        }
+
 		AppraisalComment model = appraisalCommentMapper.selectByAppraisalIdUserId(userId,param.getAppraisalId());
 		if(model == null){
 			model = new AppraisalComment();

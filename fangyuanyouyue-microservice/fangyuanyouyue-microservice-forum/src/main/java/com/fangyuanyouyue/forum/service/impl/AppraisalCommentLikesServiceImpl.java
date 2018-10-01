@@ -2,6 +2,11 @@ package com.fangyuanyouyue.forum.service.impl;
 
 import java.util.Date;
 
+import com.fangyuanyouyue.base.enums.Status;
+import com.fangyuanyouyue.forum.dao.AppraisalCommentMapper;
+import com.fangyuanyouyue.forum.dao.AppraisalDetailMapper;
+import com.fangyuanyouyue.forum.model.AppraisalComment;
+import com.fangyuanyouyue.forum.model.AppraisalDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +23,10 @@ public class AppraisalCommentLikesServiceImpl implements AppraisalCommentLikesSe
 
 	@Autowired
 	private AppraisalCommentLikesMapper appraisalCommentLikesMapper;
+	@Autowired
+    private AppraisalCommentMapper appraisalCommentMapper;
+	@Autowired
+    private AppraisalDetailMapper appraisalDetailMapper;
 
 	@Override
 	public Integer countCommentLikes(Integer commentId) throws ServiceException {
@@ -26,6 +35,17 @@ public class AppraisalCommentLikesServiceImpl implements AppraisalCommentLikesSe
 
 	@Override
 	public void saveLikes(Integer userId, Integer commentId,Integer type) throws ServiceException {
+        AppraisalComment comment = appraisalCommentMapper.selectByPrimaryKey(commentId);
+        if(comment == null || comment.getStatus().equals(Status.HIDE.getValue())){
+            throw new ServiceException("未找到评论！");
+        }
+        AppraisalDetail detail = appraisalDetailMapper.selectByPrimaryKey(comment.getAppraisalId());
+        if(detail == null || detail.getStatus().equals(Status.DELETE.getValue())){
+            throw new ServiceException("未找到全民鉴定！");
+        }
+        if(detail.getStatus().equals(Status.END.getValue())){
+            throw new ServiceException("全民鉴定已结束！");
+        }
         AppraisalCommentLikes appraisalCommentLikes = appraisalCommentLikesMapper.selectByCommentIdUserId(commentId, userId);
         if(type == 1){
             if(appraisalCommentLikes != null){

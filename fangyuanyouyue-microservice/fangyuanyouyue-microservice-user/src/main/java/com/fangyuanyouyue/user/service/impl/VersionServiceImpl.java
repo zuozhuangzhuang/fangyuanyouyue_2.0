@@ -99,7 +99,7 @@ public class VersionServiceImpl implements VersionService {
         if(StringUtils.isNotEmpty(param.getPackageName())){
             appVersion.setPackageName(param.getPackageName());
         }
-        appVersionMapper.updateByPrimaryKey(appVersion);
+        appVersionMapper.updateByPrimaryKeySelective(appVersion);
     }
 
     @Override

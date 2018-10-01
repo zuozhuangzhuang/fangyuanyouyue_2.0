@@ -59,8 +59,8 @@ public class TimerServiceImpl implements TimerService{
                     //更改总订单状态
                     orderInfo.setStatus(Status.ORDER_GOODS_CANCEL.getValue());
                     orderPay.setStatus(Status.ORDER_GOODS_CANCEL.getValue());
-                    orderInfoMapper.updateByPrimaryKey(orderInfo);
-                    orderPayMapper.updateByPrimaryKey(orderPay);
+                    orderInfoMapper.updateByPrimaryKeySelective(orderInfo);
+                    orderPayMapper.updateByPrimaryKeySelective(orderPay);
                     //获取此订单内所有商品，更改商品状态为出售中
                     List<OrderDetail> orderDetails = orderDetailMapper.selectByMainOrderId(orderInfo.getId());
                     StringBuffer goodsName = new StringBuffer();
@@ -82,8 +82,8 @@ public class TimerServiceImpl implements TimerService{
                             //更改子订单状态
                             info.setStatus(Status.ORDER_GOODS_CANCEL.getValue());
                             pay.setStatus(Status.ORDER_GOODS_CANCEL.getValue());
-                            orderInfoMapper.updateByPrimaryKey(info);
-                            orderPayMapper.updateByPrimaryKey(pay);
+                            orderInfoMapper.updateByPrimaryKeySelective(info);
+                            orderPayMapper.updateByPrimaryKeySelective(pay);
                             //给卖家发消息：您的商品【名称】买家已取消订单
                             List<OrderDetail> details = orderDetailMapper.selectByOrderId(info.getId());
                             StringBuffer name = new StringBuffer();
@@ -124,10 +124,10 @@ public class TimerServiceImpl implements TimerService{
                 }
                 //修改订单支付表状态
                 orderPay.setStatus(Status.ORDER_GOODS_COMPLETE.getValue());
-                orderPayMapper.updateByPrimaryKey(orderPay);
+                orderPayMapper.updateByPrimaryKeySelective(orderPay);
                 //修改订单状态
                 orderInfo.setStatus(Status.ORDER_GOODS_COMPLETE.getValue());
-                orderInfoMapper.updateByPrimaryKey(orderInfo);
+                orderInfoMapper.updateByPrimaryKeySelective(orderInfo);
                 //卖家增加余额
                 BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(orderInfo.getSellerId(),orderPay.getPayAmount(),Status.ADD.getValue())), BaseResp.class);
                 if(baseResp.getCode() == 1){

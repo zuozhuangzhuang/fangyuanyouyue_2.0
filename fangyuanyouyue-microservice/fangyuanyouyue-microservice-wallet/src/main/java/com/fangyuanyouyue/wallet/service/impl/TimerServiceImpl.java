@@ -71,7 +71,7 @@ public class TimerServiceImpl implements TimerService{
                     userVip.setVipType(null);
                     userVip.setStatus(Status.NOT_VIP.getValue());
                     userVip.setIsSendMessage(null);
-                    userVipMapper.updateByPrimaryKey(userVip);
+                    userVipMapper.updateByPrimaryKeySelective(userVip);
                     //您的会员已到期！点击此处去重新开通~
                     schedualMessageService.easemobMessage(userVip.getUserId().toString(),
                             "您的会员已到期！点击此处去重新开通~",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_VIP.getMessage(),"");
