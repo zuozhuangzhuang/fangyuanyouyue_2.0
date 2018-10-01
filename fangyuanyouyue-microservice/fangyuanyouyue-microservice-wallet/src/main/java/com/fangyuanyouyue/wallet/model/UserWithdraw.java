@@ -33,4 +33,6 @@ public class UserWithdraw {
     private String nickName;//用户昵称
 
     private Date addTime;//添加时间
+
+    private BigDecimal serviceCharge;//手续费
 }

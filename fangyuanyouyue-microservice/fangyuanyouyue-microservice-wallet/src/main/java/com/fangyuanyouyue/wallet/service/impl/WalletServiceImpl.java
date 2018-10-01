@@ -135,13 +135,12 @@ public class WalletServiceImpl implements WalletService{
             userWithdraw.setAccount("用户unionID");
         }
 
-        userWithdrawMapper.insert(userWithdraw);
 
         //根据用户会员等级扣除不同手续费
         UserVip userVip = userVipMapper.selectByUserId(userId);
         Integer vipLevel = userVip.getVipLevel();//会员等级
         BigDecimal charge;//手续费
-        BigDecimal percent;
+        BigDecimal percent;//提现手续费利率
         if(amount.compareTo(new BigDecimal(200)) <= 0){
             charge = new BigDecimal(2);
         }else{
@@ -159,6 +158,8 @@ public class WalletServiceImpl implements WalletService{
             }
             charge = amount.multiply(percent);
         }
+        userWithdraw.setServiceCharge(charge);
+        userWithdrawMapper.insert(userWithdraw);
         amount = amount.add(charge);
         //扣除余额 type 类型 1充值 2消费 payType 支付类型 1微信 2支付宝 3余额
         updateBalance(userId,amount,2);
@@ -606,11 +607,11 @@ public class WalletServiceImpl implements WalletService{
             schedualMessageService.easemobMessage(userWithdraw.getUserId().toString(),"您在小方圆申请￥"+userWithdraw.getAmount()+"的提现申请已通过审核",
                     Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
         }else if(status.intValue() == Status.WITHDRAW_REFUSE.getValue()){
-            updateBalance(userWithdraw.getUserId(),userWithdraw.getAmount(),Status.ADD.getValue());
+            updateBalance(userWithdraw.getUserId(),userWithdraw.getAmount().add(userWithdraw.getServiceCharge()),Status.ADD.getValue());
             //订单号
             final IdGenerator idg = IdGenerator.INSTANCE;
             String orderNo = idg.nextId();
-            addUserBalanceDetail(userWithdraw.getUserId(),userWithdraw.getAmount(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"提现拒绝退款",Status.WITHDRAW.getValue(),null,userWithdraw.getUserId(),orderNo);
+            addUserBalanceDetail(userWithdraw.getUserId(),userWithdraw.getAmount().add(userWithdraw.getServiceCharge()),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"提现拒绝退款",Status.WITHDRAW.getValue(),null,userWithdraw.getUserId(),orderNo);
             schedualMessageService.easemobMessage(userWithdraw.getUserId().toString(),"您在小方圆申请￥"+userWithdraw.getAmount()+"的提现申请已被拒绝，拒绝原因："+content,
                     Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
         }
