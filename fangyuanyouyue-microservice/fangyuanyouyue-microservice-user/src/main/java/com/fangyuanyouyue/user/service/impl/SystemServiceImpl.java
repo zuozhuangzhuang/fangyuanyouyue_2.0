@@ -6,15 +6,16 @@ import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.user.dao.FeedbackMapper;
+import com.fangyuanyouyue.user.dao.SysMsgLogMapper;
 import com.fangyuanyouyue.user.dao.UserInfoMapper;
 import com.fangyuanyouyue.user.dto.admin.AdminFeedbackDto;
 import com.fangyuanyouyue.user.dto.admin.AdminProcessDto;
+import com.fangyuanyouyue.user.dto.admin.AdminSysMsgLogDto;
 import com.fangyuanyouyue.user.model.Feedback;
-import com.fangyuanyouyue.user.model.UserAuthApply;
+import com.fangyuanyouyue.user.model.SysMsgLog;
 import com.fangyuanyouyue.user.model.UserInfo;
 import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.service.*;
-import netscape.javascript.JSObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,8 @@ public class SystemServiceImpl implements SystemService {
     private SchedualGoodsService schedualGoodsService;
     @Autowired
     private SchedualForumService schedualForumService;
+    @Autowired
+    private SysMsgLogMapper sysMsgLogMapper;
 
     @Override
     public void feedback(Integer userId, String content, Integer type, String version) throws ServiceException {
@@ -51,9 +54,9 @@ public class SystemServiceImpl implements SystemService {
     @Override
     public Pager feedbackList(AdminUserParam param) throws ServiceException {
 
-        Integer total = feedbackMapper.countPage(param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getType());
+        Integer total = feedbackMapper.countPage(param.getKeyword(),param.getStartDate(),param.getEndDate());
 
-        List<Feedback> feedbacks = feedbackMapper.getPage(param.getStart()*param.getLimit(),param.getLimit(),param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType(),param.getType());
+        List<Feedback> feedbacks = feedbackMapper.getPage(param.getStart()*param.getLimit(),param.getLimit(),param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
         List<AdminFeedbackDto> datas = AdminFeedbackDto.toDtoList(feedbacks);
         Pager pager = new Pager();
         pager.setTotal(total);
@@ -63,6 +66,10 @@ public class SystemServiceImpl implements SystemService {
 
     @Override
     public void sendMessage(String content) throws ServiceException {
+        SysMsgLog sysMsgLog = new SysMsgLog();
+        sysMsgLog.setContent(content);
+        sysMsgLog.setAddTime(DateStampUtils.getTimesteamp());
+        sysMsgLogMapper.insert(sysMsgLog);
         List<UserInfo> allHxUser = userInfoMapper.findAllHxUser();
         for(UserInfo userInfo:allHxUser){
             schedualMessageService.easemobMessage(userInfo.getId().toString(),content, Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
@@ -122,4 +129,18 @@ public class SystemServiceImpl implements SystemService {
 //        Integer monthUserCount = userInfoMapper.getMonthUserCount();
 //        System.out.println("本月注册用户数量："+monthUserCount);
 //    }
+
+
+    @Override
+    public Pager sysMsgList(AdminUserParam param) throws ServiceException {
+
+        Integer total = sysMsgLogMapper.countPage(param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getType());
+
+        List<SysMsgLog> sysMsgLogs = sysMsgLogMapper.getPage(param.getStart()*param.getLimit(),param.getLimit(),param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType(),param.getType());
+        List<AdminSysMsgLogDto> datas = AdminSysMsgLogDto.toDtoList(sysMsgLogs);
+        Pager pager = new Pager();
+        pager.setTotal(total);
+        pager.setDatas(datas);
+        return pager;
+    }
 }
