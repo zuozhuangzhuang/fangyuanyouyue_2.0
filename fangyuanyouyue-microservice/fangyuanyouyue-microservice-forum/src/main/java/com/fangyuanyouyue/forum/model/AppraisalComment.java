@@ -36,7 +36,7 @@ public class AppraisalComment {
 
     private String pic6;
 
-    private Integer isWinner;//观点是否获胜 1是 2否
+    private Integer isWinner=2;//观点是否获胜 1是 2否
 
     private Integer status;//状态 1显示 2隐藏
 
