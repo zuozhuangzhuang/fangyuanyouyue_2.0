@@ -20,7 +20,6 @@ import com.fangyuanyouyue.user.param.AdminMenuParam;
 import com.fangyuanyouyue.user.param.AdminMenuSaveParam;
 import com.fangyuanyouyue.user.param.AdminRoleParam;
 import com.fangyuanyouyue.user.service.SysMenuService;
-import com.google.gson.JsonArray;
 
 @Service(value = "sysMenuService")
 @Transactional(rollbackFor=Exception.class)
