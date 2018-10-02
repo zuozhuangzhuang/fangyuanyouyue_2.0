@@ -68,9 +68,10 @@ public interface ForumInfoService {
 	 * @param sort
 	 * @param isChosen
 	 * @param status
+	 * @param content
 	 * @throws ServiceException
 	 */
-    void updateForum(Integer forumId,Integer sort,Integer isChosen,Integer status,String title) throws ServiceException;
+    void updateForum(Integer forumId,Integer sort,Integer isChosen,Integer status,String content) throws ServiceException;
 
 	/**
 	 * 编辑浏览量基数

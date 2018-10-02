@@ -243,7 +243,7 @@
     <if test="keyword != null">
       and (a.title like "%"#{keyword}"%" or a.content like "%"#{keyword}"%" or b.nick_name like "%"#{keyword}"%" or c.content like "%"#{keyword}"%")
     </if>
-    order by a.add_time desc limit #{start},#{limit}
+    order by a.sort,a.add_time desc limit #{start},#{limit}
   </select>
 
   <select id="selectDetailByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">

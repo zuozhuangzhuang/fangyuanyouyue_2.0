@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
 
-public class UpdateGoodsCatalog {
+public class UpdateDatabase {
     static Connection conn;
     static PreparedStatement ps;
     static ResultSet rs;
@@ -105,16 +105,20 @@ public class UpdateGoodsCatalog {
             while(rs.next()){
                 //user_info
                 String userInfoSql = getUserInfoSql(rs);
-                FileUtils.createFile(String.valueOf(rs.getInt("id")),userInfoSql);
+                if(StringUtils.isNotEmpty(userInfoSql)){
+                    FileUtils.createFile(String.valueOf(rs.getInt("id")),userInfoSql);
+                }
                 //user_info_ext
                 String userInfoExtSql = getUserExtSql(rs);
-                FileUtils.createFile(String.valueOf(rs.getInt("id")),userInfoExtSql);
+                if(StringUtils.isNotEmpty(userInfoExtSql)){
+                    FileUtils.createFile(String.valueOf(rs.getInt("id")),userInfoExtSql);
+                }
                 //user_wallet
-                String userWalletSql = "insert into user_vip (id, user_id, start_time, end_time, vip_level, level_desc, vip_type, status, add_time, update_time, vip_no, is_send_message ) values (";
-                FileUtils.createFile(String.valueOf(rs.getInt("id")),userWalletSql);
+//                String userWalletSql = "insert into user_vip (id, user_id, start_time, end_time, vip_level, level_desc, vip_type, status, add_time, update_time, vip_no, is_send_message ) values (";
+//                FileUtils.createFile(String.valueOf(rs.getInt("id")),userWalletSql);
                 //user_vip
-                String userVipSql = "insert into user_wallet (id, user_id, balance, balance_frozen, point, score, add_time, update_time, appraisal_count ) values (";
-                FileUtils.createFile(String.valueOf(rs.getInt("id")),userVipSql);
+//                String userVipSql = "insert into user_wallet (id, user_id, balance, balance_frozen, point, score, add_time, update_time, appraisal_count ) values (";
+//                FileUtils.createFile(String.valueOf(rs.getInt("id")),userVipSql);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -130,7 +134,24 @@ public class UpdateGoodsCatalog {
         }
     }
 
+    static String getUserWalletSql(ResultSet rs) throws SQLException{
+
+        String userWalletSql = "";
+        return userWalletSql;
+    }
+
+    /**
+     * user_info_ext
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
     static String getUserExtSql(ResultSet rs) throws SQLException{
+        if(StringUtils.isEmpty(rs.getString("user_ext_id"))){
+            return null;
+        }else{
+
+        }
         String selectUserExt = "select * from a_user_ext where id = " + Integer.parseInt(rs.getString("user_ext_id"));
         conn=getConnection();//连接数据库
         //执行动态SQL语句。通常通过PreparedStatement实例实现。
@@ -139,18 +160,52 @@ public class UpdateGoodsCatalog {
         ResultSet ext_rs=ext_ps.executeQuery(selectUserExt);  // 3.ִ执行SQL语句
         //user_info_ext
         if(ext_rs.next()){
-        String userInfoExtSql = "insert into user_info_ext (id, user_id, identity, name, pay_pwd, status, auth_type, add_time, update_time, credit, fans_count) values (";
+            Integer userId = rs.getInt("id");
             String identity = ext_rs.getString("card_no");
             String name = ext_rs.getString("real_name");
             String payPwd = MD5Util.generate(rs.getString("pay_pwd"));
+            Integer status = 3;
+            if(ext_rs.getString("status").equals("0")){
+                status = 1;
+            }else if(ext_rs.getString("status").equals("1")){
+                status = 2;
+            }
+            Integer authType = 3;
+            Date addTime = DateStampUtils.getDate(rs.getLong("add_time"));
+            Long credit = 0L;
+            Integer fansCount = rs.getInt("fans_count");
+            String userInfoExtSql = "insert into user_info_ext (" +
+                    "id, " +
+                    "user_id, " +
+                    "identity, " +
+                    "name, " +
+                    "pay_pwd, " +
+                    "status, " +
+                    "auth_type, " +
+                    "add_time, " +
+                    "update_time, " +
+                    "credit, " +
+                    "fans_count) values ("
+                    +null+","
+                    +userId+",'"
+                    +identity+"','"
+                    +name+"','"
+                    +payPwd+"',"
+                    +status+","
+                    +authType+","
+                    +addTime+","
+                    +null+","
+                    +credit+","
+                    +fansCount+")";
 
-        return userInfoExtSql;
+
+            return userInfoExtSql;
         }else{
             return null;
         }
     }
     /**
-     * user_info表insert语句
+     * user_info
      * @param rs
      * @return
      * @throws SQLException
@@ -169,7 +224,7 @@ public class UpdateGoodsCatalog {
         Integer level = 0;
         String level_desc = "";
         Integer status = Integer.parseInt(rs.getString("status"));
-        Date addTime = DateStampUtils.getTimesteamp();
+        Date addTime = DateStampUtils.getDate(rs.getLong("add_time"));
         Integer isRegHx = Integer.parseInt(rs.getString("is_hx"));
 
         String filecontent = "insert into user_info (" +
@@ -215,14 +270,16 @@ public class UpdateGoodsCatalog {
                 +null+","
                 +null+","
                 +null+","
-                +null+",'"
-                +addTime+"',"
+                +null+","
+                +addTime+","
                 +null+","
                 +isRegHx+")";
         return filecontent;
     }
     public static void main(String[] args) throws Exception{
         getSqlFile();
+//        Date s = DateStampUtils.getDate(new Date().getTime());
+//        System.out.println(s);
     }
 
 

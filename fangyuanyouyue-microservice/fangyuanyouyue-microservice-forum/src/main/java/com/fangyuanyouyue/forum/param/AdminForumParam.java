@@ -44,4 +44,8 @@ public class AdminForumParam extends BasePageReq{
     @ApiModelProperty(name = "title", value = "标题", dataType = "String",hidden = true)
     private String title;
 
+    //内容
+    @ApiModelProperty(name = "content", value = "内容", dataType = "String",hidden = true)
+    private String content;
+
 }

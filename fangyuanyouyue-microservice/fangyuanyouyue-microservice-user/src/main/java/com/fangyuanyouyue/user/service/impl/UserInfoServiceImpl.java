@@ -794,9 +794,10 @@ public class UserInfoServiceImpl implements UserInfoService {
 	public void registIMUser(UserInfo user) throws ServiceException {
         try {
             //判断用户是否已经注册环信
-            if(user.getIsRegHx()==null||user.getIsRegHx().intValue()==StatusEnum.NO.getCode().intValue()) {
-                schedualMessageService.easemobRegist(user.getId().toString(), MD5Util.MD5("xiaofangyuan"+user.getId().toString()));
-                user.setIsRegHx(StatusEnum.YES.getCode());
+            if(user.getIsRegHx()==null||user.getIsRegHx().equals(StatusEnum.NO.getCode().intValue())) {
+                String easemobRegist = schedualMessageService.easemobRegist(user.getId().toString(), MD5Util.MD5("xiaofangyuan"+user.getId().toString()));
+                Integer code = JSONObject.parseObject(easemobRegist).getInteger("code");
+                user.setIsRegHx(code.equals(ReCode.FAILD.getValue())?Status.NO.getValue():Status.YES.getValue());
                 userInfoMapper.updateByPrimaryKey(user);
             }
         }catch (RetryableException e){
@@ -872,8 +873,8 @@ public class UserInfoServiceImpl implements UserInfoService {
         if(userInfoExt == null || userInfo==null){
             throw new ServiceException("未找到用户信息！");
         }
-        if(param.getCount()!=null) {
-        	userInfoExt.setFansCount(param.getCount());
+        if(param.getFansCount()!=null) {
+        	userInfoExt.setFansCount(param.getFansCount());
         }
         if(param.getStatus()!=null) {
         	userInfo.setStatus(param.getStatus());
@@ -881,8 +882,8 @@ public class UserInfoServiceImpl implements UserInfoService {
         if(param.getAuthType()!=null) {
         	userInfoExt.setAuthType(param.getAuthType());
         }
-        userInfoMapper.updateByPrimaryKey(userInfo);
-        userInfoExtMapper.updateByPrimaryKey(userInfoExt);
+        userInfoMapper.updateByPrimaryKeySelective(userInfo);
+        userInfoExtMapper.updateByPrimaryKeySelective(userInfoExt);
     }
     
 }

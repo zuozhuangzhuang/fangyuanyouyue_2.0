@@ -395,4 +395,30 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 			}
 		}
 	}
+
+    @Override
+    public void updateAppraisal(Integer appraisalaId, Integer sort, Integer count, Integer status, String content) throws ServiceException {
+        AppraisalDetail detail = appraisalDetailMapper.selectByPrimaryKey(appraisalaId);
+        if(detail == null){
+            throw new ServiceException("未找到全民鉴定");
+        }
+        if(sort != null){
+            detail.setSort(sort);
+        }
+        if(status != null){
+            detail.setStatus(status);
+        }
+        if(count != null){
+            detail.setPvCount(count);
+        }
+        appraisalDetailMapper.updateByPrimaryKey(detail);
+        if(status != null && status.equals(Status.DELETE.getValue())){
+            if(StringUtils.isEmpty(content)){
+                throw new ServiceException("删除理由不能为空！");
+            }
+            //很抱歉，您的帖子/视频/全民鉴定/【名称】已被官方删除，删除理由：……
+            schedualMessageService.easemobMessage(detail.getUserId().toString(),
+                    "很抱歉，您的全民鉴定【"+detail.getTitle()+"】已被官方删除，删除理由："+content, Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
+        }
+    }
 }

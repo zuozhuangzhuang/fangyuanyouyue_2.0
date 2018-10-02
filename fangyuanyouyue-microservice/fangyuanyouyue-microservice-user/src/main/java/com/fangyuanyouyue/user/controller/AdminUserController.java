@@ -295,17 +295,18 @@ public class AdminUserController extends BaseController {
     }
 
 
-    @ApiOperation(value = "编辑用户粉丝基数", notes = "编辑用户粉丝基数",response = BaseResp.class)
+    @ApiOperation(value = "编辑用户", notes = "编辑用户",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "count", value = "修改数量", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "type", value = "类型 1增加 2减少", required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "status", value = "状态 1正常 2冻结 3删除", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "authType", value = "类型 1增加 2减少", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "fansCount", value = "粉丝数量", required = true, dataType = "int", paramType = "query")
     })
     @PutMapping(value = "/updateUser")
     @ResponseBody
-    public BaseResp updateFansCount(AdminUserParam param) throws IOException {
+    public BaseResp updateUser(AdminUserParam param) throws IOException {
         try {
-            log.info("编辑用户粉丝基数");
+            log.info("编辑用户");
             log.info("参数："+param.toString());
             if(param.getId() == null){
                 return toError("用户id不能为空！");

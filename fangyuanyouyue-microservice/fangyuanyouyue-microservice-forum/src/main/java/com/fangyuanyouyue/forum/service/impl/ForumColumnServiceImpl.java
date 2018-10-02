@@ -234,7 +234,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 					forumColumnApply.setReason(reason);
 					//很抱歉您的【专栏名称】专栏审核未通过，可联系客服咨询详情
 					schedualMessageService.easemobMessage(forumColumnApply.getUserId().toString(),
-							"很抱歉您的【"+forumColumnApply.getColumnName()+"】专栏审核未通过，可联系客服咨询详情",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
+							"很抱歉您的【"+forumColumnApply.getColumnName()+"】专栏审核未通过，可联系客服咨询详情",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_COLUMN_REFUSE.getMessage(),"");
 					//余额账单
 					//订单号
 					final IdGenerator idg = IdGenerator.INSTANCE;

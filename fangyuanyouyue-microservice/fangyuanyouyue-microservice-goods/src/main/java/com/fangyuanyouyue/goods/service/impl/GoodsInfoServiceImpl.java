@@ -762,10 +762,22 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             }
             goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
             if(param.getStatus()!=null&&param.getStatus().intValue() == 5){
+                if(StringUtils.isEmpty(param.getContent())){
+                    throw new ServiceException("删除理由不能为空！");
+                }
                 //卖家-20信誉度
                 schedualWalletService.updateCredit(goodsInfo.getUserId(),Credit.DELETE_FAKE.getCredit(),Status.SUB.getValue());
+                //很抱歉，您的商品/抢购【名称】已被官方删除，删除理由：……。点击查看详情
+                if(goodsInfo.getType().equals(Status.GOODS.getValue())){
+                    schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
+                            "很抱歉，您的商品【"+goodsInfo.getName()+"】已被官方删除，删除理由："+param.getContent()+"。点击查看详情",
+                            Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),goodsInfo.getId().toString());
+                }else{
+                    schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
+                            "很抱歉，您的抢购【"+goodsInfo.getName()+"】已被官方删除，删除理由："+param.getContent()+"。点击查看详情",
+                            Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_AUCTION.getMessage(),goodsInfo.getId().toString());
+                }
             }
-
         }
     }
 

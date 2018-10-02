@@ -29,7 +29,7 @@ import com.fangyuanyouyue.forum.service.SchedualUserService;
 @Service(value = "appraisalCommentService")
 @Transactional(rollbackFor=Exception.class)
 public class AppraisalCommentServiceImpl implements AppraisalCommentService {
-	
+
 	@Autowired
 	AppraisalCommentMapper appraisalCommentMapper;
 	@Autowired
@@ -58,16 +58,18 @@ public class AppraisalCommentServiceImpl implements AppraisalCommentService {
 		}
 		List<AppraisalComment> list = appraisalCommentMapper.selectByAppraisalId(appraisalId, start*limit, limit);
 		List<AppraisalCommentDto> dtos = AppraisalCommentDto.toDtoList(list);
-		for(AppraisalCommentDto dto:dtos){
-			//是否点赞
-			AppraisalCommentLikes appraisalCommentLikes = appraisalCommentLikesMapper.selectByCommentIdUserId(dto.getCommentId(),userId);
-			if(appraisalCommentLikes != null){
-				dto.setIsLikes(StatusEnum.YES.getValue());
-			}
-			if(userId.equals(dto.getUserId()) || detail.getStatus().equals(Status.END.getValue())){
-				//点赞数量
-				Integer likesCount = appraisalCommentLikesService.countCommentLikes(dto.getCommentId());
-				dto.setLikesCount(likesCount);
+		if(userId != null){
+			for(AppraisalCommentDto dto:dtos){
+				//是否点赞
+				AppraisalCommentLikes appraisalCommentLikes = appraisalCommentLikesMapper.selectByCommentIdUserId(dto.getCommentId(),userId);
+				if(appraisalCommentLikes != null){
+					dto.setIsLikes(StatusEnum.YES.getValue());
+				}
+				if(userId.equals(dto.getUserId()) || detail.getStatus().equals(Status.END.getValue())){
+					//点赞数量
+					Integer likesCount = appraisalCommentLikesService.countCommentLikes(dto.getCommentId());
+					dto.setLikesCount(likesCount);
+				}
 			}
 		}
 		return dtos;
@@ -79,9 +81,9 @@ public class AppraisalCommentServiceImpl implements AppraisalCommentService {
 		if(detail == null || detail.getStatus().equals(Status.DELETE.getValue())){
 			throw new ServiceException("未找到全民鉴定！");
 		}
-        if(detail.getStatus().equals(Status.END.getValue())){
-            throw new ServiceException("全民鉴定已结束！");
-        }
+		if(detail.getStatus().equals(Status.END.getValue())){
+			throw new ServiceException("全民鉴定已结束！");
+		}
 
 		AppraisalComment model = appraisalCommentMapper.selectByAppraisalIdUserId(userId,param.getAppraisalId());
 		if(model == null){
