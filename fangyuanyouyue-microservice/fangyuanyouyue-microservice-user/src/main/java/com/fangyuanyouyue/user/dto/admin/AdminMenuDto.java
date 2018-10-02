@@ -1,9 +1,9 @@
 package com.fangyuanyouyue.user.dto.admin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-import com.fangyuanyouyue.user.model.Feedback;
 import com.fangyuanyouyue.user.model.SysMenu;
 
 import lombok.Getter;
@@ -28,7 +28,15 @@ public class AdminMenuDto {
 
     private String url;
     
+    private String type;
+    
+    private State state = new State();
+    
+    
     private List<AdminMenuDto> children = new ArrayList<AdminMenuDto>();
+
+	//权限
+	private List<HashMap<String,Integer>> auth;
 
     public AdminMenuDto(SysMenu model) {
         this.id = model.getId();
@@ -51,5 +59,13 @@ public class AdminMenuDto {
         return dtolist;
     }
 
+    @Getter
+    @Setter
+    @ToString
+	public class State{
+    	boolean selected = false;
+    	boolean opened = true;
+    	boolean disabled = false;
+    }
 
 }

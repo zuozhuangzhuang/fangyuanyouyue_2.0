@@ -23,4 +23,8 @@ public interface SysMenuMapper {
     List<SysMenu> selectAll();
     
     List<SysMenu> selectChildren(Integer parentId);
+    
+    List<SysMenu> selectByRoleId(Integer roleId);
+    
+    int deleteByParentId(Integer parentId);
 }

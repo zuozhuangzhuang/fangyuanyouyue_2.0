@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.fangyuanyouyue.base.BasePageReq;
+import com.fangyuanyouyue.user.dto.admin.AdminMenuDto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -33,7 +34,8 @@ public class AdminMenuParam extends BasePageReq{
 	@ApiModelProperty(name = "type", value = "操作类型", dataType = "String",hidden = true)
 	private String type;
 	
-	//权限
-	private List<HashMap<String,String>> auth;
+	private String menu;
+
+	private Integer roleId;
 
 }

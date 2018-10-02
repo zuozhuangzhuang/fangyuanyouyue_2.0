@@ -21,4 +21,6 @@ public interface SysRoleMapper {
     int updateByPrimaryKey(SysRole record);
 
     List<SysRole> selectAll();
+    
+    List<SysRole> selectByMenuId(Integer menuId);
 }

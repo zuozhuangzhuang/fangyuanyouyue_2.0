@@ -42,5 +42,4 @@ public interface SysMenuService {
      */
     void deleteMenu(Integer menuId) ;
     
-
 }

@@ -20,12 +20,16 @@ import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.user.dao.SysRoleMapper;
 import com.fangyuanyouyue.user.dto.admin.AdminDailyStatisticsDto;
 import com.fangyuanyouyue.user.dto.admin.AdminMenuDto;
 import com.fangyuanyouyue.user.dto.admin.AdminProcessDto;
+import com.fangyuanyouyue.user.dto.admin.AdminRoleDto;
 import com.fangyuanyouyue.user.param.AdminMenuParam;
+import com.fangyuanyouyue.user.param.AdminRoleParam;
 import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.service.SysMenuService;
+import com.fangyuanyouyue.user.service.SysRoleService;
 import com.fangyuanyouyue.user.service.SystemService;
 import com.fangyuanyouyue.user.service.UserInfoService;
 import com.fangyuanyouyue.user.service.VersionService;
@@ -49,6 +53,8 @@ public class AdminSysController extends BaseController {
     private SystemService systemService;
     @Autowired
     private SysMenuService sysMenuService;
+    @Autowired
+    private SysRoleService sysRoleService;
 
 
 
@@ -298,14 +304,42 @@ public class AdminSysController extends BaseController {
     })
     @GetMapping(value = "/menuList")
     @ResponseBody
-    public BaseResp menuList(AdminUserParam param) throws IOException {
+    public BaseResp menuList(AdminMenuParam param) throws IOException {
         try {
             log.info("----》获取全部菜单列表《----");
             log.info("参数："+param.toString());
+            List<AdminMenuDto> menus = null;
+            if(param.getRoleId()!=null&&param.getRoleId()>0) {
+                menus = sysMenuService.getMenuByRole(param.getRoleId());
+            }else {
+
+            	menus = sysMenuService.getAllMenu();
+            }
             
-            List<AdminMenuDto> menus = sysMenuService.getAllMenu();
             
             return toSuccess(menus);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统错误！");
+        }
+    }
+
+    
+    @ApiOperation(value = "菜单列表", notes = "菜单列表",response = BaseResp.class)
+    @ApiImplicitParams({
+    })
+    @GetMapping(value = "/roleMenuList")
+    @ResponseBody
+    public Object menuListRole(AdminMenuParam param) throws IOException {
+        try {
+            log.info("----》获取角色菜单列表《----");
+            log.info("参数："+param.toString());
+            List<AdminMenuDto> menus = sysMenuService.getMenuByRole(param.getRoleId());
+            
+            return menus;
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
@@ -321,14 +355,15 @@ public class AdminSysController extends BaseController {
     @ApiOperation(value = "添加菜单", notes = "添加菜单",response = BaseResp.class)
     @ApiImplicitParams({
     })
-    @PostMapping(value = "/menuAdd")
+    @PostMapping(value = "/menuSave")
     @ResponseBody
     public BaseResp menuAdd(AdminMenuParam param) throws IOException {
         try {
-            log.info("----》删除菜单《----");
+            log.info("----》添加菜单《----");
             log.info("参数："+param.toString());
             
             sysMenuService.saveMenu(param);
+            
             return toSuccess();
         } catch (Exception e) {
             e.printStackTrace();
@@ -348,6 +383,74 @@ public class AdminSysController extends BaseController {
             log.info("参数："+param.toString());
             
             sysMenuService.deleteMenu(param.getId());
+            return toSuccess();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统错误！");
+        }
+    }
+    
+    
+
+    @ApiOperation(value = "	角色列表", notes = "角色列表",response = BaseResp.class)
+    @ApiImplicitParams({
+    })
+    @GetMapping(value = "/roleList")
+    @ResponseBody
+    public BaseResp roleList(AdminRoleParam param) throws IOException {
+        try {
+            log.info("----》获取全部菜单列表《----");
+            log.info("参数："+param.toString());
+            List<AdminRoleDto> roles = null;
+            if(param.getMenuId()!=null) {
+                roles = sysRoleService.getRoleByMenuId(param.getMenuId());
+            }else {
+            	roles = sysRoleService.getAllRole();
+            }
+            return toSuccess(roles);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统错误！");
+        }
+    }
+
+
+
+
+    @ApiOperation(value = "添加角色", notes = "添加角色",response = BaseResp.class)
+    @ApiImplicitParams({
+    })
+    @PostMapping(value = "/roleSave")
+    @ResponseBody
+    public BaseResp roleAdd(AdminRoleParam param) throws IOException {
+        try {
+            log.info("----》添加角色《----");
+            log.info("参数："+param.toString());
+            
+            sysRoleService.saveRole(param);
+            
+            return toSuccess();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统错误！");
+        }
+    }
+
+
+    @ApiOperation(value = "删除角色", notes = "删除角色",response = BaseResp.class)
+    @ApiImplicitParams({
+    })
+    @PostMapping(value = "/roleDelete")
+    @ResponseBody
+    public BaseResp roleDelete(AdminUserParam param) throws IOException {
+        try {
+            log.info("----》删除角色《----");
+            log.info("参数："+param.toString());
+            
+            sysRoleService.deleteRole(param.getId());
             return toSuccess();
         } catch (Exception e) {
             e.printStackTrace();

@@ -95,4 +95,18 @@
     <include refid="Base_Column_List" />
     from sys_role
   </select>
+  <select id="selectByMenuId" resultMap="BaseResultMap" >
+    select 
+    a.*
+    from sys_role a,sys_role_menu b where a.id=b.role_id
+    and b.menu_id = #{menuId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="selectByUserId" resultMap="BaseResultMap" >
+    select 
+    a.*
+    from sys_role a,sys_role_menu b where a.id=b.role_id
+    and b.menu_id = #{menuId,jdbcType=INTEGER}
+  </select>
+  
 </mapper>
