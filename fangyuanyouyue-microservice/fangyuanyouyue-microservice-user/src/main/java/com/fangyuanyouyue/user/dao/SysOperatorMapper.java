@@ -16,4 +16,6 @@ public interface SysOperatorMapper {
     int updateByPrimaryKeySelective(SysOperator record);
 
     int updateByPrimaryKey(SysOperator record);
+    
+    SysOperator selectLogin(String userCode,String password);
 }

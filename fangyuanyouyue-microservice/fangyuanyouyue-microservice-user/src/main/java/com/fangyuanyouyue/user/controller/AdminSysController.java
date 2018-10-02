@@ -4,27 +4,31 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
-import com.fangyuanyouyue.base.Pager;
-import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.user.dto.AppVersionDto;
-import com.fangyuanyouyue.user.dto.admin.AdminAppVersionDto;
-import com.fangyuanyouyue.user.dto.admin.AdminDailyStatisticsDto;
-import com.fangyuanyouyue.user.dto.admin.AdminProcessDto;
-import com.fangyuanyouyue.user.model.AppVersion;
-import com.fangyuanyouyue.user.param.AdminUserParam;
-import com.fangyuanyouyue.user.service.SystemService;
-import com.fangyuanyouyue.user.service.VersionService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.user.dto.admin.AdminDailyStatisticsDto;
+import com.fangyuanyouyue.user.dto.admin.AdminMenuDto;
+import com.fangyuanyouyue.user.dto.admin.AdminProcessDto;
+import com.fangyuanyouyue.user.param.AdminMenuParam;
+import com.fangyuanyouyue.user.param.AdminUserParam;
+import com.fangyuanyouyue.user.service.SysMenuService;
+import com.fangyuanyouyue.user.service.SystemService;
 import com.fangyuanyouyue.user.service.UserInfoService;
+import com.fangyuanyouyue.user.service.VersionService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -43,6 +47,8 @@ public class AdminSysController extends BaseController {
     private VersionService versionService;
     @Autowired
     private SystemService systemService;
+    @Autowired
+    private SysMenuService sysMenuService;
 
 
 
@@ -263,7 +269,6 @@ public class AdminSysController extends BaseController {
         }
     }
 
-
     @ApiOperation(value = "获取统计列表", notes = "(AdminProcessDto)获取统计列表",response = BaseResp.class) @ApiImplicitParams({
             @ApiImplicitParam(name = "count", value = "天数", required = true, dataType = "int", paramType = "query"),
     })
@@ -286,4 +291,69 @@ public class AdminSysController extends BaseController {
             return toError("系统错误！");
         }
     }
+
+
+    @ApiOperation(value = "菜单列表", notes = "菜单列表",response = BaseResp.class)
+    @ApiImplicitParams({
+    })
+    @GetMapping(value = "/menuList")
+    @ResponseBody
+    public BaseResp menuList(AdminUserParam param) throws IOException {
+        try {
+            log.info("----》获取全部菜单列表《----");
+            log.info("参数："+param.toString());
+            
+            List<AdminMenuDto> menus = sysMenuService.getAllMenu();
+            
+            return toSuccess(menus);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统错误！");
+        }
+    }
+
+
+
+
+    @ApiOperation(value = "添加菜单", notes = "添加菜单",response = BaseResp.class)
+    @ApiImplicitParams({
+    })
+    @PostMapping(value = "/menuAdd")
+    @ResponseBody
+    public BaseResp menuAdd(AdminMenuParam param) throws IOException {
+        try {
+            log.info("----》删除菜单《----");
+            log.info("参数："+param.toString());
+            
+            sysMenuService.saveMenu(param);
+            return toSuccess();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统错误！");
+        }
+    }
+
+
+    @ApiOperation(value = "删除菜单", notes = "删除菜单",response = BaseResp.class)
+    @ApiImplicitParams({
+    })
+    @PostMapping(value = "/menuDelete")
+    @ResponseBody
+    public BaseResp menuDelete(AdminUserParam param) throws IOException {
+        try {
+            log.info("----》删除菜单《----");
+            log.info("参数："+param.toString());
+            
+            sysMenuService.deleteMenu(param.getId());
+            return toSuccess();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统错误！");
+        }
+    }
+    
+    
 }
