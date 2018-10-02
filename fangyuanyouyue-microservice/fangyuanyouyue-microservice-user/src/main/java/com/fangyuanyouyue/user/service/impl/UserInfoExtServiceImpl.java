@@ -122,10 +122,8 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
     @Override
     public boolean isAuth(Integer userId) throws ServiceException {
         UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(userId);
-        //根据用户ID获取实名认证申请信息
-        IdentityAuthApply identityAuthApply = identityAuthApplyMapper.selectByUserId(userId);
         //已申请过 状态 1申请 2通过 3拒绝
-        if(identityAuthApply != null && identityAuthApply.getStatus().equals(StatusEnum.AUTH_ACCEPT.getCode()) && userInfoExt.getStatus().intValue() == StatusEnum.AUTH_ACCEPT.getCode()) {
+        if(userInfoExt.getStatus().equals(StatusEnum.AUTH_ACCEPT.getCode())) {
             return true;
         }else{
             return false;
@@ -251,7 +249,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
         }else{
             //拒绝
             schedualMessageService.easemobMessage(apply.getUserId().toString(),
-                    "很抱歉，您申请的实名认证，官方审核未通过！可重新提交资料再次申请。",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
+                    "很抱歉，您申请的实名认证，官方审核未通过！可重新提交资料再次申请。",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_EXT_REFUSE.getMessage(),"");
         }
         userInfoExtMapper.updateByPrimaryKeySelective(userInfoExt);
     }
@@ -307,7 +305,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
             schedualWalletService.addUserBalanceDetail(model.getUserId(),new BigDecimal(360),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"申请认证店铺失败退款",null,model.getUserId(),Status.SHOP_AUTH.getValue(),orderNo);
             //拒绝
             schedualMessageService.easemobMessage(model.getUserId().toString(),
-                    "很抱歉，您申请的认证店铺未通过官方审核，可联系客服咨询详情。",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
+                    "很抱歉，您申请的认证店铺未通过官方审核，可联系客服咨询详情。",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_AUTH_TYPE_REFUSE.getMessage(),"");
         }
         userAuthApplyMapper.updateByPrimaryKey(model);
     }

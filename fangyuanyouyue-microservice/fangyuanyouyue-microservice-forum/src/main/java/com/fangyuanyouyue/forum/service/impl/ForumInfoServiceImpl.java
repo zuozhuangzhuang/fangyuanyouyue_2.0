@@ -235,16 +235,13 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 	}
 
 	@Override
-	public void updateForum(Integer forumId, Integer sort, Integer isChosen,Integer status,String title) throws ServiceException {
+	public void updateForum(Integer forumId, Integer sort, Integer isChosen,Integer status,String content) throws ServiceException {
 		ForumInfo forumInfo = forumInfoMapper.selectByPrimaryKey(forumId);
 		if(forumInfo == null || forumInfo.getStatus().equals(Status.HIDE.getValue())){
 			throw new ServiceException("未找到视频、帖子！");
 		}
 		if(isChosen!=null){
 			forumInfo.setIsChosen(isChosen);
-		}
-		if(title!=null) {
-			forumInfo.setTitle(title);
 		}
 		if(sort != null){
 			forumInfo.setSort(sort);
@@ -253,6 +250,15 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 			forumInfo.setStatus(status);
 		}
 		forumInfoMapper.updateByPrimaryKey(forumInfo);
+		//很抱歉，您的帖子/视频/全民鉴定/【名称】已被官方删除，删除理由：……
+		if(status != null && status.equals(Status.DELETE.getValue())){
+			if(StringUtils.isEmpty(content)){
+				throw new ServiceException("删除理由不能为空！");
+			}
+			schedualMessageService.easemobMessage(forumInfo.getUserId().toString(),
+					"很抱歉，您的"+(forumInfo.getType()==1?"帖子【":"视频【")+forumInfo.getTitle()+"】已被官方删除，删除理由："+content+"",
+					Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
+		}
 	}
 
 	@Override

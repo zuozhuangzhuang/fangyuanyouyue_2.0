@@ -322,7 +322,8 @@ public class AdminController  extends BaseController {
             @ApiImplicitParam(name = "goodsCategoryIds", value = "商品分类数组（同一商品可多种分类）",allowMultiple = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "status", value = "商品状态 1出售中 2已售出 3已下架（已结束） 5删除",dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "isAppraisal", value = "是否官方鉴定 1已鉴定 2未鉴定",dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "sort", value = "（置顶、取消）商品排序 1置顶 2默认",dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "sort", value = "（置顶、取消）商品排序 1置顶 2默认",dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "content", value = "处理原因",dataType = "String", paramType = "query")
     })
     @PutMapping(value = "/updateGoods")
     @ResponseBody

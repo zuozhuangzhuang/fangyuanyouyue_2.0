@@ -21,7 +21,7 @@ public class AppraisalDetail {
 
     private String label;//标签
 
-    private Integer sort;//排序
+    private Integer sort;//排序 1置顶 2默认排序
 
     private Integer status;//状态 1进行中 2结束 3删除
 

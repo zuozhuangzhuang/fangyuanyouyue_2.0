@@ -46,6 +46,10 @@ public class AdminUserParam extends BasePageReq{
 	@ApiModelProperty(name = "count", value = "修改数量", dataType = "int",hidden = true)
 	private Integer count;
 
+	//粉丝数量
+	@ApiModelProperty(name = "fansCount", value = "粉丝数量", dataType = "int",hidden = true)
+	private Integer fansCount;
+
 	//版本号
 	@ApiModelProperty(name = "versionNo", value = "版本号", dataType = "int",hidden = true)
 	private Integer versionNo;

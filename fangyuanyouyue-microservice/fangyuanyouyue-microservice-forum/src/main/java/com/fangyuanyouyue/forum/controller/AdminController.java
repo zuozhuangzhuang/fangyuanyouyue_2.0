@@ -3,6 +3,7 @@ package com.fangyuanyouyue.forum.controller;
 import java.io.IOException;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -126,7 +127,7 @@ public class AdminController extends BaseController {
 	@ResponseBody
 	public BaseResp videoList(BasePageReq param) throws IOException {
 		try {
-			log.info("----》帖子列表《----");
+			log.info("----》视频列表《----");
 			log.info("参数：" + param.toString());
             if(param.getStart()==null || param.getStart() < 0 ||param.getLimit()==null || param.getLimit() < 1) {
                 return toError("分页参数错误");
@@ -342,7 +343,8 @@ public class AdminController extends BaseController {
             @ApiImplicitParam(name = "id", value = "帖子、视频id", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "sort", value = "排列优先级 1置顶 2默认排序",required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "isChosen", value = "是否精选 1是 2否",required = false, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "status", value = "状态 1显示 2删除",required = false, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "status", value = "状态 1显示 2删除",required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "content", value = "处理原因",required = false, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/updateForum")
     @ResponseBody
@@ -353,7 +355,7 @@ public class AdminController extends BaseController {
             if(param.getId() == null){
                 return toError("帖子、视频id不能为空！");
             }
-            forumInfoService.updateForum(param.getId(),param.getSort(),param.getIsChosen(),param.getStatus(),param.getTitle());
+            forumInfoService.updateForum(param.getId(),param.getSort(),param.getIsChosen(),param.getStatus(),param.getContent());
 
             return toSuccess();
         } catch (Exception e) {
@@ -363,7 +365,7 @@ public class AdminController extends BaseController {
     }
 
 
-    @ApiOperation(value = "编辑浏览量基数", notes = "编辑浏览量基数",response = BaseResp.class)
+    @ApiOperation(value = "编辑帖子、视频浏览量基数", notes = "编辑帖子、视频浏览量基数",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "视频、帖子id", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "count", value = "修改数量", required = true, dataType = "int", paramType = "query"),
@@ -383,6 +385,35 @@ public class AdminController extends BaseController {
         }catch (Exception e) {
             e.printStackTrace();
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
+
+    @ApiOperation(value = "编辑全民鉴定", notes = "编辑全民鉴定",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "全民鉴定id", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "sort", value = "排列优先级 1置顶 2默认排序",required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "count", value = "浏览量基数",required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "状态 1进行中 2结束 3删除",required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "content", value = "处理原因",required = false, dataType = "int", paramType = "query")
+    })
+    @GetMapping(value = "/updateAppraisal")
+    @ResponseBody
+    public BaseResp updateAppraisal(AdminForumParam param) throws IOException {
+        try {
+            log.info("----》编辑全民鉴定《----");
+            log.info("参数："+param.toString());
+            if(param.getId() == null){
+                return toError("全民鉴定id不能为空！");
+            }
+            appraisalDetailService.updateAppraisal(param.getId(),param.getSort(),param.getCount(),param.getStatus(),param.getContent());
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
         }
     }
 

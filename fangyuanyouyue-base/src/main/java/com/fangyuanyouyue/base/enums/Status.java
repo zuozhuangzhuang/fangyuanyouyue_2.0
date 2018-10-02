@@ -35,10 +35,12 @@ public enum Status {
      * 跳转类型
      * 1系统消息（不跳转） 2商品详情 3抢购详情 4帖子详情 5视频详情 6全民鉴定详情 7钱包页面 8会员页面
      * 9官方鉴定列表 10买家订单详情 11卖家订单详情 12我的专栏 13实名认证通过 14官方认证通过 15申请专栏通过
+     * 16实名认证拒绝 17官方认证拒绝 18申请专栏拒绝
      */
     JUMP_TYPE_SYSTEM("1"),JUMP_TYPE_GOODS("2"),JUMP_TYPE_AUCTION("3"),JUMP_TYPE_FORUM("4"),JUMP_TYPE_VIDEO("5"),JUMP_TYPE_APPRAISAL("6"),JUMP_TYPE_WALLET("7"),
     JUMP_TYPE_VIP("8"),JUMP_TYPE_PLATFORM_APPRAISAL("9"),JUMP_TYPE_ORDER_BUYER("10"),JUMP_TYPE_ORDER_SELLER("11"),JUMP_TYPE_COLUMN("12"),
     JUMP_TYPE_EXT_AGREE("13"),JUMP_TYPE_AUTH_TYPE_AGREE("14"),JUMP_TYPE_COLUMN_AGREE("15"),
+    JUMP_TYPE_EXT_REFUSE("16"),JUMP_TYPE_AUTH_TYPE_REFUSE("17"),JUMP_TYPE_COLUMN_REFUSE("18"),
 
 
     //会员等级 1铂金会员 2至尊会员

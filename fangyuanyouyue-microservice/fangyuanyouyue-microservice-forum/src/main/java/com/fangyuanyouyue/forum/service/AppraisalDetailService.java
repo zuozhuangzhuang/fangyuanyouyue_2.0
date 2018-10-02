@@ -84,4 +84,15 @@ public interface AppraisalDetailService {
      * @throws ServiceException
      */
     void deleteAppraisal(Integer userId,Integer[] ids) throws ServiceException;
+
+    /**
+     * 编辑全民鉴定
+     * @param appraisalaId
+     * @param sort
+     * @param count
+     * @param status
+     * @param content
+     * @throws ServiceException
+     */
+    void updateAppraisal(Integer appraisalaId,Integer sort,Integer count,Integer status,String content) throws ServiceException;
 }
