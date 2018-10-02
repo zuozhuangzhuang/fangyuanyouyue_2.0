@@ -122,10 +122,8 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
     @Override
     public boolean isAuth(Integer userId) throws ServiceException {
         UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(userId);
-        //根据用户ID获取实名认证申请信息
-        IdentityAuthApply identityAuthApply = identityAuthApplyMapper.selectByUserId(userId);
         //已申请过 状态 1申请 2通过 3拒绝
-        if(identityAuthApply != null && identityAuthApply.getStatus().equals(StatusEnum.AUTH_ACCEPT.getCode()) && userInfoExt.getStatus().intValue() == StatusEnum.AUTH_ACCEPT.getCode()) {
+        if(userInfoExt.getStatus().equals(StatusEnum.AUTH_ACCEPT.getCode())) {
             return true;
         }else{
             return false;

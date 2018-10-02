@@ -339,8 +339,8 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 	@Override
 	public void invite(Integer userId,Integer appraisalId, Integer[] userIds) throws ServiceException {
 		AppraisalDetail appraisalDetail = appraisalDetailMapper.selectByPrimaryKey(appraisalId);
-		if(!appraisalDetail.getStatus().equals(Status.BEING.getValue())){
-			throw new ServiceException("全民鉴定状态异常！");
+		if(appraisalDetail == null || appraisalDetail.getStatus().equals(Status.DELETE.getValue())){
+			throw new ServiceException("未找到全民鉴定状态！");
 		}
 		//邀请我：用户“用户昵称”发起全民鉴定【全名鉴定名称】时邀请了您！点击此处前往查看吧
 		UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);

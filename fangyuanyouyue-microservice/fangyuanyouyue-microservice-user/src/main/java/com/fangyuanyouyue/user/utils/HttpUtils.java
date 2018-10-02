@@ -17,8 +17,7 @@ public class HttpUtils {
     public HttpUtils() {
     }
 
-    public static void saveImagestodisk() throws IOException
-    {
+    public static void saveImagestodisk() throws IOException{
         InputStream inputStream=getInputStream(URL_PATH);
         byte[] data=new byte[1024];
         int len=0;
