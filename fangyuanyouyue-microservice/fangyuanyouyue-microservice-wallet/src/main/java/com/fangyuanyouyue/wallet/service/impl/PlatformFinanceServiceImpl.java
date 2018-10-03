@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.wallet.service.impl;
 
 import com.fangyuanyouyue.base.Pager;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.wallet.dao.PlatformFinanceDetailMapper;
@@ -40,7 +41,15 @@ public class PlatformFinanceServiceImpl implements PlatformFinanceService {
         financeDetail.setUserId(userId);
         financeDetail.setAmount(amount);
         financeDetail.setPayType(payType);
-        financeDetail.setType(type==1?1:2);
+        if(type.equals(Status.EXPEND.getValue())){
+            if(payType.equals(Status.PAY_TYPE_BALANCE.getValue())){
+                financeDetail.setType(Status.EXPEND.getValue());
+            }else{
+                financeDetail.setType(Status.INCOME.getValue());
+            }
+        }else{
+            financeDetail.setType(Status.EXPEND.getValue());
+        }
         financeDetail.setAddTime(DateStampUtils.getTimesteamp());
         financeDetail.setTitle(title);
         financeDetail.setOrderNo(orderNo);

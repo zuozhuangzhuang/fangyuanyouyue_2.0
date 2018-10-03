@@ -239,7 +239,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 					//订单号
 					final IdGenerator idg = IdGenerator.INSTANCE;
 					String orderNo = idg.nextId();
-					schedualWalletService.addUserBalanceDetail(forumColumnApply.getUserId(),new BigDecimal(200), Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"申请【"+forumColumnApply.getColumnName()+"】专栏失败退款",null,forumColumnApply.getUserId(),Status.FORUM_COLUMN.getValue(),orderNo);
+					schedualWalletService.addUserBalanceDetail(forumColumnApply.getUserId(),new BigDecimal(200), Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"【"+forumColumnApply.getColumnName()+"】审核未通过",null,forumColumnApply.getUserId(),Status.FORUM_COLUMN.getValue(),orderNo);
 				}else{
 					throw new ServiceException("状态值错误！");
 				}

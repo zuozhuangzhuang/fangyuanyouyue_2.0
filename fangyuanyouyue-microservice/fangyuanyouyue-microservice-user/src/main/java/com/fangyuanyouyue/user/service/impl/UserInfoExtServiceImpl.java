@@ -302,7 +302,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
 			//订单号
 			final IdGenerator idg = IdGenerator.INSTANCE;
 			String orderNo = idg.nextId();
-            schedualWalletService.addUserBalanceDetail(model.getUserId(),new BigDecimal(360),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"申请认证店铺失败退款",null,model.getUserId(),Status.SHOP_AUTH.getValue(),orderNo);
+            schedualWalletService.addUserBalanceDetail(model.getUserId(),new BigDecimal(360),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"认证店铺审核未通过",null,model.getUserId(),Status.SHOP_AUTH.getValue(),orderNo);
             //拒绝
             schedualMessageService.easemobMessage(model.getUserId().toString(),
                     "很抱歉，您申请的认证店铺未通过官方审核，可联系客服咨询详情。",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_AUTH_TYPE_REFUSE.getMessage(),"");

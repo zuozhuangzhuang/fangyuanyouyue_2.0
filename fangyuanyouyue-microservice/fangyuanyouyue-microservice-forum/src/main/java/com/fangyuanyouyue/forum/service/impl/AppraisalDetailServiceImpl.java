@@ -329,7 +329,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 			}
 		}
 		//余额账单
-		schedualWalletService.addUserBalanceDetail(argueOrder.getUserId(),argueOrder.getAmount(),payType,Status.EXPEND.getValue(),orderNo,argueOrder.getTitle(),argueOrder.getUserId(),null, Status.APPRAISAL.getValue(),thirdOrderNo);
+		schedualWalletService.addUserBalanceDetail(argueOrder.getUserId(),argueOrder.getAmount(),payType,Status.EXPEND.getValue(),orderNo,"【"+argueOrder.getTitle()+"】",argueOrder.getUserId(),null, Status.APPRAISAL.getValue(),thirdOrderNo);
 		argueOrder.setStatus(Status.ORDER_COMPLETE.getValue());
 		argueOrder.setPayNo(thirdOrderNo);
 		argueOrderMapper.updateByPrimaryKey(argueOrder);
@@ -416,6 +416,17 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
             if(StringUtils.isEmpty(content)){
                 throw new ServiceException("删除理由不能为空！");
             }
+			if(detail.getBonus() != null){
+				BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(detail.getUserId(),detail.getBonus(),Status.ADD.getValue())), BaseResp.class);
+				if(baseResp.getCode() == 1){
+					throw new ServiceException(baseResp.getReport().toString());
+				}
+				//余额账单
+				//订单号
+				final IdGenerator idg = IdGenerator.INSTANCE;
+				String orderNo = idg.nextId();
+				schedualWalletService.addUserBalanceDetail(detail.getUserId(),detail.getBonus(), Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"【"+detail.getTitle()+"】官方删除",detail.getUserId(),null,Status.APPRAISAL.getValue(),orderNo);
+			}
             //很抱歉，您的帖子/视频/全民鉴定/【名称】已被官方删除，删除理由：……
             schedualMessageService.easemobMessage(detail.getUserId().toString(),
                     "很抱歉，您的全民鉴定【"+detail.getTitle()+"】已被官方删除，删除理由："+content, Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");

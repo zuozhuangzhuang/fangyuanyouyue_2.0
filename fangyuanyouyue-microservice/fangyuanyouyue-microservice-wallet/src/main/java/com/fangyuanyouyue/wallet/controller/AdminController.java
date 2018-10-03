@@ -52,7 +52,8 @@ public class AdminController extends BaseController{
             @ApiImplicitParam(name = "ascType", value = "排序类型 1升序 2降序", required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "payType", value = "支付类型 1微信 2支付宝 3余额 4小程序", required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "type", value = "收支类型 1收入 2支出", required = false, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "orderType", value = "订单类型 1商品、抢购 2官方鉴定 3商品议价 4全民鉴定 5专栏(申请专栏：支出、每日返利：收入、申请被拒：退款) 6充值 7提现 8开通会员 9续费会员 10认证店铺", required = false, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "orderType", value = "订单类型 1商品、抢购 2官方鉴定 3商品议价 4全民鉴定 5专栏(申请专栏：支出、每日返利：收入、申请被拒：退款) 6充值 7提现 8开通会员 9续费会员 10认证店铺", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "计算方式 1总账 2平台纯收支", required = true, dataType = "int", paramType = "query")
     })
     @GetMapping(value = "/platformFinance")
     @ResponseBody
@@ -65,6 +66,9 @@ public class AdminController extends BaseController{
             }
             if(param.getLimit() == null || param.getLimit() < 1){
                 return toError("每页个数错误！");
+            }
+            if(param.getStatus() == null){
+                return toError("计算方式不能为空！");
             }
             Pager pager = platformFinanceService.platformFinance(param);
             return toPage(pager);
