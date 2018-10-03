@@ -1,9 +1,12 @@
 package com.fangyuanyouyue.forum.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.Credit;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.base.util.IdGenerator;
 import com.fangyuanyouyue.forum.dao.AppraisalDetailMapper;
 import com.fangyuanyouyue.forum.dao.ForumInfoMapper;
 import com.fangyuanyouyue.forum.dao.ReportMapper;
@@ -85,6 +88,17 @@ public class ReportServiceImpl implements ReportService{
             AppraisalDetail detail = appraisalDetailMapper.selectByPrimaryKey(report.getBusinessId());
             //删除全民鉴定
             detail.setStatus(Status.DELETE.getValue());
+            if(detail.getBonus() != null){
+                BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(detail.getUserId(),detail.getBonus(),Status.ADD.getValue())), BaseResp.class);
+                if(baseResp.getCode() == 1){
+                    throw new ServiceException(baseResp.getReport().toString());
+                }
+                //余额账单
+                //订单号
+                final IdGenerator idg = IdGenerator.INSTANCE;
+                String orderNo = idg.nextId();
+                schedualWalletService.addUserBalanceDetail(detail.getUserId(),detail.getBonus(), Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"【"+detail.getTitle()+"】官方删除",detail.getUserId(),null,Status.APPRAISAL.getValue(),orderNo);
+            }
             appraisalDetailMapper.updateByPrimaryKey(detail);
             //被举报-40
             schedualWalletService.updateCredit(detail.getUserId(), Credit.REPORT_VERIFYED.getCredit(),Status.SUB.getValue());

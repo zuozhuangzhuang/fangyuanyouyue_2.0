@@ -29,9 +29,27 @@
         select count(id) from vip_order where add_time <![CDATA[ >= ]]> (CURDATE()-1) and add_time <![CDATA[ < ]]> CURDATE() and status = 2
     </select>
     <select id="getYestoryIncome" resultType="BigDecimal">
-        select sum(amount) from platform_finance_detail where add_time <![CDATA[ >= ]]> (CURDATE()-1) and add_time <![CDATA[ < ]]> CURDATE() and type = 1
+        select sum(amount) from platform_finance_detail
+        <where>
+            add_time <![CDATA[ >= ]]> (CURDATE()-1) and add_time <![CDATA[ < ]]> CURDATE() and type = 1
+            and(order_type = 2
+            or order_type = 5
+            or order_type = 8
+            or order_type = 9
+            or order_type = 10
+            )
+        </where>
     </select>
     <select id="getYestoryExpend" resultType="BigDecimal">
-        select sum(amount) from platform_finance_detail where add_time <![CDATA[ >= ]]> (CURDATE()-1) and add_time <![CDATA[ < ]]> CURDATE() and type = 2
+        select sum(amount) from platform_finance_detail
+        <where>
+            add_time <![CDATA[ >= ]]> (CURDATE()-1) and add_time <![CDATA[ < ]]> CURDATE() and type = 2
+            and(order_type = 2
+            or order_type = 5
+            or order_type = 8
+            or order_type = 9
+            or order_type = 10
+            )
+        </where>
     </select>
 </mapper>

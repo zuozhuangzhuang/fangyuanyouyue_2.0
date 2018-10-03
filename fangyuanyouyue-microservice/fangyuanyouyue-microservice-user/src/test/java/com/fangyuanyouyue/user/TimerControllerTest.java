@@ -48,7 +48,7 @@ public class TimerControllerTest {
 //    }
 
     /**
-     * 每天统计一次昨日注册用户
+     * 每天统计
      * @throws Exception
      */
     @Test

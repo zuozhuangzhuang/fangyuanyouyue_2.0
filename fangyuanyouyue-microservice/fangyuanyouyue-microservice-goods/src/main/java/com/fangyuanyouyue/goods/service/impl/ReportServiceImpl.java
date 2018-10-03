@@ -6,12 +6,15 @@ import com.fangyuanyouyue.base.enums.Score;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
+import com.fangyuanyouyue.goods.dao.GoodsBargainMapper;
 import com.fangyuanyouyue.goods.dao.GoodsInfoMapper;
 import com.fangyuanyouyue.goods.dao.ReportMapper;
 import com.fangyuanyouyue.goods.dto.adminDto.AdminReportGoodsDto;
+import com.fangyuanyouyue.goods.model.GoodsBargain;
 import com.fangyuanyouyue.goods.model.GoodsInfo;
 import com.fangyuanyouyue.goods.model.Report;
 import com.fangyuanyouyue.goods.param.AdminGoodsParam;
+import com.fangyuanyouyue.goods.service.BargainService;
 import com.fangyuanyouyue.goods.service.ReportService;
 import com.fangyuanyouyue.goods.service.SchedualMessageService;
 import com.fangyuanyouyue.goods.service.SchedualWalletService;
@@ -33,6 +36,10 @@ public class ReportServiceImpl implements ReportService{
     private SchedualMessageService schedualMessageService;
     @Autowired
     private SchedualWalletService schedualWalletService;
+    @Autowired
+    private GoodsBargainMapper goodsBargainMapper;
+    @Autowired
+    private BargainService bargainService;
 
     @Override
     public void report(Integer userId, Integer businessId, String reason, Integer type) throws ServiceException {
@@ -79,6 +86,11 @@ public class ReportServiceImpl implements ReportService{
                 schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
                         "很抱歉，您的抢购【"+goodsInfo.getName()+"】被多用户举报，并经官方核实。已被删除，删除理由："+content+"。点击查看详情",
                         Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_AUCTION.getMessage(),goodsInfo.getId().toString());
+            }
+            //取消所有议价
+            List<GoodsBargain> goodsBargains = goodsBargainMapper.selectAllByGoodsId(goodsInfo.getId(),Status.BARGAIN_APPLY.getValue());//状态 1申请 2同意 3拒绝 4取消
+            for(GoodsBargain bargain:goodsBargains){
+                bargainService.updateBargain(goodsInfo.getUserId(),goodsInfo.getId(),bargain.getId(),Status.BARGAIN_REFUSE.getValue());
             }
 
             report.setStatus(Status.YES.getValue());

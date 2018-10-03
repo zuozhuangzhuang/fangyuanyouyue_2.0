@@ -332,13 +332,13 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             if(goodsInfo == null || goodsInfo.getStatus().intValue() == 5){
                 throw new ServiceException("商品不存在或已下架！");
             }else{
+                if(!goodsInfo.getUserId().equals(userId)){
+                    throw new ServiceException("无权删除！");
+                }
                 //取消所有议价
                 List<GoodsBargain> goodsBargains = goodsBargainMapper.selectAllByGoodsId(goodsId,Status.BARGAIN_APPLY.getValue());//状态 1申请 2同意 3拒绝 4取消
                 for(GoodsBargain bargain:goodsBargains){
-                    bargainService.updateBargain(userId,goodsId,bargain.getId(),Status.BARGAIN_REFUSE.getValue());
-                    //议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
-                    schedualMessageService.easemobMessage(bargain.getUserId().toString(),
-                            "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),bargain.getGoodsId().toString());
+                    bargainService.updateBargain(goodsInfo.getUserId(),goodsId,bargain.getId(),Status.BARGAIN_REFUSE.getValue());
                 }
                 goodsInfo.setStatus(5);//状态 普通商品 1出售中 2已售出 3已下架（已结束） 5删除
                 goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
@@ -756,6 +756,13 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             }
             if(param.getStatus() != null){
                 goodsInfo.setStatus(param.getStatus());//状态 1出售中 2已售出 3已下架（已结束） 5删除
+                if(param.getStatus().equals(5)){
+                    //取消所有议价
+                    List<GoodsBargain> goodsBargains = goodsBargainMapper.selectAllByGoodsId(param.getId(),Status.BARGAIN_APPLY.getValue());//状态 1申请 2同意 3拒绝 4取消
+                    for(GoodsBargain bargain:goodsBargains){
+                        bargainService.updateBargain(goodsInfo.getUserId(),param.getId(),bargain.getId(),Status.BARGAIN_REFUSE.getValue());
+                    }
+                }
             }
             if(param.getIsAppraisal() != null){
                 goodsInfo.setIsAppraisal(param.getIsAppraisal());

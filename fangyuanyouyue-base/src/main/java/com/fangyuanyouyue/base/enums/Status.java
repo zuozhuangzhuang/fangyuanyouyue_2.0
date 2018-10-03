@@ -49,8 +49,8 @@ public enum Status {
     //会员类型 1一个月 2三个月 3一年会员
     VIP_TYPE_ONE_MONTH(1),VIP_TYPE_THREE_MONTH(2),VIP_TYPE_ONE_YEAR(3),
 
-    //会员开通类型 1开通 2续费
-
+    //会员开通类型 1开通 2续费 3取消
+    VIP_DREDGE(1),VIP_RENEW(2),VIP_CANCEL(3),
     //会员状态 1已开通 2未开通
     IS_VIP(1),NOT_VIP(2),
 

@@ -75,7 +75,7 @@ public interface AppraisalService {
     List<AppraisalDetailDto> getAllAppraisal(Integer start,Integer limit) throws ServiceException;
 
     /**
-     * 修改订单祖状态
+     * 修改订单状态
      * @param orderNo
      * @param thirdOrderNo
      * @param payType

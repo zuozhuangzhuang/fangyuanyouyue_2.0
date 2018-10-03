@@ -35,7 +35,7 @@ public class GoodsAppraisalDetail {
 
     private Date updateTime;//更新时间
 
-    private Integer type;//鉴定类型 1商家鉴定 2买家 3普通用户
+    private Integer type;//鉴定类型 1卖家鉴定 2买家鉴定 3我要鉴定
 
     private Integer isShow;//是否鉴定展示 1是 2否
 
