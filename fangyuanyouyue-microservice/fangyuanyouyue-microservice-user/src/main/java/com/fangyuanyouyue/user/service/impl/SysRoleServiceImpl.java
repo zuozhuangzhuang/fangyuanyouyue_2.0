@@ -51,8 +51,21 @@ public class SysRoleServiceImpl implements SysRoleService{
 	}
 	@Override
 	public List<AdminRoleDto> getRoleByUserId(Integer userId) throws ServiceException {
-		// TODO Auto-generated method stub
-		return null;
+		List<SysRole> allRole = sysRoleMapper.selectAll();
+		List<SysRole> permissionRole = sysRoleMapper.selectByUserId(userId);
+		List<AdminRoleDto> dtos = new ArrayList<AdminRoleDto>();
+		for(SysRole role:allRole) {
+			AdminRoleDto dto = new AdminRoleDto(role);
+			dto.setPermission(false);
+			for(SysRole pRole:permissionRole) {
+				if(dto.getId().intValue()==pRole.getId().intValue()) {
+					dto.setPermission(true);
+				}
+			}
+			dtos.add(dto);
+		}
+		
+		return dtos;
 	}
 	@Override
 	public void saveRole(AdminRoleParam param) throws ServiceException {

@@ -61,7 +61,7 @@ public class SystemServiceImpl implements SystemService {
 
         Integer total = feedbackMapper.countPage(param.getKeyword(),param.getStartDate(),param.getEndDate());
 
-        List<Feedback> feedbacks = feedbackMapper.getPage(param.getStart()*param.getLimit(),param.getLimit(),param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+        List<Feedback> feedbacks = feedbackMapper.getPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
         List<AdminFeedbackDto> datas = AdminFeedbackDto.toDtoList(feedbacks);
         Pager pager = new Pager();
         pager.setTotal(total);

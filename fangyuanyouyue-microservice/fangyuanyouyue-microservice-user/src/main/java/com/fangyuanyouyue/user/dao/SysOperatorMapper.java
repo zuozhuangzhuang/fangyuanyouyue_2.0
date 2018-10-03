@@ -23,4 +23,7 @@ public interface SysOperatorMapper {
     SysOperator selectLogin(String userCode,String password);
     
     List<SysOperator> selectAll();
+
+    List<SysOperator> selectByRoleId(Integer roleId);
+    
 }

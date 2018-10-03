@@ -129,9 +129,6 @@
       or b.phone like "%"#{keyword,jdbcType=VARCHAR}"%"
       )
     </if>
-    <if test="type != null">
-      and a.type = #{type}
-    </if>
     <if test="startDate != null">
       and a.add_time <![CDATA[ > ]]> #{startDate}
     </if>
@@ -149,9 +146,6 @@
       b.nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
       or b.phone like "%"#{keyword,jdbcType=VARCHAR}"%"
       )
-    </if>
-    <if test="type != null">
-      and a.type = #{type}
     </if>
 
     <if test="startDate != null">

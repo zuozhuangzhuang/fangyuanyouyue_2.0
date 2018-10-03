@@ -16,7 +16,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class AdminOperatorDto {
-    private Integer id;
+    private Integer userId;
 
     private String userCode;//登录名
 
@@ -44,7 +44,7 @@ public class AdminOperatorDto {
     
 
     public AdminOperatorDto(SysOperator model) {
-        this.id = model.getId();
+        this.userId = model.getId();
        	this.userCode = model.getUserCode();
        	this.userName = model.getUserName();
        	this.loginPwd = model.getLoginPwd();

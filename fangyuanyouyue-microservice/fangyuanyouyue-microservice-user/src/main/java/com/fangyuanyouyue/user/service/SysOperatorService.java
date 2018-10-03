@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.user.dto.admin.AdminOperatorDto;
+import com.fangyuanyouyue.user.param.AdminOperatorParam;
 
 public interface SysOperatorService {
     
@@ -27,6 +28,12 @@ public interface SysOperatorService {
      * @param menuId
      */
     void deleteOperator(Integer operatorId) ;
+    
+    /**
+     * 保存操作员
+     * @param param
+     */
+    void saveOperator(AdminOperatorParam param);
     
     /**
      * 登录

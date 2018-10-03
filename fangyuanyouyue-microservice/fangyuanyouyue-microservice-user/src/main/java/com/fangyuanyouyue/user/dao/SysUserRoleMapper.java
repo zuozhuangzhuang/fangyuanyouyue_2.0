@@ -16,4 +16,8 @@ public interface SysUserRoleMapper {
     int updateByPrimaryKeySelective(SysUserRole record);
 
     int updateByPrimaryKey(SysUserRole record);
+    
+    int deleteByRoleId(Integer roleId);
+    
+    int deleteByUserId(Integer userId);
 }

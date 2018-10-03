@@ -105,8 +105,8 @@
   <select id="selectByUserId" resultMap="BaseResultMap" >
     select 
     a.*
-    from sys_role a,sys_role_menu b where a.id=b.role_id
-    and b.menu_id = #{menuId,jdbcType=INTEGER}
+    from sys_role a,sys_user_role b where a.id=b.role_id
+    and b.operator_id = #{userId,jdbcType=INTEGER}
   </select>
   
 </mapper>

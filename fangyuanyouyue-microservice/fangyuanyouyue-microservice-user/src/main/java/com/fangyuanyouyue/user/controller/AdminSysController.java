@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.user.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,6 +27,7 @@ import com.fangyuanyouyue.user.dto.admin.AdminOperatorDto;
 import com.fangyuanyouyue.user.dto.admin.AdminProcessDto;
 import com.fangyuanyouyue.user.dto.admin.AdminRoleDto;
 import com.fangyuanyouyue.user.param.AdminMenuParam;
+import com.fangyuanyouyue.user.param.AdminOperatorParam;
 import com.fangyuanyouyue.user.param.AdminRoleParam;
 import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.service.SysMenuService;
@@ -408,7 +410,7 @@ public class AdminSysController extends BaseController {
             if(param.getMenuId()!=null) {
                 roles = sysRoleService.getRoleByMenuId(param.getMenuId());
             }else if(param.getUserId()!=null) {
-                roles = sysRoleService.getRoleByMenuId(param.getMenuId());
+                roles = sysRoleService.getRoleByUserId(param.getUserId());
             }else {
             	roles = sysRoleService.getAllRole();
             }
@@ -463,7 +465,6 @@ public class AdminSysController extends BaseController {
         }
     }
     
-    
 
 
     @ApiOperation(value = "操作员列表", notes = "操作员列表",response = BaseResp.class)
@@ -471,12 +472,20 @@ public class AdminSysController extends BaseController {
     })
     @GetMapping(value = "/operatorList")
     @ResponseBody
-    public Object operatorList(AdminRoleParam param) throws IOException {
+    public Object operatorList(AdminOperatorParam param) throws IOException {
         try {
             log.info("----》获取全部菜单列表《----");
             log.info("参数："+param.toString());
             
-            List<AdminOperatorDto> datas = sysOperatorService.getAllOperator();
+            List<AdminOperatorDto> datas = new ArrayList<AdminOperatorDto>();
+            
+            if(param.getRoleId()!=null) {
+            	datas = sysOperatorService.getAllOperator(param.getRoleId());
+            }else {
+            	datas = sysOperatorService.getAllOperator();
+            }
+            
+            
             HashMap<String,Object> returns = new HashMap<String,Object>();
             returns.put("success", true);
             returns.put("data",datas);
@@ -486,6 +495,27 @@ public class AdminSysController extends BaseController {
             e.printStackTrace();
             return toError(e.getMessage());
         } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统错误！");
+        }
+    }
+
+
+
+    @ApiOperation(value = "操作员保存", notes = "操作员保存",response = BaseResp.class)
+    @ApiImplicitParams({
+    })
+    @PostMapping(value = "/operatorSave")
+    @ResponseBody
+    public Object operatorSave(AdminOperatorParam param) throws IOException {
+        try {
+            log.info("----》保存操作员《----");
+            log.info("参数："+param.toString());
+            
+            sysOperatorService.saveOperator(param);            
+    		
+            return toSuccess();
+        }catch (Exception e) {
             e.printStackTrace();
             return toError("系统错误！");
         }

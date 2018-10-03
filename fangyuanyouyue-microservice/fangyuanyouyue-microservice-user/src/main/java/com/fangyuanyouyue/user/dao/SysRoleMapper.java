@@ -23,4 +23,6 @@ public interface SysRoleMapper {
     List<SysRole> selectAll();
     
     List<SysRole> selectByMenuId(Integer menuId);
+    
+    List<SysRole> selectByUserId(Integer userId);
 }
