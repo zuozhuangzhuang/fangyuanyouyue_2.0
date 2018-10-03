@@ -71,10 +71,10 @@ public class AddressController extends BaseController{
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError("登录超时，请重新登录！");
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
             if(user.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             //添加收货地址
             List<UserAddressDto> userAddressDtos = userAddressInfoService.addAddress(param.getToken(),param.getReceiverName(),param.getReceiverPhone(),param.getProvince(),param.getCity(),param.getArea(),param.getAddress(),param.getPostCode(),param.getType());
@@ -126,10 +126,10 @@ public class AddressController extends BaseController{
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError("登录超时，请重新登录！");
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
             if(user.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             //修改收货地址
             userAddressInfoService.updateAddress(param.getToken(),param.getAddressId(),param.getReceiverName(),param.getReceiverPhone(),param.getProvince(),param.getCity(),param.getArea(),param.getAddress(),param.getPostCode(),param.getType());
@@ -162,10 +162,10 @@ public class AddressController extends BaseController{
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError("登录超时，请重新登录！");
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
             if(user.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             //删除收货地址
             List<UserAddressDto> userAddressDtos = userAddressInfoService.deleteAddress(param.getToken(),param.getAddressId());
@@ -194,11 +194,11 @@ public class AddressController extends BaseController{
                 return toError("用户token不能为空！");
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
-            if(user == null){
-                return toError("登录超时，请重新登录！");
+            if(user==null){
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
             if(user.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             //获取收货地址列表
             List<UserAddressDto> userAddressDtos = userAddressInfoService.getAddressList(param.getToken(),param.getAddressId());
@@ -229,11 +229,11 @@ public class AddressController extends BaseController{
                 return toError("用户token不能为空！");
             }
             UserInfo user = userInfoService.getUserByToken(param.getToken());
-            if(user == null){
-                return toError("登录超时，请重新登录！");
+            if(user==null){
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
             if(user.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             //设置默认收货地址
             userAddressInfoService.defaultAddress(param.getToken(),param.getAddressId());
@@ -262,11 +262,11 @@ public class AddressController extends BaseController{
                 return toError("用户token不能为空！");
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
-            if(user == null){
-                return toError("登录超时，请重新登录！");
+            if(user==null){
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
             if(user.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             //获取默认地址
             UserAddressDto defaultAddress = userAddressInfoService.getDefaultAddress(param.getToken());

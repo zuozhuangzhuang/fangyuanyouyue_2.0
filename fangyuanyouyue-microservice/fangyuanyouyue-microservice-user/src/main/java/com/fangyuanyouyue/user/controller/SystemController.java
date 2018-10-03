@@ -2,6 +2,7 @@ package com.fangyuanyouyue.user.controller;
 
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.user.dto.AppVersionDto;
 import com.fangyuanyouyue.user.model.UserInfo;
@@ -54,10 +55,10 @@ public class SystemController extends BaseController{
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError("登录超时，请重新登录！");
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
             if(user.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             if(StringUtils.isEmpty(param.getContent())){
                 return toError("反馈信息不能为空！");

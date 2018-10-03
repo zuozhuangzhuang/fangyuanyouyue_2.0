@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.model.WxPayResult;
 import com.fangyuanyouyue.base.util.AES;
@@ -227,10 +228,10 @@ public class UserController extends BaseController {
             //验证用户
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError("登录超时，请重新登录！");
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
             if(user.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             //三方绑定
             //三方绑定是为了将微信号与手机号绑定到一个账户，如果用户用手机号注册过，又用微信号登录了第二个账号，将没有绑定功能，而是合并账号，以手机号为主，
@@ -275,10 +276,10 @@ public class UserController extends BaseController {
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError("登录超时，请重新登录！");
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
             if(user.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             //实名认证
             userInfoExtService.certification(param.getToken(),param.getName(),param.getIdentity(),param.getIdentityImgCoverUrl(),param.getIdentityImgBackUrl());
@@ -320,10 +321,10 @@ public class UserController extends BaseController {
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError("登录超时，请重新登录！");
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
             if(user.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             //手机号不可以重复
             if(StringUtils.isNotEmpty(param.getPhone())){
@@ -379,10 +380,10 @@ public class UserController extends BaseController {
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError("登录超时，请重新登录！");
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
             if(user.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             if(StringUtils.isEmpty(param.getPhone())){
                 return toError("手机号码不能为空！");
@@ -445,10 +446,10 @@ public class UserController extends BaseController {
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError("登录超时，请重新登录！");
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
             if(user.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             if(StringUtils.isEmpty(user.getPhone())){
                 return toError("第三方用户不可修改密码！");
@@ -487,11 +488,11 @@ public class UserController extends BaseController {
                 return toError("用户token不能为空！");
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
-            if(user == null){
-                return toError("登录超时，请重新登录！");
+            if(user==null){
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
             if(user.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             if(user.getPhone() != null && !user.getPhone().equals("")){
                 if(user.getPhone().equals(param.getPhone())){
@@ -537,11 +538,11 @@ public class UserController extends BaseController {
                 return toError("用户token不能为空！");
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
-            if(user == null){
-                return toError("登录超时，请重新登录！");
+            if(user==null){
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
             if(user.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             if (StringUtils.isEmpty(param.getLoginPwd())) {
                 return toError("密码不能为空！");
@@ -827,10 +828,10 @@ public class UserController extends BaseController {
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError("登录超时，请重新登录！");
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
             if(user.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             if(user.getId() == param.getToUserId()){
                 return toError("不能关注自己");
@@ -871,10 +872,10 @@ public class UserController extends BaseController {
             log.info("参数："+param.toString());
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError("登录超时，请重新登录！");
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
             if(user.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             if(param.getStart() == null || param.getStart() < 0){
                 return toError("起始页数错误！");
@@ -912,10 +913,10 @@ public class UserController extends BaseController {
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError("登录超时，请重新登录！");
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
             if(user.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             //获取待处理信息
             WaitProcessDto waitProcessDto = userInfoService.myWaitProcess(user.getId());
@@ -946,7 +947,10 @@ public class UserController extends BaseController {
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
-                return toError("登录超时，请重新登录！");
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
+            }
+            if(user.getStatus() == 2){
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             if(param.getPayType() == null){
                 return toError("支付方式不能为空！");
