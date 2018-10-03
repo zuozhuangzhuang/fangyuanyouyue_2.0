@@ -20,5 +20,5 @@ public class SysUserRole {
 
     private Date addTime;//添加时间
 
-    private Date update;//修改时间
+    private Date updateTime;//修改时间
 }
