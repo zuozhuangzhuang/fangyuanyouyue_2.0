@@ -88,17 +88,17 @@ public class TimerServiceImpl implements TimerService{
 
         DailyStatistics dailyStatistics = new DailyStatistics();
         dailyStatistics.setDate(DateUtil.getDateAfterDay(new Date(),-1));
-        dailyStatistics.setUserCount(yesterdayUser);
-        dailyStatistics.setGoodsCount(yesterdayGoods);
-        dailyStatistics.setAuctionCount(yestoryAuction);
-        dailyStatistics.setPlatformAppraisalCount(yestoryPlatfomAppraisal);
-        dailyStatistics.setOrderCount(yesterdayOrder);
-        dailyStatistics.setForumCount(yesterdayForum);
-        dailyStatistics.setVideoCount(yestoryVideo);
-        dailyStatistics.setAppraisalCount(yestoryAppraisal);
-        dailyStatistics.setVipCount(yestoryVip);
-        dailyStatistics.setIncomeCount(yestoryIncome);
-        dailyStatistics.setExpendCount(yestoryExpend);
+        dailyStatistics.setUserCount(yesterdayUser == null?0:yesterdayUser);
+        dailyStatistics.setGoodsCount(yesterdayGoods == null?0:yesterdayGoods);
+        dailyStatistics.setAuctionCount(yestoryAuction == null?0:yestoryAuction);
+        dailyStatistics.setPlatformAppraisalCount(yestoryPlatfomAppraisal == null?0:yestoryPlatfomAppraisal);
+        dailyStatistics.setOrderCount(yesterdayOrder == null?0:yesterdayOrder);
+        dailyStatistics.setForumCount(yesterdayForum == null?0:yesterdayForum);
+        dailyStatistics.setVideoCount(yestoryVideo == null?0:yestoryVideo);
+        dailyStatistics.setAppraisalCount(yestoryAppraisal == null?0:yestoryAppraisal);
+        dailyStatistics.setVipCount(yestoryVip == null?0:yestoryVip);
+        dailyStatistics.setIncomeCount(yestoryIncome == null?new BigDecimal(0):yestoryIncome);
+        dailyStatistics.setExpendCount(yestoryExpend == null?new BigDecimal(0):yestoryExpend);
         dailyStatistics.setAddTime(DateStampUtils.getTimesteamp());
         dailyStatisticsMapper.insert(dailyStatistics);
     }
