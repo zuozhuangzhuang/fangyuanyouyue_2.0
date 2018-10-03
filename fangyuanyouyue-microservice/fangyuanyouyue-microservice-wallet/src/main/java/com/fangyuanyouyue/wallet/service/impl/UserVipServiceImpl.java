@@ -58,7 +58,7 @@ public class UserVipServiceImpl implements UserVipService{
             StringBuffer time = new StringBuffer();
             time.append(vipOrder.getVipType().intValue() == Status.VIP_TYPE_ONE_MONTH.getValue()?"一个月"
                     :(vipOrder.getVipType().intValue() == Status.VIP_TYPE_THREE_MONTH.getValue()?"三个月":"一年"));
-            if(vipOrder.getType() == 1){
+            if(vipOrder.getType().equals(Status.VIP_DREDGE.getValue())){
                 //开通
                 if(userVip.getStatus().intValue() == Status.IS_VIP.getValue()){//已开通
                     throw new ServiceException("已开通会员！");
@@ -244,7 +244,7 @@ public class UserVipServiceImpl implements UserVipService{
     @Override
     public void updateUserVip(Integer userId, Integer vipLevel, Integer vipType,Integer type) throws ServiceException {
         UserVip userVip = userVipMapper.selectByUserId(userId);
-        if(type.equals(1)){
+        if(type.equals(Status.VIP_DREDGE.getValue())){
             if(userVip.getStatus().intValue() == Status.IS_VIP.getValue()){//已开通
                 throw new ServiceException("已开通会员！");
             }
@@ -286,10 +286,10 @@ public class UserVipServiceImpl implements UserVipService{
                 schedualMessageService.easemobMessage(userId.toString(),
                         "您本月赠送的代金券已到账，点击前往查看~",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_WALLET.getMessage(),"");
             }
-        }else if(type.equals(2)){
-            if(userVip.getStatus() == Status.NOT_VIP.getValue()){//未开通
-                throw new ServiceException("请开通会员！");
-            }
+        }else if(type.equals(Status.VIP_RENEW.getValue())){
+//            if(userVip.getStatus() == Status.NOT_VIP.getValue()){//未开通
+//                throw new ServiceException("请开通会员！");
+//            }
             if(userVip.getVipLevel().intValue() == vipLevel){//续费相同等级会员
                 //计算结束时间
                 if(vipType.intValue() == Status.VIP_TYPE_ONE_MONTH.getValue()){
@@ -321,7 +321,7 @@ public class UserVipServiceImpl implements UserVipService{
                 userVip.setVipType(vipType);//会员类型 1一个月 2三个月 3一年会员
                 userVip.setStatus(Status.IS_VIP.getValue());//会员状态 1已开通 2未开通
             }
-        }else if(type.equals(3)){
+        }else if(type.equals(Status.VIP_CANCEL.getValue())){
             //取消会员
             userVip.setStartTime(null);
             userVip.setEndTime(null);

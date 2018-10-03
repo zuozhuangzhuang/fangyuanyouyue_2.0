@@ -274,6 +274,9 @@ public class AdminController extends BaseController{
             }
             walletService.confinedUser(param.getId(), param.getStatus());
             return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         }catch (Exception e) {
             e.printStackTrace();
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
@@ -308,6 +311,9 @@ public class AdminController extends BaseController{
             }
             userVipService.updateUserVip(param.getId(), param.getVipLevel(),param.getVipType(),param.getType());
             return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         }catch (Exception e) {
             e.printStackTrace();
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
