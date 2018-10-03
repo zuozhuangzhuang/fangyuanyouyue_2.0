@@ -415,7 +415,7 @@ public class AdminController  extends BaseController {
 
     @ApiOperation(value = "官方鉴定列表", notes = "官方鉴定列表",response = BaseResp.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "鉴定类型 1商家鉴定 2买家 3普通用户", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "鉴定类型 1卖家鉴定 2买家鉴定 3我要鉴定", required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "keyword", value = "搜索词条", required = false, dataType = "String", paramType = "query"),
