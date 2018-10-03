@@ -1,7 +1,10 @@
 package com.fangyuanyouyue.user.dao;
 
-import com.fangyuanyouyue.user.model.SysOperator;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
+
+import com.fangyuanyouyue.user.model.SysOperator;
 
 @Mapper
 public interface SysOperatorMapper {
@@ -18,4 +21,6 @@ public interface SysOperatorMapper {
     int updateByPrimaryKey(SysOperator record);
     
     SysOperator selectLogin(String userCode,String password);
+    
+    List<SysOperator> selectAll();
 }

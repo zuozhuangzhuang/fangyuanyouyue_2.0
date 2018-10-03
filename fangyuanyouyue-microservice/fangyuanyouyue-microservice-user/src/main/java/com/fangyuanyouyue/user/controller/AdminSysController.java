@@ -20,15 +20,16 @@ import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.user.dao.SysRoleMapper;
 import com.fangyuanyouyue.user.dto.admin.AdminDailyStatisticsDto;
 import com.fangyuanyouyue.user.dto.admin.AdminMenuDto;
+import com.fangyuanyouyue.user.dto.admin.AdminOperatorDto;
 import com.fangyuanyouyue.user.dto.admin.AdminProcessDto;
 import com.fangyuanyouyue.user.dto.admin.AdminRoleDto;
 import com.fangyuanyouyue.user.param.AdminMenuParam;
 import com.fangyuanyouyue.user.param.AdminRoleParam;
 import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.service.SysMenuService;
+import com.fangyuanyouyue.user.service.SysOperatorService;
 import com.fangyuanyouyue.user.service.SysRoleService;
 import com.fangyuanyouyue.user.service.SystemService;
 import com.fangyuanyouyue.user.service.UserInfoService;
@@ -55,6 +56,8 @@ public class AdminSysController extends BaseController {
     private SysMenuService sysMenuService;
     @Autowired
     private SysRoleService sysRoleService;
+    @Autowired
+    private SysOperatorService sysOperatorService;
 
 
 
@@ -457,6 +460,36 @@ public class AdminSysController extends BaseController {
             return toError("系统错误！");
         }
     }
+    
+    
+
+
+    @ApiOperation(value = "操作员列表", notes = "操作员列表",response = BaseResp.class)
+    @ApiImplicitParams({
+    })
+    @GetMapping(value = "/operatorList")
+    @ResponseBody
+    public Object operatorList(AdminRoleParam param) throws IOException {
+        try {
+            log.info("----》获取全部菜单列表《----");
+            log.info("参数："+param.toString());
+            
+            List<AdminOperatorDto> datas = sysOperatorService.getAllOperator();
+            HashMap<String,Object> returns = new HashMap<String,Object>();
+            returns.put("success", true);
+            returns.put("data",datas);
+    		
+            return returns;
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统错误！");
+        }
+    }
+
+
     
     
 }

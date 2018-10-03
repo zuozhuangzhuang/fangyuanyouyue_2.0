@@ -13,6 +13,8 @@ public class AdminRoleParam {
 	
     private Integer id;
 
+    private Integer userId;
+
     private Integer menuId;
     
     private String roleName;
