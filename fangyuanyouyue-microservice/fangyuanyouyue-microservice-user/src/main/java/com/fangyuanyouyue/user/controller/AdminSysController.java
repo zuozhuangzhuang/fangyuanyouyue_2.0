@@ -407,6 +407,8 @@ public class AdminSysController extends BaseController {
             List<AdminRoleDto> roles = null;
             if(param.getMenuId()!=null) {
                 roles = sysRoleService.getRoleByMenuId(param.getMenuId());
+            }else if(param.getUserId()!=null) {
+                roles = sysRoleService.getRoleByMenuId(param.getMenuId());
             }else {
             	roles = sysRoleService.getAllRole();
             }
