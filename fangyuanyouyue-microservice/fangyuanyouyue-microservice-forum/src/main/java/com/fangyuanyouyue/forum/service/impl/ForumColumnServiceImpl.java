@@ -236,6 +236,10 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 					schedualMessageService.easemobMessage(forumColumnApply.getUserId().toString(),
 							"很抱歉您的【"+forumColumnApply.getColumnName()+"】专栏审核未通过，可联系客服咨询详情",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_COLUMN_REFUSE.getMessage(),"");
 					//余额账单
+					BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(forumColumnApply.getUserId(),new BigDecimal(200),Status.ADD.getValue())), BaseResp.class);
+					if(baseResp.getCode() == 1){
+						throw new ServiceException(baseResp.getReport().toString());
+					}
 					//订单号
 					final IdGenerator idg = IdGenerator.INSTANCE;
 					String orderNo = idg.nextId();
