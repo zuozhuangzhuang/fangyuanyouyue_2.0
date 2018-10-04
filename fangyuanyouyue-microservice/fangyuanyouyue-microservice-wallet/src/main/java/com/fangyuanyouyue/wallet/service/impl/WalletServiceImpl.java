@@ -166,7 +166,7 @@ public class WalletServiceImpl implements WalletService{
         //订单号
         final IdGenerator idg = IdGenerator.INSTANCE;
         String orderNo = idg.nextId();
-        addUserBalanceDetail(userId,amount,Status.PAY_TYPE_BALANCE.getValue(),Status.EXPEND.getValue(),orderNo,userWithdraw.getPayType().equals(1)?"微信":"支付宝"+"提现",Status.WITHDRAW.getValue(),null,userId,orderNo);
+        addUserBalanceDetail(userId,amount,Status.PAY_TYPE_BALANCE.getValue(),Status.EXPEND.getValue(),orderNo,(userWithdraw.getPayType().equals(1)?"微信":"支付宝")+"提现",Status.WITHDRAW.getValue(),null,userId,orderNo);
     }
 
 
@@ -545,7 +545,7 @@ public class WalletServiceImpl implements WalletService{
         userRechargeDetail.setStatus(2);
         userRechargeDetailMapper.updateByPrimaryKeySelective(userRechargeDetail);
         //生成余额账单
-        addUserBalanceDetail(userRechargeDetail.getUserId(),userRechargeDetail.getAmount(),payType,Status.INCOME.getValue(),orderNo,payType.equals(1)?"微信":"支付宝"+"提现",Status.WITHDRAW.getValue(),null,null,thirdOrderNo);
+        addUserBalanceDetail(userRechargeDetail.getUserId(),userRechargeDetail.getAmount(),payType,Status.INCOME.getValue(),orderNo,(payType.equals(1)?"微信":"支付宝")+"提现",Status.WITHDRAW.getValue(),null,null,thirdOrderNo);
         //充值
         updateBalance(userRechargeDetail.getUserId(),userRechargeDetail.getAmount(),1);
         return true;
@@ -611,12 +611,12 @@ public class WalletServiceImpl implements WalletService{
         final IdGenerator idg = IdGenerator.INSTANCE;
         String orderNo = idg.nextId();
         if(status.intValue() == Status.WITHDRAW_AGGRES.getValue()){
-            platformFinanceService.saveFinace(userWithdraw.getUserId(),userWithdraw.getAmount().add(userWithdraw.getServiceCharge()),Status.PAY_TYPE_BALANCE.getValue(),Status.EXPEND.getValue(),orderNo,userWithdraw.getPayType().equals(1)?"微信":"支付宝"+"提现",Status.WITHDRAW.getValue(),null,userWithdraw.getUserId(),orderNo);
+            platformFinanceService.saveFinace(userWithdraw.getUserId(),userWithdraw.getAmount().add(userWithdraw.getServiceCharge()),Status.PAY_TYPE_BALANCE.getValue(),Status.EXPEND.getValue(),orderNo,(userWithdraw.getPayType().equals(1)?"微信":"支付宝")+"提现",Status.WITHDRAW.getValue(),null,userWithdraw.getUserId(),orderNo);
             schedualMessageService.easemobMessage(userWithdraw.getUserId().toString(),"您在小方圆申请￥"+userWithdraw.getAmount()+"的提现申请已通过审核",
                     Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
         }else if(status.intValue() == Status.WITHDRAW_REFUSE.getValue()){
             updateBalance(userWithdraw.getUserId(),userWithdraw.getAmount().add(userWithdraw.getServiceCharge()),Status.ADD.getValue());
-            addUserBalanceDetail(userWithdraw.getUserId(),userWithdraw.getAmount().add(userWithdraw.getServiceCharge()),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,userWithdraw.getPayType().equals(1)?"微信":"支付宝"+"提现失败",Status.WITHDRAW.getValue(),null,userWithdraw.getUserId(),orderNo);
+            addUserBalanceDetail(userWithdraw.getUserId(),userWithdraw.getAmount().add(userWithdraw.getServiceCharge()),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,(userWithdraw.getPayType().equals(1)?"微信":"支付宝")+"提现失败",Status.WITHDRAW.getValue(),null,userWithdraw.getUserId(),orderNo);
             schedualMessageService.easemobMessage(userWithdraw.getUserId().toString(),"您在小方圆申请￥"+userWithdraw.getAmount()+"的提现申请已被拒绝，拒绝原因："+content,
                     Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
         }
