@@ -453,19 +453,20 @@ public class OrderServiceImpl implements OrderService{
         for(OrderDetailDto orderDetailDto:orderDetailDtos){
             //获取卖家信息
             UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(orderDetailDto.getSellerId())).getString("data")), UserInfo.class);
-
-            SellerDto sellerDto = new SellerDto();
-            sellerDto.setSellerHeadImgUrl(seller.getHeadImgUrl());
-            sellerDto.setSellerId(seller.getId());
-            sellerDto.setSellerName(seller.getNickName());
-            boolean flag = true;
-            for(SellerDto dto:sellerDtos){
-                if(dto.getSellerId() == seller.getId()){
-                    flag = false;
+            if(seller != null){
+                SellerDto sellerDto = new SellerDto();
+                sellerDto.setSellerHeadImgUrl(seller.getHeadImgUrl());
+                sellerDto.setSellerId(seller.getId());
+                sellerDto.setSellerName(seller.getNickName());
+                boolean flag = true;
+                for(SellerDto dto:sellerDtos){
+                    if(dto.getSellerId() == seller.getId()){
+                        flag = false;
+                    }
                 }
-            }
-            if(flag){
-                sellerDtos.add(sellerDto);
+                if(flag){
+                    sellerDtos.add(sellerDto);
+                }
             }
         }
         return sellerDtos;
