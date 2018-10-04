@@ -44,11 +44,11 @@ public class SysOperatorServiceImpl implements SysOperatorService{
 		return new AdminOperatorDto(operator);
 	}
 	@Override
-	public void saveOperator(AdminOperatorParam param) {
+	public void saveOperator(AdminOperatorParam param) throws ServiceException {
 		if(param.getUserId()!=null&&param.getUserId()>0) {
 			SysOperator oper = sysOperatorMapper.selectByPrimaryKey(param.getUserId());
-			oper.setUserCode(param.getUserCode());
-			oper.setUserName(param.getUserCode());
+			//oper.setUserCode(param.getUserCode());
+			//oper.setUserName(param.getUserCode());
 			if(param.getPassword()!=null)
 				oper.setLoginPwd(param.getPassword());
 			oper.setStatus(0);
@@ -59,6 +59,12 @@ public class SysOperatorServiceImpl implements SysOperatorService{
 			
 			sysUserRoleMapper.deleteByUserId(param.getUserId());
 		}else {
+			
+			//用户名是否重复了
+			if(sysOperatorMapper.countUser(param.getUserCode())>0) {
+				throw new ServiceException("登录名不能重复");
+			}
+			
 			SysOperator oper = new SysOperator();
 			oper.setAddTime(new Date());
 			oper.setUserCode(param.getUserCode());

@@ -12,6 +12,7 @@
     <result column="real_name" jdbcType="VARCHAR" property="realName" />
     <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
     <result column="service_charge" jdbcType="DECIMAL" property="serviceCharge" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, amount, pay_type, status, content, account, real_name, add_time, service_charge

@@ -26,4 +26,5 @@ public interface SysOperatorMapper {
 
     List<SysOperator> selectByRoleId(Integer roleId);
     
+    int countUser(String userCode);
 }

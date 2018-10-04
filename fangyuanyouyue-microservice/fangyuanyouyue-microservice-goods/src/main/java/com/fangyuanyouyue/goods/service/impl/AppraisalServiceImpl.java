@@ -1,5 +1,14 @@
 package com.fangyuanyouyue.goods.service.impl;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
@@ -10,26 +19,27 @@ import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.IdGenerator;
-import com.fangyuanyouyue.goods.dao.*;
+import com.fangyuanyouyue.goods.dao.AppraisalOrderInfoMapper;
+import com.fangyuanyouyue.goods.dao.AppraisalUrlMapper;
+import com.fangyuanyouyue.goods.dao.GoodsAppraisalDetailMapper;
+import com.fangyuanyouyue.goods.dao.GoodsImgMapper;
+import com.fangyuanyouyue.goods.dao.GoodsInfoMapper;
 import com.fangyuanyouyue.goods.dto.AppraisalDetailDto;
 import com.fangyuanyouyue.goods.dto.AppraisalOrderInfoDto;
 import com.fangyuanyouyue.goods.dto.AppraisalUrlDto;
 import com.fangyuanyouyue.goods.dto.adminDto.AdminAppraisalDetailDto;
-import com.fangyuanyouyue.goods.model.*;
+import com.fangyuanyouyue.goods.dto.adminDto.AdminAppraisalUrlDto;
+import com.fangyuanyouyue.goods.model.AppraisalOrderInfo;
+import com.fangyuanyouyue.goods.model.AppraisalUrl;
+import com.fangyuanyouyue.goods.model.GoodsAppraisalDetail;
+import com.fangyuanyouyue.goods.model.GoodsImg;
+import com.fangyuanyouyue.goods.model.GoodsInfo;
+import com.fangyuanyouyue.goods.model.UserInfo;
 import com.fangyuanyouyue.goods.param.AdminGoodsParam;
 import com.fangyuanyouyue.goods.service.AppraisalService;
 import com.fangyuanyouyue.goods.service.SchedualMessageService;
 import com.fangyuanyouyue.goods.service.SchedualUserService;
 import com.fangyuanyouyue.goods.service.SchedualWalletService;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service(value = "appraisalService")
 @Transactional(rollbackFor=Exception.class)
@@ -375,13 +385,15 @@ public class AppraisalServiceImpl implements AppraisalService{
         //商品列表
         List<GoodsAppraisalDetail> appraisalPage = goodsAppraisalDetailMapper.getAppraisalPage(param.getType(),param.getStart(),param.getLimit(),
                 param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
-        List<AdminAppraisalDetailDto> dtos = AdminAppraisalDetailDto.toDtoList(appraisalPage);
-        for(AdminAppraisalDetailDto dto:dtos){
-
+        List<AdminAppraisalDetailDto> dtos = new ArrayList<AdminAppraisalDetailDto>();
+        for(GoodsAppraisalDetail detail:appraisalPage){
+        	AdminAppraisalDetailDto dto = new AdminAppraisalDetailDto(detail);
             //获取鉴定图片列表
             List<AppraisalUrl> appraisalUrls = appraisalUrlMapper.selectListBuUserId(dto.getAppraisalDetailId());
-            ArrayList<AppraisalUrlDto> appraisalUrlDtos = AppraisalUrlDto.toDtoList(appraisalUrls);
+            ArrayList<AdminAppraisalUrlDto> appraisalUrlDtos = AdminAppraisalUrlDto.toDtoList(appraisalUrls);
             dto.setAppraisalUrlDtos(appraisalUrlDtos);
+            
+            dtos.add(dto);
         }
         //遍历商品列表，添加到GoodsDtos中
         Pager pager = new Pager();

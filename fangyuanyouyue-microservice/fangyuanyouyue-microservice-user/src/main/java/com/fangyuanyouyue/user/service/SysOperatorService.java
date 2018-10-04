@@ -32,8 +32,9 @@ public interface SysOperatorService {
     /**
      * 保存操作员
      * @param param
+     * @throws ServiceException 
      */
-    void saveOperator(AdminOperatorParam param);
+    void saveOperator(AdminOperatorParam param) throws ServiceException;
     
     /**
      * 登录

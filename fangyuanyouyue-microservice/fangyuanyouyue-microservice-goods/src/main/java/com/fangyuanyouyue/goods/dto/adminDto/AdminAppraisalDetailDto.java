@@ -44,7 +44,7 @@ public class AdminAppraisalDetailDto {
 
     private Integer type;//鉴定类型 1卖家鉴定 2买家鉴定 3我要鉴定
 
-    private List<AppraisalUrlDto> appraisalUrlDtos;//鉴定图片表DTO数组
+    private List<AdminAppraisalUrlDto> appraisalUrlDtos;//鉴定图片表DTO数组
 
     //用户昵称
     private String nickName;
