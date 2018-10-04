@@ -1046,8 +1046,9 @@ public class OrderServiceImpl implements OrderService{
 
                 //获取卖家信息
                 UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(info.getSellerId())).getString("data")), UserInfo.class);
-
-                orderDto.setSeller(seller.getPhone()+"\n"+seller.getNickName());
+                if(seller != null){
+                    orderDto.setSeller(seller.getPhone()+"\n"+seller.getNickName());
+                }
             }
             ArrayList<AdminOrderDetailDto> orderDetailDtos = AdminOrderDetailDto.toDtoList(orderDetails);
             String orderDetail = "";
@@ -1069,8 +1070,10 @@ public class OrderServiceImpl implements OrderService{
             if(orderDto.getIsRefund() == 1){
                 //退货状态
                 OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null,null);
-                orderDto.setReturnStatus(orderRefund.getStatus());
-                orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
+                if(orderRefund != null){
+                    orderDto.setReturnStatus(orderRefund.getStatus());
+                    orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
+                }
             }
             //是否评价
             //OrderComment orderComment = orderCommentMapper.selectByOrder(orderDto.getOrderId());

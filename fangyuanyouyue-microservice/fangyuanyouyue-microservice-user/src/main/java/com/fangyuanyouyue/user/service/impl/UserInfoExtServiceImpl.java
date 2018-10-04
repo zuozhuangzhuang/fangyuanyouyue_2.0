@@ -114,6 +114,9 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
         if(userInfoExt == null){
             throw new ServiceException("用户扩展信息错误！");
         }
+        if(StringUtils.isEmpty(userInfoExt.getPayPwd())){
+            throw new ServiceException("未设置支付密码！");
+        }
         boolean result = MD5Util.verify(MD5Util.MD5(payPwd),userInfoExt.getPayPwd());
         //TODO 支付密码错误次数
         return result;
