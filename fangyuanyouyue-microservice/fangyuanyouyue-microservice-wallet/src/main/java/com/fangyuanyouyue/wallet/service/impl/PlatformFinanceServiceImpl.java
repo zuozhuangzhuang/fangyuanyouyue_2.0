@@ -41,15 +41,16 @@ public class PlatformFinanceServiceImpl implements PlatformFinanceService {
         financeDetail.setUserId(userId);
         financeDetail.setAmount(amount);
         financeDetail.setPayType(payType);
-        if(type.equals(Status.EXPEND.getValue())){
-            if(payType.equals(Status.PAY_TYPE_BALANCE.getValue())){
-                financeDetail.setType(Status.EXPEND.getValue());
-            }else{
-                financeDetail.setType(Status.INCOME.getValue());
-            }
-        }else{
+        if(orderType.equals(Status.WITHDRAW.getValue())){
             financeDetail.setType(Status.EXPEND.getValue());
+        }else{
+            if(type.equals(Status.EXPEND.getValue())){
+                financeDetail.setType(Status.INCOME.getValue());
+            }else{
+                financeDetail.setType(Status.EXPEND.getValue());
+            }
         }
+
         financeDetail.setAddTime(DateStampUtils.getTimesteamp());
         financeDetail.setTitle(title);
         financeDetail.setOrderNo(orderNo);

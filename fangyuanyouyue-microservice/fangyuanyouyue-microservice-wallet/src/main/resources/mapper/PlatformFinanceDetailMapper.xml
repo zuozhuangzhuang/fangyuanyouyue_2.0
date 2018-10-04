@@ -211,7 +211,7 @@
             ((
             a.pay_type <![CDATA[ <> ]]> 3
             ) or (
-            a.order_type = 8 and a.type = 2
+            a.order_type = 7 and a.type = 2
             ))
         </if>
         <if test="status != null and status == 2">
