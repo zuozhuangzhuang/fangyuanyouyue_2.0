@@ -114,6 +114,6 @@
   </select>
 
   <select id="getListByUserId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select a.*,b.coupon_type,b.coupon_amount,b.condition_amount,b.start_time,b.end_time from user_coupon a,coupon_info b where a.coupon_id = b.id and a.user_id = #{userId} and a.status = 1
+    select a.*,b.coupon_type,b.coupon_amount,b.condition_amount,b.start_time,b.end_time from user_coupon a,coupon_info b where a.coupon_id = b.id and a.user_id = #{userId} and a.status = 1 order by b.condition_amount
   </select>
 </mapper>

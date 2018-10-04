@@ -96,6 +96,8 @@ public class CartServiceImpl implements CartService {
             List<CartDetail> cartDetails = cartDetailMapper.selectByCartId(cart.getId());
             if (cartDetails != null) {
                 for (CartDetail cartDetail : cartDetails) {
+                    //是否官方认证
+                    Map<String, Object> goodsUserInfoExtAndVip = goodsInfoMapper.getGoodsUserInfoExtAndVip(cartDetail.getGoodsId());
                     //获取卖家信息
                     UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(cartDetail.getUserId())).getString("data")), UserInfo.class);
                     CartShopDto cartShopDto = new CartShopDto();
@@ -108,6 +110,10 @@ public class CartServiceImpl implements CartService {
                         continue;
                     }
                     for (CartDetailDto cartDetailDto : cartDetailDtos) {
+                        //是否官方认证
+                        if(goodsUserInfoExtAndVip != null) {
+                            cartDetailDto.setAuthType((Integer) goodsUserInfoExtAndVip.get("auth_type") == 2 ? 1 : 2);
+                        }
                         List<GoodsImg> imgsByGoodsId = goodsImgMapper.getImgsByGoodsId(cartDetailDto.getGoodsId());
                         for (GoodsImg goodsImg : imgsByGoodsId) {
                             if (goodsImg.getType() == 1) {//主图

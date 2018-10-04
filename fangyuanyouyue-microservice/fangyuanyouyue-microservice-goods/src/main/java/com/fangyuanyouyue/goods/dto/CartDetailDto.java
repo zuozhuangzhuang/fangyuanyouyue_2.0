@@ -38,6 +38,8 @@ public class CartDetailDto {
 
     private Integer userId;//店铺ID
 
+    private Integer authType;//官方认证状态 1已认证 2未认证
+
     public CartDetailDto() {
     }
 
