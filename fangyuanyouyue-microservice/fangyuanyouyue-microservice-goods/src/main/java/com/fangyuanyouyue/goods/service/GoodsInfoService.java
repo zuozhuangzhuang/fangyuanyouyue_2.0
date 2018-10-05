@@ -10,7 +10,7 @@ import com.fangyuanyouyue.goods.dto.GoodsDto;
 import com.fangyuanyouyue.goods.dto.GoodsQuickSearchDto;
 import com.fangyuanyouyue.goods.dto.SearchDto;
 import com.fangyuanyouyue.goods.dto.adminDto.AdminGoodsDto;
-import com.fangyuanyouyue.goods.model.BannerIndex;
+import com.fangyuanyouyue.goods.model.GoodsCategory;
 import com.fangyuanyouyue.goods.model.GoodsInfo;
 import com.fangyuanyouyue.goods.param.AdminGoodsParam;
 import com.fangyuanyouyue.goods.param.GoodsParam;
@@ -192,5 +192,7 @@ public interface GoodsInfoService {
      * @throws ServiceException
      */
 //    Integer processMonthGoods()throws ServiceException;
+    
+	List<GoodsCategory> getCategory();
 
 }

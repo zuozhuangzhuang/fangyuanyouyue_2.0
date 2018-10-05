@@ -165,6 +165,8 @@
     <if test="keyword != null">
       and ( 
       	a.column_name like "%"#{keyword,jdbcType=VARCHAR}"%"
+      	and b.nick_name like %"#{keyword,jdbcType=VARCHAR}"%"
+      	and b.phone like %"#{keyword,jdbcType=VARCHAR}"%"
       )
     </if>
     <if test="status != null">

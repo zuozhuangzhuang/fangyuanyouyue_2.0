@@ -16,6 +16,8 @@ public class GoodsCategory {
     private Integer id;
 
     private Integer parentId;//上级id
+    
+    private String parentName; //上级名称
 
     private String name;//类目名称
 

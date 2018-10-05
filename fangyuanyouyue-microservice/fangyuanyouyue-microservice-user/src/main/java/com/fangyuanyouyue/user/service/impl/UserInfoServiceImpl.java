@@ -817,9 +817,30 @@ public class UserInfoServiceImpl implements UserInfoService {
 			UserInfoExt ext = userInfoExtMapper.selectByUserId(info.getId());
 			dto.setFansBaseCount(ext.getFansCount());
 			dto.setAuthType(ext.getAuthType());
+			dto.setName(ext.getName());
+			dto.setIdentity(ext.getIdentity());
+			Long credit = ext.getCredit();
+			Integer creditLevel = 0;
+			if(credit != null){
+                if(credit < -100){//差
+                    creditLevel = 1;
+                }else if(-100 <= credit && credit < 1000){//低
+                    creditLevel = 2;
+                }else if(1000 <= credit && credit < 10000){//中
+                    creditLevel = 3;
+                }else if(10000 <= credit && credit < 500000){//高
+                    creditLevel = 4;
+                }else if(500000 <= credit){//优
+                    creditLevel = 5;
+                }
+            }
+			dto.setCreditLevel(creditLevel);
+			
 			
 			UserWallet wallet = userWalletMapper.selectByUserId(info.getId());
 			dto.setBalance(wallet.getBalance());
+			dto.setPoint(wallet.getPoint());
+			
 			
 			UserVip vip = userVipMapper.getUserVipByUserId(info.getId());
 			dto.setVipLevel(vip.getVipLevel());

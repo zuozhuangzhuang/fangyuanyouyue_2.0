@@ -34,6 +34,13 @@ public interface GoodsCategoryMapper {
      * @return
      */
     List<GoodsCategory> getChildCategoryList(Integer parentId);
+    
+    /**
+    * 根据父级分类获取分类列表
+    * @param parentId
+    * @return
+    */
+   List<GoodsCategory> getTopCategory();
 
     /**
      * 根据ID修改热度
@@ -58,9 +65,9 @@ public interface GoodsCategoryMapper {
      * 分页总条数
      * @return
      */
-    int countPage(@Param("keyword")String keyword,@Param("status")Integer status);
+    int countPage(@Param("keyword")String keyword,@Param("status")Integer status,@Param("type")Integer type,@Param("parentId")Integer parentId);
     
-    List<GoodsCategory> getPage(@Param("start") Integer start,@Param("limit") Integer limit,@Param("keyword")String keyword,@Param("status")Integer status,@Param("startDate")String startDate,@Param("endDate")String endDate,@Param("orders")String orders,@Param("ascType")Integer ascType);
+    List<GoodsCategory> getPage(@Param("start") Integer start,@Param("limit") Integer limit,@Param("keyword")String keyword,@Param("status")Integer status,@Param("type")Integer type,@Param("startDate")String startDate,@Param("endDate")String endDate,@Param("orders")String orders,@Param("ascType")Integer ascType,@Param("parentId")Integer parentId);
     
     
 

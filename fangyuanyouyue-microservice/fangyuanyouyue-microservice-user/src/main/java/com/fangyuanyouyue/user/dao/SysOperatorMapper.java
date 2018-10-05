@@ -3,6 +3,7 @@ package com.fangyuanyouyue.user.dao;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.fangyuanyouyue.user.model.SysOperator;
 
@@ -20,7 +21,7 @@ public interface SysOperatorMapper {
 
     int updateByPrimaryKey(SysOperator record);
     
-    SysOperator selectLogin(String userCode,String password);
+    SysOperator selectLogin(@Param("userCode") String userCode,@Param("loginPwd") String loginPwd);
     
     List<SysOperator> selectAll();
 

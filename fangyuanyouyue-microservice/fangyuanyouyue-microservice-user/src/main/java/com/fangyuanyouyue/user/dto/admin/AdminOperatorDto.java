@@ -42,6 +42,10 @@ public class AdminOperatorDto {
 
     private String updateTime;//更新时间
     
+    private String token;//token
+    
+    private List<AdminMenuDto> menus;
+    
 
     public AdminOperatorDto(SysOperator model) {
         this.userId = model.getId();

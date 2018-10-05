@@ -339,7 +339,7 @@
     <if test="status != null">
       and status = #{status}
     </if>
-    <if test="startDate != null">
+    <if test="startDate != null ">
       and add_time <![CDATA[ > ]]> #{startDate}
     </if>
     

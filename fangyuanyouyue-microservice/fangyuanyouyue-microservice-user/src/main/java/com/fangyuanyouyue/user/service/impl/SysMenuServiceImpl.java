@@ -45,6 +45,17 @@ public class SysMenuServiceImpl implements SysMenuService{
 		return dtos;
 	}
 
+	public List<AdminMenuDto> getUserChildren(Integer userId,Integer parentId){
+		List<SysMenu> menus = sysMenuMapper.selectUserIdParentId(userId, parentId);
+		List<AdminMenuDto> dtos = new ArrayList<AdminMenuDto>();
+		for(SysMenu menu:menus) {
+			AdminMenuDto dto = new AdminMenuDto(menu);
+			dto.setChildren(getUserChildren(userId,menu.getId()));
+			dtos.add(dto);
+		}
+		return dtos;
+	}
+	
 	@Override
 	public List<AdminMenuDto> getMenuByRole(Integer roleId) throws ServiceException {
 
@@ -64,9 +75,8 @@ public class SysMenuServiceImpl implements SysMenuService{
 
 	@Override
 	public List<AdminMenuDto> getMenuByUser(Integer userId) throws ServiceException {
-
-		List<SysMenu> menus = sysMenuMapper.selectAll();
-		return AdminMenuDto.toDtoList(menus);
+		List<AdminMenuDto> menus = getUserChildren(userId,0);
+		return menus;
 	}
 
 	@Override

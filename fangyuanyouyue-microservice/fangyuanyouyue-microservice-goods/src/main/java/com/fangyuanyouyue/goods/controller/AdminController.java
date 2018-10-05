@@ -1,27 +1,37 @@
 package com.fangyuanyouyue.goods.controller;
 
+import java.io.IOException;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.goods.dto.adminDto.AdminBannerDto;
 import com.fangyuanyouyue.goods.dto.adminDto.AdminGoodsDto;
+import com.fangyuanyouyue.goods.model.GoodsCategory;
 import com.fangyuanyouyue.goods.param.AdminGoodsParam;
 import com.fangyuanyouyue.goods.service.AppraisalService;
 import com.fangyuanyouyue.goods.service.BannerService;
 import com.fangyuanyouyue.goods.service.GoodsInfoService;
 import com.fangyuanyouyue.goods.service.ReportService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
 
 @RestController
 @RequestMapping(value = "/adminGoods")
@@ -232,8 +242,15 @@ public class AdminController  extends BaseController {
         try {
             log.info("----》修改分类信息《----");
             log.info("参数："+param.toString());
-            //获取分类列表
-            goodsInfoService.updateCategory(param.getId(),param.getParentId(), param.getName(),param.getImgUrl(), param.getSort(),param.getType(),param.getStatus());
+            if(param.getId()!=null&&param.getId()>0) {
+            	 //获取分类列表
+                goodsInfoService.updateCategory(param.getId(),param.getParentId(), param.getName(),param.getImgUrl(), param.getSort(),param.getType(),param.getStatus());
+              
+            }else{
+
+                //获取分类列表
+                goodsInfoService.addCategory(param);
+            }
             return toSuccess();
         } catch (Exception e) {
             e.printStackTrace();
@@ -257,6 +274,25 @@ public class AdminController  extends BaseController {
             return toError("系统繁忙，请稍后再试！");
         }
     }
+    
+
+
+    @ApiOperation(value = "获取顶级分类列表", notes = "查看顶级分类列表",response = BaseResp.class)
+    @GetMapping(value = "/categorys")
+    @ResponseBody
+    public BaseResp categorys() throws IOException {
+        try {
+            log.info("----》获取顶级菜单列表列表《----");
+            
+            //获取分类列表
+            List<GoodsCategory> datas = goodsInfoService.getCategory();
+            return toSuccess(datas);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
 
 
     //获取商品列表

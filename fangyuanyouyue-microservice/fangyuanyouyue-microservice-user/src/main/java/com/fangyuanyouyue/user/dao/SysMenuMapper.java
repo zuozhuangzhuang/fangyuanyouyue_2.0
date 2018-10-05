@@ -3,6 +3,7 @@ package com.fangyuanyouyue.user.dao;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.fangyuanyouyue.user.model.SysMenu;
 
@@ -27,4 +28,6 @@ public interface SysMenuMapper {
     List<SysMenu> selectByRoleId(Integer roleId);
     
     int deleteByParentId(Integer parentId);
+    
+    List<SysMenu> selectUserIdParentId(@Param("userId") Integer userId,@Param("parentId") Integer parentId);
 }

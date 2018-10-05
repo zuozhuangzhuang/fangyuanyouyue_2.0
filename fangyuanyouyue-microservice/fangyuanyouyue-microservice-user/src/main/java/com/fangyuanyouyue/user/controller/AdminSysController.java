@@ -21,6 +21,7 @@ import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.base.util.MD5Util;
 import com.fangyuanyouyue.user.dto.admin.AdminDailyStatisticsDto;
 import com.fangyuanyouyue.user.dto.admin.AdminMenuDto;
 import com.fangyuanyouyue.user.dto.admin.AdminOperatorDto;
@@ -73,15 +74,25 @@ public class AdminSysController extends BaseController {
     public BaseResp delete(String loginCode,String password) throws IOException {
         try {
             log.info("后台后台登录 - "+loginCode);
+            
+            AdminOperatorDto user = sysOperatorService.login(loginCode, MD5Util.MD5(password));
+            if(user==null) {
 
-            //测试登录
-            if("admin".equals(loginCode) && "123456".equals(password)) {
-                HashMap map = new HashMap<String,String>();
-                map.put("token", "abcdefg");
-                return toSuccess(map);
-            }else {
                 return toError("账号或密码有误");
             }
+            
+            user.setToken(System.currentTimeMillis()+"");
+
+            return toSuccess(user);
+            
+            //测试登录
+//            if("admin".equals(loginCode) && "123456".equals(password)) {
+//                HashMap map = new HashMap<String,String>();
+//                map.put("token", "abcdefg");
+//                return toSuccess(map);
+//            }else {
+//                return toError("账号或密码有误");
+//            }
 
         }catch (Exception e) {
             e.printStackTrace();

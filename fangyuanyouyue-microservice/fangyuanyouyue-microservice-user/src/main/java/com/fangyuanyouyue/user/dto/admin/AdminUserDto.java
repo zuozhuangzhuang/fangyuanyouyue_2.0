@@ -45,6 +45,7 @@ public class AdminUserDto {
     
     private BigDecimal balance;
 
+    private Long point;
 
     //UserVip
     private Integer vipLevel;//会员等级
@@ -76,6 +77,10 @@ public class AdminUserDto {
     private Integer status;
 
     private Integer fansBaseCount;//粉丝基数
+    
+    private String name;
+    
+    private String identity;
 
 
     public AdminUserDto(UserInfo model) {

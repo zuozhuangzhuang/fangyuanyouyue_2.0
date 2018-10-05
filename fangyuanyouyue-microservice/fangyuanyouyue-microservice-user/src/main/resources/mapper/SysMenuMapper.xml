@@ -145,4 +145,13 @@
     delete from sys_menu
     where parent_id = #{parentId,jdbcType=INTEGER}
   </delete>
+  
+  <select id="selectUserIdParentId" resultMap="BaseResultMap" >
+    select 
+    a.*
+    from sys_menu a,sys_role_menu b,sys_user_role c where a.id = b.menu_id and b.role_id=c.role_id
+    and c.operator_id = #{userId,jdbcType=INTEGER}
+    and a.parent_id = #{parentId,jdbcType=INTEGER}
+  </select>
+  
 </mapper>

@@ -8,8 +8,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.base.util.MD5Util;
+import com.fangyuanyouyue.user.dao.SysMenuMapper;
 import com.fangyuanyouyue.user.dao.SysOperatorMapper;
 import com.fangyuanyouyue.user.dao.SysUserRoleMapper;
+import com.fangyuanyouyue.user.dto.admin.AdminMenuDto;
 import com.fangyuanyouyue.user.dto.admin.AdminOperatorDto;
 import com.fangyuanyouyue.user.model.SysOperator;
 import com.fangyuanyouyue.user.model.SysUserRole;
@@ -23,6 +26,8 @@ public class SysOperatorServiceImpl implements SysOperatorService{
     private SysOperatorMapper sysOperatorMapper;
     @Autowired
     private SysUserRoleMapper sysUserRoleMapper;
+    @Autowired
+    private SysMenuServiceImpl sysMenuServiceImpl;
 	@Override
 	public List<AdminOperatorDto> getAllOperator() throws ServiceException {
 		return AdminOperatorDto.toDtoList(sysOperatorMapper.selectAll());
@@ -41,8 +46,22 @@ public class SysOperatorServiceImpl implements SysOperatorService{
 	@Override
 	public AdminOperatorDto login(String loginCode, String loginPwd) throws ServiceException {
 		SysOperator operator = sysOperatorMapper.selectLogin(loginCode, loginPwd);
-		return new AdminOperatorDto(operator);
+		
+		if(operator==null)return null;
+		
+		AdminOperatorDto dto = new AdminOperatorDto(operator);
+		
+		dto.setLoginPwd(null);
+		
+		//获取权限菜单
+		List<AdminMenuDto> menus = sysMenuServiceImpl.getMenuByUser(operator.getId());
+		
+		//处理菜单
+		dto.setMenus(menus);
+		
+		return dto;
 	}
+	
 	@Override
 	public void saveOperator(AdminOperatorParam param) throws ServiceException {
 		if(param.getUserId()!=null&&param.getUserId()>0) {
@@ -50,7 +69,7 @@ public class SysOperatorServiceImpl implements SysOperatorService{
 			//oper.setUserCode(param.getUserCode());
 			//oper.setUserName(param.getUserCode());
 			if(param.getPassword()!=null)
-				oper.setLoginPwd(param.getPassword());
+				oper.setLoginPwd(MD5Util.generate(param.getPassword()));
 			oper.setStatus(0);
 			if("FORBIDDEN".equals(param.getState())) {
 				oper.setStatus(1);
@@ -68,7 +87,7 @@ public class SysOperatorServiceImpl implements SysOperatorService{
 			SysOperator oper = new SysOperator();
 			oper.setAddTime(new Date());
 			oper.setUserCode(param.getUserCode());
-			oper.setLoginPwd(param.getPassword());
+			oper.setLoginPwd(MD5Util.generate(param.getPassword()));
 			oper.setUserName(param.getUserCode());
 			oper.setStatus(0);
 			if("FORBIDDEN".equals(param.getState())) {

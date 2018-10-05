@@ -11,6 +11,7 @@ import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.goods.dao.*;
 import com.fangyuanyouyue.goods.dto.*;
+import com.fangyuanyouyue.goods.dto.adminDto.AdminGoodsCategoryDto;
 import com.fangyuanyouyue.goods.dto.adminDto.AdminGoodsDto;
 import com.fangyuanyouyue.goods.model.*;
 import com.fangyuanyouyue.goods.param.AdminGoodsParam;
@@ -663,14 +664,14 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
 
     @Override
     public Pager categoryPage(AdminGoodsParam param) throws ServiceException {
-        Integer total = goodsCategoryMapper.countPage(param.getKeyword(),param.getStatus());
+        Integer total = goodsCategoryMapper.countPage(param.getKeyword(),param.getStatus(),param.getType(),param.getParentId());
         //商品分类列表
         param.setOrders("parent_id,id");
         List<GoodsCategory> goodsCategoryDtos = goodsCategoryMapper.getPage(param.getStart(),param.getLimit(),
-                param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+                param.getKeyword(),param.getStatus(),param.getType(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType(),param.getParentId());
         Pager pager = new Pager();
         pager.setTotal(total);
-        pager.setDatas(goodsCategoryDtos);
+        pager.setDatas(AdminGoodsCategoryDto.toDtoList(goodsCategoryDtos));
         return pager;
     }
 
@@ -797,9 +798,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             if(goodsCategory == null){
                 throw new ServiceException("未找到分类信息！");
             }
-            if(parentId != null){
-                goodsCategory.setParentId(parentId);
-            }
+            goodsCategory.setParentId(parentId);
             if(StringUtils.isNotEmpty(name)){
                 goodsCategory.setName(name);
             }
@@ -872,6 +871,12 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         Integer allGoodsCount = goodsInfoMapper.getAllGoodsCount();
         return allGoodsCount;
     }
+
+
+	@Override
+	public List<GoodsCategory> getCategory() {
+		return goodsCategoryMapper.getTopCategory();
+	}
 
 //    @Override
 //    public Integer processMonthGoods() throws ServiceException {
