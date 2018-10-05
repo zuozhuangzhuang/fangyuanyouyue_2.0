@@ -81,6 +81,7 @@ public class AdminAppraisalDetailDto {
         this.content = detail.getContent();
         this.nickName = detail.getNickName();
         this.headImgUrl = detail.getHeadImgUrl();
+        this.baseCount = detail.getPvCount();
     }
 
     public static List<AdminAppraisalDetailDto> toDtoList(List<AppraisalDetail> list) {

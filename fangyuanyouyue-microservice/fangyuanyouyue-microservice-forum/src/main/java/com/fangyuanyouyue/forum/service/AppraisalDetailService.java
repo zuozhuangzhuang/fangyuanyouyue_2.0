@@ -7,6 +7,7 @@ import com.fangyuanyouyue.base.BasePageReq;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.forum.dto.AppraisalDetailDto;
+import com.fangyuanyouyue.forum.param.AdminForumParam;
 
 /**
  * 全民鉴定接口
@@ -94,5 +95,5 @@ public interface AppraisalDetailService {
      * @param content
      * @throws ServiceException
      */
-    void updateAppraisal(Integer appraisalaId,Integer sort,Integer count,Integer status,String content) throws ServiceException;
+    void updateAppraisal(AdminForumParam param) throws ServiceException;
 }

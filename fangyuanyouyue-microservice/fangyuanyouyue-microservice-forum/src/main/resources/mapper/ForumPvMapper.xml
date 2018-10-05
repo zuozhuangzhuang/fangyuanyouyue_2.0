@@ -116,10 +116,20 @@
   </select>
 
   <select id="getCountByColumnId" resultType="Integer">
-    select count(*) from forum_pv a,forum_info b where a.forum_id = b.id  and b.status = 1 and a.column_id = #{columnId} and a.add_time <![CDATA[ >= ]]> #{startTime} and a.type = #{type}
+    select count(*) from forum_pv a,forum_info b where a.forum_id = b.id  and b.status = 1 and a.column_id = #{columnId}
+    
+    <if test="type != null and type != ''">
+      and a.type =  #{type}
+    </if>
+    
+     <if test="startTime != null and startTime != ''">
+      and a.add_time <![CDATA[ >= ]]> #{startTime}
+    </if>
+    
     <if test="endTime != null and endTime != ''">
       and a.add_time <![CDATA[ < ]]> #{endTime}
     </if>
+    
   </select>
   
   <select id="dailyWage" resultType="Map">

@@ -21,6 +21,7 @@ import com.fangyuanyouyue.forum.dao.CollectMapper;
 import com.fangyuanyouyue.forum.dao.ForumColumnMapper;
 import com.fangyuanyouyue.forum.dao.ForumInfoMapper;
 import com.fangyuanyouyue.forum.dao.ForumLikesMapper;
+import com.fangyuanyouyue.forum.dao.ForumPvMapper;
 import com.fangyuanyouyue.forum.dto.ForumInfoDto;
 import com.fangyuanyouyue.forum.dto.admin.AdminForumInfoDto;
 import com.fangyuanyouyue.forum.model.Collect;
@@ -28,6 +29,7 @@ import com.fangyuanyouyue.forum.model.ForumColumn;
 import com.fangyuanyouyue.forum.model.ForumInfo;
 import com.fangyuanyouyue.forum.model.ForumLikes;
 import com.fangyuanyouyue.forum.model.UserInfo;
+import com.fangyuanyouyue.forum.param.AdminForumParam;
 import com.fangyuanyouyue.forum.service.ForumCommentService;
 import com.fangyuanyouyue.forum.service.ForumInfoService;
 import com.fangyuanyouyue.forum.service.ForumLikesService;
@@ -62,6 +64,8 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 	private SchedualMessageService schedualMessageService;
 	@Autowired
 	private SchedualWalletService schedualWalletService;
+	@Autowired
+	private ForumPvMapper forumPvMapper;
 
 	@Override
 	public ForumInfoDto getForumInfoById(Integer forumId,Integer userId) throws ServiceException {
@@ -225,6 +229,13 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 		List<AdminForumInfoDto> dtos = new ArrayList<AdminForumInfoDto>();
 		for(ForumInfo info:datas) {
 			AdminForumInfoDto dto = new AdminForumInfoDto(info);
+			
+			Integer count = forumPvMapper.countById(info.getId());
+			
+			dto.setRealCount(count);
+			
+			dto.setTotalCount(dto.getBaseCount()+dto.getRealCount());
+			
 			dtos.add(dto);
 		}
 
@@ -235,28 +246,35 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 	}
 
 	@Override
-	public void updateForum(Integer forumId, Integer sort, Integer isChosen,Integer status,String content) throws ServiceException {
-		ForumInfo forumInfo = forumInfoMapper.selectByPrimaryKey(forumId);
-		if(forumInfo == null || forumInfo.getStatus().equals(Status.HIDE.getValue())){
+	public void updateForum(AdminForumParam param) throws ServiceException {
+		ForumInfo forumInfo = forumInfoMapper.selectByPrimaryKey(param.getId());
+		if(forumInfo == null){
 			throw new ServiceException("未找到视频、帖子！");
 		}
-		if(isChosen!=null){
-			forumInfo.setIsChosen(isChosen);
+		if(forumInfo.getStatus().equals(Status.HIDE.getValue())){
+
+			throw new ServiceException("该视频或帖子已删除，无法编辑！");
 		}
-		if(sort != null){
-			forumInfo.setSort(sort);
+		if(param.getIsChosen()!=null){
+			forumInfo.setIsChosen(param.getIsChosen());
 		}
-		if(status != null){
-			forumInfo.setStatus(status);
+		if(param.getSort() != null){
+			forumInfo.setSort(param.getSort());
+		}
+		if(param.getStatus() != null){
+			forumInfo.setStatus(param.getStatus());
+		}
+		if(param.getCount()!=null) {
+			forumInfo.setPvCount(param.getCount());
 		}
 		forumInfoMapper.updateByPrimaryKey(forumInfo);
 		//很抱歉，您的帖子/视频/全民鉴定/【名称】已被官方删除，删除理由：……
-		if(status != null && status.equals(Status.DELETE.getValue())){
-			if(StringUtils.isEmpty(content)){
+		if(param.getStatus() != null && param.getStatus().equals(Status.DELETE.getValue())){
+			if(StringUtils.isEmpty(param.getContent())){
 				throw new ServiceException("删除理由不能为空！");
 			}
 			schedualMessageService.easemobMessage(forumInfo.getUserId().toString(),
-					"很抱歉，您的"+(forumInfo.getType()==1?"帖子【":"视频【")+forumInfo.getTitle()+"】已被官方删除，删除理由："+content+"",
+					"很抱歉，您的"+(forumInfo.getType()==1?"帖子【":"视频【")+forumInfo.getTitle()+"】已被官方删除，删除理由："+param.getContent()+"",
 					Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
 		}
 	}

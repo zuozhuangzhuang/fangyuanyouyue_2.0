@@ -355,9 +355,12 @@ public class AdminController extends BaseController {
             if(param.getId() == null){
                 return toError("帖子、视频id不能为空！");
             }
-            forumInfoService.updateForum(param.getId(),param.getSort(),param.getIsChosen(),param.getStatus(),param.getContent());
+            forumInfoService.updateForum(param);
 
             return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -397,7 +400,7 @@ public class AdminController extends BaseController {
             @ApiImplicitParam(name = "status", value = "状态 1进行中 2结束 3删除",required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "content", value = "处理原因",required = false, dataType = "int", paramType = "query")
     })
-    @GetMapping(value = "/updateAppraisal")
+    @PostMapping(value = "/updateAppraisal")
     @ResponseBody
     public BaseResp updateAppraisal(AdminForumParam param) throws IOException {
         try {
@@ -406,7 +409,7 @@ public class AdminController extends BaseController {
             if(param.getId() == null){
                 return toError("全民鉴定id不能为空！");
             }
-            appraisalDetailService.updateAppraisal(param.getId(),param.getSort(),param.getCount(),param.getStatus(),param.getContent());
+            appraisalDetailService.updateAppraisal(param);
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();

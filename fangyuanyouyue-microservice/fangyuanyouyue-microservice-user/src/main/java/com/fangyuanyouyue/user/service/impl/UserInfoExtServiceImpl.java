@@ -289,6 +289,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
             throw new ServiceException("未找到申请信息！");
         }
         model.setStatus(status);
+        
         UserInfoExt ext = userInfoExtMapper.selectByUserId(model.getUserId());
         ext.setAuthType(status);
         userInfoExtMapper.updateByPrimaryKey(ext);

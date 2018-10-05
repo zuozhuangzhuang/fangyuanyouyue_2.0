@@ -310,24 +310,26 @@
   
     
   <select id="countPage" parameterType="Integer" resultType="Integer">
-    select count(*) from forum_info where 1=1
+    select count(*) from forum_info a,user_info b where a.user_id=b.id
     <if test="type != null">
       and  type=#{type,jdbcType=VARCHAR}
     </if>
     <if test="keyword != null">
-      and ( 
-      	name like "%"#{keyword,jdbcType=VARCHAR}"%"
+      and (
+        a.title like "%"#{keyword,jdbcType=VARCHAR}"%"
+        or a.content like "%"#{keyword,jdbcType=VARCHAR}"%"
+        or b.nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
       )
     </if>
     <if test="status != null">
-      and status = #{status}
+      and a.status = #{status}
     </if>
     <if test="startDate != null">
-      and add_time <![CDATA[ > ]]> #{startDate}
+      and a.add_time <![CDATA[ > ]]> #{startDate}
     </if>
     
     <if test="endDate != null">
-      and add_time <![CDATA[ <= ]]> #{endDate}
+      and a.add_time <![CDATA[ <= ]]> #{endDate}
     </if>
     
   </select>
@@ -339,7 +341,8 @@
     </if>
     <if test="keyword != null">
       and (
-        a.name like "%"#{keyword,jdbcType=VARCHAR}"%"
+        a.title like "%"#{keyword,jdbcType=VARCHAR}"%"
+        or a.content like "%"#{keyword,jdbcType=VARCHAR}"%"
         or b.nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
       )
     </if>
@@ -371,7 +374,8 @@
     </if>
     <if test="keyword != null">
       and (
-        a.name like "%"#{keyword,jdbcType=VARCHAR}"%"
+        a.title like "%"#{keyword,jdbcType=VARCHAR}"%"
+        or a.content like "%"#{keyword,jdbcType=VARCHAR}"%"
         or b.nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
       )
     </if>

@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.forum.service.impl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -285,9 +286,18 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 
 		Integer total = forumColumnMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
 		List<ForumColumn> datas = forumColumnMapper.getPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+		ArrayList<AdminForumColumnDto> dtos = new ArrayList<AdminForumColumnDto>();
+		for(ForumColumn model:datas) {
+			AdminForumColumnDto dto = new AdminForumColumnDto(model);
+			
+			Integer count =forumPvMapper.getCountByColumnId(model.getId(), null, null, null);
+			dto.setTotalCount(count);
+			
+			dtos.add(dto);
+		}
 		Pager pager = new Pager();
 		pager.setTotal(total);
-		pager.setDatas(AdminForumColumnDto.toDtoList(datas));
+		pager.setDatas(dtos);
 		return pager;
 	}
 

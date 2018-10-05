@@ -114,8 +114,38 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
-
-  <select id="getList" resultMap="BaseResultMap">
-    select * from company where status = 1
+  
+    
+  <select id="countPage" parameterType="Integer" resultType="Integer">
+    select count(*) from company where status = 1
+    <if test="keyword != null">
+      and ( 
+      	name like "%"#{keyword,jdbcType=VARCHAR}"%"
+      	or company_no like "%"#{keyword,jdbcType=VARCHAR}"%"
+      )
+    </if>
+    <if test="status != null">
+      and status = #{status}
+    </if>
+    
   </select>
+  
+  <select id="getPage" resultMap="BaseResultMap">
+    select * from company where status = 1
+    <if test="keyword != null">
+      and ( 
+      	name like "%"#{keyword,jdbcType=VARCHAR}"%"
+      	or company_no like "%"#{keyword,jdbcType=VARCHAR}"%"
+      )
+    </if>
+    <if test="orders != null">
+      order by ${orders}
+      <if test="ascType != null and ascType == 2">
+        desc
+      </if>
+    </if>
+    limit #{start},#{limit}
+  </select>
+  
+  
 </mapper>

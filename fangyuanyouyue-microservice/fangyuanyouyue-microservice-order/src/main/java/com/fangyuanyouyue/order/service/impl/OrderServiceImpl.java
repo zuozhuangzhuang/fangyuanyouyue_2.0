@@ -1104,8 +1104,8 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public Pager companyList(AdminOrderParam param) throws ServiceException {
-        List<Company> list = companyMapper.getList();
-        Integer total = list.size();
+        List<Company> list = companyMapper.getPage(param.getStart(), param.getLimit(), param.getKeyword(), param.getStatus(), param.getOrders(), param.getAscType());
+        Integer total = companyMapper.countPage(param.getKeyword(), param.getStatus());
         List<AdminCompanyDto> adminCompanyDtos = AdminCompanyDto.toDtoList(list);
         Pager pager = new Pager();
         pager.setTotal(total);

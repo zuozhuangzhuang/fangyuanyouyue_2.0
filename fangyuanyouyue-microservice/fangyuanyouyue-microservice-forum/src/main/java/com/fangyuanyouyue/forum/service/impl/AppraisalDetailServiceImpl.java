@@ -26,6 +26,7 @@ import com.fangyuanyouyue.forum.dao.AppraisalCommentMapper;
 import com.fangyuanyouyue.forum.dao.AppraisalDetailMapper;
 import com.fangyuanyouyue.forum.dao.AppraisalImgMapper;
 import com.fangyuanyouyue.forum.dao.AppraisalLikesMapper;
+import com.fangyuanyouyue.forum.dao.AppraisalPvMapper;
 import com.fangyuanyouyue.forum.dao.ArgueOrderMapper;
 import com.fangyuanyouyue.forum.dao.CollectMapper;
 import com.fangyuanyouyue.forum.dto.AppraisalDetailDto;
@@ -38,6 +39,7 @@ import com.fangyuanyouyue.forum.model.AppraisalLikes;
 import com.fangyuanyouyue.forum.model.ArgueOrder;
 import com.fangyuanyouyue.forum.model.Collect;
 import com.fangyuanyouyue.forum.model.UserInfo;
+import com.fangyuanyouyue.forum.param.AdminForumParam;
 import com.fangyuanyouyue.forum.service.AppraisalDetailService;
 import com.fangyuanyouyue.forum.service.SchedualMessageService;
 import com.fangyuanyouyue.forum.service.SchedualUserService;
@@ -72,6 +74,8 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 	private SchedualWalletService schedualWalletService;
 	@Autowired
 	private ArgueOrderMapper argueOrderMapper;
+	@Autowired
+	private AppraisalPvMapper appraisalPvMapper;
 
 
 	@Override
@@ -366,6 +370,11 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 			List<AppraisalImg> appraisalImgs = appraisalImgMapper.selectListByAppraisal(model.getId());
 			dto.setImgDtos(AppraisalImgDto.toDtoList(appraisalImgs));
 			
+			Integer count = appraisalPvMapper.countById(model.getId());
+
+			dto.setRealCount(count);
+			
+			dto.setTotalCount(dto.getBaseCount()+dto.getRealCount());
 			dtos.add(dto);
 		}
 		
@@ -397,23 +406,23 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 	}
 
     @Override
-    public void updateAppraisal(Integer appraisalaId, Integer sort, Integer count, Integer status, String content) throws ServiceException {
-        AppraisalDetail detail = appraisalDetailMapper.selectByPrimaryKey(appraisalaId);
+    public void updateAppraisal(AdminForumParam param) throws ServiceException {
+        AppraisalDetail detail = appraisalDetailMapper.selectByPrimaryKey(param.getId());
         if(detail == null){
             throw new ServiceException("未找到全民鉴定");
         }
-        if(sort != null){
-            detail.setSort(sort);
+        if(param.getSort() != null){
+            detail.setSort(param.getSort());
         }
-        if(status != null){
-            detail.setStatus(status);
+        if(param.getStatus() != null){
+            detail.setStatus(param.getStatus());
         }
-        if(count != null){
-            detail.setPvCount(count);
+        if(param.getCount() != null){
+            detail.setPvCount(param.getCount());
         }
         appraisalDetailMapper.updateByPrimaryKey(detail);
-        if(status != null && status.equals(Status.DELETE.getValue())){
-            if(StringUtils.isEmpty(content)){
+        if(param.getStatus() != null && param.getStatus().equals(Status.DELETE.getValue())){
+            if(StringUtils.isEmpty(param.getContent())){
                 throw new ServiceException("删除理由不能为空！");
             }
 			if(detail.getBonus() != null){
@@ -429,7 +438,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 			}
             //很抱歉，您的帖子/视频/全民鉴定/【名称】已被官方删除，删除理由：……
             schedualMessageService.easemobMessage(detail.getUserId().toString(),
-                    "很抱歉，您的全民鉴定【"+detail.getTitle()+"】已被官方删除，删除理由："+content, Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
+                    "很抱歉，您的全民鉴定【"+detail.getTitle()+"】已被官方删除，删除理由："+param.getContent(), Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
         }
     }
 }
