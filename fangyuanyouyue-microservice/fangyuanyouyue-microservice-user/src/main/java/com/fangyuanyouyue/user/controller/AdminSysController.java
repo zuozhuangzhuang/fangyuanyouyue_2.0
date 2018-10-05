@@ -291,7 +291,8 @@ public class AdminSysController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "获取统计列表", notes = "(AdminProcessDto)获取统计列表",response = BaseResp.class) @ApiImplicitParams({
+    @ApiOperation(value = "获取统计列表", notes = "(AdminProcessDto)获取统计列表",response = BaseResp.class)
+    @ApiImplicitParams({
             @ApiImplicitParam(name = "count", value = "天数", required = true, dataType = "int", paramType = "query"),
     })
     @PostMapping(value = "/getProcessList")

@@ -1,12 +1,13 @@
 package com.fangyuanyouyue.user.utils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import com.aliyun.oss.OSSClient;
+import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.base.util.DateUtil;
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.UUID;
 
 public class FileUtils {
@@ -124,9 +125,78 @@ public class FileUtils {
         }
         return bool;
     }
+
+    /**
+     * 转移旧图片
+     * @param fileUrl 旧图片路径
+     * @param fileName 文件名
+     * @return
+     */
+    static String transferFile(String fileUrl, String fileName) {
+        try{
+            String ossPath="https://xiaofangyuan.oss-cn-shenzhen.aliyuncs.com/";
+            String accessKeyId="LTAIpIueVqc3Cl2H";
+            String accessKeySecret= "9oBv7Hs1K1te1FLoV80r65vkpRl5Ck";
+            String endpoint="oss-cn-shenzhen.aliyuncs.com";
+            String bucket="xiaofangyuan";
+
+            OSSClient ossClient = new OSSClient(endpoint, accessKeyId, accessKeySecret);
+            // 上传文件流file
+            ossClient.putObject(bucket, fileName, getInputStream(fileUrl));
+            // 关闭client
+            ossClient.shutdown();
+            fileUrl = ossPath+fileName;
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return fileUrl;
+    }
+
+    /**
+     * GET请求获取输入流
+     * @param imgUrl
+     * @return
+     * @throws IOException
+     */
+    public static InputStream getInputStream(String imgUrl) throws IOException {
+        InputStream inputStream=null;
+        HttpURLConnection httpurlconn=null;
+        try {
+            URL url=new URL(imgUrl);
+            if(url!=null) {
+                httpurlconn=(HttpURLConnection) url.openConnection();
+                //设置连接超时时间
+                httpurlconn.setConnectTimeout(3000);
+                //表示使用GET方式请求
+                httpurlconn.setRequestMethod("GET");
+                int responsecode=httpurlconn.getResponseCode();
+                if(responsecode==200)
+                {
+                    //从服务返回一个输入流
+                    inputStream=httpurlconn.getInputStream();
+                }
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return inputStream;
+    }
+
+    /**
+     * 获取文件名
+     * @param fileName
+     * @return
+     */
+    static String getFileName(){
+        String fileName = UUID.randomUUID().toString();
+        String date = DateUtil.getCurrentDate("/yyyy/MM/dd/");
+        return date + fileName;
+    }
+
     public static void main(String[] args) {
-        UUID uuid = UUID.randomUUID();
-        createFile(uuid+"myfile", "我的梦说别停留等待,就让光芒折射泪湿的瞳孔,映出心中最想拥有的彩虹,带我奔向那片有你的天空,因为你是我的梦 我的梦");
+//        UUID uuid = UUID.randomUUID();
+//        createFile(uuid+"myfile", "我的梦说别停留等待,就让光芒折射泪湿的瞳孔,映出心中最想拥有的彩虹,带我奔向那片有你的天空,因为你是我的梦 我的梦");
+        System.out.println(getFileName());
     }
 
 
