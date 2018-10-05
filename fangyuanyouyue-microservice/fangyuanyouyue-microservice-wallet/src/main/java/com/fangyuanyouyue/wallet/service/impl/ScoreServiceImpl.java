@@ -113,7 +113,7 @@ public class ScoreServiceImpl implements ScoreService{
         if(userWallet == null){
             throw new ServiceException("获取钱包信息失败！");
         }else{
-            if(type == 1){
+            if(type.equals(Status.ADD.getValue())){
                 //判断是否满500积分
                 Long userScore = userScoreDetailMapper.getUserScoreByDay(userId);
                 //铂金2倍 至尊4倍

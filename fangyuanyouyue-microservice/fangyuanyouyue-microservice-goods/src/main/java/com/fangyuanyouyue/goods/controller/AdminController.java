@@ -219,6 +219,9 @@ public class AdminController  extends BaseController {
             //获取分类列表
             goodsInfoService.addCategory(param);
             return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -252,6 +255,9 @@ public class AdminController  extends BaseController {
                 goodsInfoService.addCategory(param);
             }
             return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -269,6 +275,9 @@ public class AdminController  extends BaseController {
             //获取分类列表
             Pager pager = goodsInfoService.categoryPage(param);
             return toPage(pager);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -323,6 +332,9 @@ public class AdminController  extends BaseController {
             //获取商品列表
             Pager pager = goodsInfoService.getGoodsPage(param);
             return toPage(pager);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -346,6 +358,9 @@ public class AdminController  extends BaseController {
             //获取商品详情
             AdminGoodsDto dto = goodsInfoService.adminGoodsDetail(param.getId());
             return toSuccess(dto);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");

@@ -262,11 +262,11 @@ public class OrderServiceImpl implements OrderService{
                     if(!Boolean.valueOf(JSONObject.parseObject(schedualUserService.userIsAuth(goods.getUserId())).getString("data"))){
                         throw new ServiceException("【"+goods.getName()+"】所属店铺未认证，不可使用优惠券！");
                     }
-                    orderDetail.setCouponId(couponId);
                     BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.getPriceByCoupon(orderInfo.getUserId(),price,couponId)), BaseResp.class);
                     if(baseResp.getCode() == 1){
                         throw new ServiceException(baseResp.getReport().toString());
                     }else{
+                        orderDetail.setCouponId(couponId);
                         price = (BigDecimal)baseResp.getData();
                     }
                 }
