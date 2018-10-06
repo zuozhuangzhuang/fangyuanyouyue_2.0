@@ -70,10 +70,11 @@ public class SystemServiceImpl implements SystemService {
     }
 
     @Override
-    public void sendMessage(String content) throws ServiceException {
+    public void sendMessage(Integer userId,String content) throws ServiceException {
         SysMsgLog sysMsgLog = new SysMsgLog();
         sysMsgLog.setContent(content);
         sysMsgLog.setAddTime(DateStampUtils.getTimesteamp());
+        sysMsgLog.setUserId(userId);
         sysMsgLogMapper.insert(sysMsgLog);
         List<UserInfo> allHxUser = userInfoMapper.findAllHxUser();
         for(UserInfo userInfo:allHxUser){

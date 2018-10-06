@@ -23,7 +23,7 @@ public class BannerServiceImpl implements BannerService{
     private BannerIndexMapper bannerIndexMapper;
 
     @Override
-    public AdminBannerDto addBanner(AdminGoodsParam param) throws ServiceException {
+    public void addBanner(AdminGoodsParam param) throws ServiceException {
         BannerIndex bannerIndex = new BannerIndex();
         bannerIndex.setBusinessId(param.getBusinessId());
         bannerIndex.setJumpType(param.getJumpType());
@@ -35,8 +35,6 @@ public class BannerServiceImpl implements BannerService{
         bannerIndex.setStatus(1);//是否展示，1展示 2不展示
         bannerIndex.setAddTime(DateStampUtils.getTimesteamp());
         bannerIndexMapper.insert(bannerIndex);
-        AdminBannerDto adminBannerDto = new AdminBannerDto(bannerIndex);
-        return adminBannerDto;
     }
 
     @Override
@@ -53,18 +51,14 @@ public class BannerServiceImpl implements BannerService{
             if(param.getType() != null){
                 bannerIndex.setType(param.getType());
             }
-            if(param.getBusinessId() != null){
-                bannerIndex.setBusinessId(param.getBusinessId());
-            }
             if(StringUtils.isNotEmpty(param.getImgUrl())){
                 bannerIndex.setImgUrl(param.getImgUrl());
             }
             if(param.getJumpType() != null){
                 bannerIndex.setJumpType(param.getJumpType());
             }
-            if(param.getBusinessType() != null){
-                bannerIndex.setBusinessType(param.getBusinessType());
-            }
+            bannerIndex.setBusinessType(param.getBusinessType());
+            bannerIndex.setBusinessId(param.getBusinessId());
             if(StringUtils.isNotEmpty(param.getTitle())){
                 bannerIndex.setTitle(param.getTitle());
             }

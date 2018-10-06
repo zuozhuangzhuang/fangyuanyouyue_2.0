@@ -1041,20 +1041,20 @@ public class OrderServiceImpl implements OrderService{
             List<OrderDetail> orderDetails;
             if(info.getSellerId() == null){
                 orderDetails = orderDetailMapper.selectByMainOrderId(orderDto.getOrderId());
-                orderDto.setSeller("多卖家");
+                //orderDto.setSeller("多卖家");
             }else{
                 orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
 
                 //获取卖家信息
-                UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(info.getSellerId())).getString("data")), UserInfo.class);
-                if(seller != null){
-                    orderDto.setSeller(seller.getPhone()+"\n"+seller.getNickName());
-                }
+                //UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(info.getSellerId())).getString("data")), UserInfo.class);
+                //if(seller != null){
+                //    orderDto.setSeller(seller.getPhone()+"\n"+seller.getNickName());
+                //}
             }
             ArrayList<AdminOrderDetailDto> orderDetailDtos = AdminOrderDetailDto.toDtoList(orderDetails);
             String orderDetail = "";
             for(AdminOrderDetailDto detail:orderDetailDtos) {
-            	orderDetail += "【"+detail.getGoodsName() + "】\n";
+            	orderDetail += "卖家："+detail.getNickName()+" - "+detail.getPhone()+"，商品："+detail.getGoodsName() + "\n";
             }
             orderDto.setOrderDetail(orderDetail);
             orderDto.setTotalCount(orderDetailDtos.size());
@@ -1063,19 +1063,19 @@ public class OrderServiceImpl implements OrderService{
            // List sellerDtos = new ArrayList<>();
             //sellerDtos.addAll(getSellerDtos(OrderDetailDto.toDtoList(orderDetails)));
             //订单支付表
-            OrderPay orderPay = orderPayMapper.selectByOrderId(orderDto.getOrderId());
-            AdminOrderPayDto orderPayDto = new AdminOrderPayDto(orderPay);
-            orderDto.setOrderPayDto(orderPayDto);
+            //OrderPay orderPay = orderPayMapper.selectByOrderId(orderDto.getOrderId());
+            //AdminOrderPayDto orderPayDto = new AdminOrderPayDto(orderPay);
+            //orderDto.setOrderPayDto(orderPayDto);
             //orderDto.setSellerDtos(sellerDtos);
-            orderDto.setOrderDetailDtos(orderDetailDtos);
-            if(orderDto.getIsRefund() == 1){
+            //orderDto.setOrderDetailDtos(orderDetailDtos);
+            //if(orderDto.getIsRefund() == 1){
                 //退货状态
-                OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null,null);
-                if(orderRefund != null){
-                    orderDto.setReturnStatus(orderRefund.getStatus());
-                    orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
-                }
-            }
+            //    OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null,null);
+            //    if(orderRefund != null){
+            //        orderDto.setReturnStatus(orderRefund.getStatus());
+             //       orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
+            //    }
+           // }
             //是否评价
             //OrderComment orderComment = orderCommentMapper.selectByOrder(orderDto.getOrderId());
             //if(orderComment != null){
@@ -1090,6 +1090,55 @@ public class OrderServiceImpl implements OrderService{
     }
     
     @Override
+    public AdminOrderDto adminOrderDetail(Integer orderId) throws ServiceException{
+    	OrderInfo info = orderInfoMapper.selectByOrderId(orderId);
+    	if(info==null) {
+    		throw new ServiceException("找不到订单");
+    	}
+    	AdminOrderDto orderDto = new AdminOrderDto(info);
+        //获取订单详情列表
+        //如果是没有拆单的订单根据主订单获取，拆了单的根据订单id获取
+        List<OrderDetail> orderDetails;
+        if(info.getSellerId() == null){
+            orderDetails = orderDetailMapper.selectByMainOrderId(orderDto.getOrderId());
+            //orderDto.setSeller("多卖家");
+        }else{
+            orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
+
+             //获取卖家信息
+            //UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(info.getSellerId())).getString("data")), UserInfo.class);
+            //if(seller != null){
+            //    orderDto.setSeller(seller.getPhone()+"\n"+seller.getNickName());
+            //}
+        }
+        ArrayList<AdminOrderDetailDto> orderDetailDtos = AdminOrderDetailDto.toDtoList(orderDetails);
+        String orderDetail = "";
+        for(AdminOrderDetailDto detail:orderDetailDtos) {
+        	orderDetail += "卖家："+detail.getNickName()+" - "+detail.getPhone()+"，商品："+detail.getGoodsName() + "\n";
+        }
+        orderDto.setOrderDetail(orderDetail);
+        orderDto.setTotalCount(orderDetailDtos.size());
+         
+        //卖家信息DTO        // List sellerDtos = new ArrayList<>();
+        //sellerDtos.addAll(getSellerDtos(OrderDetailDto.toDtoList(orderDetails)));
+        //订单支付表
+        OrderPay orderPay = orderPayMapper.selectByOrderId(orderDto.getOrderId());
+        AdminOrderPayDto orderPayDto = new AdminOrderPayDto(orderPay);
+        orderDto.setOrderPayDto(orderPayDto);
+        //orderDto.setSellerDtos(sellerDtos);
+        orderDto.setOrderDetailDtos(orderDetailDtos);
+        if(orderDto.getIsRefund() == 1){
+            //退货状态
+            OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null,null);
+            if(orderRefund != null){
+                orderDto.setReturnStatus(orderRefund.getStatus());
+                orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
+            }
+        }
+        return orderDto;
+    }
+    
+    @Override
     public Pager simpleOrderList(AdminOrderParam param) throws ServiceException {
         //后台查看所有用户订单
         Integer total = orderInfoMapper.countPage(param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate());
@@ -1098,7 +1147,7 @@ public class OrderServiceImpl implements OrderService{
 
         Pager pager = new Pager();
         pager.setTotal(total);
-        pager.setDatas(list);
+        pager.setDatas(AdminOrderDto.toDtoList(list));
         return pager;
     }
 
@@ -1144,56 +1193,6 @@ public class OrderServiceImpl implements OrderService{
         }
         companyMapper.updateByPrimaryKey(company);
     }
-
-    @Override
-    public AdminOrderDto adminOrderDetail(Integer orderId) throws ServiceException {
-        OrderInfo info = orderInfoMapper.selectByPrimaryKey(orderId);
-        AdminOrderDto orderDto = new AdminOrderDto(info);
-        //获取订单详情列表
-        //如果是没有拆单的订单根据主订单获取，拆了单的根据订单id获取
-        List<OrderDetail> orderDetails;
-        if(info.getSellerId() == null){
-            orderDetails = orderDetailMapper.selectByMainOrderId(orderDto.getOrderId());
-            orderDto.setSeller("多卖家");
-        }else{
-            orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
-
-            //获取卖家信息
-            UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(info.getSellerId())).getString("data")), UserInfo.class);
-
-            orderDto.setSeller(seller.getPhone()+"<br>"+seller.getNickName());
-        }
-        ArrayList<AdminOrderDetailDto> orderDetailDtos = AdminOrderDetailDto.toDtoList(orderDetails);
-        String orderDetail = "";
-        for(AdminOrderDetailDto detail:orderDetailDtos) {
-            orderDetail += "【"+detail.getGoodsName() + "】x1 <br>";
-        }
-        orderDto.setOrderDetail(orderDetail);
-        orderDto.setTotalCount(orderDetailDtos.size());
-
-        //卖家信息DTO
-        // List sellerDtos = new ArrayList<>();
-        //sellerDtos.addAll(getSellerDtos(OrderDetailDto.toDtoList(orderDetails)));
-        //订单支付表
-        OrderPay orderPay = orderPayMapper.selectByOrderId(orderDto.getOrderId());
-        AdminOrderPayDto orderPayDto = new AdminOrderPayDto(orderPay);
-        orderDto.setOrderPayDto(orderPayDto);
-        //orderDto.setSellerDtos(sellerDtos);
-        orderDto.setOrderDetailDtos(orderDetailDtos);
-        if(orderDto.getIsRefund() == 1){
-            //退货状态
-            OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null,null);
-            orderDto.setReturnStatus(orderRefund.getStatus());
-            orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
-        }
-        //是否评价
-        //OrderComment orderComment = orderCommentMapper.selectByOrder(orderDto.getOrderId());
-        //if(orderComment != null){
-        //    orderDto.setIsEvaluation(1);
-        // }
-        return orderDto;
-    }
-
 
     @Override
     public AdminOrderProcessDto getOrderProcess(Integer status, String startDate, String endDate) throws ServiceException {

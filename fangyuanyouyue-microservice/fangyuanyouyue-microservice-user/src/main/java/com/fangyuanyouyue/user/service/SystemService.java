@@ -32,7 +32,7 @@ public interface SystemService {
      * @param content
      * @throws ServiceException
      */
-    void sendMessage(String content) throws ServiceException;
+    void sendMessage(Integer userId,String content) throws ServiceException;
 
     /**
      * 获取统计信息
@@ -74,4 +74,5 @@ public interface SystemService {
      * @throws ServiceException
      */
     List<AdminDailyStatisticsDto> getProcessList(Integer count) throws ServiceException;
+
 }

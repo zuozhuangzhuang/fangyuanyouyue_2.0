@@ -66,31 +66,44 @@ public class AdminController  extends BaseController {
         try {
             log.info("----》新增首页轮播图《----");
             log.info("参数："+param.toString());
-            if(param.getBusinessId() == null){
-                return toError("业务ID不能为空！");
-            }
-            if(param.getJumpType() == null){
-                return toError("跳转类型不能为空！");
-            }
-            if(param.getBusinessType() == null){
-                return toError("业务类型不能为空！");
-            }
-            if(param.getType() == null){
-                return toError("类型不能为空！");
-            }
-            if(StringUtils.isEmpty(param.getTitle())){
-                return toError("描述标题不能为空！");
-            }
-            if(StringUtils.isEmpty(param.getImgUrl())){
-                return toError("图片地址不能为空！");
-            }
-            if(param.getSort() == null){
-                return toError("排序不能为空！");
-            }
-            //新增首页轮播图
-            AdminBannerDto dto = bannerService.addBanner(param);
+            
+            if(param.getId()!=null&&param.getId()>0) {
 
-            return toSuccess(dto);
+                if(param.getBusinessType() != null){
+                	 if(param.getBusinessId() == null){
+                         return toError("业务ID不能为空！");
+                     }
+                }
+                //修改首页轮播图
+                bannerService.updateBanner(param);
+            }else { 
+                if(param.getJumpType() == null){
+                    return toError("跳转类型不能为空！");
+                }
+                if(param.getBusinessType() != null){
+                	 if(param.getBusinessId() == null){
+                         return toError("业务ID不能为空！");
+                     }
+                }
+                if(param.getType() == null){
+                    return toError("类型不能为空！");
+                }
+                if(StringUtils.isEmpty(param.getTitle())){
+                    return toError("描述标题不能为空！");
+                }
+                if(StringUtils.isEmpty(param.getImgUrl())){
+                    return toError("图片地址不能为空！");
+                }
+                if(param.getSort() == null){
+                    return toError("排序不能为空！");
+                }
+                //新增首页轮播图
+                bannerService.addBanner(param);
+            	
+            }
+           
+
+            return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
@@ -102,20 +115,17 @@ public class AdminController  extends BaseController {
 
 
     @ApiOperation(value = "删除轮播图", notes = "删除轮播图",response = BaseResp.class)
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "bannerId", value = "轮播图ID", required = true, dataType = "int", paramType = "query")
-    })
-    @DeleteMapping(value = "/deleteBanner")
+    @PostMapping(value = "/deleteBanner")
     @ResponseBody
-    public BaseResp deleteBanner(AdminGoodsParam param) throws IOException{
+    public BaseResp deleteBanner(Integer bannerId) throws IOException{
         try {
-            log.info("----》查看轮播图详情《----");
-            log.info("参数：" + param);
+            log.info("----》删除轮播图《----");
+            log.info("参数：" + bannerId);
             //查看首页轮播图
-            if(param.getId() == null){
+            if(bannerId == null){
                 return toError("id不能为空！");
             }
-            bannerService.deleteBanner(param.getId());
+            bannerService.deleteBanner(bannerId);
 
             return toSuccess();
         } catch (ServiceException e) {
@@ -127,39 +137,6 @@ public class AdminController  extends BaseController {
         }
     }
 
-    @ApiOperation(value = "修改首页轮播图", notes = "(BannerIndex)修改首页轮播图",response = BaseResp.class)
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "轮播图ID", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "businessId", value = "业务ID：例：商品id、视频id、积分商城商品id...", required = false, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "jumpType", value = "跳转类型 1页面 2链接 3图片（businessId为空）", required = false, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "businessType", value = "业务类型 1商品详情、2抢购详情、3帖子详情、4全民鉴定详情、5视频详情、6专栏 7积分商品", required = false, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "type", value = "类型 1首页 2商品详情 3积分商城", required = false, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "title", value = "描述标题", required = false, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "imgUrl", value = "图片地址", required = false, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "sort", value = "排序", required = false, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "status", value = "是否展示，1展示 2不展示", required = false, dataType = "int", paramType = "query")
-    })
-    @PutMapping(value = "/updateBanner")
-    @ResponseBody
-    public BaseResp updateBanner(AdminGoodsParam param) throws IOException{
-        try {
-            log.info("----》修改首页轮播图《----");
-            log.info("参数：" + param.toString());
-            if(param.getId() == null){
-                return toError("id不能为空！");
-            }
-            //修改首页轮播图
-            bannerService.updateBanner(param);
-
-            return toSuccess();
-        } catch (ServiceException e) {
-            e.printStackTrace();
-            return toError(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return toError("系统繁忙，请稍后再试！");
-        }
-    }
 
     @ApiOperation(value = "查看轮播图列表", notes = "查看首页轮播图列表",response = BaseResp.class)
     @ApiImplicitParams({

@@ -236,7 +236,7 @@ public class AdminSysController extends BaseController {
             if(StringUtils.isEmpty(param.getContent())){
                 return toError("消息体不能为空！");
             }
-            systemService.sendMessage(param.getContent());
+            systemService.sendMessage(1,param.getContent());
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();

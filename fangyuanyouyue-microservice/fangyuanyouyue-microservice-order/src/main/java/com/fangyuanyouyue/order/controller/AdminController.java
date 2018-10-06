@@ -83,8 +83,6 @@ public class AdminController extends BaseController{
         }
     }
     
-    
-
     @ApiOperation(value = "查看退货订单", notes = "订单退货",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
@@ -244,7 +242,7 @@ public class AdminController extends BaseController{
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "订单ID",required = true, dataType = "int", paramType = "query")
     })
-    @PostMapping(value = "/orderDetail")
+    @GetMapping(value = "/orderDetail")
     @ResponseBody
     public BaseResp orderDetail(AdminOrderParam param) throws IOException {
         try {

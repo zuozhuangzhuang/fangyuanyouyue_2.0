@@ -37,6 +37,12 @@ public class AdminOrderDetailDto {
     private String description;//商品详情
 
     private Integer goodsType;//类型 1普通商品 2抢购商品
+    
+    private String nickName;//用户昵称
+
+    private String headImgUrl;//用户头像
+
+    private String phone;//用户手机
 
     //优惠券
 
@@ -55,6 +61,9 @@ public class AdminOrderDetailDto {
         this.freight = orderDetail.getFreight();
         this.description = orderDetail.getDescription();
         this.goodsType = orderDetail.getGoodsType();
+        this.nickName = orderDetail.getNickName();
+        this.phone = orderDetail.getPhone();
+        this.headImgUrl = orderDetail.getHeadImgUrl();
     }
 
     public static ArrayList<AdminOrderDetailDto> toDtoList(List<OrderDetail> list) {

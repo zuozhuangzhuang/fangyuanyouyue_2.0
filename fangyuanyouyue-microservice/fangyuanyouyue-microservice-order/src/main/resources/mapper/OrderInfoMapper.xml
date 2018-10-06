@@ -312,21 +312,26 @@
     select a.*,b.nick_name,b.head_img_url from order_info a,user_info b where a.user_id = b.id and a.order_no = #{orderNo} and a.status = 1
   </select>
 
+  <select id="selectByOrderId" parameterType="Integer" resultMap="BaseResultMap">
+    select a.*,b.nick_name,b.head_img_url,b.phone from order_info a,user_info b where a.user_id = b.id and a.id = #{orderId} 
+  </select>
+  
   <select id="selectByStatus" parameterType="Integer" resultMap="BaseResultMap">
     select a.*,b.nick_name,b.head_img_url from order_info a,user_info b where a.user_id = b.id and a.status = #{status} and a.is_resolve = 2
   </select>
 
 
   <select id="countPage" resultType="Integer">
-    select count(*) from order_info a,order_detail b,user_info c,goods_info d
+    select count(*) from order_info a,order_detail b,user_info c
     <where>
-        (a.id = b.order_id or a.id = b.main_order_id) and a.is_resolve = 2 and a.user_id = c.id and b.goods_id = d.id
-        <if test="keyword != null and keyword != ''">
-            and (
-            d.name like "%"#{keyword}"%"
-            or c.nick_name like "%"#{keyword}"%"
-            )
-        </if>
+        (a.id = b.order_id or a.id = b.main_order_id) and a.is_resolve = 2 and a.user_id = c.id
+      <if test="keyword != null and keyword != ''">
+        and (
+          a.order_no like "%"#{keyword}"%"
+          or b.goods_name like "%"#{keyword}"%"
+          or c.nick_name like "%"#{keyword}"%"
+        )
+      </if>
       <if test="status != null">
         <if test="status == 7">
           and a.is_refund = 1
@@ -345,12 +350,13 @@
   </select>
 
   <select id="getOrderPage" resultMap="BaseResultMap">
-    select DISTINCT a.*,c.nick_name,c.head_img_url,c.phone from order_info a,order_detail b,user_info c,goods_info d
+    select DISTINCT a.*,c.nick_name,c.head_img_url,c.phone from order_info a,order_detail b,user_info c
     <where>
-      (a.id = b.order_id or a.id = b.main_order_id) and a.is_resolve = 2 and a.user_id = c.id and b.goods_id = d.id
+      (a.id = b.order_id or a.id = b.main_order_id) and a.is_resolve = 2 and a.user_id = c.id
       <if test="keyword != null and keyword != ''">
         and (
-          d.name like "%"#{keyword}"%"
+          a.order_no like "%"#{keyword}"%"
+          or b.goods_name like "%"#{keyword}"%"
           or c.nick_name like "%"#{keyword}"%"
         )
       </if>
