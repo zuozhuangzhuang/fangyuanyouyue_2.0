@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.fangyuanyouyue.base.util.DateStampUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,6 +83,8 @@ public class ForumCommentServiceImpl implements ForumCommentService {
 		model.setStatus(StatusEnum.STATUS_NORMAL.getValue());
 		model.setCommentId(commentId);
 		forumCommentMapper.insert(model);
+		forumInfo.setCommentTime(DateStampUtils.getTimesteamp());
+		forumInfoMapper.updateByPrimaryKey(forumInfo);
 		//社交消息：您的帖子【帖子标题】有新的评论，点击此处前往查看吧
 		//社交消息：您的视频【视频标题】有新的评论，点击此处前往查看吧
 		if(forumInfo.getType() == 1){

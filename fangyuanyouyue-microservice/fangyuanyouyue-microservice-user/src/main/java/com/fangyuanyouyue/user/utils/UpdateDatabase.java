@@ -1,5 +1,7 @@
 package com.fangyuanyouyue.user.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.base.util.IdGenerator;
@@ -53,8 +55,11 @@ public class UpdateDatabase {
     }
     public static Connection getNewConnection(){
         String url="jdbc:mysql://localhost:3306/new_xiaofangyuan?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=true";
+//        String url="jdbc:mysql://xiaofangyuan-prd.mysql.rds.aliyuncs.com:3306/xiaofangyuan?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=true";
         String userName="root";
+//        String userName="wuzhimin";
         String password="123456";
+//        String password="Wuzhimin123";
         try {
             Class.forName("com.mysql.jdbc.Driver");
         } catch (ClassNotFoundException e) {
@@ -73,9 +78,11 @@ public class UpdateDatabase {
         }
         return null;
     }
+
 /**
  * user_info
  * user_info_ext
+ * identity_auth_apply
  * user_third_party
  * user_wallet
  * user_vip
@@ -91,34 +98,282 @@ public class UpdateDatabase {
  * order_pay
  * order_refund
  * user_recharge_detail
- *
- *
  * goods_appraisal_detail
  * appraisal_detail
  * forum_info
- *
  */
-    /**
-     * a_user
-     * a_user_exp
-     * a_user_ext
-     * a_user_third
-     * a_user_withdraw
-     * a_user_finance
-     * a_address
-     * a_fans
-     * a_goods
-     * a_goods_pic
-     * a_order
-     * a_refund_detail
-     *
-     * a_appraisal
-     * a_appraisal_pic
-     * a_appreciate
-     * a_appreciate_pic
-     */
 
+/**
+ * a_user
+ * a_user_exp
+ * a_user_ext
+ * a_user_third
+ * a_user_withdraw
+ * a_user_finance
+ * a_address
+ * a_fans
+ * a_goods
+ * a_goods_pic
+ * a_order
+ * a_refund_detail
+ * a_appraisal
+ * a_appraisal_pic
+ * a_appreciate
+ * a_appreciate_pic
+ */
+
+    /**
+     * a_appreciate
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
+    static String getForumSql(ResultSet rs) throws SQLException {
+        System.out.println("----------forum_info----------");
+        Integer userId = rs.getInt("id")+100000;//用户id
+        StringBuffer forumSql = new StringBuffer();
+        PreparedStatement forum_ps = null;
+        ResultSet forum_rs = null;
+        PreparedStatement forum_pic_ps = null;
+        ResultSet forum_pic_rs = null;
+        try{
+            String selectFroum = "select * from a_appreciate where user_id ="+rs.getInt("id");
+            forum_ps = conn.prepareStatement(selectFroum);
+            forum_rs = forum_ps.executeQuery(selectFroum);
+            while (forum_rs.next()){
+                Integer id = forum_rs.getInt("id");
+                String title = forum_rs.getString("title").replace("'","‘");//标题
+                String videoUrl = null;//视频链接
+                Integer videoLength = null;//视频长度
+                String label = null;//标签
+                Integer sort=forum_rs.getInt("is_top")==0?2:1;//排列优先级 1置顶 2默认排序
+                Integer type = 1;//帖子类型 1帖子 2视频
+                Integer status = forum_rs.getInt("status")==0?1:2;//状态 1显示 2隐藏
+                String addTime = DateStampUtils.formatUnixTime(forum_rs.getLong("add_time"),DateUtil.DATE_FORMT);
+                String updateTime = null;//更新时间
+                Integer columnId = 1;//专栏id
+                Integer isChosen = 2;//是否精选1是 2否
+                String videoImg = null;//视频封面图
+                String content = null;//内容描述，富文本
+                Integer pvCount = forum_rs.getInt("browse_count");//帖子浏览量基数，展示浏览量为基数＋浏览量个数
+                String commentTime = DateStampUtils.formatUnixTime(forum_rs.getLong("comment_time"),DateUtil.DATE_FORMT);
+
+                String selectForumPic = "select * from a_appreciate_pic where appreciate_id ="+id;
+                forum_pic_ps = conn.prepareStatement(selectForumPic);
+                forum_pic_rs = forum_pic_ps.executeQuery(selectForumPic);
+                int conteneId = 0;
+                List<ColumnContentDto> list = new ArrayList<>();
+                while (forum_pic_rs.next()){
+                    ColumnContentDto contentDto = new ColumnContentDto();
+                    contentDto.setId(conteneId++);
+                    contentDto.setType(2);
+                    contentDto.setImgUrl(forum_pic_rs.getString("img_url"));
+                    list.add(contentDto);
+                }
+                ColumnContentDto contentDto = new ColumnContentDto();
+                contentDto.setId(conteneId);
+                contentDto.setType(1);
+                contentDto.setContent(forum_rs.getString("description"));
+                list.add(contentDto);
+                Object json = JSONObject.toJSON(list);
+                content = json.toString().replace("'","‘").replace("\\","\\/\\/");
+                forumSql.append("insert into forum_info (" +
+                        "id, " +
+                        "user_id, " +
+                        "title," +
+                        "video_url, " +
+                        "video_length, " +
+                        "label," +
+                        "sort, " +
+                        "type, " +
+                        "status," +
+                        "add_time," +
+                        "update_time, " +
+                        "column_id," +
+                        "is_chosen, " +
+                        "video_img, " +
+                        "pv_count," +
+                        "comment_time, "  +
+                        "content) values ("
+                        +id+","
+                        +userId+",'"
+                        +title+"','"
+                        +videoUrl+"',"
+                        +videoLength+",'"
+                        +label+"',"
+                        +sort+","
+                        +type+","
+                        +status+",'"
+                        +addTime+"','"
+                        +updateTime+"',"
+                        +columnId+","
+                        +isChosen+",'"
+                        +videoImg+"',"
+                        +pvCount+",'"
+                        +commentTime+"','"
+                        +content+"');\r\n"
+                );
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }finally {
+            if(forum_ps != null){
+                forum_ps.close();
+            }
+            if(forum_rs != null){
+                forum_rs.close();
+            }
+            if(forum_pic_ps != null){
+                forum_pic_ps.close();
+            }
+            if(forum_pic_rs != null){
+                forum_pic_rs.close();
+            }
+        }
+        return forumSql.toString().replace("null","NULL").replace("'NULL'","NULL");
+    }
+
+    /**
+     * a_appraisal
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
+    static String getAppraisalSql(ResultSet rs) throws SQLException{
+        System.out.println("----------goods_appraisal----------");
+        StringBuffer appraisalSql = new StringBuffer();
+        Integer userId = rs.getInt("id")+100000;//用户id
+        PreparedStatement appraisal_ps = null;
+        ResultSet appraisal_rs = null;
+        PreparedStatement appraisal_url_ps = null;
+        ResultSet appraisal_url_rs = null;
+        try{
+            /**
+             * goods_appraisal_detail
+             */
+            Integer id = null;//唯一自增ID
+            Integer orderId = 0;//鉴定id
+            Integer goodsId = null;//商品id
+            String opinion = null;//鉴定观点
+            Integer status = null;//状态 0申请 1真 2假 3存疑 4待支付(在列表中不显示) 5删除
+            String title = null;//鉴定标题
+            BigDecimal price = new BigDecimal(0);//鉴定赏金
+            String description = null;//描述
+            String submitTime = null;//审核时间
+            String addTime = null;//添加时间
+            String updateTime = null;//更新时间
+            Integer type = 3;//鉴定类型 1卖家鉴定 2买家鉴定 3我要鉴定
+            Integer isShow = 2;//是否鉴定展示 1是 2否
+
+
+            String selectAppraisal = "select * from a_appraisal where user_id =" + rs.getInt("id");
+            appraisal_ps = conn.prepareStatement(selectAppraisal);
+            appraisal_rs = appraisal_ps.executeQuery(selectAppraisal);
+            while (appraisal_rs.next()){
+                id = appraisal_rs.getInt("id");
+                opinion = appraisal_rs.getString("opinion");
+                //鉴定状态 0鉴定中  1已鉴定
+                //状态 0申请 1真 2假 3存疑 4待支付(在列表中不显示) 5删除
+                status = appraisal_rs.getInt("status");
+                //鉴定结果状态 0存疑  1 真品  2非真品
+                Integer appraisal_type = appraisal_rs.getInt("type");
+                if(appraisal_type.equals(0)){
+                    status = 3;
+                }else if(appraisal_type.equals(1)){
+                    status = 1;
+                }else if(appraisal_type.equals(2)){
+                    status = 2;
+                }
+                title = appraisal_rs.getString("title").replace("'","‘").replace("\"","”");
+                description = appraisal_rs.getString("content").replace("'","‘").replace("\"","”");
+                submitTime = DateStampUtils.formatUnixTime(appraisal_rs.getLong("submit_time"),DateUtil.DATE_FORMT);
+                addTime = DateStampUtils.formatUnixTime(appraisal_rs.getLong("add_time"),DateUtil.DATE_FORMT);
+                appraisalSql.append("insert into goods_appraisal_detail (" +
+                        "id, " +
+                        "order_id, " +
+                        "goods_id," +
+                        "opinion, " +
+                        "status, " +
+                        "price," +
+                        "submit_time, " +
+                        "type, " +
+                        "add_time," +
+                        "update_time, " +
+                        "user_id, " +
+                        "is_show," +
+                        "title, " +
+                        "description) values ("
+                        +id+","
+                        +orderId+","
+                        +goodsId+",'"
+                        +opinion+"',"
+                        +status+","
+                        +price+",'"
+                        +submitTime+"',"
+                        +type+",'"
+                        +addTime+"','"
+                        +updateTime+"',"
+                        +userId+","
+                        +isShow+",'"
+                        +title+"','"
+                        +description+"');\r\n"
+                );
+                /**
+                 * appraisal_url
+                 */
+                String url = null;//图片/视频地址
+
+                Integer urlType = 1;//类型 1图片 2视频 3视频截图
+                String selectAppraisalUrl = "select * from a_appraisal_pic where appraisal_id ="+id;
+                appraisal_url_ps = conn.prepareStatement(selectAppraisalUrl);
+                appraisal_url_rs = appraisal_url_ps.executeQuery(selectAppraisalUrl);
+                while (appraisal_url_rs.next()){
+                    url = appraisal_url_rs.getString("url");
+                    appraisalSql.append("insert into appraisal_url (" +
+                            "id, " +
+                            "appraisal_id, " +
+                            "url," +
+                            "type, " +
+                            "add_time) values ("
+                            +null+","
+                            +id+",'"
+                            +url+"',"
+                            +urlType+",'"
+                            +addTime+"');\r\n"
+                    );
+                }
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }finally {
+            try {
+                if(appraisal_ps != null){
+                    appraisal_ps.close();
+                }
+                if(appraisal_rs != null){
+                    appraisal_rs.close();
+                }
+                if(appraisal_url_ps != null){
+                    appraisal_ps.close();
+                }
+                if(appraisal_url_rs != null){
+                    appraisal_rs.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return appraisalSql.toString().replace("null","NULL").replace("'NULL'","NULL");
+    }
+
+    /**
+     * a_order
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
     static String getOrderSql(ResultSet rs) throws SQLException {
+        System.out.println("----------order_info----------");
         StringBuffer orderSql = new StringBuffer();
         PreparedStatement order_ps = null;
         ResultSet order_rs = null;
@@ -141,15 +396,20 @@ public class UpdateDatabase {
                 String payNo = order_rs.getString("third_no");//支付流水号
                 BigDecimal amount = order_rs.getBigDecimal("price");//订单总金额
                 Integer status = null;//状态 1待支付 2待发货 3待收货 4已完成 5已取消
+                Integer rechargeStatus = 3;//状态 1待支付 2已完成 3已删除
                 Integer old_status = order_rs.getInt("status");
                 if(old_status.equals(0)){
                     status = 1;
+                    rechargeStatus = 1;
                 }else if(old_status.equals(1)){
                     status = 2;
+                    rechargeStatus = 2;
                 }else if(old_status.equals(2)){
                     status = 4;
+                    rechargeStatus = 2;
                 }else if(old_status.equals(3)){
                     status = 3;
+                    rechargeStatus = 2;
                 }else if(old_status.equals(4)){
                     status = 5;
                 }
@@ -170,7 +430,7 @@ public class UpdateDatabase {
                 }
                 Integer type = order_rs.getInt("type");
 
-                if(type.equals(0)){
+                if(type.equals(1)){
                     orderSql.append("insert into user_recharge_detail (" +
                             "id, " +
                             "user_id, " +
@@ -187,7 +447,7 @@ public class UpdateDatabase {
                             +payNo+"','"
                             +orderAddTime+"','"
                             +updateTime+"',"
-                            +status+");\r\n"
+                            +rechargeStatus+");\r\n"
                     );
                 }else{
                     /**
@@ -354,7 +614,8 @@ public class UpdateDatabase {
                             +sendTime+"');\r\n"
                     );
 
-                    goodsName = order_rs.getString("content");
+                    goodsId = order_rs.getInt("goods_id");
+                    goodsName = order_rs.getString("content").replace("'","‘").replace("\"","”");
 
                     orderSql.append("insert into order_detail (" +
                             "id, " +
@@ -560,7 +821,7 @@ public class UpdateDatabase {
             goods_rs = goods_ps.executeQuery(selectGoods);
             while (goods_rs.next()){
                 goodsId = goods_rs.getInt("id");
-                name = goods_rs.getString("title");
+                name = goods_rs.getString("title").replace("'","‘").replace("\"","”");
                 price = goods_rs.getBigDecimal("start_price");
                 postage = goods_rs.getBigDecimal("postage");
                 sort = goods_rs.getInt("is_top")==1?1:2;
@@ -569,7 +830,7 @@ public class UpdateDatabase {
                 isAppraisal = 2;
                 addTime = DateStampUtils.formatUnixTime(goods_rs.getLong("add_time"),DateUtil.DATE_FORMT);
                 startPrice = price;
-                description = goods_rs.getString("description");
+                description = goods_rs.getString("description").replace("'","‘").replace("\"","”");
 
 
                 goodsSql.append("insert into goods_info (" +
@@ -592,6 +853,7 @@ public class UpdateDatabase {
                         "update_time, " +
                         "video_length, " +
                         "start_price, " +
+                        "comment_time,  " +
                         "description) values ("
                         +goodsId+","
                         +userId+",'"
@@ -612,6 +874,7 @@ public class UpdateDatabase {
                         +updateTime+","
                         +videoLength+","
                         +startPrice+",'"
+                        +null+"','"
                         +description+"');\r\n"
                 );
                 goodsCategoryId = goods_rs.getInt("catalog_new_id");
@@ -635,13 +898,13 @@ public class UpdateDatabase {
                             +updateTime+");\r\n"
                     );
                 }
-                /*
+
                 String selectGoodsImg = "select * from a_goods_pic where goods_id = "+goods_rs.getInt("id");
                 pic_ps = conn.prepareStatement(selectGoodsImg);
                 pic_rs = pic_ps.executeQuery(selectGoodsImg);
-                *//**
+                /**
                  * goods_img
-                 *//*
+                 */
                 //图片地址
                 String imgUrl = null;
                 //类型 1主图（展示在第一张的图片） 2次图 3视频截图
@@ -649,7 +912,8 @@ public class UpdateDatabase {
                 //排序
                 Integer imgSort = null;
                 while (pic_rs.next()){
-                    imgUrl = FileUtils.transferFile(pic_rs.getString("img_url"),"pic"+FileUtils.getFileName()+".jpg");
+//                    imgUrl = FileUtils.transferFile(pic_rs.getString("img_url"),"pic"+FileUtils.getFileName()+".jpg");
+                    imgUrl = pic_rs.getString("img_url");
                     imgType = pic_rs.getInt("is_main")==0?1:2;
                     imgSort = pic_rs.getInt("sort");
                     goodsSql.append("insert into goods_img (" +
@@ -667,7 +931,7 @@ public class UpdateDatabase {
                             +imgSort+");\r\n"
                     );
                 }
-                */
+
             }
 
         }catch (SQLException e){
@@ -773,7 +1037,7 @@ public class UpdateDatabase {
                 province = address_rs.getString("province");
                 city = address_rs.getString("city");
                 area = address_rs.getString("area");
-                address = address_rs.getString("address");
+                address = address_rs.getString("address").replace("'","‘").replace("\"","”");
                 type = address_rs.getInt("is_default")==0?1:2;
                 addTime = DateStampUtils.formatUnixTime(address_rs.getLong("add_time"),DateUtil.DATE_FORMT);
                 userAddressSql.append("insert into user_address_info (" +
@@ -1029,6 +1293,7 @@ public class UpdateDatabase {
 
         return userWithdrawSql.toString().replace("null","NULL").replace("'NULL'","NULL");
     }
+
     /**
      * user_third_party
      * @param rs
@@ -1075,7 +1340,7 @@ public class UpdateDatabase {
                         +headImgUrl+"','"
                         +addTime+"',"
                         +null+","
-                        +null+")"
+                        +null+");\r\n"
         );
         return userThirdSql.toString().replace("null","NULL").replace("'NULL'","NULL");
     }
@@ -1137,7 +1402,7 @@ public class UpdateDatabase {
                         +score+",'"
                         +addTime+"',"
                         +null+","
-                        +appraisalCount+")"
+                        +appraisalCount+");\r\n"
         );
         return userWalletSql.toString().replace("null","NULL").replace("'NULL'","NULL");
     }
@@ -1178,7 +1443,7 @@ public class UpdateDatabase {
                         +addTime+"',"
                         +null+","
                         +null+","
-                        +null+")"
+                        +null+");\r\n"
         );
         return userVipSql.toString().replace("null","NULL").replace("'NULL'","NULL");
     }
@@ -1191,6 +1456,7 @@ public class UpdateDatabase {
      */
     static String getUserExtSql(ResultSet rs) throws SQLException{
         System.out.println("----------user_info_ext----------");
+        StringBuffer userInfoExtSql = new StringBuffer();
         Integer userId = rs.getInt("id")+100000;
         String addTime = DateStampUtils.formatUnixTime(rs.getLong("add_time"),DateUtil.DATE_FORMT);
         Long credit = 0L;
@@ -1209,7 +1475,7 @@ public class UpdateDatabase {
                 // 3、执行数据库存储过程。通常通过CallableStatement实例实现。
                 ext_ps=conn.prepareStatement(selectUserExt);// 2.创建Satement并设置参数
                 ext_rs=ext_ps.executeQuery(selectUserExt);  // 3.ִ执行SQL语句
-                while(ext_rs.next()){
+                if(ext_rs.next()){
                     identity = ext_rs.getString("card_no");
                     name = ext_rs.getString("real_name");
                     if(ext_rs.getString("status").equals("0")){
@@ -1217,6 +1483,28 @@ public class UpdateDatabase {
                     }else if(ext_rs.getString("status").equals("1")){
                         status = 2;
                     }
+                    userInfoExtSql.append("insert into identity_auth_apply (" +
+                            "id, " +
+                            "user_id, " +
+                            "name," +
+                            "identity, " +
+                            "identity_img_cover, " +
+                            "identity_img_back," +
+                            "reject_desc, " +
+                            "status, " +
+                            "add_time," +
+                            "update_time) values ("
+                            +null+","
+                            +userId+",'"
+                            +name+"','"
+                            +identity+"','"
+                            +null+"','"
+                            +null+"','"
+                            +null+"',"
+                            +status+",'"
+                            +addTime+"','"
+                            +null+"');\r\n"
+                    );
                 }
             }finally{
                 //释放资源
@@ -1228,7 +1516,7 @@ public class UpdateDatabase {
                 }
             }
         }
-        StringBuffer userInfoExtSql = new StringBuffer(
+        userInfoExtSql.append(
                 "insert into user_info_ext (" +
                         "id, " +
                         "user_id, " +
@@ -1251,10 +1539,12 @@ public class UpdateDatabase {
                         +addTime+"',"
                         +null+","
                         +credit+","
-                        +fansCount+")"
+                        +fansCount+");\r\n"
         );
+//        System.out.println(userInfoExtSql.toString().replace("null","NULL").replace("'NULL'","NULL"));
         return userInfoExtSql.toString().replace("null","NULL").replace("'NULL'","NULL");
     }
+
     /**
      * user_info
      * @param rs
@@ -1275,7 +1565,7 @@ public class UpdateDatabase {
         String contact = StringUtils.isEmpty(rs.getString("contact"))?"":rs.getString("contact");
         Integer level = 0;
         String level_desc = "";
-        Integer status = Integer.parseInt(rs.getString("status"));
+        Integer status = rs.getInt("status")==0?1:2;
         String addTime = DateStampUtils.formatUnixTime(rs.getLong("add_time"),DateUtil.DATE_FORMT);
         Integer isRegHx = Integer.parseInt(rs.getString("is_hx"));
 
@@ -1326,18 +1616,19 @@ public class UpdateDatabase {
                         +null+",'"
                         +addTime+"',"
                         +null+","
-                        +isRegHx+")"
+                        +isRegHx+");\r\n"
         );
         return filecontent.toString().replace("null","NULL").replace("'NULL'","NULL");
     }
 
 
     public static void main(String[] args) throws Exception {
-        String selectUser = "select * from a_user limit 0,100";
+        String selectUser = "select * from a_user limit 0,10";
         long start = System.currentTimeMillis();
-        getSqlFile(selectUser);
-//        insertIntoDatabase(selectUser);
-        System.out.println(System.currentTimeMillis()-start);
+//        getSqlFile(selectUser);
+        insertIntoDatabase(selectUser);
+        String timeDifference = DateUtil.getTimeDifference(System.currentTimeMillis(), start);
+        System.out.println(timeDifference);
     }
 
     /**
@@ -1353,6 +1644,7 @@ public class UpdateDatabase {
             rs=ps.executeQuery(selectUser);  // 3.ִ执行SQL语句
             String title = "insertSql";
             // 4.处理结果集
+            int all = 7610;
             StringBuffer insertSql = new StringBuffer();
             while(rs.next()){
                 String nickName = rs.getString("nickName");
@@ -1360,34 +1652,34 @@ public class UpdateDatabase {
                 //user_info
                 String userInfoSql = getUserInfoSql(rs);
                 if(StringUtils.isNotEmpty(userInfoSql)){
-                    insertSql.append(userInfoSql+";\r\n");
+                    insertSql.append(userInfoSql);
                 }
                 //user_info_ext
                 String userInfoExtSql = getUserExtSql(rs);
                 if(StringUtils.isNotEmpty(userInfoExtSql)){
-                    insertSql.append(userInfoExtSql+";\r\n");
+                    insertSql.append(userInfoExtSql);
                 }
                 //user_vip
                 String userVipSql = getUserVipSql(rs);
                 if(StringUtils.isNotEmpty(userVipSql)){
-                    insertSql.append(userVipSql+";\r\n");
+                    insertSql.append(userVipSql);
                 }
                 //user_wallet
                 String userWalletSql = getUserWalletSql(rs);
                 if(StringUtils.isNotEmpty(userWalletSql)){
-                    insertSql.append(userWalletSql+";\r\n");
+                    insertSql.append(userWalletSql);
                 }
                 //user_third_party
                 if(StringUtils.isNotEmpty(rs.getString("wechat_cliend"))){
                     String userWechatSql = getUserThirdSql(rs,1);
                     if(StringUtils.isNotEmpty(userWechatSql)){
-                        insertSql.append(userWechatSql+";\r\n");
+                        insertSql.append(userWechatSql);
                     }
                 }
                 if(StringUtils.isNotEmpty(rs.getString("qq_cliend"))){
                     String userQQSql = getUserThirdSql(rs,2);
                     if(StringUtils.isNotEmpty(userQQSql)){
-                        insertSql.append(userQQSql+";\r\n");
+                        insertSql.append(userQQSql);
                     }
                 }
                 //a_user_withdraw
@@ -1420,8 +1712,18 @@ public class UpdateDatabase {
                 if(StringUtils.isNotEmpty(orderSql)){
                     insertSql.append(orderSql);
                 }
+                //a_appraisal
+                String appraisalSql = getAppraisalSql(rs);
+                if(StringUtils.isNotEmpty(appraisalSql)){
+                    insertSql.append(appraisalSql);
+                }
+                //a_appreciate
+                String forumSql = getForumSql(rs);
+                if(StringUtils.isNotEmpty(forumSql)){
+                    insertSql.append(forumSql);
+                }
                 insertSql.append("\r\n");
-                System.out.println("【"+nickName+"】结束");
+                System.out.println("【"+nickName+"】结束,剩余人数："+(--all));
             }
             FileUtils.createFile(title,insertSql.toString());
         } catch (SQLException e) {
@@ -1452,9 +1754,10 @@ public class UpdateDatabase {
             rs=ps.executeQuery(selectUser);  // 3.ִ执行SQL语句
             String title = "insertSql";
             // 4.处理结果集
-            StringBuffer insertSql = new StringBuffer();
+            int all = 7610;
             while(rs.next()){
-                System.out.println("【"+rs.getString("nickName")+"】开始");
+                String nickName = rs.getString("nickName");
+                System.out.println("【"+nickName+"】开始");
                 //user_info
                 String userInfoSql = getUserInfoSql(rs);
                 if(StringUtils.isNotEmpty(userInfoSql)){
@@ -1558,6 +1861,48 @@ public class UpdateDatabase {
                         e.printStackTrace();
                     }
                 }
+                //a_goods
+                String goodsSql = getGoodsSql(rs);
+                if(StringUtils.isNotEmpty(goodsSql)){
+                    try{
+                        new_ps = new_conn.prepareStatement(goodsSql);
+                        new_ps.executeLargeUpdate(goodsSql);
+                    }catch (SQLException e){
+                        e.printStackTrace();
+                    }
+                }
+                //a_order
+                String orderSql = getOrderSql(rs);
+                if(StringUtils.isNotEmpty(orderSql)){
+                    try{
+                        new_ps = new_conn.prepareStatement(orderSql);
+                        new_ps.executeLargeUpdate(orderSql);
+                    }catch (SQLException e){
+                        e.printStackTrace();
+                    }
+                }
+                //a_appraisal
+                String appraisalSql = getAppraisalSql(rs);
+                if(StringUtils.isNotEmpty(appraisalSql)){
+                    try{
+                        new_ps = new_conn.prepareStatement(appraisalSql);
+                        new_ps.executeLargeUpdate(appraisalSql);
+                    }catch (SQLException e){
+                        e.printStackTrace();
+                    }
+                }
+                //a_appreciate
+                String forumSql = getForumSql(rs);
+                if(StringUtils.isNotEmpty(forumSql)){
+                    try{
+                        new_ps = new_conn.prepareStatement(forumSql);
+                        new_ps.executeLargeUpdate(forumSql);
+                    }catch (SQLException e){
+                        e.printStackTrace();
+                    }
+                }
+
+                System.out.println("【"+nickName+"】结束,剩余人数："+(--all));
             }
         } catch (SQLException e) {
             e.printStackTrace();
