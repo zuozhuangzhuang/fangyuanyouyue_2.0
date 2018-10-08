@@ -94,12 +94,16 @@ public class TimerServiceImpl implements TimerService{
                                 auction = goodsInfo.getType().intValue() == Status.AUCTION.getValue()?true:false;
                                 name.append("【"+goodsInfo.getName()+"】");
                             }
-                            schedualMessageService.easemobMessage(info.getSellerId().toString(),
-                                    "您的"+(auction?"抢购":"商品")+name+"买家超时已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),info.getId().toString());
+                            if(orderInfo.getSellerId() != null){
+                                schedualMessageService.easemobMessage(info.getSellerId().toString(),
+                                        "您的"+(auction?"抢购":"商品")+name+"买家超时已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),info.getId().toString());
+                            }
                         }
                     }else{
-                        schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
-                                "您的"+(isAuction?"抢购":"商品")+goodsName+"买家超时已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),orderInfo.getId().toString());
+                        if(orderInfo.getSellerId() != null){
+                            schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
+                                    "您的"+(isAuction?"抢购":"商品")+goodsName+"买家超时已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),orderInfo.getId().toString());
+                        }
                     }
                     //给买家发送信息：您未支付的商品【名称】已取消订单
                     schedualMessageService.easemobMessage(orderInfo.getUserId().toString(),

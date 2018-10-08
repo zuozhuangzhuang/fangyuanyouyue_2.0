@@ -95,6 +95,8 @@ public class AppraisalCommentServiceImpl implements AppraisalCommentService {
 			model.setAddTime(DateStampUtils.getTimesteamp());
 			model.setStatus(Status.SHOW.getValue());
 			appraisalCommentMapper.insert(model);
+			detail.setCommentTime(DateStampUtils.getTimesteamp());
+			appraisalDetailMapper.updateByPrimaryKey(detail);
 			if(param.getUserIds() != null && param.getUserIds().length > 0){
 				//邀请我：用户“用户昵称”参与全民鉴定【全民鉴定名称】时邀请了您！点击此处前往查看吧
 				UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);

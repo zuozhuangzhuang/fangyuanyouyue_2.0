@@ -54,4 +54,6 @@ public class GoodsInfo {
     private Integer videoLength;//视频长度
 
     private BigDecimal startPrice;//初始价格
+
+    private Date commentTime;//最近一次评论时间
 }

@@ -38,4 +38,6 @@ public class AppraisalDetail {
     private String headImgUrl;//用户头像
 
     private String nickName;//用户昵称
+
+    private Date commentTime;//最近一次评论时间
 }

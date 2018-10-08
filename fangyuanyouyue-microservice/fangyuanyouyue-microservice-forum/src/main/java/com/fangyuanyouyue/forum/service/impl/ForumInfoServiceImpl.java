@@ -3,6 +3,7 @@ package com.fangyuanyouyue.forum.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fangyuanyouyue.base.BaseResp;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -97,8 +98,8 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 					dto.setIsCollect(StatusEnum.YES.getValue());
 				}
 				//是否关注作者
-				boolean isFans = JSONObject.parseObject(schedualUserService.isFans(userId,forumInfo.getUserId())).getBoolean("data");
-				if(isFans){
+				String ret = schedualUserService.isFans(userId,forumInfo.getUserId());
+				if(JSONObject.parseObject(ret).getIntValue("code")==0&&JSONObject.parseObject(ret).getBoolean("data")) {
 					dto.setIsFans(StatusEnum.YES.getValue());
 				}
 			}
