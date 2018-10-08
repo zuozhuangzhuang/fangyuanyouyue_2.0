@@ -138,7 +138,7 @@
   </select>
   
   <select id="countByCommentId" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
-    select count(*) from forum_comment where comment_id = #{commentId,jdbcType=INTEGER}
+    select count(*) from forum_comment where comment_id = #{commentId,jdbcType=INTEGER} and status <![CDATA[ <> ]]> 2
   </select>
   <select id="selectByForumId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select
