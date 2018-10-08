@@ -233,8 +233,8 @@
   <select id="selectMyList" parameterType="Integer" resultMap="BaseResultMap">
     select
     a.*,b.nick_name,b.head_img_url
-    from appraisal_detail a,user_info b
-    where a.user_id=b.id and a.status <![CDATA[ <> ]]> 3 and  b.status <![CDATA[ <> ]]> 3
+    from appraisal_detail a,user_info b,appraisal_comment c
+    where a.user_id=b.id and a.id = c.appraisal_id and a.status <![CDATA[ <> ]]> 3 and  b.status <![CDATA[ <> ]]> 3 and c.status <![CDATA[ <> ]]> 2
     <if test="userId != null">
       and a.user_id = #{userId}
     </if>
@@ -248,7 +248,7 @@
     select
     a.*,b.nick_name,b.head_img_url
     from appraisal_detail a,user_info b,appraisal_comment c
-    where a.user_id=b.id and a.id = c.appraisal_id and a.status <![CDATA[ <> ]]> 3 and b.status <![CDATA[ <> ]]> 3
+    where a.user_id=b.id and a.id = c.appraisal_id and a.status <![CDATA[ <> ]]> 3 and b.status <![CDATA[ <> ]]> 3 and c.status <![CDATA[ <> ]]> 2
     <if test="userId != null">
       and c.user_id = #{userId}
     </if>
