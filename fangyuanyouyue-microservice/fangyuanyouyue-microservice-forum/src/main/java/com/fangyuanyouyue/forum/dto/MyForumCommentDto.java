@@ -15,6 +15,8 @@ import lombok.ToString;
 @Setter
 @ToString
 public class MyForumCommentDto {
+    private Integer id;//评论id
+
     private Integer forumId;//帖子id
 
     private String title;//标题
@@ -29,6 +31,7 @@ public class MyForumCommentDto {
     }
 
     public MyForumCommentDto(Map model) {
+        this.id = (int)model.get("commentId");
         this.forumId = (int)model.get("id");
         this.title = (String)model.get("title");
         this.videoImg = (String)model.get("video_img");

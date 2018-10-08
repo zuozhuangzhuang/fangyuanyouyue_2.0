@@ -159,7 +159,7 @@
   </select>
 
   <select id="selectByUserId" parameterType="Integer" resultType="Map">
-    select a.content as commentContent,b.id,b.title,b.content,b.video_img from forum_comment a,forum_info b where a.forum_id = b.id and a.status = 1 and b.status =1 and a.user_id = #{userId} and b.type = #{type} order by a.add_time desc limit #{start},#{limit}
+    select a.id as commentId,a.content as commentContent,b.id,b.title,b.content,b.video_img from forum_comment a,forum_info b where a.forum_id = b.id and a.status = 1 and b.status =1 and a.user_id = #{userId} and b.type = #{type} order by a.add_time desc limit #{start},#{limit}
   </select>
 
 </mapper>
