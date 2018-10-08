@@ -283,8 +283,10 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 if(bargainDtos != null && bargainDtos.size()>0){
                     for(BargainDto bargainDto:bargainDtos){
                         UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(bargainDto.getUserId())).getString("data")), UserInfo.class);
-                        bargainDto.setNickName(seller.getNickName());
-                        bargainDto.setHeadImgUrl(seller.getHeadImgUrl());
+                        if(seller != null){
+                            bargainDto.setNickName(seller.getNickName());
+                            bargainDto.setHeadImgUrl(seller.getHeadImgUrl());
+                        }
                     }
                     goodsDto.setBargainDtos(bargainDtos);
                 }
