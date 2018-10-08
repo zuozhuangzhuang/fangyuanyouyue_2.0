@@ -35,10 +35,11 @@ public interface SchedualWalletService {
      * 修改剩余免费鉴定次数
      * @param userId
      * @param count
+     * @param type
      * @return
      */
     @RequestMapping(value = "/walletFeign/updateAppraisalCount",method = RequestMethod.POST)
-    String updateAppraisalCount(@RequestParam(value = "userId") Integer userId, @RequestParam(value = "count") Integer count);
+    String updateAppraisalCount(@RequestParam(value = "userId") Integer userId, @RequestParam(value = "count") Integer count, @RequestParam(value = "type") Integer type);
 
     /**
      * 定时更新用户等级

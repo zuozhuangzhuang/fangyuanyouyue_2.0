@@ -283,17 +283,22 @@ public class WalletServiceImpl implements WalletService{
     }
 
     @Override
-    public void updateAppraisalCount(Integer userId, Integer count) throws ServiceException {
+    public void updateAppraisalCount(Integer userId, Integer count,Integer type) throws ServiceException {
         //只做了减少次数，后期可支持 增加次数
         UserWallet userWallet = userWalletMapper.selectByUserId(userId);
         if(userWallet == null){
             throw new ServiceException("获取钱包信息失败！");
         }else{
-            if(userWallet.getAppraisalCount() < count){
-                throw new ServiceException("剩余鉴定次数不足！");
-            }else{
-                userWallet.setAppraisalCount(userWallet.getAppraisalCount()-count);
+            if(type.equals(Status.ADD.getValue())){
+                userWallet.setAppraisalCount(userWallet.getAppraisalCount()+count);
                 userWalletMapper.updateByPrimaryKey(userWallet);
+            }else{
+                if(userWallet.getAppraisalCount() < count){
+                    throw new ServiceException("剩余鉴定次数不足！");
+                }else{
+                    userWallet.setAppraisalCount(userWallet.getAppraisalCount()-count);
+                    userWalletMapper.updateByPrimaryKey(userWallet);
+                }
             }
         }
     }

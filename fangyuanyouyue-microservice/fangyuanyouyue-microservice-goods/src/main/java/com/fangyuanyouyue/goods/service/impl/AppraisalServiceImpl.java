@@ -155,9 +155,10 @@ public class AppraisalServiceImpl implements AppraisalService{
             goodsAppraisalDetail.setStatus(4);//状态 0申请 1真 2假 3存疑 4待支付(在列表中不显示)
             BigDecimal price = new BigDecimal(10);//自己上传图片或视频收费10元
             if(appraisalCount > 0){//免费鉴定
+                //订单直接完成
                 goodsAppraisalDetail.setStatus(0);
                 price = new BigDecimal(0);
-                JSONObject.parseObject(schedualWalletService.updateAppraisalCount(userId,1)).getInteger("data");
+                JSONObject.parseObject(schedualWalletService.updateAppraisalCount(userId,1,Status.SUB.getValue())).getInteger("data");
             }
             goodsAppraisalDetail.setPrice(price);
             goodsAppraisalDetailMapper.insert(goodsAppraisalDetail);
@@ -213,6 +214,9 @@ public class AppraisalServiceImpl implements AppraisalService{
         if(appraisalOrderInfo == null){
             throw new ServiceException("获取鉴定信息失败！");
         }else{
+            if(appraisalOrderInfo.getAmount().compareTo(new BigDecimal(0)) == 0){
+                JSONObject.parseObject(schedualWalletService.updateAppraisalCount(userId,1,Status.ADD.getValue())).getInteger("data");
+            }
             List<GoodsAppraisalDetail> goodsAppraisalDetails = goodsAppraisalDetailMapper.selectListByUserId(userId,orderId,null,null,4);
             for(GoodsAppraisalDetail detail:goodsAppraisalDetails){
                 if(detail != null){
@@ -332,9 +336,23 @@ public class AppraisalServiceImpl implements AppraisalService{
                     title.append("鉴定详情");
                 }
 
-                //系统消息：您的鉴定申请已提交，专家将于两个工作日内给出答复，请注意消息通知
-                schedualMessageService.easemobMessage(appraisalOrderInfo.getUserId().toString(),
-                        "您的鉴定申请已提交，专家将于两个工作日内给出答复，请注意消息通知",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
+                //判断会员等级
+                JSONObject result = JSONObject.parseObject(schedualWalletService.getUserVipLevel(appraisalOrderInfo.getUserId()));
+                Integer vipLevel = null;
+                if(result.getInteger("code").equals(0)){
+                    vipLevel = result.getInteger("data");
+                }
+                //系统消息：您的鉴定申请已提交，专家将于两个工作日/4个工作时/1个工作时内给出答复，请注意消息通知
+                if(vipLevel == null){
+                    schedualMessageService.easemobMessage(appraisalOrderInfo.getUserId().toString(),
+                            "您的鉴定申请已提交，专家将于两个工作日内给出答复，请注意消息通知",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
+                }else if(vipLevel.equals(Status.VIP_LEVEL_LOW.getValue())){
+                    schedualMessageService.easemobMessage(appraisalOrderInfo.getUserId().toString(),
+                            "您的鉴定申请已提交，专家将于4个工作时内给出答复，请注意消息通知",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
+                }else if(vipLevel.equals(Status.VIP_LEVEL_HIGH.getValue())){
+                    schedualMessageService.easemobMessage(appraisalOrderInfo.getUserId().toString(),
+                            "您的鉴定申请已提交，专家将于1个工作时内给出答复，请注意消息通知",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
+                }
                 //余额账单
                 schedualWalletService.addUserBalanceDetail(appraisalOrderInfo.getUserId(),appraisalOrderInfo.getAmount(),payType,Status.EXPEND.getValue(),orderNo,title.toString(),null,appraisalOrderInfo.getUserId(),Status.PLATFORM_APPRAISAL.getValue(),thirdOrderNo);
                 return true;

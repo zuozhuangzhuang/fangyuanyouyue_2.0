@@ -63,9 +63,10 @@ public interface WalletService {
      * 修改剩余免费鉴定次数
      * @param userId
      * @param count
+     * @param type
      * @throws ServiceException
      */
-    void updateAppraisalCount(Integer userId,Integer count) throws ServiceException;
+    void updateAppraisalCount(Integer userId,Integer count,Integer type) throws ServiceException;
 
     /**
      * 修改信誉度
