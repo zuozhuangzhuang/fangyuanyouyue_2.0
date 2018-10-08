@@ -60,6 +60,8 @@ public class OrderPayDto {
 
     private String logisticCompany;//物流公司
 
+    private String logisticCompanyNo;//物流公司编号
+
     public OrderPayDto() {
     }
 
@@ -86,6 +88,7 @@ public class OrderPayDto {
         }
         this.logisticCode = orderPay.getLogisticCode();
         this.logisticCompany = orderPay.getLogisticCompany();
+        this.logisticCompanyNo = orderPay.getLogisticCompanyNo();
     }
 
     public static ArrayList<OrderPayDto> toDtoList(List<OrderPay> list) {
