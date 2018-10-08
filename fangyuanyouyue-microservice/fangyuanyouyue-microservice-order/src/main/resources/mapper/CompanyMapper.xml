@@ -146,6 +146,8 @@
     </if>
     limit #{start},#{limit}
   </select>
-  
-  
+
+  <select id="getList" resultMap="BaseResultMap">
+    select * from company where status = 1
+  </select>
 </mapper>
