@@ -231,7 +231,7 @@
   </select>
 
   <select id="selectMyList" parameterType="Integer" resultMap="BaseResultMap">
-    select
+    select DISTINCT
     a.*,b.nick_name,b.head_img_url
     from appraisal_detail a,user_info b,appraisal_comment c
     where a.user_id=b.id and a.id = c.appraisal_id and a.status <![CDATA[ <> ]]> 3 and  b.status <![CDATA[ <> ]]> 3 and c.status <![CDATA[ <> ]]> 2

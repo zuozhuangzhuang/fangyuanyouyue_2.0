@@ -134,7 +134,7 @@ public class CommentServiceImpl implements CommentService{
         List<Map<String, Object>> maps = goodsCommentMapper.selectByGoodsId( goodsId,start*limit,limit);
         List<GoodsCommentDto> goodsCommentDtos = GoodsCommentDto.mapToDtoList(maps);
         for(GoodsCommentDto goodsCommentDto:goodsCommentDtos){
-            goodsCommentDto.setReplys(selectCommentList(goodsCommentDto.getId(),goodsId));
+            goodsCommentDto.setReplys(selectCommentList(userId,goodsCommentDto.getId(),goodsId));
             //判断评论是否已点赞
             if(userId != null){
                 CommentLikes commentLikes = commentLikesMapper.selectByUserId(userId, goodsCommentDto.getId());
@@ -152,7 +152,7 @@ public class CommentServiceImpl implements CommentService{
      * @param goodsId
      * @return
      */
-    private List<GoodsCommentDto> selectCommentList(Integer commentId,Integer goodsId){
+    private List<GoodsCommentDto> selectCommentList(Integer userId,Integer commentId,Integer goodsId){
         //根据评论的ID和商品的ID获取回复列表
         List<Map<String, Object>> maps = goodsCommentMapper.selectMapByGoodsIdCommentId(commentId, goodsId,null,null);
         List<GoodsCommentDto> goodsCommentDtos = GoodsCommentDto.mapToDtoList(maps);
@@ -165,8 +165,15 @@ public class CommentServiceImpl implements CommentService{
                     goodsCommentDto.setToUserHeadImgUrl((String)map.get("head_img_url"));
                     goodsCommentDto.setToUserName((String)map.get("nick_name"));
                 }
+                //判断评论是否已点赞
+                if(userId != null){
+                    CommentLikes commentLikes = commentLikesMapper.selectByUserId(userId, goodsCommentDto.getId());
+                    if(commentLikes != null){
+                        goodsCommentDto.setIsLike(1);
+                    }
+                }
                 //重复获取此回复的回复列表，直到没有回复了为止
-                goodsCommentDto.setReplys(selectCommentList(goodsCommentDto.getId(),goodsId));
+                goodsCommentDto.setReplys(selectCommentList(userId,goodsCommentDto.getId(),goodsId));
             }
         }
         return goodsCommentDtos;
