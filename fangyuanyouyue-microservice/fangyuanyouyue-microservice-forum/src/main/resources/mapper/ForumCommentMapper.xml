@@ -131,10 +131,10 @@
 
 
   <select id="countAll" resultType="java.lang.Integer" >
-    select count(*) from forum_comment
+    select count(*) from forum_comment where status <![CDATA[ <> ]]> 2
   </select>
   <select id="countById" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
-    select count(*) from forum_comment where forum_id = #{forumId,jdbcType=INTEGER}
+    select count(*) from forum_comment where forum_id = #{forumId,jdbcType=INTEGER} and status <![CDATA[ <> ]]> 2
   </select>
   
   <select id="countByCommentId" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
