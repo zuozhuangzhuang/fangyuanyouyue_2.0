@@ -29,8 +29,7 @@ public class UpdateDatabase {
      * 写一个连接数据库的方法
      */
     public static Connection getOldConnection(){
-//        String url="jdbc:mysql://120.77.101.123:3306/auction";
-//        String url="jdbc:mysql://120.77.173.90:3306/auction";
+//        String url="jdbc:mysql://120.77.173.90:3306/auction?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=true";
         String url="jdbc:mysql://localhost:3306/auction?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=true";
         String userName="root";
 //        String userName="gaozhuo";
@@ -101,6 +100,9 @@ public class UpdateDatabase {
  * goods_appraisal_detail
  * appraisal_detail
  * forum_info
+ *
+ * confined_user
+ *
  */
 
 /**
@@ -120,7 +122,56 @@ public class UpdateDatabase {
  * a_appraisal_pic
  * a_appreciate
  * a_appreciate_pic
+ *
+ * a_confined_user
+ * a_finance
  */
+
+    /**
+     * a_confined_user
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
+    static String getConfineUserSql() throws SQLException {
+        System.out.println("----------confined_user----------");
+        StringBuffer confinedUserSql = new StringBuffer();
+        PreparedStatement confine_user_ps = null;
+        ResultSet confine_user_rs = null;
+        try{
+            String selectConfine = "select * from a_confined_user";
+            confine_user_ps = conn.prepareStatement(selectConfine);
+            confine_user_rs = confine_user_ps.executeQuery(selectConfine);
+            while (confine_user_rs.next()){
+                Integer userId = confine_user_rs.getInt("id")+100000;//用户id
+                Integer status = confine_user_rs.getInt("status");//用于假删除用户  0被限制用户 1被限制后又被解除限制用户（表面正常用户）
+                String addTime = DateStampUtils.formatUnixTime(System.currentTimeMillis(),DateUtil.DATE_FORMT);//添加时间
+                String updateTime = null;//更新时间
+                confinedUserSql.append("insert into confined_user (" +
+                        "id, " +
+                        "user_id, " +
+                        "status," +
+                        "add_time, " +
+                        "update_time) values ("
+                        +null+","
+                        +userId+","
+                        +status+",'"
+                        +addTime+"','"
+                        +updateTime+"');\r\n"
+                );
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            if(confine_user_ps != null){
+                confine_user_ps.close();
+            }
+            if(confine_user_rs != null){
+                confine_user_rs.close();
+            }
+        }
+        return confinedUserSql.toString().replace("null","NULL").replace("'NULL'","NULL");
+    }
 
     /**
      * a_appreciate
@@ -494,7 +545,7 @@ public class UpdateDatabase {
                     String mainImgUrl = null;//商品主图
                     String description = null;//商品描述
                     Integer goodsType = null;//类型 1普通商品 2抢购商品
-
+                    String logisticCompanyNo = null;//物流编号
                     orderId = order_rs.getInt("id");
                     mainOrderId = orderId;
                     count = 1;
@@ -552,8 +603,8 @@ public class UpdateDatabase {
 
                     payTime = DateStampUtils.formatUnixTime(order_rs.getLong("pay_time"),DateUtil.DATE_FORMT);
                     logisticCode = order_rs.getString("logistics");
-                    Integer companyId = order_rs.getInt("company_id");
                     logisticCompany = order_rs.getString("company_name");
+                    logisticCompanyNo = order_rs.getString("company_no");
                     province = order_rs.getString("province");
                     city = order_rs.getString("city");
                     area = order_rs.getString("area");
@@ -585,7 +636,8 @@ public class UpdateDatabase {
                             "province," +
                             "city," +
                             "area," +
-                            "send_time) values ("
+                            "send_time, " +
+                            "logistic_company_no) values ("
                             +null+","
                             +orderId+",'"
                             +receiverName+"','"
@@ -611,7 +663,8 @@ public class UpdateDatabase {
                             +province+"','"
                             +city+"','"
                             +area+"','"
-                            +sendTime+"');\r\n"
+                            +sendTime+"','"
+                            +logisticCompanyNo+"');\r\n"
                     );
 
                     goodsId = order_rs.getInt("goods_id");
@@ -1623,7 +1676,7 @@ public class UpdateDatabase {
 
 
     public static void main(String[] args) throws Exception {
-        String selectUser = "select * from a_user limit 0,10";
+        String selectUser = "select * from a_user";
         long start = System.currentTimeMillis();
 //        getSqlFile(selectUser);
         insertIntoDatabase(selectUser);
@@ -1731,9 +1784,15 @@ public class UpdateDatabase {
         }finally{
             //释放资源
             try {
-                rs.close();
-                ps.close();
-                conn.close();
+                if(rs != null){
+                    rs.close();
+                }
+                if(ps != null){
+                    ps.close();
+                }
+                if(conn != null){
+                    conn.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -1748,6 +1807,15 @@ public class UpdateDatabase {
             conn=getOldConnection();//连接数据库
             Connection new_conn = getNewConnection();
             PreparedStatement new_ps = null;
+            String confineUserSql = getConfineUserSql();
+            if(StringUtils.isNotEmpty(confineUserSql)){
+                try{
+                    new_ps = new_conn.prepareStatement(confineUserSql);
+                    new_ps.executeLargeUpdate(confineUserSql);
+                }catch (SQLException e){
+                    e.printStackTrace();
+                }
+            }
             //执行动态SQL语句。通常通过PreparedStatement实例实现。
             // 3、执行数据库存储过程。通常通过CallableStatement实例实现。
             ps=conn.prepareStatement(selectUser);// 2.创建Satement并设置参数
@@ -1909,9 +1977,15 @@ public class UpdateDatabase {
         }finally{
             //释放资源
             try {
-                rs.close();
-                ps.close();
-                conn.close();
+                if(rs != null){
+                    rs.close();
+                }
+                if(ps != null){
+                    ps.close();
+                }
+                if(conn != null){
+                    conn.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }

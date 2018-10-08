@@ -795,6 +795,7 @@ public class OrderServiceImpl implements OrderService{
                 //物流状态
 //                orderPay.setLogisticStatus();
                 orderPay.setLogisticCompany(company.getName());
+                orderPay.setLogisticCompanyNo(company.getCompanyNo());
                 orderPay.setLogisticCode(number);
                 orderPay.setStatus(Status.ORDER_GOODS_SENDED.getValue());
                 orderPay.setSendTime(new Date());
