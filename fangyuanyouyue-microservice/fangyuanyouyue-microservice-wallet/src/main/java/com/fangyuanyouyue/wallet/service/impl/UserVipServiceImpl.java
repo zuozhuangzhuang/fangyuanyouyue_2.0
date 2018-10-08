@@ -344,6 +344,12 @@ public class UserVipServiceImpl implements UserVipService{
     }
 
     @Override
+    public Integer getUserVipLevel(Integer userId) throws ServiceException {
+        UserVip userVip = userVipMapper.selectByUserId(userId);
+        return userVip.getVipLevel();
+    }
+
+    @Override
     public Pager vipList(AdminWalletParam param) throws ServiceException {
         Integer total = userVipMapper.countPage(param.getVipLevel(),param.getVipType(),param.getIsSendMessage(),param.getKeyword(),param.getStartDate(),param.getEndDate());
         List<UserVip> userWithdraws = userVipMapper.getPage(param.getVipLevel(),param.getVipType(),param.getIsSendMessage(),param.getStart(),param.getLimit(),param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());

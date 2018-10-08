@@ -19,7 +19,7 @@ public class SchedualWalletServiceImpl implements SchedualWalletService{
     }
 
     @Override
-    public String updateAppraisalCount(Integer userId, Integer count) {
+    public String updateAppraisalCount(Integer userId, Integer count,Integer type) {
         return "修改免费鉴定次数失败！";
     }
 

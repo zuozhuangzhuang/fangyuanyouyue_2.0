@@ -35,10 +35,11 @@ public interface SchedualWalletService {
      * 修改剩余免费鉴定次数
      * @param userId
      * @param count
+     * @param type
      * @return
      */
     @RequestMapping(value = "/walletFeign/updateAppraisalCount",method = RequestMethod.POST)
-    String updateAppraisalCount(@RequestParam(value = "userId") Integer userId,@RequestParam(value = "count") Integer count);
+    String updateAppraisalCount(@RequestParam(value = "userId") Integer userId,@RequestParam(value = "count") Integer count, @RequestParam(value = "type") Integer type);
 
     /**
      * 微信支付
@@ -123,4 +124,11 @@ public interface SchedualWalletService {
     String addUserBehavior(@RequestParam(value = "userId") Integer userId,@RequestParam(value = "toUserId") Integer toUserId,@RequestParam(value = "businessId") Integer businessId,
                            @RequestParam(value = "businessType") Integer businessType,@RequestParam(value = "type") Integer type);
 
+    /**
+     * 获取用户会员等级
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "/walletFeign/getUserVipLevel",method = RequestMethod.POST)
+    String getUserVipLevel(@RequestParam(value = "userId") Integer userId);
 }
