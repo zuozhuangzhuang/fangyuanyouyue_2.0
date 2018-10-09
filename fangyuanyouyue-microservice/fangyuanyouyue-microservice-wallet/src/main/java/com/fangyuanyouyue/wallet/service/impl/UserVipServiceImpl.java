@@ -79,9 +79,9 @@ public class UserVipServiceImpl implements UserVipService{
                     userVip.setLevelDesc(vipOrder.getVipLevel() == 1?"铂金会员":"至尊会员");
                     userVip.setVipType(vipOrder.getVipType());//会员类型 1一个月 2三个月 3一年会员
                     userVip.setStatus(Status.IS_VIP.getValue());//会员状态 1已开通 2未开通
-                    //TODO 生成NO.xxxx :年月日 基数与开通顺序的和，例：180912123457
+                    //生成NO.xxxx :年月日 基数与开通顺序的和，例：180912123457
                     int no = 111111 + userVip.getId();
-                    String date = DateUtil.getFormatDate(DateStampUtils.getTimesteamp(),"yyMMdd");
+                    String date = DateUtil.getFormatDate(DateStampUtils.getTimesteamp(),"yyMM");
                     userVip.setVipNo(date + no);
                     //开通会员送第一个月优惠券
                     if(vipOrder.getVipType().intValue() == Status.VIP_TYPE_ONE_YEAR.getValue()){
@@ -262,9 +262,9 @@ public class UserVipServiceImpl implements UserVipService{
             userVip.setLevelDesc(vipLevel == 1?"铂金会员":"至尊会员");
             userVip.setVipType(vipType);//会员类型 1一个月 2三个月 3一年会员
             userVip.setStatus(Status.IS_VIP.getValue());//会员状态 1已开通 2未开通
-            //TODO 生成NO.xxxx :年月日 基数与开通顺序的和，例：180912123457
+            //生成NO.xxxx :年月+基数与开通顺序的和，例：1809123457
             int no = 111111 + userVip.getId();
-            String date = DateUtil.getFormatDate(DateStampUtils.getTimesteamp(),"yyMMdd");
+            String date = DateUtil.getFormatDate(DateStampUtils.getTimesteamp(),"yyMM");
             userVip.setVipNo(date + no);
             //开通会员送第一个月优惠券
             if(vipType.intValue() == Status.VIP_TYPE_ONE_YEAR.getValue()){

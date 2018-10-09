@@ -168,7 +168,7 @@ public class GoodsDto {
                 this.lastIntervalTime = DateUtil.getFormatDate(goodsInfo.getLastIntervalTime(), DateUtil.DATE_FORMT);
             }
             this.isAppraisal = goodsInfo.getIsAppraisal();
-            this.addTime = DateUtil.getFormatDate(goodsInfo.getAddTime(), DateUtil.DATE_FORMT_YEAR);
+            this.addTime = DateUtil.getFormatDate(goodsInfo.getAddTime(), DateUtil.DATE_FORMT);
             this.updateTime = DateUtil.getFormatDate(goodsInfo.getUpdateTime(), DateUtil.DATE_FORMT_YEAR);
             this.videoUrl = goodsInfo.getVideoUrl();
             this.videoLength = goodsInfo.getVideoLength();

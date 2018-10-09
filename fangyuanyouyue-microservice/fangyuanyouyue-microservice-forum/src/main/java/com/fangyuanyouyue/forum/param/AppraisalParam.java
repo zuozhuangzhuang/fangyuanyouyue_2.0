@@ -63,7 +63,6 @@ public class AppraisalParam{
 	@ApiModelProperty(name = "payPwd", value = "支付密码", dataType = "String",hidden = true)
 	private String payPwd;//支付密码
 
-
 	@ApiModelProperty(name = "ids", value = "id数组", dataType = "int",hidden = true)
 	private Integer[] ids;//id数组
 

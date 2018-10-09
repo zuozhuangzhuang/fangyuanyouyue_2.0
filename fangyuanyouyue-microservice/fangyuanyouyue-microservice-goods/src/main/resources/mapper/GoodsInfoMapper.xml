@@ -319,7 +319,7 @@
         select * from goods_info a left join user_info_ext b on a.user_id = b.user_id
         <where>
             1=1
-            <if test="status != null">
+            <if test="status != null and quality != 5">
                 and a.status = #{status,jdbcType=INTEGER}
             </if>
             <if test="status == null">
