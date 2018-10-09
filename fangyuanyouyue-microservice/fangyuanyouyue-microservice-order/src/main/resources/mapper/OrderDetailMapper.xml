@@ -239,7 +239,7 @@
   </update>
 
   <select id="selectByOrderId" parameterType="Integer" resultMap="BaseResultMap">
-    select a.*,b.type goods_type,c.nick_name,c.head_img_url,c.phone from order_detail a,goods_info b,user_info c
+    select a.*,b.description,b.type goods_type,c.nick_name,c.head_img_url,c.phone from order_detail a,goods_info b,user_info c
     <where>
       a.goods_id = b.id and a.user_id=c.id
       <if test="orderId != null">
@@ -249,7 +249,7 @@
   </select>
 
   <select id="selectByMainOrderId" parameterType="Integer" resultMap="BaseResultMap">
-    select a.*,b.type goods_type,c.nick_name,c.head_img_url,c.phone from order_detail a,goods_info b,user_info c
+    select a.*,b.description,b.type goods_type,c.nick_name,c.head_img_url,c.phone from order_detail a,goods_info b,user_info c
     <where>
       a.goods_id = b.id and a.user_id=c.id
       <if test="mainOrderId != null">

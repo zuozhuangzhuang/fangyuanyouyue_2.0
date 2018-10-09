@@ -117,12 +117,9 @@ public class WalletServiceImpl implements WalletService{
         userWithdraw.setAddTime(DateStampUtils.getTimesteamp());
 
         UserInfoExt userInfoExt = userInfoExtMapper.selectUserInfoExtByUserId(userId);
-        if(type != 1){//提现方式 1微信 2支付宝
-            if(StringUtils.isEmpty(payPwd)){
-                throw new ServiceException("支付密码为空！");
-            }
+        if(type.equals(Status.PAY_TYPE_ALIPAY.getValue())){//提现方式 1微信 2支付宝
             if(userInfoExt.getPayPwd()==null){
-                throw new ServiceException("请先设置支付密码再提现");
+                throw new ServiceException("用户未设置支付密码！");
             }
             if(MD5Util.verify(MD5Util.MD5(payPwd),userInfoExt.getPayPwd()) == false){
                 throw new ServiceException(ReCode.PAYMENT_PASSWORD_ERROR.getValue(),ReCode.PAYMENT_PASSWORD_ERROR.getMessage());
@@ -131,10 +128,14 @@ public class WalletServiceImpl implements WalletService{
             userWithdraw.setRealName(realName);
         }else{
             //微信提现需要用户绑定微信账号
-
-            userWithdraw.setAccount("用户unionID");
+            //查询用户的三方记录
+            UserThirdParty userThirdByUserId = userThirdPartyMapper.getUserThirdByUserId(userId, Status.PAY_TYPE_WECHAT.getValue());
+            if(StringUtils.isEmpty(userThirdByUserId.getMiniOpenId())){
+                throw new ServiceException("该账号未绑定小程序，无法微信提现！");
+            }else{
+                userWithdraw.setAccount(userThirdByUserId.getMiniOpenId());
+            }
         }
-
 
         //根据用户会员等级扣除不同手续费
         UserVip userVip = userVipMapper.selectByUserId(userId);
@@ -257,7 +258,7 @@ public class WalletServiceImpl implements WalletService{
                 //获取被限制的用户（代理不可以余额提现）
                 ConfinedUser confinedUser = confinedUserMapper.selectByUserIdStatus(userId, 0);
                 if(confinedUser != null){
-                    throw new ServiceException("此用户被限制使用余额提现！");
+                    throw new ServiceException("此用户被限制使用余额！");
                 }
                 if(userWallet.getBalance().compareTo(amount) < 0){//余额小于消费金额
                     throw new ServiceException(ReCode.INSUFFICIENT_FUND.getValue(),ReCode.INSUFFICIENT_FUND.getMessage());

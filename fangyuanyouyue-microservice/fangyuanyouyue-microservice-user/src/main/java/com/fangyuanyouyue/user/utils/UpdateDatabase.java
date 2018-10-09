@@ -2,6 +2,7 @@ package com.fangyuanyouyue.user.utils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.base.util.IdGenerator;
@@ -87,6 +88,7 @@ public class UpdateDatabase {
  * user_vip
  * user_withdraw
  * user_balance_detail
+ * platform_finance_detail
  * user_address_info
  * user_fans
  * goods_info
@@ -100,7 +102,7 @@ public class UpdateDatabase {
  * goods_appraisal_detail
  * appraisal_detail
  * forum_info
- *
+ * collect
  * confined_user
  *
  */
@@ -112,6 +114,7 @@ public class UpdateDatabase {
  * a_user_third
  * a_user_withdraw
  * a_user_finance
+ * a_finance
  * a_address
  * a_fans
  * a_goods
@@ -123,9 +126,266 @@ public class UpdateDatabase {
  * a_appreciate
  * a_appreciate_pic
  * a_confined_user
+ * a_collect
+ * a_appreciate_collection
  *
- * a_finance
  */
+
+    /**
+     * comment
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
+    static String getCommentSql(ResultSet rs) throws SQLException {
+        System.out.println("----------comment----------");
+        StringBuffer commentSql = new StringBuffer();
+        PreparedStatement comment_ps = null;
+        ResultSet comment_rs = null;
+        PreparedStatement reply_ps = null;
+        ResultSet reply_rs = null;
+        try{
+            /**
+             * goods_comment
+             */
+            Integer id = null;
+            Integer goodsId = null;//商品id
+            Integer userId = rs.getInt("id")+100000;//用户id
+            Integer commentId = null;//回复评论id
+            String content = null;//评论内容
+            Integer likesCount = 0;//点赞次数
+            String img1Url = null;//图片地址1
+            String img2Url = null;//图片地址2
+            String img3Url = null;//图片地址3
+            Integer status = 1;//状态 1正常 2隐藏
+            String addTime = null;//添加时间
+            String updateTime = null;//更新时间
+
+            /**
+             * forum_comment
+             */
+            Integer forumId;//帖子id
+
+            //评论
+            String selectComment = "select * from a_comment where user_id ="+rs.getInt("id");
+            comment_ps = conn.prepareStatement(selectComment);
+            comment_rs = comment_ps.executeQuery(selectComment);
+            while (comment_rs.next()){
+                id = comment_rs.getInt("id");
+                goodsId = comment_rs.getInt("goods_id");
+                content = comment_rs.getString("content");
+
+                forumId = comment_rs.getInt("appreciate_id");
+                if(goodsId != null){
+                    commentSql.append("insert into goods_comment (" +
+                            "id, " +
+                            "goods_id, " +
+                            "user_id," +
+                            "comment_id, " +
+                            "content, " +
+                            "likes_count," +
+                            "img1_url, " +
+                            "img2_url, " +
+                            "img3_url," +
+                            "status, " +
+                            "add_time, " +
+                            "update_time) values ("
+                            +id+","
+                            +goodsId+","
+                            +userId+","
+                            +commentId+",'"
+                            +content+"',"
+                            +likesCount+",'"
+                            +img1Url+"','"
+                            +img2Url+"','"
+                            +img3Url+"',"
+                            +status+",'"
+                            +addTime+"','"
+                            +updateTime+"');\r\n"
+                    );
+                }else{
+                    commentSql.append("insert into forum_comment (" +
+                            "id, " +
+                            "user_id, " +
+                            "forum_id," +
+                            "comment_id, " +
+                            "content, " +
+                            "status," +
+                            "add_time, " +
+                            "update_time) values ("
+                            +id+","
+                            +userId+","
+                            +forumId+","
+                            +commentId+",'"
+                            +content+"',"
+                            +status+",'"
+                            +addTime+"',"
+                            +updateTime+");\r\n"
+                    );
+                }
+
+                //回复
+                String selectReply = "select * from a_reply where comment_id ="+comment_rs.getInt("id");
+                reply_ps = conn.prepareStatement(selectComment);
+                reply_rs = reply_ps.executeQuery(selectComment);
+                while (reply_rs.next()){
+                    id = reply_rs.getInt("id");
+                    commentId = reply_rs.getInt("comment_id");
+                    goodsId = comment_rs.getInt("goods_id");
+                    content = comment_rs.getString("content");
+
+                    forumId = comment_rs.getInt("appreciate_id");
+                    if(goodsId != null){
+                        commentSql.append("insert into goods_comment (" +
+                                "id, " +
+                                "goods_id, " +
+                                "user_id," +
+                                "comment_id, " +
+                                "content, " +
+                                "likes_count," +
+                                "img1_url, " +
+                                "img2_url, " +
+                                "img3_url," +
+                                "status, " +
+                                "add_time, " +
+                                "update_time) values ("
+                                +id+","
+                                +goodsId+","
+                                +userId+","
+                                +commentId+",'"
+                                +content+"',"
+                                +likesCount+",'"
+                                +img1Url+"','"
+                                +img2Url+"','"
+                                +img3Url+"',"
+                                +status+",'"
+                                +addTime+"','"
+                                +updateTime+"');\r\n"
+                        );
+                    }else{
+                        commentSql.append("insert into forum_comment (" +
+                                "id, " +
+                                "user_id, " +
+                                "forum_id," +
+                                "comment_id, " +
+                                "content, " +
+                                "status," +
+                                "add_time, " +
+                                "update_time) values ("
+                                +id+","
+                                +userId+","
+                                +forumId+","
+                                +commentId+",'"
+                                +content+"',"
+                                +status+",'"
+                                +addTime+"',"
+                                +updateTime+");\r\n"
+                        );
+                    }
+                }
+            }
+
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            if(comment_ps != null){
+                comment_ps.close();
+            }
+            if(comment_rs != null){
+                comment_rs.close();
+            }
+            if(reply_ps != null){
+                reply_ps.close();
+            }
+            if(reply_rs != null){
+                reply_rs.close();
+            }
+        }
+        return commentSql.toString().replace("null","NULL").replace("'NULL'","NULL");
+    }
+
+    /**
+     * collect
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
+    static String getCollectSql(ResultSet rs) throws SQLException {
+        System.out.println("----------collect----------");
+        StringBuffer collectSql = new StringBuffer();
+        PreparedStatement collect_ps = null;
+        ResultSet collect_rs = null;
+        try{
+            Integer userId = rs.getInt("id")+100000;//用户id
+            Integer collectId = null;//收藏对象ID
+            Integer collectType = null;//关注/收藏类型 1商品 2抢购 3视频 4专栏 5鉴赏
+            Integer type = null;//类型 1关注 2收藏
+            String addTime = null;//添加时间
+            String updateTime = null;//更新时间
+
+            String selectCollect = "select * from a_collect where user_id ="+rs.getInt("id");
+            collect_ps = conn.prepareStatement(selectCollect);
+            collect_rs = collect_ps.executeQuery(selectCollect);
+            while (collect_rs.next()){
+                collectId = collect_rs.getInt("goods_id");
+                collectType = 1;
+                type = 2;
+                addTime = DateStampUtils.formatUnixTime(collect_rs.getLong("add_time"),DateUtil.DATE_FORMT);
+                collectSql.append("insert into collect (" +
+                        "id, " +
+                        "user_id, " +
+                        "collect_id," +
+                        "collect_type, " +
+                        "type, " +
+                        "add_time," +
+                        "update_time) values ("
+                        +null+","
+                        +userId+","
+                        +collectId+","
+                        +collectType+","
+                        +type+",'"
+                        +addTime+"','"
+                        +updateTime+"');\r\n"
+                );
+            }
+            String selectAppraisal = "select * from a_appreciate_collection where user_id ="+rs.getInt("id");
+            collect_ps = conn.prepareStatement(selectAppraisal);
+            collect_rs = collect_ps.executeQuery(selectAppraisal);
+            while (collect_rs.next()){
+                collectId = collect_rs.getInt("appreciate_id");
+                collectType = 4;
+                type = 2;
+                addTime = DateStampUtils.formatUnixTime(collect_rs.getLong("create_time"),DateUtil.DATE_FORMT);
+
+                collectSql.append("insert into collect (" +
+                        "id, " +
+                        "user_id, " +
+                        "collect_id," +
+                        "collect_type, " +
+                        "type, " +
+                        "add_time," +
+                        "update_time) values ("
+                        +null+","
+                        +userId+","
+                        +collectId+","
+                        +collectType+","
+                        +type+",'"
+                        +addTime+"','"
+                        +updateTime+"');\r\n"
+                );
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            if(collect_ps != null){
+                collect_ps.close();
+            }
+            if(collect_rs != null){
+                collect_rs.close();
+            }
+        }
+        return collectSql.toString().replace("null","NULL").replace("'NULL'","NULL");
+    }
 
     /**
      * a_confined_user
@@ -209,7 +469,7 @@ public class UpdateDatabase {
                 Integer pvCount = forum_rs.getInt("browse_count");//帖子浏览量基数，展示浏览量为基数＋浏览量个数
                 String commentTime = DateStampUtils.formatUnixTime(forum_rs.getLong("comment_time"),DateUtil.DATE_FORMT);
 
-                String selectForumPic = "select * from a_appreciate_pic where appreciate_id ="+id;
+                String selectForumPic = "select * from a_appreciate_pic where img_url <> '' and appreciate_id ="+id;
                 forum_pic_ps = conn.prepareStatement(selectForumPic);
                 forum_pic_rs = forum_pic_ps.executeQuery(selectForumPic);
                 int conteneId = 0;
@@ -554,7 +814,7 @@ public class UpdateDatabase {
                     seller_ps = conn.prepareStatement(selectSeller);
                     seller_rs = seller_ps.executeQuery(selectSeller);
                     if(seller_rs.next()){
-                        sellerId = seller_rs.getInt("user_id");
+                        sellerId = seller_rs.getInt("user_id")+100000;
                     }
                     isResolve = 2;
                     Integer returnStatus = order_rs.getInt("return_status");
@@ -1253,6 +1513,44 @@ public class UpdateDatabase {
                         +buyerId+",'"
                         +payNo+"');\r\n"
                 );
+
+                if(orderType.equals(Status.WITHDRAW.getValue())){
+                    type = Status.EXPEND.getValue();
+                }else{
+                    if(type.equals(Status.EXPEND.getValue())){
+                        type = Status.INCOME.getValue();
+                    }else{
+                        type = Status.EXPEND.getValue();
+                    }
+                }
+                userFinanceSql.append("insert into platform_finance_detail (" +
+                        "id, " +
+                        "user_id, " +
+                        "amount," +
+                        "order_no, " +
+                        "pay_no, " +
+                        "pay_type," +
+                        "type, " +
+                        "add_time, " +
+                        "update_time," +
+                        "title, " +
+                        "order_type, " +
+                        "seller_id," +
+                        "buyer_id) values ("
+                        +null+","
+                        +userId+","
+                        +amount+",'"
+                        +orderNo+"','"
+                        +payNo+"',"
+                        +payType+","
+                        +type+",'"
+                        +addTime+"','"
+                        +updateTime+"','"
+                        +(title==null?0:title)+"',"
+                        +orderType+","
+                        +sellerId+","
+                        +buyerId+");\r\n"
+                );
             }
         }catch (SQLException e){
             e.printStackTrace();
@@ -1775,6 +2073,11 @@ public class UpdateDatabase {
                 if(StringUtils.isNotEmpty(forumSql)){
                     insertSql.append(forumSql);
                 }
+                //collect
+                String collectSql = getCollectSql(rs);
+                if(StringUtils.isNotEmpty(collectSql)){
+                    insertSql.append(collectSql);
+                }
                 insertSql.append("\r\n");
                 System.out.println("【"+nickName+"】结束,剩余人数："+(--all));
             }
@@ -1965,6 +2268,16 @@ public class UpdateDatabase {
                     try{
                         new_ps = new_conn.prepareStatement(forumSql);
                         new_ps.executeLargeUpdate(forumSql);
+                    }catch (SQLException e){
+                        e.printStackTrace();
+                    }
+                }
+                //collect
+                String collectSql = getCollectSql(rs);
+                if(StringUtils.isNotEmpty(collectSql)){
+                    try{
+                        new_ps = new_conn.prepareStatement(collectSql);
+                        new_ps.executeLargeUpdate(collectSql);
                     }catch (SQLException e){
                         e.printStackTrace();
                     }
