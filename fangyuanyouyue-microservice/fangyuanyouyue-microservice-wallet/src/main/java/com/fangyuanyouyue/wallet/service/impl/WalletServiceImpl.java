@@ -130,7 +130,7 @@ public class WalletServiceImpl implements WalletService{
             //微信提现需要用户绑定微信账号
             //查询用户的三方记录
             UserThirdParty userThirdByUserId = userThirdPartyMapper.getUserThirdByUserId(userId, Status.PAY_TYPE_WECHAT.getValue());
-            if(StringUtils.isEmpty(userThirdByUserId.getMiniOpenId())){
+            if(userThirdByUserId == null || StringUtils.isEmpty(userThirdByUserId.getMiniOpenId())){
                 throw new ServiceException("该账号未绑定小程序，无法微信提现！");
             }else{
                 userWithdraw.setAccount(userThirdByUserId.getMiniOpenId());
