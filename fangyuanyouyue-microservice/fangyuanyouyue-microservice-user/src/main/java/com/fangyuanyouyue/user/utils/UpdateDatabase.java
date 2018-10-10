@@ -104,6 +104,10 @@ public class UpdateDatabase {
  * forum_info
  * collect
  * confined_user
+ * goods_comment
+ * forum_comment
+ *
+ * report
  *
  */
 
@@ -128,8 +132,58 @@ public class UpdateDatabase {
  * a_confined_user
  * a_collect
  * a_appreciate_collection
+ * a_comment
+ * a_reply
+ *
+ * a_goods_report
  *
  */
+
+    /*
+    static String getReportSql() throws SQLException {
+        System.out.println("----------report----------");
+        StringBuffer reportSql = new StringBuffer();
+        PreparedStatement report_ps = null;
+        ResultSet report_rs = null;
+        try{
+            //唯一自增ID
+            Integer id= null;
+            //举报原因
+            String reason= null;
+            //被举报对象id
+            Integer businessId= null;
+            //用户id
+            Integer userId= null;
+            //添加时间
+            Date addTime= null;
+            //更新时间
+            Date updateTime= null;
+            //举报类型 1商品\抢购 2视频 3帖子 4全民鉴定
+            Integer type= 1;
+            //是否处理 1已处理 2未处理
+            Integer status= null;
+
+            String selectReport = "select * from a_goods_report";
+            report_ps = conn.prepareStatement(selectReport);
+            report_rs = report_ps.executeQuery(selectReport);
+            while (report_rs.next()){
+                id = report_rs.getInt("id");
+                reason = report_rs.getString("report_count");
+                businessId = report_rs.getInt("goods_id");
+                userId = report_rs.getInt()
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            if(report_ps != null){
+                report_ps.close();
+            }
+            if(report_rs != null){
+                report_rs.close();
+            }
+        }
+        return reportSql.toString().replace("null","NULL").replace("'NULL'","NULL");
+    }*/
 
     /**
      * comment
@@ -176,6 +230,7 @@ public class UpdateDatabase {
                 content = comment_rs.getString("content");
 
                 forumId = comment_rs.getInt("appreciate_id");
+                addTime = DateStampUtils.formatUnixTime(comment_rs.getLong("add_time"),DateUtil.DATE_FORMT);
                 if(goodsId != null){
                     commentSql.append("insert into goods_comment (" +
                             "id, " +
@@ -203,6 +258,43 @@ public class UpdateDatabase {
                             +addTime+"','"
                             +updateTime+"');\r\n"
                     );
+                    //回复
+                    String selectReply = "select * from a_reply where comment_id ="+comment_rs.getInt("id");
+                    reply_ps = conn.prepareStatement(selectReply);
+                    reply_rs = reply_ps.executeQuery(selectReply);
+                    while (reply_rs.next()){
+                        commentId = reply_rs.getInt("comment_id");
+                        content = reply_rs.getString("content");
+                        userId = reply_rs.getInt("from_user_id");
+                        addTime = DateStampUtils.formatUnixTime(reply_rs.getLong("add_time"),DateUtil.DATE_FORMT);
+
+                        commentSql.append("insert into goods_comment (" +
+                                "id, " +
+                                "goods_id, " +
+                                "user_id," +
+                                "comment_id, " +
+                                "content, " +
+                                "likes_count," +
+                                "img1_url, " +
+                                "img2_url, " +
+                                "img3_url," +
+                                "status, " +
+                                "add_time, " +
+                                "update_time) values ("
+                                +null+","
+                                +goodsId+","
+                                +userId+","
+                                +commentId+",'"
+                                +content+"',"
+                                +likesCount+",'"
+                                +img1Url+"','"
+                                +img2Url+"','"
+                                +img3Url+"',"
+                                +status+",'"
+                                +addTime+"','"
+                                +updateTime+"');\r\n"
+                        );
+                    }
                 }else{
                     commentSql.append("insert into forum_comment (" +
                             "id, " +
@@ -222,47 +314,16 @@ public class UpdateDatabase {
                             +addTime+"',"
                             +updateTime+");\r\n"
                     );
-                }
+                    //回复
+                    String selectReply = "select * from a_reply where comment_id ="+comment_rs.getInt("id");
+                    reply_ps = conn.prepareStatement(selectReply);
+                    reply_rs = reply_ps.executeQuery(selectReply);
+                    while (reply_rs.next()){
+                        commentId = reply_rs.getInt("comment_id");
+                        content = reply_rs.getString("content");
+                        userId = reply_rs.getInt("from_user_id");
+                        addTime = DateStampUtils.formatUnixTime(reply_rs.getLong("add_time"),DateUtil.DATE_FORMT);
 
-                //回复
-                String selectReply = "select * from a_reply where comment_id ="+comment_rs.getInt("id");
-                reply_ps = conn.prepareStatement(selectComment);
-                reply_rs = reply_ps.executeQuery(selectComment);
-                while (reply_rs.next()){
-                    id = reply_rs.getInt("id");
-                    commentId = reply_rs.getInt("comment_id");
-                    goodsId = comment_rs.getInt("goods_id");
-                    content = comment_rs.getString("content");
-
-                    forumId = comment_rs.getInt("appreciate_id");
-                    if(goodsId != null){
-                        commentSql.append("insert into goods_comment (" +
-                                "id, " +
-                                "goods_id, " +
-                                "user_id," +
-                                "comment_id, " +
-                                "content, " +
-                                "likes_count," +
-                                "img1_url, " +
-                                "img2_url, " +
-                                "img3_url," +
-                                "status, " +
-                                "add_time, " +
-                                "update_time) values ("
-                                +id+","
-                                +goodsId+","
-                                +userId+","
-                                +commentId+",'"
-                                +content+"',"
-                                +likesCount+",'"
-                                +img1Url+"','"
-                                +img2Url+"','"
-                                +img3Url+"',"
-                                +status+",'"
-                                +addTime+"','"
-                                +updateTime+"');\r\n"
-                        );
-                    }else{
                         commentSql.append("insert into forum_comment (" +
                                 "id, " +
                                 "user_id, " +
@@ -272,7 +333,7 @@ public class UpdateDatabase {
                                 "status," +
                                 "add_time, " +
                                 "update_time) values ("
-                                +id+","
+                                +null+","
                                 +userId+","
                                 +forumId+","
                                 +commentId+",'"
@@ -284,7 +345,6 @@ public class UpdateDatabase {
                     }
                 }
             }
-
         }catch (SQLException e) {
             e.printStackTrace();
         }finally {
@@ -1974,7 +2034,7 @@ public class UpdateDatabase {
 
 
     public static void main(String[] args) throws Exception {
-        String selectUser = "select * from a_user";
+        String selectUser = "select * from a_user order by id desc limit 0,1000";
         long start = System.currentTimeMillis();
 //        getSqlFile(selectUser);
         insertIntoDatabase(selectUser);
@@ -1989,15 +2049,25 @@ public class UpdateDatabase {
         List<Map<String,Object>> users = new ArrayList<>();
         try {
             conn=getOldConnection();//连接数据库
+            String countSql = "select count(id) as count from a_user";
+            Integer count = 0;
+            try{
+                ps = conn.prepareStatement(countSql);
+                rs = ps.executeQuery(countSql);
+                if(rs.next()){
+                    count = rs.getInt("count");
+                }
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
             //执行动态SQL语句。通常通过PreparedStatement实例实现。
             // 3、执行数据库存储过程。通常通过CallableStatement实例实现。
             ps=conn.prepareStatement(selectUser);// 2.创建Satement并设置参数
             rs=ps.executeQuery(selectUser);  // 3.ִ执行SQL语句
             String title = "insertSql";
             // 4.处理结果集
-            int all = 7610;
-            StringBuffer insertSql = new StringBuffer();
             while(rs.next()){
+                StringBuffer insertSql = new StringBuffer();
                 String nickName = rs.getString("nickName");
                 System.out.println("【"+nickName+"】开始");
                 //user_info
@@ -2078,10 +2148,15 @@ public class UpdateDatabase {
                 if(StringUtils.isNotEmpty(collectSql)){
                     insertSql.append(collectSql);
                 }
+                //comment
+                String commentSql = getCommentSql(rs);
+                if(StringUtils.isNotEmpty(commentSql)){
+                    insertSql.append(commentSql);
+                }
                 insertSql.append("\r\n");
-                System.out.println("【"+nickName+"】结束,剩余人数："+(--all));
+                System.out.println("【"+nickName+"】结束,剩余人数："+(--count));
+                FileUtils.createFile(title,insertSql.toString());
             }
-            FileUtils.createFile(title,insertSql.toString());
         } catch (SQLException e) {
             e.printStackTrace();
         }finally{
@@ -2119,13 +2194,22 @@ public class UpdateDatabase {
                     e.printStackTrace();
                 }
             }
+            String countSql = "select count(id) as count from a_user";
+            Integer count = 0;
+            try{
+                ps = conn.prepareStatement(countSql);
+                rs = ps.executeQuery(countSql);
+                if(rs.next()){
+                    count = rs.getInt("count");
+                }
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
             //执行动态SQL语句。通常通过PreparedStatement实例实现。
             // 3、执行数据库存储过程。通常通过CallableStatement实例实现。
             ps=conn.prepareStatement(selectUser);// 2.创建Satement并设置参数
             rs=ps.executeQuery(selectUser);  // 3.ִ执行SQL语句
-            String title = "insertSql";
             // 4.处理结果集
-            int all = 7610;
             while(rs.next()){
                 String nickName = rs.getString("nickName");
                 System.out.println("【"+nickName+"】开始");
@@ -2282,8 +2366,17 @@ public class UpdateDatabase {
                         e.printStackTrace();
                     }
                 }
-
-                System.out.println("【"+nickName+"】结束,剩余人数："+(--all));
+                //comment
+                String commentSql = getCommentSql(rs);
+                if(StringUtils.isNotEmpty(commentSql)){
+                    try{
+                        new_ps = new_conn.prepareStatement(commentSql);
+                        new_ps.executeLargeUpdate(commentSql);
+                    }catch (SQLException e){
+                        e.printStackTrace();
+                    }
+                }
+                System.out.println("【"+nickName+"】结束,剩余人数："+(--count));
             }
         } catch (SQLException e) {
             e.printStackTrace();
