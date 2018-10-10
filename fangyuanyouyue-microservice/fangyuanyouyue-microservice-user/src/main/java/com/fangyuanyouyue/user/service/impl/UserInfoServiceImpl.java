@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.fangyuanyouyue.user.dao.*;
+import com.fangyuanyouyue.user.model.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,16 +22,6 @@ import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.MD5Util;
 import com.fangyuanyouyue.user.constant.StatusEnum;
-import com.fangyuanyouyue.user.dao.CouponInfoMapper;
-import com.fangyuanyouyue.user.dao.IdentityAuthApplyMapper;
-import com.fangyuanyouyue.user.dao.UserCouponMapper;
-import com.fangyuanyouyue.user.dao.UserFansMapper;
-import com.fangyuanyouyue.user.dao.UserInfoExtMapper;
-import com.fangyuanyouyue.user.dao.UserInfoMapper;
-import com.fangyuanyouyue.user.dao.UserNickNameDetailMapper;
-import com.fangyuanyouyue.user.dao.UserThirdPartyMapper;
-import com.fangyuanyouyue.user.dao.UserVipMapper;
-import com.fangyuanyouyue.user.dao.UserWalletMapper;
 import com.fangyuanyouyue.user.dto.MergeDto;
 import com.fangyuanyouyue.user.dto.ShopDto;
 import com.fangyuanyouyue.user.dto.UserDto;
@@ -37,14 +29,6 @@ import com.fangyuanyouyue.user.dto.UserFansDto;
 import com.fangyuanyouyue.user.dto.WaitProcessDto;
 import com.fangyuanyouyue.user.dto.admin.AdminUserDto;
 import com.fangyuanyouyue.user.dto.admin.AdminUserNickNameDetailDto;
-import com.fangyuanyouyue.user.model.UserCoupon;
-import com.fangyuanyouyue.user.model.UserFans;
-import com.fangyuanyouyue.user.model.UserInfo;
-import com.fangyuanyouyue.user.model.UserInfoExt;
-import com.fangyuanyouyue.user.model.UserNickNameDetail;
-import com.fangyuanyouyue.user.model.UserThirdParty;
-import com.fangyuanyouyue.user.model.UserVip;
-import com.fangyuanyouyue.user.model.UserWallet;
 import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.param.UserParam;
 import com.fangyuanyouyue.user.service.SchedualForumService;
@@ -96,6 +80,8 @@ public class UserInfoServiceImpl implements UserInfoService {
     private UserNickNameDetailMapper userNickNameDetailMapper;
     @Autowired
     private SchedualForumService schedualForumService;
+    @Autowired
+    private UserAuthApplyMapper userAuthApplyMapper;
 
     @Override
     public UserInfo getUserByToken(String token) throws ServiceException {
@@ -902,6 +888,11 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         if(param.getAuthType()!=null) {
         	userInfoExt.setAuthType(param.getAuthType());
+            UserAuthApply userAuthApply = userAuthApplyMapper.selectByUserIdStatus(param.getId(),StatusEnum.AUTH_TYPE_APPLY.getCode());
+            if(userAuthApply != null){
+                userAuthApply.setStatus(param.getAuthType());
+                userAuthApplyMapper.updateByPrimaryKey(userAuthApply);
+            }
         }
         userInfoMapper.updateByPrimaryKeySelective(userInfo);
         userInfoExtMapper.updateByPrimaryKeySelective(userInfoExt);

@@ -52,6 +52,8 @@ public class OrderServiceImpl implements OrderService{
     private SchedualMessageService schedualMessageService;
     @Autowired
     private UserBehaviorMapper userBehaviorMapper;
+    @Autowired
+    private UserCouponMapper userCouponMapper;
 
     @Override
     public OrderDto saveOrderByCart(String token,String sellerString, Integer userId, Integer addressId) throws ServiceException {
@@ -287,6 +289,12 @@ public class OrderServiceImpl implements OrderService{
                 amount = amount.add(orderDetail.getAmount());//原价
                 payAmount = payAmount.add(orderDetail.getPayAmount());//实际支付
                 OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail);
+                //优惠券
+                UserCoupon userCoupon = userCouponMapper.selectUserCouponDetail(orderDetail.getCouponId());
+                if(userCoupon != null){
+                    UserCouponDto userCouponDto = new UserCouponDto(userCoupon);
+                    orderDetailDto.setUserCouponDto(userCouponDto);
+                }
                 orderDetailDtos.add(orderDetailDto);
                 goodsName.append("【"+goods.getName()+"】");
             }
@@ -411,7 +419,17 @@ public class OrderServiceImpl implements OrderService{
             OrderPayDto orderPayDto = new OrderPayDto(orderPay);
             OrderDto orderDto = new OrderDto(orderInfo);
             orderDto.setOrderPayDto(orderPayDto);
-            ArrayList<OrderDetailDto> orderDetailDtos = OrderDetailDto.toDtoList(orderDetails);
+            ArrayList<OrderDetailDto> orderDetailDtos = new ArrayList<>();
+            for(OrderDetail orderDetail:orderDetails){
+                OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail);
+                //优惠券
+                UserCoupon userCoupon = userCouponMapper.selectUserCouponDetail(orderDetail.getCouponId());
+                if(userCoupon != null){
+                    UserCouponDto userCouponDto = new UserCouponDto(userCoupon);
+                    orderDetailDto.setUserCouponDto(userCouponDto);
+                }
+                orderDetailDtos.add(orderDetailDto);
+            }
 //            for(OrderDetailDto orderDetailDto:orderDetailDtos){
 //                if(orderDetailDto.getFreight().compareTo(new BigDecimal(0)) > 0){
 //                    //订单详情DTO邮费为0则说明邮费不是最高或者邮费为0
@@ -492,7 +510,17 @@ public class OrderServiceImpl implements OrderService{
                 }else{
                     orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
                 }
-                ArrayList<OrderDetailDto> orderDetailDtos = OrderDetailDto.toDtoList(orderDetails);
+                ArrayList<OrderDetailDto> orderDetailDtos = new ArrayList<>();
+                for(OrderDetail orderDetail:orderDetails){
+                    OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail);
+                    //优惠券
+                    UserCoupon userCoupon = userCouponMapper.selectUserCouponDetail(orderDetail.getCouponId());
+                    if(userCoupon != null){
+                        UserCouponDto userCouponDto = new UserCouponDto(userCoupon);
+                        orderDetailDto.setUserCouponDto(userCouponDto);
+                    }
+                    orderDetailDtos.add(orderDetailDto);
+                }
                 //卖家信息DTO
                 List<SellerDto> sellerDtos = getSellerDtos(orderDetailDtos);
                 //订单支付表
@@ -529,7 +557,17 @@ public class OrderServiceImpl implements OrderService{
             sellerDtos.add(sellerDto);
             for(OrderDto orderDto:orderDtos){//获取订单详情列表
                 List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
-                ArrayList<OrderDetailDto> orderDetailDtos = OrderDetailDto.toDtoList(orderDetails);
+                ArrayList<OrderDetailDto> orderDetailDtos = new ArrayList<>();
+                for(OrderDetail orderDetail:orderDetails){
+                    OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail);
+                    //优惠券
+                    UserCoupon userCoupon = userCouponMapper.selectUserCouponDetail(orderDetail.getCouponId());
+                    if(userCoupon != null){
+                        UserCouponDto userCouponDto = new UserCouponDto(userCoupon);
+                        orderDetailDto.setUserCouponDto(userCouponDto);
+                    }
+                    orderDetailDtos.add(orderDetailDto);
+                }
 
                 //订单支付表
                 OrderPay orderPay = orderPayMapper.selectByOrderId(orderDto.getOrderId());
@@ -669,7 +707,14 @@ public class OrderServiceImpl implements OrderService{
         //修改商品的状态为已售出
         schedualGoodsService.updateGoodsStatus(goodsId,2);//状态  1出售中 2已售出 3已下架（已结束） 5删除
         ArrayList<OrderDetailDto> orderDetailDtos = new ArrayList<>();
-        orderDetailDtos.add(new OrderDetailDto(orderDetail));
+        OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail);
+        //优惠券
+        UserCoupon userCoupon = userCouponMapper.selectUserCouponDetail(orderDetail.getCouponId());
+        if(userCoupon != null){
+            UserCouponDto userCouponDto = new UserCouponDto(userCoupon);
+            orderDetailDto.setUserCouponDto(userCouponDto);
+        }
+        orderDetailDtos.add(orderDetailDto);
         //卖家dto
         List<SellerDto> sellerDtos = getSellerDtos(orderDetailDtos);
         //生成子订单，在总订单中加入价格和邮费，实际支付价格

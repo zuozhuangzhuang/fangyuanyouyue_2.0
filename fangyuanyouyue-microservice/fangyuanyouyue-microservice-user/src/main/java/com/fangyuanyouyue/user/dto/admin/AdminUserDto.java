@@ -64,9 +64,9 @@ public class AdminUserDto {
 
     private Integer creditLevel;//信誉度等级 1差 2低 3中 4高 5优
 
-    private Integer authType;//认证状态 1已认证 2未认证
+    private Integer authType;//认证店铺状态 1申请 2认证 3未认证
 
-    private Integer extStatus;//实名登记状态 1申请中 2已实名 3未实名
+    private Integer extStatus;//实名认证状态 1申请 2通过 3未通过
 
     private Integer isPayPwd;//是否设置支付密码 1是 2否
 
