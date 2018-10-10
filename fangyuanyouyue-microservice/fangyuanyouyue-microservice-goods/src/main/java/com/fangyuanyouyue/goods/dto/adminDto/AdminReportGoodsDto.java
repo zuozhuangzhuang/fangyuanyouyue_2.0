@@ -42,6 +42,10 @@ public class AdminReportGoodsDto {
 
     //举报处理状态 1已处理 2未处理
     private Integer status;
+    
+    private String reason;//举报原因
+
+    private Integer type;//举报原因
 
     public AdminReportGoodsDto() {
     }
@@ -56,6 +60,8 @@ public class AdminReportGoodsDto {
         this.addTime = DateUtil.getFormatDate(report.getAddTime(),DateUtil.DATE_FORMT);
         this.updateTime = DateUtil.getFormatDate(report.getUpdateTime(),DateUtil.DATE_FORMT);
         this.status = report.getStatus();
+        this.reason = report.getReason();
+        this.type = report.getType();
     }
 
     public static ArrayList<AdminReportGoodsDto> toDtoList(List<Report> list) {

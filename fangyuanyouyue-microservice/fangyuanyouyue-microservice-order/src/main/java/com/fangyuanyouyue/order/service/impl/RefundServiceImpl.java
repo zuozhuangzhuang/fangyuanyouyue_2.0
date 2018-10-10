@@ -11,6 +11,8 @@ import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.order.dao.*;
 import com.fangyuanyouyue.order.dto.*;
 import com.fangyuanyouyue.order.dto.adminDto.AdminCompanyDto;
+import com.fangyuanyouyue.order.dto.adminDto.AdminOrderDetailDto;
+import com.fangyuanyouyue.order.dto.adminDto.AdminOrderDto;
 import com.fangyuanyouyue.order.dto.adminDto.AdminOrderRefundDto;
 import com.fangyuanyouyue.order.model.*;
 import com.fangyuanyouyue.order.param.AdminOrderParam;
@@ -255,9 +257,41 @@ public class RefundServiceImpl implements RefundService{
     public Pager refundList(AdminOrderParam param) throws ServiceException {
         List<OrderRefund> list = orderRefundMapper.getPage(param.getStart(), param.getLimit(), param.getKeyword(), param.getStatus(), param.getStartDate(), param.getEndDate(), param.getOrders(),param.getAscType());
         Integer total = orderRefundMapper.countPage(param.getKeyword(), param.getStatus(), param.getStartDate(), param.getEndDate());
+        List<AdminOrderRefundDto> dtos = new ArrayList<AdminOrderRefundDto>();
+        for(OrderRefund refund:list) {
+        	AdminOrderRefundDto dto = new AdminOrderRefundDto(refund);
+        	OrderInfo info = orderInfoMapper.selectByOrderId(dto.getOrderId());
+        	AdminOrderDto orderDto = new AdminOrderDto(info);
+            //获取订单详情列表
+            //如果是没有拆单的订单根据主订单获取，拆了单的根据订单id获取
+            List<OrderDetail> orderDetails;
+            if(info.getSellerId() == null){
+                orderDetails = orderDetailMapper.selectByMainOrderId(orderDto.getOrderId());
+                //orderDto.setSeller("多卖家");
+            }else{
+                orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
+
+                //获取卖家信息
+                //UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(info.getSellerId())).getString("data")), UserInfo.class);
+                //if(seller != null){
+                //    orderDto.setSeller(seller.getPhone()+"\n"+seller.getNickName());
+                //}
+            }
+            ArrayList<AdminOrderDetailDto> orderDetailDtos = AdminOrderDetailDto.toDtoList(orderDetails);
+            String orderDetail = "";
+            for(AdminOrderDetailDto detail:orderDetailDtos) {
+            	orderDetail += "卖家："+detail.getNickName()+" - "+detail.getPhone()+"，商品："+detail.getGoodsName() + "<br>";
+            }
+            orderDto.setOrderDetail(orderDetail);
+            orderDto.setTotalCount(orderDetailDtos.size());
+            
+            dto.setOrderInfo(orderDto);
+        	
+        	dtos.add(dto);
+        }
         Pager pager = new Pager();
         pager.setTotal(total);
-        pager.setDatas(AdminOrderRefundDto.toDtoList(list));
+        pager.setDatas(dtos);
         return pager;
     }
     
