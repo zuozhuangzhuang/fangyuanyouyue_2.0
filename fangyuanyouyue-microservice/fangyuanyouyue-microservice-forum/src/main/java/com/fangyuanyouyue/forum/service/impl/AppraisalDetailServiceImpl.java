@@ -140,16 +140,16 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 	public List<AppraisalDetailDto> getAppraisalList(Integer userId,String keyword,Integer start, Integer limit,Integer type) throws ServiceException {
 		List<AppraisalDetail> list;
 		if(type == null){
-			list = appraisalDetailMapper.selectMyList(null, keyword, start, limit);
+			list = appraisalDetailMapper.selectMyList(null, keyword, start*limit, limit);
 		}else{
 			if(userId == null){
 				throw new ServiceException("用户id不能为空！");
 			}
 			if(type == 1){
-				list = appraisalDetailMapper.selectListWithMe(userId, keyword, start, limit);
+				list = appraisalDetailMapper.selectListWithMe(userId, keyword, start*limit, limit);
 			}else if(type == 2){
 				//userId 不为空：我的全民鉴定列表
-				list = appraisalDetailMapper.selectMyList(userId, keyword, start, limit);
+				list = appraisalDetailMapper.selectMyList(userId, keyword, start*limit, limit);
 			}else{
 				throw new ServiceException("类型错误！");
 			}
