@@ -143,9 +143,9 @@
   <select id="selectPage" resultMap="BaseResultMap">
     select 
     a.*,b.name as type_name
-    from forum_column a,forum_column_type b
+    from forum_column a,forum_column_type b,user_info c
     <where>
-      a.type_id=b.id
+      a.type_id=b.id and a.user_id=c.id
       <if test="typeId != null">
         and b.id = #{typeId}
       </if>
@@ -191,29 +191,29 @@
   
     
   <select id="countPage" parameterType="Integer" resultType="Integer">
-    select count(*) from forum_column where 1=1
+    select count(*) from forum_column a,forum_column_type b,user_info c where a.type_id=b.id and a.user_id=c.id
     <if test="keyword != null">
       and ( 
-      	name like "%"#{keyword,jdbcType=VARCHAR}"%"
+      	a.name like "%"#{keyword,jdbcType=VARCHAR}"%"
       )
     </if>
     <if test="status != null">
-      and status = #{status}
+      and a.status = #{status}
     </if>
     <if test="startDate != null">
-      and add_time <![CDATA[ > ]]> #{startDate}
+      and a.add_time <![CDATA[ > ]]> #{startDate}
     </if>
     
     <if test="endDate != null">
-      and add_time <![CDATA[ < ]]> #{endDate}
+      and a.add_time <![CDATA[ <= ]]> #{endDate}
     </if>
     
   </select>
   
   <select id="getPage" resultMap="BaseResultMap">
-    select *,b.name as type_name,c.nick_name from forum_column a,forum_column_type b,user_info c where a.type_id=b.id and a.user_id=c.id
+    select a.*,b.name as type_name,c.nick_name from forum_column a,forum_column_type b,user_info c where a.type_id=b.id and a.user_id=c.id
     <if test="keyword != null">
-      and ( 
+      and (
       	a.name like "%"#{keyword,jdbcType=VARCHAR}"%"
       )
     </if>
