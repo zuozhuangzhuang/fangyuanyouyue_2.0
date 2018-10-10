@@ -578,8 +578,10 @@ public class OrderServiceImpl implements OrderService{
                 if(orderDto.getIsRefund() == 1){
                     //退货状态
                     OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null,null);
-                    orderDto.setReturnStatus(orderRefund.getStatus());
-                    orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
+                    if(orderRefund != null){
+                        orderDto.setReturnStatus(orderRefund.getStatus());
+                        orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
+                    }
                 }
             }
         }else{
