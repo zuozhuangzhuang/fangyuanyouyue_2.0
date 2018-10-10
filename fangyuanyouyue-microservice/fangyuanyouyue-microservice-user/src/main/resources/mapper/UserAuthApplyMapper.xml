@@ -130,7 +130,7 @@
   </update>
 
   <select id="selectByUserIdStatus" parameterType="Integer" resultMap="BaseResultMap">
-    select * from user_auth_apply where user_id = #{userId} and status = #{1}
+    select * from user_auth_apply where user_id = #{userId} and status = 1
   </select>
   
   
