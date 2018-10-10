@@ -212,6 +212,6 @@
   </update>
 
   <select id="selectByDayCount" resultMap="BaseResultMap">
-    select * from daily_statistics limit 0,#{count}
+    select * from daily_statistics order by date desc limit 0,#{count}
   </select>
 </mapper>
