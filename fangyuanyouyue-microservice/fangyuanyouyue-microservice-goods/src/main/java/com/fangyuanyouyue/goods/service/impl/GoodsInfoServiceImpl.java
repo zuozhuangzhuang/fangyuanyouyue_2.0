@@ -427,7 +427,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             //如果是已下架的商品或抢购，重新上架
             goodsInfo.setStatus(1);//状态 1出售中 2已售出 3已下架（已结束） 5删除
             goodsInfo.setUpdateTime(DateStampUtils.getTimesteamp());
-            goodsInfoMapper.updateByPrimaryKey(goodsInfo);
+            goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
 
             //抢购 重新编辑可以重新上架，删除旧降价历史
             if(goodsInfo.getType() == 2){
