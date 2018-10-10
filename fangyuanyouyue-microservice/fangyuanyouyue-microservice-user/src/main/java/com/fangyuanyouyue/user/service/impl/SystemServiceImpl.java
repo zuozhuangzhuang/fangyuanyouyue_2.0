@@ -23,6 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 @Service(value = "systemService")
@@ -152,6 +155,7 @@ public class SystemServiceImpl implements SystemService {
     public List<AdminDailyStatisticsDto> getProcessList(Integer count) throws ServiceException {
         List<DailyStatistics> dailyStatistics = dailyStatisticsMapper.selectByDayCount(count);
         List<AdminDailyStatisticsDto> dtos = AdminDailyStatisticsDto.toDtoList(dailyStatistics);
+        Collections.reverse(dtos);
         return dtos;
     }
 }
