@@ -9,6 +9,7 @@ import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.*;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
+import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.base.util.IdGenerator;
 import com.fangyuanyouyue.order.dao.*;
 import com.fangyuanyouyue.order.dto.*;
@@ -448,6 +449,7 @@ public class OrderServiceImpl implements OrderService{
                 OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderInfo.getId(), null,null);
                 orderDto.setReturnStatus(orderRefund.getStatus());
                 orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
+                orderDto.setReturnTime(DateUtil.getFormatDate(orderRefund.getAddTime(),DateUtil.DATE_FORMT));
             }
             //是否评价
             OrderComment orderComment = orderCommentMapper.selectByOrder(orderId);
@@ -534,6 +536,7 @@ public class OrderServiceImpl implements OrderService{
                     OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null,null);
                     orderDto.setReturnStatus(orderRefund.getStatus());
                     orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
+                    orderDto.setReturnTime(DateUtil.getFormatDate(orderRefund.getAddTime(),DateUtil.DATE_FORMT));
                 }
                 //是否评价
                 OrderComment orderComment = orderCommentMapper.selectByOrder(orderDto.getOrderId());
@@ -581,6 +584,7 @@ public class OrderServiceImpl implements OrderService{
                     if(orderRefund != null){
                         orderDto.setReturnStatus(orderRefund.getStatus());
                         orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
+                        orderDto.setReturnTime(DateUtil.getFormatDate(orderRefund.getAddTime(),DateUtil.DATE_FORMT));
                     }
                 }
             }

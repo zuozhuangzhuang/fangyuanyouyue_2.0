@@ -54,6 +54,8 @@ public class OrderDto {
 
     private String headImgUrl;//买家头像
 
+    private String returnTime;//申请退货时间
+
     public OrderDto() {
     }
 
