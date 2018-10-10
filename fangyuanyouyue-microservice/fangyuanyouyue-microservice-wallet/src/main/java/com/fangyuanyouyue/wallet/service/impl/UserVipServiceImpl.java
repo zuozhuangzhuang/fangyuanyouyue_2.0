@@ -10,6 +10,7 @@ import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.base.util.IdGenerator;
+import com.fangyuanyouyue.wallet.constant.StatusEnum;
 import com.fangyuanyouyue.wallet.dao.UserVipCouponDetailMapper;
 import com.fangyuanyouyue.wallet.dao.UserVipMapper;
 import com.fangyuanyouyue.wallet.dao.VipOrderMapper;
@@ -244,10 +245,18 @@ public class UserVipServiceImpl implements UserVipService{
     @Override
     public void updateUserVip(Integer userId, Integer vipLevel, Integer vipType,Integer type) throws ServiceException {
         UserVip userVip = userVipMapper.selectByUserId(userId);
+        if(userVip == null){
+            userVip = new UserVip();
+            userVip.setUserId(userId);
+            userVip.setAddTime(DateStampUtils.getTimesteamp());
+            userVip.setStatus(Status.VIP_CANCEL.getValue());
+            userVipMapper.insert(userVip);
+        }
         if(type.equals(Status.VIP_DREDGE.getValue())){
             if(userVip.getStatus().intValue() == Status.IS_VIP.getValue()){//已开通
                 throw new ServiceException("已开通会员！");
             }
+            userVip.setStartTime(DateStampUtils.getTimesteamp());
             //计算结束时间
             if(vipType.intValue() == Status.VIP_TYPE_ONE_MONTH.getValue()){
                 userVip.setEndTime(DateUtil.getDateAfterMonth(DateStampUtils.getTimesteamp(),1));
@@ -290,7 +299,7 @@ public class UserVipServiceImpl implements UserVipService{
 //            if(userVip.getStatus() == Status.NOT_VIP.getValue()){//未开通
 //                throw new ServiceException("请开通会员！");
 //            }
-            if(userVip.getVipLevel().intValue() == vipLevel){//续费相同等级会员
+            if(vipLevel.equals(userVip.getVipLevel())){//续费相同等级会员
                 //计算结束时间
                 if(vipType.intValue() == Status.VIP_TYPE_ONE_MONTH.getValue()){
                     userVip.setEndTime(DateUtil.getDateAfterMonth(userVip.getEndTime(),1));

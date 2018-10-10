@@ -135,14 +135,21 @@ public class UpdateDatabase {
  * a_comment
  * a_reply
  *
+ * a_goods_record
  * a_goods_report
  *
  */
 
-    /*
+    /**
+     * a_goods_record
+     * @return
+     * @throws SQLException
+     */
     static String getReportSql() throws SQLException {
         System.out.println("----------report----------");
         StringBuffer reportSql = new StringBuffer();
+        PreparedStatement record_ps = null;
+        ResultSet record_rs = null;
         PreparedStatement report_ps = null;
         ResultSet report_rs = null;
         try{
@@ -155,26 +162,56 @@ public class UpdateDatabase {
             //用户id
             Integer userId= null;
             //添加时间
-            Date addTime= null;
+            String addTime= null;
             //更新时间
-            Date updateTime= null;
+            String updateTime= null;
             //举报类型 1商品\抢购 2视频 3帖子 4全民鉴定
             Integer type= 1;
             //是否处理 1已处理 2未处理
-            Integer status= null;
+            Integer status= 1;
 
-            String selectReport = "select * from a_goods_report";
-            report_ps = conn.prepareStatement(selectReport);
-            report_rs = report_ps.executeQuery(selectReport);
-            while (report_rs.next()){
-                id = report_rs.getInt("id");
-                reason = report_rs.getString("report_count");
-                businessId = report_rs.getInt("goods_id");
-                userId = report_rs.getInt()
+            String selectRecord = "select * from a_goods_record";
+            record_ps = conn.prepareStatement(selectRecord);
+            record_rs = record_ps.executeQuery(selectRecord);
+            while (record_rs.next()){
+                id = record_rs.getInt("id");
+                businessId = record_rs.getInt("goods_id");
+                userId = record_rs.getInt("user_id")+100000;
+                addTime = DateStampUtils.formatUnixTime(record_rs.getLong("create_time"),DateUtil.DATE_FORMT);
+                String selectReport = "select * from a_goods_report where goods_id =" +businessId;
+                report_ps = conn.prepareStatement(selectReport);
+                report_rs = report_ps.executeQuery(selectReport);
+                if(report_rs.next()){
+                    status = report_rs.getInt("status")==0?1:2;
+                }
+                reportSql.append("insert into report (" +
+                        "id, " +
+                        "reason, " +
+                        "business_id," +
+                        "user_id, " +
+                        "add_time, " +
+                        "update_time," +
+                        "type, " +
+                        "status) values ("
+                        +null+",'"
+                        +(reason==null?"假货/存疑":reason)+"',"
+                        +businessId+","
+                        +userId+",'"
+                        +addTime+"','"
+                        +updateTime+"',"
+                        +type+","
+                        +status+");\r\n"
+                );
             }
         }catch (SQLException e) {
             e.printStackTrace();
         }finally {
+            if(record_ps != null){
+                record_ps.close();
+            }
+            if(record_rs != null){
+                record_rs.close();
+            }
             if(report_ps != null){
                 report_ps.close();
             }
@@ -183,7 +220,7 @@ public class UpdateDatabase {
             }
         }
         return reportSql.toString().replace("null","NULL").replace("'NULL'","NULL");
-    }*/
+    }
 
     /**
      * comment
@@ -463,7 +500,7 @@ public class UpdateDatabase {
             confine_user_ps = conn.prepareStatement(selectConfine);
             confine_user_rs = confine_user_ps.executeQuery(selectConfine);
             while (confine_user_rs.next()){
-                Integer userId = confine_user_rs.getInt("id")+100000;//用户id
+                Integer userId = confine_user_rs.getInt("user_id")+100000;//用户id
                 Integer status = confine_user_rs.getInt("status");//用于假删除用户  0被限制用户 1被限制后又被解除限制用户（表面正常用户）
                 String addTime = DateStampUtils.formatUnixTime(System.currentTimeMillis(),DateUtil.DATE_FORMT);//添加时间
                 String updateTime = null;//更新时间
@@ -757,7 +794,8 @@ public class UpdateDatabase {
 
         try{
 
-            String selectOrder = "select * from a_order where status <> 4 and is_delete <> 0 and sell_delete <> 0 and user_id ="+rs.getInt("id");
+//            String selectOrder = "select * from a_order where status <> 4 and is_delete <> 0 and sell_delete <> 0 and user_id ="+rs.getInt("id");
+            String selectOrder = "select * from a_order where user_id ="+rs.getInt("id");
             order_ps = conn.prepareStatement(selectOrder);
             order_rs = order_ps.executeQuery(selectOrder);
 
@@ -768,6 +806,7 @@ public class UpdateDatabase {
                 BigDecimal amount = order_rs.getBigDecimal("price");//订单总金额
                 Integer status = null;//状态 1待支付 2待发货 3待收货 4已完成 5已取消
                 Integer rechargeStatus = 3;//状态 1待支付 2已完成 3已删除
+                //状态 0 待付款  1已付款  2已完成  3已发货  4已取消
                 Integer old_status = order_rs.getInt("status");
                 if(old_status.equals(0)){
                     status = 1;
@@ -2034,7 +2073,7 @@ public class UpdateDatabase {
 
 
     public static void main(String[] args) throws Exception {
-        String selectUser = "select * from a_user order by id desc limit 0,1000";
+        String selectUser = "select * from a_user";
         long start = System.currentTimeMillis();
 //        getSqlFile(selectUser);
         insertIntoDatabase(selectUser);
@@ -2049,6 +2088,26 @@ public class UpdateDatabase {
         List<Map<String,Object>> users = new ArrayList<>();
         try {
             conn=getOldConnection();//连接数据库
+            Connection new_conn = getNewConnection();
+            PreparedStatement new_ps = null;
+            String confineUserSql = getConfineUserSql();
+            if(StringUtils.isNotEmpty(confineUserSql)){
+                try{
+                    new_ps = new_conn.prepareStatement(confineUserSql);
+                    new_ps.executeLargeUpdate(confineUserSql);
+                }catch (SQLException e){
+                    e.printStackTrace();
+                }
+            }
+            String reportSql = getReportSql();
+            if(StringUtils.isNotEmpty(reportSql)){
+                try{
+                    new_ps = new_conn.prepareStatement(reportSql);
+                    new_ps.executeLargeUpdate(reportSql);
+                }catch (SQLException e){
+                    e.printStackTrace();
+                }
+            }
             String countSql = "select count(id) as count from a_user";
             Integer count = 0;
             try{
@@ -2064,6 +2123,7 @@ public class UpdateDatabase {
             // 3、执行数据库存储过程。通常通过CallableStatement实例实现。
             ps=conn.prepareStatement(selectUser);// 2.创建Satement并设置参数
             rs=ps.executeQuery(selectUser);  // 3.ִ执行SQL语句
+            // 4.处理结果集
             String title = "insertSql";
             // 4.处理结果集
             while(rs.next()){
@@ -2176,6 +2236,7 @@ public class UpdateDatabase {
             }
         }
     }
+
     /**
      * 插入数据库
      */
@@ -2185,11 +2246,22 @@ public class UpdateDatabase {
             conn=getOldConnection();//连接数据库
             Connection new_conn = getNewConnection();
             PreparedStatement new_ps = null;
+            //confine_user
             String confineUserSql = getConfineUserSql();
             if(StringUtils.isNotEmpty(confineUserSql)){
                 try{
                     new_ps = new_conn.prepareStatement(confineUserSql);
                     new_ps.executeLargeUpdate(confineUserSql);
+                }catch (SQLException e){
+                    e.printStackTrace();
+                }
+            }
+            //report
+            String reportSql = getReportSql();
+            if(StringUtils.isNotEmpty(reportSql)){
+                try{
+                    new_ps = new_conn.prepareStatement(reportSql);
+                    new_ps.executeLargeUpdate(reportSql);
                 }catch (SQLException e){
                     e.printStackTrace();
                 }

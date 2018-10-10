@@ -164,7 +164,7 @@
 
 
   <select id="getBanner" parameterType="Integer" resultMap="BaseResultMap">
-    select * from banner_index where status = 1 and type = #{type,jdbcType=INTEGER} order by sort desc
+    select * from banner_index where status = 1 and type = #{type,jdbcType=INTEGER} order by sort
   </select>
 
 

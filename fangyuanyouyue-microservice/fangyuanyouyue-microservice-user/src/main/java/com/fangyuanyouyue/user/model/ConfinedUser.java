@@ -1,4 +1,4 @@
-package com.fangyuanyouyue.wallet.model;
+package com.fangyuanyouyue.user.model;
 
 import lombok.Getter;
 import lombok.Setter;

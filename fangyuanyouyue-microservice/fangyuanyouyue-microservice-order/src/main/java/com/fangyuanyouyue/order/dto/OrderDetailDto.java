@@ -38,6 +38,8 @@ public class OrderDetailDto {
 
     private Integer goodsType;//类型 1普通商品 2抢购商品
 
+    private UserCouponDto userCouponDto;//优惠券信息
+
     //优惠券
 
     public OrderDetailDto() {
