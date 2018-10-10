@@ -3,6 +3,7 @@ package com.fangyuanyouyue.user.controller;
 import java.io.IOException;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.user.service.ConfinedUserService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -38,6 +39,8 @@ public class AdminUserController extends BaseController {
     private UserInfoExtService userInfoExtService;
     @Autowired
     private SystemService systemService;
+    @Autowired
+    private ConfinedUserService confinedUserService;
 
     @ApiOperation(value = "用户列表", notes = "用户列表",response = BaseResp.class)
     @ApiImplicitParams({
@@ -298,9 +301,9 @@ public class AdminUserController extends BaseController {
     @ApiOperation(value = "编辑用户", notes = "编辑用户",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "status", value = "状态 1正常 2冻结 3删除", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "authType", value = "类型 1增加 2减少", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "fansCount", value = "粉丝数量", required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "status", value = "状态 1正常 2冻结", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "authType", value = "认证店铺状态 1申请 2认证 3未认证", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "fansCount", value = "粉丝基数", required = true, dataType = "int", paramType = "query")
     })
     @PutMapping(value = "/updateUser")
     @ResponseBody
@@ -321,4 +324,37 @@ public class AdminUserController extends BaseController {
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
         }
     }
+
+
+    @ApiOperation(value = "代理用户列表", notes = "代理用户列表",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "keyword", value = "搜索词条", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "状态 1正常 2冻结 3删除", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "startDate", value = "开始日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "endDate", value = "结束日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orders", value = "排序规则", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "ascType", value = "排序类型 1升序 2降序", required = false, dataType = "int", paramType = "query")
+    })
+    @GetMapping(value = "/confinedUserlist")
+    @ResponseBody
+    public BaseResp confinedUserlist(AdminUserParam param) throws IOException {
+        try {
+            log.info("后台管理查看代理用户列表");
+            log.info("参数："+param.toString());
+            if(param.getStart() == null || param.getStart() < 0){
+                return toError("起始页数错误！");
+            }
+            if(param.getLimit() == null || param.getLimit() < 1){
+                return toError("每页个数错误！");
+            }
+            Pager pager = confinedUserService.getPage(param);
+            return toPage(pager);
+        }catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
 }
