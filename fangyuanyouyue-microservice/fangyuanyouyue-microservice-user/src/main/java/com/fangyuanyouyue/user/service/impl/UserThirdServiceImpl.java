@@ -99,11 +99,11 @@ public class UserThirdServiceImpl implements UserThirdService {
                 //1、userWallet：合并
                 UserWallet userWallet = userWalletMapper.selectByUserId(user.getId());
                 UserWallet phoneUserWallet = userWalletMapper.selectByUserId(phoneUser.getId());
-                userWallet.setBalance(userWallet.getBalance().add(phoneUserWallet.getBalance()));
-                userWallet.setBalanceFrozen(userWallet.getBalanceFrozen().add(phoneUserWallet.getBalanceFrozen()));
-                userWallet.setPoint(userWallet.getPoint()+phoneUserWallet.getPoint());
-                userWallet.setScore(userWallet.getScore()+phoneUserWallet.getScore());
-                userWalletMapper.updateByPrimaryKeySelective(userWallet);
+                phoneUserWallet.setBalance(userWallet.getBalance().add(phoneUserWallet.getBalance()));
+                phoneUserWallet.setBalanceFrozen(userWallet.getBalanceFrozen().add(phoneUserWallet.getBalanceFrozen()));
+                phoneUserWallet.setPoint(userWallet.getPoint()+phoneUserWallet.getPoint());
+                phoneUserWallet.setScore(userWallet.getScore()+phoneUserWallet.getScore());
+                userWalletMapper.updateByPrimaryKeySelective(phoneUserWallet);
                 //2、userFans：如果to_user_id == 三方用户id，如果user_id != 手机用户，修改to_user_id 为 手机用户id，如果user_id == 手机用户，删除此条记录
                 List<UserFans> userFansList = userFansMapper.userFans(user.getId(), null, null);
                 if(userFansList != null && userFansList.size() >0){
