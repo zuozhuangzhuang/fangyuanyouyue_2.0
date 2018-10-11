@@ -369,7 +369,7 @@
                 ))
             </if>
         </where>
-        order by a.sort,
+        order by
         <if test="synthesize != null">
             <if test="synthesize == 1">
 
@@ -384,7 +384,7 @@
                 a.price desc,
             </if>
         </if>
-        a.comment_time desc,a.update_time desc limit #{start},#{limit}
+        a.sort,a.comment_time desc,a.update_time desc limit #{start},#{limit}
     </select>
 
 

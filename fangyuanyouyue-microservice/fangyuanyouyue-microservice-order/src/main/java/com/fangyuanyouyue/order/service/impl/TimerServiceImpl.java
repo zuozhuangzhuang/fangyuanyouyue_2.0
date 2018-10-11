@@ -160,19 +160,18 @@ public class TimerServiceImpl implements TimerService{
                         if(DateUtil.getDateAfterDay(orderRefund.getAddTime(),2).getTime() < new Date().getTime()){
                             //自动同意
                             orderRefund.setSellerReturnStatus(4);
+                            orderRefundMapper.updateByPrimaryKeySelective(orderRefund);
                         }
                     }else if(info.getStatus().intValue() == Status.ORDER_GOODS_SENDED.getValue()){
                         //退货申请时间 + 3天 < 当前时间
                         if(DateUtil.getDateAfterDay(orderRefund.getAddTime(),3).getTime() < new Date().getTime()){
                             //自动拒绝
                             orderRefund.setSellerReturnStatus(5);
+                            orderRefundMapper.updateByPrimaryKeySelective(orderRefund);
                         }
                     }else{
                         throw new ServiceException("订单状态错误！");
                     }
-                    //自动处理扣除卖家信誉度
-                    schedualWalletService.updateCredit(info.getSellerId(), Credit.RETURN_TIMEOUT.getCredit(), Status.SUB.getValue());
-                    orderRefundMapper.updateByPrimaryKeySelective(orderRefund);
                 }
             }
         }
