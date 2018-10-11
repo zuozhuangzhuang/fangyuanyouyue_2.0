@@ -115,7 +115,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="status != null">
         status = #{status,jdbcType=INTEGER},
@@ -133,7 +132,6 @@
       amount = #{amount,jdbcType=DECIMAL},
       count = #{count,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       status = #{status,jdbcType=INTEGER},
       pay_no = #{payNo,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}

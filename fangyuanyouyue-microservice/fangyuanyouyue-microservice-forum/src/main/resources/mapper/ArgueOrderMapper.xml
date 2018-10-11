@@ -145,7 +145,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="title != null">
         title = #{title,jdbcType=VARCHAR},
@@ -172,7 +171,6 @@
       amount = #{amount,jdbcType=DECIMAL},
       status = #{status,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       title = #{title,jdbcType=VARCHAR},
       to_users = #{toUsers,jdbcType=VARCHAR},
       pay_no = #{payNo,jdbcType=VARCHAR},
@@ -187,7 +185,6 @@
       amount = #{amount,jdbcType=DECIMAL},
       status = #{status,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       title = #{title,jdbcType=VARCHAR},
       to_users = #{toUsers,jdbcType=VARCHAR},
       pay_no = #{payNo,jdbcType=VARCHAR},

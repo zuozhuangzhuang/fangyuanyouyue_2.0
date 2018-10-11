@@ -86,7 +86,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="previousPrice != null">
         previous_price = #{previousPrice,jdbcType=DECIMAL},
@@ -99,7 +98,6 @@
     set goods_id = #{goodsId,jdbcType=INTEGER},
       markdown = #{markdown,jdbcType=DECIMAL},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       previous_price = #{previousPrice,jdbcType=DECIMAL}
     where id = #{id,jdbcType=INTEGER}
   </update>

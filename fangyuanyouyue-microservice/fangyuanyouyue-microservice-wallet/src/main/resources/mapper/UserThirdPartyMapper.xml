@@ -151,7 +151,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null" >
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="sessionKey != null" >
         session_key = #{sessionKey,jdbcType=VARCHAR},
@@ -170,7 +169,6 @@
       nick_name = #{nickName,jdbcType=VARCHAR},
       head_img_url = #{headImgUrl,jdbcType=VARCHAR},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       session_key = #{sessionKey,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>

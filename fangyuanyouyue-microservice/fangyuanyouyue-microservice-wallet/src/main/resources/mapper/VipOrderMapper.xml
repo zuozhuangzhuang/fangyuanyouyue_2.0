@@ -139,7 +139,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="vipLevel != null">
         vip_level = #{vipLevel,jdbcType=INTEGER},
@@ -166,7 +165,6 @@
       amount = #{amount,jdbcType=DECIMAL},
       status = #{status,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       vip_level = #{vipLevel,jdbcType=INTEGER},
       level_desc = #{levelDesc,jdbcType=VARCHAR},
       vip_type = #{vipType,jdbcType=INTEGER},

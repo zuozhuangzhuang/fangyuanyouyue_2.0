@@ -115,7 +115,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="isChosen != null">
         is_chosen = #{isChosen,jdbcType=INTEGER},
@@ -133,7 +132,6 @@
       cover_img_url = #{coverImgUrl,jdbcType=VARCHAR},
       fans_count = #{fansCount,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       is_chosen = #{isChosen,jdbcType=INTEGER},
       type_id = #{typeId,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}

@@ -100,7 +100,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="type != null">
         type = #{type,jdbcType=INTEGER},
@@ -119,7 +118,6 @@
     set bonus_name = #{bonusName,jdbcType=VARCHAR},
       probability = #{probability,jdbcType=DOUBLE},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       type = #{type,jdbcType=INTEGER},
       score = #{score,jdbcType=BIGINT},
       coupon_id = #{couponId,jdbcType=INTEGER}

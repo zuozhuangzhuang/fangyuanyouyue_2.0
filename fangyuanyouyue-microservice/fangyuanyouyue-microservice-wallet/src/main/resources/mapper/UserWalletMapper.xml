@@ -118,7 +118,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="appraisalCount != null">
         appraisal_count = #{appraisalCount,jdbcType=INTEGER},
@@ -134,7 +133,6 @@
       point = #{point,jdbcType=BIGINT},
       score = #{score,jdbcType=BIGINT},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       appraisal_count = #{appraisalCount,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>

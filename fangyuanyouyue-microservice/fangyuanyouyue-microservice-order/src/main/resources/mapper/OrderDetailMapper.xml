@@ -173,7 +173,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="couponId != null">
         coupon_id = #{couponId,jdbcType=INTEGER},
@@ -209,7 +208,6 @@
       goods_id = #{goodsId,jdbcType=INTEGER},
       goods_name = #{goodsName,jdbcType=VARCHAR},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       coupon_id = #{couponId,jdbcType=INTEGER},
       main_img_url = #{mainImgUrl,jdbcType=VARCHAR},
       amount = #{amount,jdbcType=DECIMAL},
@@ -227,7 +225,6 @@
       goods_id = #{goodsId,jdbcType=INTEGER},
       goods_name = #{goodsName,jdbcType=VARCHAR},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       coupon_id = #{couponId,jdbcType=INTEGER},
       main_img_url = #{mainImgUrl,jdbcType=VARCHAR},
       amount = #{amount,jdbcType=DECIMAL},
