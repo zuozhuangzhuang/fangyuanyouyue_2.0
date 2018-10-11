@@ -92,10 +92,10 @@
     </where>
   </select>
   <select id="fansCount" parameterType="Integer" resultType="Integer">
-    select count(*) from user_fans where to_user_id = #{userId,jdbcType=INTEGER}
+    select count(*) from user_fans a,user_info b where a.user_id = b.id and b.status <![CDATA[ <> ]]> 3 and a.to_user_id = #{userId,jdbcType=INTEGER}
   </select>
   <select id="collectCount" parameterType="Integer" resultType="Integer">
-    select count(*) from user_fans where user_id = #{userId,jdbcType=INTEGER}
+    select count(*) from user_fans a,user_info b where a.user_id = b.id and b.status <![CDATA[ <> ]]> 3 and a.user_id = #{userId,jdbcType=INTEGER}
   </select>
 
   <select id="myFansOrFollows" parameterType="Integer" resultType="Map">
