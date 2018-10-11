@@ -290,7 +290,7 @@
       and a.is_chosen = 1
     </if>
     <if test="searchType != null and searchType == 1">
-      and (a.pv_count + (select count(*) from forum_pv where forum_id = a.id) &gt;= 10000)
+      and ((a.pv_count + (select count(*) from forum_pv where forum_id = a.id)) >= 1000)
     </if>
     order by a.sort,a.comment_time desc,a.update_time desc
     limit #{start},#{limit}
