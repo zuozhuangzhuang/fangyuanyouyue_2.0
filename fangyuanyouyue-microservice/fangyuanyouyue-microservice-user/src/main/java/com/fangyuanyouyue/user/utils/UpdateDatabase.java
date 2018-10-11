@@ -2090,15 +2090,15 @@ public class UpdateDatabase {
             conn=getOldConnection();//连接数据库
             Connection new_conn = getNewConnection();
             PreparedStatement new_ps = null;
-            String confineUserSql = getConfineUserSql();
-            if(StringUtils.isNotEmpty(confineUserSql)){
-                try{
-                    new_ps = new_conn.prepareStatement(confineUserSql);
-                    new_ps.executeLargeUpdate(confineUserSql);
-                }catch (SQLException e){
-                    e.printStackTrace();
-                }
-            }
+//            String confineUserSql = getConfineUserSql();
+//            if(StringUtils.isNotEmpty(confineUserSql)){
+//                try{
+//                    new_ps = new_conn.prepareStatement(confineUserSql);
+//                    new_ps.executeLargeUpdate(confineUserSql);
+//                }catch (SQLException e){
+//                    e.printStackTrace();
+//                }
+//            }
             String reportSql = getReportSql();
             if(StringUtils.isNotEmpty(reportSql)){
                 try{
@@ -2247,15 +2247,15 @@ public class UpdateDatabase {
             Connection new_conn = getNewConnection();
             PreparedStatement new_ps = null;
             //confine_user
-            String confineUserSql = getConfineUserSql();
-            if(StringUtils.isNotEmpty(confineUserSql)){
-                try{
-                    new_ps = new_conn.prepareStatement(confineUserSql);
-                    new_ps.executeLargeUpdate(confineUserSql);
-                }catch (SQLException e){
-                    e.printStackTrace();
-                }
-            }
+//            String confineUserSql = getConfineUserSql();
+//            if(StringUtils.isNotEmpty(confineUserSql)){
+//                try{
+//                    new_ps = new_conn.prepareStatement(confineUserSql);
+//                    new_ps.executeLargeUpdate(confineUserSql);
+//                }catch (SQLException e){
+//                    e.printStackTrace();
+//                }
+//            }
             //report
             String reportSql = getReportSql();
             if(StringUtils.isNotEmpty(reportSql)){
