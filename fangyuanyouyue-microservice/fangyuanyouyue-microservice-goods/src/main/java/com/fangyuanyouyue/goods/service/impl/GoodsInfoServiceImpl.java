@@ -173,6 +173,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             goodsInfo.setIntervalTime(param.getIntervalTime());
             goodsInfo.setMarkdown(param.getMarkdown());
         }
+        goodsInfo.setCommentTime(DateStampUtils.getTimesteamp());
         goodsInfoMapper.insert(goodsInfo);
         //视频截图路径
         if(StringUtils.isNotEmpty(param.getVideoImg())){
@@ -427,6 +428,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             //如果是已下架的商品或抢购，重新上架
             goodsInfo.setStatus(1);//状态 1出售中 2已售出 3已下架（已结束） 5删除
             goodsInfo.setUpdateTime(DateStampUtils.getTimesteamp());
+            goodsInfo.setCommentTime(DateStampUtils.getTimesteamp());
             goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
 
             //抢购 重新编辑可以重新上架，删除旧降价历史
