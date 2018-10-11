@@ -51,9 +51,6 @@ public class FeignController  extends BaseController {
     public BaseResp verifyUserById(Integer userId) throws IOException {
         try {
             log.info("----》验证用户《----");
-            if(userId == null){
-                return toError("用户ID不能为空！");
-            }
             UserInfo userInfo=userInfoService.selectByPrimaryKey(userId);
             if(userInfo==null){
                 return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
@@ -61,8 +58,6 @@ public class FeignController  extends BaseController {
             if(userInfo.getStatus() == 2){
                 return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
-//            BaseClientResult result = new BaseClientResult(Status.YES.getValue(), "验证用户成功！");
-//            result.put("userInfo",userInfo);
             return toSuccess(userInfo);
         } catch (Exception e) {
             e.printStackTrace();
@@ -89,9 +84,6 @@ public class FeignController  extends BaseController {
             if(user.getStatus() == 2){
                 return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
-//            BaseClientResult result = new BaseClientResult(Status.YES.getValue(), "根据手机号验证用户成功！");
-//            result.put("userInfo",userInfo);
-//            return toResult(result);
             return toSuccess(user);
         } catch (Exception e) {
             e.printStackTrace();
@@ -133,9 +125,6 @@ public class FeignController  extends BaseController {
     public BaseResp userIsAuth(Integer userId) throws IOException {
         try {
             log.info("----》用户是否官方认证《----");
-            if(userId == null){
-                return toError("用户ID不能为空！");
-            }
             UserInfo user = userInfoService.selectByPrimaryKey(userId);
             if(user==null){
                 return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
@@ -159,9 +148,6 @@ public class FeignController  extends BaseController {
         try {
             log.info("----》验证支付密码《----");
             log.info("参数：userId：" + userId + ",payPwd："+ payPwd);
-            if(userId == null){
-                return toError("用户ID不能为空！");
-            }
             UserInfo user = userInfoService.selectByPrimaryKey(userId);
             if(user==null){
                 return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
@@ -186,9 +172,6 @@ public class FeignController  extends BaseController {
     public BaseResp isAuth(Integer userId) throws IOException {
         try {
             log.info("----》是否实名认证《----");
-            if(userId == null){
-                return toError("用户ID不能为空！");
-            }
             UserInfo user = userInfoService.selectByPrimaryKey(userId);
             if(user==null){
                 return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
@@ -211,9 +194,6 @@ public class FeignController  extends BaseController {
         try {
             log.info("----》A是否关注用户B《----");
             log.info("参数：userId:"+userId+",toUserId:"+toUserId);
-            if(userId == null){
-                return toError("用户ID不能为空！");
-            }
             if(toUserId == null){
                 return toError("被关注用户ID不能为空！");
             }
