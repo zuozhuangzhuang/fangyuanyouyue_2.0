@@ -887,8 +887,8 @@ public class UserController extends BaseController {
                 return toError("类型不能为空！");
             }
             //我的关注/我的粉丝
-            List<UserFansDto> userFansDtos = userInfoService.myFansOrFollows(user.getId(), param.getType(),param.getStart(), param.getLimit(),param.getSearch());
-            return toSuccess(userFansDtos);
+            FansDto fansDto = userInfoService.myFansOrFollows(user.getId(), param.getType(),param.getStart(), param.getLimit(),param.getSearch());
+            return toSuccess(fansDto);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());

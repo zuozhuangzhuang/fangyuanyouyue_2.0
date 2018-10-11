@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fangyuanyouyue.user.dao.*;
+import com.fangyuanyouyue.user.dto.*;
 import com.fangyuanyouyue.user.model.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -22,11 +23,6 @@ import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.MD5Util;
 import com.fangyuanyouyue.user.constant.StatusEnum;
-import com.fangyuanyouyue.user.dto.MergeDto;
-import com.fangyuanyouyue.user.dto.ShopDto;
-import com.fangyuanyouyue.user.dto.UserDto;
-import com.fangyuanyouyue.user.dto.UserFansDto;
-import com.fangyuanyouyue.user.dto.WaitProcessDto;
 import com.fangyuanyouyue.user.dto.admin.AdminUserDto;
 import com.fangyuanyouyue.user.dto.admin.AdminUserNickNameDetailDto;
 import com.fangyuanyouyue.user.param.AdminUserParam;
@@ -740,15 +736,23 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public List<UserFansDto> myFansOrFollows(Integer userId,Integer type,Integer start,Integer limit,String search) throws ServiceException {
+    public FansDto myFansOrFollows(Integer userId, Integer type, Integer start, Integer limit, String search) throws ServiceException {
         UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
         if(userInfo == null){
             throw new ServiceException("用户不存在！");
         }else{
+            UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(userId);
             //分页获取粉丝列表/关注列表
             List<Map<String, Object>> maps = userFansMapper.myFansOrFollows(userId,type,start*limit, limit,search);
             List<UserFansDto> userFollowsDtos = UserFansDto.toDtoList(maps);
-            return userFollowsDtos;
+            FansDto fansDto = new FansDto();
+            fansDto.setUserFansDtos(userFollowsDtos);
+            if(type.equals(1)){
+                fansDto.setCount(userFansMapper.collectCount(userId));
+            }else{
+                fansDto.setCount(userFansMapper.fansCount(userId)+userInfoExt.getFansCount());
+            }
+            return fansDto;
         }
     }
 
