@@ -897,7 +897,7 @@ public class OrderServiceImpl implements OrderService{
                     goodsName.append("【"+goodsInfo.getName()+"】");
                 }
                 //卖家余额账单
-                schedualWalletService.addUserBalanceDetail(orderInfo.getSellerId(),orderInfo.getAmount(),Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),orderInfo.getOrderNo());
+                schedualWalletService.addUserBalanceDetail(orderInfo.getSellerId(),orderPay.getPayAmount(),Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),orderInfo.getOrderNo());
                 //卖家增加信誉度
                 if(orderPay.getPayAmount().compareTo(new BigDecimal(2000)) <= 0){
                     schedualWalletService.updateCredit(orderInfo.getSellerId(),Credit.NORMAL_ORDER.getCredit(),Status.ADD.getValue());

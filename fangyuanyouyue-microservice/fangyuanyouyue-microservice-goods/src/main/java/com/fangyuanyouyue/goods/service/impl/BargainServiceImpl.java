@@ -280,13 +280,15 @@ public class BargainServiceImpl implements BargainService{
                             "恭喜您！您对商品【"+goodsInfo.getName()+"】的议价卖家已同意，点击此处查看订单详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER_BUYER.getMessage(),orderId.toString());
                     List<GoodsBargain> goodsBargains = goodsBargainMapper.selectAllByGoodsId(goodsId,Status.BARGAIN_APPLY.getValue());
                     for(GoodsBargain bargain:goodsBargains){
-                        bargain.setStatus(Status.BARGAIN_REFUSE.getValue());
-                        goodsBargainMapper.updateByPrimaryKey(bargain);
-                        //议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
-                        schedualMessageService.easemobMessage(bargain.getUserId().toString(),
-                                "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),bargain.getGoodsId().toString());
-                        //买家新增余额账单
-                        schedualWalletService.addUserBalanceDetail(bargain.getUserId(),bargain.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),bargain.getBargainNo(),"【"+goodsInfo.getName()+"】拒绝议价",goodsInfo.getUserId(),bargain.getUserId(),Status.BARGAIN.getValue(),bargain.getBargainNo());
+                        if(!bargain.getUserId().equals(goodsBargain.getUserId())){
+                            bargain.setStatus(Status.BARGAIN_REFUSE.getValue());
+                            goodsBargainMapper.updateByPrimaryKey(bargain);
+                            //议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
+                            schedualMessageService.easemobMessage(bargain.getUserId().toString(),
+                                    "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),bargain.getGoodsId().toString());
+                            //买家新增余额账单
+                            schedualWalletService.addUserBalanceDetail(bargain.getUserId(),bargain.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),bargain.getBargainNo(),"【"+goodsInfo.getName()+"】拒绝议价",goodsInfo.getUserId(),bargain.getUserId(),Status.BARGAIN.getValue(),bargain.getBargainNo());
+                        }
                     }
                 }else if(status.intValue() == Status.BARGAIN_REFUSE.getValue()){
                     //退回余额
