@@ -148,7 +148,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="vipNo != null">
         vip_no = #{vipNo,jdbcType=VARCHAR},
@@ -169,7 +168,6 @@
       vip_type = #{vipType,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       vip_no = #{vipNo,jdbcType=VARCHAR},
       is_send_message = #{isSendMessage,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}

@@ -161,7 +161,6 @@
         end_time = #{endTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="addTime != null">
         add_time = #{addTime,jdbcType=TIMESTAMP},
@@ -187,7 +186,6 @@
       sort = #{sort,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
       end_time = #{endTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       add_time = #{addTime,jdbcType=TIMESTAMP},
       pv_count = #{pvCount,jdbcType=INTEGER},
       comment_time = #{commentTime,jdbcType=TIMESTAMP},
@@ -203,7 +201,6 @@
       sort = #{sort,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
       end_time = #{endTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       add_time = #{addTime,jdbcType=TIMESTAMP},
       pv_count = #{pvCount,jdbcType=INTEGER},
       comment_time = #{commentTime,jdbcType=TIMESTAMP}

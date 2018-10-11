@@ -198,7 +198,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="columnId != null">
         column_id = #{columnId,jdbcType=INTEGER},
@@ -232,7 +231,6 @@
       type = #{type,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       column_id = #{columnId,jdbcType=INTEGER},
       is_chosen = #{isChosen,jdbcType=INTEGER},
       video_img = #{videoImg,jdbcType=VARCHAR},
@@ -252,7 +250,6 @@
       type = #{type,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       column_id = #{columnId,jdbcType=INTEGER},
       is_chosen = #{isChosen,jdbcType=INTEGER},
       video_img = #{videoImg,jdbcType=VARCHAR},

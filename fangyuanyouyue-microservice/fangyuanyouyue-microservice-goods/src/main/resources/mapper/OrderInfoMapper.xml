@@ -145,7 +145,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="sellerId != null">
         seller_id = #{sellerId,jdbcType=INTEGER},
@@ -168,7 +167,6 @@
       count = #{count,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       seller_id = #{sellerId,jdbcType=INTEGER},
       is_resolve = #{isResolve,jdbcType=INTEGER},
       is_refund = #{isRefund,jdbcType=INTEGER}

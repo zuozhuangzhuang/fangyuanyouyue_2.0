@@ -110,7 +110,6 @@
         reason = #{reason,jdbcType=VARCHAR},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="addTime != null">
         add_time = #{addTime,jdbcType=TIMESTAMP},
@@ -125,7 +124,6 @@
       column_name = #{columnName,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
       reason = #{reason,jdbcType=VARCHAR},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       add_time = #{addTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>

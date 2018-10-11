@@ -183,7 +183,6 @@
         receive_time = #{receiveTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="sellerIsDelete != null">
         seller_is_delete = #{sellerIsDelete,jdbcType=INTEGER},
@@ -207,7 +206,6 @@
       is_resolve = #{isResolve,jdbcType=INTEGER},
       is_refund = #{isRefund,jdbcType=INTEGER},
       receive_time = #{receiveTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       seller_is_delete = #{sellerIsDelete,jdbcType=INTEGER},
       buyer_is_delete = #{buyerIsDelete,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}

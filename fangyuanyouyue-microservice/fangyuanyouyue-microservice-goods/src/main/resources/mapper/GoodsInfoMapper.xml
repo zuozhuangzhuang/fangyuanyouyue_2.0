@@ -250,7 +250,6 @@
                 add_time = #{addTime,jdbcType=TIMESTAMP},
             </if>
             <if test="updateTime != null">
-                update_time = #{updateTime,jdbcType=TIMESTAMP},
             </if>
             <if test="videoLength != null">
                 video_length = #{videoLength,jdbcType=INTEGER},
@@ -284,7 +283,6 @@
       is_appraisal = #{isAppraisal,jdbcType=INTEGER},
       video_url = #{videoUrl,jdbcType=VARCHAR},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       video_length = #{videoLength,jdbcType=INTEGER},
       start_price = #{startPrice,jdbcType=DECIMAL},
       comment_time = #{commentTime,jdbcType=TIMESTAMP},
@@ -308,7 +306,6 @@
       is_appraisal = #{isAppraisal,jdbcType=INTEGER},
       video_url = #{videoUrl,jdbcType=VARCHAR},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       video_length = #{videoLength,jdbcType=INTEGER},
       start_price = #{startPrice,jdbcType=DECIMAL},
       comment_time = #{commentTime,jdbcType=TIMESTAMP}
