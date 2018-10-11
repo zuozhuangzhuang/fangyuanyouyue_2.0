@@ -118,15 +118,15 @@
   <select id="getCountByColumnId" resultType="Integer">
     select count(*) from forum_pv a,forum_info b where a.forum_id = b.id  and b.status = 1 and a.column_id = #{columnId}
     
-    <if test="type != null and type != ''">
+    <if test="type != null">
       and a.type =  #{type}
     </if>
     
-     <if test="startTime != null and startTime != ''">
+     <if test="startTime != null">
       and a.add_time <![CDATA[ >= ]]> #{startTime}
     </if>
     
-    <if test="endTime != null and endTime != ''">
+    <if test="endTime != null">
       and a.add_time <![CDATA[ < ]]> #{endTime}
     </if>
     
