@@ -344,7 +344,7 @@ public class DateStampUtils {
 		return formatGMTUnixTime(getGMTUnixTimeByCalendar(), "yyyy-MM-dd");
 	}
 	
-	public static void main(String args[]){
+	public static void main(String[] args){
 		System.out.println(formatGMTUnixTime(1516245855733L));
 		/*System.out.println(DateStampUtils.getGMTUnixTimeByCalendar());
 		System.out.println(System.currentTimeMillis());

@@ -47,7 +47,9 @@ public class SysOperatorServiceImpl implements SysOperatorService{
 	public AdminOperatorDto login(String loginCode, String loginPwd) throws ServiceException {
 		SysOperator operator = sysOperatorMapper.selectLogin(loginCode, loginPwd);
 		
-		if(operator==null)return null;
+		if(operator==null) {
+            return null;
+        }
 		
 		AdminOperatorDto dto = new AdminOperatorDto(operator);
 		
@@ -68,8 +70,9 @@ public class SysOperatorServiceImpl implements SysOperatorService{
 			SysOperator oper = sysOperatorMapper.selectByPrimaryKey(param.getUserId());
 			//oper.setUserCode(param.getUserCode());
 			//oper.setUserName(param.getUserCode());
-			if(param.getPassword()!=null)
-				oper.setLoginPwd(MD5Util.generate(param.getPassword()));
+			if(param.getPassword()!=null) {
+                oper.setLoginPwd(MD5Util.generate(param.getPassword()));
+            }
 			oper.setStatus(0);
 			if("FORBIDDEN".equals(param.getState())) {
 				oper.setStatus(1);
