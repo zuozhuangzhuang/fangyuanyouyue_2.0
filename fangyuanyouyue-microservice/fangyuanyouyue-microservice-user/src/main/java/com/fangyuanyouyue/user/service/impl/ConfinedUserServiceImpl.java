@@ -1,14 +1,16 @@
 package com.fangyuanyouyue.user.service.impl;
 
 import com.fangyuanyouyue.base.Pager;
+import com.fangyuanyouyue.base.enums.Status;
+import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.base.util.CheckCode;
+import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.user.dao.*;
 import com.fangyuanyouyue.user.dto.admin.AdminUserDto;
-import com.fangyuanyouyue.user.model.UserInfo;
-import com.fangyuanyouyue.user.model.UserInfoExt;
-import com.fangyuanyouyue.user.model.UserVip;
-import com.fangyuanyouyue.user.model.UserWallet;
+import com.fangyuanyouyue.user.model.*;
 import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.service.*;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,6 +53,8 @@ public class ConfinedUserServiceImpl implements ConfinedUserService {
     private UserNickNameDetailMapper userNickNameDetailMapper;
     @Autowired
     private SchedualForumService schedualForumService;
+    @Autowired
+    private ConfinedUserMapper confinedUserMapper;
 
     @Override
     public Pager getPage(AdminUserParam param) {
@@ -101,5 +105,32 @@ public class ConfinedUserServiceImpl implements ConfinedUserService {
         pager.setTotal(total);
         pager.setDatas(dtos);
         return pager;
+    }
+
+    @Override
+    public void updateConfined(Integer id, Integer type, String code) throws ServiceException {
+        //根据id获取用户
+        UserInfo userInfo = userInfoMapper.selectByPrimaryKey(id);
+        if(userInfo == null){
+            throw new ServiceException("未找到用户!");
+        }
+        if(type.equals(Status.IS_PROXY.getValue())){
+            ConfinedUser confinedUser = new ConfinedUser();
+            confinedUser.setStatus(Status.IS_PROXY.getValue());
+            confinedUser.setAddTime(DateStampUtils.getTimesteamp());
+            confinedUser.setUserId(id);
+            String proxy = CheckCode.getProxyCode();
+            confinedUser.setCode(proxy);
+            if(StringUtils.isNotEmpty(code)){
+                ConfinedUser parentProxy = confinedUserMapper.selectByCode(code);
+                confinedUser.setParentId(parentProxy.getUserId());
+            }
+            confinedUserMapper.insert(confinedUser);
+        }else{
+            //TODO 如果取消一级代理，二级代理怎么办
+            ConfinedUser confinedUser = confinedUserMapper.selectByPrimaryKey(id);
+            confinedUser.setStatus(Status.NOT_PROXY.getValue());
+            confinedUserMapper.updateByPrimaryKeySelective(confinedUser);
+        }
     }
 }

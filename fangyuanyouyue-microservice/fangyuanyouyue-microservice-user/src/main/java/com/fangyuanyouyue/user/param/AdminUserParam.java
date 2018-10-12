@@ -70,4 +70,8 @@ public class AdminUserParam extends BasePageReq{
 	@ApiModelProperty(name = "packageName", value = "安卓包名", dataType = "String",hidden = true)
 	private String packageName;
 
+	//代理识别号
+	@ApiModelProperty(name = "code", value = "代理识别号", dataType = "String",hidden = true)
+	private String code;
+
 }

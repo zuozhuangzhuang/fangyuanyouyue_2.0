@@ -88,6 +88,8 @@ public enum Status {
     SHOW(1),HIDE(2),
     //状态 1进行中 2结束 3删除
     BEING(1),END(2),DELETE(3),
+    //代理信息
+    IS_PROXY(1),NOT_PROXY(2)
     ;
     private Integer value;
     private String message;

@@ -162,7 +162,7 @@ public class ScoreController extends BaseController{
     @ResponseBody
     public BaseResp shareHtml(WalletParam param) throws IOException {
         try {
-            log.info("----》根据用户id获取优惠券列表《----");
+            log.info("----》分享增加积分《----");
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
