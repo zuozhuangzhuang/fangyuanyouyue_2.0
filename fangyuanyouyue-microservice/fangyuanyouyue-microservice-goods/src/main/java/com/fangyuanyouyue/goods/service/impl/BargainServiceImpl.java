@@ -282,6 +282,11 @@ public class BargainServiceImpl implements BargainService{
                     for(GoodsBargain bargain:goodsBargains){
                         if(!bargain.getUserId().equals(goodsBargain.getUserId())){
                             bargain.setStatus(Status.BARGAIN_REFUSE.getValue());
+                            //调用wallet-service修改余额功能
+                            BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),Status.ADD.getValue())), BaseResp.class);
+                            if(baseResp.getCode() == 1){
+                                throw new ServiceException(baseResp.getReport().toString());
+                            }
                             goodsBargainMapper.updateByPrimaryKey(bargain);
                             //议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
                             schedualMessageService.easemobMessage(bargain.getUserId().toString(),
