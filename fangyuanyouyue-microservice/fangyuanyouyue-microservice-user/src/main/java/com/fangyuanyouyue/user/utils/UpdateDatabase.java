@@ -1772,7 +1772,7 @@ public class UpdateDatabase {
             try{
                 fuckUser_ps = conn.prepareStatement(selectFuckUser);
                 fuckUser_rs = fuckUser_ps.executeQuery(selectFuckUser);
-                if(fuckUser_rs.next()){
+                if(fuckUser_rs.next() && StringUtils.isEmpty(fuckUser_rs.getString("phone"))){
                     unionId = unionId+"-";
                 }
             }catch (SQLException e){
