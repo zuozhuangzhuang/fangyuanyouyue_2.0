@@ -25,7 +25,7 @@ public class MessageServiceImpl implements MessageService{
 
 
     IClientProfile profile;
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         MessageServiceImpl smm = new MessageServiceImpl();
         smm.sendCode("18103966057","1233","192.168.0.0.1");
 //        smm.sendAuthSuccess("18103966057","192.168.0.0.1");

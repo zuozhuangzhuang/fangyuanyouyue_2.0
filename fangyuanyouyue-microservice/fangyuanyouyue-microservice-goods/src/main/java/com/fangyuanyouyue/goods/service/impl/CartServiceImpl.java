@@ -2,6 +2,7 @@ package com.fangyuanyouyue.goods.service.impl;
 
 import java.util.*;
 
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.goods.dao.*;
 import com.fangyuanyouyue.goods.dto.GoodsCommentDto;
 import com.fangyuanyouyue.goods.model.*;
@@ -66,6 +67,9 @@ public class CartServiceImpl implements CartService {
                 }
                 if(goodsInfo.getUserId().intValue() == userId.intValue()){
                     throw new ServiceException("不可以把自己的商品加入到购物车！");
+                }
+                if(goodsInfo.getType().equals(Status.AUCTION.getValue())){
+                    throw new ServiceException("抢购商品无法加入购物车！");
                 }
                 CartDetail cartDetail = cartDetailMapper.selectByCartIdGoodsId(cartInfo.getId(), goodsId);
                 //判断购物车是否已经有这个商品了

@@ -101,7 +101,9 @@ public class SysMenuServiceImpl implements SysMenuService{
 	 */
 	private void updateChildren(AdminMenuSaveParam menu,Integer parentId) {
 		
-		if(menu==null)return ;
+		if(menu==null) {
+            return ;
+        }
 		
 		if(menu.getId()==null||menu.getId()==0) {
 			SysMenu parent = new SysMenu();

@@ -2,6 +2,7 @@ package com.fangyuanyouyue.user.utils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
@@ -1752,6 +1753,8 @@ public class UpdateDatabase {
      */
     static String getUserThirdSql(ResultSet rs,Integer type) throws SQLException {
         System.out.println("----------user_third_part----------");
+        PreparedStatement fuckUser_ps = null;
+        ResultSet fuckUser_rs = null;
         Integer userId = rs.getInt("id")+100000;
         String unionId = null;
         String appOpenId = null;
@@ -1763,6 +1766,25 @@ public class UpdateDatabase {
             unionId = rs.getString("wechat_cliend");
         }else{
             unionId = rs.getString("qq_cliend");
+        }
+        if(StringUtils.isNotEmpty(unionId) && type == 1){
+            String selectFuckUser = "select * from a_user where wechat_cliend = '" +unionId+"'";
+            try{
+                fuckUser_ps = conn.prepareStatement(selectFuckUser);
+                fuckUser_rs = fuckUser_ps.executeQuery(selectFuckUser);
+                if(fuckUser_rs.next()){
+                    unionId = unionId+"-";
+                }
+            }catch (SQLException e){
+                e.printStackTrace();
+            }finally {
+                if(fuckUser_ps != null){
+                    fuckUser_ps.close();
+                }
+                if(fuckUser_rs != null){
+                    fuckUser_rs.close();
+                }
+            }
         }
         StringBuffer userThirdSql = new StringBuffer(
                 "insert into user_third_party (" +
@@ -2003,6 +2025,8 @@ public class UpdateDatabase {
      */
     static String getUserInfoSql(ResultSet rs) throws SQLException {
         System.out.println("----------user_info----------");
+        PreparedStatement fuckUser_ps = null;
+        ResultSet fuckUser_rs = null;
         //每个用户生成一个sql文件
         Integer userId = rs.getInt("id")+100000;
         String phone = rs.getString("phone");
@@ -2018,6 +2042,24 @@ public class UpdateDatabase {
         Integer status = rs.getInt("status")==0?1:2;
         String addTime = DateStampUtils.formatUnixTime(rs.getLong("add_time"),DateUtil.DATE_FORMT);
         Integer isRegHx = Integer.parseInt(rs.getString("is_hx"));
+        String selectFuckUser = "select * from a_user where nickName = '"+nickName+"'";
+        try{
+            fuckUser_ps = conn.prepareStatement(selectFuckUser);
+            fuckUser_rs = fuckUser_ps.executeQuery(selectFuckUser);
+            if(fuckUser_rs.next()){
+                nickName = nickName+"-"+((int)(Math.random() * 9000) + 1000);
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }finally {
+            if(fuckUser_ps != null){
+                fuckUser_ps.close();
+            }
+            if(fuckUser_rs != null){
+                fuckUser_rs.close();
+            }
+        }
+
 
         StringBuffer filecontent = new StringBuffer(
                 "insert into user_info (" +
