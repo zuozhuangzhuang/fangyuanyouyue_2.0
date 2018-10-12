@@ -233,8 +233,12 @@ public class OrderServiceImpl implements OrderService{
 
             List<AddOrderDetailDto> addOrderDetailDtos = addOrderDto.getAddOrderDetailDtos();
             //订单详情，出现在这里的商品都是正常的商品，不再做判断
-            BigDecimal freight = new BigDecimal(0);//邮费，初始为0
-
+            for(AddOrderDetailDto addOrderDetailDto:addOrderDetailDtos){
+                GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(addOrderDetailDto.getGoodsId())).getString("data")),GoodsInfo.class);
+                if(goods.getPostage().compareTo(payFreight) > 0){
+                    payFreight = goods.getPostage();
+                }
+            }
             //每个卖家的商品
             StringBuffer goodsName = new StringBuffer();
             for(AddOrderDetailDto addOrderDetailDto:addOrderDetailDtos){
@@ -274,19 +278,19 @@ public class OrderServiceImpl implements OrderService{
                     }
                 }
                 //取运费最高者计算
-                if(goods.getPostage().compareTo(freight) > 0){
-                    freight = goods.getPostage();
-                    orderDetail.setFreight(goods.getPostage());
-                }else{//如果不是最高邮费，就设置为0
-                    orderDetail.setFreight(new BigDecimal(0));
-                }
+//                if(goods.getPostage().compareTo(freight) > 0){
+//                    freight = goods.getPostage();
+//                    orderDetail.setFreight(goods.getPostage());
+//                }else{//如果不是最高邮费，就设置为0
+//                    orderDetail.setFreight(new BigDecimal(0));
+//                }
                 //实际支付加上邮费
-                orderDetail.setPayAmount(price.add(orderDetail.getFreight()));
+                orderDetail.setPayAmount(price);
                 orderDetail.setDescription(goods.getDescription());
                 orderDetailMapper.insert(orderDetail);
                 //修改商品的状态为已售出
                 schedualGoodsService.updateGoodsStatus(addOrderDetailDto.getGoodsId(),2);//状态  1出售中 2已售出 3已下架（已结束） 5删除
-                payFreight = payFreight.add(orderDetail.getFreight());
+//                payFreight = payFreight.add(orderDetail.getFreight());
                 amount = amount.add(orderDetail.getAmount());//原价
                 payAmount = payAmount.add(orderDetail.getPayAmount());//实际支付
                 OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail);
@@ -300,7 +304,7 @@ public class OrderServiceImpl implements OrderService{
                 goodsName.append("【"+goods.getName()+"】");
             }
             mainAmount = mainAmount.add(amount);
-            mainPayAmount = mainPayAmount.add(payAmount);
+            mainPayAmount = mainPayAmount.add(payAmount.add(payFreight));
             mainPayFreight = mainPayFreight.add(payFreight);
             //子订单
             orderInfo.setAmount(amount);
