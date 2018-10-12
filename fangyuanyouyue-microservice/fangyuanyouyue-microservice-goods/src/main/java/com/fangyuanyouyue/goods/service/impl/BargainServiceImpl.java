@@ -234,7 +234,7 @@ public class BargainServiceImpl implements BargainService{
                     orderPay.setAddress(addressInfo.getAddress());
                     orderPay.setPostCode(addressInfo.getPostCode());
                     orderPay.setOrderNo(orderInfo.getOrderNo());
-                    orderPay.setAmount(goodsInfo.getPrice().add(goodsInfo.getPostage()));//原价
+                    orderPay.setAmount(goodsInfo.getPrice());//原价
                     orderPay.setPayAmount(goodsBargain.getPrice());//实际支付金额
                     orderPay.setFreight(new BigDecimal(0));//运费金额(议价默认为0)
                     orderPay.setCount(1);
@@ -263,11 +263,11 @@ public class BargainServiceImpl implements BargainService{
                         }
                     }
                     orderDetail.setMainImgUrl(goodsMainImg.toString());
-                    orderDetail.setAmount(goodsInfo.getPrice().add(goodsInfo.getPostage()));
+                    orderDetail.setAmount(goodsInfo.getPrice());
                     //邮费为0
                     orderDetail.setFreight(new BigDecimal(0));
                     //实际支付
-                    orderDetail.setPayAmount(goodsBargain.getPrice());
+                    orderDetail.setPayAmount(goodsInfo.getPrice());
                     orderDetail.setDescription(goodsInfo.getDescription());
                     orderDetailMapper.insert(orderDetail);
                     //修改商品的状态为已售出
