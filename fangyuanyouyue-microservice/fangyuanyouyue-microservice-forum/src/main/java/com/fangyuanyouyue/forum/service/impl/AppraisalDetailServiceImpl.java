@@ -270,6 +270,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 			appraisalDetail.setAddTime(DateStampUtils.getTimesteamp());
 			appraisalDetail.setPvCount(0);
 			appraisalDetail.setBonus(new BigDecimal(0));
+			appraisalDetail.setCommentTime(DateStampUtils.getTimesteamp());
 			appraisalDetailMapper.insert(appraisalDetail);
 			//存储图片
 			insertAppraisalImg(imgUrls, appraisalDetail);
@@ -319,6 +320,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 		appraisalDetail.setEndTime(DateUtil.getDateAfterDay(DateStampUtils.getTimesteamp(),7));
 		appraisalDetail.setAddTime(DateStampUtils.getTimesteamp());
 		appraisalDetail.setPvCount(0);
+		appraisalDetail.setCommentTime(DateStampUtils.getTimesteamp());
 		appraisalDetailMapper.insert(appraisalDetail);
 		//存储图片
 		String[] imgUrls = argueOrder.getImgUrls().split(",");

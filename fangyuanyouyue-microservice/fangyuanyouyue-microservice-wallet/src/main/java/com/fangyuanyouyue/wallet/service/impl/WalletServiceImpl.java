@@ -82,7 +82,7 @@ public class WalletServiceImpl implements WalletService{
         String id = idg.nextId();
         userRechargeDetail.setPayNo(id);
         userRechargeDetail.setAddTime(DateStampUtils.getTimesteamp());
-        userRechargeDetail.setStatus(1);
+        userRechargeDetail.setStatus(Status.ORDER_UNPAID.getValue());
         userRechargeDetailMapper.insert(userRechargeDetail);
 
         if(type.intValue() == 1){
@@ -548,12 +548,14 @@ public class WalletServiceImpl implements WalletService{
         if(userRechargeDetail == null){
             throw new ServiceException("订单不存在！");
         }
-        userRechargeDetail.setStatus(2);
+        userRechargeDetail.setStatus(Status.ORDER_COMPLETE.getValue());
         userRechargeDetailMapper.updateByPrimaryKeySelective(userRechargeDetail);
+        schedualMessageService.easemobMessage(userRechargeDetail.getUserId().toString(),
+                "您充值的"+userRechargeDetail.getAmount()+"元已到账，点击前往查看~",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_WALLET.getMessage(),"");
         //生成余额账单
-        addUserBalanceDetail(userRechargeDetail.getUserId(),userRechargeDetail.getAmount(),payType,Status.INCOME.getValue(),orderNo,(payType.equals(1)?"微信":"支付宝")+"提现",Status.WITHDRAW.getValue(),null,null,thirdOrderNo);
+        addUserBalanceDetail(userRechargeDetail.getUserId(),userRechargeDetail.getAmount(),payType,Status.INCOME.getValue(),orderNo,(payType.equals(Status.PAY_TYPE_WECHAT.getValue())?"微信":"支付宝")+"充值",Status.RECHARGE.getValue(),null,null,thirdOrderNo);
         //充值
-        updateBalance(userRechargeDetail.getUserId(),userRechargeDetail.getAmount(),1);
+        updateBalance(userRechargeDetail.getUserId(),userRechargeDetail.getAmount(),Status.ADD.getValue());
         return true;
     }
 

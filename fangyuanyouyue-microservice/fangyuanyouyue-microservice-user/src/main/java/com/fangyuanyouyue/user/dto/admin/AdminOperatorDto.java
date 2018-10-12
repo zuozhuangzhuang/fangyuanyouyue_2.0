@@ -57,8 +57,9 @@ public class AdminOperatorDto {
        	this.phone = model.getPhone();
        	this.status = model.getStatus();
        	this.remarks = model.getRemarks();
-       	if(model.getLastLoginTime()!=null)
-       		this.lastLoginTime = DateUtil.getFormatDate(model.getLastLoginTime(), DateUtil.DATE_FORMT);
+       	if(model.getLastLoginTime()!=null) {
+            this.lastLoginTime = DateUtil.getFormatDate(model.getLastLoginTime(), DateUtil.DATE_FORMT);
+        }
        	this.addTime = DateUtil.getFormatDate(model.getAddTime(), DateUtil.DATE_FORMT);
     }
 
