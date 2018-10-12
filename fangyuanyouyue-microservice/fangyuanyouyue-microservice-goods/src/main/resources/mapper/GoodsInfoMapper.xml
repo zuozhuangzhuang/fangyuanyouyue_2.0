@@ -342,7 +342,7 @@
                     and b.auth_type = 2
                 </if>
                 <if test="quality == 2">
-                    and a.id in (select goods_id from goods_appraisal_detail where type = 1 and status = 1)
+                    and a.is_appraisal = 1
                 </if>
                 <if test="quality == 3">
                     and b.credit <![CDATA[ >= ]]> 10000
