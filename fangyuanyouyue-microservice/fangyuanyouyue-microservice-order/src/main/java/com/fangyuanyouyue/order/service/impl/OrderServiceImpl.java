@@ -1,5 +1,15 @@
 package com.fangyuanyouyue.order.service.impl;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
@@ -7,17 +17,54 @@ import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
-import com.fangyuanyouyue.base.enums.*;
+import com.fangyuanyouyue.base.enums.Credit;
+import com.fangyuanyouyue.base.enums.NotifyUrl;
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.enums.Score;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.base.util.IdGenerator;
-import com.fangyuanyouyue.base.util.ParseReturnValue;
-import com.fangyuanyouyue.order.dao.*;
-import com.fangyuanyouyue.order.dto.*;
-import com.fangyuanyouyue.order.dto.adminDto.*;
-import com.fangyuanyouyue.order.model.*;
+import com.fangyuanyouyue.order.dao.CompanyMapper;
+import com.fangyuanyouyue.order.dao.OrderCommentMapper;
+import com.fangyuanyouyue.order.dao.OrderDetailMapper;
+import com.fangyuanyouyue.order.dao.OrderInfoMapper;
+import com.fangyuanyouyue.order.dao.OrderPayMapper;
+import com.fangyuanyouyue.order.dao.OrderRefundMapper;
+import com.fangyuanyouyue.order.dao.UserBehaviorMapper;
+import com.fangyuanyouyue.order.dao.UserCouponMapper;
+import com.fangyuanyouyue.order.dto.AddOrderDetailDto;
+import com.fangyuanyouyue.order.dto.AddOrderDto;
+import com.fangyuanyouyue.order.dto.CompanyDto;
+import com.fangyuanyouyue.order.dto.OrderDetailDto;
+import com.fangyuanyouyue.order.dto.OrderDto;
+import com.fangyuanyouyue.order.dto.OrderPayDto;
+import com.fangyuanyouyue.order.dto.SellerDto;
+import com.fangyuanyouyue.order.dto.UserCouponDto;
+import com.fangyuanyouyue.order.dto.adminDto.AdminCompanyDto;
+import com.fangyuanyouyue.order.dto.adminDto.AdminOrderDetailDto;
+import com.fangyuanyouyue.order.dto.adminDto.AdminOrderDto;
+import com.fangyuanyouyue.order.dto.adminDto.AdminOrderPayDto;
+import com.fangyuanyouyue.order.dto.adminDto.AdminOrderProcessDto;
+import com.fangyuanyouyue.order.model.Company;
+import com.fangyuanyouyue.order.model.GoodsInfo;
+import com.fangyuanyouyue.order.model.OrderComment;
+import com.fangyuanyouyue.order.model.OrderDetail;
+import com.fangyuanyouyue.order.model.OrderInfo;
+import com.fangyuanyouyue.order.model.OrderPay;
+import com.fangyuanyouyue.order.model.OrderRefund;
+import com.fangyuanyouyue.order.model.UserAddressInfo;
+import com.fangyuanyouyue.order.model.UserBehavior;
+import com.fangyuanyouyue.order.model.UserCoupon;
+import com.fangyuanyouyue.order.model.UserInfo;
 import com.fangyuanyouyue.order.param.AdminOrderParam;
+import com.fangyuanyouyue.order.service.OrderService;
+import com.fangyuanyouyue.order.service.SchedualGoodsService;
+import com.fangyuanyouyue.order.service.SchedualMessageService;
+import com.fangyuanyouyue.order.service.SchedualUserService;
+import com.fangyuanyouyue.order.service.SchedualWalletService;
+import com.snowalker.lock.redisson.RedissonLock;
 import com.fangyuanyouyue.order.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,8 +103,8 @@ public class OrderServiceImpl implements OrderService{
     private UserBehaviorMapper userBehaviorMapper;
     @Autowired
     private UserCouponMapper userCouponMapper;
-//    @Autowired
-//    RedissonLock redissonLock;
+    @Autowired
+    RedissonLock redissonLock;
 
     @Override
     public OrderDto saveOrderByCart(String token,String sellerString, Integer userId, Integer addressId) throws ServiceException {
@@ -271,10 +318,10 @@ public class OrderServiceImpl implements OrderService{
                 GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), GoodsInfo.class);
 
             	//加入分布式锁，锁住商品id，10秒后释放
-//            	redissonLock.lock("GoodsOrder"+addOrderDetailDto.getGoodsId().toString(), 10);
+            	redissonLock.lock("GoodsOrder"+addOrderDetailDto.getGoodsId().toString(), 10);
 
 
-//            	try {
+            	try {
 	                //计算总订单总金额
 	                //每个商品生成一个订单详情表
 	                OrderDetail orderDetail = new OrderDetail();
@@ -336,11 +383,11 @@ public class OrderServiceImpl implements OrderService{
 	                }
 	                orderDetailDtos.add(orderDetailDto);
 	                goodsName.append("【"+goods.getName()+"】");
-//            	}catch (Exception e) {
-//            		e.printStackTrace();
-//				}finally {
-//		        	redissonLock.release("GoodsOrder"+goods.getId());
-//				}
+            	}catch (Exception e) {
+            		e.printStackTrace();
+				}finally {
+		        	redissonLock.release("GoodsOrder"+goods.getId());
+				}
             }
             mainAmount = mainAmount.add(amount);
             mainPayAmount = mainPayAmount.add(payAmount.add(payFreight));
@@ -668,8 +715,8 @@ public class OrderServiceImpl implements OrderService{
         }
 
     	//加入分布式锁，锁住商品id，10秒后释放
-//    	redissonLock.lock("GoodsOrder"+goodsId, 10);
-//        try {
+    	redissonLock.lock("GoodsOrder"+goodsId, 10);
+        try {
 
 	        //获取商品信息
 	        GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(goodsId)).getString("data")),GoodsInfo.class);
@@ -809,12 +856,12 @@ public class OrderServiceImpl implements OrderService{
 	                "恭喜您！您的"+(goods.getType()==Status.GOODS.getValue()?"商品【":"抢购【")+goods.getName()+"】已有人下单，点击此处查看订单",
 	                Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER_SELLER.getMessage(),orderInfo.getId().toString());
 	        return orderDto;
-//        }catch (Exception e) {
-//        	e.printStackTrace();
-//            throw new ServiceException("下单出错，请稍后再试！");
-//		}finally {
-//        	redissonLock.release("GoodsOrder"+goodsId);
-//		}
+        }catch (Exception e) {
+        	e.printStackTrace();
+            throw new ServiceException("下单出错，请稍后再试！");
+		}finally {
+        	redissonLock.release("GoodsOrder"+goodsId);
+		}
 
     }
 

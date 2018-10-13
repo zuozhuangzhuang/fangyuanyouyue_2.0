@@ -36,8 +36,9 @@ spring:
     port: 5672
     username: guest
     password: guest
-redisson:
+redisson: 
   lock:
     server:
-      address:redis:6379
-      type:standalone
+      address: redis:6379
+      type: standalone
+ 
