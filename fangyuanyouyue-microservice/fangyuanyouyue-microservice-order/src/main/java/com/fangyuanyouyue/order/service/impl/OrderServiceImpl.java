@@ -668,7 +668,7 @@ public class OrderServiceImpl implements OrderService{
         }
 
     	//加入分布式锁，锁住商品id，10秒后释放
-    	redissonLock.lock("GoodsOrder"+goodsId, 10);
+    	//redissonLock.lock("GoodsOrder"+goodsId, 10);
         try {
 
 	        //获取商品信息
@@ -813,7 +813,7 @@ public class OrderServiceImpl implements OrderService{
         	e.printStackTrace();
             throw new ServiceException("下单出错，请稍后再试！");
 		}finally {
-        	redissonLock.release("GoodsOrder"+goodsId);
+        	//redissonLock.release("GoodsOrder"+goodsId);
 		}
 
     }
