@@ -12,6 +12,8 @@ import com.fangyuanyouyue.order.dto.adminDto.AdminOrderProcessDto;
 import com.fangyuanyouyue.order.param.AdminOrderParam;
 import com.fangyuanyouyue.order.param.OrderParam;
 import com.fangyuanyouyue.order.service.*;
+import com.snowalker.lock.redisson.RedissonLock;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -45,6 +47,9 @@ public class AdminController extends BaseController{
     @Autowired
     private RefundService refundService;
 
+    @Autowired
+    RedissonLock redissonLock;
+
 
     @ApiOperation(value = "查看所有用户订单", notes = "订单管理、退货管理",response = BaseResp.class)
     @ApiImplicitParams({
@@ -60,6 +65,8 @@ public class AdminController extends BaseController{
     @GetMapping(value = "/orderList")
     @ResponseBody
     public BaseResp orderList(AdminOrderParam param) throws IOException {
+    	log.info("redissonLock ");
+    	redissonLock.lock("GoodsOrder", 10);
         try {
             log.info("----》查看所有用户订单《----");
             log.info("参数："+param.toString());
@@ -80,6 +87,9 @@ public class AdminController extends BaseController{
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
+        }finally {
+        	redissonLock.release("GoodsOrder");
+        	log.info("redissonLock release");
         }
     }
     
