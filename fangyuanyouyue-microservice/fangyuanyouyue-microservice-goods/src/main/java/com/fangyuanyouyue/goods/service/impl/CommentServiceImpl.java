@@ -1,8 +1,11 @@
 package com.fangyuanyouyue.goods.service.impl;
 
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.goods.dao.CommentLikesMapper;
 import com.fangyuanyouyue.goods.dao.GoodsCommentMapper;
 import com.fangyuanyouyue.goods.dao.GoodsImgMapper;
@@ -82,10 +85,16 @@ public class CommentServiceImpl implements CommentService{
         if(param.getCommentId() != null){
             //回复
             GoodsComment comment = goodsCommentMapper.selectByPrimaryKey(param.getCommentId());
-            schedualWalletService.addUserBehavior(param.getUserId(),comment.getUserId(),param.getCommentId(), Status.BUSINESS_TYPE_GOODS_COMMENT.getValue(),Status.BEHAVIOR_TYPE_COMMENT.getValue());
+            BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBehavior(param.getUserId(),comment.getUserId(),param.getCommentId(), Status.BUSINESS_TYPE_GOODS_COMMENT.getValue(),Status.BEHAVIOR_TYPE_COMMENT.getValue()));
+            if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+            }
         }else{
             //评论商品
-            schedualWalletService.addUserBehavior(param.getUserId(),goodsInfo.getUserId(),param.getGoodsId(),Status.BUSINESS_TYPE_GOODS.getValue(),Status.BEHAVIOR_TYPE_COMMENT.getValue());
+            BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBehavior(param.getUserId(),goodsInfo.getUserId(),param.getGoodsId(),Status.BUSINESS_TYPE_GOODS.getValue(),Status.BEHAVIOR_TYPE_COMMENT.getValue()));
+            if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+            }
         }
         return goodsComment.getId();
     }
@@ -111,8 +120,10 @@ public class CommentServiceImpl implements CommentService{
                     //更新点赞数
                     goodsComment.setLikesCount(goodsComment.getLikesCount()+1);
                     goodsCommentMapper.updateByPrimaryKey(goodsComment);
-                    schedualWalletService.addUserBehavior(userId,goodsComment.getUserId(),goodsComment.getId(),Status.BUSINESS_TYPE_GOODS_COMMENT.getValue(),Status.BEHAVIOR_TYPE_LIKES.getValue());
-
+                    BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBehavior(userId,goodsComment.getUserId(),goodsComment.getId(),Status.BUSINESS_TYPE_GOODS_COMMENT.getValue(),Status.BEHAVIOR_TYPE_LIKES.getValue()));
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                    }
                 }
             }else if(type == 2){//取消点赞
                 if(commentLikes != null){

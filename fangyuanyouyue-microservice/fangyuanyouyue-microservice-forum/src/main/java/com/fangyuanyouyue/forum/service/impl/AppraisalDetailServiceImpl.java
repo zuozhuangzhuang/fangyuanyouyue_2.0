@@ -369,7 +369,10 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 			}
 		}
 		//余额账单
-		schedualWalletService.addUserBalanceDetail(argueOrder.getUserId(),argueOrder.getAmount(),payType,Status.EXPEND.getValue(),orderNo,"【"+argueOrder.getTitle()+"】",argueOrder.getUserId(),null, Status.APPRAISAL.getValue(),thirdOrderNo);
+        BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(argueOrder.getUserId(),argueOrder.getAmount(),payType,Status.EXPEND.getValue(),orderNo,"【"+argueOrder.getTitle()+"】",argueOrder.getUserId(),null, Status.APPRAISAL.getValue(),thirdOrderNo));
+        if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+            throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+        }
 		argueOrder.setStatus(Status.ORDER_COMPLETE.getValue());
 		argueOrder.setPayNo(thirdOrderNo);
 		argueOrderMapper.updateByPrimaryKey(argueOrder);
@@ -477,7 +480,10 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 				//订单号
 				final IdGenerator idg = IdGenerator.INSTANCE;
 				String orderNo = idg.nextId();
-				schedualWalletService.addUserBalanceDetail(detail.getUserId(),detail.getBonus(), Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"【"+detail.getTitle()+"】官方删除",detail.getUserId(),null,Status.APPRAISAL.getValue(),orderNo);
+				baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(detail.getUserId(),detail.getBonus(), Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"【"+detail.getTitle()+"】官方删除",detail.getUserId(),null,Status.APPRAISAL.getValue(),orderNo));
+				if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+					throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+				}
 			}
             //很抱歉，您的帖子/视频/全民鉴定/【名称】已被官方删除，删除理由：……
             schedualMessageService.easemobMessage(detail.getUserId().toString(),

@@ -364,9 +364,10 @@ public class OrderServiceImpl implements OrderService{
 	                orderDetail.setDescription(goods.getDescription());
 	                orderDetailMapper.insert(orderDetail);
 	                //修改商品的状态为已售出
-	            	schedualGoodsService.updateGoodsStatus(addOrderDetailDto.getGoodsId(),2);//状态  1出售中 2已售出 3已下架（已结束） 5删除
-
-	//                payFreight = payFreight.add(orderDetail.getFreight());
+                    BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualGoodsService.updateGoodsStatus(addOrderDetailDto.getGoodsId(), 2));//状态  1出售中 2已售出 3已下架（已结束） 5删除
+                    if(!parseReturnValue.getCode().equals(ReCode.SUCCESS)){
+                        throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+                    }
 	                amount = amount.add(orderDetail.getAmount());//原价
 	                payAmount = payAmount.add(orderDetail.getPayAmount());//实际支付
 	                OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail);
@@ -823,7 +824,10 @@ public class OrderServiceImpl implements OrderService{
 	        orderDetail.setSellerId(goods.getUserId());
 	        orderDetailMapper.insert(orderDetail);
 	        //修改商品的状态为已售出
-	        schedualGoodsService.updateGoodsStatus(goodsId,2);//状态  1出售中 2已售出 3已下架（已结束） 5删除
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualGoodsService.updateGoodsStatus(goodsId, 2));//状态  1出售中 2已售出 3已下架（已结束） 5删除
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS)){
+                throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+            }
 
 	        ArrayList<OrderDetailDto> orderDetailDtos = new ArrayList<>();
 	        OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail);
@@ -1033,7 +1037,10 @@ public class OrderServiceImpl implements OrderService{
                     goodsName.append("【"+goodsInfo.getName()+"】");
                 }
                 //卖家余额账单
-                schedualWalletService.addUserBalanceDetail(orderInfo.getSellerId(),orderPay.getPayAmount(),Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),orderInfo.getOrderNo());
+                baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(orderInfo.getSellerId(),orderPay.getPayAmount(),Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),orderInfo.getOrderNo()));
+                if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                }
                 //卖家增加信誉度
                 if(orderPay.getPayAmount().compareTo(new BigDecimal(2000)) <= 0){
                     String result = schedualWalletService.updateCredit(orderInfo.getSellerId(),Credit.NORMAL_ORDER.getCredit(),Status.ADD.getValue());
@@ -1214,7 +1221,10 @@ public class OrderServiceImpl implements OrderService{
                         schedualMessageService.easemobMessage(childOrder.getSellerId().toString(),
                                 "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER_SELLER.getMessage(),childOrder.getId().toString());
                         //买家新增余额账单
-                        schedualWalletService.addUserBalanceDetail(childOrder.getUserId(),pay.getPayAmount(),payType,Status.EXPEND.getValue(),childOrder.getOrderNo(),goodsName.toString(),childOrder.getSellerId(),childOrder.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo);
+                        BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(childOrder.getUserId(),pay.getPayAmount(),payType,Status.EXPEND.getValue(),childOrder.getOrderNo(),goodsName.toString(),childOrder.getSellerId(),childOrder.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo));
+                        if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                            throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                        }
                     }
                 }else{
                     //获取商品名字列表
@@ -1230,7 +1240,10 @@ public class OrderServiceImpl implements OrderService{
                     schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
                             "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER_SELLER.getMessage(),orderInfo.getId().toString());
                     //买家新增余额账单
-                    schedualWalletService.addUserBalanceDetail(orderInfo.getUserId(),orderPay.getPayAmount(),payType,Status.EXPEND.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo);
+                    BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(orderInfo.getUserId(),orderPay.getPayAmount(),payType,Status.EXPEND.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo));
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                    }
                 }
                 orderInfo.setStatus(Status.ORDER_GOODS_PAY.getValue());
                 orderInfoMapper.updateByPrimaryKeySelective(orderInfo);

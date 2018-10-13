@@ -4,6 +4,9 @@ import java.util.Date;
 import java.util.List;
 
 import com.codingapi.tx.annotation.TxTransaction;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,7 +60,10 @@ public class ForumLikesServiceImpl implements ForumLikesService {
 				forumLikesMapper.insert(model);
 				ForumInfo forumInfo = forumInfoMapper.selectByPrimaryKey(forumId);
 				//新增用户行为
-				schedualWalletService.addUserBehavior(userId,forumInfo.getUserId(),forumId, Status.BUSINESS_TYPE_FORUM.getValue(),Status.BEHAVIOR_TYPE_LIKES.getValue());
+				BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBehavior(userId,forumInfo.getUserId(),forumId, Status.BUSINESS_TYPE_FORUM.getValue(),Status.BEHAVIOR_TYPE_LIKES.getValue()));
+				if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+					throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+				}
 			}
 		}else if(type == 2){
 			if(model == null){

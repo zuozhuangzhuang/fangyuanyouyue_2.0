@@ -71,7 +71,10 @@ public class TimerServiceImpl implements TimerService{
                     StringBuffer goodsName = new StringBuffer();
                     boolean isAuction = false;
                     for(OrderDetail orderDetail:orderDetails){
-                        schedualGoodsService.updateGoodsStatus(orderDetail.getGoodsId(),1);//状态 1出售中 2已售出 3已下架（已结束） 5删除
+                        BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualGoodsService.updateGoodsStatus(orderDetail.getGoodsId(), 1));//状态  1出售中 2已售出 3已下架（已结束） 5删除
+                        if(!parseReturnValue.getCode().equals(ReCode.SUCCESS)){
+                            throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+                        }
                         GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(
                                 schedualGoodsService.goodsInfo(orderDetail.getGoodsId())).getString("data")), GoodsInfo.class);
 
