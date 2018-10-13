@@ -55,6 +55,6 @@ spring:
 redisson: 
   lock:
     server:
-      address: 172.18.80.212:6379
+      address: redis:6379
       type: standalone
  
