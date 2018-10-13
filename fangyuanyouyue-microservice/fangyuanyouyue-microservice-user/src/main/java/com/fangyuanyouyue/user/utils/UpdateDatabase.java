@@ -177,7 +177,7 @@ public class UpdateDatabase {
             while (record_rs.next()){
                 id = record_rs.getInt("id");
                 businessId = record_rs.getInt("goods_id");
-                userId = record_rs.getInt("user_id")+100000;
+                userId = record_rs.getInt("user_id");
                 addTime = DateStampUtils.formatUnixTime(record_rs.getLong("create_time"),DateUtil.DATE_FORMT);
                 String selectReport = "select * from a_goods_report where goods_id =" +businessId;
                 report_ps = conn.prepareStatement(selectReport);
@@ -242,7 +242,7 @@ public class UpdateDatabase {
              */
             Integer id = null;
             Integer goodsId = null;//商品id
-            Integer userId = rs.getInt("id")+100000;//用户id
+            Integer userId = rs.getInt("id");//用户id
             Integer commentId = null;//回复评论id
             String content = null;//评论内容
             Integer likesCount = 0;//点赞次数
@@ -414,7 +414,7 @@ public class UpdateDatabase {
         PreparedStatement collect_ps = null;
         ResultSet collect_rs = null;
         try{
-            Integer userId = rs.getInt("id")+100000;//用户id
+            Integer userId = rs.getInt("id");//用户id
             Integer collectId = null;//收藏对象ID
             Integer collectType = null;//关注/收藏类型 1商品 2抢购 3视频 4专栏 5鉴赏
             Integer type = null;//类型 1关注 2收藏
@@ -501,7 +501,7 @@ public class UpdateDatabase {
             confine_user_ps = conn.prepareStatement(selectConfine);
             confine_user_rs = confine_user_ps.executeQuery(selectConfine);
             while (confine_user_rs.next()){
-                Integer userId = confine_user_rs.getInt("user_id")+100000;//用户id
+                Integer userId = confine_user_rs.getInt("user_id");//用户id
                 Integer status = confine_user_rs.getInt("status");//用于假删除用户  0被限制用户 1被限制后又被解除限制用户（表面正常用户）
                 String addTime = DateStampUtils.formatUnixTime(System.currentTimeMillis(),DateUtil.DATE_FORMT);//添加时间
                 String updateTime = null;//更新时间
@@ -539,7 +539,7 @@ public class UpdateDatabase {
      */
     static String getForumSql(ResultSet rs) throws SQLException {
         System.out.println("----------forum_info----------");
-        Integer userId = rs.getInt("id")+100000;//用户id
+        Integer userId = rs.getInt("id");//用户id
         StringBuffer forumSql = new StringBuffer();
         PreparedStatement forum_ps = null;
         ResultSet forum_rs = null;
@@ -651,7 +651,7 @@ public class UpdateDatabase {
     static String getAppraisalSql(ResultSet rs) throws SQLException{
         System.out.println("----------goods_appraisal----------");
         StringBuffer appraisalSql = new StringBuffer();
-        Integer userId = rs.getInt("id")+100000;//用户id
+        Integer userId = rs.getInt("id");//用户id
         PreparedStatement appraisal_ps = null;
         ResultSet appraisal_rs = null;
         PreparedStatement appraisal_url_ps = null;
@@ -791,7 +791,7 @@ public class UpdateDatabase {
         PreparedStatement refund_ps = null;
         ResultSet refund_rs = null;
 
-        Integer userId = rs.getInt("id")+100000;//用户id
+        Integer userId = rs.getInt("id");//用户id
 
         try{
 
@@ -914,7 +914,7 @@ public class UpdateDatabase {
                     seller_ps = conn.prepareStatement(selectSeller);
                     seller_rs = seller_ps.executeQuery(selectSeller);
                     if(seller_rs.next()){
-                        sellerId = seller_rs.getInt("user_id")+100000;
+                        sellerId = seller_rs.getInt("user_id");
                     }
                     isResolve = 2;
                     Integer returnStatus = order_rs.getInt("return_status");
@@ -1190,7 +1190,7 @@ public class UpdateDatabase {
         PreparedStatement correlation_ps = null;
         ResultSet correlation_rs = null;
         try{
-            Integer userId = rs.getInt("id")+100000;
+            Integer userId = rs.getInt("id");
             /**
              * goods_info
              */
@@ -1377,7 +1377,7 @@ public class UpdateDatabase {
      */
     static String getUserFansSql(ResultSet rs) throws SQLException {
         System.out.println("----------user_fans----------");
-        Integer userId = rs.getInt("id")+100000;
+        Integer userId = rs.getInt("id");
         Integer toUserId = null;
         String addTime = null;
 
@@ -1389,7 +1389,7 @@ public class UpdateDatabase {
             fans_ps = conn.prepareStatement(selectUserFans);
             fans_rs = fans_ps.executeQuery(selectUserFans);
             while (fans_rs.next()){
-                toUserId = fans_rs.getInt("to_user_id")+100000;
+                toUserId = fans_rs.getInt("to_user_id");
                 addTime = DateStampUtils.formatUnixTime(fans_rs.getLong("add_time"),DateUtil.DATE_FORMT);
                 userFansSql.append("insert into user_fans (" +
                         "id, " +
@@ -1424,7 +1424,7 @@ public class UpdateDatabase {
      */
     static String getUserAddressSql(ResultSet rs) throws SQLException{
         System.out.println("----------user_address----------");
-        Integer userId = rs.getInt("id")+100000;
+        Integer userId = rs.getInt("id");
         String receiverName = null;
         String receiverPhone = null;
         String province = null;
@@ -1504,7 +1504,7 @@ public class UpdateDatabase {
      */
     static String getUserFinanceSql(ResultSet rs) throws SQLException {
         System.out.println("----------user_finance----------");
-        Integer userId = rs.getInt("id")+100000;
+        Integer userId = rs.getInt("id");
         BigDecimal amount = null;
         BigDecimal beforAmount = null;
         BigDecimal afterAmount = null;
@@ -1674,7 +1674,7 @@ public class UpdateDatabase {
      */
     static String getUserWithdrawSql(ResultSet rs) throws SQLException {
         System.out.println("----------user_withdraw----------");
-        Integer userId = rs.getInt("id")+100000;
+        Integer userId = rs.getInt("id");
         BigDecimal amount = new BigDecimal(0);
         Integer payType = null;
         Integer status = null;
@@ -1755,7 +1755,7 @@ public class UpdateDatabase {
         System.out.println("----------user_third_part----------");
         PreparedStatement fuckUser_ps = null;
         ResultSet fuckUser_rs = null;
-        Integer userId = rs.getInt("id")+100000;
+        Integer userId = rs.getInt("id");
         String unionId = null;
         String appOpenId = null;
         String nickName = null;
@@ -1772,8 +1772,12 @@ public class UpdateDatabase {
             try{
                 fuckUser_ps = conn.prepareStatement(selectFuckUser);
                 fuckUser_rs = fuckUser_ps.executeQuery(selectFuckUser);
-                if(fuckUser_rs.next() && StringUtils.isEmpty(fuckUser_rs.getString("phone"))){
-                    unionId = unionId+"-";
+                if(fuckUser_rs.next()){
+                    if(fuckUser_rs.getDouble("balance") == 0){
+                        unionId = unionId+"+";
+                    }else if(StringUtils.isEmpty(fuckUser_rs.getString("phone"))){
+                        unionId = unionId+"-";
+                    }
                 }
             }catch (SQLException e){
                 e.printStackTrace();
@@ -1825,7 +1829,7 @@ public class UpdateDatabase {
      */
     static String getUserWalletSql(ResultSet rs) throws SQLException{
         System.out.println("----------user_wallet----------");
-        Integer userId = rs.getInt("id")+100000;
+        Integer userId = rs.getInt("id");
         BigDecimal balance = rs.getBigDecimal("balance");
         BigDecimal balanceFrozen = new BigDecimal(0);
         Long point = 0L;
@@ -1887,7 +1891,7 @@ public class UpdateDatabase {
      */
     static String getUserVipSql(ResultSet rs) throws SQLException {
         System.out.println("----------user_vip----------");
-        Integer userId = rs.getInt("id")+100000;
+        Integer userId = rs.getInt("id");
         Integer status = 2;
         String addTime = DateStampUtils.formatUnixTime(rs.getLong("add_time"),DateUtil.DATE_FORMT);
         StringBuffer userVipSql = new StringBuffer(
@@ -1929,7 +1933,7 @@ public class UpdateDatabase {
     static String getUserExtSql(ResultSet rs) throws SQLException{
         System.out.println("----------user_info_ext----------");
         StringBuffer userInfoExtSql = new StringBuffer();
-        Integer userId = rs.getInt("id")+100000;
+        Integer userId = rs.getInt("id");
         String addTime = DateStampUtils.formatUnixTime(rs.getLong("add_time"),DateUtil.DATE_FORMT);
         Long credit = 0L;
         Integer fansCount = rs.getInt("fans_count");
@@ -2028,7 +2032,7 @@ public class UpdateDatabase {
         PreparedStatement fuckUser_ps = null;
         ResultSet fuckUser_rs = null;
         //每个用户生成一个sql文件
-        Integer userId = rs.getInt("id")+100000;
+        Integer userId = rs.getInt("id");
         String phone = rs.getString("phone");
         String address = rs.getString("address");
         String logPwd = MD5Util.generate(rs.getString("login_pwd"));
@@ -2041,7 +2045,7 @@ public class UpdateDatabase {
         String level_desc = "";
         Integer status = rs.getInt("status")==0?1:2;
         String addTime = DateStampUtils.formatUnixTime(rs.getLong("add_time"),DateUtil.DATE_FORMT);
-        Integer isRegHx = Integer.parseInt(rs.getString("is_hx"));
+        Integer isRegHx = 2;
         String selectFuckUser = "select * from a_user where nickName = '"+nickName+"'";
         try{
             fuckUser_ps = conn.prepareStatement(selectFuckUser);
