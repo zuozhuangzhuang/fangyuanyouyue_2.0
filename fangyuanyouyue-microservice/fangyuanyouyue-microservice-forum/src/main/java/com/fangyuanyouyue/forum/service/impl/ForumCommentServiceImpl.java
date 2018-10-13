@@ -6,7 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.codingapi.tx.annotation.TxTransaction;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.util.DateStampUtils;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -99,7 +102,11 @@ public class ForumCommentServiceImpl implements ForumCommentService {
 					"您的视频【"+forumInfo.getTitle()+"】有新的评论，点击此处前往查看吧",Status.SOCIAL_MESSAGE.getMessage(),Status.JUMP_TYPE_VIDEO.getMessage(),forumId.toString());
 		}
 		//新增用户行为
-		schedualWalletService.addUserBehavior(userId,forumInfo.getUserId(),forumId, Status.BUSINESS_TYPE_FORUM.getValue(),Status.BEHAVIOR_TYPE_COMMENT.getValue());
+		BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBehavior(userId,forumInfo.getUserId(),forumId, Status.BUSINESS_TYPE_FORUM.getValue(),Status.BEHAVIOR_TYPE_COMMENT.getValue()));
+		if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+			throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+		}
+
 
 		ForumCommentDto dto = new ForumCommentDto(model);
 

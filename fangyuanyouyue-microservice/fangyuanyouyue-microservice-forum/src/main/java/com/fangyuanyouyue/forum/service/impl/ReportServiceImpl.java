@@ -80,7 +80,7 @@ public class ReportServiceImpl implements ReportService{
         //举报者+20
         String result = schedualWalletService.updateCredit(report.getUserId(), Credit.REPORT_VERIFY.getCredit(), Status.ADD.getValue());
         BaseResp br = ParseReturnValue.getParseReturnValue(result);
-        if(!br.getCode().equals(ReCode.SUCCESS)){
+        if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
             throw new ServiceException(br.getCode(),br.getReport());
         }
         if(report.getType() == 2 || report.getType() == 3){
@@ -91,7 +91,7 @@ public class ReportServiceImpl implements ReportService{
             //被举报-40
             String forumUserResult = schedualWalletService.updateCredit(forumInfo.getUserId(), Credit.REPORT_VERIFYED.getCredit(),Status.SUB.getValue());
             BaseResp forumUserBr = ParseReturnValue.getParseReturnValue(forumUserResult);
-            if(!forumUserBr.getCode().equals(ReCode.SUCCESS)){
+            if(!forumUserBr.getCode().equals(ReCode.SUCCESS.getValue())){
                 throw new ServiceException(forumUserBr.getCode(),forumUserBr.getReport());
             }
             //很抱歉，您的帖子/视频/全民鉴定【名称】被多用户举报，并经官方核实。已被删除，删除理由：￥@……#%￥&#%￥……@
@@ -104,20 +104,23 @@ public class ReportServiceImpl implements ReportService{
             detail.setStatus(Status.DELETE.getValue());
             if(detail.getBonus() != null){
                 BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(detail.getUserId(),detail.getBonus(),Status.ADD.getValue()));
-                if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
                 //余额账单
                 //订单号
                 final IdGenerator idg = IdGenerator.INSTANCE;
                 String orderNo = idg.nextId();
-                schedualWalletService.addUserBalanceDetail(detail.getUserId(),detail.getBonus(), Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"【"+detail.getTitle()+"】官方删除",detail.getUserId(),null,Status.APPRAISAL.getValue(),orderNo);
+                baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(detail.getUserId(),detail.getBonus(), Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"【"+detail.getTitle()+"】官方删除",detail.getUserId(),null,Status.APPRAISAL.getValue(),orderNo));
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                }
             }
             appraisalDetailMapper.updateByPrimaryKey(detail);
             //被举报-40
             String appraisalUserResult = schedualWalletService.updateCredit(detail.getUserId(), Credit.REPORT_VERIFYED.getCredit(),Status.SUB.getValue());
             BaseResp appraisalUserBr = ParseReturnValue.getParseReturnValue(appraisalUserResult);
-            if(!appraisalUserBr.getCode().equals(ReCode.SUCCESS)){
+            if(!appraisalUserBr.getCode().equals(ReCode.SUCCESS.getValue())){
                 throw new ServiceException(appraisalUserBr.getCode(),appraisalUserBr.getReport());
             }
             //很抱歉，您的帖子/视频/全民鉴定【名称】被多用户举报，并经官方核实。已被删除，删除理由：￥@……#%￥&#%￥……@

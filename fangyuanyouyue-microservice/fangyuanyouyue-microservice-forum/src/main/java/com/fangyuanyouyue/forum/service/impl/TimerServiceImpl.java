@@ -84,14 +84,17 @@ public class TimerServiceImpl implements TimerService{
                     //无人评论，退回奖金
                     if(detail.getBonus() != null){
                         BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(detail.getUserId(),detail.getBonus(),Status.ADD.getValue()));
-                        if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                             throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                         }
                         //余额账单
                         //订单号
                         final IdGenerator idg = IdGenerator.INSTANCE;
                         String orderNo = idg.nextId();
-                        schedualWalletService.addUserBalanceDetail(detail.getUserId(),detail.getBonus(), Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"【"+detail.getTitle()+"】无人参与",detail.getUserId(),null,Status.APPRAISAL.getValue(),orderNo);
+                        baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(detail.getUserId(),detail.getBonus(), Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"【"+detail.getTitle()+"】无人参与",detail.getUserId(),null,Status.APPRAISAL.getValue(),orderNo));
+                        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                            throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                        }
                     }
                 }else{
                     for(int i=0;i<comments.size();i++){
@@ -103,7 +106,7 @@ public class TimerServiceImpl implements TimerService{
                             //胜者增加余额
                             if(detail.getBonus() != null){
                                 BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(comment.getUserId(),detail.getBonus(),Status.ADD.getValue()));
-                                if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                                     throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                                 }
                             }
@@ -114,7 +117,10 @@ public class TimerServiceImpl implements TimerService{
                             //订单号
                             final IdGenerator idg = IdGenerator.INSTANCE;
                             String orderNo = idg.nextId();
-                            schedualWalletService.addUserBalanceDetail(comment.getUserId(),detail.getBonus(), Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderNo,"【"+detail.getTitle()+"】胜",detail.getUserId(),comment.getUserId(),Status.APPRAISAL.getValue(),orderNo);
+                            BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(comment.getUserId(),detail.getBonus(), Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderNo,"【"+detail.getTitle()+"】胜",detail.getUserId(),comment.getUserId(),Status.APPRAISAL.getValue(),orderNo));
+                            if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                                throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                            }
                         }else{
                             comment.setIsWinner(StatusEnum.NO.getValue());
                             appraisalCommentMapper.updateByPrimaryKey(comment);
@@ -149,13 +155,16 @@ public class TimerServiceImpl implements TimerService{
                 }
                 BigDecimal amount = new BigDecimal(count).multiply(new BigDecimal(0.005)).setScale(2,BigDecimal.ROUND_HALF_UP);
                 BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(forumColumn.getUserId(),amount,Status.ADD.getValue()));
-                if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
                 //订单号
                 final IdGenerator idg = IdGenerator.INSTANCE;
                 String orderNo = idg.nextId();
-                schedualWalletService.addUserBalanceDetail(forumColumn.getUserId(),amount,Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderNo,"【"+forumColumn.getName()+"】返利",null,forumColumn.getUserId(),Status.FORUM_COLUMN.getValue(),orderNo);
+                baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(forumColumn.getUserId(),amount,Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderNo,"【"+forumColumn.getName()+"】返利",null,forumColumn.getUserId(),Status.FORUM_COLUMN.getValue(),orderNo));
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                }
                 schedualMessageService.easemobMessage(forumColumn.getUserId().toString(),"您的专栏本日收益为"+amount+"元！已发放至您的余额，点击此处查看您的余额吧",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_WALLET.getMessage(),"");
             }
         }

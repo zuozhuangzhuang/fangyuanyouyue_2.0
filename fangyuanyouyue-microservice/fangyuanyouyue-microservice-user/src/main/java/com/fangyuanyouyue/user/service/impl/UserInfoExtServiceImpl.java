@@ -165,7 +165,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
                 if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
                     String getWechatOrder = schedualWalletService.orderPayByWechat(authOrder.getOrderNo(), authOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.auth_wechat_notify.getNotifUrl());
                     BaseResp result = ParseReturnValue.getParseReturnValue(getWechatOrder);
-                    if(!result.getCode().equals(ReCode.SUCCESS)){
+                    if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(result.getCode(),result.getReport());
                     }
                     WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
@@ -173,7 +173,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
                 }else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
                     String getALiOrder = schedualWalletService.orderPayByALi(authOrder.getOrderNo(), authOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.auth_alipay_notify.getNotifUrl());
                     BaseResp result = ParseReturnValue.getParseReturnValue(getALiOrder);
-                    if(!result.getCode().equals(ReCode.SUCCESS)){
+                    if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(result.getCode(),result.getReport());
                     }
                     payInfo.append(result.getData());
@@ -184,7 +184,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
                     }
                     //卖家增加余额
                     BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(userId, authOrder.getAmount(), Status.SUB.getValue()));
-                    if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                     }
                     updateOrder(authOrder.getOrderNo(),null,Status.PAY_TYPE_BALANCE.getValue());
@@ -192,7 +192,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
                 }else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
                     String getMiniOrder = schedualWalletService.orderPayByWechatMini(userId,authOrder.getOrderNo(), authOrder.getAmount(), NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.auth_wechat_notify.getNotifUrl());
                     BaseResp result = ParseReturnValue.getParseReturnValue(getMiniOrder);
-                    if(!result.getCode().equals(ReCode.SUCCESS)){
+                    if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(result.getCode(),result.getReport());
                     }
                     WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
@@ -235,7 +235,10 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
         //系统消息：您的认证店铺申请已提交，将于5个工作日内完成审核，请注意消息通知
         schedualMessageService.easemobMessage(authOrder.getUserId().toString(),"您的认证店铺申请已提交，将于5个工作日内完成审核，请注意消息通知",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
         //买家新增余额账单
-        schedualWalletService.addUserBalanceDetail(authOrder.getUserId(),authOrder.getAmount(),payType,Status.EXPEND.getValue(),orderNo,"申请认证店铺",null,authOrder.getUserId(),Status.SHOP_AUTH.getValue(),thirdOrderNo);
+        BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(authOrder.getUserId(),authOrder.getAmount(),payType,Status.EXPEND.getValue(),orderNo,"申请认证店铺",null,authOrder.getUserId(),Status.SHOP_AUTH.getValue(),thirdOrderNo));
+        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+            throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+        }
         return true;
     }
 
@@ -321,14 +324,17 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
         }else{
             model.setReason(content);
             BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(ext.getUserId(),new BigDecimal(360),Status.ADD.getValue()));
-            if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+            if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                 throw new ServiceException(baseResp.getCode(),baseResp.getReport());
             }
             //买家新增余额账单
 			//订单号
 			final IdGenerator idg = IdGenerator.INSTANCE;
 			String orderNo = idg.nextId();
-            schedualWalletService.addUserBalanceDetail(model.getUserId(),new BigDecimal(360),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"认证店铺审核未通过",null,model.getUserId(),Status.SHOP_AUTH.getValue(),orderNo);
+            baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(model.getUserId(),new BigDecimal(360),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"认证店铺审核未通过",null,model.getUserId(),Status.SHOP_AUTH.getValue(),orderNo));
+            if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+            }
             //拒绝
             schedualMessageService.easemobMessage(model.getUserId().toString(),
                     "很抱歉，您申请的认证店铺未通过官方审核，可联系客服咨询详情。",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_AUTH_TYPE_REFUSE.getMessage(),"");
