@@ -666,7 +666,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
 
     @Override
     @Transactional
-    @TxTransaction(isStart=true)
+    @TxTransaction
     public void updateGoodsStatus(Integer goodsId,Integer status) throws ServiceException {
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
         if(goodsInfo == null){
