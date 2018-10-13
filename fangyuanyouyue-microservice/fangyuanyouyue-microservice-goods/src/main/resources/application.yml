@@ -8,8 +8,8 @@ server:
 spring:
 
   profiles:
-    active: dev
-#    active: test
+#    active: dev
+    active: test
 #    active: prod
 #springcloud-bus
 management:
