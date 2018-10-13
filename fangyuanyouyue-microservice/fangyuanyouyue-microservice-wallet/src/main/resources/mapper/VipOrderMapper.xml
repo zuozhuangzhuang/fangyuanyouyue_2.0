@@ -13,10 +13,11 @@
     <result column="level_desc" jdbcType="VARCHAR" property="levelDesc" />
     <result column="vip_type" jdbcType="INTEGER" property="vipType" />
     <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="pay_no" jdbcType="VARCHAR" property="payNo" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, user_id, order_no, amount, status, add_time, update_time,
-    vip_level, level_desc, vip_type, type
+    id, user_id, order_no, amount, status, add_time, update_time, vip_level, level_desc, 
+    vip_type, type, pay_no
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -31,16 +32,16 @@
   <insert id="insert" parameterType="com.fangyuanyouyue.wallet.model.VipOrder" useGeneratedKeys="true" keyProperty="id">
     insert into vip_order (id, user_id, order_no, 
       amount, status, add_time, 
-      update_time,
-      vip_level, level_desc, vip_type, 
-      type)
+      update_time, vip_level, level_desc, 
+      vip_type, type, pay_no
+      )
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{orderNo,jdbcType=VARCHAR}, 
       #{amount,jdbcType=DECIMAL}, #{status,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP},
-      #{vipLevel,jdbcType=INTEGER}, #{levelDesc,jdbcType=VARCHAR}, #{vipType,jdbcType=INTEGER}, 
-      #{type,jdbcType=INTEGER})
+      #{updateTime,jdbcType=TIMESTAMP}, #{vipLevel,jdbcType=INTEGER}, #{levelDesc,jdbcType=VARCHAR}, 
+      #{vipType,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{payNo,jdbcType=VARCHAR}
+      )
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.wallet.model.VipOrder">
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.wallet.model.VipOrder" useGeneratedKeys="true" keyProperty="id">
     insert into vip_order
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -75,6 +76,9 @@
       </if>
       <if test="type != null">
         type,
+      </if>
+      <if test="payNo != null">
+        pay_no,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -111,6 +115,9 @@
       <if test="type != null">
         #{type,jdbcType=INTEGER},
       </if>
+      <if test="payNo != null">
+        #{payNo,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.wallet.model.VipOrder">
@@ -132,7 +139,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="vipLevel != null">
         vip_level = #{vipLevel,jdbcType=INTEGER},
@@ -146,6 +152,9 @@
       <if test="type != null">
         type = #{type,jdbcType=INTEGER},
       </if>
+      <if test="payNo != null">
+        pay_no = #{payNo,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -156,11 +165,11 @@
       amount = #{amount,jdbcType=DECIMAL},
       status = #{status,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       vip_level = #{vipLevel,jdbcType=INTEGER},
       level_desc = #{levelDesc,jdbcType=VARCHAR},
       vip_type = #{vipType,jdbcType=INTEGER},
-      type = #{type,jdbcType=INTEGER}
+      type = #{type,jdbcType=INTEGER},
+      pay_no = #{payNo,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 

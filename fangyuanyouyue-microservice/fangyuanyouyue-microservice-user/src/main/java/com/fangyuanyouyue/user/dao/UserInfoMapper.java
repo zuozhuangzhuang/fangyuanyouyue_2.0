@@ -87,8 +87,32 @@ public interface UserInfoMapper {
     Integer getAllUserCount();
 
     /**
-     * 获取本月注册用户数量
+     * 获取昨日注册用户数量
      * @return
      */
-//    Integer getMonthUserCount();
+    Integer processYesterdayUser();
+
+    /**
+     * 分页总条数
+     * @param keyword
+     * @param status
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    int countConfinedUserPage(@Param("keyword")String keyword,@Param("status")Integer status,@Param("startDate")String startDate,@Param("endDate")String endDate);
+
+    /**
+     * 分页获取
+     * @param start
+     * @param limit
+     * @param keyword
+     * @param status
+     * @param startDate
+     * @param endDate
+     * @param orders
+     * @return
+     */
+    List<UserInfo> getConfinedUserPage(@Param("start") Integer start,@Param("limit") Integer limit,@Param("keyword")String keyword,@Param("status")Integer status,@Param("startDate")String startDate,@Param("endDate")String endDate,@Param("orders")String orders,@Param("ascType")Integer ascType);
+
 }

@@ -21,6 +21,7 @@ import java.util.List;
 @ToString
 public class AdminOrderDto {
 	
+	private Integer id;
     //订单信息
     private Integer userId;//买家id
     
@@ -74,9 +75,10 @@ public class AdminOrderDto {
     }
 
     public AdminOrderDto(OrderInfo orderInfo) {
+    	this.id = orderInfo.getId();
         this.userId = orderInfo.getUserId();
         this.nickName = orderInfo.getNickName();
-        this.buyer = orderInfo.getPhone()+"<br>"+orderInfo.getNickName();
+        this.buyer = orderInfo.getNickName()+" - "+orderInfo.getPhone();
         this.headImgUrl = orderInfo.getHeadImgUrl();
         this.phone = orderInfo.getPhone();
         this.orderId = orderInfo.getId();

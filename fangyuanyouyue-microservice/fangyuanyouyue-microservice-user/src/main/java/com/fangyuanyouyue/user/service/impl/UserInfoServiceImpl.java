@@ -5,6 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.codingapi.tx.annotation.TxTransaction;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
+import com.fangyuanyouyue.user.dao.*;
+import com.fangyuanyouyue.user.dto.*;
+import com.fangyuanyouyue.user.model.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,31 +26,8 @@ import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.MD5Util;
 import com.fangyuanyouyue.user.constant.StatusEnum;
-import com.fangyuanyouyue.user.dao.CouponInfoMapper;
-import com.fangyuanyouyue.user.dao.IdentityAuthApplyMapper;
-import com.fangyuanyouyue.user.dao.UserCouponMapper;
-import com.fangyuanyouyue.user.dao.UserFansMapper;
-import com.fangyuanyouyue.user.dao.UserInfoExtMapper;
-import com.fangyuanyouyue.user.dao.UserInfoMapper;
-import com.fangyuanyouyue.user.dao.UserNickNameDetailMapper;
-import com.fangyuanyouyue.user.dao.UserThirdPartyMapper;
-import com.fangyuanyouyue.user.dao.UserVipMapper;
-import com.fangyuanyouyue.user.dao.UserWalletMapper;
-import com.fangyuanyouyue.user.dto.MergeDto;
-import com.fangyuanyouyue.user.dto.ShopDto;
-import com.fangyuanyouyue.user.dto.UserDto;
-import com.fangyuanyouyue.user.dto.UserFansDto;
-import com.fangyuanyouyue.user.dto.WaitProcessDto;
 import com.fangyuanyouyue.user.dto.admin.AdminUserDto;
 import com.fangyuanyouyue.user.dto.admin.AdminUserNickNameDetailDto;
-import com.fangyuanyouyue.user.model.UserCoupon;
-import com.fangyuanyouyue.user.model.UserFans;
-import com.fangyuanyouyue.user.model.UserInfo;
-import com.fangyuanyouyue.user.model.UserInfoExt;
-import com.fangyuanyouyue.user.model.UserNickNameDetail;
-import com.fangyuanyouyue.user.model.UserThirdParty;
-import com.fangyuanyouyue.user.model.UserVip;
-import com.fangyuanyouyue.user.model.UserWallet;
 import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.param.UserParam;
 import com.fangyuanyouyue.user.service.SchedualForumService;
@@ -96,6 +79,8 @@ public class UserInfoServiceImpl implements UserInfoService {
     private UserNickNameDetailMapper userNickNameDetailMapper;
     @Autowired
     private SchedualForumService schedualForumService;
+    @Autowired
+    private UserAuthApplyMapper userAuthApplyMapper;
 
     @Override
     public UserInfo getUserByToken(String token) throws ServiceException {
@@ -714,12 +699,16 @@ public class UserInfoServiceImpl implements UserInfoService {
                 if(userFans != null){
                    userDto.setIsFollow(1);//是否关注 1是 2否
                 }
+            }else{
+                throw new ServiceException(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
             return userDto;
         }
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void fansFollow(Integer userId, Integer toUserId, Integer type) throws ServiceException {
         UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
         if(userInfo == null){
@@ -739,7 +728,10 @@ public class UserInfoServiceImpl implements UserInfoService {
                     userFans.setToUserId(toUserId);
                     userFans.setUserId(userId);
                     userFansMapper.insert(userFans);
-                    schedualWalletService.addUserBehavior(userId,toUserId,toUserId, Status.BUSINESS_TYPE_USER.getValue(),Status.BEHAVIOR_TYPE_FANS.getValue());
+                    BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBehavior(userId,toUserId,toUserId, Status.BUSINESS_TYPE_USER.getValue(),Status.BEHAVIOR_TYPE_FANS.getValue()));
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                    }
                 }else if(type == 1){//取消关注
                     if(userFans == null){
                         throw new ServiceException("未关注，取消关注失败！");
@@ -754,15 +746,23 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public List<UserFansDto> myFansOrFollows(Integer userId,Integer type,Integer start,Integer limit,String search) throws ServiceException {
+    public FansDto myFansOrFollows(Integer userId, Integer type, Integer start, Integer limit, String search) throws ServiceException {
         UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
         if(userInfo == null){
             throw new ServiceException("用户不存在！");
         }else{
+            UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(userId);
             //分页获取粉丝列表/关注列表
             List<Map<String, Object>> maps = userFansMapper.myFansOrFollows(userId,type,start*limit, limit,search);
             List<UserFansDto> userFollowsDtos = UserFansDto.toDtoList(maps);
-            return userFollowsDtos;
+            FansDto fansDto = new FansDto();
+            fansDto.setUserFansDtos(userFollowsDtos);
+            if(type.equals(1)){
+                fansDto.setCount(userFansMapper.collectCount(userId));
+            }else{
+                fansDto.setCount(userFansMapper.fansCount(userId)+userInfoExt.getFansCount());
+            }
+            return fansDto;
         }
     }
 
@@ -794,9 +794,10 @@ public class UserInfoServiceImpl implements UserInfoService {
 	public void registIMUser(UserInfo user) throws ServiceException {
         try {
             //判断用户是否已经注册环信
-            if(user.getIsRegHx()==null||user.getIsRegHx().intValue()==StatusEnum.NO.getCode().intValue()) {
-                schedualMessageService.easemobRegist(user.getId().toString(), MD5Util.MD5("xiaofangyuan"+user.getId().toString()));
-                user.setIsRegHx(StatusEnum.YES.getCode());
+            if(user.getIsRegHx()==null||user.getIsRegHx().equals(StatusEnum.NO.getCode().intValue())) {
+                String easemobRegist = schedualMessageService.easemobRegist(user.getId().toString(), MD5Util.MD5("xiaofangyuan"+user.getId().toString()));
+                Integer code = JSONObject.parseObject(easemobRegist).getInteger("code");
+                user.setIsRegHx(code.equals(ReCode.FAILD.getValue())?Status.NO.getValue():Status.YES.getValue());
                 userInfoMapper.updateByPrimaryKey(user);
             }
         }catch (RetryableException e){
@@ -816,9 +817,30 @@ public class UserInfoServiceImpl implements UserInfoService {
 			UserInfoExt ext = userInfoExtMapper.selectByUserId(info.getId());
 			dto.setFansBaseCount(ext.getFansCount());
 			dto.setAuthType(ext.getAuthType());
+			dto.setName(ext.getName());
+			dto.setIdentity(ext.getIdentity());
+			Long credit = ext.getCredit();
+			Integer creditLevel = 0;
+			if(credit != null){
+                if(credit < -100){//差
+                    creditLevel = 1;
+                }else if(-100 <= credit && credit < 1000){//低
+                    creditLevel = 2;
+                }else if(1000 <= credit && credit < 10000){//中
+                    creditLevel = 3;
+                }else if(10000 <= credit && credit < 500000){//高
+                    creditLevel = 4;
+                }else if(500000 <= credit){//优
+                    creditLevel = 5;
+                }
+            }
+			dto.setCreditLevel(creditLevel);
+			
 			
 			UserWallet wallet = userWalletMapper.selectByUserId(info.getId());
 			dto.setBalance(wallet.getBalance());
+			dto.setPoint(wallet.getPoint());
+			
 			
 			UserVip vip = userVipMapper.getUserVipByUserId(info.getId());
 			dto.setVipLevel(vip.getVipLevel());
@@ -872,17 +894,22 @@ public class UserInfoServiceImpl implements UserInfoService {
         if(userInfoExt == null || userInfo==null){
             throw new ServiceException("未找到用户信息！");
         }
-        if(param.getCount()!=null) {
-        	userInfoExt.setFansCount(param.getCount());
+        if(param.getFansCount()!=null) {
+        	userInfoExt.setFansCount(param.getFansCount());
         }
         if(param.getStatus()!=null) {
         	userInfo.setStatus(param.getStatus());
         }
         if(param.getAuthType()!=null) {
         	userInfoExt.setAuthType(param.getAuthType());
+            UserAuthApply userAuthApply = userAuthApplyMapper.selectByUserIdStatus(param.getId(),StatusEnum.AUTH_TYPE_APPLY.getCode());
+            if(userAuthApply != null){
+                userAuthApply.setStatus(param.getAuthType());
+                userAuthApplyMapper.updateByPrimaryKey(userAuthApply);
+            }
         }
-        userInfoMapper.updateByPrimaryKey(userInfo);
-        userInfoExtMapper.updateByPrimaryKey(userInfoExt);
+        userInfoMapper.updateByPrimaryKeySelective(userInfo);
+        userInfoExtMapper.updateByPrimaryKeySelective(userInfoExt);
     }
     
 }

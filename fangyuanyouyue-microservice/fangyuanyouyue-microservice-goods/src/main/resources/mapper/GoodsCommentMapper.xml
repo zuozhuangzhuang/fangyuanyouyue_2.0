@@ -154,7 +154,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null" >
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -170,8 +169,7 @@
       img2_url = #{img2Url,jdbcType=VARCHAR},
       img3_url = #{img3Url,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
-      add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      add_time = #{addTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
@@ -195,10 +193,10 @@
     select * from goods_comment a left join user_info b on a.user_id = b.id where a.id = #{commentId,jdbcType=INTEGER} and b.status <![CDATA[ <> ]]> 3
   </select>
   <select id="selectCount" parameterType="Integer" resultType="Integer">
-    select count(id) from goods_comment where goods_id = #{goodsId,jdbcType=INTEGER}
+    select count(id) from goods_comment where goods_id = #{goodsId,jdbcType=INTEGER} and status <![CDATA[ <> ]]> 2
   </select>
   <select id="selectByGoodsId" parameterType="Integer" resultType="Map">
-    select * from goods_comment a left join user_info b on a.user_id = b.id where b.status <![CDATA[ <> ]]> 3 and a.goods_id = #{goodsId,jdbcType=INTEGER} and ISNULL(a.comment_id) limit #{start,jdbcType=INTEGER},#{limit,jdbcType=INTEGER}
+    select * from goods_comment a left join user_info b on a.user_id = b.id where a.status <![CDATA[ <> ]]> 2 and b.status <![CDATA[ <> ]]> 3 and a.goods_id = #{goodsId,jdbcType=INTEGER} and ISNULL(a.comment_id) limit #{start,jdbcType=INTEGER},#{limit,jdbcType=INTEGER}
   </select>
   <select id="selectByUserId" parameterType="Integer" resultType="Map">
     select a.*,b.* from goods_comment a,user_info b,goods_info c where b.status <![CDATA[ <> ]]> 3 and a.user_id = b.id and a.user_id = #{userId} and a.goods_id = c.id and a.status = 1 order by a.add_time desc limit #{start},#{limit}

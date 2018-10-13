@@ -35,7 +35,7 @@ public class UserInfo {
 
     private String contact;//联系电话
 
-    private Integer level;//用户等级
+    private Integer level = 1;//用户等级
 
     private String levelDesc;//等级描述
 

@@ -152,7 +152,7 @@ public class FeignController extends BaseController{
 
     @PostMapping(value = "/updateAppraisalCount")
     @ResponseBody
-    public BaseResp updateAppraisalCount(Integer userId,Integer count) throws IOException {
+    public BaseResp updateAppraisalCount(Integer userId,Integer count,Integer type) throws IOException {
         try {
             log.info("----》修改剩余免费鉴定次数《----");
             log.info("参数：userId："+userId);
@@ -162,8 +162,11 @@ public class FeignController extends BaseController{
             if(count == null){
                 return toError("修改数值不能为空！");
             }
+            if(type == null){
+                return toError("修改类型不能为空！");
+            }
             //修改剩余免费鉴定次数
-            walletService.updateAppraisalCount(userId,count);
+            walletService.updateAppraisalCount(userId,count,type);
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
@@ -345,9 +348,28 @@ public class FeignController extends BaseController{
             if(userId == null){
                 return toError("用户id不能为空！");
             }
-            //新增用户行为
             boolean isUserVip = userVipService.isUserVip(userId);
             return toSuccess(isUserVip);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "获取用户会员等级", notes = "获取用户会员等级",hidden = true)
+    @PostMapping(value = "/getUserVipLevel")
+    @ResponseBody
+    public BaseResp getUserVipLevel(Integer userId) throws IOException {
+        try {
+            log.info("----》获取用户会员等级《----");
+            if(userId == null){
+                return toError("用户id不能为空！");
+            }
+            Integer vipLevel = userVipService.getUserVipLevel(userId);
+            return toSuccess(vipLevel);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());

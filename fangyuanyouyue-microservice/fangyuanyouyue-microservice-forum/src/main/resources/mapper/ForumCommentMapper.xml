@@ -112,7 +112,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null" >
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -124,27 +123,26 @@
       comment_id = #{commentId,jdbcType=INTEGER},
       content = #{content,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
-      add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      add_time = #{addTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
 
   <select id="countAll" resultType="java.lang.Integer" >
-    select count(*) from forum_comment
+    select count(*) from forum_comment where status <![CDATA[ <> ]]> 2
   </select>
   <select id="countById" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
-    select count(*) from forum_comment where forum_id = #{forumId,jdbcType=INTEGER}
+    select count(*) from forum_comment where forum_id = #{forumId,jdbcType=INTEGER} and status <![CDATA[ <> ]]> 2
   </select>
   
   <select id="countByCommentId" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
-    select count(*) from forum_comment where comment_id = #{commentId,jdbcType=INTEGER}
+    select count(*) from forum_comment where comment_id = #{commentId,jdbcType=INTEGER} and status <![CDATA[ <> ]]> 2
   </select>
   <select id="selectByForumId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select
     a.*,b.nick_name,b.head_img_url
     from forum_comment a,user_info b
-    where a.user_id=b.id and forum_id=#{forumId} and b.status <![CDATA[ <> ]]> 3
+    where a.user_id=b.id and forum_id=#{forumId} and b.status <![CDATA[ <> ]]> 3 and a.status <![CDATA[ <> ]]> 2
     and a.comment_id is null
     order by (select count(id) from forum_comment_likes where comment_id = a.id) desc,a.add_time desc
     limit #{start},#{limit}
@@ -153,13 +151,13 @@
     select
     a.*,b.nick_name,b.head_img_url
     from forum_comment a,user_info b
-    where a.user_id=b.id and a.comment_id=#{commentId} and b.status <![CDATA[ <> ]]> 3
+    where a.user_id=b.id and a.comment_id=#{commentId} and b.status <![CDATA[ <> ]]> 3 and a.status <![CDATA[ <> ]]> 2
     order by (select count(id) from forum_comment_likes where comment_id = a.id) desc,a.add_time desc
     limit #{start},#{limit}
   </select>
 
   <select id="selectByUserId" parameterType="Integer" resultType="Map">
-    select a.content as commentContent,b.id,b.title,b.content,b.video_img from forum_comment a,forum_info b where a.forum_id = b.id and a.user_id = #{userId} and a.status = 1 and b.type = #{type} order by a.add_time desc limit #{start},#{limit}
+    select a.id as commentId,a.content as commentContent,b.id,b.title,b.content,b.video_img from forum_comment a,forum_info b where a.forum_id = b.id and a.status = 1 and b.status =1 and a.user_id = #{userId} and b.type = #{type} order by a.add_time desc limit #{start},#{limit}
   </select>
 
 </mapper>

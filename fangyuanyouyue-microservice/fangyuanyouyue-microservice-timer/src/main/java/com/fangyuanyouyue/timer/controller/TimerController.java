@@ -172,4 +172,17 @@ public class TimerController extends BaseController {
     }
     //TODO 优惠券自动过期
 
+
+    @Scheduled(cron="0 0 2 * * ? ")
+    public BaseResp dailyStatistics() throws IOException {
+        try {
+            log.info("----》每日统计数据《----");
+            schedualUserService.dailyStatistics();
+            return toSuccess();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
 }

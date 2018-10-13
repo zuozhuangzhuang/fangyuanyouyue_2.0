@@ -91,7 +91,7 @@
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
 		</dependency>
-		<!--视频截图-->
+		<!--视频截图 -->
 		<dependency>
 			<groupId>org.bytedeco</groupId>
 			<artifactId>javacv</artifactId>
@@ -113,13 +113,38 @@
 			<version>3.4.2-1.4.1</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
-		<!--lombok-->
+		<!--lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>1.16.18</version>
 			<scope>provided</scope>
-		</dependency>
+		</dependency>        
+		<dependency>
+            <groupId>com.codingapi</groupId>
+            <artifactId>transaction-springcloud</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+		<dependency>
+            <groupId>com.codingapi</groupId>
+            <artifactId>tx-client</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.codingapi</groupId>
+            <artifactId>tx-plugins-db</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 	</dependencies>
 
 	<build>

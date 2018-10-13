@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import com.codingapi.tx.annotation.TxTransaction;
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,6 +72,8 @@ public class TimerServiceImpl implements TimerService{
 
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void appraisalEnd() throws ServiceException {
         //1、获取status=1，enndTime小于当前时间的全民鉴定 2、获取鉴定中评论获取点赞最多的评论，定为获胜者(票数一致最先评论者胜出) 3、向发起者和获胜者发送消息通知
         List<AppraisalDetail> details = appraisalDetailMapper.selectByStatusEndTime(StatusEnum.UNDERWAY.getValue(), DateStampUtils.getTimesteamp());
@@ -78,15 +83,18 @@ public class TimerServiceImpl implements TimerService{
                 if(comments == null || comments.size() < 1){
                     //无人评论，退回奖金
                     if(detail.getBonus() != null){
-                        BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(detail.getUserId(),detail.getBonus(),Status.ADD.getValue())), BaseResp.class);
-                        if(baseResp.getCode() == 1){
-                            throw new ServiceException(baseResp.getReport().toString());
+                        BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(detail.getUserId(),detail.getBonus(),Status.ADD.getValue()));
+                        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                            throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                         }
                         //余额账单
                         //订单号
                         final IdGenerator idg = IdGenerator.INSTANCE;
                         String orderNo = idg.nextId();
-                        schedualWalletService.addUserBalanceDetail(detail.getUserId(),detail.getBonus(), Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,detail.getTitle(),detail.getUserId(),null,Status.APPRAISAL.getValue(),orderNo);
+                        baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(detail.getUserId(),detail.getBonus(), Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"【"+detail.getTitle()+"】无人参与",detail.getUserId(),null,Status.APPRAISAL.getValue(),orderNo));
+                        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                            throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                        }
                     }
                 }else{
                     for(int i=0;i<comments.size();i++){
@@ -97,9 +105,9 @@ public class TimerServiceImpl implements TimerService{
                             appraisalCommentMapper.updateByPrimaryKey(comment);
                             //胜者增加余额
                             if(detail.getBonus() != null){
-                                BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(comment.getUserId(),detail.getBonus(),Status.ADD.getValue())), BaseResp.class);
-                                if(baseResp.getCode() == 1){
-                                    throw new ServiceException(baseResp.getReport().toString());
+                                BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(comment.getUserId(),detail.getBonus(),Status.ADD.getValue()));
+                                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                                 }
                             }
                             //恭喜您！您参与的全民鉴定【名称】，您获得了最高票数！点击查看最终结果吧~
@@ -109,7 +117,10 @@ public class TimerServiceImpl implements TimerService{
                             //订单号
                             final IdGenerator idg = IdGenerator.INSTANCE;
                             String orderNo = idg.nextId();
-                            schedualWalletService.addUserBalanceDetail(comment.getUserId(),detail.getBonus(), Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderNo,detail.getTitle(),detail.getUserId(),comment.getUserId(),Status.APPRAISAL.getValue(),orderNo);
+                            BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(comment.getUserId(),detail.getBonus(), Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderNo,"【"+detail.getTitle()+"】胜",detail.getUserId(),comment.getUserId(),Status.APPRAISAL.getValue(),orderNo));
+                            if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                                throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                            }
                         }else{
                             comment.setIsWinner(StatusEnum.NO.getValue());
                             appraisalCommentMapper.updateByPrimaryKey(comment);
@@ -129,6 +140,8 @@ public class TimerServiceImpl implements TimerService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void dailyWage() throws ServiceException {
         //每天上午08:00 结算专栏返利，200新增浏览量（当前日期前一天0时到24时新增浏览量）/元，浏览量为奇数时，浏览量-1再计算返利金额，直接返到用户余额，并提示用户，新增余额账单
         List<Map<String,Object>> forumPvs = forumPvMapper.dailyWage();
@@ -141,11 +154,17 @@ public class TimerServiceImpl implements TimerService{
                     count-=1;
                 }
                 BigDecimal amount = new BigDecimal(count).multiply(new BigDecimal(0.005)).setScale(2,BigDecimal.ROUND_HALF_UP);
-                schedualWalletService.updateBalance(forumColumn.getUserId(),amount,Status.ADD.getValue());
+                BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(forumColumn.getUserId(),amount,Status.ADD.getValue()));
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                }
                 //订单号
                 final IdGenerator idg = IdGenerator.INSTANCE;
                 String orderNo = idg.nextId();
-                schedualWalletService.addUserBalanceDetail(forumColumn.getUserId(),amount,Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderNo,"专栏每日收益",null,forumColumn.getUserId(),Status.FORUM_COLUMN.getValue(),orderNo);
+                baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(forumColumn.getUserId(),amount,Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderNo,"【"+forumColumn.getName()+"】返利",null,forumColumn.getUserId(),Status.FORUM_COLUMN.getValue(),orderNo));
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                }
                 schedualMessageService.easemobMessage(forumColumn.getUserId().toString(),"您的专栏本日收益为"+amount+"元！已发放至您的余额，点击此处查看您的余额吧",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_WALLET.getMessage(),"");
             }
         }

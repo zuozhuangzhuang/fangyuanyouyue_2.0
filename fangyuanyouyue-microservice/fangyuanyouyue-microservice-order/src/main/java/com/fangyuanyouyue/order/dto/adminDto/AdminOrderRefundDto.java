@@ -24,6 +24,8 @@ public class AdminOrderRefundDto {
     private Integer userId;//退货申请用户id
 
     private Integer orderId;//订单id
+    
+    private AdminOrderDto orderInfo;
 
     private String orderNo;//订单号
 

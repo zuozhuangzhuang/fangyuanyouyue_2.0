@@ -1,12 +1,15 @@
 package com.fangyuanyouyue.order.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.Credit;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.order.dao.*;
 import com.fangyuanyouyue.order.model.*;
 import com.fangyuanyouyue.order.service.*;
@@ -46,27 +49,32 @@ public class TimerServiceImpl implements TimerService{
     private SchedualRedisService schedualRedisService;
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void cancelOrder() throws ServiceException {
         //1、获取所有未支付的订单 2、判断下单时间与现在时间的差值是否大于24h 3、取消大于24h的订单 4、修改商品状态
         //状态 1待支付 2待发货 3待收货 4已完成 5已取消
         List<OrderInfo> orders = orderInfoMapper.selectByStatus(1);
         if(orders != null && orders.size() > 0){
             for(OrderInfo orderInfo:orders){
-                if((System.currentTimeMillis() - orderInfo.getAddTime().getTime()) >= 24*60*60*1000){
+                if((System.currentTimeMillis() - orderInfo.getAddTime().getTime()) >= 30*60*1000){
                 //测试暂用3min
 //                if((new Date().getTime() - orderInfo.getAddTime().getTime()) >= 3*60*1000){
                     OrderPay orderPay = orderPayMapper.selectByOrderId(orderInfo.getId());
                     //更改总订单状态
                     orderInfo.setStatus(Status.ORDER_GOODS_CANCEL.getValue());
                     orderPay.setStatus(Status.ORDER_GOODS_CANCEL.getValue());
-                    orderInfoMapper.updateByPrimaryKey(orderInfo);
-                    orderPayMapper.updateByPrimaryKey(orderPay);
+                    orderInfoMapper.updateByPrimaryKeySelective(orderInfo);
+                    orderPayMapper.updateByPrimaryKeySelective(orderPay);
                     //获取此订单内所有商品，更改商品状态为出售中
                     List<OrderDetail> orderDetails = orderDetailMapper.selectByMainOrderId(orderInfo.getId());
                     StringBuffer goodsName = new StringBuffer();
                     boolean isAuction = false;
                     for(OrderDetail orderDetail:orderDetails){
-                        schedualGoodsService.updateGoodsStatus(orderDetail.getGoodsId(),1);//状态 1出售中 2已售出 3已下架（已结束） 5删除
+                        BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualGoodsService.updateGoodsStatus(orderDetail.getGoodsId(), 1));//状态  1出售中 2已售出 3已下架（已结束） 5删除
+                        if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                            throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+                        }
                         GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(
                                 schedualGoodsService.goodsInfo(orderDetail.getGoodsId())).getString("data")), GoodsInfo.class);
 
@@ -82,8 +90,8 @@ public class TimerServiceImpl implements TimerService{
                             //更改子订单状态
                             info.setStatus(Status.ORDER_GOODS_CANCEL.getValue());
                             pay.setStatus(Status.ORDER_GOODS_CANCEL.getValue());
-                            orderInfoMapper.updateByPrimaryKey(info);
-                            orderPayMapper.updateByPrimaryKey(pay);
+                            orderInfoMapper.updateByPrimaryKeySelective(info);
+                            orderPayMapper.updateByPrimaryKeySelective(pay);
                             //给卖家发消息：您的商品【名称】买家已取消订单
                             List<OrderDetail> details = orderDetailMapper.selectByOrderId(info.getId());
                             StringBuffer name = new StringBuffer();
@@ -94,12 +102,16 @@ public class TimerServiceImpl implements TimerService{
                                 auction = goodsInfo.getType().intValue() == Status.AUCTION.getValue()?true:false;
                                 name.append("【"+goodsInfo.getName()+"】");
                             }
-                            schedualMessageService.easemobMessage(info.getSellerId().toString(),
-                                    "您的"+(auction?"抢购":"商品")+name+"买家超时已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),info.getId().toString());
+                            if(orderInfo.getSellerId() != null){
+                                schedualMessageService.easemobMessage(info.getSellerId().toString(),
+                                        "您的"+(auction?"抢购":"商品")+name+"买家超时已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),info.getId().toString());
+                            }
                         }
                     }else{
-                        schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
-                                "您的"+(isAuction?"抢购":"商品")+goodsName+"买家超时已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),orderInfo.getId().toString());
+                        if(orderInfo.getSellerId() != null){
+                            schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
+                                    "您的"+(isAuction?"抢购":"商品")+goodsName+"买家超时已取消订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),orderInfo.getId().toString());
+                        }
                     }
                     //给买家发送信息：您未支付的商品【名称】已取消订单
                     schedualMessageService.easemobMessage(orderInfo.getUserId().toString(),
@@ -110,6 +122,8 @@ public class TimerServiceImpl implements TimerService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void saveReceiptGoods() throws ServiceException {
         //1、获取所有待收货且发货时间超过12天的订单 2、修改订单状态 3、卖家增加余额 4、买家、卖家增加积分
         List<OrderPay> orderPays = orderPayMapper.selectByStatus(Status.ORDER_GOODS_SENDED.getValue(), DateUtil.getDateAfterDay(new Date(), -12));
@@ -124,20 +138,28 @@ public class TimerServiceImpl implements TimerService{
                 }
                 //修改订单支付表状态
                 orderPay.setStatus(Status.ORDER_GOODS_COMPLETE.getValue());
-                orderPayMapper.updateByPrimaryKey(orderPay);
+                orderPayMapper.updateByPrimaryKeySelective(orderPay);
                 //修改订单状态
                 orderInfo.setStatus(Status.ORDER_GOODS_COMPLETE.getValue());
-                orderInfoMapper.updateByPrimaryKey(orderInfo);
+                orderInfoMapper.updateByPrimaryKeySelective(orderInfo);
                 //卖家增加余额
-                BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(orderInfo.getSellerId(),orderPay.getPayAmount(),Status.ADD.getValue())), BaseResp.class);
-                if(baseResp.getCode() == 1){
-                    throw new ServiceException(baseResp.getReport().toString());
+                BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(orderInfo.getSellerId(),orderPay.getPayAmount(),Status.ADD.getValue()));
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
                 //卖家成交增加积分
                 if(orderPay.getPayAmount().compareTo(new BigDecimal(2000)) <= 0){//2000以内+20分
-                    schedualWalletService.updateScore(orderInfo.getSellerId(),20L,1);
+                    String result = schedualWalletService.updateScore(orderInfo.getSellerId(),20L,1);
+                    BaseResp br = ParseReturnValue.getParseReturnValue(result);
+                    if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(br.getCode(),br.getReport());
+                    }
                 }else{//2000以上+50分
-                    schedualWalletService.updateScore(orderInfo.getSellerId(),50L,1);
+                    String result = schedualWalletService.updateScore(orderInfo.getSellerId(),50L,1);
+                    BaseResp br = ParseReturnValue.getParseReturnValue(result);
+                    if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(br.getCode(),br.getReport());
+                    }
                 }
             }
         }
@@ -156,19 +178,18 @@ public class TimerServiceImpl implements TimerService{
                         if(DateUtil.getDateAfterDay(orderRefund.getAddTime(),2).getTime() < new Date().getTime()){
                             //自动同意
                             orderRefund.setSellerReturnStatus(4);
+                            orderRefundMapper.updateByPrimaryKeySelective(orderRefund);
                         }
                     }else if(info.getStatus().intValue() == Status.ORDER_GOODS_SENDED.getValue()){
                         //退货申请时间 + 3天 < 当前时间
                         if(DateUtil.getDateAfterDay(orderRefund.getAddTime(),3).getTime() < new Date().getTime()){
                             //自动拒绝
                             orderRefund.setSellerReturnStatus(5);
+                            orderRefundMapper.updateByPrimaryKeySelective(orderRefund);
                         }
                     }else{
                         throw new ServiceException("订单状态错误！");
                     }
-                    //自动处理扣除卖家信誉度
-                    schedualWalletService.updateCredit(info.getSellerId(), Credit.RETURN_TIMEOUT.getCredit(), Status.SUB.getValue());
-                    orderRefundMapper.updateByPrimaryKeySelective(orderRefund);
                 }
             }
         }

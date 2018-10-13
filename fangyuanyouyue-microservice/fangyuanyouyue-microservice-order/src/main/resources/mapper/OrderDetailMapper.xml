@@ -17,6 +17,9 @@
     <result column="seller_id" jdbcType="INTEGER" property="sellerId" />
     <result column="main_order_id" jdbcType="INTEGER" property="mainOrderId" />
     <result column="goods_type" jdbcType="INTEGER" property="goodsType" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+    <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.order.model.OrderDetail">
     <result column="description" jdbcType="LONGVARCHAR" property="description" />
@@ -170,7 +173,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="couponId != null">
         coupon_id = #{couponId,jdbcType=INTEGER},
@@ -206,7 +208,6 @@
       goods_id = #{goodsId,jdbcType=INTEGER},
       goods_name = #{goodsName,jdbcType=VARCHAR},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       coupon_id = #{couponId,jdbcType=INTEGER},
       main_img_url = #{mainImgUrl,jdbcType=VARCHAR},
       amount = #{amount,jdbcType=DECIMAL},
@@ -224,7 +225,6 @@
       goods_id = #{goodsId,jdbcType=INTEGER},
       goods_name = #{goodsName,jdbcType=VARCHAR},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       coupon_id = #{couponId,jdbcType=INTEGER},
       main_img_url = #{mainImgUrl,jdbcType=VARCHAR},
       amount = #{amount,jdbcType=DECIMAL},
@@ -236,9 +236,9 @@
   </update>
 
   <select id="selectByOrderId" parameterType="Integer" resultMap="BaseResultMap">
-    select a.*,b.type goods_type from order_detail a,goods_info b
+    select a.*,b.description,b.type goods_type,c.nick_name,c.head_img_url,c.phone from order_detail a,goods_info b,user_info c
     <where>
-      a.goods_id = b.id
+      a.goods_id = b.id and a.user_id=c.id
       <if test="orderId != null">
         and order_id = #{orderId,jdbcType=INTEGER}
       </if>
@@ -246,9 +246,9 @@
   </select>
 
   <select id="selectByMainOrderId" parameterType="Integer" resultMap="BaseResultMap">
-    select a.*,b.type goods_type from order_detail a,goods_info b
+    select a.*,b.description,b.type goods_type,c.nick_name,c.head_img_url,c.phone from order_detail a,goods_info b,user_info c
     <where>
-      a.goods_id = b.id
+      a.goods_id = b.id and a.user_id=c.id
       <if test="mainOrderId != null">
         and main_order_id = #{mainOrderId,jdbcType=INTEGER}
       </if>

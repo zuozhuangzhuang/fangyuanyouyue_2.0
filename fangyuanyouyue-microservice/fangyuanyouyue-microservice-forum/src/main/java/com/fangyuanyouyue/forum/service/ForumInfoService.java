@@ -6,6 +6,7 @@ import com.fangyuanyouyue.base.BasePageReq;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.forum.dto.ForumInfoDto;
+import com.fangyuanyouyue.forum.param.AdminForumParam;
 
 /**
  * 论坛帖子接口
@@ -68,9 +69,10 @@ public interface ForumInfoService {
 	 * @param sort
 	 * @param isChosen
 	 * @param status
+	 * @param content
 	 * @throws ServiceException
 	 */
-    void updateForum(Integer forumId,Integer sort,Integer isChosen,Integer status,String title) throws ServiceException;
+    void updateForum(AdminForumParam param) throws ServiceException;
 
 	/**
 	 * 编辑浏览量基数
@@ -94,4 +96,11 @@ public interface ForumInfoService {
 	 */
 	Integer processAllForum()throws ServiceException;
 
+	/**
+	 * 删除帖子/视频
+	 * @param userId
+	 * @param ids
+	 * @throws ServiceException
+	 */
+	void deleteForum(Integer userId,Integer[] ids) throws ServiceException;
 }

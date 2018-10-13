@@ -29,4 +29,6 @@ public class UserAuthOrder {
 
     private String title;//订单标题
 
+    private String payNo;//支付流水号
+
 }

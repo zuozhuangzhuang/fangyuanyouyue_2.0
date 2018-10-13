@@ -186,7 +186,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -205,23 +204,23 @@
       pic6 = #{pic6,jdbcType=VARCHAR},
       is_winner = #{isWinner,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
-      add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      add_time = #{addTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
   <select id="countById" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
-    select count(*) from appraisal_comment where appraisal_id = #{appraisalId,jdbcType=INTEGER}
+    select count(*) from appraisal_comment a,user_info b where a.user_id = b.id and a.appraisal_id = #{appraisalId,jdbcType=INTEGER} and a.status <![CDATA[ <> ]]> 2 and b.status <![CDATA[ <> ]]> 3
   </select>
   
   <select id="countByViewPoint" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
-    select count(*) from appraisal_comment where appraisal_id = #{appraisalId,jdbcType=INTEGER} and viewpoint = #{viewpoint,jdbcType=INTEGER}
+    select count(*) from appraisal_comment where appraisal_id = #{appraisalId,jdbcType=INTEGER} and viewpoint = #{viewpoint,jdbcType=INTEGER} and status <![CDATA[ <> ]]> 2
   </select>
   
   <select id="selectByAppraisalId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select
     a.*,b.nick_name,b.head_img_url
     from appraisal_comment a,user_info b
-    where a.user_id=b.id and appraisal_id=#{appraisalId}  and b.status <![CDATA[ <> ]]> 3
+    where a.user_id=b.id and appraisal_id=#{appraisalId}  and b.status <![CDATA[ <> ]]> 3 and a.status <![CDATA[ <> ]]> 2
     order by (select count(id) from appraisal_comment_likes where comment_id = a.id) desc,a.add_time desc
     <if test="start != null and limit != null">
     limit #{start},#{limit}
@@ -229,6 +228,6 @@
   </select>
 
   <select id="selectByAppraisalIdUserId" parameterType="Integer" resultMap="BaseResultMap">
-    select a.*,b.nick_name,b.head_img_url from appraisal_comment a,user_info b where a.user_id = b.id and b.status <![CDATA[ <> ]]> 3 and user_id = #{userId} and appraisal_id = #{appraisalId}
+    select a.*,b.nick_name,b.head_img_url from appraisal_comment a,user_info b where  a.status <![CDATA[ <> ]]> 2 and a.user_id = b.id and b.status <![CDATA[ <> ]]> 3 and user_id = #{userId} and appraisal_id = #{appraisalId}
   </select>
 </mapper>

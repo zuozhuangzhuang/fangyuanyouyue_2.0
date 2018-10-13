@@ -2,6 +2,9 @@ package com.fangyuanyouyue.forum.service.impl;
 
 import java.util.List;
 
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +32,7 @@ import com.fangyuanyouyue.forum.service.SchedualUserService;
 @Service(value = "appraisalCommentService")
 @Transactional(rollbackFor=Exception.class)
 public class AppraisalCommentServiceImpl implements AppraisalCommentService {
-	
+
 	@Autowired
 	AppraisalCommentMapper appraisalCommentMapper;
 	@Autowired
@@ -53,18 +56,23 @@ public class AppraisalCommentServiceImpl implements AppraisalCommentService {
 	public List<AppraisalCommentDto> getAppraisalCommentList(Integer userId,Integer appraisalId, Integer start, Integer limit)
 			throws ServiceException {
 		AppraisalDetail detail = appraisalDetailMapper.selectByPrimaryKey(appraisalId);
+		if(detail == null || detail.getStatus().equals(Status.DELETE.getValue())){
+			throw new ServiceException("未找到全民鉴定！");
+		}
 		List<AppraisalComment> list = appraisalCommentMapper.selectByAppraisalId(appraisalId, start*limit, limit);
 		List<AppraisalCommentDto> dtos = AppraisalCommentDto.toDtoList(list);
-		for(AppraisalCommentDto dto:dtos){
-			//是否点赞
-			AppraisalCommentLikes appraisalCommentLikes = appraisalCommentLikesMapper.selectByCommentIdUserId(dto.getCommentId(),userId);
-			if(appraisalCommentLikes != null){
-				dto.setIsLikes(StatusEnum.YES.getValue());
-			}
-			if(detail.getStatus().equals(2)){
-				//点赞数量
-				Integer likesCount = appraisalCommentLikesService.countCommentLikes(dto.getCommentId());
-				dto.setLikesCount(likesCount);
+		if(userId != null){
+			for(AppraisalCommentDto dto:dtos){
+				//是否点赞
+				AppraisalCommentLikes appraisalCommentLikes = appraisalCommentLikesMapper.selectByCommentIdUserId(dto.getCommentId(),userId);
+				if(appraisalCommentLikes != null){
+					dto.setIsLikes(StatusEnum.YES.getValue());
+				}
+				if(userId.equals(dto.getUserId()) || detail.getStatus().equals(Status.END.getValue())){
+					//点赞数量
+					Integer likesCount = appraisalCommentLikesService.countCommentLikes(dto.getCommentId());
+					dto.setLikesCount(likesCount);
+				}
 			}
 		}
 		return dtos;
@@ -73,13 +81,13 @@ public class AppraisalCommentServiceImpl implements AppraisalCommentService {
 	@Override
 	public AppraisalCommentDto saveComment(Integer userId,AppraisalParam param) throws ServiceException{
 		AppraisalDetail detail = appraisalDetailMapper.selectByPrimaryKey(param.getAppraisalId());
-		if(detail == null){
-			throw new ServiceException("未找到鉴定！");
-		}else{
-			if(detail.getStatus() == 2){
-				throw new ServiceException("鉴定已结束！");
-			}
+		if(detail == null || detail.getStatus().equals(Status.DELETE.getValue())){
+			throw new ServiceException("未找到全民鉴定！");
 		}
+		if(detail.getStatus().equals(Status.END.getValue())){
+			throw new ServiceException("全民鉴定已结束！");
+		}
+
 		AppraisalComment model = appraisalCommentMapper.selectByAppraisalIdUserId(userId,param.getAppraisalId());
 		if(model == null){
 			model = new AppraisalComment();
@@ -88,10 +96,18 @@ public class AppraisalCommentServiceImpl implements AppraisalCommentService {
 			model.setViewpoint(param.getViewpoint());
 			model.setContent(param.getContent());
 			model.setAddTime(DateStampUtils.getTimesteamp());
+			model.setStatus(Status.SHOW.getValue());
 			appraisalCommentMapper.insert(model);
+			detail.setCommentTime(DateStampUtils.getTimesteamp());
+			appraisalDetailMapper.updateByPrimaryKey(detail);
 			if(param.getUserIds() != null && param.getUserIds().length > 0){
 				//邀请我：用户“用户昵称”参与全民鉴定【全民鉴定名称】时邀请了您！点击此处前往查看吧
-				UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
+				String verifyUserById = schedualUserService.verifyUserById(userId);
+				BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
+				if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+					throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+				}
+				UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
 				AppraisalDetail appraisalDetail = appraisalDetailMapper.selectDetailByPrimaryKey(param.getAppraisalId());
 				for(Integer toUserId:param.getUserIds()){
 					schedualMessageService.easemobMessage(toUserId.toString(),
@@ -114,12 +130,13 @@ public class AppraisalCommentServiceImpl implements AppraisalCommentService {
 	@Override
 	public void deleteComment(Integer userId, Integer commentId) throws ServiceException {
 		AppraisalComment comment = appraisalCommentMapper.selectByPrimaryKey(commentId);
-		if(comment == null){
+		if(comment == null || Status.HIDE.getValue().equals(comment.getStatus())){
 			throw new ServiceException("未找到评论");
 		}
 		if(!comment.getUserId().equals(userId)){
 			throw new ServiceException("您无权删除此评论！");
 		}
-		appraisalCommentMapper.deleteByPrimaryKey(commentId);
+		comment.setStatus(Status.HIDE.getValue());
+		appraisalCommentMapper.updateByPrimaryKey(comment);
 	}
 }

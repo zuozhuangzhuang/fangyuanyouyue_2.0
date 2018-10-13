@@ -2,8 +2,11 @@ package com.fangyuanyouyue.user.service;
 
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.user.dto.admin.AdminDailyStatisticsDto;
 import com.fangyuanyouyue.user.dto.admin.AdminProcessDto;
 import com.fangyuanyouyue.user.param.AdminUserParam;
+
+import java.util.List;
 
 public interface SystemService {
     /**
@@ -29,7 +32,7 @@ public interface SystemService {
      * @param content
      * @throws ServiceException
      */
-    void sendMessage(String content) throws ServiceException;
+    void sendMessage(Integer userId,String content) throws ServiceException;
 
     /**
      * 获取统计信息
@@ -54,5 +57,22 @@ public interface SystemService {
      * 每天统计一次本月注册用户
      * @throws ServiceException
      */
-//    Integer processMonthUser() throws ServiceException;
+    Integer processYesterdayUser() throws ServiceException;
+
+    /**
+     * 系统消息历史列表
+     * @param param
+     * @return
+     * @throws ServiceException
+     */
+    Pager sysMsgList(AdminUserParam param) throws ServiceException;
+
+    /**
+     * 获取统计列表
+     * @param count
+     * @return
+     * @throws ServiceException
+     */
+    List<AdminDailyStatisticsDto> getProcessList(Integer count) throws ServiceException;
+
 }

@@ -21,10 +21,11 @@
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
         <result column="video_length" jdbcType="INTEGER" property="videoLength" />
         <result column="start_price" jdbcType="DECIMAL" property="startPrice" />
-        <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
-        <result column="head_img_url" property="headImgUrl" jdbcType="VARCHAR" />
-        <result column="address" property="userAddress" jdbcType="VARCHAR" />
-        <result column="level" property="level" jdbcType="INTEGER" />
+        <result column="comment_time" jdbcType="TIMESTAMP" property="commentTime" />
+        <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+        <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl" />
+        <result column="address" jdbcType="VARCHAR" property="userAddress" />
+        <result column="level" jdbcType="INTEGER" property="level" />
     </resultMap>
     <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.goods.model.GoodsInfo">
         <result column="description" jdbcType="LONGVARCHAR" property="description" />
@@ -32,7 +33,7 @@
     <sql id="Base_Column_List">
     id, user_id, name, price, postage, sort, label, type, status, floor_price, interval_time, 
     markdown, last_interval_time, is_appraisal, video_url, add_time, update_time, video_length, 
-    start_price
+    start_price, comment_time
   </sql>
     <sql id="Blob_Column_List">
     description
@@ -56,14 +57,16 @@
       floor_price, interval_time, markdown, 
       last_interval_time, is_appraisal, video_url, 
       add_time, update_time, video_length, 
-      start_price, description)
+      start_price, comment_time, description
+      )
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, 
       #{price,jdbcType=DECIMAL}, #{postage,jdbcType=DECIMAL}, #{sort,jdbcType=INTEGER}, 
       #{label,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
       #{floorPrice,jdbcType=DECIMAL}, #{intervalTime,jdbcType=INTEGER}, #{markdown,jdbcType=DECIMAL}, 
       #{lastIntervalTime,jdbcType=TIMESTAMP}, #{isAppraisal,jdbcType=INTEGER}, #{videoUrl,jdbcType=VARCHAR}, 
       #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{videoLength,jdbcType=INTEGER}, 
-      #{startPrice,jdbcType=DECIMAL}, #{description,jdbcType=LONGVARCHAR})
+      #{startPrice,jdbcType=DECIMAL}, #{commentTime,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR}
+      )
   </insert>
     <insert id="insertSelective" parameterType="com.fangyuanyouyue.goods.model.GoodsInfo" useGeneratedKeys="true" keyProperty="id">
         insert into goods_info
@@ -124,6 +127,9 @@
             </if>
             <if test="startPrice != null">
                 start_price,
+            </if>
+            <if test="commentTime != null">
+                comment_time,
             </if>
             <if test="description != null">
                 description,
@@ -187,6 +193,9 @@
             <if test="startPrice != null">
                 #{startPrice,jdbcType=DECIMAL},
             </if>
+            <if test="commentTime != null">
+                #{commentTime,jdbcType=TIMESTAMP},
+            </if>
             <if test="description != null">
                 #{description,jdbcType=LONGVARCHAR},
             </if>
@@ -241,13 +250,15 @@
                 add_time = #{addTime,jdbcType=TIMESTAMP},
             </if>
             <if test="updateTime != null">
-                update_time = #{updateTime,jdbcType=TIMESTAMP},
             </if>
             <if test="videoLength != null">
                 video_length = #{videoLength,jdbcType=INTEGER},
             </if>
             <if test="startPrice != null">
                 start_price = #{startPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="commentTime != null">
+                comment_time = #{commentTime,jdbcType=TIMESTAMP},
             </if>
             <if test="description != null">
                 description = #{description,jdbcType=LONGVARCHAR},
@@ -272,9 +283,9 @@
       is_appraisal = #{isAppraisal,jdbcType=INTEGER},
       video_url = #{videoUrl,jdbcType=VARCHAR},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       video_length = #{videoLength,jdbcType=INTEGER},
       start_price = #{startPrice,jdbcType=DECIMAL},
+      comment_time = #{commentTime,jdbcType=TIMESTAMP},
       description = #{description,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -295,9 +306,9 @@
       is_appraisal = #{isAppraisal,jdbcType=INTEGER},
       video_url = #{videoUrl,jdbcType=VARCHAR},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       video_length = #{videoLength,jdbcType=INTEGER},
-      start_price = #{startPrice,jdbcType=DECIMAL}
+      start_price = #{startPrice,jdbcType=DECIMAL},
+      comment_time = #{commentTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
@@ -305,7 +316,7 @@
         select * from goods_info a left join user_info_ext b on a.user_id = b.user_id
         <where>
             1=1
-            <if test="status != null">
+            <if test="status != null and quality != 5">
                 and a.status = #{status,jdbcType=INTEGER}
             </if>
             <if test="status == null">
@@ -331,7 +342,7 @@
                     and b.auth_type = 2
                 </if>
                 <if test="quality == 2">
-                    and a.id in (select goods_id from goods_appraisal_detail where type = 1 and status = 1)
+                    and a.is_appraisal = 1
                 </if>
                 <if test="quality == 3">
                     and b.credit <![CDATA[ >= ]]> 10000
@@ -343,7 +354,7 @@
                     and a.status = 2
                 </if>
             </if>
-            <if test="goodsCategoryIds != null and goodsCategoryIds.length > 0">
+            <if test="goodsCategoryIds != null and goodsCategoryIds.length &gt; 0">
                 and a.id in (select goods_id from goods_correlation where (goods_category_id in
                 <foreach close=")" collection="goodsCategoryIds" index="index" item="categoryId" open="(" separator=",">
                     #{categoryId,jdbcType=INTEGER}
@@ -355,7 +366,7 @@
                 ))
             </if>
         </where>
-        order by a.sort,
+        order by
         <if test="synthesize != null">
             <if test="synthesize == 1">
 
@@ -370,7 +381,7 @@
                 a.price desc,
             </if>
         </if>
-        a.update_time desc limit #{start},#{limit}
+        a.sort,a.comment_time desc,a.update_time desc limit #{start},#{limit}
     </select>
 
 
@@ -411,7 +422,7 @@
         (select goods_id from goods_correlation
         <where>
             1=1
-            <if test="goodsCategoryIds != null and goodsCategoryIds.size() > 0">
+            <if test="goodsCategoryIds != null and goodsCategoryIds.size() &gt; 0">
                 and  goods_category_id in
                 <foreach close=")" collection="goodsCategoryIds" index="index" item="categoryId" open="(" separator=",">
                     #{categoryId,jdbcType=INTEGER}
@@ -465,9 +476,9 @@
     </select>
 
     <select id="getGoodsPage" resultMap="BaseResultMap">
-        select * from goods_info 
+        select * from goods_info
         <where>
-            status != 5 
+            status != 5
             <if test="type != null">
                 and type = #{type}
             </if>

@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fangyuanyouyue.user.dao.DailyStatisticsMapper" >
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.user.model.DailyStatistics" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="date" property="date" jdbcType="DATE" />
+    <result column="user_count" property="userCount" jdbcType="INTEGER" />
+    <result column="order_count" property="orderCount" jdbcType="INTEGER" />
+    <result column="income_count" property="incomeCount" jdbcType="DECIMAL" />
+    <result column="expend_count" property="expendCount" jdbcType="DECIMAL" />
+    <result column="goods_count" property="goodsCount" jdbcType="INTEGER" />
+    <result column="forum_count" property="forumCount" jdbcType="INTEGER" />
+    <result column="auction_count" property="auctionCount" jdbcType="INTEGER" />
+    <result column="video_count" property="videoCount" jdbcType="INTEGER" />
+    <result column="appraisal_count" property="appraisalCount" jdbcType="INTEGER" />
+    <result column="platform_appraisal_count" property="platformAppraisalCount" jdbcType="INTEGER" />
+    <result column="vip_count" property="vipCount" jdbcType="INTEGER" />
+    <result column="add_time" property="addTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, date, user_count, order_count, income_count, expend_count, goods_count, forum_count, 
+    auction_count, video_count, appraisal_count, platform_appraisal_count, vip_count, 
+    add_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from daily_statistics
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from daily_statistics
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.fangyuanyouyue.user.model.DailyStatistics"  useGeneratedKeys="true" keyProperty="id">
+    insert into daily_statistics (id, date, user_count, 
+      order_count, income_count, expend_count, 
+      goods_count, forum_count, auction_count, 
+      video_count, appraisal_count, platform_appraisal_count, 
+      vip_count, add_time, update_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{date,jdbcType=DATE}, #{userCount,jdbcType=INTEGER}, 
+      #{orderCount,jdbcType=INTEGER}, #{incomeCount,jdbcType=DECIMAL}, #{expendCount,jdbcType=DECIMAL}, 
+      #{goodsCount,jdbcType=INTEGER}, #{forumCount,jdbcType=INTEGER}, #{auctionCount,jdbcType=INTEGER}, 
+      #{videoCount,jdbcType=INTEGER}, #{appraisalCount,jdbcType=INTEGER}, #{platformAppraisalCount,jdbcType=INTEGER}, 
+      #{vipCount,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.user.model.DailyStatistics"  useGeneratedKeys="true" keyProperty="id">
+    insert into daily_statistics
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="date != null" >
+        date,
+      </if>
+      <if test="userCount != null" >
+        user_count,
+      </if>
+      <if test="orderCount != null" >
+        order_count,
+      </if>
+      <if test="incomeCount != null" >
+        income_count,
+      </if>
+      <if test="expendCount != null" >
+        expend_count,
+      </if>
+      <if test="goodsCount != null" >
+        goods_count,
+      </if>
+      <if test="forumCount != null" >
+        forum_count,
+      </if>
+      <if test="auctionCount != null" >
+        auction_count,
+      </if>
+      <if test="videoCount != null" >
+        video_count,
+      </if>
+      <if test="appraisalCount != null" >
+        appraisal_count,
+      </if>
+      <if test="platformAppraisalCount != null" >
+        platform_appraisal_count,
+      </if>
+      <if test="vipCount != null" >
+        vip_count,
+      </if>
+      <if test="addTime != null" >
+        add_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="date != null" >
+        #{date,jdbcType=DATE},
+      </if>
+      <if test="userCount != null" >
+        #{userCount,jdbcType=INTEGER},
+      </if>
+      <if test="orderCount != null" >
+        #{orderCount,jdbcType=INTEGER},
+      </if>
+      <if test="incomeCount != null" >
+        #{incomeCount,jdbcType=DECIMAL},
+      </if>
+      <if test="expendCount != null" >
+        #{expendCount,jdbcType=DECIMAL},
+      </if>
+      <if test="goodsCount != null" >
+        #{goodsCount,jdbcType=INTEGER},
+      </if>
+      <if test="forumCount != null" >
+        #{forumCount,jdbcType=INTEGER},
+      </if>
+      <if test="auctionCount != null" >
+        #{auctionCount,jdbcType=INTEGER},
+      </if>
+      <if test="videoCount != null" >
+        #{videoCount,jdbcType=INTEGER},
+      </if>
+      <if test="appraisalCount != null" >
+        #{appraisalCount,jdbcType=INTEGER},
+      </if>
+      <if test="platformAppraisalCount != null" >
+        #{platformAppraisalCount,jdbcType=INTEGER},
+      </if>
+      <if test="vipCount != null" >
+        #{vipCount,jdbcType=INTEGER},
+      </if>
+      <if test="addTime != null" >
+        #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.user.model.DailyStatistics" >
+    update daily_statistics
+    <set >
+      <if test="date != null" >
+        date = #{date,jdbcType=DATE},
+      </if>
+      <if test="userCount != null" >
+        user_count = #{userCount,jdbcType=INTEGER},
+      </if>
+      <if test="orderCount != null" >
+        order_count = #{orderCount,jdbcType=INTEGER},
+      </if>
+      <if test="incomeCount != null" >
+        income_count = #{incomeCount,jdbcType=DECIMAL},
+      </if>
+      <if test="expendCount != null" >
+        expend_count = #{expendCount,jdbcType=DECIMAL},
+      </if>
+      <if test="goodsCount != null" >
+        goods_count = #{goodsCount,jdbcType=INTEGER},
+      </if>
+      <if test="forumCount != null" >
+        forum_count = #{forumCount,jdbcType=INTEGER},
+      </if>
+      <if test="auctionCount != null" >
+        auction_count = #{auctionCount,jdbcType=INTEGER},
+      </if>
+      <if test="videoCount != null" >
+        video_count = #{videoCount,jdbcType=INTEGER},
+      </if>
+      <if test="appraisalCount != null" >
+        appraisal_count = #{appraisalCount,jdbcType=INTEGER},
+      </if>
+      <if test="platformAppraisalCount != null" >
+        platform_appraisal_count = #{platformAppraisalCount,jdbcType=INTEGER},
+      </if>
+      <if test="vipCount != null" >
+        vip_count = #{vipCount,jdbcType=INTEGER},
+      </if>
+      <if test="addTime != null" >
+        add_time = #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.user.model.DailyStatistics" >
+    update daily_statistics
+    set date = #{date,jdbcType=DATE},
+      user_count = #{userCount,jdbcType=INTEGER},
+      order_count = #{orderCount,jdbcType=INTEGER},
+      income_count = #{incomeCount,jdbcType=DECIMAL},
+      expend_count = #{expendCount,jdbcType=DECIMAL},
+      goods_count = #{goodsCount,jdbcType=INTEGER},
+      forum_count = #{forumCount,jdbcType=INTEGER},
+      auction_count = #{auctionCount,jdbcType=INTEGER},
+      video_count = #{videoCount,jdbcType=INTEGER},
+      appraisal_count = #{appraisalCount,jdbcType=INTEGER},
+      platform_appraisal_count = #{platformAppraisalCount,jdbcType=INTEGER},
+      vip_count = #{vipCount,jdbcType=INTEGER},
+      add_time = #{addTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectByDayCount" resultMap="BaseResultMap">
+    select * from daily_statistics order by date desc limit 0,#{count}
+  </select>
+</mapper>

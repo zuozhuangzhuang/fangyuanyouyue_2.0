@@ -261,7 +261,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null" >
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -287,8 +286,7 @@
       pay_pwd_err_count = #{payPwdErrCount,jdbcType=INTEGER},
       last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},
       last_login_platform = #{lastLoginPlatform,jdbcType=INTEGER},
-      add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      add_time = #{addTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

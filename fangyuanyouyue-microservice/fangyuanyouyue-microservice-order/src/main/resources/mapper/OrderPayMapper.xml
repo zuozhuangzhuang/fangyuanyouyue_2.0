@@ -28,12 +28,13 @@
     <result column="city" jdbcType="VARCHAR" property="city" />
     <result column="area" jdbcType="VARCHAR" property="area" />
     <result column="send_time" jdbcType="TIMESTAMP" property="sendTime" />
+    <result column="logistic_company_no" jdbcType="VARCHAR" property="logisticCompanyNo" />
   </resultMap>
   <sql id="Base_Column_List">
     id, order_id, receiver_name, receiver_phone, address, post_code, order_no, amount, 
     pay_amount, freight, count, pay_type, pay_no, pay_time, send_type, logistic_status, 
     logistic_code, logistic_company, remarks, status, add_time, update_time, province, 
-    city, area, send_time
+    city, area, send_time, logistic_company_no
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -54,7 +55,8 @@
       logistic_status, logistic_code, logistic_company, 
       remarks, status, add_time, 
       update_time, province, city, 
-      area, send_time)
+      area, send_time, logistic_company_no
+      )
     values (#{id,jdbcType=INTEGER}, #{orderId,jdbcType=INTEGER}, #{receiverName,jdbcType=VARCHAR}, 
       #{receiverPhone,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{postCode,jdbcType=VARCHAR}, 
       #{orderNo,jdbcType=VARCHAR}, #{amount,jdbcType=DECIMAL}, #{payAmount,jdbcType=DECIMAL}, 
@@ -63,9 +65,10 @@
       #{logisticStatus,jdbcType=INTEGER}, #{logisticCode,jdbcType=VARCHAR}, #{logisticCompany,jdbcType=VARCHAR}, 
       #{remarks,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP}, #{province,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR}, 
-      #{area,jdbcType=VARCHAR}, #{sendTime,jdbcType=TIMESTAMP})
+      #{area,jdbcType=VARCHAR}, #{sendTime,jdbcType=TIMESTAMP}, #{logisticCompanyNo,jdbcType=VARCHAR}
+      )
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.order.model.OrderPay">
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.order.model.OrderPay" useGeneratedKeys="true" keyProperty="id">
     insert into order_pay
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -145,6 +148,9 @@
       </if>
       <if test="sendTime != null">
         send_time,
+      </if>
+      <if test="logisticCompanyNo != null">
+        logistic_company_no,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -226,6 +232,9 @@
       <if test="sendTime != null">
         #{sendTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="logisticCompanyNo != null">
+        #{logisticCompanyNo,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.order.model.OrderPay">
@@ -292,7 +301,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="province != null">
         province = #{province,jdbcType=VARCHAR},
@@ -305,6 +313,9 @@
       </if>
       <if test="sendTime != null">
         send_time = #{sendTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="logisticCompanyNo != null">
+        logistic_company_no = #{logisticCompanyNo,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -331,11 +342,11 @@
       remarks = #{remarks,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       province = #{province,jdbcType=VARCHAR},
       city = #{city,jdbcType=VARCHAR},
       area = #{area,jdbcType=VARCHAR},
-      send_time = #{sendTime,jdbcType=TIMESTAMP}
+      send_time = #{sendTime,jdbcType=TIMESTAMP},
+      logistic_company_no = #{logisticCompanyNo,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 

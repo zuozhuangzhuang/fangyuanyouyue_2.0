@@ -3,8 +3,10 @@ package com.fangyuanyouyue.wallet.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.model.WxPayResult;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.base.util.WechatUtil.WXPayUtil;
 import com.fangyuanyouyue.base.util.alipay.util.AlipayNotify;
 import com.fangyuanyouyue.wallet.param.WalletParam;
@@ -70,10 +72,9 @@ public class UserVipController extends BaseController{
                 return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            String verifyUser = schedualUserService.verifyUserById(userId);
-            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if(jsonObject != null && (Integer)jsonObject.get("code") != 0){
-                return toError(jsonObject.getString("report"));
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
             if(param.getVipLevel()==null){
                 return toError("会员等级不能为空！");

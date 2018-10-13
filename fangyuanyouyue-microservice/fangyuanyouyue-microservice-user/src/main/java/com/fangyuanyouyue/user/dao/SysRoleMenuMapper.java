@@ -1,7 +1,10 @@
 package com.fangyuanyouyue.user.dao;
 
-import com.fangyuanyouyue.user.model.SysRoleMenu;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
+
+import com.fangyuanyouyue.user.model.SysRoleMenu;
 
 @Mapper
 public interface SysRoleMenuMapper {
@@ -16,4 +19,14 @@ public interface SysRoleMenuMapper {
     int updateByPrimaryKeySelective(SysRoleMenu record);
 
     int updateByPrimaryKey(SysRoleMenu record);
+
+    List<SysRoleMenu> selectAll();
+
+    List<SysRoleMenu> selectByRoleId(Integer roleId);
+
+    List<SysRoleMenu> selectByMenuId(Integer menuId);
+
+    int deleteByRoleId(Integer roleId);
+
+    int deleteByMenuId(Integer menuId);
 }

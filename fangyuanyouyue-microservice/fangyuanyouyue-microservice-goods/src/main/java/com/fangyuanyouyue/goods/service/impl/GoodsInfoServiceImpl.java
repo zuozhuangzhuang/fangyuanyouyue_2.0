@@ -1,16 +1,20 @@
 package com.fangyuanyouyue.goods.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.Credit;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.enums.Score;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.goods.dao.*;
 import com.fangyuanyouyue.goods.dto.*;
+import com.fangyuanyouyue.goods.dto.adminDto.AdminGoodsCategoryDto;
 import com.fangyuanyouyue.goods.dto.adminDto.AdminGoodsDto;
 import com.fangyuanyouyue.goods.model.*;
 import com.fangyuanyouyue.goods.param.AdminGoodsParam;
@@ -131,11 +135,18 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void addGoods(Integer userId,String nickName,GoodsParam param) throws ServiceException {
+        String verifyUserById = schedualUserService.verifyUserById(userId);
+        BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
+        if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+            throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+        }
+        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
         //验证手机号
-        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
         if(StringUtils.isEmpty(user.getPhone())){
-            throw new ServiceException("未绑定手机号！");
+            throw new ServiceException(ReCode.NO_PHONE.getValue(),ReCode.NO_PHONE.getMessage());
         }
         //商品表 goods_info
         GoodsInfo goodsInfo = new GoodsInfo();
@@ -172,6 +183,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             goodsInfo.setIntervalTime(param.getIntervalTime());
             goodsInfo.setMarkdown(param.getMarkdown());
         }
+        goodsInfo.setCommentTime(DateStampUtils.getTimesteamp());
         goodsInfoMapper.insert(goodsInfo);
         //视频截图路径
         if(StringUtils.isNotEmpty(param.getVideoImg())){
@@ -196,11 +208,23 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             }
         }
         //增加积分、信誉度
-        schedualWalletService.updateScore(userId, Score.ADD_GOODSINFO.getScore(),Status.ADD.getValue());
+        String result = schedualWalletService.updateScore(userId, Score.ADD_GOODSINFO.getScore(),Status.ADD.getValue());
+        BaseResp br = ParseReturnValue.getParseReturnValue(result);
+        if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
+            throw new ServiceException(br.getCode(),br.getReport());
+        }
         if(param.getType() == Status.GOODS.getValue()){
-            schedualWalletService.updateCredit(userId, Credit.ADD_GOODSINFO.getCredit(),Status.ADD.getValue());
+            result = schedualWalletService.updateCredit(userId, Credit.ADD_GOODSINFO.getCredit(),Status.ADD.getValue());
+            br = ParseReturnValue.getParseReturnValue(result);
+            if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
+                throw new ServiceException(br.getCode(),br.getReport());
+            }
         }else{
-            schedualWalletService.updateCredit(userId, Credit.ADD_AUCTION.getCredit(),Status.ADD.getValue());
+            result = schedualWalletService.updateCredit(userId, Credit.ADD_AUCTION.getCredit(),Status.ADD.getValue());
+            br = ParseReturnValue.getParseReturnValue(result);
+            if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
+                throw new ServiceException(br.getCode(),br.getReport());
+            }
         }
         //给被邀请的用户发送信息 邀请我：用户“用户昵称”上传商品【商品名称】时邀请了您！点击此处前往查看吧
         //邀请我：用户“用户昵称”上传抢购【抢购名称】时邀请了您！点击此处前往查看吧
@@ -265,7 +289,12 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             }
 
             //获取卖家信息
-            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(goodsInfo.getUserId())).getString("data")), UserInfo.class);
+            String verifyUserById = schedualUserService.verifyUserById(goodsInfo.getUserId());
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+            }
+            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
             GoodsDto goodsDto = new GoodsDto(user,goodsInfo,goodsImgs,goodsCorrelations,goodsCommentDtos);
             if(userId != null){
                 Integer type;
@@ -281,9 +310,16 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 List<BargainDto> bargainDtos = BargainDto.toDtoList(bargains);
                 if(bargainDtos != null && bargainDtos.size()>0){
                     for(BargainDto bargainDto:bargainDtos){
-                        UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(bargainDto.getUserId())).getString("data")), UserInfo.class);
-                        bargainDto.setNickName(seller.getNickName());
-                        bargainDto.setHeadImgUrl(seller.getHeadImgUrl());
+                        String verifySellerById = schedualUserService.verifyUserById(bargainDto.getUserId());
+                        BaseResp parseSellerReturnValue = ParseReturnValue.getParseReturnValue(verifySellerById);
+                        if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                            throw new ServiceException(parseSellerReturnValue.getCode(),parseSellerReturnValue.getReport());
+                        }
+                        UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(parseSellerReturnValue.getData().toString()), UserInfo.class);
+                        if(seller != null){
+                            bargainDto.setNickName(seller.getNickName());
+                            bargainDto.setHeadImgUrl(seller.getHeadImgUrl());
+                        }
                     }
                     goodsDto.setBargainDtos(bargainDtos);
                 }
@@ -332,13 +368,13 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             if(goodsInfo == null || goodsInfo.getStatus().intValue() == 5){
                 throw new ServiceException("商品不存在或已下架！");
             }else{
+                if(!goodsInfo.getUserId().equals(userId)){
+                    throw new ServiceException("无权删除！");
+                }
                 //取消所有议价
                 List<GoodsBargain> goodsBargains = goodsBargainMapper.selectAllByGoodsId(goodsId,Status.BARGAIN_APPLY.getValue());//状态 1申请 2同意 3拒绝 4取消
                 for(GoodsBargain bargain:goodsBargains){
-                    bargainService.updateBargain(userId,goodsId,bargain.getId(),Status.BARGAIN_REFUSE.getValue());
-                    //议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
-                    schedualMessageService.easemobMessage(bargain.getUserId().toString(),
-                            "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),bargain.getGoodsId().toString());
+                    bargainService.updateBargain(goodsInfo.getUserId(),goodsId,bargain.getId(),Status.BARGAIN_REFUSE.getValue());
                 }
                 goodsInfo.setStatus(5);//状态 普通商品 1出售中 2已售出 3已下架（已结束） 5删除
                 goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
@@ -424,7 +460,8 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             //如果是已下架的商品或抢购，重新上架
             goodsInfo.setStatus(1);//状态 1出售中 2已售出 3已下架（已结束） 5删除
             goodsInfo.setUpdateTime(DateStampUtils.getTimesteamp());
-            goodsInfoMapper.updateByPrimaryKey(goodsInfo);
+            goodsInfo.setCommentTime(DateStampUtils.getTimesteamp());
+            goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
 
             //抢购 重新编辑可以重新上架，删除旧降价历史
             if(goodsInfo.getType() == 2){
@@ -628,6 +665,8 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void updateGoodsStatus(Integer goodsId,Integer status) throws ServiceException {
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
         if(goodsInfo == null){
@@ -644,12 +683,15 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                     bargain.setStatus(Status.BARGAIN_REFUSE.getValue());
                     goodsBargainMapper.updateByPrimaryKeySelective(bargain);
                     //退回余额
-                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),Status.ADD.getValue())), BaseResp.class);
-                    if(baseResp.getCode() == 1){
-                        throw new ServiceException(baseResp.getReport().toString());
+                    BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),Status.ADD.getValue()));
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                     }
                     //买家新增余额账单
-                    schedualWalletService.addUserBalanceDetail(bargain.getUserId(),bargain.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),bargain.getBargainNo(),"【"+goodsInfo.getName()+"】",goodsInfo.getUserId(),bargain.getUserId(),Status.BARGAIN.getValue(),bargain.getBargainNo());
+                    baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(bargain.getUserId(),bargain.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),bargain.getBargainNo(),"【"+goodsInfo.getName()+"】",goodsInfo.getUserId(),bargain.getUserId(),Status.BARGAIN.getValue(),bargain.getBargainNo()));
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                    }
                     schedualMessageService.easemobMessage(bargain.getUserId().toString(),
                             "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),bargain.getGoodsId().toString());
                 }
@@ -663,14 +705,14 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
 
     @Override
     public Pager categoryPage(AdminGoodsParam param) throws ServiceException {
-        Integer total = goodsCategoryMapper.countPage(param.getKeyword(),param.getStatus());
+        Integer total = goodsCategoryMapper.countPage(param.getKeyword(),param.getStatus(),param.getType(),param.getParentId());
         //商品分类列表
         param.setOrders("parent_id,id");
         List<GoodsCategory> goodsCategoryDtos = goodsCategoryMapper.getPage(param.getStart(),param.getLimit(),
-                param.getKeyword(),param.getStatus(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
+                param.getKeyword(),param.getStatus(),param.getType(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType(),param.getParentId());
         Pager pager = new Pager();
         pager.setTotal(total);
-        pager.setDatas(goodsCategoryDtos);
+        pager.setDatas(AdminGoodsCategoryDto.toDtoList(goodsCategoryDtos));
         return pager;
     }
 
@@ -698,9 +740,14 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
 //            goodsDto.setMainUrl(mainImgUrl);
             
             goodsDto.setGoodsImgDtos(GoodsImgDto.toDtoList(goodsImgs));
-            
+
             //获取卖家信息
-            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(goodsInfo.getUserId())).getString("data")), UserInfo.class);
+            String verifyUserById = schedualUserService.verifyUserById(goodsInfo.getUserId());
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+            }
+            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
             goodsDto.setHeadImgUrl(user.getHeadImgUrl());
             goodsDto.setNickName(user.getNickName());
             String ret = schedualUserService.userIsAuth(goodsInfo.getUserId());
@@ -716,6 +763,8 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void updateGoods(AdminGoodsParam param) throws ServiceException {
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(param.getId());
         if(goodsInfo == null){
@@ -756,16 +805,39 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             }
             if(param.getStatus() != null){
                 goodsInfo.setStatus(param.getStatus());//状态 1出售中 2已售出 3已下架（已结束） 5删除
+                if(param.getStatus().equals(5)){
+                    //取消所有议价
+                    List<GoodsBargain> goodsBargains = goodsBargainMapper.selectAllByGoodsId(param.getId(),Status.BARGAIN_APPLY.getValue());//状态 1申请 2同意 3拒绝 4取消
+                    for(GoodsBargain bargain:goodsBargains){
+                        bargainService.updateBargain(goodsInfo.getUserId(),param.getId(),bargain.getId(),Status.BARGAIN_REFUSE.getValue());
+                    }
+                }
             }
             if(param.getIsAppraisal() != null){
                 goodsInfo.setIsAppraisal(param.getIsAppraisal());
             }
             goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
             if(param.getStatus()!=null&&param.getStatus().intValue() == 5){
+                if(StringUtils.isEmpty(param.getContent())){
+                    throw new ServiceException("删除理由不能为空！");
+                }
                 //卖家-20信誉度
-                schedualWalletService.updateCredit(goodsInfo.getUserId(),Credit.DELETE_FAKE.getCredit(),Status.SUB.getValue());
+                String result = schedualWalletService.updateCredit(goodsInfo.getUserId(),Credit.DELETE_FAKE.getCredit(),Status.SUB.getValue());
+                BaseResp br = ParseReturnValue.getParseReturnValue(result);
+                if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(br.getCode(),br.getReport());
+                }
+                //很抱歉，您的商品/抢购【名称】已被官方删除，删除理由：……。点击查看详情
+                if(goodsInfo.getType().equals(Status.GOODS.getValue())){
+                    schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
+                            "很抱歉，您的商品【"+goodsInfo.getName()+"】已被官方删除，删除理由："+param.getContent()+"。点击查看详情",
+                            Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),goodsInfo.getId().toString());
+                }else{
+                    schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
+                            "很抱歉，您的抢购【"+goodsInfo.getName()+"】已被官方删除，删除理由："+param.getContent()+"。点击查看详情",
+                            Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_AUCTION.getMessage(),goodsInfo.getId().toString());
+                }
             }
-
         }
     }
 
@@ -778,9 +850,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             if(goodsCategory == null){
                 throw new ServiceException("未找到分类信息！");
             }
-            if(parentId != null){
-                goodsCategory.setParentId(parentId);
-            }
+            goodsCategory.setParentId(parentId);
             if(StringUtils.isNotEmpty(name)){
                 goodsCategory.setName(name);
             }
@@ -824,7 +894,12 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         goodsDto.setGoodsImgDtos(GoodsImgDto.toDtoList(goodsImgs));
 
         //获取卖家信息
-        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(goodsInfo.getUserId())).getString("data")), UserInfo.class);
+        String verifyUserById = schedualUserService.verifyUserById(goodsInfo.getUserId());
+        BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
+        if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+            throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+        }
+        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
         goodsDto.setHeadImgUrl(user.getHeadImgUrl());
         goodsDto.setNickName(user.getNickName());
         String ret = schedualUserService.userIsAuth(goodsInfo.getUserId());
@@ -853,6 +928,12 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         Integer allGoodsCount = goodsInfoMapper.getAllGoodsCount();
         return allGoodsCount;
     }
+
+
+	@Override
+	public List<GoodsCategory> getCategory() {
+		return goodsCategoryMapper.getTopCategory();
+	}
 
 //    @Override
 //    public Integer processMonthGoods() throws ServiceException {

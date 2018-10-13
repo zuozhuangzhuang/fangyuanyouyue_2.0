@@ -3,6 +3,7 @@ package com.fangyuanyouyue.forum.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fangyuanyouyue.base.enums.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,17 +69,17 @@ public class CollectServiceImpl implements CollectService{
     public void collect(Integer userId, Integer collectId, Integer collectType,Integer status) throws ServiceException {
         if(collectType == 3){//视频
             ForumInfo forumInfo = forumInfoMapper.selectByPrimaryKey(collectId);
-            if(forumInfo == null){
+            if(forumInfo == null || Status.HIDE.getValue().equals(forumInfo.getStatus())){
                 throw new ServiceException("收藏对象不存在！");
             }
         }else if (collectType == 4) {//帖子
             ForumInfo forumInfo = forumInfoMapper.selectByPrimaryKey(collectId);
-            if(forumInfo == null){
+            if(forumInfo == null || Status.HIDE.getValue().equals(forumInfo.getStatus())){
                 throw new ServiceException("收藏对象不存在！");
             }
         }else if(collectType == 5){//鉴定
             AppraisalDetail appraisalDetail = appraisalDetailMapper.selectByPrimaryKey(collectId);
-            if(appraisalDetail == null){
+            if(appraisalDetail == null || Status.DELETE.getValue().equals(appraisalDetail.getStatus())){
                 throw new ServiceException("收藏对象不存在！");
             }
         }else{

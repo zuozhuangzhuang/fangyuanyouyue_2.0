@@ -12,10 +12,11 @@
     <result column="goods_id" jdbcType="INTEGER" property="goodsId" />
     <result column="address_id" jdbcType="INTEGER" property="addressId" />
     <result column="reason" jdbcType="VARCHAR" property="reason" />
+    <result column="pay_no" jdbcType="VARCHAR" property="payNo" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, order_no, amount, status, add_time, update_time, goods_id, address_id, 
-    reason
+    reason, pay_no
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -31,11 +32,11 @@
     insert into bargain_order (id, user_id, order_no, 
       amount, status, add_time, 
       update_time, goods_id, address_id, 
-      reason)
+      reason, pay_no)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{orderNo,jdbcType=VARCHAR}, 
       #{amount,jdbcType=DECIMAL}, #{status,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP}, #{goodsId,jdbcType=INTEGER}, #{addressId,jdbcType=INTEGER}, 
-      #{reason,jdbcType=VARCHAR})
+      #{reason,jdbcType=VARCHAR}, #{payNo,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.fangyuanyouyue.goods.model.BargainOrder" useGeneratedKeys="true" keyProperty="id">
     insert into bargain_order
@@ -70,6 +71,9 @@
       <if test="reason != null">
         reason,
       </if>
+      <if test="payNo != null">
+        pay_no,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -102,6 +106,9 @@
       <if test="reason != null">
         #{reason,jdbcType=VARCHAR},
       </if>
+      <if test="payNo != null">
+        #{payNo,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.goods.model.BargainOrder">
@@ -123,7 +130,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="goodsId != null">
         goods_id = #{goodsId,jdbcType=INTEGER},
@@ -133,6 +139,9 @@
       </if>
       <if test="reason != null">
         reason = #{reason,jdbcType=VARCHAR},
+      </if>
+      <if test="payNo != null">
+        pay_no = #{payNo,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -144,10 +153,10 @@
       amount = #{amount,jdbcType=DECIMAL},
       status = #{status,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       goods_id = #{goodsId,jdbcType=INTEGER},
       address_id = #{addressId,jdbcType=INTEGER},
-      reason = #{reason,jdbcType=VARCHAR}
+      reason = #{reason,jdbcType=VARCHAR},
+      pay_no = #{payNo,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 

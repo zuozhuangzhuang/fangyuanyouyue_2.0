@@ -119,7 +119,7 @@ public class GoodsParam{
     private BigDecimal priceMax;//最大价格
 
     @ApiModelProperty(name = "quality", value = "品质", dataType = "int",hidden = true)
-    private Integer quality;//品质 1：认证店铺 2：官方保真 3：高信誉度 4：我的关注
+    private Integer quality;//品质 1：认证店铺 2：官方保真 3：高信誉度 4：我的关注 5：（抢购）已完成
 
     //轮播图 BannerIndex
     @ApiModelProperty(name = "businessId", value = "业务ID:商品ID/用户ID", dataType = "int",hidden = true)
@@ -161,4 +161,7 @@ public class GoodsParam{
 
     @ApiModelProperty(name = "videoLength", value = "视频长度", dataType = "int",hidden = true)
     private Integer videoLength;//视频长度
+
+    @ApiModelProperty(name = "ids", value = "id数组", dataType = "int",hidden = true)
+    private Integer[] ids;//id数组
 }

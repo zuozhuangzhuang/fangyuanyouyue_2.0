@@ -269,7 +269,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="isRegHx != null">
         is_reg_hx = #{isRegHx,jdbcType=INTEGER},
@@ -299,7 +298,6 @@
       last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},
       last_login_platform = #{lastLoginPlatform,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       is_reg_hx = #{isRegHx,jdbcType=INTEGER}
       
     where id = #{id,jdbcType=INTEGER}
@@ -339,7 +337,7 @@
     <if test="status != null">
       and status = #{status}
     </if>
-    <if test="startDate != null">
+    <if test="startDate != null ">
       and add_time <![CDATA[ > ]]> #{startDate}
     </if>
     
@@ -407,8 +405,62 @@
     select count(id) count from user_info
   </select>
 
-  <!--<select id="getMonthUserCount" resultType="Integer">
-    select count(*) count from user_info where date_format(add_time,'%Y-%m')=date_format(now(),'%Y-%m')
-  </select>-->
+  <select id="processYesterdayUser" resultType="Integer">
+    select count(id) count from user_info where add_time <![CDATA[ >= ]]> (CURDATE()-1) and add_time <![CDATA[ < ]]> CURDATE()
+  </select>
+
+
+  <select id="countConfinedUserPage" parameterType="Integer" resultType="Integer">
+    select count(*) from user_info a,confined_user b where a.id = b.user_id
+    <if test="keyword != null">
+      and (
+      a.nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
+      or a.phone like "%"#{keyword,jdbcType=VARCHAR}"%"
+      )
+    </if>
+    <if test="status != null">
+      and a.status = #{status}
+    </if>
+    <if test="startDate != null ">
+      and a.add_time <![CDATA[ > ]]> #{startDate}
+    </if>
+    <if test="endDate != null">
+      and a.add_time <![CDATA[ <= ]]> #{endDate}
+    </if>
+
+  </select>
+
+  <select id="getConfinedUserPage" resultMap="BaseResultMap">
+    select * from user_info a,confined_user b
+    <where>
+      a.id = b.user_id
+      <if test="keyword != null">
+        and (
+        a.nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
+        or a.phone like "%"#{keyword,jdbcType=VARCHAR}"%"
+        )
+      </if>
+      <if test="status != null">
+        and a.status = #{status}
+      </if>
+
+      <if test="startDate != null">
+        and a.add_time <![CDATA[ > ]]> #{startDate}
+      </if>
+
+      <if test="endDate != null">
+        and a.add_time <![CDATA[ <= ]]> #{endDate}
+      </if>
+    </where>
+    <if test="orders != null">
+      order by a.${orders}
+      <if test="ascType != null and ascType == 2">
+        desc
+      </if>
+    </if>
+    <if test="start != null and limit != null">
+      limit #{start},#{limit}
+    </if>
+  </select>
 
 </mapper>

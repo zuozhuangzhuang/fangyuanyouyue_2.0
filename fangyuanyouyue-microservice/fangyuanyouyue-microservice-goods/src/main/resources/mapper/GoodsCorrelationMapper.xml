@@ -90,7 +90,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -100,8 +99,7 @@
     set goods_category_id = #{goodsCategoryId,jdbcType=INTEGER},
       goods_id = #{goodsId,jdbcType=INTEGER},
       category_parent_id = #{categoryParentId,jdbcType=INTEGER},
-      add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      add_time = #{addTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
 

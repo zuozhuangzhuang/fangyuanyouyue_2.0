@@ -183,7 +183,6 @@
         receive_time = #{receiveTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="sellerIsDelete != null">
         seller_is_delete = #{sellerIsDelete,jdbcType=INTEGER},
@@ -207,7 +206,6 @@
       is_resolve = #{isResolve,jdbcType=INTEGER},
       is_refund = #{isRefund,jdbcType=INTEGER},
       receive_time = #{receiveTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       seller_is_delete = #{sellerIsDelete,jdbcType=INTEGER},
       buyer_is_delete = #{buyerIsDelete,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
@@ -312,17 +310,25 @@
     select a.*,b.nick_name,b.head_img_url from order_info a,user_info b where a.user_id = b.id and a.order_no = #{orderNo} and a.status = 1
   </select>
 
+  <select id="selectByOrderId" parameterType="Integer" resultMap="BaseResultMap">
+    select a.*,b.nick_name,b.head_img_url,b.phone from order_info a,user_info b where a.user_id = b.id and a.id = #{orderId} 
+  </select>
+  
   <select id="selectByStatus" parameterType="Integer" resultMap="BaseResultMap">
     select a.*,b.nick_name,b.head_img_url from order_info a,user_info b where a.user_id = b.id and a.status = #{status} and a.is_resolve = 2
   </select>
 
 
   <select id="countPage" resultType="Integer">
-    select count(*) from order_info a,order_detail b
+    select count( DISTINCT a.id ) from order_info a,order_detail b,user_info c
     <where>
-      1=1
-      <if test="keyword != null">
-        and b.goods_id in (select id from goods_info where name like "%"#{keyword}"%" or description like "%"#{keyword}"%")
+        (a.id = b.order_id or a.id = b.main_order_id) and a.is_resolve = 2 and a.user_id = c.id
+      <if test="keyword != null and keyword != ''">
+        and (
+          a.order_no like "%"#{keyword}"%"
+          or b.goods_name like "%"#{keyword}"%"
+          or c.nick_name like "%"#{keyword}"%"
+        )
       </if>
       <if test="status != null">
         <if test="status == 7">
@@ -332,7 +338,6 @@
           and a.status = #{status} and a.is_refund = 2
         </if>
       </if>
-
       <if test="startDate != null">
         and a.add_time <![CDATA[ > ]]> #{startDate}
       </if>
@@ -343,12 +348,13 @@
   </select>
 
   <select id="getOrderPage" resultMap="BaseResultMap">
-    select DISTINCT a.*,c.nick_name,c.head_img_url,c.phone from order_info a,order_detail b,user_info c,goods_info d
+    select DISTINCT a.*,c.nick_name,c.head_img_url,c.phone from order_info a,order_detail b,user_info c
     <where>
-      (a.id = b.order_id or a.id = b.main_order_id) and a.is_resolve = 2 and a.user_id = c.id and b.goods_id = d.id
+      (a.id = b.order_id or a.id = b.main_order_id) and a.is_resolve = 2 and a.user_id = c.id
       <if test="keyword != null and keyword != ''">
         and (
-          d.name like "%"#{keyword}"%"
+          a.order_no like "%"#{keyword}"%"
+          or b.goods_name like "%"#{keyword}"%"
           or c.nick_name like "%"#{keyword}"%"
         )
       </if>
@@ -387,13 +393,6 @@
 
   <select id="getAllOrderCount" resultType="Integer">
     select count(*) count from order_info where is_resolve=2
-    <if test="status != null">
-      and status = #{status}
-    </if>
-  </select>
-
-  <select id="getMonthOrderCount" resultType="Integer">
-    select count(*) count from order_info where date_format(add_time,'%Y-%m')=date_format(now(),'%Y-%m')
     <if test="status != null">
       and status = #{status}
     </if>

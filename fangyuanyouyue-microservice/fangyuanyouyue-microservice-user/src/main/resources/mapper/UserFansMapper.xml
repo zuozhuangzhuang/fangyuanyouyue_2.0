@@ -92,16 +92,16 @@
     </where>
   </select>
   <select id="fansCount" parameterType="Integer" resultType="Integer">
-    select count(*) from user_fans where to_user_id = #{userId,jdbcType=INTEGER}
+    select count(*) from user_fans a,user_info b where a.user_id = b.id and b.status <![CDATA[ <> ]]> 3 and a.to_user_id = #{userId,jdbcType=INTEGER}
   </select>
   <select id="collectCount" parameterType="Integer" resultType="Integer">
-    select count(*) from user_fans where user_id = #{userId,jdbcType=INTEGER}
+    select count(*) from user_fans a,user_info b where a.user_id = b.id and b.status <![CDATA[ <> ]]> 3 and a.user_id = #{userId,jdbcType=INTEGER}
   </select>
 
   <select id="myFansOrFollows" parameterType="Integer" resultType="Map">
     select * from user_info a,user_fans b,user_vip c,user_info_ext d
     <where>
-      a.id = c.user_id and a.id = d.user_id
+      a.id = c.user_id and a.id = d.user_id and a.status <![CDATA[ <> ]]> 3
       <if test="userId != null and type == 1">
         and a.id = b.to_user_id and b.user_id = #{userId}
       </if>
@@ -116,7 +116,7 @@
   </select>
 
   <select id="userFans" parameterType="Integer" resultMap="BaseResultMap">
-    select * from user_fans where to_user_id = #{userId}
+    select * from user_fans a,user_info b where a.user_id = b.id and a.to_user_id = #{userId} and b.status <![CDATA[ <> ]]> 3
     <if test="start != null and limit != null">
       limit #{start},#{limit}
     </if>

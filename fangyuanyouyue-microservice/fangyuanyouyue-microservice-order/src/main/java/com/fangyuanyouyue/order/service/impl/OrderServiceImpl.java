@@ -3,19 +3,23 @@ package com.fangyuanyouyue.order.service.impl;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.*;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
+import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.base.util.IdGenerator;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.order.dao.*;
 import com.fangyuanyouyue.order.dto.*;
 import com.fangyuanyouyue.order.dto.adminDto.*;
 import com.fangyuanyouyue.order.model.*;
 import com.fangyuanyouyue.order.param.AdminOrderParam;
 import com.fangyuanyouyue.order.service.*;
+import com.snowalker.lock.redisson.RedissonLock;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +29,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @Service(value = "orderService")
 @Transactional(rollbackFor=Exception.class)
@@ -52,14 +55,22 @@ public class OrderServiceImpl implements OrderService{
     private SchedualMessageService schedualMessageService;
     @Autowired
     private UserBehaviorMapper userBehaviorMapper;
+    @Autowired
+    private UserCouponMapper userCouponMapper;
+//    @Autowired
+//    RedissonLock redissonLock;
 
     @Override
     public OrderDto saveOrderByCart(String token,String sellerString, Integer userId, Integer addressId) throws ServiceException {
-        // FIXME: 2018/8/5 事务处理（如果提交多个商品，前面的商品状态正常，且正常生成订单后修改状态，再出现异常，前面的商品状态不会rollback）
         //验证手机号
-        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
+        String verifyUserById = schedualUserService.verifyUserById(userId);
+        BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
+        if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+            throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+        }
+        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
         if(StringUtils.isEmpty(user.getPhone())){
-            throw new ServiceException("未绑定手机号！");
+            throw new ServiceException(ReCode.NO_PHONE.getValue(),ReCode.NO_PHONE.getMessage());
         }
         //获取收货地址
         String result = schedualUserService.getAddressList(token,addressId);
@@ -85,8 +96,13 @@ public class OrderServiceImpl implements OrderService{
                 String str = objects.getString(i);
                 AddOrderDto addOrderDto = JSONObject.toJavaObject(JSONObject.parseObject(str), AddOrderDto.class);
                 addOrderDtos.add(addOrderDto);
+                String verifySeller = schedualUserService.verifyUserById(addOrderDto.getSellerId());
+                BaseResp verifySellerResult = ParseReturnValue.getParseReturnValue(verifyUserById);
+                if(!verifySellerResult.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(verifySellerResult.getCode(),verifySellerResult.getReport());
+                }
                 //获取卖家信息
-                UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(addOrderDto.getSellerId())).getString("data")), UserInfo.class);
+                UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(verifySellerResult.getData().toString()), UserInfo.class);
                 SellerDto sellerDto = new SellerDto();
                 sellerDto.setSellerHeadImgUrl(seller.getHeadImgUrl());
                 sellerDto.setSellerId(seller.getId());
@@ -149,6 +165,8 @@ public class OrderServiceImpl implements OrderService{
      * @param addOrderDstos 提供每个店铺及店铺商品列表
      * @return
      */
+    @Transactional
+    @TxTransaction(isStart=true)
     private List<OrderDetailDto> separatesOrder(OrderInfo mainOrder,OrderPay mainOrderPay,List<AddOrderDto> addOrderDstos) throws ServiceException{
         if(addOrderDstos.size() == 0){
             return null;
@@ -162,7 +180,11 @@ public class OrderServiceImpl implements OrderService{
                 throw new ServiceException("商品信息错误！");
             }
             for(AddOrderDetailDto addOrderDetailDto:addOrderDetailDtos) {
-                GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(addOrderDetailDto.getGoodsId())).getString("data")), GoodsInfo.class);
+                BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualGoodsService.goodsInfo(addOrderDetailDto.getGoodsId()));
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                }
+                GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), GoodsInfo.class);
                 if (goods.getStatus() != 1) {//状态 1出售中 2已售出 3已下架（已结束） 5删除
                     throw new ServiceException("商品状态异常！");
                 }
@@ -230,68 +252,99 @@ public class OrderServiceImpl implements OrderService{
 
             List<AddOrderDetailDto> addOrderDetailDtos = addOrderDto.getAddOrderDetailDtos();
             //订单详情，出现在这里的商品都是正常的商品，不再做判断
-            BigDecimal freight = new BigDecimal(0);//邮费，初始为0
-
+            for(AddOrderDetailDto addOrderDetailDto:addOrderDetailDtos){
+                BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualGoodsService.goodsInfo(addOrderDetailDto.getGoodsId()));
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                }
+                GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), GoodsInfo.class);
+                if(goods.getPostage().compareTo(payFreight) > 0){
+                    payFreight = goods.getPostage();
+                }
+            }
             //每个卖家的商品
             StringBuffer goodsName = new StringBuffer();
             for(AddOrderDetailDto addOrderDetailDto:addOrderDetailDtos){
-                GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(addOrderDetailDto.getGoodsId())).getString("data")),GoodsInfo.class);
-                //计算总订单总金额
-                //每个商品生成一个订单详情表
-                OrderDetail orderDetail = new OrderDetail();
-                //买家ID
-                orderDetail.setUserId(orderInfo.getUserId());
-                //卖家ID
-                orderDetail.setSellerId(goods.getUserId());
-                orderDetail.setMainOrderId(mainOrder.getId());//主订单ID
-                orderDetail.setOrderId(orderInfo.getId());
-                orderDetail.setGoodsId(goods.getId());
-                orderDetail.setGoodsName(goods.getName());
-                orderDetail.setAddTime(DateStampUtils.getTimesteamp());
-                //商品主图
-                String goodsMainImg = JSONObject.parseObject(schedualGoodsService.goodsMainImg(goods.getId())).getString("data");
-                orderDetail.setMainImgUrl(goodsMainImg);
-                orderDetail.setAmount(goods.getPrice());
-
-                //计算优惠券（每个商品都可以使用优惠券）
-                Integer couponId = addOrderDetailDto.getCouponId();//优惠券ID
-
-                BigDecimal price = goods.getPrice();
-                if(couponId != null){
-                    //判断商品所属店铺是否可用优惠券
-                    if(!Boolean.valueOf(JSONObject.parseObject(schedualUserService.userIsAuth(goods.getUserId())).getString("data"))){
-                        throw new ServiceException("【"+goods.getName()+"】所属店铺未认证，不可使用优惠券！");
-                    }
-                    orderDetail.setCouponId(couponId);
-                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.getPriceByCoupon(orderInfo.getUserId(),price,couponId)), BaseResp.class);
-                    if(baseResp.getCode() == 1){
-                        throw new ServiceException(baseResp.getReport().toString());
-                    }else{
-                        price = (BigDecimal)baseResp.getData();
-                    }
+                BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualGoodsService.goodsInfo(addOrderDetailDto.getGoodsId()));
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
-                //取运费最高者计算
-                if(goods.getPostage().compareTo(freight) > 0){
-                    freight = goods.getPostage();
-                    orderDetail.setFreight(goods.getPostage());
-                }else{//如果不是最高邮费，就设置为0
-                    orderDetail.setFreight(new BigDecimal(0));
-                }
-                //实际支付加上邮费
-                orderDetail.setPayAmount(price.add(orderDetail.getFreight()));
-                orderDetail.setDescription(goods.getDescription());
-                orderDetailMapper.insert(orderDetail);
-                //修改商品的状态为已售出
-                schedualGoodsService.updateGoodsStatus(addOrderDetailDto.getGoodsId(),2);//状态  1出售中 2已售出 3已下架（已结束） 5删除
-                payFreight = payFreight.add(orderDetail.getFreight());
-                amount = amount.add(orderDetail.getAmount());//原价
-                payAmount = payAmount.add(orderDetail.getPayAmount());//实际支付
-                OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail);
-                orderDetailDtos.add(orderDetailDto);
-                goodsName.append("【"+goods.getName()+"】");
+                GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), GoodsInfo.class);
+
+            	//加入分布式锁，锁住商品id，10秒后释放
+//            	redissonLock.lock("GoodsOrder"+addOrderDetailDto.getGoodsId().toString(), 10);
+
+
+//            	try {
+	                //计算总订单总金额
+	                //每个商品生成一个订单详情表
+	                OrderDetail orderDetail = new OrderDetail();
+	                //买家ID
+	                orderDetail.setUserId(orderInfo.getUserId());
+	                //卖家ID
+	                orderDetail.setSellerId(goods.getUserId());
+	                orderDetail.setMainOrderId(mainOrder.getId());//主订单ID
+	                orderDetail.setOrderId(orderInfo.getId());
+	                orderDetail.setGoodsId(goods.getId());
+	                orderDetail.setGoodsName(goods.getName());
+	                orderDetail.setAddTime(DateStampUtils.getTimesteamp());
+	                //商品主图
+	                String goodsMainImg = JSONObject.parseObject(schedualGoodsService.goodsMainImg(goods.getId())).getString("data");
+	                orderDetail.setMainImgUrl(goodsMainImg);
+	                orderDetail.setAmount(goods.getPrice());
+
+	                //计算优惠券（每个商品都可以使用优惠券）
+	                Integer couponId = addOrderDetailDto.getCouponId();//优惠券ID
+
+	                BigDecimal price = goods.getPrice();
+	                if(couponId != null){
+	                    //判断商品所属店铺是否可用优惠券
+	                    if(!Boolean.valueOf(JSONObject.parseObject(schedualUserService.userIsAuth(goods.getUserId())).getString("data"))){
+	                        throw new ServiceException("【"+goods.getName()+"】所属店铺未认证，不可使用优惠券！");
+	                    }
+                        baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.getPriceByCoupon(orderInfo.getUserId(),price,couponId));
+                        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                            throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                        }else{
+	                        orderDetail.setCouponId(couponId);
+	                        price = (BigDecimal)baseResp.getData();
+	                    }
+	                }
+	                //取运费最高者计算
+	//                if(goods.getPostage().compareTo(freight) > 0){
+	//                    freight = goods.getPostage();
+	//                    orderDetail.setFreight(goods.getPostage());
+	//                }else{//如果不是最高邮费，就设置为0
+	//                    orderDetail.setFreight(new BigDecimal(0));
+	//                }
+	                //实际支付加上邮费
+	                orderDetail.setPayAmount(price);
+	                orderDetail.setDescription(goods.getDescription());
+	                orderDetailMapper.insert(orderDetail);
+	                //修改商品的状态为已售出
+                    BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualGoodsService.updateGoodsStatus(addOrderDetailDto.getGoodsId(), 2));//状态  1出售中 2已售出 3已下架（已结束） 5删除
+                    if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+                    }
+	                amount = amount.add(orderDetail.getAmount());//原价
+	                payAmount = payAmount.add(orderDetail.getPayAmount());//实际支付
+	                OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail);
+	                //优惠券
+	                UserCoupon userCoupon = userCouponMapper.selectUserCouponDetail(orderDetail.getCouponId());
+	                if(userCoupon != null){
+	                    UserCouponDto userCouponDto = new UserCouponDto(userCoupon);
+	                    orderDetailDto.setUserCouponDto(userCouponDto);
+	                }
+	                orderDetailDtos.add(orderDetailDto);
+	                goodsName.append("【"+goods.getName()+"】");
+//            	}catch (Exception e) {
+//            		e.printStackTrace();
+//				}finally {
+//		        	redissonLock.release("GoodsOrder"+goods.getId());
+//				}
             }
             mainAmount = mainAmount.add(amount);
-            mainPayAmount = mainPayAmount.add(payAmount);
+            mainPayAmount = mainPayAmount.add(payAmount.add(payFreight));
             mainPayFreight = mainPayFreight.add(payFreight);
             //子订单
             orderInfo.setAmount(amount);
@@ -300,7 +353,7 @@ public class OrderServiceImpl implements OrderService{
             //子支付订单
             orderPay.setCount(addOrderDetailDtos.size());
             orderPay.setAmount(amount);//原价
-            orderPay.setPayAmount(payAmount);//实际支付
+            orderPay.setPayAmount(payAmount.add(payFreight));//实际支付
             orderPay.setFreight(payFreight);//总邮费
             orderPayMapper.updateByPrimaryKey(orderPay);
 
@@ -311,7 +364,10 @@ public class OrderServiceImpl implements OrderService{
         //删除买家购物车内此商品信息:goodsFeign/cartRemove
         Integer[] goodsIds = new Integer[goodsList.size()];
         goodsList.toArray(goodsIds);
-        schedualGoodsService.cartRemove(mainOrder.getUserId(),goodsIds);
+        BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualGoodsService.cartRemove(mainOrder.getUserId(),goodsIds));
+        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+            throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+        }
         //总订单
         mainOrder.setAmount(mainAmount);
         mainOrder.setCount(count);
@@ -326,6 +382,8 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void cancelOrder(Integer userId, Integer orderId) throws ServiceException {
         //根据订单ID获取订单信息
         OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKeyDetail(orderId);
@@ -344,9 +402,16 @@ public class OrderServiceImpl implements OrderService{
             StringBuffer goodsName = new StringBuffer();
             boolean isAuction = false;
             for(OrderDetail orderDetail:orderDetails){
-                schedualGoodsService.updateGoodsStatus(orderDetail.getGoodsId(),1);//状态 1出售中 2已售出 3已下架（已结束） 5删除
-                GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(
-                        schedualGoodsService.goodsInfo(orderDetail.getGoodsId())).getString("data")), GoodsInfo.class);
+                BaseResp  baseResp = ParseReturnValue.getParseReturnValue(schedualGoodsService.updateGoodsStatus(orderDetail.getGoodsId(),1));
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                }
+                baseResp = ParseReturnValue.getParseReturnValue(schedualGoodsService.goodsInfo(orderDetail.getGoodsId()));
+                ;//状态 1出售中 2已售出 3已下架（已结束） 5删除
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                }
+                GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), GoodsInfo.class);
 
                 isAuction = goodsInfo.getType().intValue() == Status.AUCTION.getValue()?true:false;
                 goodsName.append("【"+goodsInfo.getName()+"】");
@@ -367,8 +432,11 @@ public class OrderServiceImpl implements OrderService{
                     StringBuffer name = new StringBuffer();
                     boolean auction = false;//是否是抢购
                     for(OrderDetail detail:details){
-                        GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(
-                                schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
+                        BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualGoodsService.goodsInfo(detail.getGoodsId()));
+                        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                            throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                        }
+                        GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), GoodsInfo.class);
                         auction = goodsInfo.getType().intValue() == Status.AUCTION.getValue()?true:false;
                         name.append("【"+goodsInfo.getName()+"】");
                     }
@@ -411,7 +479,17 @@ public class OrderServiceImpl implements OrderService{
             OrderPayDto orderPayDto = new OrderPayDto(orderPay);
             OrderDto orderDto = new OrderDto(orderInfo);
             orderDto.setOrderPayDto(orderPayDto);
-            ArrayList<OrderDetailDto> orderDetailDtos = OrderDetailDto.toDtoList(orderDetails);
+            ArrayList<OrderDetailDto> orderDetailDtos = new ArrayList<>();
+            for(OrderDetail orderDetail:orderDetails){
+                OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail);
+                //优惠券
+                UserCoupon userCoupon = userCouponMapper.selectUserCouponDetail(orderDetail.getCouponId());
+                if(userCoupon != null){
+                    UserCouponDto userCouponDto = new UserCouponDto(userCoupon);
+                    orderDetailDto.setUserCouponDto(userCouponDto);
+                }
+                orderDetailDtos.add(orderDetailDto);
+            }
 //            for(OrderDetailDto orderDetailDto:orderDetailDtos){
 //                if(orderDetailDto.getFreight().compareTo(new BigDecimal(0)) > 0){
 //                    //订单详情DTO邮费为0则说明邮费不是最高或者邮费为0
@@ -430,6 +508,7 @@ public class OrderServiceImpl implements OrderService{
                 OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderInfo.getId(), null,null);
                 orderDto.setReturnStatus(orderRefund.getStatus());
                 orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
+                orderDto.setReturnTime(DateUtil.getFormatDate(orderRefund.getAddTime(),DateUtil.DATE_FORMT));
             }
             //是否评价
             OrderComment orderComment = orderCommentMapper.selectByOrder(orderId);
@@ -453,19 +532,20 @@ public class OrderServiceImpl implements OrderService{
         for(OrderDetailDto orderDetailDto:orderDetailDtos){
             //获取卖家信息
             UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(orderDetailDto.getSellerId())).getString("data")), UserInfo.class);
-
-            SellerDto sellerDto = new SellerDto();
-            sellerDto.setSellerHeadImgUrl(seller.getHeadImgUrl());
-            sellerDto.setSellerId(seller.getId());
-            sellerDto.setSellerName(seller.getNickName());
-            boolean flag = true;
-            for(SellerDto dto:sellerDtos){
-                if(dto.getSellerId() == seller.getId()){
-                    flag = false;
+            if(seller != null){
+                SellerDto sellerDto = new SellerDto();
+                sellerDto.setSellerHeadImgUrl(seller.getHeadImgUrl());
+                sellerDto.setSellerId(seller.getId());
+                sellerDto.setSellerName(seller.getNickName());
+                boolean flag = true;
+                for(SellerDto dto:sellerDtos){
+                    if(dto.getSellerId() == seller.getId()){
+                        flag = false;
+                    }
                 }
-            }
-            if(flag){
-                sellerDtos.add(sellerDto);
+                if(flag){
+                    sellerDtos.add(sellerDto);
+                }
             }
         }
         return sellerDtos;
@@ -491,7 +571,17 @@ public class OrderServiceImpl implements OrderService{
                 }else{
                     orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
                 }
-                ArrayList<OrderDetailDto> orderDetailDtos = OrderDetailDto.toDtoList(orderDetails);
+                ArrayList<OrderDetailDto> orderDetailDtos = new ArrayList<>();
+                for(OrderDetail orderDetail:orderDetails){
+                    OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail);
+                    //优惠券
+                    UserCoupon userCoupon = userCouponMapper.selectUserCouponDetail(orderDetail.getCouponId());
+                    if(userCoupon != null){
+                        UserCouponDto userCouponDto = new UserCouponDto(userCoupon);
+                        orderDetailDto.setUserCouponDto(userCouponDto);
+                    }
+                    orderDetailDtos.add(orderDetailDto);
+                }
                 //卖家信息DTO
                 List<SellerDto> sellerDtos = getSellerDtos(orderDetailDtos);
                 //订单支付表
@@ -505,6 +595,7 @@ public class OrderServiceImpl implements OrderService{
                     OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null,null);
                     orderDto.setReturnStatus(orderRefund.getStatus());
                     orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
+                    orderDto.setReturnTime(DateUtil.getFormatDate(orderRefund.getAddTime(),DateUtil.DATE_FORMT));
                 }
                 //是否评价
                 OrderComment orderComment = orderCommentMapper.selectByOrder(orderDto.getOrderId());
@@ -515,7 +606,12 @@ public class OrderServiceImpl implements OrderService{
             }
         }else if(type == 2){//我卖出的
             //卖家
-            UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
+            String verifyUserById = schedualUserService.verifyUserById(userId);
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+            }
+            UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
             //根据卖家ID获取订单列表
             List<OrderInfo> orderBySellerId = orderInfoMapper.getOrderBySellerId(userId, start * limit, limit, status,search);
             orderDtos = OrderDto.toDtoList(orderBySellerId);
@@ -528,7 +624,17 @@ public class OrderServiceImpl implements OrderService{
             sellerDtos.add(sellerDto);
             for(OrderDto orderDto:orderDtos){//获取订单详情列表
                 List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
-                ArrayList<OrderDetailDto> orderDetailDtos = OrderDetailDto.toDtoList(orderDetails);
+                ArrayList<OrderDetailDto> orderDetailDtos = new ArrayList<>();
+                for(OrderDetail orderDetail:orderDetails){
+                    OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail);
+                    //优惠券
+                    UserCoupon userCoupon = userCouponMapper.selectUserCouponDetail(orderDetail.getCouponId());
+                    if(userCoupon != null){
+                        UserCouponDto userCouponDto = new UserCouponDto(userCoupon);
+                        orderDetailDto.setUserCouponDto(userCouponDto);
+                    }
+                    orderDetailDtos.add(orderDetailDto);
+                }
 
                 //订单支付表
                 OrderPay orderPay = orderPayMapper.selectByOrderId(orderDto.getOrderId());
@@ -539,8 +645,11 @@ public class OrderServiceImpl implements OrderService{
                 if(orderDto.getIsRefund() == 1){
                     //退货状态
                     OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null,null);
-                    orderDto.setReturnStatus(orderRefund.getStatus());
-                    orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
+                    if(orderRefund != null){
+                        orderDto.setReturnStatus(orderRefund.getStatus());
+                        orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
+                        orderDto.setReturnTime(DateUtil.getFormatDate(orderRefund.getAddTime(),DateUtil.DATE_FORMT));
+                    }
                 }
             }
         }else{
@@ -550,143 +659,169 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public OrderDto saveOrder(String token,Integer goodsId,Integer couponId,Integer userId,Integer addressId,Integer type) throws ServiceException {
         //验证手机号
         UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
         if(StringUtils.isEmpty(user.getPhone())){
             throw new ServiceException("未绑定手机号！");
         }
-        //获取商品信息
-        GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(goodsId)).getString("data")),GoodsInfo.class);
-        if (goods.getStatus() != 1) {//状态 1出售中 2已售出 3已下架（已结束） 5删除
-            throw new ServiceException("商品状态异常！");
-        }
-        if(goods.getUserId().intValue() == userId.intValue()){
-            throw new ServiceException("不可以对自己的商品进行下单！");
-        }
 
-        if(type.intValue() == Status.AUCTION.getValue()){
-            //非会员只能免费抢购一次，会员可无限制抢购——验证是否为会员
-            if(!Boolean.valueOf(JSONObject.parseObject(schedualWalletService.isUserVip(userId)).getString("data"))){
-                List<UserBehavior> userBehaviors = userBehaviorMapper.selectByUserIdType(userId, Status.BUY_AUCTION.getValue());
-                if(userBehaviors != null && userBehaviors.size() > 0){
-                    throw new ServiceException("非会员只能免费抢购一次！");
+    	//加入分布式锁，锁住商品id，10秒后释放
+//    	redissonLock.lock("GoodsOrder"+goodsId, 10);
+//        try {
+
+	        //获取商品信息
+	        GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(goodsId)).getString("data")),GoodsInfo.class);
+	        if (goods.getStatus() != 1) {//状态 1出售中 2已售出 3已下架（已结束） 5删除
+	            throw new ServiceException("商品状态异常！");
+	        }
+	        if(goods.getUserId().intValue() == userId.intValue()){
+	            throw new ServiceException("不可以对自己的商品进行下单！");
+	        }
+
+	        if(type.intValue() == Status.AUCTION.getValue()){
+	            //非会员只能免费抢购一次，会员可无限制抢购——验证是否为会员
+	            if(!Boolean.valueOf(JSONObject.parseObject(schedualWalletService.isUserVip(userId)).getString("data"))){
+	                List<UserBehavior> userBehaviors = userBehaviorMapper.selectByUserIdType(userId, Status.BUY_AUCTION.getValue());
+	                if(userBehaviors != null && userBehaviors.size() > 0){
+	                    throw new ServiceException("非会员只能免费抢购一次！");
+	                }else{
+	                    UserBehavior userBehavior = new UserBehavior();
+	                    userBehavior.setUserId(userId);
+	                    userBehavior.setBusinessId(goodsId);
+	                    userBehavior.setBusinessType(Status.BUSINESS_TYPE_GOODS.getValue());
+	                    userBehavior.setType(Status.BUY_AUCTION.getValue());
+	                    userBehavior.setToUserId(goods.getUserId());
+	                    userBehavior.setAddTime(DateStampUtils.getTimesteamp());
+	                    userBehaviorMapper.insert(userBehavior);
+	                }
+	            }
+	        }
+	        //获取收货地址
+	        String result = schedualUserService.getAddressList(token,addressId);
+	        JSONArray addressArray = JSONArray.parseArray(JSONObject.parseObject(result).getString("data"));
+	        JSONObject address = null;
+	        if(addressArray != null && addressArray.size()>0){
+	            address = JSONObject.parseObject(addressArray.get(0).toString());
+	        }
+	        UserAddressInfo addressInfo = JSONObject.toJavaObject(address,UserAddressInfo.class);
+
+	        if(addressInfo == null || StringUtils.isEmpty(addressInfo.getAddress()) || StringUtils.isEmpty(addressInfo.getProvince())
+	                || StringUtils.isEmpty(addressInfo.getCity()) || StringUtils.isEmpty(addressInfo.getArea())){
+	            throw new  ServiceException("收货地址异常，请先更新地址");
+	        }
+
+
+	        //1.下订单
+	        //2.下支付订单
+	        OrderInfo orderInfo = new OrderInfo();
+	        orderInfo.setIsResolve(Status.NO.getValue());//是否拆单 1是 2否
+	        orderInfo.setUserId(userId);
+	        //订单号
+	        final IdGenerator idg = IdGenerator.INSTANCE;
+	        String id = idg.nextId();
+	        orderInfo.setOrderNo("1"+id);
+
+	        BigDecimal amount = goods.getPrice();//原价
+	        //计算优惠券（每个商品都可以使用优惠券）
+	        if(couponId != null){
+	            //判断商品所属店铺是否可用优惠券
+	            if(!Boolean.valueOf(JSONObject.parseObject(schedualUserService.userIsAuth(goods.getUserId())).getString("data"))){
+	                throw new ServiceException("【"+goods.getName()+"】所属店铺未认证，不可使用优惠券！");
+	            }
+                BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.getPriceByCoupon(userId,amount,couponId));
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }else{
-                    UserBehavior userBehavior = new UserBehavior();
-                    userBehavior.setUserId(userId);
-                    userBehavior.setBusinessId(goodsId);
-                    userBehavior.setBusinessType(Status.BUSINESS_TYPE_GOODS.getValue());
-                    userBehavior.setType(Status.BUY_AUCTION.getValue());
-                    userBehavior.setToUserId(goods.getUserId());
-                    userBehavior.setAddTime(DateStampUtils.getTimesteamp());
-                    userBehaviorMapper.insert(userBehavior);
-                }
+	                amount = (BigDecimal)baseResp.getData();
+	            }
+	        }
+	        BigDecimal payFreight = goods.getPostage()==null?new BigDecimal(0):goods.getPostage();//总邮费
+	        BigDecimal payAmount = amount.add(payFreight);//实际支付金额
+	        orderInfo.setAmount(amount);
+	        orderInfo.setCount(1);//商品数量，初始为0
+	        orderInfo.setStatus(Status.ORDER_GOODS_PREPAY.getValue());
+	        orderInfo.setAddTime(DateStampUtils.getTimesteamp());
+	        orderInfo.setSellerId(goods.getUserId());//卖家ID
+	        orderInfoMapper.insert(orderInfo);
+	        //生成订单支付表
+	        OrderPay orderPay = new OrderPay();
+	        orderPay.setOrderId(orderInfo.getId());
+	        orderPay.setReceiverName(addressInfo.getReceiverName());
+	        orderPay.setReceiverPhone(addressInfo.getReceiverPhone());
+	        orderPay.setProvince(addressInfo.getProvince());
+	        orderPay.setCity(addressInfo.getCity());
+	        orderPay.setArea(addressInfo.getArea());
+	        orderPay.setAddress(addressInfo.getAddress());
+	        orderPay.setPostCode(addressInfo.getPostCode());
+	        orderPay.setOrderNo(orderInfo.getOrderNo());
+	        orderPay.setAmount(amount);
+	        orderPay.setPayAmount(payAmount);
+	        orderPay.setFreight(payFreight);
+	        orderPay.setCount(1);//商品数量，初始为0
+	        orderPay.setStatus(Status.ORDER_GOODS_PREPAY.getValue());
+	        orderPay.setAddTime(DateStampUtils.getTimesteamp());
+	        orderPayMapper.insert(orderPay);
+	        OrderDetail orderDetail = new OrderDetail();
+	        orderDetail.setUserId(userId);
+	        orderDetail.setMainOrderId(orderInfo.getId());//主订单ID
+	        orderDetail.setOrderId(orderInfo.getId());
+	        orderDetail.setGoodsId(goodsId);
+	        orderDetail.setGoodsName(goods.getName());
+	        orderDetail.setAddTime(DateStampUtils.getTimesteamp());
+	        orderDetail.setCouponId(couponId);
+	        //商品主图
+	        String goodsMainImg = JSONObject.parseObject(schedualGoodsService.goodsMainImg(goods.getId())).getString("data");
+	        orderDetail.setMainImgUrl(goodsMainImg);
+	        orderDetail.setAmount(amount);
+	        orderDetail.setFreight(payFreight);
+	        orderDetail.setPayAmount(payAmount);
+	        orderDetail.setDescription(goods.getDescription());
+	        orderDetail.setSellerId(goods.getUserId());
+	        orderDetailMapper.insert(orderDetail);
+	        //修改商品的状态为已售出
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualGoodsService.updateGoodsStatus(goodsId, 2));//状态  1出售中 2已售出 3已下架（已结束） 5删除
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
-        }
-        //获取收货地址
-        String result = schedualUserService.getAddressList(token,addressId);
-        JSONArray addressArray = JSONArray.parseArray(JSONObject.parseObject(result).getString("data"));
-        JSONObject address = null;
-        if(addressArray != null && addressArray.size()>0){
-            address = JSONObject.parseObject(addressArray.get(0).toString());
-        }
-        UserAddressInfo addressInfo = JSONObject.toJavaObject(address,UserAddressInfo.class);
 
-        if(addressInfo == null || StringUtils.isEmpty(addressInfo.getAddress()) || StringUtils.isEmpty(addressInfo.getProvince())
-                || StringUtils.isEmpty(addressInfo.getCity()) || StringUtils.isEmpty(addressInfo.getArea())){
-            throw new  ServiceException("收货地址异常，请先更新地址");
-        }
-
-
-        //1.下订单
-        //2.下支付订单
-        OrderInfo orderInfo = new OrderInfo();
-        orderInfo.setIsResolve(Status.NO.getValue());//是否拆单 1是 2否
-        orderInfo.setUserId(userId);
-        //订单号
-        final IdGenerator idg = IdGenerator.INSTANCE;
-        String id = idg.nextId();
-        orderInfo.setOrderNo("1"+id);
-
-        BigDecimal amount = goods.getPrice();//原价
-        //计算优惠券（每个商品都可以使用优惠券）
-        if(couponId != null){
-            //判断商品所属店铺是否可用优惠券
-            if(!Boolean.valueOf(JSONObject.parseObject(schedualUserService.userIsAuth(goods.getUserId())).getString("data"))){
-                throw new ServiceException("【"+goods.getName()+"】所属店铺未认证，不可使用优惠券！");
-            }
-            BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.getPriceByCoupon(userId,amount,couponId)), BaseResp.class);
-            if(baseResp.getCode() == 1){
-                throw new ServiceException(baseResp.getReport().toString());
-            }else{
-                amount = (BigDecimal)baseResp.getData();
-            }
-        }
-        BigDecimal payFreight = goods.getPostage()==null?new BigDecimal(0):goods.getPostage();//总邮费
-        BigDecimal payAmount = amount.add(payFreight);//实际支付金额
-        orderInfo.setAmount(amount);
-        orderInfo.setCount(1);//商品数量，初始为0
-        orderInfo.setStatus(Status.ORDER_GOODS_PREPAY.getValue());
-        orderInfo.setAddTime(DateStampUtils.getTimesteamp());
-        orderInfo.setSellerId(goods.getUserId());//卖家ID
-        orderInfoMapper.insert(orderInfo);
-        //生成订单支付表
-        OrderPay orderPay = new OrderPay();
-        orderPay.setOrderId(orderInfo.getId());
-        orderPay.setReceiverName(addressInfo.getReceiverName());
-        orderPay.setReceiverPhone(addressInfo.getReceiverPhone());
-        orderPay.setProvince(addressInfo.getProvince());
-        orderPay.setCity(addressInfo.getCity());
-        orderPay.setArea(addressInfo.getArea());
-        orderPay.setAddress(addressInfo.getAddress());
-        orderPay.setPostCode(addressInfo.getPostCode());
-        orderPay.setOrderNo(orderInfo.getOrderNo());
-        orderPay.setAmount(amount);
-        orderPay.setPayAmount(payAmount);
-        orderPay.setFreight(payFreight);
-        orderPay.setCount(1);//商品数量，初始为0
-        orderPay.setStatus(Status.ORDER_GOODS_PREPAY.getValue());
-        orderPay.setAddTime(DateStampUtils.getTimesteamp());
-        orderPayMapper.insert(orderPay);
-        OrderDetail orderDetail = new OrderDetail();
-        orderDetail.setUserId(userId);
-        orderDetail.setMainOrderId(orderInfo.getId());//主订单ID
-        orderDetail.setOrderId(orderInfo.getId());
-        orderDetail.setGoodsId(goodsId);
-        orderDetail.setGoodsName(goods.getName());
-        orderDetail.setAddTime(DateStampUtils.getTimesteamp());
-        orderDetail.setCouponId(couponId);
-        //商品主图
-        String goodsMainImg = JSONObject.parseObject(schedualGoodsService.goodsMainImg(goods.getId())).getString("data");
-        orderDetail.setMainImgUrl(goodsMainImg);
-        orderDetail.setAmount(amount);
-        orderDetail.setFreight(payFreight);
-        orderDetail.setPayAmount(payAmount);
-        orderDetail.setDescription(goods.getDescription());
-        orderDetail.setSellerId(goods.getUserId());
-        orderDetailMapper.insert(orderDetail);
-        //修改商品的状态为已售出
-        schedualGoodsService.updateGoodsStatus(goodsId,2);//状态  1出售中 2已售出 3已下架（已结束） 5删除
-        ArrayList<OrderDetailDto> orderDetailDtos = new ArrayList<>();
-        orderDetailDtos.add(new OrderDetailDto(orderDetail));
-        //卖家dto
-        List<SellerDto> sellerDtos = getSellerDtos(orderDetailDtos);
-        //生成子订单，在总订单中加入价格和邮费，实际支付价格
-        OrderDto orderDto = new OrderDto(orderInfo);
-        OrderPayDto orderPayDto = new OrderPayDto(orderPay);
-        orderDto.setOrderPayDto(orderPayDto);
-        orderDto.setOrderDetailDtos(orderDetailDtos);
-        orderDto.setSellerDtos(sellerDtos);
-        //交易消息：恭喜您！您的商品【大头三年原光】已有人下单，点击此处查看订单
-        // 交易消息：恭喜您！您的抢购【大头三年原光】已有人下单，点击此处查看订单
-        schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
-                "恭喜您！您的"+(goods.getType()==Status.GOODS.getValue()?"商品【":"抢购【")+goods.getName()+"】已有人下单，点击此处查看订单",
-                Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER_SELLER.getMessage(),orderInfo.getId().toString());
-        return orderDto;
+	        ArrayList<OrderDetailDto> orderDetailDtos = new ArrayList<>();
+	        OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail);
+	        //优惠券
+	        UserCoupon userCoupon = userCouponMapper.selectUserCouponDetail(orderDetail.getCouponId());
+	        if(userCoupon != null){
+	            UserCouponDto userCouponDto = new UserCouponDto(userCoupon);
+	            orderDetailDto.setUserCouponDto(userCouponDto);
+	        }
+	        orderDetailDtos.add(orderDetailDto);
+	        //卖家dto
+	        List<SellerDto> sellerDtos = getSellerDtos(orderDetailDtos);
+	        //生成子订单，在总订单中加入价格和邮费，实际支付价格
+	        OrderDto orderDto = new OrderDto(orderInfo);
+	        OrderPayDto orderPayDto = new OrderPayDto(orderPay);
+	        orderDto.setOrderPayDto(orderPayDto);
+	        orderDto.setOrderDetailDtos(orderDetailDtos);
+	        orderDto.setSellerDtos(sellerDtos);
+	        //交易消息：恭喜您！您的商品【大头三年原光】已有人下单，点击此处查看订单
+	        // 交易消息：恭喜您！您的抢购【大头三年原光】已有人下单，点击此处查看订单
+	        schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
+	                "恭喜您！您的"+(goods.getType()==Status.GOODS.getValue()?"商品【":"抢购【")+goods.getName()+"】已有人下单，点击此处查看订单",
+	                Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER_SELLER.getMessage(),orderInfo.getId().toString());
+	        return orderDto;
+//        }catch (Exception e) {
+//        	e.printStackTrace();
+//            throw new ServiceException("下单出错，请稍后再试！");
+//		}finally {
+//        	redissonLock.release("GoodsOrder"+goodsId);
+//		}
 
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public Object getOrderPay(Integer userId, Integer orderId, Integer payType, String payPwd) throws ServiceException {
         //只有买家能调用订单支付接口，直接根据orderId查询订单
 //        OrderInfo orderInfo = orderInfoMapper.getOrderByUserIdOrderId(orderId,userId);
@@ -706,34 +841,43 @@ public class OrderServiceImpl implements OrderService{
 
                 StringBuffer payInfo = new StringBuffer();
                 if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
-                    //微信支付
-                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderPay.getPayAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.order_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
-//                    orderPay.setPayNo(wechatPayDto.getSign());
-                    //微信，失败不做处理，成功继续拆单生成订单
+                    String getWechatOrder = schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderPay.getPayAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.order_wechat_notify.getNotifUrl());
+                    BaseResp result = ParseReturnValue.getParseReturnValue(getWechatOrder);
+                    if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(result.getCode(),result.getReport());
+                    }
+                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
                     return wechatPayDto;
                 }else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
-                    //支付宝支付
-                    //支付宝，失败不做处理，成功继续拆单生成订单
-                    String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(orderInfo.getOrderNo(), orderPay.getPayAmount(),NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.order_alipay_notify.getNotifUrl())).getString("data");
-                    payInfo.append(info);
+                    String getALiOrder = schedualWalletService.orderPayByALi(orderInfo.getOrderNo(), orderPay.getPayAmount(),NotifyUrl.notify.getNotifUrl()+NotifyUrl.order_alipay_notify.getNotifUrl());
+                    BaseResp result = ParseReturnValue.getParseReturnValue(getALiOrder);
+                    if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(result.getCode(),result.getReport());
+                    }
+                    payInfo.append(result.getData());
                 }else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()){
-                    //余额支付
-                    //验证支付密码
-                    Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
-                    if(!verifyPayPwd){
+                    String verifyPayPwd = schedualUserService.verifyPayPwd(userId, payPwd);
+                    BaseResp result = ParseReturnValue.getParseReturnValue(verifyPayPwd);
+                    if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(result.getCode(),result.getReport());
+                    }
+                    if (!(boolean)result.getData()) {
                         throw new ServiceException(ReCode.PAYMENT_PASSWORD_ERROR.getValue(),ReCode.PAYMENT_PASSWORD_ERROR.getMessage());
                     }else{
-                        //调用wallet-service修改余额功能
-                        BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, orderPay.getPayAmount(), Status.SUB.getValue())), BaseResp.class);
-                        if(baseResp.getCode() == 1){
-                            throw new ServiceException(baseResp.getReport().toString());
+                        BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(userId, orderPay.getPayAmount(), Status.SUB.getValue()));
+                        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                            throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                         }
                         updateOrder(orderInfo.getOrderNo(),null,payType);
                         payInfo.append("余额支付成功！");
                     }
                 }else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
-                    //小程序支付
-                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,orderInfo.getOrderNo(), orderPay.getPayAmount(), NotifyUrl.mini_test_notify.getNotifUrl()+NotifyUrl.order_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+                    String getMiniOrder = schedualWalletService.orderPayByWechatMini(userId,orderInfo.getOrderNo(), orderPay.getPayAmount(), NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.order_wechat_notify.getNotifUrl());
+                    BaseResp result = ParseReturnValue.getParseReturnValue(getMiniOrder);
+                    if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(result.getCode(),result.getReport());
+                    }
+                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
                     return wechatPayDto;
                 }else{
                     throw new ServiceException("支付类型错误！");
@@ -794,6 +938,7 @@ public class OrderServiceImpl implements OrderService{
                 //物流状态
 //                orderPay.setLogisticStatus();
                 orderPay.setLogisticCompany(company.getName());
+                orderPay.setLogisticCompanyNo(company.getCompanyNo());
                 orderPay.setLogisticCode(number);
                 orderPay.setStatus(Status.ORDER_GOODS_SENDED.getValue());
                 orderPay.setSendTime(new Date());
@@ -805,6 +950,8 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void getGoods(Integer userId, Integer orderId) throws ServiceException {
         OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKeyDetail(orderId);
         if (orderInfo == null) {
@@ -831,28 +978,47 @@ public class OrderServiceImpl implements OrderService{
                 orderInfo.setStatus(Status.ORDER_GOODS_COMPLETE.getValue());
                 orderInfoMapper.updateByPrimaryKey(orderInfo);
                 //卖家增加余额
-                BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(orderInfo.getSellerId(),orderPay.getPayAmount(),Status.ADD.getValue())), BaseResp.class);
-                if(baseResp.getCode() == 1){
-                    throw new ServiceException(baseResp.getReport().toString());
+                BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(orderInfo.getSellerId(),orderPay.getPayAmount(),Status.ADD.getValue()));
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
                 //商品名称
                 List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderId);
                 StringBuffer goodsName = new StringBuffer();
                 for(OrderDetail detail:orderDetails){
                     //获取商品、抢购信息
-                    GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
+                    baseResp = ParseReturnValue.getParseReturnValue(schedualGoodsService.goodsInfo(detail.getGoodsId()));
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                    }
+                    GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), GoodsInfo.class);
                     goodsName.append("【"+goodsInfo.getName()+"】");
                 }
                 //卖家余额账单
-                schedualWalletService.addUserBalanceDetail(orderInfo.getSellerId(),orderInfo.getAmount(),Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),orderInfo.getOrderNo());
+                baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(orderInfo.getSellerId(),orderPay.getPayAmount(),Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),orderInfo.getOrderNo()));
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                }
                 //卖家增加信誉度
                 if(orderPay.getPayAmount().compareTo(new BigDecimal(2000)) <= 0){
-                    schedualWalletService.updateCredit(orderInfo.getSellerId(),Credit.NORMAL_ORDER.getCredit(),Status.ADD.getValue());
+                    String result = schedualWalletService.updateCredit(orderInfo.getSellerId(),Credit.NORMAL_ORDER.getCredit(),Status.ADD.getValue());
+                    BaseResp br = ParseReturnValue.getParseReturnValue(result);
+                    if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(br.getCode(),br.getReport());
+                    }
                 }else {
-                    schedualWalletService.updateCredit(orderInfo.getSellerId(), Credit.BIG_ORDER.getCredit(), Status.ADD.getValue());
+                    String result = schedualWalletService.updateCredit(orderInfo.getSellerId(), Credit.BIG_ORDER.getCredit(), Status.ADD.getValue());
+                    BaseResp br = ParseReturnValue.getParseReturnValue(result);
+                    if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(br.getCode(),br.getReport());
+                    }
                 }
                 //卖家增加积分
-                schedualWalletService.updateScore(orderInfo.getSellerId(), Score.getScore(orderPay.getPayAmount()), Status.ADD.getValue());
+                String result = schedualWalletService.updateScore(orderInfo.getSellerId(), Score.getScore(orderPay.getPayAmount()), Status.ADD.getValue());
+                BaseResp br = ParseReturnValue.getParseReturnValue(result);
+                if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(br.getCode(),br.getReport());
+                }
             }
         }
     }
@@ -887,6 +1053,8 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void evaluationOrder(Integer userId, Integer orderId, Integer goodsQuality, Integer serviceAttitude) throws ServiceException {
         OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKeyDetail(orderId);
         if (orderInfo == null) {
@@ -910,15 +1078,27 @@ public class OrderServiceImpl implements OrderService{
                     if(start<=3){
                         //-300信誉度
                         orderComment.setStatus(Status.EVALUATION_BAD.getValue());
-                        schedualWalletService.updateCredit(orderInfo.getSellerId(), Credit.EVALUATION_BAD.getCredit(), Status.SUB.getValue());
+                        String result = schedualWalletService.updateCredit(orderInfo.getSellerId(), Credit.EVALUATION_BAD.getCredit(), Status.SUB.getValue());
+                        BaseResp br = ParseReturnValue.getParseReturnValue(result);
+                        if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
+                            throw new ServiceException(br.getCode(),br.getReport());
+                        }
                     }else if(3 < start && start <= 6){
                         //+300信誉度
                         orderComment.setStatus(Status.EVALUATION_NORMAL.getValue());
-                        schedualWalletService.updateCredit(orderInfo.getSellerId(),Credit.EVALUATION_NORMAL.getCredit(),Status.ADD.getValue());
+                        String result = schedualWalletService.updateCredit(orderInfo.getSellerId(),Credit.EVALUATION_NORMAL.getCredit(),Status.ADD.getValue());
+                        BaseResp br = ParseReturnValue.getParseReturnValue(result);
+                        if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
+                            throw new ServiceException(br.getCode(),br.getReport());
+                        }
                     }else if(6 <= start && start <= 10){
                         //+500信誉度
                         orderComment.setStatus(Status.EVALUATION_GOOD.getValue());
-                        schedualWalletService.updateCredit(orderInfo.getSellerId(),Credit.EVALUATION_GOOD.getCredit(),Status.ADD.getValue());
+                        String result = schedualWalletService.updateCredit(orderInfo.getSellerId(),Credit.EVALUATION_GOOD.getCredit(),Status.ADD.getValue());
+                        BaseResp br = ParseReturnValue.getParseReturnValue(result);
+                        if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
+                            throw new ServiceException(br.getCode(),br.getReport());
+                        }
                     }else{
                         throw new ServiceException("分值错误！");
                     }
@@ -954,6 +1134,8 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public boolean updateOrder(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException {
         OrderInfo orderInfo = orderInfoMapper.selectByOrderNo(orderNo);
         if(orderInfo == null){
@@ -976,6 +1158,7 @@ public class OrderServiceImpl implements OrderService{
                         pay.setPayType(payType);
                         pay.setPayTime(DateStampUtils.getTimesteamp());
                         pay.setStatus(Status.ORDER_GOODS_PAY.getValue());
+                        pay.setPayNo(thirdOrderNo);
                         orderPayMapper.updateByPrimaryKey(pay);
 
                         //获取商品名字列表
@@ -983,7 +1166,11 @@ public class OrderServiceImpl implements OrderService{
                         StringBuffer goodsName = new StringBuffer();
                         boolean isAuction = false;
                         for(OrderDetail detail:orderDetails){
-                            GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(detail.getGoodsId())).getString("data")), GoodsInfo.class);
+                            BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualGoodsService.goodsInfo(detail.getGoodsId()));
+                            if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                                throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                            }
+                            GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), GoodsInfo.class);
                             isAuction = goodsInfo.getType().intValue() == Status.AUCTION.getValue()?true:false;
                             goodsName.append("【"+goodsInfo.getName()+"】");
                         }
@@ -992,7 +1179,10 @@ public class OrderServiceImpl implements OrderService{
                         schedualMessageService.easemobMessage(childOrder.getSellerId().toString(),
                                 "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER_SELLER.getMessage(),childOrder.getId().toString());
                         //买家新增余额账单
-                        schedualWalletService.addUserBalanceDetail(childOrder.getUserId(),pay.getPayAmount(),payType,Status.EXPEND.getValue(),childOrder.getOrderNo(),goodsName.toString(),childOrder.getSellerId(),childOrder.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo);
+                        BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(childOrder.getUserId(),pay.getPayAmount(),payType,Status.EXPEND.getValue(),childOrder.getOrderNo(),goodsName.toString(),childOrder.getSellerId(),childOrder.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo));
+                        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                            throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                        }
                     }
                 }else{
                     //获取商品名字列表
@@ -1008,7 +1198,10 @@ public class OrderServiceImpl implements OrderService{
                     schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
                             "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER_SELLER.getMessage(),orderInfo.getId().toString());
                     //买家新增余额账单
-                    schedualWalletService.addUserBalanceDetail(orderInfo.getUserId(),orderPay.getPayAmount(),payType,Status.EXPEND.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo);
+                    BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(orderInfo.getUserId(),orderPay.getPayAmount(),payType,Status.EXPEND.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo));
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                    }
                 }
                 orderInfo.setStatus(Status.ORDER_GOODS_PAY.getValue());
                 orderInfoMapper.updateByPrimaryKeySelective(orderInfo);
@@ -1016,6 +1209,7 @@ public class OrderServiceImpl implements OrderService{
                 orderPay.setPayType(payType);
                 orderPay.setPayTime(DateStampUtils.getTimesteamp());
                 orderPay.setStatus(Status.ORDER_GOODS_PAY.getValue());
+                orderPay.setPayNo(thirdOrderNo);
                 orderPayMapper.updateByPrimaryKeySelective(orderPay);
 
 
@@ -1038,49 +1232,66 @@ public class OrderServiceImpl implements OrderService{
             List<OrderDetail> orderDetails;
             if(info.getSellerId() == null){
                 orderDetails = orderDetailMapper.selectByMainOrderId(orderDto.getOrderId());
-                orderDto.setSeller("多卖家");
             }else{
                 orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
-
-                //获取卖家信息
-                UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(info.getSellerId())).getString("data")), UserInfo.class);
-
-                orderDto.setSeller(seller.getPhone()+"\n"+seller.getNickName());
             }
             ArrayList<AdminOrderDetailDto> orderDetailDtos = AdminOrderDetailDto.toDtoList(orderDetails);
             String orderDetail = "";
             for(AdminOrderDetailDto detail:orderDetailDtos) {
-            	orderDetail += "【"+detail.getGoodsName() + "】\n";
+            	orderDetail += "卖家："+detail.getNickName()+" - "+detail.getPhone()+"，商品："+detail.getGoodsName() + "<br>";
             }
             orderDto.setOrderDetail(orderDetail);
             orderDto.setTotalCount(orderDetailDtos.size());
-            
-            //卖家信息DTO
-           // List sellerDtos = new ArrayList<>();
-            //sellerDtos.addAll(getSellerDtos(OrderDetailDto.toDtoList(orderDetails)));
-            //订单支付表
-            OrderPay orderPay = orderPayMapper.selectByOrderId(orderDto.getOrderId());
-            AdminOrderPayDto orderPayDto = new AdminOrderPayDto(orderPay);
-            orderDto.setOrderPayDto(orderPayDto);
-            //orderDto.setSellerDtos(sellerDtos);
-            orderDto.setOrderDetailDtos(orderDetailDtos);
-            if(orderDto.getIsRefund() == 1){
-                //退货状态
-                OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null,null);
-                orderDto.setReturnStatus(orderRefund.getStatus());
-                orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
-            }
-            //是否评价
-            //OrderComment orderComment = orderCommentMapper.selectByOrder(orderDto.getOrderId());
-            //if(orderComment != null){
-            //    orderDto.setIsEvaluation(1);
-           // }
+
             orderDtos.add(orderDto);
         }
         Pager pager = new Pager();
         pager.setTotal(total);
         pager.setDatas(orderDtos);
         return pager;
+    }
+    
+    @Override
+    public AdminOrderDto adminOrderDetail(Integer orderId) throws ServiceException{
+    	OrderInfo info = orderInfoMapper.selectByOrderId(orderId);
+    	if(info==null) {
+    		throw new ServiceException("找不到订单");
+    	}
+    	AdminOrderDto orderDto = new AdminOrderDto(info);
+        //获取订单详情列表
+        //如果是没有拆单的订单根据主订单获取，拆了单的根据订单id获取
+        List<OrderDetail> orderDetails;
+        if(info.getSellerId() == null){
+            orderDetails = orderDetailMapper.selectByMainOrderId(orderDto.getOrderId());
+            //orderDto.setSeller("多卖家");
+        }else{
+            orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
+        }
+        ArrayList<AdminOrderDetailDto> orderDetailDtos = AdminOrderDetailDto.toDtoList(orderDetails);
+        String orderDetail = "";
+        for(AdminOrderDetailDto detail:orderDetailDtos) {
+        	orderDetail += "卖家："+detail.getNickName()+" - "+detail.getPhone()+"，商品："+detail.getGoodsName() + "\n";
+        }
+        orderDto.setOrderDetail(orderDetail);
+        orderDto.setTotalCount(orderDetailDtos.size());
+         
+        //卖家信息DTO        // List sellerDtos = new ArrayList<>();
+        //sellerDtos.addAll(getSellerDtos(OrderDetailDto.toDtoList(orderDetails)));
+        //订单支付表
+        OrderPay orderPay = orderPayMapper.selectByOrderId(orderDto.getOrderId());
+        AdminOrderPayDto orderPayDto = new AdminOrderPayDto(orderPay);
+        orderDto.setOrderPayDto(orderPayDto);
+        //orderDto.setSellerDtos(sellerDtos);
+        orderDto.setOrderDetailDtos(orderDetailDtos);
+        if(orderDto.getIsRefund() == 1){
+            //退货状态
+            OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null,null);
+            if(orderRefund != null){
+                orderDto.setReturnStatus(orderRefund.getStatus());
+                orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
+            }
+        }
+        return orderDto;
     }
     
     @Override
@@ -1092,14 +1303,14 @@ public class OrderServiceImpl implements OrderService{
 
         Pager pager = new Pager();
         pager.setTotal(total);
-        pager.setDatas(list);
+        pager.setDatas(AdminOrderDto.toDtoList(list));
         return pager;
     }
 
     @Override
     public Pager companyList(AdminOrderParam param) throws ServiceException {
-        List<Company> list = companyMapper.getList();
-        Integer total = list.size();
+        List<Company> list = companyMapper.getPage(param.getStart(), param.getLimit(), param.getKeyword(), param.getStatus(), param.getOrders(), param.getAscType());
+        Integer total = companyMapper.countPage(param.getKeyword(), param.getStatus());
         List<AdminCompanyDto> adminCompanyDtos = AdminCompanyDto.toDtoList(list);
         Pager pager = new Pager();
         pager.setTotal(total);
@@ -1140,56 +1351,6 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    public AdminOrderDto adminOrderDetail(Integer orderId) throws ServiceException {
-        OrderInfo info = orderInfoMapper.selectByPrimaryKey(orderId);
-        AdminOrderDto orderDto = new AdminOrderDto(info);
-        //获取订单详情列表
-        //如果是没有拆单的订单根据主订单获取，拆了单的根据订单id获取
-        List<OrderDetail> orderDetails;
-        if(info.getSellerId() == null){
-            orderDetails = orderDetailMapper.selectByMainOrderId(orderDto.getOrderId());
-            orderDto.setSeller("多卖家");
-        }else{
-            orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
-
-            //获取卖家信息
-            UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(info.getSellerId())).getString("data")), UserInfo.class);
-
-            orderDto.setSeller(seller.getPhone()+"<br>"+seller.getNickName());
-        }
-        ArrayList<AdminOrderDetailDto> orderDetailDtos = AdminOrderDetailDto.toDtoList(orderDetails);
-        String orderDetail = "";
-        for(AdminOrderDetailDto detail:orderDetailDtos) {
-            orderDetail += "【"+detail.getGoodsName() + "】x1 <br>";
-        }
-        orderDto.setOrderDetail(orderDetail);
-        orderDto.setTotalCount(orderDetailDtos.size());
-
-        //卖家信息DTO
-        // List sellerDtos = new ArrayList<>();
-        //sellerDtos.addAll(getSellerDtos(OrderDetailDto.toDtoList(orderDetails)));
-        //订单支付表
-        OrderPay orderPay = orderPayMapper.selectByOrderId(orderDto.getOrderId());
-        AdminOrderPayDto orderPayDto = new AdminOrderPayDto(orderPay);
-        orderDto.setOrderPayDto(orderPayDto);
-        //orderDto.setSellerDtos(sellerDtos);
-        orderDto.setOrderDetailDtos(orderDetailDtos);
-        if(orderDto.getIsRefund() == 1){
-            //退货状态
-            OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null,null);
-            orderDto.setReturnStatus(orderRefund.getStatus());
-            orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
-        }
-        //是否评价
-        //OrderComment orderComment = orderCommentMapper.selectByOrder(orderDto.getOrderId());
-        //if(orderComment != null){
-        //    orderDto.setIsEvaluation(1);
-        // }
-        return orderDto;
-    }
-
-
-    @Override
     public AdminOrderProcessDto getOrderProcess(Integer status, String startDate, String endDate) throws ServiceException {
 
         AdminOrderProcessDto dto = new AdminOrderProcessDto();
@@ -1210,8 +1371,4 @@ public class OrderServiceImpl implements OrderService{
         return allOrderCount;
     }
 
-    @Override
-    public void processMonthOrder(Integer status) throws ServiceException {
-        Integer monthOrderCount = orderInfoMapper.getMonthOrderCount(status);
-    }
 }

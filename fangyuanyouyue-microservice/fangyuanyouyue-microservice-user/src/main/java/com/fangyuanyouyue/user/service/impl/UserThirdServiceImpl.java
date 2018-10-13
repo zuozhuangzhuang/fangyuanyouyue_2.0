@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.List;
 
 @Service(value = "userThirdService")
@@ -99,10 +101,15 @@ public class UserThirdServiceImpl implements UserThirdService {
                 //1、userWallet：合并
                 UserWallet userWallet = userWalletMapper.selectByUserId(user.getId());
                 UserWallet phoneUserWallet = userWalletMapper.selectByUserId(phoneUser.getId());
-                userWallet.setBalance(userWallet.getBalance().add(phoneUserWallet.getBalance()));
-                userWallet.setBalanceFrozen(userWallet.getBalanceFrozen().add(phoneUserWallet.getBalanceFrozen()));
-                userWallet.setPoint(userWallet.getPoint()+phoneUserWallet.getPoint());
-                userWallet.setScore(userWallet.getScore()+phoneUserWallet.getScore());
+                phoneUserWallet.setBalance(userWallet.getBalance().add(phoneUserWallet.getBalance()));
+                userWallet.setBalance(new BigDecimal(0));
+                phoneUserWallet.setBalanceFrozen(userWallet.getBalanceFrozen().add(phoneUserWallet.getBalanceFrozen()));
+                userWallet.setBalanceFrozen(new BigDecimal(0));
+                phoneUserWallet.setPoint(userWallet.getPoint()+phoneUserWallet.getPoint());
+                userWallet.setPoint(0L);
+                phoneUserWallet.setScore(userWallet.getScore()+phoneUserWallet.getScore());
+                userWallet.setScore(0L);
+                userWalletMapper.updateByPrimaryKeySelective(phoneUserWallet);
                 userWalletMapper.updateByPrimaryKeySelective(userWallet);
                 //2、userFans：如果to_user_id == 三方用户id，如果user_id != 手机用户，修改to_user_id 为 手机用户id，如果user_id == 手机用户，删除此条记录
                 List<UserFans> userFansList = userFansMapper.userFans(user.getId(), null, null);

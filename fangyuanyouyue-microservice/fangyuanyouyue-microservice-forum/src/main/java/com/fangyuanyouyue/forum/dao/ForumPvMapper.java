@@ -25,7 +25,7 @@ public interface ForumPvMapper {
 
     int countById(Integer forumId);
 
-    int countByUserId(Integer forumId,Integer userId);
+//    int countByUserId(Integer forumId,Integer userId);
 
     /**
      * 根据用户id和帖子id获取浏览信息

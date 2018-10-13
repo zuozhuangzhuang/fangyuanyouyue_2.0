@@ -46,6 +46,14 @@ public interface UserVipService {
     boolean isUserVip(Integer userId) throws ServiceException;
 
     /**
+     * 获取用户会员等级
+     * @param userId
+     * @return
+     * @throws ServiceException
+     */
+    Integer getUserVipLevel(Integer userId) throws ServiceException;
+
+    /**
      * 会员列表
      * @param param
      * @return

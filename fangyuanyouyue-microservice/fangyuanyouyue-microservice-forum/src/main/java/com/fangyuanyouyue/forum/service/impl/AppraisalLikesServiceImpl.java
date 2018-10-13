@@ -2,6 +2,10 @@ package com.fangyuanyouyue.forum.service.impl;
 
 import java.util.Date;
 
+import com.codingapi.tx.annotation.TxTransaction;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +37,8 @@ public class AppraisalLikesServiceImpl implements AppraisalLikesService {
 	}
 
 	@Override
+	@Transactional
+	@TxTransaction(isStart=true)
 	public void saveLikes(Integer userId, Integer appraisalId,Integer type) throws ServiceException {
 		AppraisalLikes appraisalLikes = appraisalLikesMapper.selectByAppraisalIdUserId(appraisalId, userId);
 		if(type == 1){
@@ -46,7 +52,10 @@ public class AppraisalLikesServiceImpl implements AppraisalLikesService {
 				appraisalLikesMapper.insert(appraisalLikes);
 				//增加用户行为
 				AppraisalDetail detail = appraisalDetailMapper.selectByPrimaryKey(appraisalId);
-				schedualWalletService.addUserBehavior(userId,detail.getUserId(),appraisalId, Status.BUSINESS_TYPE_APPRAISAL.getValue(),Status.BEHAVIOR_TYPE_LIKES.getValue());
+				BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBehavior(userId,detail.getUserId(),appraisalId, Status.BUSINESS_TYPE_APPRAISAL.getValue(),Status.BEHAVIOR_TYPE_LIKES.getValue()));
+				if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+					throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+				}
 			}
 		}else if(type == 2){
 			if(appraisalLikes == null){

@@ -3,8 +3,10 @@ package com.fangyuanyouyue.goods.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.model.WxPayResult;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.base.util.WechatUtil.WXPayUtil;
 import com.fangyuanyouyue.base.util.alipay.util.AlipayNotify;
 import com.fangyuanyouyue.goods.dto.AppraisalDetailDto;
@@ -72,10 +74,9 @@ public class AppraisalController extends BaseController{
                 return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            String verifyUser = schedualUserService.verifyUserById(userId);
-            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if((Integer)jsonObject.get("code") != 0){
-                return toError(jsonObject.getString("report"));
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
             if(param.getGoodsIds() == null || param.getGoodsIds().length < 1){
                 if(param.getImgUrls() == null && param.getVideoUrl() == null){
@@ -111,10 +112,9 @@ public class AppraisalController extends BaseController{
                 return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            String verifyUser = schedualUserService.verifyUserById(userId);
-            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if((Integer)jsonObject.get("code") != 0){
-                return toError(jsonObject.getString("report"));
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
             if(param.getOrderId() == null){
                 return toError("订单ID不能为空！");
@@ -151,10 +151,9 @@ public class AppraisalController extends BaseController{
                 return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            String verifyUser = schedualUserService.verifyUserById(userId);
-            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if((Integer)jsonObject.get("code") != 0){
-                return toError(jsonObject.getString("report"));
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
             if(param.getStart() == null || param.getStart() < 0){
                 return toError("起始页数错误！");
@@ -192,10 +191,9 @@ public class AppraisalController extends BaseController{
                 return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            String verifyUser = schedualUserService.verifyUserById(userId);
-            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if((Integer)jsonObject.get("code") != 0){
-                return toError(jsonObject.getString("report"));
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
             if(param.getDetailId() == null){
                 return toError("鉴定详情ID不能为空！");
@@ -232,10 +230,9 @@ public class AppraisalController extends BaseController{
                 return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            String verifyUser = schedualUserService.verifyUserById(userId);
-            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if((Integer)jsonObject.get("code") != 0){
-                return toError(jsonObject.getString("report"));
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
             if(param.getOrderId() == null){
                 return toError("订单ID不能为空！");
@@ -488,4 +485,43 @@ public class AppraisalController extends BaseController{
         return ret;
 
     }
+
+
+
+    @ApiOperation(value = "删除官方鉴定", notes = "删除官方鉴定",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token",required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "ids", value = "id数组",required = true,allowMultiple = true,dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/deleteAppraisal")
+    @ResponseBody
+    public BaseResp deleteAppraisal(GoodsParam param) throws IOException {
+        try {
+            log.info("----》删除官方鉴定《----");
+            log.info("参数：" + param.toString());
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError("用户token不能为空！");
+            }
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
+            }
+            if(param.getIds() == null || param.getIds().length <1){
+                return toError("id数组不能为空！");
+            }
+            //删除全民鉴定
+            appraisalService.deleteAppraisal(userId,param.getIds());
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+
 }

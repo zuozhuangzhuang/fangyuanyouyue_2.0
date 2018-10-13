@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class HttpUtil {
 	
-	public static void main(String args[]){
+	public static void main(String[] args){
 		
 		//sendPost("http://219.143.36.225/card/channel.jhttp://219.143.36.225/card/channel.jspsp", "merchant_id=12345678901234567890");
 		sendGet("http://115.28.5.100/Advert/user_findPageUser.do", "limit=1&page=1");

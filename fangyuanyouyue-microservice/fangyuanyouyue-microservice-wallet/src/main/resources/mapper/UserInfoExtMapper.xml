@@ -128,7 +128,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="credit != null">
         credit = #{credit,jdbcType=BIGINT},
@@ -145,7 +144,6 @@
       status = #{status,jdbcType=INTEGER},
       auth_type = #{authType,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       credit = #{credit,jdbcType=BIGINT}
     where id = #{id,jdbcType=INTEGER}
   </update>

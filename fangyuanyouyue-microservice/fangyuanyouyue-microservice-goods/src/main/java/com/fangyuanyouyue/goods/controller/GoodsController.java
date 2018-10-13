@@ -3,9 +3,12 @@ package com.fangyuanyouyue.goods.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.goods.dto.*;
 import com.fangyuanyouyue.goods.model.GoodsInfo;
+import com.fangyuanyouyue.goods.model.UserInfo;
 import com.fangyuanyouyue.goods.param.GoodsParam;
 import com.fangyuanyouyue.goods.service.*;
 import io.swagger.annotations.Api;
@@ -70,10 +73,9 @@ public class GoodsController extends BaseController{
             if(StringUtils.isNotEmpty(param.getToken())){//我的商品验证用户
                 //根据用户token获取userId
                 Integer userId = (Integer)schedualRedisService.get(param.getToken());
-                String verifyUser = schedualUserService.verifyUserById(userId);
-                JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-                if((Integer)jsonObject.get("code") != 0){
-                    return toError(jsonObject.getString("report"));
+                BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+                if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                    return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
                 }
                 param.setUserId(userId);
             }else{
@@ -128,16 +130,15 @@ public class GoodsController extends BaseController{
                 return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            String verifyUser = schedualUserService.verifyUserById(userId);
-            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if((Integer)jsonObject.get("code") != 0){
-                return toError(jsonObject.getString("report"));
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
+            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()),UserInfo.class);
             //验证实名认证
             if(JSONObject.parseObject(schedualUserService.isAuth(userId)).getBoolean("data") == false){
                 return toError("用户未实名认证！");
             }
-            JSONObject user = JSONObject.parseObject(jsonObject.getString("data"));
             if(StringUtils.isEmpty(param.getGoodsInfoName())){
                 return toError("标题不能为空！");
             }
@@ -179,7 +180,7 @@ public class GoodsController extends BaseController{
                     return toError("降价幅度不能大于原价！");
                 }
             }
-            goodsInfoService.addGoods(userId,user.getString("nickName"),param);
+            goodsInfoService.addGoods(userId,user.getNickName(),param);
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
@@ -207,10 +208,9 @@ public class GoodsController extends BaseController{
                 return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            String verifyUser = schedualUserService.verifyUserById(userId);
-            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if((Integer)jsonObject.get("code") != 0){
-                return toError(jsonObject.getString("report"));
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
             if(param.getGoodsIds() == null || param.getGoodsIds().length<1){
                 return toError("商品ID不能为空！");
@@ -266,10 +266,9 @@ public class GoodsController extends BaseController{
                 return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            String verifyUser = schedualUserService.verifyUserById(userId);
-            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if((Integer)jsonObject.get("code") != 0){
-                return toError(jsonObject.getString("report"));
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
             goodsInfoService.modifyGoods(param);
             return toSuccess();
@@ -378,7 +377,7 @@ public class GoodsController extends BaseController{
     //获取首页轮播图
     @ApiOperation(value = "获取首页轮播图", notes = "(BannerIndexDto)获取首页轮播图",response = BaseResp.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "类型 1首页 2商品详情 3积分商城 ", required = true, dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "type", value = "类型 1首页主页 2商品详情 3积分商城 4首页专栏", required = true, dataType = "int", paramType = "query")
     })
     @GetMapping(value = "/getBanner")
     @ResponseBody

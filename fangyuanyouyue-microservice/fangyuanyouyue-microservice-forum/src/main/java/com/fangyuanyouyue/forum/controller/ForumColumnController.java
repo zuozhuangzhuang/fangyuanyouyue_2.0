@@ -9,7 +9,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+ import com.fangyuanyouyue.base.enums.ReCode;
+ import com.fangyuanyouyue.base.util.ParseReturnValue;
+ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -148,10 +150,9 @@ public class ForumColumnController extends BaseController {
 				return toError("用户token不能为空！");
 			}
 			Integer userId = (Integer)schedualRedisService.get(param.getToken());
-			String verifyUser = schedualUserService.verifyUserById(userId);
-			JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-			if((Integer)jsonObject.get("code") != 0){
-				return toError(jsonObject.getString("report"));
+			BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+			if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+				return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
 			}
 			//验证实名认证
 			if(JSONObject.parseObject(schedualUserService.isAuth(userId)).getBoolean("data") == false){
@@ -392,10 +393,9 @@ public class ForumColumnController extends BaseController {
 				 return toError("用户token不能为空！");
 			 }
 			 Integer userId = (Integer)schedualRedisService.get(param.getToken());
-			 String verifyUser = schedualUserService.verifyUserById(userId);
-			 JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-			 if((Integer)jsonObject.get("code") != 0){
-				 return toError(jsonObject.getString("report"));
+			 BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+			 if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+				 return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
 			 }
 
 			 if(param.getStart()==null || param.getStart() < 0 ||param.getLimit()==null || param.getLimit() < 1) {
@@ -415,43 +415,5 @@ public class ForumColumnController extends BaseController {
 	 }
 
 
-//	 @ApiOperation(value = "用户的专栏", notes = "(MyColumnDto)用户的专栏", response = BaseResp.class)
-//	 @ApiImplicitParams({
-//			 @ApiImplicitParam(name = "userId", value = "用户id",required = true, dataType = "int", paramType = "query"),
-//			 @ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
-//			 @ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query")
-//	 })
-//	 @PostMapping(value = "/userColumn")
-//	 @ResponseBody
-//	 public BaseResp userColumn(ForumParam param) throws IOException {
-//		 try {
-//			 log.info("----》用户的专栏《----");
-//			 log.info("参数：" + param.toString());
-//			 //验证用户
-//			 if(param.getUserId() == null){
-//				 return toError("用户id不能为空！");
-//			 }
-//			 Integer userId = (Integer)schedualRedisService.get(param.getToken());
-//			 String verifyUser = schedualUserService.verifyUserById(userId);
-//			 JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-//			 if((Integer)jsonObject.get("code") != 0){
-//				 return toError(jsonObject.getString("report"));
-//			 }
-//
-//			 if(param.getStart()==null || param.getStart() < 0 ||param.getLimit()==null || param.getLimit() < 1) {
-//				 return toError("分页参数错误");
-//			 }
-//			 //用户的专栏
-//			 MyColumnDto myColumn = forumColumnService.myColumn(param.getUserId(),param.getStart(),param.getLimit());
-//
-//			 return toSuccess(myColumn);
-//		 } catch (ServiceException e) {
-//			 e.printStackTrace();
-//			 return toError(e.getMessage());
-//		 } catch (Exception e) {
-//			 e.printStackTrace();
-//			 return toError("系统繁忙，请稍后再试！");
-//		 }
-//	 }
 
  }

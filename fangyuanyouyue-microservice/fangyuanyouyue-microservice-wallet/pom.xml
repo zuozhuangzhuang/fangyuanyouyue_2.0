@@ -89,13 +89,13 @@
 			<groupId>com.alibaba</groupId>
 			<artifactId>druid-spring-boot-starter</artifactId>
 		</dependency>
-		<!--fastjson-->
+		<!--fastjson -->
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
-		<!--lombok-->
+		<!--lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -107,6 +107,32 @@
 			<groupId>net.guerlab</groupId>
 			<artifactId>sdk-alipay-core</artifactId>
 			<version>1.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.codingapi</groupId>
+			<artifactId>transaction-springcloud</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.codingapi</groupId>
+			<artifactId>tx-client</artifactId>
+		</dependency>
+
+		
+		<dependency>
+			<groupId>com.codingapi</groupId>
+			<artifactId>tx-plugins-db</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 

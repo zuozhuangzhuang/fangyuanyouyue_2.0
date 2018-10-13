@@ -16,6 +16,8 @@ spring:
     async:
       request-timeout: 30s
   profiles:
+#    active: dev
+#    active: test
     active: prod
 #springcloud-bus
 management:

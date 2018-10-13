@@ -104,25 +104,35 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
   <select id="countById" parameterType="java.lang.Integer" resultType="java.lang.Integer">
-    select count(*) from forum_pv where forum_id = #{forumId,jdbcType=INTEGER}
+    select count(*) from forum_pv a,forum_info b where a.forum_id = b.id and b.status = 1 and forum_id = #{forumId,jdbcType=INTEGER}
   </select>
-  
-  <select id="countByUserId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+
+  <!--<select id="countByUserId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
     select count(*) from forum_pv where forum_id = #{forumId,jdbcType=INTEGER} and user_id = #{userId,jdbcType=INTEGER}
-  </select>
+  </select>-->
 
   <select id="selectByUserIdColumnId" parameterType="Integer" resultMap="BaseResultMap">
     select * from forum_pv where user_id = #{userId} and forum_id = #{forumId}
   </select>
 
   <select id="getCountByColumnId" resultType="Integer">
-    select count(*) from forum_pv where column_id = #{columnId} and add_time <![CDATA[ >= ]]> #{startTime} and type = #{type}
-    <if test="endTime != null and endTime != ''">
-      and add_time <![CDATA[ < ]]> #{endTime}
+    select count(*) from forum_pv a,forum_info b where a.forum_id = b.id  and b.status = 1 and a.column_id = #{columnId}
+    
+    <if test="type != null">
+      and a.type =  #{type}
     </if>
+    
+     <if test="startTime != null">
+      and a.add_time <![CDATA[ >= ]]> #{startTime}
+    </if>
+    
+    <if test="endTime != null">
+      and a.add_time <![CDATA[ < ]]> #{endTime}
+    </if>
+    
   </select>
   
   <select id="dailyWage" resultType="Map">
-    select count(*) count,column_id columnId from forum_pv where add_time <![CDATA[ >= ]]> (CURDATE()-1) and add_time <![CDATA[ < ]]> CURDATE() and type = 1 group by column_id
+    select count(*) count,a.column_id columnId from forum_pv a,forum_info b where a.forum_id = b.id and b.status = 1 and a.add_time <![CDATA[ >= ]]> (CURDATE()-1) and a.add_time <![CDATA[ < ]]> CURDATE() and a.type = 1 group by a.column_id
   </select>
 </mapper>

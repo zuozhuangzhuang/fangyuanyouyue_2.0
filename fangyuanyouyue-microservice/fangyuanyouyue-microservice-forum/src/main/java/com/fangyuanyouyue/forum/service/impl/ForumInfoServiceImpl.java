@@ -3,6 +3,10 @@ package com.fangyuanyouyue.forum.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.codingapi.tx.annotation.TxTransaction;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +25,7 @@ import com.fangyuanyouyue.forum.dao.CollectMapper;
 import com.fangyuanyouyue.forum.dao.ForumColumnMapper;
 import com.fangyuanyouyue.forum.dao.ForumInfoMapper;
 import com.fangyuanyouyue.forum.dao.ForumLikesMapper;
+import com.fangyuanyouyue.forum.dao.ForumPvMapper;
 import com.fangyuanyouyue.forum.dto.ForumInfoDto;
 import com.fangyuanyouyue.forum.dto.admin.AdminForumInfoDto;
 import com.fangyuanyouyue.forum.model.Collect;
@@ -28,6 +33,7 @@ import com.fangyuanyouyue.forum.model.ForumColumn;
 import com.fangyuanyouyue.forum.model.ForumInfo;
 import com.fangyuanyouyue.forum.model.ForumLikes;
 import com.fangyuanyouyue.forum.model.UserInfo;
+import com.fangyuanyouyue.forum.param.AdminForumParam;
 import com.fangyuanyouyue.forum.service.ForumCommentService;
 import com.fangyuanyouyue.forum.service.ForumInfoService;
 import com.fangyuanyouyue.forum.service.ForumLikesService;
@@ -62,13 +68,16 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 	private SchedualMessageService schedualMessageService;
 	@Autowired
 	private SchedualWalletService schedualWalletService;
+	@Autowired
+	private ForumPvMapper forumPvMapper;
 
 	@Override
 	public ForumInfoDto getForumInfoById(Integer forumId,Integer userId) throws ServiceException {
 
 		ForumInfo forumInfo = forumInfoMapper.selectDetailByPrimaryKey(forumId);
-
-		if(forumInfo!=null) {
+		if(forumInfo == null || forumInfo.getStatus().equals(Status.HIDE.getValue())){
+			throw new ServiceException("未找到视频、帖子！");
+		} else {
 			ForumInfoDto dto = new ForumInfoDto(forumInfo);
 			//计算点赞数
 			Integer	 likesCount = forumLikesService.countLikes(forumId);
@@ -92,8 +101,8 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 					dto.setIsCollect(StatusEnum.YES.getValue());
 				}
 				//是否关注作者
-				boolean isFans = JSONObject.parseObject(schedualUserService.isFans(userId,forumInfo.getUserId())).getBoolean("data");
-				if(isFans){
+				String ret = schedualUserService.isFans(userId,forumInfo.getUserId());
+				if(JSONObject.parseObject(ret).getIntValue("code")==0&&JSONObject.parseObject(ret).getBoolean("data")) {
 					dto.setIsFans(StatusEnum.YES.getValue());
 				}
 			}
@@ -101,8 +110,6 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 			Integer pvCount = forumPvService.countPv(forumId);
 			dto.setViewCount(pvCount+forumInfo.getPvCount());
 			return dto;
-		}else{
-			throw new ServiceException("获取信息失败！");
 		}
 	}
 
@@ -151,11 +158,18 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 	}
 
 	@Override
+	@Transactional
+	@TxTransaction(isStart=true)
 	public void addForum(Integer userId, Integer columnId, String title, String content,String videoUrl,Integer videoLength, String videoImg, Integer type,Integer[] userIds) throws ServiceException {
+		String verifyUserById = schedualUserService.verifyUserById(userId);
+		BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
+		if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+			throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+		}
+		UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
 		//验证手机号
-		UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
 		if(StringUtils.isEmpty(user.getPhone())){
-			throw new ServiceException("未绑定手机号！");
+			throw new ServiceException(ReCode.NO_PHONE.getValue(),ReCode.NO_PHONE.getMessage());
 		}
 		ForumInfo forumInfo = new ForumInfo();
 		forumInfo.setUserId(userId);
@@ -181,7 +195,11 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 				schedualMessageService.easemobMessage(forumColumn.getUserId().toString(),
 						"您的专栏【"+forumColumn.getName()+"】有新的帖子，点击此处前往查看吧",Status.SOCIAL_MESSAGE.getMessage(),Status.JUMP_TYPE_FORUM.getMessage(),forumInfo.getId().toString());
 				//增加信誉度
-				schedualWalletService.updateCredit(userId, Credit.ADD_FORUM.getCredit(),Status.ADD.getValue());
+				String result = schedualWalletService.updateCredit(userId, Credit.ADD_FORUM.getCredit(),Status.ADD.getValue());
+				BaseResp br = ParseReturnValue.getParseReturnValue(result);
+				if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
+					throw new ServiceException(br.getCode(),br.getReport());
+				}
 			}
 		}else if(type == 2){//视频
 			if(StringUtils.isEmpty(videoUrl) || StringUtils.isEmpty(videoImg) || videoLength == null){
@@ -193,12 +211,20 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 			forumInfo.setPvCount(0);
 			forumInfoMapper.insert(forumInfo);
 			//增加信誉度
-			schedualWalletService.updateCredit(userId, Credit.ADD_VIDEO.getCredit(), Status.ADD.getValue());
+			String result = schedualWalletService.updateCredit(userId, Credit.ADD_VIDEO.getCredit(), Status.ADD.getValue());
+			BaseResp br = ParseReturnValue.getParseReturnValue(result);
+			if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
+				throw new ServiceException(br.getCode(),br.getReport());
+			}
 		}else{
 			throw new ServiceException("类型错误！");
 		}
 		//增加积分
-		schedualWalletService.updateScore(userId, Score.ADD_FORUMINFO.getScore(),Status.ADD.getValue());
+		String result = schedualWalletService.updateScore(userId, Score.ADD_FORUMINFO.getScore(),Status.ADD.getValue());
+		BaseResp br = ParseReturnValue.getParseReturnValue(result);
+		if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
+			throw new ServiceException(br.getCode(),br.getReport());
+		}
 		if(userIds != null && userIds.length > 0){
 			//邀请我：用户“用户昵称”上传帖子【帖子名称】时邀请了您！点击此处前往查看吧
 			//邀请我：用户“用户昵称”上传视频【视频名称】时邀请了您！点击此处前往查看吧
@@ -226,6 +252,13 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 		List<AdminForumInfoDto> dtos = new ArrayList<AdminForumInfoDto>();
 		for(ForumInfo info:datas) {
 			AdminForumInfoDto dto = new AdminForumInfoDto(info);
+			
+			Integer count = forumPvMapper.countById(info.getId());
+			
+			dto.setRealCount(count);
+			
+			dto.setTotalCount(dto.getBaseCount()+dto.getRealCount());
+			
 			dtos.add(dto);
 		}
 
@@ -236,30 +269,43 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 	}
 
 	@Override
-	public void updateForum(Integer forumId, Integer sort, Integer isChosen,Integer status,String title) throws ServiceException {
-		ForumInfo forumInfo = forumInfoMapper.selectByPrimaryKey(forumId);
+	public void updateForum(AdminForumParam param) throws ServiceException {
+		ForumInfo forumInfo = forumInfoMapper.selectByPrimaryKey(param.getId());
 		if(forumInfo == null){
 			throw new ServiceException("未找到视频、帖子！");
 		}
-		if(isChosen!=null){
-			forumInfo.setIsChosen(isChosen);
+		if(forumInfo.getStatus().equals(Status.HIDE.getValue())){
+
+			throw new ServiceException("该视频或帖子已删除，无法编辑！");
 		}
-		if(title!=null) {
-			forumInfo.setTitle(title);
+		if(param.getIsChosen()!=null){
+			forumInfo.setIsChosen(param.getIsChosen());
 		}
-		if(sort != null){
-			forumInfo.setSort(sort);
+		if(param.getSort() != null){
+			forumInfo.setSort(param.getSort());
 		}
-		if(status != null){
-			forumInfo.setStatus(status);
+		if(param.getStatus() != null){
+			forumInfo.setStatus(param.getStatus());
+		}
+		if(param.getCount()!=null) {
+			forumInfo.setPvCount(param.getCount());
 		}
 		forumInfoMapper.updateByPrimaryKey(forumInfo);
+		//很抱歉，您的帖子/视频/全民鉴定/【名称】已被官方删除，删除理由：……
+		if(param.getStatus() != null && param.getStatus().equals(Status.DELETE.getValue())){
+			if(StringUtils.isEmpty(param.getContent())){
+				throw new ServiceException("删除理由不能为空！");
+			}
+			schedualMessageService.easemobMessage(forumInfo.getUserId().toString(),
+					"很抱歉，您的"+(forumInfo.getType()==1?"帖子【":"视频【")+forumInfo.getTitle()+"】已被官方删除，删除理由："+param.getContent()+"",
+					Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
+		}
 	}
 
 	@Override
 	public void updatePvCount(Integer forumId, Integer count, Integer type) throws ServiceException {
 		ForumInfo forumInfo = forumInfoMapper.selectByPrimaryKey(forumId);
-		if(forumInfo == null){
+		if(forumInfo == null || forumInfo.getStatus().equals(Status.HIDE.getValue())){
 			throw new ServiceException("未找到视频、帖子！");
 		}
 		if(type.equals(Status.ADD.getValue())){
@@ -286,5 +332,22 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 	public Integer processAllForum() throws ServiceException {
 		Integer allForumCount = forumInfoMapper.getAllForumCount();
 		return allForumCount;
+	}
+
+	@Override
+	public void deleteForum(Integer userId, Integer[] ids) throws ServiceException {
+		for(Integer id:ids){
+			ForumInfo forumInfo = forumInfoMapper.selectByPrimaryKey(id);
+			if(forumInfo == null || forumInfo.getStatus().equals(Status.HIDE.getValue())){
+				throw new ServiceException("未找到帖子、视频！");
+			}else{
+				if(forumInfo.getUserId().equals(userId)){
+					forumInfo.setStatus(Status.HIDE.getValue());
+					forumInfoMapper.updateByPrimaryKey(forumInfo);
+				}else{
+					throw new ServiceException("无权删除！");
+				}
+			}
+		}
 	}
 }

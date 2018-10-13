@@ -14,7 +14,7 @@ public interface BannerService {
      * @return
      * @throws ServiceException
      */
-    AdminBannerDto addBanner(AdminGoodsParam param) throws ServiceException;
+    void addBanner(AdminGoodsParam param) throws ServiceException;
 
     /**
      * 删除轮播图

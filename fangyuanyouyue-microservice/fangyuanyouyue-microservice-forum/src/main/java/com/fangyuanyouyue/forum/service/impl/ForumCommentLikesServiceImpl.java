@@ -1,5 +1,9 @@
 package com.fangyuanyouyue.forum.service.impl;
 
+import com.codingapi.tx.annotation.TxTransaction;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +36,8 @@ public class ForumCommentLikesServiceImpl implements ForumCommentLikesService {
 	}
 
 	@Override
+	@Transactional
+	@TxTransaction(isStart=true)
 	public void saveLikes(Integer type, Integer userId, Integer commentId)  throws ServiceException {
 		ForumCommentLikes forumCommentLikes = forumCommentLikesMapper.selectByUserIdCommentId(userId, commentId);
 		if(type == 1){
@@ -44,7 +50,10 @@ public class ForumCommentLikesServiceImpl implements ForumCommentLikesService {
 				forumCommentLikes.setAddTime(DateStampUtils.getTimesteamp());
 				forumCommentLikesMapper.insert(forumCommentLikes);
 				ForumComment forumComment = forumCommentMapper.selectByPrimaryKey(commentId);
-				schedualWalletService.addUserBehavior(userId,forumComment.getUserId(),commentId, Status.BUSINESS_TYPE_APPRAILSA_COMMENT.getValue(), Status.BEHAVIOR_TYPE_LIKES.getValue());
+				BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBehavior(userId,forumComment.getUserId(),commentId, Status.BUSINESS_TYPE_APPRAILSA_COMMENT.getValue(), Status.BEHAVIOR_TYPE_LIKES.getValue()));
+				if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+					throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+				}
 			}
 		}else if(type == 2){
 			if(forumCommentLikes == null){

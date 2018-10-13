@@ -1,5 +1,6 @@
 package com.fangyuanyouyue.wallet.service.impl;
 
+import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.wallet.constant.StatusEnum;
@@ -29,6 +30,8 @@ public class UserCouponServiceImpl implements UserCouponService {
     }
 
     @Override
+    @Transactional
+    @TxTransaction
     public BigDecimal getPriceByCoupon(Integer userId,BigDecimal price, Integer userCouponId) throws ServiceException {
         //根据用户id，优惠券id查询状态为 未使用 的优惠券
         UserCoupon userCoupon = userCouponMapper.selectUserCouponDetail(userId,userCouponId);

@@ -11,10 +11,11 @@
     <result column="account" jdbcType="VARCHAR" property="account" />
     <result column="real_name" jdbcType="VARCHAR" property="realName" />
     <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
-    <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+    <result column="service_charge" jdbcType="DECIMAL" property="serviceCharge" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, user_id, amount, pay_type, status, content, account, real_name, add_time
+    id, user_id, amount, pay_type, status, content, account, real_name, add_time, service_charge
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -29,12 +30,12 @@
   <insert id="insert" parameterType="com.fangyuanyouyue.wallet.model.UserWithdraw" useGeneratedKeys="true" keyProperty="id">
     insert into user_withdraw (id, user_id, amount, 
       pay_type, status, content, 
-      account, real_name, add_time
-      )
+      account, real_name, add_time, 
+      service_charge)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{amount,jdbcType=DECIMAL}, 
       #{payType,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{content,jdbcType=VARCHAR}, 
-      #{account,jdbcType=VARCHAR}, #{realName,jdbcType=VARCHAR}, #{addTime,jdbcType=TIMESTAMP}
-      )
+      #{account,jdbcType=VARCHAR}, #{realName,jdbcType=VARCHAR}, #{addTime,jdbcType=TIMESTAMP}, 
+      #{serviceCharge,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.fangyuanyouyue.wallet.model.UserWithdraw" useGeneratedKeys="true" keyProperty="id">
     insert into user_withdraw
@@ -66,6 +67,9 @@
       <if test="addTime != null">
         add_time,
       </if>
+      <if test="serviceCharge != null">
+        service_charge,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -94,6 +98,9 @@
       </if>
       <if test="addTime != null">
         #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="serviceCharge != null">
+        #{serviceCharge,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -124,6 +131,9 @@
       <if test="addTime != null">
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="serviceCharge != null">
+        service_charge = #{serviceCharge,jdbcType=DECIMAL},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -136,7 +146,8 @@
       content = #{content,jdbcType=VARCHAR},
       account = #{account,jdbcType=VARCHAR},
       real_name = #{realName,jdbcType=VARCHAR},
-      add_time = #{addTime,jdbcType=TIMESTAMP}
+      add_time = #{addTime,jdbcType=TIMESTAMP},
+      service_charge = #{serviceCharge,jdbcType=DECIMAL}
     where id = #{id,jdbcType=INTEGER}
   </update>
 

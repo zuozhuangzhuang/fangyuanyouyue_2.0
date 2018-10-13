@@ -83,14 +83,12 @@ public class AdminController extends BaseController{
         }
     }
     
-    
-
     @ApiOperation(value = "查看退货订单", notes = "订单退货",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "keyword", value = "搜索词条", required = false, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "status", value = "状态 1待支付 2待发货 3待收货 4已完成 5已取消 7退货", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "status", value = "状态 1申请退货 2退货成功 3拒绝退货", required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "startDate", value = "开始日期", required = false, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "endDate", value = "结束日期", required = false, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "orders", value = "排序规则", required = false, dataType = "String", paramType = "query"),
@@ -100,7 +98,7 @@ public class AdminController extends BaseController{
     @ResponseBody
     public BaseResp refundList(AdminOrderParam param) throws IOException {
         try {
-            log.info("----》查看所有用户订单《----");
+            log.info("----》查看退货订单《----");
             log.info("参数："+param.toString());
             //参数判断
             //验证用户
@@ -125,7 +123,7 @@ public class AdminController extends BaseController{
 
     @ApiOperation(value = "官方处理退货", notes = "官方处理退货")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "orderId", value = "订单id",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "id", value = "退货信息id",required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "reason", value = "处理理由", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "status", value = "处理状态 2同意 3拒绝",required = true, dataType = "int", paramType = "query")
     })
@@ -136,7 +134,7 @@ public class AdminController extends BaseController{
             log.info("----》官方处理退货《----");
             log.info("参数："+param.toString());
             if(param.getOrderId() == null){
-                return toError("订单id不能为空！");
+                return toError("id不能为空！");
             }
             if(param.getStatus() == null){
                 return toError("处理状态不能为空！");
@@ -244,7 +242,7 @@ public class AdminController extends BaseController{
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "订单ID",required = true, dataType = "int", paramType = "query")
     })
-    @PostMapping(value = "/orderDetail")
+    @GetMapping(value = "/orderDetail")
     @ResponseBody
     public BaseResp orderDetail(AdminOrderParam param) throws IOException {
         try {

@@ -7,7 +7,9 @@ server:
     base-url: http://localhost:9411
 spring:
   profiles:
-    active: test
+#    active: dev
+#    active: test
+    active: prod
 #springcloud-bus
 management:
   endpoints:

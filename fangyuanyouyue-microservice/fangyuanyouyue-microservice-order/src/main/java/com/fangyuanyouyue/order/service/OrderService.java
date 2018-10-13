@@ -184,6 +184,7 @@ public interface OrderService {
      */
     void updateCompany(Integer id,String number, String name, BigDecimal price,Integer status) throws ServiceException;
 
+    
     /**
      * 获取简单订单列表
      * @param param
@@ -225,11 +226,5 @@ public interface OrderService {
      */
     Integer processAllOrder(Integer status)throws ServiceException;
 
-    /**
-     * 每天统计一次本月订单
-     * @param status
-     * @throws ServiceException
-     */
-    void processMonthOrder(Integer status)throws ServiceException;
 
 }

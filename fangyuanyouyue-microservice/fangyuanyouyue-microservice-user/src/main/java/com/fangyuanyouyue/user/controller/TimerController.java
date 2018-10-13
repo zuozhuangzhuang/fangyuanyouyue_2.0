@@ -50,4 +50,21 @@ public class TimerController extends BaseController {
         }
     }
 
+    @ApiOperation(value = "每日统计数据", notes = "每日统计数据")
+    @PostMapping(value = "/dailyStatistics")
+    @ResponseBody
+    public BaseResp dailyStatistics() throws IOException {
+        try {
+            log.info("----》每日统计数据《----");
+            timerService.dailyStatistics();
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
 }

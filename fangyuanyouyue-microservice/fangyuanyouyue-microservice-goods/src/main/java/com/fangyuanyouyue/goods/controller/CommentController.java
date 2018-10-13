@@ -3,7 +3,9 @@ package com.fangyuanyouyue.goods.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.goods.dto.GoodsCommentDto;
 import com.fangyuanyouyue.goods.param.GoodsParam;
 import com.fangyuanyouyue.goods.service.CommentService;
@@ -68,10 +70,9 @@ public class CommentController extends BaseController{
                 return toError("商品id不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            String verifyUser = schedualUserService.verifyUserById(userId);
-            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if((Integer)jsonObject.get("code") != 0){
-                return toError(jsonObject.getString("report"));
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
             if(param.getImg1Url() == null && StringUtils.isEmpty(param.getContent())){
                 return toError("内容不能为空！");
@@ -106,10 +107,9 @@ public class CommentController extends BaseController{
                 return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            String verifyUser = schedualUserService.verifyUserById(userId);
-            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if((Integer)jsonObject.get("code") != 0){
-                return toError(jsonObject.getString("report"));
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
             if(param.getCommentId() == null){
                 return toError("评论id不能为空！");
@@ -188,10 +188,9 @@ public class CommentController extends BaseController{
                 return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            String verifyUser = schedualUserService.verifyUserById(userId);
-            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if((Integer)jsonObject.get("code") != 0){
-                return toError(jsonObject.getString("report"));
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
             if(param.getType() == null){
                 return toError("类型不能为空！");
@@ -228,10 +227,9 @@ public class CommentController extends BaseController{
                 return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            String verifyUser = schedualUserService.verifyUserById(userId);
-            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if((Integer)jsonObject.get("code") != 0){
-                return toError(jsonObject.getString("report"));
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
             if(param.getCommentIds() == null || param.getCommentIds().length < 1){
                 return toError("评论id不能为空！");

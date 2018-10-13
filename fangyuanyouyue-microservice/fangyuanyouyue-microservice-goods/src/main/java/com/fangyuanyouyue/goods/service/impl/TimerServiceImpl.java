@@ -1,10 +1,13 @@
 package com.fangyuanyouyue.goods.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.goods.dao.*;
 import com.fangyuanyouyue.goods.model.GoodsBargain;
 import com.fangyuanyouyue.goods.model.GoodsInfo;
@@ -155,8 +158,9 @@ public class TimerServiceImpl implements TimerService{
         }
     }
 
-    @SuppressWarnings("AlibabaAvoidNewDateGetTime")
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void refuseBargain() throws ServiceException {
         //1、获取所有正在申请中的议价 2、根据议价申请时间进行操作 3、通知买家
 
@@ -171,9 +175,9 @@ public class TimerServiceImpl implements TimerService{
                     goodsBargainMapper.updateByPrimaryKey(bargain);
                     //退回余额
                     //调用wallet-service修改余额功能
-                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),Status.ADD.getValue())), BaseResp.class);
-                    if(baseResp.getCode() == 1){
-                        throw new ServiceException(baseResp.getReport().toString());
+                    BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),Status.ADD.getValue()));
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                     }
                     //议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
                     GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(bargain.getGoodsId());

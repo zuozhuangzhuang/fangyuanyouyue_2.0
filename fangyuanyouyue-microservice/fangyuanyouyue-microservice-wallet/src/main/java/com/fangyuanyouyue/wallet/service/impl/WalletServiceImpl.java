@@ -1,15 +1,13 @@
 package com.fangyuanyouyue.wallet.service.impl;
 
+import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.base.util.DateStampUtils;
-import com.fangyuanyouyue.base.util.DateUtil;
-import com.fangyuanyouyue.base.util.IdGenerator;
-import com.fangyuanyouyue.base.util.MD5Util;
+import com.fangyuanyouyue.base.util.*;
 import com.fangyuanyouyue.base.util.WechatUtil.PayCommonUtil;
 import com.fangyuanyouyue.base.util.alipay.util.GenOrderUtil;
 import com.fangyuanyouyue.base.util.wechat.pay.WechatPay;
@@ -82,19 +80,19 @@ public class WalletServiceImpl implements WalletService{
         String id = idg.nextId();
         userRechargeDetail.setPayNo(id);
         userRechargeDetail.setAddTime(DateStampUtils.getTimesteamp());
-        userRechargeDetail.setStatus(1);
+        userRechargeDetail.setStatus(Status.ORDER_UNPAID.getValue());
         userRechargeDetailMapper.insert(userRechargeDetail);
 
         if(type.intValue() == 1){
             //微信
-            WechatPayDto wechatPayDto = orderPayByWechat(userRechargeDetail.getPayNo(), userRechargeDetail.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.recharge_wechat_notify.getNotifUrl());
+            WechatPayDto wechatPayDto = orderPayByWechat(userRechargeDetail.getPayNo(), userRechargeDetail.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.recharge_wechat_notify.getNotifUrl());
             return wechatPayDto;
         }else if(type.intValue() == 2){
             //支付宝
-            String aliPay = orderPayByALi(userRechargeDetail.getPayNo(), userRechargeDetail.getAmount(), NotifyUrl.test_notify.getNotifUrl()+NotifyUrl.recharge_alipay_notify.getNotifUrl());
+            String aliPay = orderPayByALi(userRechargeDetail.getPayNo(), userRechargeDetail.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.recharge_alipay_notify.getNotifUrl());
             return aliPay;
         }else if(type.intValue() == 4){//小程序支付
-            WechatPayDto wechatPayDto = orderPayByWechatMini(userId, userRechargeDetail.getPayNo(), userRechargeDetail.getAmount(), NotifyUrl.mini_test_notify.getNotifUrl()+NotifyUrl.recharge_wechat_notify.getNotifUrl());
+            WechatPayDto wechatPayDto = orderPayByWechatMini(userId, userRechargeDetail.getPayNo(), userRechargeDetail.getAmount(), NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.recharge_wechat_notify.getNotifUrl());
             return wechatPayDto;
         }else{
             throw new ServiceException("充值类型错误！");
@@ -117,12 +115,9 @@ public class WalletServiceImpl implements WalletService{
         userWithdraw.setAddTime(DateStampUtils.getTimesteamp());
 
         UserInfoExt userInfoExt = userInfoExtMapper.selectUserInfoExtByUserId(userId);
-        if(type != 1){//提现方式 1微信 2支付宝
-            if(StringUtils.isEmpty(payPwd)){
-                throw new ServiceException("支付密码为空！");
-            }
+        if(type.equals(Status.PAY_TYPE_ALIPAY.getValue())){//提现方式 1微信 2支付宝
             if(userInfoExt.getPayPwd()==null){
-                throw new ServiceException("请先设置支付密码再提现");
+                throw new ServiceException("用户未设置支付密码！");
             }
             if(MD5Util.verify(MD5Util.MD5(payPwd),userInfoExt.getPayPwd()) == false){
                 throw new ServiceException(ReCode.PAYMENT_PASSWORD_ERROR.getValue(),ReCode.PAYMENT_PASSWORD_ERROR.getMessage());
@@ -131,17 +126,20 @@ public class WalletServiceImpl implements WalletService{
             userWithdraw.setRealName(realName);
         }else{
             //微信提现需要用户绑定微信账号
-
-            userWithdraw.setAccount("用户unionID");
+            //查询用户的三方记录
+            UserThirdParty userThirdByUserId = userThirdPartyMapper.getUserThirdByUserId(userId, Status.PAY_TYPE_WECHAT.getValue());
+            if(userThirdByUserId == null || StringUtils.isEmpty(userThirdByUserId.getMiniOpenId())){
+                throw new ServiceException("该账号未绑定小程序，无法微信提现！");
+            }else{
+                userWithdraw.setAccount(userThirdByUserId.getMiniOpenId());
+            }
         }
-
-        userWithdrawMapper.insert(userWithdraw);
 
         //根据用户会员等级扣除不同手续费
         UserVip userVip = userVipMapper.selectByUserId(userId);
         Integer vipLevel = userVip.getVipLevel();//会员等级
         BigDecimal charge;//手续费
-        BigDecimal percent;
+        BigDecimal percent;//提现手续费利率
         if(amount.compareTo(new BigDecimal(200)) <= 0){
             charge = new BigDecimal(2);
         }else{
@@ -159,13 +157,15 @@ public class WalletServiceImpl implements WalletService{
             }
             charge = amount.multiply(percent);
         }
+        userWithdraw.setServiceCharge(charge);
+        userWithdrawMapper.insert(userWithdraw);
         amount = amount.add(charge);
         //扣除余额 type 类型 1充值 2消费 payType 支付类型 1微信 2支付宝 3余额
         updateBalance(userId,amount,2);
         //订单号
         final IdGenerator idg = IdGenerator.INSTANCE;
         String orderNo = idg.nextId();
-        addUserBalanceDetail(userId,amount,Status.PAY_TYPE_BALANCE.getValue(),Status.EXPEND.getValue(),orderNo,"用户提现",Status.WITHDRAW.getValue(),null,userId,orderNo);
+        addUserBalanceDetail(userId,amount,Status.PAY_TYPE_BALANCE.getValue(),Status.EXPEND.getValue(),orderNo,(userWithdraw.getPayType().equals(1)?"微信":"支付宝")+"提现",Status.WITHDRAW.getValue(),null,userId,orderNo);
     }
 
 
@@ -244,6 +244,8 @@ public class WalletServiceImpl implements WalletService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction
     public boolean updateBalance(Integer userId, BigDecimal amount,Integer type) throws ServiceException {
         //获取用户钱包信息
         UserWallet userWallet = userWalletMapper.selectByUserId(userId);
@@ -256,7 +258,7 @@ public class WalletServiceImpl implements WalletService{
                 //获取被限制的用户（代理不可以余额提现）
                 ConfinedUser confinedUser = confinedUserMapper.selectByUserIdStatus(userId, 0);
                 if(confinedUser != null){
-                    throw new ServiceException("此用户被限制使用余额提现！");
+                    throw new ServiceException("此用户被限制使用余额！");
                 }
                 if(userWallet.getBalance().compareTo(amount) < 0){//余额小于消费金额
                     throw new ServiceException(ReCode.INSUFFICIENT_FUND.getValue(),ReCode.INSUFFICIENT_FUND.getMessage());
@@ -282,22 +284,31 @@ public class WalletServiceImpl implements WalletService{
     }
 
     @Override
-    public void updateAppraisalCount(Integer userId, Integer count) throws ServiceException {
+    @Transactional
+    @TxTransaction
+    public void updateAppraisalCount(Integer userId, Integer count,Integer type) throws ServiceException {
         //只做了减少次数，后期可支持 增加次数
         UserWallet userWallet = userWalletMapper.selectByUserId(userId);
         if(userWallet == null){
             throw new ServiceException("获取钱包信息失败！");
         }else{
-            if(userWallet.getAppraisalCount() < count){
-                throw new ServiceException("剩余鉴定次数不足！");
-            }else{
-                userWallet.setAppraisalCount(userWallet.getAppraisalCount()-count);
+            if(type.equals(Status.ADD.getValue())){
+                userWallet.setAppraisalCount(userWallet.getAppraisalCount()+count);
                 userWalletMapper.updateByPrimaryKey(userWallet);
+            }else{
+                if(userWallet.getAppraisalCount() < count){
+                    throw new ServiceException("剩余鉴定次数不足！");
+                }else{
+                    userWallet.setAppraisalCount(userWallet.getAppraisalCount()-count);
+                    userWalletMapper.updateByPrimaryKey(userWallet);
+                }
             }
         }
     }
 
     @Override
+    @Transactional
+    @TxTransaction
     public void updateCredit(Integer userId, Long credit, Integer type) throws ServiceException {
         UserInfoExt userInfoExt = userInfoExtMapper.selectUserInfoExtByUserId(userId);
         if (userInfoExt == null) {
@@ -398,6 +409,8 @@ public class WalletServiceImpl implements WalletService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction
     public WechatPayDto orderPayByWechat(String orderNo, BigDecimal price,String notifyUrl) throws ServiceException {
         WechatPay util = new WechatPay();
         System.out.println("请求路径："+notifyUrl);
@@ -412,6 +425,8 @@ public class WalletServiceImpl implements WalletService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction
     public WechatPayDto orderPayByWechatMini(final Integer userId,final String orderNo,final BigDecimal price,final String notifyUrl) throws ServiceException {
         //根据userId获取三方openId
         UserThirdParty userThirdByUserId = userThirdPartyMapper.getUserThirdByUserId(userId, 1);
@@ -429,6 +444,8 @@ public class WalletServiceImpl implements WalletService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction
     public String orderPayByALi(String orderNo, BigDecimal price,String notifyUrl) throws ServiceException,Exception {
         GenOrderUtil util = new GenOrderUtil();
         String orderInfo="";
@@ -453,14 +470,12 @@ public class WalletServiceImpl implements WalletService{
             UserInfo info;
             if(dto.getType().intValue() == Status.INCOME.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue()){
                 info = userInfoMapper.selectByPrimaryKey(dto.getBuyerId());
-                dto.setImgUrl(info.getHeadImgUrl());
             }else if((dto.getType().intValue() == Status.EXPEND.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue())
                     || (dto.getType().intValue() == Status.EXPEND.getValue() && dto.getOrderType().intValue() == Status.BARGAIN.getValue())
                     || (dto.getType().intValue() == Status.REFUND.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue())
                     || (dto.getType().intValue() == Status.REFUND.getValue() && dto.getOrderType().intValue() == Status.BARGAIN.getValue())
                     ){
                 info = userInfoMapper.selectByPrimaryKey(dto.getSellerId());
-                dto.setImgUrl(info.getHeadImgUrl());
             }else{
                 info = userInfoMapper.selectByPrimaryKey(66);
             }
@@ -505,6 +520,8 @@ public class WalletServiceImpl implements WalletService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction
     public void addUserBalanceDetail(Integer userId, BigDecimal amount, Integer payType, Integer type, String orderNo, String title,Integer orderType,Integer sellerId,Integer buyerId,String payNo) throws ServiceException {
         //确认下单后生成用户和平台收支表信息
         UserWallet userWallet = userWalletMapper.selectByUserId(userId);
@@ -528,7 +545,9 @@ public class WalletServiceImpl implements WalletService{
         userBalance.setBuyerId(buyerId);
         userBalance.setPayNo(payNo);
         userBalanceDetailMapper.insert(userBalance);
-        platformFinanceService.saveFinace(userId,amount,payType,type,orderNo,title,orderType,sellerId, buyerId,payNo);
+        if(!orderType.equals(Status.WITHDRAW.getValue())){//提现不生成平台收支
+            platformFinanceService.saveFinace(userId,amount,payType,type,orderNo,title,orderType,sellerId, buyerId,payNo);
+        }
 
     }
 
@@ -539,10 +558,14 @@ public class WalletServiceImpl implements WalletService{
         if(userRechargeDetail == null){
             throw new ServiceException("订单不存在！");
         }
-        userRechargeDetail.setStatus(2);
+        userRechargeDetail.setStatus(Status.ORDER_COMPLETE.getValue());
         userRechargeDetailMapper.updateByPrimaryKeySelective(userRechargeDetail);
+        schedualMessageService.easemobMessage(userRechargeDetail.getUserId().toString(),
+                "您充值的"+userRechargeDetail.getAmount()+"元已到账，点击前往查看~",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_WALLET.getMessage(),"");
+        //生成余额账单
+        addUserBalanceDetail(userRechargeDetail.getUserId(),userRechargeDetail.getAmount(),payType,Status.INCOME.getValue(),orderNo,(payType.equals(Status.PAY_TYPE_WECHAT.getValue())?"微信":"支付宝")+"充值",Status.RECHARGE.getValue(),null,null,thirdOrderNo);
         //充值
-        updateBalance(userRechargeDetail.getUserId(),userRechargeDetail.getAmount(),1);
+        updateBalance(userRechargeDetail.getUserId(),userRechargeDetail.getAmount(),Status.ADD.getValue());
         return true;
     }
 
@@ -602,15 +625,16 @@ public class WalletServiceImpl implements WalletService{
         }
         userWithdraw.setStatus(status);
         userWithdraw.setContent(content);
+        //订单号
+        final IdGenerator idg = IdGenerator.INSTANCE;
+        String orderNo = idg.nextId();
         if(status.intValue() == Status.WITHDRAW_AGGRES.getValue()){
+            platformFinanceService.saveFinace(userWithdraw.getUserId(),userWithdraw.getAmount().add(userWithdraw.getServiceCharge()),Status.PAY_TYPE_BALANCE.getValue(),Status.EXPEND.getValue(),orderNo,(userWithdraw.getPayType().equals(1)?"微信":"支付宝")+"提现",Status.WITHDRAW.getValue(),null,userWithdraw.getUserId(),orderNo);
             schedualMessageService.easemobMessage(userWithdraw.getUserId().toString(),"您在小方圆申请￥"+userWithdraw.getAmount()+"的提现申请已通过审核",
                     Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
         }else if(status.intValue() == Status.WITHDRAW_REFUSE.getValue()){
-            updateBalance(userWithdraw.getUserId(),userWithdraw.getAmount(),Status.ADD.getValue());
-            //订单号
-            final IdGenerator idg = IdGenerator.INSTANCE;
-            String orderNo = idg.nextId();
-            addUserBalanceDetail(userWithdraw.getUserId(),userWithdraw.getAmount(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"提现拒绝退款",Status.WITHDRAW.getValue(),null,userWithdraw.getUserId(),orderNo);
+            updateBalance(userWithdraw.getUserId(),userWithdraw.getAmount().add(userWithdraw.getServiceCharge()),Status.ADD.getValue());
+            addUserBalanceDetail(userWithdraw.getUserId(),userWithdraw.getAmount().add(userWithdraw.getServiceCharge()),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,(userWithdraw.getPayType().equals(1)?"微信":"支付宝")+"提现失败",Status.WITHDRAW.getValue(),null,userWithdraw.getUserId(),orderNo);
             schedualMessageService.easemobMessage(userWithdraw.getUserId().toString(),"您在小方圆申请￥"+userWithdraw.getAmount()+"的提现申请已被拒绝，拒绝原因："+content,
                     Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
         }
@@ -638,7 +662,7 @@ public class WalletServiceImpl implements WalletService{
             //订单号
             final IdGenerator idg = IdGenerator.INSTANCE;
             String orderNo = idg.nextId();
-            addUserBalanceDetail(userId,amount,Status.PAY_TYPE_BALANCE.getValue(),type,orderNo,type==1?"系统增加余额":"系统扣除余额",Status.SYSTEM_UPDATE.getValue(),null,userId,orderNo);
+            addUserBalanceDetail(userId,amount,Status.PAY_TYPE_BALANCE.getValue(),type,orderNo,type==1?"系统增加余额":"系统减少余额",Status.SYSTEM_UPDATE.getValue(),null,userId,orderNo);
         }
     }
 

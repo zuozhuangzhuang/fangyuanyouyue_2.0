@@ -348,12 +348,12 @@ public class UserControllerTest {
     @Transactional
     public void myFansOrFollows() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/user/myFansOrFollows")
-                .param("token","10045FY1535418023463")
+                .param("token","118351FY1539236097872")
                 //类型 1我的关注 2我的粉丝
                 .param("type","1")
                 .param("start","0")
                 .param("limit","10")
-                .param("search","师弟")
+//                .param("search","师弟")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

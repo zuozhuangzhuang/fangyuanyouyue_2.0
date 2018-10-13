@@ -35,10 +35,12 @@ public enum Status {
      * 跳转类型
      * 1系统消息（不跳转） 2商品详情 3抢购详情 4帖子详情 5视频详情 6全民鉴定详情 7钱包页面 8会员页面
      * 9官方鉴定列表 10买家订单详情 11卖家订单详情 12我的专栏 13实名认证通过 14官方认证通过 15申请专栏通过
+     * 16实名认证拒绝 17官方认证拒绝 18申请专栏拒绝
      */
     JUMP_TYPE_SYSTEM("1"),JUMP_TYPE_GOODS("2"),JUMP_TYPE_AUCTION("3"),JUMP_TYPE_FORUM("4"),JUMP_TYPE_VIDEO("5"),JUMP_TYPE_APPRAISAL("6"),JUMP_TYPE_WALLET("7"),
     JUMP_TYPE_VIP("8"),JUMP_TYPE_PLATFORM_APPRAISAL("9"),JUMP_TYPE_ORDER_BUYER("10"),JUMP_TYPE_ORDER_SELLER("11"),JUMP_TYPE_COLUMN("12"),
     JUMP_TYPE_EXT_AGREE("13"),JUMP_TYPE_AUTH_TYPE_AGREE("14"),JUMP_TYPE_COLUMN_AGREE("15"),
+    JUMP_TYPE_EXT_REFUSE("16"),JUMP_TYPE_AUTH_TYPE_REFUSE("17"),JUMP_TYPE_COLUMN_REFUSE("18"),
 
 
     //会员等级 1铂金会员 2至尊会员
@@ -47,8 +49,8 @@ public enum Status {
     //会员类型 1一个月 2三个月 3一年会员
     VIP_TYPE_ONE_MONTH(1),VIP_TYPE_THREE_MONTH(2),VIP_TYPE_ONE_YEAR(3),
 
-    //会员开通类型 1开通 2续费
-
+    //会员开通类型 1开通 2续费 3取消
+    VIP_DREDGE(1),VIP_RENEW(2),VIP_CANCEL(3),
     //会员状态 1已开通 2未开通
     IS_VIP(1),NOT_VIP(2),
 
@@ -81,6 +83,13 @@ public enum Status {
 
     //限制余额状态 0限制 1未限制
     IS_CONFINED(0),NOT_CONFINED(1),
+
+    //帖子、视频、评论 状态 1显示 2隐藏
+    SHOW(1),HIDE(2),
+    //状态 1进行中 2结束 3删除
+    BEING(1),END(2),DELETE(3),
+    //代理信息
+    IS_PROXY(1),NOT_PROXY(2)
     ;
     private Integer value;
     private String message;

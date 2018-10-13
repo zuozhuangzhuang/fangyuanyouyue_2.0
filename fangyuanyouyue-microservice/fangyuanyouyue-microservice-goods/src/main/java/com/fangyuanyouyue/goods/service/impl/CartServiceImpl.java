@@ -2,6 +2,11 @@ package com.fangyuanyouyue.goods.service.impl;
 
 import java.util.*;
 
+import com.codingapi.tx.annotation.TxTransaction;
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.enums.Status;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.goods.dao.*;
 import com.fangyuanyouyue.goods.dto.GoodsCommentDto;
 import com.fangyuanyouyue.goods.model.*;
@@ -67,11 +72,13 @@ public class CartServiceImpl implements CartService {
                 if(goodsInfo.getUserId().intValue() == userId.intValue()){
                     throw new ServiceException("不可以把自己的商品加入到购物车！");
                 }
+                if(goodsInfo.getType().equals(Status.AUCTION.getValue())){
+                    throw new ServiceException("抢购商品无法加入购物车！");
+                }
                 CartDetail cartDetail = cartDetailMapper.selectByCartIdGoodsId(cartInfo.getId(), goodsId);
                 //判断购物车是否已经有这个商品了
                 if (cartDetail == null) {
                     cartDetail = new CartDetail();
-                    JSONObject user = JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(goodsInfo.getUserId())).getString("data"));
                     cartDetail.setAddTime(DateStampUtils.getTimesteamp());
                     cartDetail.setCartId(cartInfo.getId());
                     cartDetail.setGoodsId(goodsId);
@@ -96,8 +103,14 @@ public class CartServiceImpl implements CartService {
             List<CartDetail> cartDetails = cartDetailMapper.selectByCartId(cart.getId());
             if (cartDetails != null) {
                 for (CartDetail cartDetail : cartDetails) {
+                    //是否官方认证
+                    Map<String, Object> goodsUserInfoExtAndVip = goodsInfoMapper.getGoodsUserInfoExtAndVip(cartDetail.getGoodsId());
+                    BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(cartDetail.getUserId()));
+                    if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+                    }
                     //获取卖家信息
-                    UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(cartDetail.getUserId())).getString("data")), UserInfo.class);
+                    UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
                     CartShopDto cartShopDto = new CartShopDto();
                     cartShopDto.setUserId(cartDetail.getUserId());
                     cartShopDto.setHeadImgUrl(user.getHeadImgUrl());
@@ -108,6 +121,10 @@ public class CartServiceImpl implements CartService {
                         continue;
                     }
                     for (CartDetailDto cartDetailDto : cartDetailDtos) {
+                        //是否官方认证
+                        if(goodsUserInfoExtAndVip != null) {
+                            cartDetailDto.setAuthType((Integer) goodsUserInfoExtAndVip.get("auth_type") == 2 ? 1 : 2);
+                        }
                         List<GoodsImg> imgsByGoodsId = goodsImgMapper.getImgsByGoodsId(cartDetailDto.getGoodsId());
                         for (GoodsImg goodsImg : imgsByGoodsId) {
                             if (goodsImg.getType() == 1) {//主图
@@ -150,15 +167,17 @@ public class CartServiceImpl implements CartService {
     public List<GoodsDto> choice(Integer userId, Integer start, Integer limit) throws ServiceException {
         //1、根据商品分类 2、根据会员等级排序
         CartInfo cartInfo = cartInfoMapper.selectByUserId(userId);
-        List<CartDetail> cartDetails = cartDetailMapper.selectByCartId(cartInfo.getId());
-        //获取购物车内所有商品分类并去重
-        Set<Integer> set = new HashSet<>();
-        for(CartDetail detail:cartDetails){
-            List<Integer> integers = goodsCorrelationMapper.selectCategoryIdByGoodsId(detail.getGoodsId());
-            set.addAll(integers);
-        }
         List<Integer> goodsCategoryIds = new ArrayList<>();
-        goodsCategoryIds.addAll(set);
+        if(cartInfo != null){
+            List<CartDetail> cartDetails = cartDetailMapper.selectByCartId(cartInfo.getId());
+            //获取购物车内所有商品分类并去重
+            Set<Integer> set = new HashSet<>();
+            for(CartDetail detail:cartDetails){
+                List<Integer> integers = goodsCorrelationMapper.selectCategoryIdByGoodsId(detail.getGoodsId());
+                set.addAll(integers);
+            }
+            goodsCategoryIds.addAll(set);
+        }
         List<GoodsInfo> goodsInfos = goodsInfoMapper.selectByCategoryIds(goodsCategoryIds, start * limit, limit);
         List<GoodsDto> goodsDtos = new ArrayList<>();
         for (GoodsInfo goodsInfo : goodsInfos) {
@@ -201,8 +220,12 @@ public class CartServiceImpl implements CartService {
                 goodsCommentDto.setMainUrl(mainImgUrl);
             }
 
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(goodsInfo.getUserId()));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+            }
             //获取卖家信息
-            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(goodsInfo.getUserId())).getString("data")), UserInfo.class);
+            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
             GoodsDto goodsDto = new GoodsDto(user, goodsInfo, goodsImgs, goodsCorrelations, goodsCommentDtos);
             goodsDto.setCommentCount(goodsCommentMapperl.selectCount(goodsInfo.getId()));
             return goodsDto;
@@ -210,6 +233,8 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void cartRemoveByIds(Integer userId,Integer[] goodsIds) throws ServiceException {
         //根据商品ID数组删除购物车内信息
         CartInfo cart = cartInfoMapper.selectByUserId(userId);

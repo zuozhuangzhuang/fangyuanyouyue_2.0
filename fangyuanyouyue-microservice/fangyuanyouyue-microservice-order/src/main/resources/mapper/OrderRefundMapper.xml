@@ -209,7 +209,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="sellerReturnStatus != null">
         seller_return_status = #{sellerReturnStatus,jdbcType=INTEGER},
@@ -245,7 +244,6 @@
       pic6 = #{pic6,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       seller_return_status = #{sellerReturnStatus,jdbcType=INTEGER},
       user_id = #{userId,jdbcType=INTEGER},
       refuse_reason = #{refuseReason,jdbcType=VARCHAR},

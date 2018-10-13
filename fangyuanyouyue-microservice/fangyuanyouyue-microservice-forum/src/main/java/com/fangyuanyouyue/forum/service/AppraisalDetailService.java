@@ -7,6 +7,7 @@ import com.fangyuanyouyue.base.BasePageReq;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.forum.dto.AppraisalDetailDto;
+import com.fangyuanyouyue.forum.param.AdminForumParam;
 
 /**
  * 全民鉴定接口
@@ -76,6 +77,23 @@ public interface AppraisalDetailService {
      * @return
      */
     Pager getPage(BasePageReq param);
-    
-    
+
+    /**
+     * 删除全民鉴定
+     * @param userId
+     * @param ids
+     * @throws ServiceException
+     */
+    void deleteAppraisal(Integer userId,Integer[] ids) throws ServiceException;
+
+    /**
+     * 编辑全民鉴定
+     * @param appraisalaId
+     * @param sort
+     * @param count
+     * @param status
+     * @param content
+     * @throws ServiceException
+     */
+    void updateAppraisal(AdminForumParam param) throws ServiceException;
 }

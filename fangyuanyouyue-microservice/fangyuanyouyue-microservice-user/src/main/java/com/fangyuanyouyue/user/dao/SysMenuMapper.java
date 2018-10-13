@@ -1,7 +1,11 @@
 package com.fangyuanyouyue.user.dao;
 
-import com.fangyuanyouyue.user.model.SysMenu;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import com.fangyuanyouyue.user.model.SysMenu;
 
 @Mapper
 public interface SysMenuMapper {
@@ -16,4 +20,14 @@ public interface SysMenuMapper {
     int updateByPrimaryKeySelective(SysMenu record);
 
     int updateByPrimaryKey(SysMenu record);
+
+    List<SysMenu> selectAll();
+    
+    List<SysMenu> selectChildren(Integer parentId);
+    
+    List<SysMenu> selectByRoleId(Integer roleId);
+    
+    int deleteByParentId(Integer parentId);
+    
+    List<SysMenu> selectUserIdParentId(@Param("userId") Integer userId,@Param("parentId") Integer parentId);
 }

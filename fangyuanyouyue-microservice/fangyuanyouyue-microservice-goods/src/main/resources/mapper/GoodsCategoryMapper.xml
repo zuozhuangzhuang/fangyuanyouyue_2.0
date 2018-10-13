@@ -12,6 +12,7 @@
     <result column="search_count" jdbcType="INTEGER" property="searchCount" />
     <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="parent_name" jdbcType="VARCHAR" property="parentName" />
   </resultMap>
   <sql id="Base_Column_List">
     id, parent_id, name, img_url, sort, type, status, search_count, add_time, update_time
@@ -131,7 +132,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -145,8 +145,7 @@
       type = #{type,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
       search_count = #{searchCount,jdbcType=INTEGER},
-      add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      add_time = #{addTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
@@ -159,6 +158,9 @@
   </select>
   <select id="getChildCategoryList" parameterType="Integer" resultMap="BaseResultMap">
     select * from goods_category where status = 0 and parent_id = #{parentId,jdbcType=INTEGER} order by sort asc
+  </select>
+  <select id="getTopCategory" resultMap="BaseResultMap">
+    select * from goods_category where status = 0 and parent_id is null
   </select>
 
   <update id="addSearchCountByCategoryIds" parameterType="Integer">
@@ -178,18 +180,27 @@
   </select>
 
   <select id="getPage" resultMap="BaseResultMap">
-    select * from goods_category
+    select a.*,b.name as parent_name from goods_category a left join goods_category b on a.parent_id = b.id 
     <where>
       1=1
       <if test="keyword != null">
         and (
-        name like "%"#{keyword,jdbcType=VARCHAR}"%"
+        a.name like "%"#{keyword,jdbcType=VARCHAR}"%"
+        or b.name like "%"#{keyword,jdbcType=VARCHAR}"%"
         )
       </if>
       <if test="status != null">
-        and status = #{status}
+        and a.status = #{status}
       </if>
 
+      <if test="type != null">
+        and a.type = #{type}
+      </if>
+      
+      <if test="parentId != null">
+        and a.parent_id = #{parentId}
+      </if>
+      
     </where>
     <if test="orders != null">
       order by ${orders}
@@ -213,6 +224,13 @@
       </if>
       <if test="status != null">
         and status = #{status}
+      </if>
+      
+      <if test="parentId != null">
+        and parent_id = #{parentId}
+      </if>
+      <if test="type != null">
+        and type = #{type}
       </if>
 
     </where>

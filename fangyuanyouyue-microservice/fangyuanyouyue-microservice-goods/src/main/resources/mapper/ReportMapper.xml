@@ -106,7 +106,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="type != null">
         type = #{type,jdbcType=INTEGER},
@@ -123,7 +122,6 @@
       business_id = #{businessId,jdbcType=INTEGER},
       user_id = #{userId,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       type = #{type,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}

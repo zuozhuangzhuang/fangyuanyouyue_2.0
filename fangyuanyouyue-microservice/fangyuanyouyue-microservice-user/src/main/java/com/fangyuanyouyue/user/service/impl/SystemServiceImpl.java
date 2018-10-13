@@ -5,20 +5,27 @@ import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
+import com.fangyuanyouyue.user.dao.DailyStatisticsMapper;
 import com.fangyuanyouyue.user.dao.FeedbackMapper;
+import com.fangyuanyouyue.user.dao.SysMsgLogMapper;
 import com.fangyuanyouyue.user.dao.UserInfoMapper;
+import com.fangyuanyouyue.user.dto.admin.AdminDailyStatisticsDto;
 import com.fangyuanyouyue.user.dto.admin.AdminFeedbackDto;
 import com.fangyuanyouyue.user.dto.admin.AdminProcessDto;
+import com.fangyuanyouyue.user.dto.admin.AdminSysMsgLogDto;
+import com.fangyuanyouyue.user.model.DailyStatistics;
 import com.fangyuanyouyue.user.model.Feedback;
-import com.fangyuanyouyue.user.model.UserAuthApply;
+import com.fangyuanyouyue.user.model.SysMsgLog;
 import com.fangyuanyouyue.user.model.UserInfo;
 import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.service.*;
-import netscape.javascript.JSObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 @Service(value = "systemService")
@@ -36,6 +43,10 @@ public class SystemServiceImpl implements SystemService {
     private SchedualGoodsService schedualGoodsService;
     @Autowired
     private SchedualForumService schedualForumService;
+    @Autowired
+    private SysMsgLogMapper sysMsgLogMapper;
+    @Autowired
+    private DailyStatisticsMapper dailyStatisticsMapper;
 
     @Override
     public void feedback(Integer userId, String content, Integer type, String version) throws ServiceException {
@@ -51,9 +62,9 @@ public class SystemServiceImpl implements SystemService {
     @Override
     public Pager feedbackList(AdminUserParam param) throws ServiceException {
 
-        Integer total = feedbackMapper.countPage(param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getType());
+        Integer total = feedbackMapper.countPage(param.getKeyword(),param.getStartDate(),param.getEndDate());
 
-        List<Feedback> feedbacks = feedbackMapper.getPage(param.getStart()*param.getLimit(),param.getLimit(),param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType(),param.getType());
+        List<Feedback> feedbacks = feedbackMapper.getPage(param.getStart(),param.getLimit(),param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
         List<AdminFeedbackDto> datas = AdminFeedbackDto.toDtoList(feedbacks);
         Pager pager = new Pager();
         pager.setTotal(total);
@@ -62,7 +73,12 @@ public class SystemServiceImpl implements SystemService {
     }
 
     @Override
-    public void sendMessage(String content) throws ServiceException {
+    public void sendMessage(Integer userId,String content) throws ServiceException {
+        SysMsgLog sysMsgLog = new SysMsgLog();
+        sysMsgLog.setContent(content);
+        sysMsgLog.setAddTime(DateStampUtils.getTimesteamp());
+        sysMsgLog.setUserId(userId);
+        sysMsgLogMapper.insert(sysMsgLog);
         List<UserInfo> allHxUser = userInfoMapper.findAllHxUser();
         for(UserInfo userInfo:allHxUser){
             schedualMessageService.easemobMessage(userInfo.getId().toString(),content, Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
@@ -106,20 +122,40 @@ public class SystemServiceImpl implements SystemService {
     @Override
     public Integer processTodayUser() throws ServiceException {
         Integer todayUserCount = userInfoMapper.getTodayUserCount();
-        System.out.println("今日注册用户数量："+todayUserCount);
         return todayUserCount;
     }
 
     @Override
     public Integer processAllUser() throws ServiceException {
         Integer allUserCount = userInfoMapper.getAllUserCount();
-        System.out.println("全部用户数量："+allUserCount);
         return allUserCount;
     }
 
-//    @Override
-//    public Integer processMonthUser() throws ServiceException {
-//        Integer monthUserCount = userInfoMapper.getMonthUserCount();
-//        System.out.println("本月注册用户数量："+monthUserCount);
-//    }
+    @Override
+    public Integer processYesterdayUser() throws ServiceException {
+        Integer yesterdayUser = userInfoMapper.processYesterdayUser();
+        return yesterdayUser;
+    }
+
+
+    @Override
+    public Pager sysMsgList(AdminUserParam param) throws ServiceException {
+
+        Integer total = sysMsgLogMapper.countPage(param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getType());
+
+        List<SysMsgLog> sysMsgLogs = sysMsgLogMapper.getPage(param.getStart()*param.getLimit(),param.getLimit(),param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType(),param.getType());
+        List<AdminSysMsgLogDto> datas = AdminSysMsgLogDto.toDtoList(sysMsgLogs);
+        Pager pager = new Pager();
+        pager.setTotal(total);
+        pager.setDatas(datas);
+        return pager;
+    }
+
+    @Override
+    public List<AdminDailyStatisticsDto> getProcessList(Integer count) throws ServiceException {
+        List<DailyStatistics> dailyStatistics = dailyStatisticsMapper.selectByDayCount(count);
+        List<AdminDailyStatisticsDto> dtos = AdminDailyStatisticsDto.toDtoList(dailyStatistics);
+        Collections.reverse(dtos);
+        return dtos;
+    }
 }

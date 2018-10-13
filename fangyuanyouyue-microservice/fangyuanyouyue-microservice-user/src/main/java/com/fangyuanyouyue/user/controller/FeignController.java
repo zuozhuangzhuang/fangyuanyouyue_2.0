@@ -51,18 +51,13 @@ public class FeignController  extends BaseController {
     public BaseResp verifyUserById(Integer userId) throws IOException {
         try {
             log.info("----》验证用户《----");
-            if(userId == null){
-                return toError("用户ID不能为空！");
-            }
             UserInfo userInfo=userInfoService.selectByPrimaryKey(userId);
             if(userInfo==null){
-                return toError("登录超时，请重新登录！");
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
             if(userInfo.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
-//            BaseClientResult result = new BaseClientResult(Status.YES.getValue(), "验证用户成功！");
-//            result.put("userInfo",userInfo);
             return toSuccess(userInfo);
         } catch (Exception e) {
             e.printStackTrace();
@@ -82,17 +77,14 @@ public class FeignController  extends BaseController {
             if(StringUtils.isEmpty(phone)){
                 return toError("手机号不能为空！");
             }
-            UserInfo userInfo=userInfoService.getUserByPhone(phone);
-            if(userInfo==null){
-                return toError("登录超时，请重新登录！");
+            UserInfo user=userInfoService.getUserByPhone(phone);
+            if(user==null){
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
-            if(userInfo.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+            if(user.getStatus() == 2){
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
-//            BaseClientResult result = new BaseClientResult(Status.YES.getValue(), "根据手机号验证用户成功！");
-//            result.put("userInfo",userInfo);
-//            return toResult(result);
-            return toSuccess(userInfo);
+            return toSuccess(user);
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -113,14 +105,14 @@ public class FeignController  extends BaseController {
             if(StringUtils.isEmpty(unionId)){
                 return toError("唯一识别号不能为空！");
             }
-            UserInfo userInfo = userInfoService.getUserByUnionId(unionId,type);
-            if(userInfo==null){
-                return toError("登录超时，请重新登录！");
+            UserInfo user = userInfoService.getUserByUnionId(unionId,type);
+            if(user==null){
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
-            if(userInfo.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+            if(user.getStatus() == 2){
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
-            return toSuccess(userInfo);
+            return toSuccess(user);
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -133,15 +125,12 @@ public class FeignController  extends BaseController {
     public BaseResp userIsAuth(Integer userId) throws IOException {
         try {
             log.info("----》用户是否官方认证《----");
-            if(userId == null){
-                return toError("用户ID不能为空！");
+            UserInfo user = userInfoService.selectByPrimaryKey(userId);
+            if(user==null){
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
-            UserInfo userInfo = userInfoService.selectByPrimaryKey(userId);
-            if(userInfo==null){
-                return toError("登录超时，请重新登录！");
-            }
-            if(userInfo.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+            if(user.getStatus() == 2){
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             boolean isAuth = userInfoExtService.userIsAuth(userId);
             return toSuccess(isAuth);
@@ -159,15 +148,12 @@ public class FeignController  extends BaseController {
         try {
             log.info("----》验证支付密码《----");
             log.info("参数：userId：" + userId + ",payPwd："+ payPwd);
-            if(userId == null){
-                return toError("用户ID不能为空！");
+            UserInfo user = userInfoService.selectByPrimaryKey(userId);
+            if(user==null){
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
-            UserInfo userInfo = userInfoService.selectByPrimaryKey(userId);
-            if(userInfo==null){
-                return toError("登录超时，请重新登录！");
-            }
-            if(userInfo.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+            if(user.getStatus() == 2){
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             if(StringUtils.isEmpty(payPwd)){
                 return toError("支付密码不能为空！");
@@ -186,15 +172,12 @@ public class FeignController  extends BaseController {
     public BaseResp isAuth(Integer userId) throws IOException {
         try {
             log.info("----》是否实名认证《----");
-            if(userId == null){
-                return toError("用户ID不能为空！");
+            UserInfo user = userInfoService.selectByPrimaryKey(userId);
+            if(user==null){
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
-            UserInfo userInfo = userInfoService.selectByPrimaryKey(userId);
-            if(userInfo==null){
-                return toError("登录超时，请重新登录！");
-            }
-            if(userInfo.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+            if(user.getStatus() == 2){
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             boolean isAuth = userInfoExtService.isAuth(userId);
             return toSuccess(isAuth);
@@ -211,18 +194,15 @@ public class FeignController  extends BaseController {
         try {
             log.info("----》A是否关注用户B《----");
             log.info("参数：userId:"+userId+",toUserId:"+toUserId);
-            if(userId == null){
-                return toError("用户ID不能为空！");
-            }
             if(toUserId == null){
                 return toError("被关注用户ID不能为空！");
             }
             UserInfo userA = userInfoService.selectByPrimaryKey(userId);
             if(userA==null){
-                return toError("登录超时，请重新登录！");
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
             if(userA.getStatus() == 2){
-                return toError("您的账号已被冻结，请联系管理员！");
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             boolean isFans = userInfoExtService.isFans(userId,toUserId);
             return toSuccess(isFans);

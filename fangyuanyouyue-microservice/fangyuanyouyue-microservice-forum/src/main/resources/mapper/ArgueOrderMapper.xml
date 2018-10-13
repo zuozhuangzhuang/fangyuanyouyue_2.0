@@ -11,13 +11,14 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="title" jdbcType="VARCHAR" property="title" />
     <result column="to_users" jdbcType="VARCHAR" property="toUsers" />
+    <result column="pay_no" jdbcType="VARCHAR" property="payNo" />
     <result column="img_urls" jdbcType="VARCHAR" property="imgUrls" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.forum.model.ArgueOrder">
     <result column="content" jdbcType="LONGVARCHAR" property="content" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, user_id, order_no, amount, status, add_time, update_time, title, to_users, img_urls
+    id, user_id, order_no, amount, status, add_time, update_time, title, to_users, pay_no, img_urls
   </sql>
   <sql id="Blob_Column_List">
     content
@@ -38,13 +39,15 @@
     insert into argue_order (id, user_id, order_no, 
       amount, status, add_time, 
       update_time, title, to_users, 
-      img_urls, content)
+      pay_no, content, img_urls
+      )
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{orderNo,jdbcType=VARCHAR}, 
       #{amount,jdbcType=DECIMAL}, #{status,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP}, #{title,jdbcType=VARCHAR}, #{toUsers,jdbcType=VARCHAR}, 
-      #{imgUrls,jdbcType=VARCHAR}, #{content,jdbcType=LONGVARCHAR})
+      #{payNo,jdbcType=VARCHAR}, #{content,jdbcType=LONGVARCHAR}, #{imgUrls,jdbcType=VARCHAR}
+      )
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.forum.model.ArgueOrder">
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.forum.model.ArgueOrder" useGeneratedKeys="true" keyProperty="id">
     insert into argue_order
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -74,11 +77,14 @@
       <if test="toUsers != null">
         to_users,
       </if>
-      <if test="imgUrls != null">
-        img_urls,
+      <if test="payNo != null">
+        pay_no,
       </if>
       <if test="content != null">
         content,
+      </if>
+      <if test="imgUrls != null">
+        img_urls,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -109,11 +115,14 @@
       <if test="toUsers != null">
         #{toUsers,jdbcType=VARCHAR},
       </if>
-      <if test="imgUrls != null">
-        #{imgUrls,jdbcType=VARCHAR},
+      <if test="payNo != null">
+        #{payNo,jdbcType=VARCHAR},
       </if>
       <if test="content != null">
         #{content,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="imgUrls != null">
+        #{imgUrls,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -136,7 +145,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="title != null">
         title = #{title,jdbcType=VARCHAR},
@@ -144,11 +152,14 @@
       <if test="toUsers != null">
         to_users = #{toUsers,jdbcType=VARCHAR},
       </if>
-      <if test="imgUrls != null">
-        img_urls = #{imgUrls,jdbcType=VARCHAR},
+      <if test="payNo != null">
+        pay_no = #{payNo,jdbcType=VARCHAR},
       </if>
       <if test="content != null">
         content = #{content,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="imgUrls != null">
+        img_urls = #{imgUrls,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -160,11 +171,11 @@
       amount = #{amount,jdbcType=DECIMAL},
       status = #{status,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       title = #{title,jdbcType=VARCHAR},
       to_users = #{toUsers,jdbcType=VARCHAR},
-      img_urls = #{imgUrls,jdbcType=VARCHAR},
-      content = #{content,jdbcType=LONGVARCHAR}
+      pay_no = #{payNo,jdbcType=VARCHAR},
+      content = #{content,jdbcType=LONGVARCHAR},
+      img_urls = #{imgUrls,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.forum.model.ArgueOrder">
@@ -174,9 +185,10 @@
       amount = #{amount,jdbcType=DECIMAL},
       status = #{status,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       title = #{title,jdbcType=VARCHAR},
       to_users = #{toUsers,jdbcType=VARCHAR},
+      pay_no = #{payNo,jdbcType=VARCHAR},
+      content = #{content,jdbcType=LONGVARCHAR},
       img_urls = #{imgUrls,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>

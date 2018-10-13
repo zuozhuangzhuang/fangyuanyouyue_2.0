@@ -3,8 +3,11 @@ package com.fangyuanyouyue.wallet.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.model.WxPayResult;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.base.util.WechatUtil.WXPayUtil;
 import com.fangyuanyouyue.base.util.alipay.util.AlipayNotify;
 import com.fangyuanyouyue.wallet.dto.BillMonthDto;
@@ -73,10 +76,9 @@ public class WalletController extends BaseController{
                 return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            String verifyUser = schedualUserService.verifyUserById(userId);
-            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if(jsonObject != null && (Integer)jsonObject.get("code") != 0){
-                return toError(jsonObject.getString("report"));
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
             if(param.getAmount()==null){
                 return toError("充值金额不能为空！");
@@ -305,9 +307,9 @@ public class WalletController extends BaseController{
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "amount", value = "提现金额",  required = true,dataType = "BigDecimal", paramType = "query"),
-//            @ApiImplicitParam(name = "type", value = "提现方式 1微信 2支付宝 ",required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "account", value = "支付宝账号",required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "realName", value = "真实姓名",required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "提现方式 1微信 2支付宝",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "account", value = "支付宝账号(支付宝必填)",required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "realName", value = "真实姓名(支付宝必填)",required = false, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "payPwd", value = "支付密码",required = true, dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/withdrawDeposit")
@@ -321,28 +323,31 @@ public class WalletController extends BaseController{
                 return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            String verifyUser = schedualUserService.verifyUserById(userId);
-            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if(jsonObject != null && (Integer)jsonObject.get("code") != 0){
-                return toError(jsonObject.getString("report"));
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
             if(param.getAmount()==null || param.getAmount().doubleValue()==0 ){
                 return toError("提现金额不能为空！");
             }
-//            if(param.getType() == null){
-//                return toError("提现方式不能为空！");
-//            }
+            if(param.getType() == null){
+                return toError("提现方式不能为空！");
+            }
             if(param.getAmount().doubleValue() < 1){
-                return toError("提现金额不能少于1！");
+                return toError("提现金额不能少于1元！");
             }
-            if(StringUtils.isEmpty(param.getAccount())){
-                return toError("请输入支付宝账号！");
+            if(param.getType().equals(Status.PAY_TYPE_ALIPAY.getValue())){
+                if(StringUtils.isEmpty(param.getAccount())){
+                    return toError("请输入支付宝账号！");
+                }
+                if(StringUtils.isEmpty(param.getRealName())){
+                    return toError("真实姓名不能为空！");
+                }
             }
-            if(StringUtils.isEmpty(param.getRealName())){
-                return toError("真实姓名不能为空！");
+            if(StringUtils.isEmpty(param.getPayPwd())){
+                return toError("支付密码为空！");
             }
-            //TODO 提现
-            param.setType(2);//暂时只支持支付宝 1微信 2支付宝
+            //提现
             walletService.withdrawDeposit(userId,param.getAmount(),param.getType(),param.getAccount(),param.getRealName(),param.getPayPwd());
             return toSuccess();
         } catch (ServiceException e) {
@@ -370,10 +375,9 @@ public class WalletController extends BaseController{
                 return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            String verifyUser = schedualUserService.verifyUserById(userId);
-            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if(jsonObject != null && (Integer)jsonObject.get("code") != 0){
-                return toError(jsonObject.getString("report"));
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
             //获取用户钱包信息
             WalletDto wallet = walletService.getWallet(userId);
@@ -405,14 +409,10 @@ public class WalletController extends BaseController{
                 return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            String verifyUser = schedualUserService.verifyUserById(userId);
-            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if(jsonObject != null && (Integer)jsonObject.get("code") != 0){
-                return toError(jsonObject.getString("report"));
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
-//            if(StringUtils.isEmpty(param.getPayPwd())){
-//                return toError("旧支付密码不能为空！");
-//            }
             if(StringUtils.isEmpty(param.getNewPwd())){
                 return toError("新支付密码不能为空！");
             }
@@ -448,10 +448,9 @@ public class WalletController extends BaseController{
                 return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            String verifyUser = schedualUserService.verifyUserById(userId);
-            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if(jsonObject != null && (Integer)jsonObject.get("code") != 0){
-                return toError(jsonObject.getString("report"));
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
 
             if(param.getStart() == null || param.getStart() < 0){
@@ -488,10 +487,9 @@ public class WalletController extends BaseController{
                 return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            String verifyUser = schedualUserService.verifyUserById(userId);
-            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if(jsonObject != null && (Integer)jsonObject.get("code") != 0){
-                return toError(jsonObject.getString("report"));
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
 
             if(param.getOrderNo() == null){
@@ -525,10 +523,9 @@ public class WalletController extends BaseController{
                 return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            String verifyUser = schedualUserService.verifyUserById(userId);
-            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if(jsonObject != null && (Integer)jsonObject.get("code") != 0){
-                return toError(jsonObject.getString("report"));
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
 
             if(StringUtils.isEmpty(param.getDate())){
@@ -562,10 +559,9 @@ public class WalletController extends BaseController{
                 return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            String verifyUser = schedualUserService.verifyUserById(userId);
-            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if(jsonObject != null && (Integer)jsonObject.get("code") != 0){
-                return toError(jsonObject.getString("report"));
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
 
             //根据用户id获取优惠券列表

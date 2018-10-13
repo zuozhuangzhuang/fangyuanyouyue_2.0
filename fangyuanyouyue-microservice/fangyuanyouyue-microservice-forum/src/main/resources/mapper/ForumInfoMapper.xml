@@ -17,16 +17,17 @@
     <result column="is_chosen" jdbcType="INTEGER" property="isChosen" />
     <result column="video_img" jdbcType="VARCHAR" property="videoImg" />
     <result column="pv_count" jdbcType="INTEGER" property="pvCount" />
-    <result column="nick_name" jdbcType="VARCHAR" property="nickName"/>
-    <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl"/>
-    <result column="column_name" jdbcType="VARCHAR" property="columnName"/>
+    <result column="comment_time" jdbcType="TIMESTAMP" property="commentTime" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+    <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl" />
+    <result column="column_name" jdbcType="VARCHAR" property="columnName" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.forum.model.ForumInfo">
     <result column="content" jdbcType="LONGVARCHAR" property="content" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, title, video_url, video_length, label, sort, type, status, add_time, 
-    update_time, column_id, is_chosen, video_img, pv_count
+    update_time, column_id, is_chosen, video_img, pv_count, comment_time
   </sql>
   <sql id="Blob_Column_List">
     content
@@ -49,15 +50,15 @@
       sort, type, status, 
       add_time, update_time, column_id, 
       is_chosen, video_img, pv_count, 
-      content)
+      comment_time, content)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, 
       #{videoUrl,jdbcType=VARCHAR}, #{videoLength,jdbcType=INTEGER}, #{label,jdbcType=VARCHAR}, 
       #{sort,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
       #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{columnId,jdbcType=INTEGER}, 
       #{isChosen,jdbcType=INTEGER}, #{videoImg,jdbcType=VARCHAR}, #{pvCount,jdbcType=INTEGER}, 
-      #{content,jdbcType=LONGVARCHAR})
+      #{commentTime,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.forum.model.ForumInfo">
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.forum.model.ForumInfo" useGeneratedKeys="true" keyProperty="id">
     insert into forum_info
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -104,6 +105,9 @@
       </if>
       <if test="pvCount != null">
         pv_count,
+      </if>
+      <if test="commentTime != null">
+        comment_time,
       </if>
       <if test="content != null">
         content,
@@ -155,6 +159,9 @@
       <if test="pvCount != null">
         #{pvCount,jdbcType=INTEGER},
       </if>
+      <if test="commentTime != null">
+        #{commentTime,jdbcType=TIMESTAMP},
+      </if>
       <if test="content != null">
         #{content,jdbcType=LONGVARCHAR},
       </if>
@@ -191,7 +198,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="columnId != null">
         column_id = #{columnId,jdbcType=INTEGER},
@@ -204,6 +210,9 @@
       </if>
       <if test="pvCount != null">
         pv_count = #{pvCount,jdbcType=INTEGER},
+      </if>
+      <if test="commentTime != null">
+        comment_time = #{commentTime,jdbcType=TIMESTAMP},
       </if>
       <if test="content != null">
         content = #{content,jdbcType=LONGVARCHAR},
@@ -222,11 +231,11 @@
       type = #{type,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       column_id = #{columnId,jdbcType=INTEGER},
       is_chosen = #{isChosen,jdbcType=INTEGER},
       video_img = #{videoImg,jdbcType=VARCHAR},
       pv_count = #{pvCount,jdbcType=INTEGER},
+      comment_time = #{commentTime,jdbcType=TIMESTAMP},
       content = #{content,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -241,11 +250,11 @@
       type = #{type,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       column_id = #{columnId,jdbcType=INTEGER},
       is_chosen = #{isChosen,jdbcType=INTEGER},
       video_img = #{videoImg,jdbcType=VARCHAR},
-      pv_count = #{pvCount,jdbcType=INTEGER}
+      pv_count = #{pvCount,jdbcType=INTEGER},
+      comment_time = #{commentTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
@@ -278,9 +287,9 @@
       and a.is_chosen = 1
     </if>
     <if test="searchType != null and searchType == 1">
-      and (a.pv_count + (select count(*) from forum_pv where forum_id = a.id) >= 10000)
+      and ((a.pv_count + (select count(*) from forum_pv where forum_id = a.id)) >= 1000)
     </if>
-    order by a.sort,a.update_time desc
+    order by a.sort,a.comment_time desc,a.update_time desc
     limit #{start},#{limit}
   </select>
 
@@ -310,24 +319,26 @@
   
     
   <select id="countPage" parameterType="Integer" resultType="Integer">
-    select count(*) from forum_info where 1=1
+    select count(*) from forum_info a,user_info b where a.user_id=b.id
     <if test="type != null">
       and  type=#{type,jdbcType=VARCHAR}
     </if>
     <if test="keyword != null">
-      and ( 
-      	name like "%"#{keyword,jdbcType=VARCHAR}"%"
+      and (
+        a.title like "%"#{keyword,jdbcType=VARCHAR}"%"
+        or a.content like "%"#{keyword,jdbcType=VARCHAR}"%"
+        or b.nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
       )
     </if>
     <if test="status != null">
-      and status = #{status}
+      and a.status = #{status}
     </if>
     <if test="startDate != null">
-      and add_time <![CDATA[ > ]]> #{startDate}
+      and a.add_time <![CDATA[ > ]]> #{startDate}
     </if>
     
     <if test="endDate != null">
-      and add_time <![CDATA[ <= ]]> #{endDate}
+      and a.add_time <![CDATA[ <= ]]> #{endDate}
     </if>
     
   </select>
@@ -339,7 +350,8 @@
     </if>
     <if test="keyword != null">
       and (
-        a.name like "%"#{keyword,jdbcType=VARCHAR}"%"
+        a.title like "%"#{keyword,jdbcType=VARCHAR}"%"
+        or a.content like "%"#{keyword,jdbcType=VARCHAR}"%"
         or b.nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
       )
     </if>
@@ -371,7 +383,8 @@
     </if>
     <if test="keyword != null">
       and (
-        a.name like "%"#{keyword,jdbcType=VARCHAR}"%"
+        a.title like "%"#{keyword,jdbcType=VARCHAR}"%"
+        or a.content like "%"#{keyword,jdbcType=VARCHAR}"%"
         or b.nick_name like "%"#{keyword,jdbcType=VARCHAR}"%"
       )
     </if>

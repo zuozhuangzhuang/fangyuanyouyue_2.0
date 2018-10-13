@@ -1,8 +1,11 @@
 package com.fangyuanyouyue.goods.service.impl;
 
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.goods.dao.CommentLikesMapper;
 import com.fangyuanyouyue.goods.dao.GoodsCommentMapper;
 import com.fangyuanyouyue.goods.dao.GoodsImgMapper;
@@ -68,6 +71,8 @@ public class CommentServiceImpl implements CommentService{
         //社交消息：您的商品【商品名称】有新的评论，点击此处前往查看吧
         //社交消息：您的抢购【抢购名称】有新的评论，点击此处前往查看吧
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(param.getGoodsId());
+        goodsInfo.setCommentTime(DateStampUtils.getTimesteamp());
+        goodsInfoMapper.updateByPrimaryKey(goodsInfo);
         if(goodsInfo.getType().equals(Status.GOODS.getValue())){
             schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
                     "您的商品【"+goodsInfo.getName()+"】有新的评论，点击此处前往查看吧",
@@ -80,10 +85,16 @@ public class CommentServiceImpl implements CommentService{
         if(param.getCommentId() != null){
             //回复
             GoodsComment comment = goodsCommentMapper.selectByPrimaryKey(param.getCommentId());
-            schedualWalletService.addUserBehavior(param.getUserId(),comment.getUserId(),param.getCommentId(), Status.BUSINESS_TYPE_GOODS_COMMENT.getValue(),Status.BEHAVIOR_TYPE_COMMENT.getValue());
+            BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBehavior(param.getUserId(),comment.getUserId(),param.getCommentId(), Status.BUSINESS_TYPE_GOODS_COMMENT.getValue(),Status.BEHAVIOR_TYPE_COMMENT.getValue()));
+            if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+            }
         }else{
             //评论商品
-            schedualWalletService.addUserBehavior(param.getUserId(),goodsInfo.getUserId(),param.getGoodsId(),Status.BUSINESS_TYPE_GOODS.getValue(),Status.BEHAVIOR_TYPE_COMMENT.getValue());
+            BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBehavior(param.getUserId(),goodsInfo.getUserId(),param.getGoodsId(),Status.BUSINESS_TYPE_GOODS.getValue(),Status.BEHAVIOR_TYPE_COMMENT.getValue()));
+            if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+            }
         }
         return goodsComment.getId();
     }
@@ -109,8 +120,10 @@ public class CommentServiceImpl implements CommentService{
                     //更新点赞数
                     goodsComment.setLikesCount(goodsComment.getLikesCount()+1);
                     goodsCommentMapper.updateByPrimaryKey(goodsComment);
-                    schedualWalletService.addUserBehavior(userId,goodsComment.getUserId(),goodsComment.getId(),Status.BUSINESS_TYPE_GOODS_COMMENT.getValue(),Status.BEHAVIOR_TYPE_LIKES.getValue());
-
+                    BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBehavior(userId,goodsComment.getUserId(),goodsComment.getId(),Status.BUSINESS_TYPE_GOODS_COMMENT.getValue(),Status.BEHAVIOR_TYPE_LIKES.getValue()));
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                    }
                 }
             }else if(type == 2){//取消点赞
                 if(commentLikes != null){
@@ -132,7 +145,7 @@ public class CommentServiceImpl implements CommentService{
         List<Map<String, Object>> maps = goodsCommentMapper.selectByGoodsId( goodsId,start*limit,limit);
         List<GoodsCommentDto> goodsCommentDtos = GoodsCommentDto.mapToDtoList(maps);
         for(GoodsCommentDto goodsCommentDto:goodsCommentDtos){
-            goodsCommentDto.setReplys(selectCommentList(goodsCommentDto.getId(),goodsId));
+            goodsCommentDto.setReplys(selectCommentList(userId,goodsCommentDto.getId(),goodsId));
             //判断评论是否已点赞
             if(userId != null){
                 CommentLikes commentLikes = commentLikesMapper.selectByUserId(userId, goodsCommentDto.getId());
@@ -150,7 +163,7 @@ public class CommentServiceImpl implements CommentService{
      * @param goodsId
      * @return
      */
-    private List<GoodsCommentDto> selectCommentList(Integer commentId,Integer goodsId){
+    private List<GoodsCommentDto> selectCommentList(Integer userId,Integer commentId,Integer goodsId){
         //根据评论的ID和商品的ID获取回复列表
         List<Map<String, Object>> maps = goodsCommentMapper.selectMapByGoodsIdCommentId(commentId, goodsId,null,null);
         List<GoodsCommentDto> goodsCommentDtos = GoodsCommentDto.mapToDtoList(maps);
@@ -163,8 +176,15 @@ public class CommentServiceImpl implements CommentService{
                     goodsCommentDto.setToUserHeadImgUrl((String)map.get("head_img_url"));
                     goodsCommentDto.setToUserName((String)map.get("nick_name"));
                 }
+                //判断评论是否已点赞
+                if(userId != null){
+                    CommentLikes commentLikes = commentLikesMapper.selectByUserId(userId, goodsCommentDto.getId());
+                    if(commentLikes != null){
+                        goodsCommentDto.setIsLike(1);
+                    }
+                }
                 //重复获取此回复的回复列表，直到没有回复了为止
-                goodsCommentDto.setReplys(selectCommentList(goodsCommentDto.getId(),goodsId));
+                goodsCommentDto.setReplys(selectCommentList(userId,goodsCommentDto.getId(),goodsId));
             }
         }
         return goodsCommentDtos;

@@ -268,7 +268,6 @@
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null" >
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="isRegHx != null" >
         is_reg_hx = #{isRegHx,jdbcType=INTEGER},
@@ -298,7 +297,6 @@
       last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},
       last_login_platform = #{lastLoginPlatform,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       is_reg_hx = #{isRegHx,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>

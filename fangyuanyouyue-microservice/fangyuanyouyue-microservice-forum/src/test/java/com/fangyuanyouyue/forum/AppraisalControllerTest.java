@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 @RunWith(SpringRunner.class)
@@ -159,6 +160,7 @@ public class AppraisalControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
+
     /**
      * 邀请好友
      * @throws Exception
@@ -171,6 +173,36 @@ public class AppraisalControllerTest {
                 .param("appraisalId", "10")
                 //邀请用户数组
                 .param("userIds", "16,39,25,42")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 删除全民鉴定评论
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void deleteComment() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/appraisal/deleteComment")
+                .param("token", "10025FY1538266306550")
+                .param("commentId", "59")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 删除全民鉴定
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void deleteAppraisal() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/appraisal/deleteAppraisal")
+                .param("token", "10025FY1538266306550")
+                .param("ids", "56")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

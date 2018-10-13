@@ -11,9 +11,10 @@ import java.util.Random;
  */
 public class CheckCode {
 	
-	static char[] codeSequence = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' }; 
+	static char[] codeSequence = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 
-	
+	static char[] codeProxy = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+
 	/**
 	 * 随机获取四位验证码
 	 * @return
@@ -35,6 +36,19 @@ public class CheckCode {
 		
 		return sb.toString();
 	}
-	
-	
+
+	/**
+	 * 随机获取八位代理唯一码
+	 * @return
+	 */
+	public static String getProxyCode(){
+		StringBuffer sb = new StringBuffer();
+		Random random = new Random();
+		for (int i = 0; i <  8; i++) {
+			//得到随机产生的
+			String strRand = String.valueOf(codeProxy[random.nextInt(16)]);
+			sb.append(strRand);
+		}
+		return sb.toString();
+	}
 }

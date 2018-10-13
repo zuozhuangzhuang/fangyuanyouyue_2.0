@@ -48,39 +48,13 @@ public class TimerControllerTest {
 //    }
 
     /**
-     * 每小时统计一次今日注册用户
+     * 每天统计
      * @throws Exception
      */
     @Test
 //    @Transactional
-    public void processTodayUser() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/timer/processTodayUser")
-                .accept(MediaType.APPLICATION_JSON))
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
-    }
-
-    /**
-     * 每小时统计一次总注册用户
-     * @throws Exception
-     */
-    @Test
-//    @Transactional
-    public void processAllUser() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/timer/processAllUser")
-                .accept(MediaType.APPLICATION_JSON))
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
-    }
-
-    /**
-     * 每天统计一次本月注册用户
-     * @throws Exception
-     */
-    @Test
-//    @Transactional
-    public void processMonthUser() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/timer/processMonthUser")
+    public void dailyStatistics() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/timer/dailyStatistics")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

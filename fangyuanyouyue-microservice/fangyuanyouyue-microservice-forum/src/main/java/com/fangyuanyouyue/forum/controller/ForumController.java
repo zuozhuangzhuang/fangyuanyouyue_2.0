@@ -3,6 +3,8 @@ package com.fangyuanyouyue.forum.controller;
 import java.io.IOException;
 import java.util.List;
 
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -145,10 +147,9 @@ public class ForumController extends BaseController {
                 return toError("用户token不能为空！");
             }
             Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            String verifyUser = schedualUserService.verifyUserById(userId);
-            JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-            if((Integer)jsonObject.get("code") != 0){
-                return toError(jsonObject.getString("report"));
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
             //验证实名认证
             if(JSONObject.parseObject(schedualUserService.isAuth(userId)).getBoolean("data") == false){
@@ -165,6 +166,45 @@ public class ForumController extends BaseController {
             }
             //发布视频、发布帖子
             forumInfoService.addForum(userId,param.getColumnId(),param.getTitle(),param.getContent(),param.getVideoUrl(),param.getVideoLength(),param.getVideoImg(),param.getType(),param.getUserIds());
+
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+
+
+
+    @ApiOperation(value = "删除帖子/视频", notes = "删除帖子/视频",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token",required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "ids", value = "id数组",required = true,allowMultiple = true,dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/deleteForum")
+    @ResponseBody
+    public BaseResp deleteForum(ForumParam param) throws IOException {
+        try {
+            log.info("----》删除帖子/视频《----");
+            log.info("参数：" + param.toString());
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError("用户token不能为空！");
+            }
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
+            }
+            if(param.getIds() == null || param.getIds().length <1){
+                return toError("id数组不能为空！");
+            }
+            //删除视频、帖子
+            forumInfoService.deleteForum(userId,param.getIds());
 
             return toSuccess();
         } catch (ServiceException e) {
