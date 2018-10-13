@@ -281,6 +281,9 @@ public class UserController extends BaseController {
             if(user.getStatus() == 2){
                 return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
+            if(StringUtils.isEmpty(user.getPhone())){
+                return toError(ReCode.NO_PHONE.getValue(),ReCode.NO_PHONE.getMessage());
+            }
             //实名认证
             userInfoExtService.certification(param.getToken(),param.getName(),param.getIdentity(),param.getIdentityImgCoverUrl(),param.getIdentityImgBackUrl());
             return toSuccess();
@@ -738,7 +741,6 @@ public class UserController extends BaseController {
                 return toError("验证码不能为空！");
             }
             //从缓存获取
-            // FIXME: 2018/8/17 验证码以0开头时验证异常 Leading zeroes not allowed
             if(schedualRedisService.get(param.getPhone()) == null){
                 return toError("验证码已失效，请重新获取验证码！");
             }

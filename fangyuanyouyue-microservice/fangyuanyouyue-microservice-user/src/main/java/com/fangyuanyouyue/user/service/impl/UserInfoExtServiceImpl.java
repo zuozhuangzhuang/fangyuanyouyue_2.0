@@ -137,7 +137,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
     public Object authType(Integer userId,Integer payType,String payPwd) throws ServiceException {
         UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
         if(StringUtils.isEmpty(userInfo.getPhone())){
-            throw new ServiceException("未绑定手机号！");
+            throw new ServiceException(ReCode.NO_PHONE.getValue(),ReCode.NO_PHONE.getMessage());
         }
         UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(userId);
         if(userInfoExt == null){

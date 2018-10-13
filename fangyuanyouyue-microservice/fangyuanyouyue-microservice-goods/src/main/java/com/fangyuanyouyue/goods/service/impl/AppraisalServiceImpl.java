@@ -66,7 +66,7 @@ public class AppraisalServiceImpl implements AppraisalService{
         //验证手机号
         UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
         if(StringUtils.isEmpty(user.getPhone())){
-            throw new ServiceException("未绑定手机号！");
+            throw new ServiceException(ReCode.NO_PHONE.getValue(),ReCode.NO_PHONE.getMessage());
         }
         //只有我要鉴定才可以用免费鉴定
         //生成订单

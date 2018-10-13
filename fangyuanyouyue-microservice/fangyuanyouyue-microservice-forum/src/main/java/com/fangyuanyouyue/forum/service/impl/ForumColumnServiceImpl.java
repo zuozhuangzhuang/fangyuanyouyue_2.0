@@ -104,7 +104,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 		//验证手机号
 		UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
 		if(StringUtils.isEmpty(user.getPhone())){
-			throw new ServiceException("未绑定手机号！");
+			throw new ServiceException(ReCode.NO_PHONE.getValue(),ReCode.NO_PHONE.getMessage());
 		}
 		//name已存在的申请时返回
 		if(forumColumnMapper.selectByName(name)!=null){

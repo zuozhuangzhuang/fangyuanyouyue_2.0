@@ -62,7 +62,7 @@ public class OrderServiceImpl implements OrderService{
         //验证手机号
         UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
         if(StringUtils.isEmpty(user.getPhone())){
-            throw new ServiceException("未绑定手机号！");
+            throw new ServiceException(ReCode.NO_PHONE.getValue(),ReCode.NO_PHONE.getMessage());
         }
         //获取收货地址
         String result = schedualUserService.getAddressList(token,addressId);
@@ -313,7 +313,7 @@ public class OrderServiceImpl implements OrderService{
             //子支付订单
             orderPay.setCount(addOrderDetailDtos.size());
             orderPay.setAmount(amount);//原价
-            orderPay.setPayAmount(payAmount);//实际支付
+            orderPay.setPayAmount(payAmount.add(payFreight));//实际支付
             orderPay.setFreight(payFreight);//总邮费
             orderPayMapper.updateByPrimaryKey(orderPay);
 

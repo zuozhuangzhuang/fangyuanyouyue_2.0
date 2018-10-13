@@ -11,15 +11,18 @@ import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.base.util.IdGenerator;
 import com.fangyuanyouyue.wallet.constant.StatusEnum;
+import com.fangyuanyouyue.wallet.dao.UserInfoMapper;
 import com.fangyuanyouyue.wallet.dao.UserVipCouponDetailMapper;
 import com.fangyuanyouyue.wallet.dao.UserVipMapper;
 import com.fangyuanyouyue.wallet.dao.VipOrderMapper;
 import com.fangyuanyouyue.wallet.dto.admin.AdminVipDto;
+import com.fangyuanyouyue.wallet.model.UserInfo;
 import com.fangyuanyouyue.wallet.model.UserVip;
 import com.fangyuanyouyue.wallet.model.UserVipCouponDetail;
 import com.fangyuanyouyue.wallet.model.VipOrder;
 import com.fangyuanyouyue.wallet.param.AdminWalletParam;
 import com.fangyuanyouyue.wallet.service.*;
+import com.github.pagehelper.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +48,8 @@ public class UserVipServiceImpl implements UserVipService{
     private UserCouponService userCouponService;
     @Autowired
     private UserVipCouponDetailMapper userVipCouponDetailMapper;
+    @Autowired
+    private UserInfoMapper userInfoMapper;
 
     @Override
     public boolean updateOrder(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException {
@@ -164,6 +169,10 @@ public class UserVipServiceImpl implements UserVipService{
     @Override
     public Object addVipOrder(Integer userId, Integer vipLevel, Integer vipType,Integer type,Integer payType,String payPwd) throws ServiceException {
         try{
+            UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
+            if(StringUtil.isEmpty(userInfo.getPhone())){
+                throw new ServiceException(ReCode.NO_PHONE.getValue(),ReCode.NO_PHONE.getMessage());
+            }
             VipOrder vipOrder = new VipOrder();
             vipOrder.setUserId(userId);
             //订单号

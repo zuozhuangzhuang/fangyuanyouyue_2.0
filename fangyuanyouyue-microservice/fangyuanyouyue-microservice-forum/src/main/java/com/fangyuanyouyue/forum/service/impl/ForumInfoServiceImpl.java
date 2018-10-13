@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -159,7 +160,7 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 		//验证手机号
 		UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
 		if(StringUtils.isEmpty(user.getPhone())){
-			throw new ServiceException("未绑定手机号！");
+			throw new ServiceException(ReCode.NO_PHONE.getValue(),ReCode.NO_PHONE.getMessage());
 		}
 		ForumInfo forumInfo = new ForumInfo();
 		forumInfo.setUserId(userId);
