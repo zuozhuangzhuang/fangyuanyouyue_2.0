@@ -3,6 +3,7 @@ package com.fangyuanyouyue.forum.service.impl;
 import java.util.Date;
 import java.util.List;
 
+import com.codingapi.tx.annotation.TxTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +42,8 @@ public class ForumLikesServiceImpl implements ForumLikesService {
 	}
 
 	@Override
+	@Transactional
+	@TxTransaction(isStart=true)
 	public void saveLikes(Integer type, Integer userId, Integer forumId) throws ServiceException{
 		ForumLikes model = forumLikesMapper.selectByForumIdUserId(forumId,userId);
 		if(type == 1){

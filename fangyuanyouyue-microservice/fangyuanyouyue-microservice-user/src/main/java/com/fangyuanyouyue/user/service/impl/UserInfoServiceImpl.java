@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.user.dao.*;
 import com.fangyuanyouyue.user.dto.*;
 import com.fangyuanyouyue.user.model.*;
@@ -704,6 +705,8 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void fansFollow(Integer userId, Integer toUserId, Integer type) throws ServiceException {
         UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
         if(userInfo == null){

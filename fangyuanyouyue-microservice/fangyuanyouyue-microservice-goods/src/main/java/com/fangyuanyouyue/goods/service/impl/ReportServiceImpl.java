@@ -1,11 +1,15 @@
 package com.fangyuanyouyue.goods.service.impl;
 
+import com.codingapi.tx.annotation.TxTransaction;
+import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.Credit;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Score;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.goods.dao.GoodsBargainMapper;
 import com.fangyuanyouyue.goods.dao.GoodsInfoMapper;
 import com.fangyuanyouyue.goods.dao.ReportMapper;
@@ -59,6 +63,8 @@ public class ReportServiceImpl implements ReportService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void dealReport(Integer id, String content) throws ServiceException {
         //1、删除商品 2、发送信息（content）
         Report report = reportMapper.selectByPrimaryKey(id);
@@ -74,9 +80,17 @@ public class ReportServiceImpl implements ReportService{
             goodsInfo.setStatus(5);
             goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
             //举报者+20
-            schedualWalletService.updateCredit(report.getUserId(), Credit.REPORT_VERIFY.getCredit(),Status.ADD.getValue());
+            String reportResult = schedualWalletService.updateCredit(report.getUserId(), Credit.REPORT_VERIFY.getCredit(),Status.ADD.getValue());
+            BaseResp reportBr = ParseReturnValue.getParseReturnValue(reportResult);
+            if(!reportBr.getCode().equals(ReCode.SUCCESS)){
+                throw new ServiceException(reportBr.getCode(),reportBr.getReport());
+            }
             //被举报-40
-            schedualWalletService.updateCredit(goodsInfo.getUserId(), Credit.REPORT_VERIFYED.getCredit(),Status.SUB.getValue());
+            String goodsResult = schedualWalletService.updateCredit(goodsInfo.getUserId(), Credit.REPORT_VERIFYED.getCredit(),Status.SUB.getValue());
+            BaseResp goodsBr = ParseReturnValue.getParseReturnValue(goodsResult);
+            if(!goodsBr.getCode().equals(ReCode.SUCCESS)){
+                throw new ServiceException(goodsBr.getCode(),goodsBr.getReport());
+            }
             //很抱歉，您的商品/抢购【名称】被多用户举报，并经官方核实。已被删除，删除理由：￥@……#%￥&#%￥……@。点击查看详情
             if(goodsInfo.getType().intValue()==Status.GOODS.getValue()){
                 schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),

@@ -2,6 +2,7 @@ package com.fangyuanyouyue.goods.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
@@ -62,6 +63,8 @@ public class BargainServiceImpl implements BargainService{
     private BargainOrderMapper bargainOrderMapper;
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public Object addBargain(Integer userId, Integer goodsId, BigDecimal price, String reason,Integer addressId,String payPwd,Integer payType) throws ServiceException {
         String verifyUserById = schedualUserService.verifyUserById(userId);
         BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
@@ -114,29 +117,48 @@ public class BargainServiceImpl implements BargainService{
 
                 StringBuffer payInfo = new StringBuffer();
                 if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
-                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(bargainOrder.getOrderNo(), bargainOrder.getAmount(),NotifyUrl.notify.getNotifUrl()+NotifyUrl.bargain_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+                    String getWechatOrder = schedualWalletService.orderPayByWechat(bargainOrder.getOrderNo(), bargainOrder.getAmount(),NotifyUrl.notify.getNotifUrl()+NotifyUrl.bargain_wechat_notify.getNotifUrl());
+                    BaseResp result = ParseReturnValue.getParseReturnValue(getWechatOrder);
+                    if(!result.getCode().equals(ReCode.SUCCESS)){
+                        throw new ServiceException(result.getCode(),result.getReport());
+                    }
+                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
+
                     return wechatPayDto;
                 }else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
-                    String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(bargainOrder.getOrderNo(), bargainOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.bargain_alipay_notify.getNotifUrl())).getString("data");
-                    payInfo.append(info);
+                    String getALiOrder = schedualWalletService.orderPayByALi(bargainOrder.getOrderNo(), bargainOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.bargain_alipay_notify.getNotifUrl());
+                    BaseResp result = ParseReturnValue.getParseReturnValue(getALiOrder);
+                    if(!result.getCode().equals(ReCode.SUCCESS)){
+                        throw new ServiceException(result.getCode(),result.getReport());
+                    }
+                    payInfo.append(result.getData());
                 }else if(payType == Status.PAY_TYPE_BALANCE.getValue()){
                     if(StringUtils.isEmpty(payPwd)){
                         throw new ServiceException("支付密码不能为空！");
                     }
                     //验证支付密码
-                    Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
-                    if(!verifyPayPwd){
+                    String verifyPayPwd = schedualUserService.verifyPayPwd(userId, payPwd);
+                    BaseResp result = ParseReturnValue.getParseReturnValue(verifyPayPwd);
+                    if(!result.getCode().equals(ReCode.SUCCESS)){
+                        throw new ServiceException(result.getCode(),result.getReport());
+                    }
+                    if (!(boolean)result.getData()) {
                         throw new ServiceException(ReCode.PAYMENT_PASSWORD_ERROR.getValue(),ReCode.PAYMENT_PASSWORD_ERROR.getMessage());
                     }else{
-                        BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, bargainOrder.getAmount(), Status.SUB.getValue())), BaseResp.class);
-                        if(baseResp.getCode() == 1){
-                            throw new ServiceException(baseResp.getReport().toString());
+                        BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(userId, bargainOrder.getAmount(), Status.SUB.getValue()));
+                        if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                            throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                         }
                         payInfo.append("余额支付成功");
                         updateOrder(bargainOrder.getOrderNo(),null,Status.PAY_TYPE_BALANCE.getValue());
                     }
                 }else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
-                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,bargainOrder.getOrderNo(), bargainOrder.getAmount(),NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.bargain_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+                    String getMiniOrder = schedualWalletService.orderPayByWechatMini(userId,bargainOrder.getOrderNo(), bargainOrder.getAmount(),NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.bargain_wechat_notify.getNotifUrl());
+                    BaseResp result = ParseReturnValue.getParseReturnValue(getMiniOrder);
+                    if(!result.getCode().equals(ReCode.SUCCESS)){
+                        throw new ServiceException(result.getCode(),result.getReport());
+                    }
+                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
                     return wechatPayDto;
                 }else{
                     throw new ServiceException("支付方式错误！");
@@ -148,6 +170,8 @@ public class BargainServiceImpl implements BargainService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public boolean updateOrder(String orderNo, String thridOrderNo, Integer payType) throws ServiceException{
         BargainOrder bargainOrder = bargainOrderMapper.selectByOrderNo(orderNo);
         if(bargainOrder == null){
@@ -177,6 +201,8 @@ public class BargainServiceImpl implements BargainService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public Integer updateBargain(Integer userId, Integer goodsId,Integer bargainId,Integer status) throws ServiceException {
         GoodsBargain goodsBargain = goodsBargainMapper.selectByPrimaryKey(bargainId);
         Integer orderId = null;
@@ -289,9 +315,9 @@ public class BargainServiceImpl implements BargainService{
                         if(!bargain.getUserId().equals(goodsBargain.getUserId())){
                             bargain.setStatus(Status.BARGAIN_REFUSE.getValue());
                             //调用wallet-service修改余额功能
-                            BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),Status.ADD.getValue())), BaseResp.class);
-                            if(baseResp.getCode() == 1){
-                                throw new ServiceException(baseResp.getReport().toString());
+                            BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),Status.ADD.getValue()));
+                            if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                                throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                             }
                             goodsBargainMapper.updateByPrimaryKey(bargain);
                             //议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
@@ -304,9 +330,9 @@ public class BargainServiceImpl implements BargainService{
                 }else if(status.intValue() == Status.BARGAIN_REFUSE.getValue()){
                     //退回余额
                     //调用wallet-service修改余额功能
-                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(goodsBargain.getUserId(), goodsBargain.getPrice(),Status.ADD.getValue())), BaseResp.class);
-                    if(baseResp.getCode() == 1){
-                        throw new ServiceException(baseResp.getReport().toString());
+                    BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(goodsBargain.getUserId(), goodsBargain.getPrice(),Status.ADD.getValue()));
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                     }
                     //议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情
                     schedualMessageService.easemobMessage(goodsBargain.getUserId().toString(),
@@ -323,9 +349,9 @@ public class BargainServiceImpl implements BargainService{
                 }
                 //退回余额
                 //调用wallet-service修改余额功能
-                BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(goodsBargain.getUserId(), goodsBargain.getPrice(),Status.ADD.getValue())), BaseResp.class);
-                if(baseResp.getCode() == 1){
-                    throw new ServiceException(baseResp.getReport().toString());
+                BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(goodsBargain.getUserId(), goodsBargain.getPrice(),Status.ADD.getValue()));
+                if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
                 //买家新增余额账单
                 schedualWalletService.addUserBalanceDetail(goodsBargain.getUserId(),goodsBargain.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),goodsBargain.getBargainNo(),"【"+goodsInfo.getName()+"】",goodsInfo.getUserId(),goodsBargain.getUserId(),Status.BARGAIN.getValue(),goodsBargain.getBargainNo());
@@ -460,6 +486,8 @@ public class BargainServiceImpl implements BargainService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void deleteBargain(Integer userId, Integer[] goodsIds) throws ServiceException {
         for(Integer goodsId:goodsIds){
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
@@ -474,9 +502,9 @@ public class BargainServiceImpl implements BargainService{
                     bargain.setStatus(Status.BARGAIN_CANCEL.getValue());
                     //退回余额
                     //调用wallet-service修改余额功能
-                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),Status.ADD.getValue())), BaseResp.class);
-                    if(baseResp.getCode() == 1){
-                        throw new ServiceException(baseResp.getReport().toString());
+                    BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),Status.ADD.getValue()));
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                     }
                     updateBargain(userId,goodsId,bargain.getId(),Status.BARGAIN_CANCEL.getValue());
                     //买家新增余额账单

@@ -1,5 +1,6 @@
 package com.fangyuanyouyue.forum.service.impl;
 
+import com.codingapi.tx.annotation.TxTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,8 @@ public class ForumCommentLikesServiceImpl implements ForumCommentLikesService {
 	}
 
 	@Override
+	@Transactional
+	@TxTransaction(isStart=true)
 	public void saveLikes(Integer type, Integer userId, Integer commentId)  throws ServiceException {
 		ForumCommentLikes forumCommentLikes = forumCommentLikesMapper.selectByUserIdCommentId(userId, commentId);
 		if(type == 1){

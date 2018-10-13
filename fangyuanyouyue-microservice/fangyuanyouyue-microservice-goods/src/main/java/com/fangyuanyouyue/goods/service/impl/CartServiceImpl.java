@@ -2,6 +2,7 @@ package com.fangyuanyouyue.goods.service.impl;
 
 import java.util.*;
 
+import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
@@ -232,6 +233,8 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void cartRemoveByIds(Integer userId,Integer[] goodsIds) throws ServiceException {
         //根据商品ID数组删除购物车内信息
         CartInfo cart = cartInfoMapper.selectByUserId(userId);

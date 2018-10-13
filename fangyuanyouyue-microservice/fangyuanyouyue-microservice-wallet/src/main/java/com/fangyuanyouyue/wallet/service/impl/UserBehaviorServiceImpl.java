@@ -1,5 +1,6 @@
 package com.fangyuanyouyue.wallet.service.impl;
 
+import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.enums.Credit;
 import com.fangyuanyouyue.base.enums.Score;
 import com.fangyuanyouyue.base.enums.Status;
@@ -32,6 +33,8 @@ public class UserBehaviorServiceImpl implements UserBehaviorService {
     private ScoreService scoreService;
 
     @Override
+    @Transactional
+    @TxTransaction
     public void addUserBehavior(Integer userId, Integer toUserId, Integer businessId, Integer businessType, Integer type) throws ServiceException {
         UserBehavior userBehavior = userBehaviorMapper.selectByUserIdType(userId, businessId, businessType, type);
         if(userBehavior == null){

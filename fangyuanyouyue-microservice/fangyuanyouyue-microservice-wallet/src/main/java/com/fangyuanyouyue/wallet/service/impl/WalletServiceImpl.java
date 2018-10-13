@@ -1,5 +1,6 @@
 package com.fangyuanyouyue.wallet.service.impl;
 
+import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
@@ -246,6 +247,8 @@ public class WalletServiceImpl implements WalletService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction
     public boolean updateBalance(Integer userId, BigDecimal amount,Integer type) throws ServiceException {
         //获取用户钱包信息
         UserWallet userWallet = userWalletMapper.selectByUserId(userId);
@@ -284,6 +287,8 @@ public class WalletServiceImpl implements WalletService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction
     public void updateAppraisalCount(Integer userId, Integer count,Integer type) throws ServiceException {
         //只做了减少次数，后期可支持 增加次数
         UserWallet userWallet = userWalletMapper.selectByUserId(userId);
@@ -305,6 +310,8 @@ public class WalletServiceImpl implements WalletService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction
     public void updateCredit(Integer userId, Long credit, Integer type) throws ServiceException {
         UserInfoExt userInfoExt = userInfoExtMapper.selectUserInfoExtByUserId(userId);
         if (userInfoExt == null) {
@@ -405,6 +412,8 @@ public class WalletServiceImpl implements WalletService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction
     public WechatPayDto orderPayByWechat(String orderNo, BigDecimal price,String notifyUrl) throws ServiceException {
         WechatPay util = new WechatPay();
         System.out.println("请求路径："+notifyUrl);
@@ -419,6 +428,8 @@ public class WalletServiceImpl implements WalletService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction
     public WechatPayDto orderPayByWechatMini(final Integer userId,final String orderNo,final BigDecimal price,final String notifyUrl) throws ServiceException {
         //根据userId获取三方openId
         UserThirdParty userThirdByUserId = userThirdPartyMapper.getUserThirdByUserId(userId, 1);
@@ -436,6 +447,8 @@ public class WalletServiceImpl implements WalletService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction
     public String orderPayByALi(String orderNo, BigDecimal price,String notifyUrl) throws ServiceException,Exception {
         GenOrderUtil util = new GenOrderUtil();
         String orderInfo="";
@@ -510,6 +523,8 @@ public class WalletServiceImpl implements WalletService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction
     public void addUserBalanceDetail(Integer userId, BigDecimal amount, Integer payType, Integer type, String orderNo, String title,Integer orderType,Integer sellerId,Integer buyerId,String payNo) throws ServiceException {
         //确认下单后生成用户和平台收支表信息
         UserWallet userWallet = userWalletMapper.selectByUserId(userId);

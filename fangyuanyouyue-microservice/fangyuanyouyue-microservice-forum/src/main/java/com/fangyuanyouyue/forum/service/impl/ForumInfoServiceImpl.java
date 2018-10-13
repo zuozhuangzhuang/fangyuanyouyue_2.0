@@ -3,6 +3,7 @@ package com.fangyuanyouyue.forum.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.util.ParseReturnValue;
@@ -157,6 +158,8 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 	}
 
 	@Override
+	@Transactional
+	@TxTransaction(isStart=true)
 	public void addForum(Integer userId, Integer columnId, String title, String content,String videoUrl,Integer videoLength, String videoImg, Integer type,Integer[] userIds) throws ServiceException {
 		String verifyUserById = schedualUserService.verifyUserById(userId);
 		BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
@@ -192,7 +195,11 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 				schedualMessageService.easemobMessage(forumColumn.getUserId().toString(),
 						"您的专栏【"+forumColumn.getName()+"】有新的帖子，点击此处前往查看吧",Status.SOCIAL_MESSAGE.getMessage(),Status.JUMP_TYPE_FORUM.getMessage(),forumInfo.getId().toString());
 				//增加信誉度
-				schedualWalletService.updateCredit(userId, Credit.ADD_FORUM.getCredit(),Status.ADD.getValue());
+				String result = schedualWalletService.updateCredit(userId, Credit.ADD_FORUM.getCredit(),Status.ADD.getValue());
+				BaseResp br = ParseReturnValue.getParseReturnValue(result);
+				if(!br.getCode().equals(ReCode.SUCCESS)){
+					throw new ServiceException(br.getCode(),br.getReport());
+				}
 			}
 		}else if(type == 2){//视频
 			if(StringUtils.isEmpty(videoUrl) || StringUtils.isEmpty(videoImg) || videoLength == null){
@@ -204,12 +211,20 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 			forumInfo.setPvCount(0);
 			forumInfoMapper.insert(forumInfo);
 			//增加信誉度
-			schedualWalletService.updateCredit(userId, Credit.ADD_VIDEO.getCredit(), Status.ADD.getValue());
+			String result = schedualWalletService.updateCredit(userId, Credit.ADD_VIDEO.getCredit(), Status.ADD.getValue());
+			BaseResp br = ParseReturnValue.getParseReturnValue(result);
+			if(!br.getCode().equals(ReCode.SUCCESS)){
+				throw new ServiceException(br.getCode(),br.getReport());
+			}
 		}else{
 			throw new ServiceException("类型错误！");
 		}
 		//增加积分
-		schedualWalletService.updateScore(userId, Score.ADD_FORUMINFO.getScore(),Status.ADD.getValue());
+		String result = schedualWalletService.updateScore(userId, Score.ADD_FORUMINFO.getScore(),Status.ADD.getValue());
+		BaseResp br = ParseReturnValue.getParseReturnValue(result);
+		if(!br.getCode().equals(ReCode.SUCCESS)){
+			throw new ServiceException(br.getCode(),br.getReport());
+		}
 		if(userIds != null && userIds.length > 0){
 			//邀请我：用户“用户昵称”上传帖子【帖子名称】时邀请了您！点击此处前往查看吧
 			//邀请我：用户“用户昵称”上传视频【视频名称】时邀请了您！点击此处前往查看吧

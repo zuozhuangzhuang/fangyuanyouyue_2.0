@@ -1,5 +1,6 @@
 package com.fangyuanyouyue.wallet.service.impl;
 
+import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.enums.Score;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
@@ -107,6 +108,8 @@ public class ScoreServiceImpl implements ScoreService{
         System.out.println(date);
     }
     @Override
+    @Transactional
+    @TxTransaction
     public void updateScore(Integer userId, Long score,Integer type) throws ServiceException {
         //每个用户每天可增加500积分 增加一张用户积分记录表，记录用户积分增加历史，按天筛选，不可超过500分
         UserWallet userWallet = userWalletMapper.selectByUserId(userId);

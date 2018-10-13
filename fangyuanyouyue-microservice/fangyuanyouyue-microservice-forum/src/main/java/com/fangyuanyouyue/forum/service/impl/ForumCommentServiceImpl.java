@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -69,6 +70,8 @@ public class ForumCommentServiceImpl implements ForumCommentService {
 	}
 
 	@Override
+	@Transactional
+	@TxTransaction(isStart=true)
 	public ForumCommentDto saveComment(Integer userId, Integer forumId, String content, Integer commentId) throws ServiceException{
 		ForumInfo forumInfo = forumInfoMapper.selectDetailByPrimaryKey(forumId);
 		if(forumInfo == null || forumInfo.getStatus().equals(Status.HIDE.getValue())){

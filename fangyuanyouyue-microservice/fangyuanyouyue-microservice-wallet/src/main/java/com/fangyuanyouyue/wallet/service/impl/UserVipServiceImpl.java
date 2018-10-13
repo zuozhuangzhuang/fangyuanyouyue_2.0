@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.wallet.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
@@ -10,6 +11,7 @@ import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.base.util.IdGenerator;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.wallet.constant.StatusEnum;
 import com.fangyuanyouyue.wallet.dao.UserInfoMapper;
 import com.fangyuanyouyue.wallet.dao.UserVipCouponDetailMapper;
@@ -227,8 +229,12 @@ public class UserVipServiceImpl implements UserVipService{
                 String info = walletService.orderPayByALi(vipOrder.getOrderNo(), vipOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.vip_alipay_notify.getNotifUrl());
                 payInfo.append(info);
             }else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()) {
-                Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
-                if(!verifyPayPwd){
+                String verifyPayPwd = schedualUserService.verifyPayPwd(userId, payPwd);
+                BaseResp result = ParseReturnValue.getParseReturnValue(verifyPayPwd);
+                if(!result.getCode().equals(ReCode.SUCCESS)){
+                    throw new ServiceException(result.getCode(),result.getReport());
+                }
+                if (!(boolean)result.getData()) {
                     throw new ServiceException(ReCode.PAYMENT_PASSWORD_ERROR.getValue(),ReCode.PAYMENT_PASSWORD_ERROR.getMessage());
                 }
                 //余额支付

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.util.ParseReturnValue;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,6 +102,8 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 	}
 
 	@Override
+	@Transactional
+	@TxTransaction(isStart=true)
 	public Object addColumn(Integer userId, Integer typeId,String name,Integer payType,String payPwd) throws ServiceException {
 		String verifyUserById = schedualUserService.verifyUserById(userId);
 		BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
@@ -144,27 +147,45 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 				StringBuffer payInfo = new StringBuffer();
 				//支付
 				if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
-					WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.column_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+					String getWechatOrder = schedualWalletService.orderPayByWechat(columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.column_wechat_notify.getNotifUrl());
+					BaseResp result = ParseReturnValue.getParseReturnValue(getWechatOrder);
+					if(!result.getCode().equals(ReCode.SUCCESS)){
+						throw new ServiceException(result.getCode(),result.getReport());
+					}
+					WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
 					return wechatPayDto;
 				}else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
-					String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.column_alipay_notify.getNotifUrl())).getString("data");
-					payInfo.append(info);
+					String getALiOrder = schedualWalletService.orderPayByALi(columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.column_alipay_notify.getNotifUrl());
+					BaseResp result = ParseReturnValue.getParseReturnValue(getALiOrder);
+					if(!result.getCode().equals(ReCode.SUCCESS)){
+						throw new ServiceException(result.getCode(),result.getReport());
+					}
+					payInfo.append(result.getData());
 				}else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()) {
-					Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
-					if (!verifyPayPwd) {
+					String verifyPayPwd = schedualUserService.verifyPayPwd(userId, payPwd);
+					BaseResp result = ParseReturnValue.getParseReturnValue(verifyPayPwd);
+					if(!result.getCode().equals(ReCode.SUCCESS)){
+						throw new ServiceException(result.getCode(),result.getReport());
+					}
+					if (!(boolean)result.getData()) {
 						throw new ServiceException(ReCode.PAYMENT_PASSWORD_ERROR.getValue(),ReCode.PAYMENT_PASSWORD_ERROR.getMessage());
-					} else {
+					}else {
 						//调用wallet-service修改余额功能,成为栏主200元/人
-						BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, new BigDecimal(200), Status.SUB.getValue())), BaseResp.class);
-						if (baseResp.getCode() == 1) {
-							throw new ServiceException(baseResp.getReport().toString());
+						BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(userId, new BigDecimal(200), Status.SUB.getValue()));
+						if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+							throw new ServiceException(baseResp.getCode(),baseResp.getReport());
 						}
 					}
 					payInfo.append("余额支付成功！");
 					//生成申请记录
 					applyColumn(columnOrder.getOrderNo(), null, Status.PAY_TYPE_BALANCE.getValue());
 				}else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
-					WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.column_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+					String getMiniOrder = schedualWalletService.orderPayByWechatMini(userId,columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.column_wechat_notify.getNotifUrl());
+					BaseResp result = ParseReturnValue.getParseReturnValue(getMiniOrder);
+					if(!result.getCode().equals(ReCode.SUCCESS)){
+						throw new ServiceException(result.getCode(),result.getReport());
+					}
+					WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
 					return wechatPayDto;
 				}else{
 					throw new ServiceException("支付方式错误！");
@@ -176,6 +197,8 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 
 
 	@Override
+	@Transactional
+	@TxTransaction(isStart=true)
 	public boolean applyColumn(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException{
 		try{
 			//获取订单
@@ -210,6 +233,8 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 	}
 
 	@Override
+	@Transactional
+	@TxTransaction(isStart=true)
 	public void handle(Integer applyId, Integer status,String coverImgUrl,String reason) throws ServiceException {
 		ForumColumnApply forumColumnApply = forumColumnApplyMapper.selectByPrimaryKey(applyId);
 		if(forumColumnApply == null){
@@ -243,9 +268,9 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 					schedualMessageService.easemobMessage(forumColumnApply.getUserId().toString(),
 							"很抱歉您的【"+forumColumnApply.getColumnName()+"】专栏审核未通过，可联系客服咨询详情",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_COLUMN_REFUSE.getMessage(),"");
 					//余额账单
-					BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(forumColumnApply.getUserId(),new BigDecimal(200),Status.ADD.getValue())), BaseResp.class);
-					if(baseResp.getCode() == 1){
-						throw new ServiceException(baseResp.getReport().toString());
+					BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(forumColumnApply.getUserId(),new BigDecimal(200),Status.ADD.getValue()));
+					if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+						throw new ServiceException(baseResp.getCode(),baseResp.getReport());
 					}
 					//订单号
 					final IdGenerator idg = IdGenerator.INSTANCE;

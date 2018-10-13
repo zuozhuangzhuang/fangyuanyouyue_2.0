@@ -1,13 +1,16 @@
 package com.fangyuanyouyue.order.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.Credit;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.order.dao.*;
 import com.fangyuanyouyue.order.dto.*;
 import com.fangyuanyouyue.order.dto.adminDto.AdminCompanyDto;
@@ -21,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -51,6 +55,8 @@ public class RefundServiceImpl implements RefundService{
 
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void orderReturnToSeller(Integer userId, Integer orderId, String reason,String[] imgUrls) throws ServiceException {
         //1、检测订单状态 2、检测是否退货 3、新增退货 4、发送信息
         OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderId);
@@ -102,7 +108,11 @@ public class RefundServiceImpl implements RefundService{
                 orderInfo.setIsRefund(Status.YES.getValue());//是否退货 1是 2否
                 orderInfoMapper.updateByPrimaryKey(orderInfo);
                 //扣除信誉度
-                schedualWalletService.updateCredit(orderInfo.getSellerId(), Credit.RETURN_ORDER.getCredit(), Status.SUB.getValue());
+                String result = schedualWalletService.updateCredit(orderInfo.getSellerId(), Credit.RETURN_ORDER.getCredit(), Status.SUB.getValue());
+                BaseResp br = ParseReturnValue.getParseReturnValue(result);
+                if(!br.getCode().equals(ReCode.SUCCESS)){
+                    throw new ServiceException(br.getCode(),br.getReport());
+                }
                 //环信给卖家发送信息 退货：您的商品【商品名称】、【xxx】、【xx】买家已申请退货，点击此处处理一下吧
                 List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderId);
                 StringBuffer goodsName = new StringBuffer();
@@ -146,6 +156,8 @@ public class RefundServiceImpl implements RefundService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void platformDealReturns(Integer userId, Integer orderId, String reason, Integer status) throws ServiceException {
         OrderRefund orderRefund = orderRefundMapper.selectByPrimaryKey(orderId);
         if(orderRefund == null){
@@ -173,9 +185,9 @@ public class RefundServiceImpl implements RefundService{
             if(status.intValue() == 2){
                 //同意
                 //修改余额
-                BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(orderInfo.getUserId(),orderPay.getPayAmount(),Status.ADD.getValue())), BaseResp.class);
-                if(baseResp.getCode() == 1){
-                    throw new ServiceException(baseResp.getReport().toString());
+                BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(orderInfo.getUserId(),orderPay.getPayAmount(),Status.ADD.getValue()));
+                if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
                 orderInfo.setStatus(Status.ORDER_GOODS_COMPLETE.getValue());
                 orderPay.setStatus(Status.ORDER_GOODS_COMPLETE.getValue());

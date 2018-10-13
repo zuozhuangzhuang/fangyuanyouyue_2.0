@@ -2,6 +2,7 @@ package com.fangyuanyouyue.forum.service.impl;
 
 import java.util.Date;
 
+import com.codingapi.tx.annotation.TxTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,8 @@ public class AppraisalLikesServiceImpl implements AppraisalLikesService {
 	}
 
 	@Override
+	@Transactional
+	@TxTransaction(isStart=true)
 	public void saveLikes(Integer userId, Integer appraisalId,Integer type) throws ServiceException {
 		AppraisalLikes appraisalLikes = appraisalLikesMapper.selectByAppraisalIdUserId(appraisalId, userId);
 		if(type == 1){

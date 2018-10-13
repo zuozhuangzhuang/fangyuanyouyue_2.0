@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.util.ParseReturnValue;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -191,6 +192,8 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 	}
 
 	@Override
+	@Transactional
+	@TxTransaction(isStart=true)
 	public Object addAppraisal(Integer userId, BigDecimal bonus, String title, String content,String[] imgUrls,Integer[] userIds,Integer payType,String payPwd) throws ServiceException {
 
 		StringBuffer payInfo = new StringBuffer();
@@ -233,26 +236,44 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 
 			//支付
 			if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
-				WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(argueOrder.getOrderNo(), argueOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.argue_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+				String getWechatOrder = schedualWalletService.orderPayByWechat(argueOrder.getOrderNo(), argueOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.argue_wechat_notify.getNotifUrl());
+				BaseResp result = ParseReturnValue.getParseReturnValue(getWechatOrder);
+				if(!result.getCode().equals(ReCode.SUCCESS)){
+					throw new ServiceException(result.getCode(),result.getReport());
+				}
+				WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
 				return wechatPayDto;
 			}else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
-				String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(argueOrder.getOrderNo(), argueOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.argue_alipay_notify.getNotifUrl())).getString("data");
-				payInfo.append(info);
+				String getALiOrder = schedualWalletService.orderPayByALi(argueOrder.getOrderNo(), argueOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.argue_alipay_notify.getNotifUrl());
+				BaseResp result = ParseReturnValue.getParseReturnValue(getALiOrder);
+				if(!result.getCode().equals(ReCode.SUCCESS)){
+					throw new ServiceException(result.getCode(),result.getReport());
+				}
+				payInfo.append(result.getData());
 			}else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()){
-				Boolean verifyPayPwd = JSONObject.parseObject(schedualUserService.verifyPayPwd(userId, payPwd)).getBoolean("data");
-				if(!verifyPayPwd){
+				String verifyPayPwd = schedualUserService.verifyPayPwd(userId, payPwd);
+				BaseResp result = ParseReturnValue.getParseReturnValue(verifyPayPwd);
+				if(!result.getCode().equals(ReCode.SUCCESS)){
+					throw new ServiceException(result.getCode(),result.getReport());
+				}
+				if (!(boolean)result.getData()) {
 					throw new ServiceException(ReCode.PAYMENT_PASSWORD_ERROR.getValue(),ReCode.PAYMENT_PASSWORD_ERROR.getMessage());
 				}else{
-					BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, bonus, Status.SUB.getValue())), BaseResp.class);
-					if(baseResp.getCode() == 1){
-						throw new ServiceException(baseResp.getReport().toString());
+					BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(userId, bonus, Status.SUB.getValue()));
+					if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+						throw new ServiceException(baseResp.getCode(),baseResp.getReport());
 					}
 				}
 				payInfo.append("余额支付成功！");
 				//生成全民鉴定信息
 				applyAppraisal(argueOrder.getOrderNo(),null,Status.PAY_TYPE_BALANCE.getValue());
 			}else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
-				WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,argueOrder.getOrderNo(), argueOrder.getAmount(), NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.argue_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+				String getMiniOrder = schedualWalletService.orderPayByWechatMini(userId,argueOrder.getOrderNo(), argueOrder.getAmount(), NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.argue_wechat_notify.getNotifUrl());
+				BaseResp result = ParseReturnValue.getParseReturnValue(getMiniOrder);
+				if(!result.getCode().equals(ReCode.SUCCESS)){
+					throw new ServiceException(result.getCode(),result.getReport());
+				}
+				WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
 				return wechatPayDto;
 			}else{
 				throw new ServiceException("支付方式错误！");
@@ -309,6 +330,8 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 	}
 
 	@Override
+	@Transactional
+	@TxTransaction(isStart=true)
 	public boolean applyAppraisal(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException{
 		//获取订单
 		ArgueOrder argueOrder = argueOrderMapper.selectByOrderNo(orderNo);
@@ -424,6 +447,8 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 	}
 
     @Override
+	@Transactional
+	@TxTransaction(isStart=true)
     public void updateAppraisal(AdminForumParam param) throws ServiceException {
         AppraisalDetail detail = appraisalDetailMapper.selectByPrimaryKey(param.getId());
         if(detail == null){
@@ -444,9 +469,9 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
                 throw new ServiceException("删除理由不能为空！");
             }
 			if(detail.getBonus() != null){
-				BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(detail.getUserId(),detail.getBonus(),Status.ADD.getValue())), BaseResp.class);
-				if(baseResp.getCode() == 1){
-					throw new ServiceException(baseResp.getReport().toString());
+				BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(detail.getUserId(),detail.getBonus(),Status.ADD.getValue()));
+				if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+					throw new ServiceException(baseResp.getCode(),baseResp.getReport());
 				}
 				//余额账单
 				//订单号

@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.user.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.BasePageReq;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
@@ -9,9 +10,7 @@ import com.fangyuanyouyue.base.enums.Credit;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
-import com.fangyuanyouyue.base.util.DateUtil;
-import com.fangyuanyouyue.base.util.IdGenerator;
-import com.fangyuanyouyue.base.util.MD5Util;
+import com.fangyuanyouyue.base.util.*;
 import com.fangyuanyouyue.user.constant.StatusEnum;
 import com.fangyuanyouyue.user.dao.*;
 import com.fangyuanyouyue.user.dto.admin.AdminIdentityAuthApplyDto;
@@ -27,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.user.service.UserInfoExtService;
 import com.fangyuanyouyue.user.service.UserInfoService;
 import org.springframework.transaction.annotation.Transactional;
@@ -134,6 +132,8 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public Object authType(Integer userId,Integer payType,String payPwd) throws ServiceException {
         UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
         if(StringUtils.isEmpty(userInfo.getPhone())){
@@ -163,24 +163,39 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
 
                 StringBuffer payInfo = new StringBuffer();
                 if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
-                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechat(authOrder.getOrderNo(), authOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.auth_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+                    String getWechatOrder = schedualWalletService.orderPayByWechat(authOrder.getOrderNo(), authOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.auth_wechat_notify.getNotifUrl());
+                    BaseResp result = ParseReturnValue.getParseReturnValue(getWechatOrder);
+                    if(!result.getCode().equals(ReCode.SUCCESS)){
+                        throw new ServiceException(result.getCode(),result.getReport());
+                    }
+                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
                     return wechatPayDto;
                 }else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
-                    String info = JSONObject.parseObject(schedualWalletService.orderPayByALi(authOrder.getOrderNo(), authOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.auth_alipay_notify.getNotifUrl())).getString("data");
-                    payInfo.append(info);
+                    String getALiOrder = schedualWalletService.orderPayByALi(authOrder.getOrderNo(), authOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.auth_alipay_notify.getNotifUrl());
+                    BaseResp result = ParseReturnValue.getParseReturnValue(getALiOrder);
+                    if(!result.getCode().equals(ReCode.SUCCESS)){
+                        throw new ServiceException(result.getCode(),result.getReport());
+                    }
+                    payInfo.append(result.getData());
                 }else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()) {
                     boolean verifyPayPwd = verifyPayPwd(userId, payPwd);
                     if(!verifyPayPwd){
                         throw new ServiceException(ReCode.PAYMENT_PASSWORD_ERROR.getValue(),ReCode.PAYMENT_PASSWORD_ERROR.getMessage());
                     }
-                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(userId, authOrder.getAmount(), Status.SUB.getValue())), BaseResp.class);
-                    if(baseResp.getCode() == 1){
-                        throw new ServiceException(baseResp.getReport().toString());
+                    //卖家增加余额
+                    BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(userId, authOrder.getAmount(), Status.SUB.getValue()));
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                     }
                     updateOrder(authOrder.getOrderNo(),null,Status.PAY_TYPE_BALANCE.getValue());
                     payInfo.append("余额支付成功！");
                 }else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
-                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualWalletService.orderPayByWechatMini(userId,authOrder.getOrderNo(), authOrder.getAmount(), NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.auth_wechat_notify.getNotifUrl())).getString("data")), WechatPayDto.class);
+                    String getMiniOrder = schedualWalletService.orderPayByWechatMini(userId,authOrder.getOrderNo(), authOrder.getAmount(), NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.auth_wechat_notify.getNotifUrl());
+                    BaseResp result = ParseReturnValue.getParseReturnValue(getMiniOrder);
+                    if(!result.getCode().equals(ReCode.SUCCESS)){
+                        throw new ServiceException(result.getCode(),result.getReport());
+                    }
+                    WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
                     return wechatPayDto;
                 }else{
                     throw new ServiceException("支付方式错误！");
@@ -196,6 +211,8 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
      * @throws ServiceException
      */
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public boolean updateOrder(String orderNo, String thirdOrderNo, Integer payType) throws ServiceException {
         UserAuthOrder authOrder = userAuthOrderMapper.selectByOrderNo(orderNo);
         if(authOrder == null){
@@ -282,6 +299,8 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void updateShopAuth(Integer applyId, Integer status, String content) throws ServiceException {
 
         UserAuthApply model = userAuthApplyMapper.selectByPrimaryKey(applyId);
@@ -301,7 +320,10 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
                     "恭喜您，您申请的认证店铺已通过官方审核！您的店铺已添加认证店铺专属标识，快拉您的好友来尽情购买吧！",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_AUTH_TYPE_AGREE.getMessage(),"");
         }else{
             model.setReason(content);
-            schedualWalletService.updateBalance(ext.getUserId(),new BigDecimal(360),Status.ADD.getValue());
+            BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(ext.getUserId(),new BigDecimal(360),Status.ADD.getValue()));
+            if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+            }
             //买家新增余额账单
 			//订单号
 			final IdGenerator idg = IdGenerator.INSTANCE;

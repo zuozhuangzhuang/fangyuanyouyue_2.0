@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.goods.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.Credit;
@@ -134,6 +135,8 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void addGoods(Integer userId,String nickName,GoodsParam param) throws ServiceException {
         String verifyUserById = schedualUserService.verifyUserById(userId);
         BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
@@ -205,11 +208,23 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             }
         }
         //增加积分、信誉度
-        schedualWalletService.updateScore(userId, Score.ADD_GOODSINFO.getScore(),Status.ADD.getValue());
+        String result = schedualWalletService.updateScore(userId, Score.ADD_GOODSINFO.getScore(),Status.ADD.getValue());
+        BaseResp br = ParseReturnValue.getParseReturnValue(result);
+        if(!br.getCode().equals(ReCode.SUCCESS)){
+            throw new ServiceException(br.getCode(),br.getReport());
+        }
         if(param.getType() == Status.GOODS.getValue()){
-            schedualWalletService.updateCredit(userId, Credit.ADD_GOODSINFO.getCredit(),Status.ADD.getValue());
+            result = schedualWalletService.updateCredit(userId, Credit.ADD_GOODSINFO.getCredit(),Status.ADD.getValue());
+            br = ParseReturnValue.getParseReturnValue(result);
+            if(!br.getCode().equals(ReCode.SUCCESS)){
+                throw new ServiceException(br.getCode(),br.getReport());
+            }
         }else{
-            schedualWalletService.updateCredit(userId, Credit.ADD_AUCTION.getCredit(),Status.ADD.getValue());
+            result = schedualWalletService.updateCredit(userId, Credit.ADD_AUCTION.getCredit(),Status.ADD.getValue());
+            br = ParseReturnValue.getParseReturnValue(result);
+            if(!br.getCode().equals(ReCode.SUCCESS)){
+                throw new ServiceException(br.getCode(),br.getReport());
+            }
         }
         //给被邀请的用户发送信息 邀请我：用户“用户昵称”上传商品【商品名称】时邀请了您！点击此处前往查看吧
         //邀请我：用户“用户昵称”上传抢购【抢购名称】时邀请了您！点击此处前往查看吧
@@ -650,6 +665,8 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void updateGoodsStatus(Integer goodsId,Integer status) throws ServiceException {
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
         if(goodsInfo == null){
@@ -666,9 +683,9 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                     bargain.setStatus(Status.BARGAIN_REFUSE.getValue());
                     goodsBargainMapper.updateByPrimaryKeySelective(bargain);
                     //退回余额
-                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),Status.ADD.getValue())), BaseResp.class);
-                    if(baseResp.getCode() == 1){
-                        throw new ServiceException(baseResp.getReport().toString());
+                    BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),Status.ADD.getValue()));
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                     }
                     //买家新增余额账单
                     schedualWalletService.addUserBalanceDetail(bargain.getUserId(),bargain.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),bargain.getBargainNo(),"【"+goodsInfo.getName()+"】",goodsInfo.getUserId(),bargain.getUserId(),Status.BARGAIN.getValue(),bargain.getBargainNo());
@@ -743,6 +760,8 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void updateGoods(AdminGoodsParam param) throws ServiceException {
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(param.getId());
         if(goodsInfo == null){
@@ -800,7 +819,11 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                     throw new ServiceException("删除理由不能为空！");
                 }
                 //卖家-20信誉度
-                schedualWalletService.updateCredit(goodsInfo.getUserId(),Credit.DELETE_FAKE.getCredit(),Status.SUB.getValue());
+                String result = schedualWalletService.updateCredit(goodsInfo.getUserId(),Credit.DELETE_FAKE.getCredit(),Status.SUB.getValue());
+                BaseResp br = ParseReturnValue.getParseReturnValue(result);
+                if(!br.getCode().equals(ReCode.SUCCESS)){
+                    throw new ServiceException(br.getCode(),br.getReport());
+                }
                 //很抱歉，您的商品/抢购【名称】已被官方删除，删除理由：……。点击查看详情
                 if(goodsInfo.getType().equals(Status.GOODS.getValue())){
                     schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),

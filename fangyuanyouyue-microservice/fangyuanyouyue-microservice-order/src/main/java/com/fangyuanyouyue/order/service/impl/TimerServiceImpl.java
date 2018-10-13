@@ -1,12 +1,15 @@
 package com.fangyuanyouyue.order.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.Credit;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.order.dao.*;
 import com.fangyuanyouyue.order.model.*;
 import com.fangyuanyouyue.order.service.*;
@@ -46,6 +49,8 @@ public class TimerServiceImpl implements TimerService{
     private SchedualRedisService schedualRedisService;
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void cancelOrder() throws ServiceException {
         //1、获取所有未支付的订单 2、判断下单时间与现在时间的差值是否大于24h 3、取消大于24h的订单 4、修改商品状态
         //状态 1待支付 2待发货 3待收货 4已完成 5已取消
@@ -114,6 +119,8 @@ public class TimerServiceImpl implements TimerService{
     }
 
     @Override
+    @Transactional
+    @TxTransaction(isStart=true)
     public void saveReceiptGoods() throws ServiceException {
         //1、获取所有待收货且发货时间超过12天的订单 2、修改订单状态 3、卖家增加余额 4、买家、卖家增加积分
         List<OrderPay> orderPays = orderPayMapper.selectByStatus(Status.ORDER_GOODS_SENDED.getValue(), DateUtil.getDateAfterDay(new Date(), -12));
@@ -133,15 +140,23 @@ public class TimerServiceImpl implements TimerService{
                 orderInfo.setStatus(Status.ORDER_GOODS_COMPLETE.getValue());
                 orderInfoMapper.updateByPrimaryKeySelective(orderInfo);
                 //卖家增加余额
-                BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.updateBalance(orderInfo.getSellerId(),orderPay.getPayAmount(),Status.ADD.getValue())), BaseResp.class);
-                if(baseResp.getCode() == 1){
-                    throw new ServiceException(baseResp.getReport().toString());
+                BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(orderInfo.getSellerId(),orderPay.getPayAmount(),Status.ADD.getValue()));
+                if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
                 //卖家成交增加积分
                 if(orderPay.getPayAmount().compareTo(new BigDecimal(2000)) <= 0){//2000以内+20分
-                    schedualWalletService.updateScore(orderInfo.getSellerId(),20L,1);
+                    String result = schedualWalletService.updateScore(orderInfo.getSellerId(),20L,1);
+                    BaseResp br = ParseReturnValue.getParseReturnValue(result);
+                    if(!br.getCode().equals(ReCode.SUCCESS)){
+                        throw new ServiceException(br.getCode(),br.getReport());
+                    }
                 }else{//2000以上+50分
-                    schedualWalletService.updateScore(orderInfo.getSellerId(),50L,1);
+                    String result = schedualWalletService.updateScore(orderInfo.getSellerId(),50L,1);
+                    BaseResp br = ParseReturnValue.getParseReturnValue(result);
+                    if(!br.getCode().equals(ReCode.SUCCESS)){
+                        throw new ServiceException(br.getCode(),br.getReport());
+                    }
                 }
             }
         }
