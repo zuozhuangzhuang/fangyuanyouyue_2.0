@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.fangyuanyouyue.user.dao.*;
+import com.fangyuanyouyue.user.dto.*;
+import com.fangyuanyouyue.user.model.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
@@ -21,34 +23,8 @@ import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.MD5Util;
 import com.fangyuanyouyue.user.constant.StatusEnum;
-import com.fangyuanyouyue.user.dao.CouponInfoMapper;
-import com.fangyuanyouyue.user.dao.IdentityAuthApplyMapper;
-import com.fangyuanyouyue.user.dao.UserAuthApplyMapper;
-import com.fangyuanyouyue.user.dao.UserCouponMapper;
-import com.fangyuanyouyue.user.dao.UserFansMapper;
-import com.fangyuanyouyue.user.dao.UserInfoExtMapper;
-import com.fangyuanyouyue.user.dao.UserInfoMapper;
-import com.fangyuanyouyue.user.dao.UserNickNameDetailMapper;
-import com.fangyuanyouyue.user.dao.UserThirdPartyMapper;
-import com.fangyuanyouyue.user.dao.UserVipMapper;
-import com.fangyuanyouyue.user.dao.UserWalletMapper;
-import com.fangyuanyouyue.user.dto.FansDto;
-import com.fangyuanyouyue.user.dto.MergeDto;
-import com.fangyuanyouyue.user.dto.ShopDto;
-import com.fangyuanyouyue.user.dto.UserDto;
-import com.fangyuanyouyue.user.dto.UserFansDto;
-import com.fangyuanyouyue.user.dto.WaitProcessDto;
 import com.fangyuanyouyue.user.dto.admin.AdminUserDto;
 import com.fangyuanyouyue.user.dto.admin.AdminUserNickNameDetailDto;
-import com.fangyuanyouyue.user.model.UserAuthApply;
-import com.fangyuanyouyue.user.model.UserCoupon;
-import com.fangyuanyouyue.user.model.UserFans;
-import com.fangyuanyouyue.user.model.UserInfo;
-import com.fangyuanyouyue.user.model.UserInfoExt;
-import com.fangyuanyouyue.user.model.UserNickNameDetail;
-import com.fangyuanyouyue.user.model.UserThirdParty;
-import com.fangyuanyouyue.user.model.UserVip;
-import com.fangyuanyouyue.user.model.UserWallet;
 import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.param.UserParam;
 import com.fangyuanyouyue.user.service.SchedualForumService;
@@ -720,6 +696,8 @@ public class UserInfoServiceImpl implements UserInfoService {
                 if(userFans != null){
                    userDto.setIsFollow(1);//是否关注 1是 2否
                 }
+            }else{
+                throw new ServiceException(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
             return userDto;
         }
@@ -902,8 +880,6 @@ public class UserInfoServiceImpl implements UserInfoService {
     
 
     @Override
-    @TxTransaction(isStart=true)
-    @Transactional
     public void updateUserInfo(AdminUserParam param) throws ServiceException {
     	UserInfo userInfo = userInfoMapper.selectByPrimaryKey(param.getId());
         UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(param.getId());

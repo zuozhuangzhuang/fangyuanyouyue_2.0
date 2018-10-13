@@ -46,7 +46,3 @@ pagehelper:
 ribbon:
   ReadTimeout: 60000
   ConnectTimeout: 60000
-
-tm:
-  manager:
-    url:http://127.0.0.1:8899/tx/manager/

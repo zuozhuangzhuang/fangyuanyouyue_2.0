@@ -22,37 +22,11 @@ public class ConfinedUserServiceImpl implements ConfinedUserService {
     @Autowired
     private UserInfoMapper userInfoMapper;
     @Autowired
-    private UserThirdPartyMapper userThirdPartyMapper;
-    @Autowired
-    private IdentityAuthApplyMapper identityAuthApplyMapper;
-    @Autowired
     private UserInfoExtMapper userInfoExtMapper;
     @Autowired
     private UserVipMapper userVipMapper;
     @Autowired
-    private SchedualGoodsService schedualGoodsService;
-    @Autowired
-    private SchedualRedisService schedualRedisService;
-    @Autowired
-    private UserFansMapper userFansMapper;
-    @Autowired
     private UserWalletMapper userWalletMapper;
-    @Autowired
-    private SchedualOrderService schedualOrderService;
-    @Autowired
-    private SchedualMessageService schedualMessageService;
-    @Autowired
-    private UserThirdService userThirdService;
-    @Autowired
-    private SchedualWalletService schedualWalletService;
-    @Autowired
-    private UserCouponMapper userCouponMapper;
-    @Autowired
-    private CouponInfoMapper couponInfoMapper;
-    @Autowired
-    private UserNickNameDetailMapper userNickNameDetailMapper;
-    @Autowired
-    private SchedualForumService schedualForumService;
     @Autowired
     private ConfinedUserMapper confinedUserMapper;
 
