@@ -57,8 +57,8 @@ public class OrderServiceImpl implements OrderService{
     private UserBehaviorMapper userBehaviorMapper;
     @Autowired
     private UserCouponMapper userCouponMapper;
-    @Autowired
-    RedissonLock redissonLock;
+//    @Autowired
+//    RedissonLock redissonLock;
 
     @Override
     public OrderDto saveOrderByCart(String token,String sellerString, Integer userId, Integer addressId) throws ServiceException {
@@ -272,10 +272,10 @@ public class OrderServiceImpl implements OrderService{
                 GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), GoodsInfo.class);
 
             	//加入分布式锁，锁住商品id，10秒后释放
-            	redissonLock.lock("GoodsOrder"+addOrderDetailDto.getGoodsId().toString(), 10);
+//            	redissonLock.lock("GoodsOrder"+addOrderDetailDto.getGoodsId().toString(), 10);
 
 
-            	try {
+//            	try {
 	                //计算总订单总金额
 	                //每个商品生成一个订单详情表
 	                OrderDetail orderDetail = new OrderDetail();
@@ -337,11 +337,11 @@ public class OrderServiceImpl implements OrderService{
 	                }
 	                orderDetailDtos.add(orderDetailDto);
 	                goodsName.append("【"+goods.getName()+"】");
-            	}catch (Exception e) {
-            		e.printStackTrace();
-				}finally {
-		        	redissonLock.release("GoodsOrder"+goods.getId());
-				}
+//            	}catch (Exception e) {
+//            		e.printStackTrace();
+//				}finally {
+//		        	redissonLock.release("GoodsOrder"+goods.getId());
+//				}
             }
             mainAmount = mainAmount.add(amount);
             mainPayAmount = mainPayAmount.add(payAmount.add(payFreight));
@@ -669,8 +669,8 @@ public class OrderServiceImpl implements OrderService{
         }
 
     	//加入分布式锁，锁住商品id，10秒后释放
-    	redissonLock.lock("GoodsOrder"+goodsId, 10);
-        try {
+//    	redissonLock.lock("GoodsOrder"+goodsId, 10);
+//        try {
 
 	        //获取商品信息
 	        GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(goodsId)).getString("data")),GoodsInfo.class);
@@ -810,12 +810,12 @@ public class OrderServiceImpl implements OrderService{
 	                "恭喜您！您的"+(goods.getType()==Status.GOODS.getValue()?"商品【":"抢购【")+goods.getName()+"】已有人下单，点击此处查看订单",
 	                Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER_SELLER.getMessage(),orderInfo.getId().toString());
 	        return orderDto;
-        }catch (Exception e) {
-        	e.printStackTrace();
-            throw new ServiceException("下单出错，请稍后再试！");
-		}finally {
-        	redissonLock.release("GoodsOrder"+goodsId);
-		}
+//        }catch (Exception e) {
+//        	e.printStackTrace();
+//            throw new ServiceException("下单出错，请稍后再试！");
+//		}finally {
+//        	redissonLock.release("GoodsOrder"+goodsId);
+//		}
 
     }
 
