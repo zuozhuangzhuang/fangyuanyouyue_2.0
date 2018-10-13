@@ -46,3 +46,9 @@ debug: true
 logging:
   level:
     com.fangyuanyouyue.order: DEBUG
+redisson:
+  lock:
+    server:
+      address:redis:6379
+      type:standalone
+ 

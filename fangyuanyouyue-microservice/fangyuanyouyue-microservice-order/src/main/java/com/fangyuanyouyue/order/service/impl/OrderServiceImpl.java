@@ -1,12 +1,26 @@
 package com.fangyuanyouyue.order.service.impl;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
-import com.fangyuanyouyue.base.enums.*;
+import com.fangyuanyouyue.base.enums.Credit;
+import com.fangyuanyouyue.base.enums.NotifyUrl;
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.enums.Score;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
@@ -16,18 +30,45 @@ import com.fangyuanyouyue.order.dao.*;
 import com.fangyuanyouyue.order.dto.*;
 import com.fangyuanyouyue.order.dto.adminDto.*;
 import com.fangyuanyouyue.order.model.*;
+import com.fangyuanyouyue.order.dao.CompanyMapper;
+import com.fangyuanyouyue.order.dao.OrderCommentMapper;
+import com.fangyuanyouyue.order.dao.OrderDetailMapper;
+import com.fangyuanyouyue.order.dao.OrderInfoMapper;
+import com.fangyuanyouyue.order.dao.OrderPayMapper;
+import com.fangyuanyouyue.order.dao.OrderRefundMapper;
+import com.fangyuanyouyue.order.dao.UserBehaviorMapper;
+import com.fangyuanyouyue.order.dao.UserCouponMapper;
+import com.fangyuanyouyue.order.dto.AddOrderDetailDto;
+import com.fangyuanyouyue.order.dto.AddOrderDto;
+import com.fangyuanyouyue.order.dto.CompanyDto;
+import com.fangyuanyouyue.order.dto.OrderDetailDto;
+import com.fangyuanyouyue.order.dto.OrderDto;
+import com.fangyuanyouyue.order.dto.OrderPayDto;
+import com.fangyuanyouyue.order.dto.SellerDto;
+import com.fangyuanyouyue.order.dto.UserCouponDto;
+import com.fangyuanyouyue.order.dto.adminDto.AdminCompanyDto;
+import com.fangyuanyouyue.order.dto.adminDto.AdminOrderDetailDto;
+import com.fangyuanyouyue.order.dto.adminDto.AdminOrderDto;
+import com.fangyuanyouyue.order.dto.adminDto.AdminOrderPayDto;
+import com.fangyuanyouyue.order.dto.adminDto.AdminOrderProcessDto;
+import com.fangyuanyouyue.order.model.Company;
+import com.fangyuanyouyue.order.model.GoodsInfo;
+import com.fangyuanyouyue.order.model.OrderComment;
+import com.fangyuanyouyue.order.model.OrderDetail;
+import com.fangyuanyouyue.order.model.OrderInfo;
+import com.fangyuanyouyue.order.model.OrderPay;
+import com.fangyuanyouyue.order.model.OrderRefund;
+import com.fangyuanyouyue.order.model.UserAddressInfo;
+import com.fangyuanyouyue.order.model.UserBehavior;
+import com.fangyuanyouyue.order.model.UserCoupon;
+import com.fangyuanyouyue.order.model.UserInfo;
 import com.fangyuanyouyue.order.param.AdminOrderParam;
-import com.fangyuanyouyue.order.service.*;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import com.fangyuanyouyue.order.service.OrderService;
+import com.fangyuanyouyue.order.service.SchedualGoodsService;
+import com.fangyuanyouyue.order.service.SchedualMessageService;
+import com.fangyuanyouyue.order.service.SchedualUserService;
+import com.fangyuanyouyue.order.service.SchedualWalletService;
+import com.snowalker.lock.redisson.RedissonLock;
 
 @Service(value = "orderService")
 @Transactional(rollbackFor=Exception.class)
@@ -56,6 +97,8 @@ public class OrderServiceImpl implements OrderService{
     private UserBehaviorMapper userBehaviorMapper;
     @Autowired
     private UserCouponMapper userCouponMapper;
+    @Autowired
+    RedissonLock redissonLock;
 
     @Override
     public OrderDto saveOrderByCart(String token,String sellerString, Integer userId, Integer addressId) throws ServiceException {
@@ -176,6 +219,7 @@ public class OrderServiceImpl implements OrderService{
                 throw new ServiceException("商品信息错误！");
             }
             for(AddOrderDetailDto addOrderDetailDto:addOrderDetailDtos) {
+
                 GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(addOrderDetailDto.getGoodsId())).getString("data")), GoodsInfo.class);
                 if (goods.getStatus() != 1) {//状态 1出售中 2已售出 3已下架（已结束） 5删除
                     throw new ServiceException("商品状态异常！");
@@ -253,66 +297,78 @@ public class OrderServiceImpl implements OrderService{
             //每个卖家的商品
             StringBuffer goodsName = new StringBuffer();
             for(AddOrderDetailDto addOrderDetailDto:addOrderDetailDtos){
+
+            	//加入分布式锁，锁住商品id，10秒后释放
+            	redissonLock.lock("GoodsOrder"+addOrderDetailDto.getGoodsId().toString(), 10);
+
                 GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(addOrderDetailDto.getGoodsId())).getString("data")),GoodsInfo.class);
-                //计算总订单总金额
-                //每个商品生成一个订单详情表
-                OrderDetail orderDetail = new OrderDetail();
-                //买家ID
-                orderDetail.setUserId(orderInfo.getUserId());
-                //卖家ID
-                orderDetail.setSellerId(goods.getUserId());
-                orderDetail.setMainOrderId(mainOrder.getId());//主订单ID
-                orderDetail.setOrderId(orderInfo.getId());
-                orderDetail.setGoodsId(goods.getId());
-                orderDetail.setGoodsName(goods.getName());
-                orderDetail.setAddTime(DateStampUtils.getTimesteamp());
-                //商品主图
-                String goodsMainImg = JSONObject.parseObject(schedualGoodsService.goodsMainImg(goods.getId())).getString("data");
-                orderDetail.setMainImgUrl(goodsMainImg);
-                orderDetail.setAmount(goods.getPrice());
 
-                //计算优惠券（每个商品都可以使用优惠券）
-                Integer couponId = addOrderDetailDto.getCouponId();//优惠券ID
+            	try {
+	                //计算总订单总金额
+	                //每个商品生成一个订单详情表
+	                OrderDetail orderDetail = new OrderDetail();
+	                //买家ID
+	                orderDetail.setUserId(orderInfo.getUserId());
+	                //卖家ID
+	                orderDetail.setSellerId(goods.getUserId());
+	                orderDetail.setMainOrderId(mainOrder.getId());//主订单ID
+	                orderDetail.setOrderId(orderInfo.getId());
+	                orderDetail.setGoodsId(goods.getId());
+	                orderDetail.setGoodsName(goods.getName());
+	                orderDetail.setAddTime(DateStampUtils.getTimesteamp());
+	                //商品主图
+	                String goodsMainImg = JSONObject.parseObject(schedualGoodsService.goodsMainImg(goods.getId())).getString("data");
+	                orderDetail.setMainImgUrl(goodsMainImg);
+	                orderDetail.setAmount(goods.getPrice());
 
-                BigDecimal price = goods.getPrice();
-                if(couponId != null){
-                    //判断商品所属店铺是否可用优惠券
-                    if(!Boolean.valueOf(JSONObject.parseObject(schedualUserService.userIsAuth(goods.getUserId())).getString("data"))){
-                        throw new ServiceException("【"+goods.getName()+"】所属店铺未认证，不可使用优惠券！");
-                    }
-                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.getPriceByCoupon(orderInfo.getUserId(),price,couponId)), BaseResp.class);
-                    if(baseResp.getCode() == 1){
-                        throw new ServiceException(baseResp.getReport().toString());
-                    }else{
-                        orderDetail.setCouponId(couponId);
-                        price = (BigDecimal)baseResp.getData();
-                    }
-                }
-                //取运费最高者计算
-//                if(goods.getPostage().compareTo(freight) > 0){
-//                    freight = goods.getPostage();
-//                    orderDetail.setFreight(goods.getPostage());
-//                }else{//如果不是最高邮费，就设置为0
-//                    orderDetail.setFreight(new BigDecimal(0));
-//                }
-                //实际支付加上邮费
-                orderDetail.setPayAmount(price);
-                orderDetail.setDescription(goods.getDescription());
-                orderDetailMapper.insert(orderDetail);
-                //修改商品的状态为已售出
-                schedualGoodsService.updateGoodsStatus(addOrderDetailDto.getGoodsId(),2);//状态  1出售中 2已售出 3已下架（已结束） 5删除
-//                payFreight = payFreight.add(orderDetail.getFreight());
-                amount = amount.add(orderDetail.getAmount());//原价
-                payAmount = payAmount.add(orderDetail.getPayAmount());//实际支付
-                OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail);
-                //优惠券
-                UserCoupon userCoupon = userCouponMapper.selectUserCouponDetail(orderDetail.getCouponId());
-                if(userCoupon != null){
-                    UserCouponDto userCouponDto = new UserCouponDto(userCoupon);
-                    orderDetailDto.setUserCouponDto(userCouponDto);
-                }
-                orderDetailDtos.add(orderDetailDto);
-                goodsName.append("【"+goods.getName()+"】");
+	                //计算优惠券（每个商品都可以使用优惠券）
+	                Integer couponId = addOrderDetailDto.getCouponId();//优惠券ID
+
+	                BigDecimal price = goods.getPrice();
+	                if(couponId != null){
+	                    //判断商品所属店铺是否可用优惠券
+	                    if(!Boolean.valueOf(JSONObject.parseObject(schedualUserService.userIsAuth(goods.getUserId())).getString("data"))){
+	                        throw new ServiceException("【"+goods.getName()+"】所属店铺未认证，不可使用优惠券！");
+	                    }
+	                    BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.getPriceByCoupon(orderInfo.getUserId(),price,couponId)), BaseResp.class);
+	                    if(baseResp.getCode() == 1){
+	                        throw new ServiceException(baseResp.getReport().toString());
+	                    }else{
+	                        orderDetail.setCouponId(couponId);
+	                        price = (BigDecimal)baseResp.getData();
+	                    }
+	                }
+	                //取运费最高者计算
+	//                if(goods.getPostage().compareTo(freight) > 0){
+	//                    freight = goods.getPostage();
+	//                    orderDetail.setFreight(goods.getPostage());
+	//                }else{//如果不是最高邮费，就设置为0
+	//                    orderDetail.setFreight(new BigDecimal(0));
+	//                }
+	                //实际支付加上邮费
+	                orderDetail.setPayAmount(price);
+	                orderDetail.setDescription(goods.getDescription());
+	                orderDetailMapper.insert(orderDetail);
+	                //修改商品的状态为已售出
+	            	schedualGoodsService.updateGoodsStatus(addOrderDetailDto.getGoodsId(),2);//状态  1出售中 2已售出 3已下架（已结束） 5删除
+
+	//                payFreight = payFreight.add(orderDetail.getFreight());
+	                amount = amount.add(orderDetail.getAmount());//原价
+	                payAmount = payAmount.add(orderDetail.getPayAmount());//实际支付
+	                OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail);
+	                //优惠券
+	                UserCoupon userCoupon = userCouponMapper.selectUserCouponDetail(orderDetail.getCouponId());
+	                if(userCoupon != null){
+	                    UserCouponDto userCouponDto = new UserCouponDto(userCoupon);
+	                    orderDetailDto.setUserCouponDto(userCouponDto);
+	                }
+	                orderDetailDtos.add(orderDetailDto);
+	                goodsName.append("【"+goods.getName()+"】");
+            	}catch (Exception e) {
+            		e.printStackTrace();
+				}finally {
+		        	redissonLock.release("GoodsOrder"+goods.getId());
+				}
             }
             mainAmount = mainAmount.add(amount);
             mainPayAmount = mainPayAmount.add(payAmount.add(payFreight));
@@ -621,140 +677,152 @@ public class OrderServiceImpl implements OrderService{
         if(StringUtils.isEmpty(user.getPhone())){
             throw new ServiceException("未绑定手机号！");
         }
-        //获取商品信息
-        GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(goodsId)).getString("data")),GoodsInfo.class);
-        if (goods.getStatus() != 1) {//状态 1出售中 2已售出 3已下架（已结束） 5删除
-            throw new ServiceException("商品状态异常！");
-        }
-        if(goods.getUserId().intValue() == userId.intValue()){
-            throw new ServiceException("不可以对自己的商品进行下单！");
-        }
 
-        if(type.intValue() == Status.AUCTION.getValue()){
-            //非会员只能免费抢购一次，会员可无限制抢购——验证是否为会员
-            if(!Boolean.valueOf(JSONObject.parseObject(schedualWalletService.isUserVip(userId)).getString("data"))){
-                List<UserBehavior> userBehaviors = userBehaviorMapper.selectByUserIdType(userId, Status.BUY_AUCTION.getValue());
-                if(userBehaviors != null && userBehaviors.size() > 0){
-                    throw new ServiceException("非会员只能免费抢购一次！");
-                }else{
-                    UserBehavior userBehavior = new UserBehavior();
-                    userBehavior.setUserId(userId);
-                    userBehavior.setBusinessId(goodsId);
-                    userBehavior.setBusinessType(Status.BUSINESS_TYPE_GOODS.getValue());
-                    userBehavior.setType(Status.BUY_AUCTION.getValue());
-                    userBehavior.setToUserId(goods.getUserId());
-                    userBehavior.setAddTime(DateStampUtils.getTimesteamp());
-                    userBehaviorMapper.insert(userBehavior);
-                }
-            }
-        }
-        //获取收货地址
-        String result = schedualUserService.getAddressList(token,addressId);
-        JSONArray addressArray = JSONArray.parseArray(JSONObject.parseObject(result).getString("data"));
-        JSONObject address = null;
-        if(addressArray != null && addressArray.size()>0){
-            address = JSONObject.parseObject(addressArray.get(0).toString());
-        }
-        UserAddressInfo addressInfo = JSONObject.toJavaObject(address,UserAddressInfo.class);
+    	//加入分布式锁，锁住商品id，10秒后释放
+    	redissonLock.lock("GoodsOrder"+goodsId, 10);
+        try {
 
-        if(addressInfo == null || StringUtils.isEmpty(addressInfo.getAddress()) || StringUtils.isEmpty(addressInfo.getProvince())
-                || StringUtils.isEmpty(addressInfo.getCity()) || StringUtils.isEmpty(addressInfo.getArea())){
-            throw new  ServiceException("收货地址异常，请先更新地址");
-        }
+	        //获取商品信息
+	        GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(goodsId)).getString("data")),GoodsInfo.class);
+	        if (goods.getStatus() != 1) {//状态 1出售中 2已售出 3已下架（已结束） 5删除
+	            throw new ServiceException("商品状态异常！");
+	        }
+	        if(goods.getUserId().intValue() == userId.intValue()){
+	            throw new ServiceException("不可以对自己的商品进行下单！");
+	        }
+
+	        if(type.intValue() == Status.AUCTION.getValue()){
+	            //非会员只能免费抢购一次，会员可无限制抢购——验证是否为会员
+	            if(!Boolean.valueOf(JSONObject.parseObject(schedualWalletService.isUserVip(userId)).getString("data"))){
+	                List<UserBehavior> userBehaviors = userBehaviorMapper.selectByUserIdType(userId, Status.BUY_AUCTION.getValue());
+	                if(userBehaviors != null && userBehaviors.size() > 0){
+	                    throw new ServiceException("非会员只能免费抢购一次！");
+	                }else{
+	                    UserBehavior userBehavior = new UserBehavior();
+	                    userBehavior.setUserId(userId);
+	                    userBehavior.setBusinessId(goodsId);
+	                    userBehavior.setBusinessType(Status.BUSINESS_TYPE_GOODS.getValue());
+	                    userBehavior.setType(Status.BUY_AUCTION.getValue());
+	                    userBehavior.setToUserId(goods.getUserId());
+	                    userBehavior.setAddTime(DateStampUtils.getTimesteamp());
+	                    userBehaviorMapper.insert(userBehavior);
+	                }
+	            }
+	        }
+	        //获取收货地址
+	        String result = schedualUserService.getAddressList(token,addressId);
+	        JSONArray addressArray = JSONArray.parseArray(JSONObject.parseObject(result).getString("data"));
+	        JSONObject address = null;
+	        if(addressArray != null && addressArray.size()>0){
+	            address = JSONObject.parseObject(addressArray.get(0).toString());
+	        }
+	        UserAddressInfo addressInfo = JSONObject.toJavaObject(address,UserAddressInfo.class);
+
+	        if(addressInfo == null || StringUtils.isEmpty(addressInfo.getAddress()) || StringUtils.isEmpty(addressInfo.getProvince())
+	                || StringUtils.isEmpty(addressInfo.getCity()) || StringUtils.isEmpty(addressInfo.getArea())){
+	            throw new  ServiceException("收货地址异常，请先更新地址");
+	        }
 
 
-        //1.下订单
-        //2.下支付订单
-        OrderInfo orderInfo = new OrderInfo();
-        orderInfo.setIsResolve(Status.NO.getValue());//是否拆单 1是 2否
-        orderInfo.setUserId(userId);
-        //订单号
-        final IdGenerator idg = IdGenerator.INSTANCE;
-        String id = idg.nextId();
-        orderInfo.setOrderNo("1"+id);
+	        //1.下订单
+	        //2.下支付订单
+	        OrderInfo orderInfo = new OrderInfo();
+	        orderInfo.setIsResolve(Status.NO.getValue());//是否拆单 1是 2否
+	        orderInfo.setUserId(userId);
+	        //订单号
+	        final IdGenerator idg = IdGenerator.INSTANCE;
+	        String id = idg.nextId();
+	        orderInfo.setOrderNo("1"+id);
 
-        BigDecimal amount = goods.getPrice();//原价
-        //计算优惠券（每个商品都可以使用优惠券）
-        if(couponId != null){
-            //判断商品所属店铺是否可用优惠券
-            if(!Boolean.valueOf(JSONObject.parseObject(schedualUserService.userIsAuth(goods.getUserId())).getString("data"))){
-                throw new ServiceException("【"+goods.getName()+"】所属店铺未认证，不可使用优惠券！");
-            }
-            BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.getPriceByCoupon(userId,amount,couponId)), BaseResp.class);
-            if(baseResp.getCode() == 1){
-                throw new ServiceException(baseResp.getReport().toString());
-            }else{
-                amount = (BigDecimal)baseResp.getData();
-            }
-        }
-        BigDecimal payFreight = goods.getPostage()==null?new BigDecimal(0):goods.getPostage();//总邮费
-        BigDecimal payAmount = amount.add(payFreight);//实际支付金额
-        orderInfo.setAmount(amount);
-        orderInfo.setCount(1);//商品数量，初始为0
-        orderInfo.setStatus(Status.ORDER_GOODS_PREPAY.getValue());
-        orderInfo.setAddTime(DateStampUtils.getTimesteamp());
-        orderInfo.setSellerId(goods.getUserId());//卖家ID
-        orderInfoMapper.insert(orderInfo);
-        //生成订单支付表
-        OrderPay orderPay = new OrderPay();
-        orderPay.setOrderId(orderInfo.getId());
-        orderPay.setReceiverName(addressInfo.getReceiverName());
-        orderPay.setReceiverPhone(addressInfo.getReceiverPhone());
-        orderPay.setProvince(addressInfo.getProvince());
-        orderPay.setCity(addressInfo.getCity());
-        orderPay.setArea(addressInfo.getArea());
-        orderPay.setAddress(addressInfo.getAddress());
-        orderPay.setPostCode(addressInfo.getPostCode());
-        orderPay.setOrderNo(orderInfo.getOrderNo());
-        orderPay.setAmount(amount);
-        orderPay.setPayAmount(payAmount);
-        orderPay.setFreight(payFreight);
-        orderPay.setCount(1);//商品数量，初始为0
-        orderPay.setStatus(Status.ORDER_GOODS_PREPAY.getValue());
-        orderPay.setAddTime(DateStampUtils.getTimesteamp());
-        orderPayMapper.insert(orderPay);
-        OrderDetail orderDetail = new OrderDetail();
-        orderDetail.setUserId(userId);
-        orderDetail.setMainOrderId(orderInfo.getId());//主订单ID
-        orderDetail.setOrderId(orderInfo.getId());
-        orderDetail.setGoodsId(goodsId);
-        orderDetail.setGoodsName(goods.getName());
-        orderDetail.setAddTime(DateStampUtils.getTimesteamp());
-        orderDetail.setCouponId(couponId);
-        //商品主图
-        String goodsMainImg = JSONObject.parseObject(schedualGoodsService.goodsMainImg(goods.getId())).getString("data");
-        orderDetail.setMainImgUrl(goodsMainImg);
-        orderDetail.setAmount(amount);
-        orderDetail.setFreight(payFreight);
-        orderDetail.setPayAmount(payAmount);
-        orderDetail.setDescription(goods.getDescription());
-        orderDetail.setSellerId(goods.getUserId());
-        orderDetailMapper.insert(orderDetail);
-        //修改商品的状态为已售出
-        schedualGoodsService.updateGoodsStatus(goodsId,2);//状态  1出售中 2已售出 3已下架（已结束） 5删除
-        ArrayList<OrderDetailDto> orderDetailDtos = new ArrayList<>();
-        OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail);
-        //优惠券
-        UserCoupon userCoupon = userCouponMapper.selectUserCouponDetail(orderDetail.getCouponId());
-        if(userCoupon != null){
-            UserCouponDto userCouponDto = new UserCouponDto(userCoupon);
-            orderDetailDto.setUserCouponDto(userCouponDto);
-        }
-        orderDetailDtos.add(orderDetailDto);
-        //卖家dto
-        List<SellerDto> sellerDtos = getSellerDtos(orderDetailDtos);
-        //生成子订单，在总订单中加入价格和邮费，实际支付价格
-        OrderDto orderDto = new OrderDto(orderInfo);
-        OrderPayDto orderPayDto = new OrderPayDto(orderPay);
-        orderDto.setOrderPayDto(orderPayDto);
-        orderDto.setOrderDetailDtos(orderDetailDtos);
-        orderDto.setSellerDtos(sellerDtos);
-        //交易消息：恭喜您！您的商品【大头三年原光】已有人下单，点击此处查看订单
-        // 交易消息：恭喜您！您的抢购【大头三年原光】已有人下单，点击此处查看订单
-        schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
-                "恭喜您！您的"+(goods.getType()==Status.GOODS.getValue()?"商品【":"抢购【")+goods.getName()+"】已有人下单，点击此处查看订单",
-                Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER_SELLER.getMessage(),orderInfo.getId().toString());
-        return orderDto;
+	        BigDecimal amount = goods.getPrice();//原价
+	        //计算优惠券（每个商品都可以使用优惠券）
+	        if(couponId != null){
+	            //判断商品所属店铺是否可用优惠券
+	            if(!Boolean.valueOf(JSONObject.parseObject(schedualUserService.userIsAuth(goods.getUserId())).getString("data"))){
+	                throw new ServiceException("【"+goods.getName()+"】所属店铺未认证，不可使用优惠券！");
+	            }
+	            BaseResp baseResp = JSONObject.toJavaObject(JSONObject.parseObject(schedualWalletService.getPriceByCoupon(userId,amount,couponId)), BaseResp.class);
+	            if(baseResp.getCode() == 1){
+	                throw new ServiceException(baseResp.getReport().toString());
+	            }else{
+	                amount = (BigDecimal)baseResp.getData();
+	            }
+	        }
+	        BigDecimal payFreight = goods.getPostage()==null?new BigDecimal(0):goods.getPostage();//总邮费
+	        BigDecimal payAmount = amount.add(payFreight);//实际支付金额
+	        orderInfo.setAmount(amount);
+	        orderInfo.setCount(1);//商品数量，初始为0
+	        orderInfo.setStatus(Status.ORDER_GOODS_PREPAY.getValue());
+	        orderInfo.setAddTime(DateStampUtils.getTimesteamp());
+	        orderInfo.setSellerId(goods.getUserId());//卖家ID
+	        orderInfoMapper.insert(orderInfo);
+	        //生成订单支付表
+	        OrderPay orderPay = new OrderPay();
+	        orderPay.setOrderId(orderInfo.getId());
+	        orderPay.setReceiverName(addressInfo.getReceiverName());
+	        orderPay.setReceiverPhone(addressInfo.getReceiverPhone());
+	        orderPay.setProvince(addressInfo.getProvince());
+	        orderPay.setCity(addressInfo.getCity());
+	        orderPay.setArea(addressInfo.getArea());
+	        orderPay.setAddress(addressInfo.getAddress());
+	        orderPay.setPostCode(addressInfo.getPostCode());
+	        orderPay.setOrderNo(orderInfo.getOrderNo());
+	        orderPay.setAmount(amount);
+	        orderPay.setPayAmount(payAmount);
+	        orderPay.setFreight(payFreight);
+	        orderPay.setCount(1);//商品数量，初始为0
+	        orderPay.setStatus(Status.ORDER_GOODS_PREPAY.getValue());
+	        orderPay.setAddTime(DateStampUtils.getTimesteamp());
+	        orderPayMapper.insert(orderPay);
+	        OrderDetail orderDetail = new OrderDetail();
+	        orderDetail.setUserId(userId);
+	        orderDetail.setMainOrderId(orderInfo.getId());//主订单ID
+	        orderDetail.setOrderId(orderInfo.getId());
+	        orderDetail.setGoodsId(goodsId);
+	        orderDetail.setGoodsName(goods.getName());
+	        orderDetail.setAddTime(DateStampUtils.getTimesteamp());
+	        orderDetail.setCouponId(couponId);
+	        //商品主图
+	        String goodsMainImg = JSONObject.parseObject(schedualGoodsService.goodsMainImg(goods.getId())).getString("data");
+	        orderDetail.setMainImgUrl(goodsMainImg);
+	        orderDetail.setAmount(amount);
+	        orderDetail.setFreight(payFreight);
+	        orderDetail.setPayAmount(payAmount);
+	        orderDetail.setDescription(goods.getDescription());
+	        orderDetail.setSellerId(goods.getUserId());
+	        orderDetailMapper.insert(orderDetail);
+	        //修改商品的状态为已售出
+	        schedualGoodsService.updateGoodsStatus(goodsId,2);//状态  1出售中 2已售出 3已下架（已结束） 5删除
+
+	        ArrayList<OrderDetailDto> orderDetailDtos = new ArrayList<>();
+	        OrderDetailDto orderDetailDto = new OrderDetailDto(orderDetail);
+	        //优惠券
+	        UserCoupon userCoupon = userCouponMapper.selectUserCouponDetail(orderDetail.getCouponId());
+	        if(userCoupon != null){
+	            UserCouponDto userCouponDto = new UserCouponDto(userCoupon);
+	            orderDetailDto.setUserCouponDto(userCouponDto);
+	        }
+	        orderDetailDtos.add(orderDetailDto);
+	        //卖家dto
+	        List<SellerDto> sellerDtos = getSellerDtos(orderDetailDtos);
+	        //生成子订单，在总订单中加入价格和邮费，实际支付价格
+	        OrderDto orderDto = new OrderDto(orderInfo);
+	        OrderPayDto orderPayDto = new OrderPayDto(orderPay);
+	        orderDto.setOrderPayDto(orderPayDto);
+	        orderDto.setOrderDetailDtos(orderDetailDtos);
+	        orderDto.setSellerDtos(sellerDtos);
+	        //交易消息：恭喜您！您的商品【大头三年原光】已有人下单，点击此处查看订单
+	        // 交易消息：恭喜您！您的抢购【大头三年原光】已有人下单，点击此处查看订单
+	        schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
+	                "恭喜您！您的"+(goods.getType()==Status.GOODS.getValue()?"商品【":"抢购【")+goods.getName()+"】已有人下单，点击此处查看订单",
+	                Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER_SELLER.getMessage(),orderInfo.getId().toString());
+	        return orderDto;
+        }catch (Exception e) {
+        	e.printStackTrace();
+            throw new ServiceException("下单出错，请稍后再试！");
+		}finally {
+        	redissonLock.release("GoodsOrder"+goodsId);
+		}
 
     }
 
@@ -1123,7 +1191,7 @@ public class OrderServiceImpl implements OrderService{
             }
             orderDto.setOrderDetail(orderDetail);
             orderDto.setTotalCount(orderDetailDtos.size());
-            
+
             orderDtos.add(orderDto);
         }
         Pager pager = new Pager();
