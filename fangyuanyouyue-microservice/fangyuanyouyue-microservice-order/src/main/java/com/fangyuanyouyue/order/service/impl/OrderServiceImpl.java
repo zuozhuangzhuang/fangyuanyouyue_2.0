@@ -660,7 +660,6 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     @Transactional
-    @TxTransaction(isStart=true)
     public OrderDto saveOrder(String token,Integer goodsId,Integer couponId,Integer userId,Integer addressId,Integer type) throws ServiceException {
         //验证手机号
         UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
