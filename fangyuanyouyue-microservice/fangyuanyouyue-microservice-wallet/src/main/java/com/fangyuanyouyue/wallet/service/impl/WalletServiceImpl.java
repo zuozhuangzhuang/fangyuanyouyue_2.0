@@ -460,14 +460,12 @@ public class WalletServiceImpl implements WalletService{
             UserInfo info;
             if(dto.getType().intValue() == Status.INCOME.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue()){
                 info = userInfoMapper.selectByPrimaryKey(dto.getBuyerId());
-                dto.setImgUrl(info.getHeadImgUrl());
             }else if((dto.getType().intValue() == Status.EXPEND.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue())
                     || (dto.getType().intValue() == Status.EXPEND.getValue() && dto.getOrderType().intValue() == Status.BARGAIN.getValue())
                     || (dto.getType().intValue() == Status.REFUND.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue())
                     || (dto.getType().intValue() == Status.REFUND.getValue() && dto.getOrderType().intValue() == Status.BARGAIN.getValue())
                     ){
                 info = userInfoMapper.selectByPrimaryKey(dto.getSellerId());
-                dto.setImgUrl(info.getHeadImgUrl());
             }else{
                 info = userInfoMapper.selectByPrimaryKey(66);
             }

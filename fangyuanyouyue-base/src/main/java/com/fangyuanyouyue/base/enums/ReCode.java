@@ -16,6 +16,7 @@ public enum ReCode {
 	DATA_IS_NULL(7,"数据为空，请填写数据"),
 	LOGIN_TIME_OUT(10,"登录超时，请重新登录！"),
 	FROZEN(11,"您的账号已被冻结，请联系管理员！"),
+	NO_PHONE(12,"未绑定手机号！"),
 
 	;
 
