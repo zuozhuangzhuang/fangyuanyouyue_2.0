@@ -10,6 +10,7 @@ import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.IdGenerator;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.goods.dao.*;
 import com.fangyuanyouyue.goods.dto.BargainDto;
 import com.fangyuanyouyue.goods.dto.GoodsCommentDto;
@@ -62,8 +63,13 @@ public class BargainServiceImpl implements BargainService{
 
     @Override
     public Object addBargain(Integer userId, Integer goodsId, BigDecimal price, String reason,Integer addressId,String payPwd,Integer payType) throws ServiceException {
+        String verifyUserById = schedualUserService.verifyUserById(userId);
+        BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
+        if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+            throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+        }
+        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
         //验证手机号
-        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
         if(StringUtils.isEmpty(user.getPhone())){
             throw new ServiceException(ReCode.NO_PHONE.getValue(),ReCode.NO_PHONE.getMessage());
         }
@@ -344,7 +350,12 @@ public class BargainServiceImpl implements BargainService{
             List<GoodsBargain> bargains = goodsBargainMapper.selectByUserIdGoodsId(userId, goodsInfo.getId(), null);
             List<BargainDto> bargainDtos = BargainDto.toDtoList(bargains);
             for(BargainDto bargainDto:bargainDtos){
-                UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(bargainDto.getUserId())).getString("data")), UserInfo.class);
+                String verifyUserById = schedualUserService.verifyUserById(bargainDto.getUserId());
+                BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
+                if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+                }
+                UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
                 bargainDto.setNickName(seller.getNickName());
                 bargainDto.setHeadImgUrl(seller.getHeadImgUrl());
             }
@@ -422,8 +433,13 @@ public class BargainServiceImpl implements BargainService{
                     }
                 }
             }
+            String verifyUserById = schedualUserService.verifyUserById(goodsInfo.getUserId());
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+            }
+            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
             //获取卖家信息
-            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(goodsInfo.getUserId())).getString("data")), UserInfo.class);
             GoodsDto goodsDto = new GoodsDto(user,goodsInfo,goodsImgs,goodsCorrelations,goodsCommentDtos);
             goodsDto.setCommentCount(goodsCommentMapper.selectCount(goodsInfo.getId()));
             return goodsDto;

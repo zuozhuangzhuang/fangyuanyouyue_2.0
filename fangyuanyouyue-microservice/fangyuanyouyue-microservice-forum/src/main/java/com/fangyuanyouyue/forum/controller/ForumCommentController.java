@@ -3,6 +3,8 @@ package com.fangyuanyouyue.forum.controller;
 import java.io.IOException;
 import java.util.List;
 
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,10 +139,9 @@ public class ForumCommentController extends BaseController {
 				return toError("用户token不能为空！");
 			}
 			Integer userId = (Integer)schedualRedisService.get(param.getToken());
-			String verifyUser = schedualUserService.verifyUserById(userId);
-			JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-			if((Integer)jsonObject.get("code") != 0){
-				return toError(jsonObject.getString("report"));
+			BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+			if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+				return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
 			}
 
 			if (param.getForumId() == null) {
@@ -181,10 +182,9 @@ public class ForumCommentController extends BaseController {
 				return toError("用户token不能为空！");
 			}
 			Integer userId = (Integer)schedualRedisService.get(param.getToken());
-			String verifyUser = schedualUserService.verifyUserById(userId);
-			JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-			if((Integer)jsonObject.get("code") != 0){
-				return toError(jsonObject.getString("report"));
+			BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+			if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+				return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
 			}
 			if(param.getCommentId() == null){
 				return toError("评论id不能为空");
@@ -223,10 +223,9 @@ public class ForumCommentController extends BaseController {
 				return toError("用户token不能为空！");
 			}
 			Integer userId = (Integer)schedualRedisService.get(param.getToken());
-			String verifyUser = schedualUserService.verifyUserById(userId);
-			JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-			if((Integer)jsonObject.get("code") != 0){
-				return toError(jsonObject.getString("report"));
+			BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+			if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+				return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
 			}
 			if (param.getStart() == null || param.getLimit() == null) {
 				return toError("分页参数不能为空");
@@ -265,10 +264,9 @@ public class ForumCommentController extends BaseController {
 				return toError("用户token不能为空！");
 			}
 			Integer userId = (Integer)schedualRedisService.get(param.getToken());
-			String verifyUser = schedualUserService.verifyUserById(userId);
-			JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-			if((Integer)jsonObject.get("code") != 0){
-				return toError(jsonObject.getString("report"));
+			BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+			if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+				return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
 			}
 			if(param.getIds() == null || param.getIds().length <1){
 				return toError("id数组不能为空！");

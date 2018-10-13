@@ -121,43 +121,6 @@ public class RefundServiceImpl implements RefundService{
         }
     }
 
-//    @Override
-//    public Pager orderReturnList(AdminOrderParam param) throws ServiceException {
-//        Integer total = orderInfoMapper.countPage()
-//        List<OrderInfo> refundOrder = orderInfoMapper.getRefundOrder(userId, start * limit, limit, type);
-//        ArrayList<OrderDto> orderDtos = new ArrayList<>();
-//        for(OrderInfo orderInfo:refundOrder){//获取订单详情列表
-//            OrderDto orderDto = new OrderDto(orderInfo);
-//            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(orderInfo.getUserId())).getString("data")), UserInfo.class);
-//            UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(orderInfo.getSellerId())).getString("data")), UserInfo.class);
-//            List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderInfo.getId());
-//            ArrayList<OrderDetailDto> orderDetailDtos = OrderDetailDto.toDtoList(orderDetails, orderInfo.getStatus());
-//
-//            //卖家信息DTO
-//            List<SellerDto> sellerDtos = new ArrayList<>();
-//            SellerDto sellerDto = new SellerDto();
-//            sellerDto.setSellerHeadImgUrl(seller.getHeadImgUrl());
-//            sellerDto.setSellerId(seller.getId());
-//            sellerDto.setSellerName(seller.getNickName());
-//            sellerDtos.add(sellerDto);
-//            //订单支付表
-//            OrderPay orderPay = orderPayMapper.selectByOrderId(orderDto.getOrderId());
-//            OrderPayDto orderPayDto = new OrderPayDto(orderPay);
-//            orderDto.setOrderPayDto(orderPayDto);
-//            orderDto.setSellerDtos(sellerDtos);
-//            orderDto.setOrderDetailDtos(orderDetailDtos);
-//            orderDto.setNickName(user.getNickName());
-//            //退货状态
-//            OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderInfo.getId(), null);
-//            orderDto.setReturnStatus(orderRefund.getStatus());
-//            orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
-//            orderDtos.add(orderDto);
-//        }
-//        Pager pager = new Pager();
-//        pager.setTotal(total);
-//        pager.setDatas(orderDtos);
-//        return pager;
-//    }
 
     @Override
     public void handleReturns(Integer userId, Integer orderId, String reason, Integer status) throws ServiceException {
@@ -270,12 +233,6 @@ public class RefundServiceImpl implements RefundService{
                 //orderDto.setSeller("多卖家");
             }else{
                 orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
-
-                //获取卖家信息
-                //UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(info.getSellerId())).getString("data")), UserInfo.class);
-                //if(seller != null){
-                //    orderDto.setSeller(seller.getPhone()+"\n"+seller.getNickName());
-                //}
             }
             ArrayList<AdminOrderDetailDto> orderDetailDtos = AdminOrderDetailDto.toDtoList(orderDetails);
             String orderDetail = "";

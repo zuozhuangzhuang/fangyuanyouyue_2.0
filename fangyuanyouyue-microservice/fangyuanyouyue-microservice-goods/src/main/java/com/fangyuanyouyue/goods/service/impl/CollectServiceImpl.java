@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -181,8 +184,13 @@ public class CollectServiceImpl implements CollectService{
                 goodsCommentDto.setDescription(goodsInfo.getDescription());
             }
             //获取卖家信息
-            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(goodsInfo.getUserId())).getString("data")), UserInfo.class);
-            GoodsDto goodsDto = new GoodsDto(user,goodsInfo,goodsImgs,goodsCorrelations,goodsCommentDtos);
+            String verifyUserById = schedualUserService.verifyUserById(goodsInfo.getUserId());
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+            }
+            UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
+            GoodsDto goodsDto = new GoodsDto(seller,goodsInfo,goodsImgs,goodsCorrelations,goodsCommentDtos);
             goodsDto.setCommentCount(goodsCommentMapperl.selectCount(goodsInfo.getId()));
             return goodsDto;
         }

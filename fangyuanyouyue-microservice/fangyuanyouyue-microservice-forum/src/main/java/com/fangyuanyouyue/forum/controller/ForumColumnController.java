@@ -9,7 +9,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+ import com.fangyuanyouyue.base.enums.ReCode;
+ import com.fangyuanyouyue.base.util.ParseReturnValue;
+ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -148,10 +150,9 @@ public class ForumColumnController extends BaseController {
 				return toError("用户token不能为空！");
 			}
 			Integer userId = (Integer)schedualRedisService.get(param.getToken());
-			String verifyUser = schedualUserService.verifyUserById(userId);
-			JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-			if((Integer)jsonObject.get("code") != 0){
-				return toError(jsonObject.getString("report"));
+			BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+			if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+				return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
 			}
 			//验证实名认证
 			if(JSONObject.parseObject(schedualUserService.isAuth(userId)).getBoolean("data") == false){
@@ -392,10 +393,9 @@ public class ForumColumnController extends BaseController {
 				 return toError("用户token不能为空！");
 			 }
 			 Integer userId = (Integer)schedualRedisService.get(param.getToken());
-			 String verifyUser = schedualUserService.verifyUserById(userId);
-			 JSONObject jsonObject = JSONObject.parseObject(verifyUser);
-			 if((Integer)jsonObject.get("code") != 0){
-				 return toError(jsonObject.getString("report"));
+			 BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+			 if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+				 return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
 			 }
 
 			 if(param.getStart()==null || param.getStart() < 0 ||param.getLimit()==null || param.getLimit() < 1) {

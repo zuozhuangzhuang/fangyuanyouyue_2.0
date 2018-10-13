@@ -2,6 +2,9 @@ package com.fangyuanyouyue.forum.service.impl;
 
 import java.util.List;
 
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -99,7 +102,12 @@ public class AppraisalCommentServiceImpl implements AppraisalCommentService {
 			appraisalDetailMapper.updateByPrimaryKey(detail);
 			if(param.getUserIds() != null && param.getUserIds().length > 0){
 				//邀请我：用户“用户昵称”参与全民鉴定【全民鉴定名称】时邀请了您！点击此处前往查看吧
-				UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
+				String verifyUserById = schedualUserService.verifyUserById(userId);
+				BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
+				if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+					throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+				}
+				UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
 				AppraisalDetail appraisalDetail = appraisalDetailMapper.selectDetailByPrimaryKey(param.getAppraisalId());
 				for(Integer toUserId:param.getUserIds()){
 					schedualMessageService.easemobMessage(toUserId.toString(),

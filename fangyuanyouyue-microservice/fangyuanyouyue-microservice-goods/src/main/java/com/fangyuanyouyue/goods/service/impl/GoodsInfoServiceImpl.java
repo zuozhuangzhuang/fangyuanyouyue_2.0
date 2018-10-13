@@ -10,6 +10,7 @@ import com.fangyuanyouyue.base.enums.Score;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.goods.dao.*;
 import com.fangyuanyouyue.goods.dto.*;
 import com.fangyuanyouyue.goods.dto.adminDto.AdminGoodsCategoryDto;
@@ -134,8 +135,13 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
 
     @Override
     public void addGoods(Integer userId,String nickName,GoodsParam param) throws ServiceException {
+        String verifyUserById = schedualUserService.verifyUserById(userId);
+        BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
+        if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+            throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+        }
+        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
         //验证手机号
-        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
         if(StringUtils.isEmpty(user.getPhone())){
             throw new ServiceException(ReCode.NO_PHONE.getValue(),ReCode.NO_PHONE.getMessage());
         }
@@ -268,7 +274,12 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             }
 
             //获取卖家信息
-            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(goodsInfo.getUserId())).getString("data")), UserInfo.class);
+            String verifyUserById = schedualUserService.verifyUserById(goodsInfo.getUserId());
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+            }
+            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
             GoodsDto goodsDto = new GoodsDto(user,goodsInfo,goodsImgs,goodsCorrelations,goodsCommentDtos);
             if(userId != null){
                 Integer type;
@@ -284,7 +295,12 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 List<BargainDto> bargainDtos = BargainDto.toDtoList(bargains);
                 if(bargainDtos != null && bargainDtos.size()>0){
                     for(BargainDto bargainDto:bargainDtos){
-                        UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(bargainDto.getUserId())).getString("data")), UserInfo.class);
+                        String verifySellerById = schedualUserService.verifyUserById(bargainDto.getUserId());
+                        BaseResp parseSellerReturnValue = ParseReturnValue.getParseReturnValue(verifySellerById);
+                        if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                            throw new ServiceException(parseSellerReturnValue.getCode(),parseSellerReturnValue.getReport());
+                        }
+                        UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(parseSellerReturnValue.getData().toString()), UserInfo.class);
                         if(seller != null){
                             bargainDto.setNickName(seller.getNickName());
                             bargainDto.setHeadImgUrl(seller.getHeadImgUrl());
@@ -704,9 +720,14 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
 //            goodsDto.setMainUrl(mainImgUrl);
             
             goodsDto.setGoodsImgDtos(GoodsImgDto.toDtoList(goodsImgs));
-            
+
             //获取卖家信息
-            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(goodsInfo.getUserId())).getString("data")), UserInfo.class);
+            String verifyUserById = schedualUserService.verifyUserById(goodsInfo.getUserId());
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+            }
+            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
             goodsDto.setHeadImgUrl(user.getHeadImgUrl());
             goodsDto.setNickName(user.getNickName());
             String ret = schedualUserService.userIsAuth(goodsInfo.getUserId());
@@ -847,7 +868,12 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         goodsDto.setGoodsImgDtos(GoodsImgDto.toDtoList(goodsImgs));
 
         //获取卖家信息
-        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(goodsInfo.getUserId())).getString("data")), UserInfo.class);
+        String verifyUserById = schedualUserService.verifyUserById(goodsInfo.getUserId());
+        BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
+        if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+            throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+        }
+        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
         goodsDto.setHeadImgUrl(user.getHeadImgUrl());
         goodsDto.setNickName(user.getNickName());
         String ret = schedualUserService.userIsAuth(goodsInfo.getUserId());

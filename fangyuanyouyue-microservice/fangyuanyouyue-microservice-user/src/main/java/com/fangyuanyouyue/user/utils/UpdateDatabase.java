@@ -55,12 +55,12 @@ public class UpdateDatabase {
         return conn;
     }
     public static Connection getNewConnection(){
-        String url="jdbc:mysql://localhost:3306/new_xiaofangyuan?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=true";
-//        String url="jdbc:mysql://xiaofangyuan-prd.mysql.rds.aliyuncs.com:3306/xiaofangyuan?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=true";
-        String userName="root";
-//        String userName="wuzhimin";
-        String password="123456";
-//        String password="Wuzhimin123";
+//        String url="jdbc:mysql://localhost:3306/new_xiaofangyuan?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=true";
+        String url="jdbc:mysql://xiaofangyuan-prd.mysql.rds.aliyuncs.com:3306/xiaofangyuan?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=true";
+//        String userName="root";
+        String userName="wuzhimin";
+//        String password="123456";
+        String password="Wuzhimin123";
         try {
             Class.forName("com.mysql.jdbc.Driver");
         } catch (ClassNotFoundException e) {

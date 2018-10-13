@@ -2,7 +2,10 @@ package com.fangyuanyouyue.goods.service.impl;
 
 import java.util.*;
 
+import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.goods.dao.*;
 import com.fangyuanyouyue.goods.dto.GoodsCommentDto;
 import com.fangyuanyouyue.goods.model.*;
@@ -75,7 +78,6 @@ public class CartServiceImpl implements CartService {
                 //判断购物车是否已经有这个商品了
                 if (cartDetail == null) {
                     cartDetail = new CartDetail();
-                    JSONObject user = JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(goodsInfo.getUserId())).getString("data"));
                     cartDetail.setAddTime(DateStampUtils.getTimesteamp());
                     cartDetail.setCartId(cartInfo.getId());
                     cartDetail.setGoodsId(goodsId);
@@ -102,8 +104,12 @@ public class CartServiceImpl implements CartService {
                 for (CartDetail cartDetail : cartDetails) {
                     //是否官方认证
                     Map<String, Object> goodsUserInfoExtAndVip = goodsInfoMapper.getGoodsUserInfoExtAndVip(cartDetail.getGoodsId());
+                    BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(cartDetail.getUserId()));
+                    if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+                    }
                     //获取卖家信息
-                    UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(cartDetail.getUserId())).getString("data")), UserInfo.class);
+                    UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
                     CartShopDto cartShopDto = new CartShopDto();
                     cartShopDto.setUserId(cartDetail.getUserId());
                     cartShopDto.setHeadImgUrl(user.getHeadImgUrl());
@@ -213,8 +219,12 @@ public class CartServiceImpl implements CartService {
                 goodsCommentDto.setMainUrl(mainImgUrl);
             }
 
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(goodsInfo.getUserId()));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+            }
             //获取卖家信息
-            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(goodsInfo.getUserId())).getString("data")), UserInfo.class);
+            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
             GoodsDto goodsDto = new GoodsDto(user, goodsInfo, goodsImgs, goodsCorrelations, goodsCommentDtos);
             goodsDto.setCommentCount(goodsCommentMapperl.selectCount(goodsInfo.getId()));
             return goodsDto;

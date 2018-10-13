@@ -30,6 +30,9 @@ public class VersionServiceImpl implements VersionService {
     @Override
     public AppVersionDto getVersion() throws ServiceException {
         AppVersion version = appVersionMapper.getVersion();
+        if(version == null){
+            throw new ServiceException("未发现新版本！");
+        }
         return new AppVersionDto(version);
     }
 

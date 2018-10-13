@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -275,7 +276,12 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 			//存储图片
 			insertAppraisalImg(imgUrls, appraisalDetail);
 			//邀请我：用户“用户昵称”发起全民鉴定【全名鉴定名称】时邀请了您！点击此处前往查看吧
-			UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
+			String verifyUserById = schedualUserService.verifyUserById(userId);
+			BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
+			if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+				throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+			}
+			UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
 			if(userIds != null && userIds.length > 0){
 				for(Integer toUserId:userIds){
 					schedualMessageService.easemobMessage(toUserId.toString(),
@@ -327,7 +333,12 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 		insertAppraisalImg(imgUrls, appraisalDetail);
 		String[] userInds = argueOrder.getToUsers().split(",");
 		//邀请我：用户“用户昵称”发起全民鉴定【全名鉴定名称】时邀请了您！点击此处前往查看吧
-		UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(argueOrder.getUserId())).getString("data")), UserInfo.class);
+		String verifyUserById = schedualUserService.verifyUserById(argueOrder.getUserId());
+		BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
+		if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+			throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+		}
+		UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
 		if(userInds != null && userInds.length > 0){
 			for(String toUserId:userInds){
 				schedualMessageService.easemobMessage(toUserId,
@@ -349,7 +360,12 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 			throw new ServiceException("未找到全民鉴定状态！");
 		}
 		//邀请我：用户“用户昵称”发起全民鉴定【全名鉴定名称】时邀请了您！点击此处前往查看吧
-		UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
+		String verifyUserById = schedualUserService.verifyUserById(userId);
+		BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
+		if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+			throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+		}
+		UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
 		if(userIds != null && userIds.length > 0){
 			for(Integer toUserId:userIds){
 				schedualMessageService.easemobMessage(toUserId.toString(),

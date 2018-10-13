@@ -11,6 +11,7 @@ import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.base.util.IdGenerator;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.order.dao.*;
 import com.fangyuanyouyue.order.dto.*;
 import com.fangyuanyouyue.order.dto.adminDto.*;
@@ -60,7 +61,12 @@ public class OrderServiceImpl implements OrderService{
     public OrderDto saveOrderByCart(String token,String sellerString, Integer userId, Integer addressId) throws ServiceException {
         // FIXME: 2018/8/5 事务处理（如果提交多个商品，前面的商品状态正常，且正常生成订单后修改状态，再出现异常，前面的商品状态不会rollback）
         //验证手机号
-        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
+        String verifyUserById = schedualUserService.verifyUserById(userId);
+        BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
+        if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+            throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+        }
+        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
         if(StringUtils.isEmpty(user.getPhone())){
             throw new ServiceException(ReCode.NO_PHONE.getValue(),ReCode.NO_PHONE.getMessage());
         }
@@ -88,8 +94,13 @@ public class OrderServiceImpl implements OrderService{
                 String str = objects.getString(i);
                 AddOrderDto addOrderDto = JSONObject.toJavaObject(JSONObject.parseObject(str), AddOrderDto.class);
                 addOrderDtos.add(addOrderDto);
+                String verifySeller = schedualUserService.verifyUserById(addOrderDto.getSellerId());
+                BaseResp verifySellerResult = ParseReturnValue.getParseReturnValue(verifyUserById);
+                if(!verifySellerResult.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(verifySellerResult.getCode(),verifySellerResult.getReport());
+                }
                 //获取卖家信息
-                UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(addOrderDto.getSellerId())).getString("data")), UserInfo.class);
+                UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(verifySellerResult.getData().toString()), UserInfo.class);
                 SellerDto sellerDto = new SellerDto();
                 sellerDto.setSellerHeadImgUrl(seller.getHeadImgUrl());
                 sellerDto.setSellerId(seller.getId());
@@ -551,7 +562,12 @@ public class OrderServiceImpl implements OrderService{
             }
         }else if(type == 2){//我卖出的
             //卖家
-            UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
+            String verifyUserById = schedualUserService.verifyUserById(userId);
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
+            }
+            UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
             //根据卖家ID获取订单列表
             List<OrderInfo> orderBySellerId = orderInfoMapper.getOrderBySellerId(userId, start * limit, limit, status,search);
             orderDtos = OrderDto.toDtoList(orderBySellerId);
@@ -1097,15 +1113,8 @@ public class OrderServiceImpl implements OrderService{
             List<OrderDetail> orderDetails;
             if(info.getSellerId() == null){
                 orderDetails = orderDetailMapper.selectByMainOrderId(orderDto.getOrderId());
-                //orderDto.setSeller("多卖家");
             }else{
                 orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
-
-                //获取卖家信息
-                //UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(info.getSellerId())).getString("data")), UserInfo.class);
-                //if(seller != null){
-                //    orderDto.setSeller(seller.getPhone()+"\n"+seller.getNickName());
-                //}
             }
             ArrayList<AdminOrderDetailDto> orderDetailDtos = AdminOrderDetailDto.toDtoList(orderDetails);
             String orderDetail = "";
@@ -1115,28 +1124,6 @@ public class OrderServiceImpl implements OrderService{
             orderDto.setOrderDetail(orderDetail);
             orderDto.setTotalCount(orderDetailDtos.size());
             
-            //卖家信息DTO
-           // List sellerDtos = new ArrayList<>();
-            //sellerDtos.addAll(getSellerDtos(OrderDetailDto.toDtoList(orderDetails)));
-            //订单支付表
-            //OrderPay orderPay = orderPayMapper.selectByOrderId(orderDto.getOrderId());
-            //AdminOrderPayDto orderPayDto = new AdminOrderPayDto(orderPay);
-            //orderDto.setOrderPayDto(orderPayDto);
-            //orderDto.setSellerDtos(sellerDtos);
-            //orderDto.setOrderDetailDtos(orderDetailDtos);
-            //if(orderDto.getIsRefund() == 1){
-                //退货状态
-            //    OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderDto.getOrderId(), null,null);
-            //    if(orderRefund != null){
-            //        orderDto.setReturnStatus(orderRefund.getStatus());
-             //       orderDto.setSellerReturnStatus(orderRefund.getSellerReturnStatus());
-            //    }
-           // }
-            //是否评价
-            //OrderComment orderComment = orderCommentMapper.selectByOrder(orderDto.getOrderId());
-            //if(orderComment != null){
-            //    orderDto.setIsEvaluation(1);
-           // }
             orderDtos.add(orderDto);
         }
         Pager pager = new Pager();
@@ -1160,12 +1147,6 @@ public class OrderServiceImpl implements OrderService{
             //orderDto.setSeller("多卖家");
         }else{
             orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
-
-             //获取卖家信息
-            //UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(info.getSellerId())).getString("data")), UserInfo.class);
-            //if(seller != null){
-            //    orderDto.setSeller(seller.getPhone()+"\n"+seller.getNickName());
-            //}
         }
         ArrayList<AdminOrderDetailDto> orderDetailDtos = AdminOrderDetailDto.toDtoList(orderDetails);
         String orderDetail = "";
