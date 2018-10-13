@@ -86,13 +86,13 @@ public class CommentServiceImpl implements CommentService{
             //回复
             GoodsComment comment = goodsCommentMapper.selectByPrimaryKey(param.getCommentId());
             BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBehavior(param.getUserId(),comment.getUserId(),param.getCommentId(), Status.BUSINESS_TYPE_GOODS_COMMENT.getValue(),Status.BEHAVIOR_TYPE_COMMENT.getValue()));
-            if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+            if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                 throw new ServiceException(baseResp.getCode(),baseResp.getReport());
             }
         }else{
             //评论商品
             BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBehavior(param.getUserId(),goodsInfo.getUserId(),param.getGoodsId(),Status.BUSINESS_TYPE_GOODS.getValue(),Status.BEHAVIOR_TYPE_COMMENT.getValue()));
-            if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+            if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                 throw new ServiceException(baseResp.getCode(),baseResp.getReport());
             }
         }
@@ -121,7 +121,7 @@ public class CommentServiceImpl implements CommentService{
                     goodsComment.setLikesCount(goodsComment.getLikesCount()+1);
                     goodsCommentMapper.updateByPrimaryKey(goodsComment);
                     BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBehavior(userId,goodsComment.getUserId(),goodsComment.getId(),Status.BUSINESS_TYPE_GOODS_COMMENT.getValue(),Status.BEHAVIOR_TYPE_LIKES.getValue()));
-                    if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                     }
                 }

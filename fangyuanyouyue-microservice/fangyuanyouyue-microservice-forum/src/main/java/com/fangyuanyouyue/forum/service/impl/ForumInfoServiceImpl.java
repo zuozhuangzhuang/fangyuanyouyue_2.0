@@ -197,7 +197,7 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 				//增加信誉度
 				String result = schedualWalletService.updateCredit(userId, Credit.ADD_FORUM.getCredit(),Status.ADD.getValue());
 				BaseResp br = ParseReturnValue.getParseReturnValue(result);
-				if(!br.getCode().equals(ReCode.SUCCESS)){
+				if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
 					throw new ServiceException(br.getCode(),br.getReport());
 				}
 			}
@@ -213,7 +213,7 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 			//增加信誉度
 			String result = schedualWalletService.updateCredit(userId, Credit.ADD_VIDEO.getCredit(), Status.ADD.getValue());
 			BaseResp br = ParseReturnValue.getParseReturnValue(result);
-			if(!br.getCode().equals(ReCode.SUCCESS)){
+			if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
 				throw new ServiceException(br.getCode(),br.getReport());
 			}
 		}else{
@@ -222,7 +222,7 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 		//增加积分
 		String result = schedualWalletService.updateScore(userId, Score.ADD_FORUMINFO.getScore(),Status.ADD.getValue());
 		BaseResp br = ParseReturnValue.getParseReturnValue(result);
-		if(!br.getCode().equals(ReCode.SUCCESS)){
+		if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
 			throw new ServiceException(br.getCode(),br.getReport());
 		}
 		if(userIds != null && userIds.length > 0){

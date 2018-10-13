@@ -168,7 +168,7 @@ public class AppraisalServiceImpl implements AppraisalService{
                 goodsAppraisalDetail.setStatus(0);
                 price = new BigDecimal(0);
                 BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateAppraisalCount(userId, 1, Status.SUB.getValue()));
-                if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
             }
@@ -230,7 +230,7 @@ public class AppraisalServiceImpl implements AppraisalService{
         }else{
             if(appraisalOrderInfo.getAmount().compareTo(new BigDecimal(0)) == 0){
                 BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateAppraisalCount(userId, 1, Status.ADD.getValue()));
-                if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
             }
@@ -292,7 +292,7 @@ public class AppraisalServiceImpl implements AppraisalService{
             if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
                 String getWechatOrder = schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderInfo.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.appraisal_wechat_notify.getNotifUrl());
                 BaseResp result = ParseReturnValue.getParseReturnValue(getWechatOrder);
-                if(!result.getCode().equals(ReCode.SUCCESS)){
+                if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(result.getCode(),result.getReport());
                 }
                 WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
@@ -300,7 +300,7 @@ public class AppraisalServiceImpl implements AppraisalService{
             }else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
                 String getALiOrder = schedualWalletService.orderPayByALi(orderInfo.getOrderNo(), orderInfo.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.appraisal_alipay_notify.getNotifUrl());
                 BaseResp result = ParseReturnValue.getParseReturnValue(getALiOrder);
-                if(!result.getCode().equals(ReCode.SUCCESS)){
+                if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(result.getCode(),result.getReport());
                 }
                 payInfo.append(result.getData());
@@ -308,7 +308,7 @@ public class AppraisalServiceImpl implements AppraisalService{
                 //验证支付密码
                 String verifyPayPwd = schedualUserService.verifyPayPwd(userId, payPwd);
                 BaseResp result = ParseReturnValue.getParseReturnValue(verifyPayPwd);
-                if(!result.getCode().equals(ReCode.SUCCESS)){
+                if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(result.getCode(),result.getReport());
                 }
                 if (!(boolean)result.getData()) {
@@ -316,7 +316,7 @@ public class AppraisalServiceImpl implements AppraisalService{
                 } else {
                     //调用wallet-service修改余额功能
                     BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(userId, orderInfo.getAmount(), Status.SUB.getValue()));
-                    if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                     }
                 }
@@ -326,7 +326,7 @@ public class AppraisalServiceImpl implements AppraisalService{
             }else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
                 String getMiniOrder = schedualWalletService.orderPayByWechatMini(userId,orderInfo.getOrderNo(), orderInfo.getAmount(), NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.appraisal_wechat_notify.getNotifUrl());
                 BaseResp result = ParseReturnValue.getParseReturnValue(getMiniOrder);
-                if(!result.getCode().equals(ReCode.SUCCESS)){
+                if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(result.getCode(),result.getReport());
                 }
                 WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
@@ -393,7 +393,7 @@ public class AppraisalServiceImpl implements AppraisalService{
                 }
                 //余额账单
                 BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(appraisalOrderInfo.getUserId(), appraisalOrderInfo.getAmount(), payType, Status.EXPEND.getValue(), orderNo, title.toString(), null, appraisalOrderInfo.getUserId(), Status.PLATFORM_APPRAISAL.getValue(), thirdOrderNo));
-                if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
                 return true;
@@ -493,14 +493,14 @@ public class AppraisalServiceImpl implements AppraisalService{
             }
             //退还鉴定金
             BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(goodsAppraisalDetail.getUserId(),goodsAppraisalDetail.getPrice(),Status.ADD.getValue()));
-            if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+            if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                 throw new ServiceException(baseResp.getCode(),baseResp.getReport());
             }
             //订单号
             final IdGenerator idg = IdGenerator.INSTANCE;
             String orderNo = idg.nextId();
             baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(goodsAppraisalDetail.getUserId(),goodsAppraisalDetail.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,title.toString(),null,goodsAppraisalDetail.getUserId(),Status.APPRAISAL.getValue(),orderNo));
-            if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+            if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                 throw new ServiceException(baseResp.getCode(),baseResp.getReport());
             }
 

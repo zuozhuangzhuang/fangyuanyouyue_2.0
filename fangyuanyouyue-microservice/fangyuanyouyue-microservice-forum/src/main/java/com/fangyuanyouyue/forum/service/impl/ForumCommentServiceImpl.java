@@ -103,7 +103,7 @@ public class ForumCommentServiceImpl implements ForumCommentService {
 		}
 		//新增用户行为
 		BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBehavior(userId,forumInfo.getUserId(),forumId, Status.BUSINESS_TYPE_FORUM.getValue(),Status.BEHAVIOR_TYPE_COMMENT.getValue()));
-		if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+		if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
 			throw new ServiceException(baseResp.getCode(),baseResp.getReport());
 		}
 

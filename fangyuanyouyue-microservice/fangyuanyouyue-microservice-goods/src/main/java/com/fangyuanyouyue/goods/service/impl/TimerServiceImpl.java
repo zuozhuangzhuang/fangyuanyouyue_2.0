@@ -176,7 +176,7 @@ public class TimerServiceImpl implements TimerService{
                     //退回余额
                     //调用wallet-service修改余额功能
                     BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),Status.ADD.getValue()));
-                    if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                     }
                     //议价：您对商品【商品名称】的议价已被卖家拒绝，点击此处查看详情

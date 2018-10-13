@@ -53,7 +53,7 @@ public class AppraisalLikesServiceImpl implements AppraisalLikesService {
 				//增加用户行为
 				AppraisalDetail detail = appraisalDetailMapper.selectByPrimaryKey(appraisalId);
 				BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBehavior(userId,detail.getUserId(),appraisalId, Status.BUSINESS_TYPE_APPRAISAL.getValue(),Status.BEHAVIOR_TYPE_LIKES.getValue()));
-				if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+				if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
 					throw new ServiceException(baseResp.getCode(),baseResp.getReport());
 				}
 			}

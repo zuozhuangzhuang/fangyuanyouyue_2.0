@@ -72,7 +72,7 @@ public class TimerServiceImpl implements TimerService{
                     boolean isAuction = false;
                     for(OrderDetail orderDetail:orderDetails){
                         BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualGoodsService.updateGoodsStatus(orderDetail.getGoodsId(), 1));//状态  1出售中 2已售出 3已下架（已结束） 5删除
-                        if(!parseReturnValue.getCode().equals(ReCode.SUCCESS)){
+                        if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
                             throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
                         }
                         GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(
@@ -144,20 +144,20 @@ public class TimerServiceImpl implements TimerService{
                 orderInfoMapper.updateByPrimaryKeySelective(orderInfo);
                 //卖家增加余额
                 BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(orderInfo.getSellerId(),orderPay.getPayAmount(),Status.ADD.getValue()));
-                if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
                 //卖家成交增加积分
                 if(orderPay.getPayAmount().compareTo(new BigDecimal(2000)) <= 0){//2000以内+20分
                     String result = schedualWalletService.updateScore(orderInfo.getSellerId(),20L,1);
                     BaseResp br = ParseReturnValue.getParseReturnValue(result);
-                    if(!br.getCode().equals(ReCode.SUCCESS)){
+                    if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(br.getCode(),br.getReport());
                     }
                 }else{//2000以上+50分
                     String result = schedualWalletService.updateScore(orderInfo.getSellerId(),50L,1);
                     BaseResp br = ParseReturnValue.getParseReturnValue(result);
-                    if(!br.getCode().equals(ReCode.SUCCESS)){
+                    if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(br.getCode(),br.getReport());
                     }
                 }

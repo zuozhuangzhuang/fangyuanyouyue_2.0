@@ -149,7 +149,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 				if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
 					String getWechatOrder = schedualWalletService.orderPayByWechat(columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.column_wechat_notify.getNotifUrl());
 					BaseResp result = ParseReturnValue.getParseReturnValue(getWechatOrder);
-					if(!result.getCode().equals(ReCode.SUCCESS)){
+					if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
 						throw new ServiceException(result.getCode(),result.getReport());
 					}
 					WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
@@ -157,14 +157,14 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 				}else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
 					String getALiOrder = schedualWalletService.orderPayByALi(columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.column_alipay_notify.getNotifUrl());
 					BaseResp result = ParseReturnValue.getParseReturnValue(getALiOrder);
-					if(!result.getCode().equals(ReCode.SUCCESS)){
+					if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
 						throw new ServiceException(result.getCode(),result.getReport());
 					}
 					payInfo.append(result.getData());
 				}else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()) {
 					String verifyPayPwd = schedualUserService.verifyPayPwd(userId, payPwd);
 					BaseResp result = ParseReturnValue.getParseReturnValue(verifyPayPwd);
-					if(!result.getCode().equals(ReCode.SUCCESS)){
+					if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
 						throw new ServiceException(result.getCode(),result.getReport());
 					}
 					if (!(boolean)result.getData()) {
@@ -172,7 +172,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 					}else {
 						//调用wallet-service修改余额功能,成为栏主200元/人
 						BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(userId, new BigDecimal(200), Status.SUB.getValue()));
-						if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+						if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
 							throw new ServiceException(baseResp.getCode(),baseResp.getReport());
 						}
 					}
@@ -182,7 +182,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 				}else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
 					String getMiniOrder = schedualWalletService.orderPayByWechatMini(userId,columnOrder.getOrderNo(), columnOrder.getAmount(), NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.column_wechat_notify.getNotifUrl());
 					BaseResp result = ParseReturnValue.getParseReturnValue(getMiniOrder);
-					if(!result.getCode().equals(ReCode.SUCCESS)){
+					if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
 						throw new ServiceException(result.getCode(),result.getReport());
 					}
 					WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
@@ -226,7 +226,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 					"您的【"+columnOrder.getName()+"】专栏申请已提交，将于3个工作日内完成审核，请注意消息通知",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
 			//余额账单
             BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(columnOrder.getUserId(),columnOrder.getAmount(),payType,Status.EXPEND.getValue(),orderNo,"申请专栏【"+columnOrder.getName()+"】",null,columnOrder.getUserId(),Status.FORUM_COLUMN.getValue(),thirdOrderNo));
-            if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+            if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                 throw new ServiceException(baseResp.getCode(),baseResp.getReport());
             }
 			return true;
@@ -272,14 +272,14 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 							"很抱歉您的【"+forumColumnApply.getColumnName()+"】专栏审核未通过，可联系客服咨询详情",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_COLUMN_REFUSE.getMessage(),"");
 					//余额账单
 					BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(forumColumnApply.getUserId(),new BigDecimal(200),Status.ADD.getValue()));
-					if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+					if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
 						throw new ServiceException(baseResp.getCode(),baseResp.getReport());
 					}
 					//订单号
 					final IdGenerator idg = IdGenerator.INSTANCE;
 					String orderNo = idg.nextId();
 					baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(forumColumnApply.getUserId(),new BigDecimal(200), Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"【"+forumColumnApply.getColumnName()+"】审核未通过",null,forumColumnApply.getUserId(),Status.FORUM_COLUMN.getValue(),orderNo));
-					if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+					if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
 						throw new ServiceException(baseResp.getCode(),baseResp.getReport());
 					}
 

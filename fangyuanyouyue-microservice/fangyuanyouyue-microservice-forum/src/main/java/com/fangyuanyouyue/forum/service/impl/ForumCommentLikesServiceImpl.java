@@ -51,7 +51,7 @@ public class ForumCommentLikesServiceImpl implements ForumCommentLikesService {
 				forumCommentLikesMapper.insert(forumCommentLikes);
 				ForumComment forumComment = forumCommentMapper.selectByPrimaryKey(commentId);
 				BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBehavior(userId,forumComment.getUserId(),commentId, Status.BUSINESS_TYPE_APPRAILSA_COMMENT.getValue(), Status.BEHAVIOR_TYPE_LIKES.getValue()));
-				if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+				if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
 					throw new ServiceException(baseResp.getCode(),baseResp.getReport());
 				}
 			}

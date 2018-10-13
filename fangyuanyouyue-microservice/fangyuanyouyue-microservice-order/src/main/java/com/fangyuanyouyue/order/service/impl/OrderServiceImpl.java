@@ -1,15 +1,5 @@
 package com.fangyuanyouyue.order.service.impl;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
@@ -17,11 +7,7 @@ import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
-import com.fangyuanyouyue.base.enums.Credit;
-import com.fangyuanyouyue.base.enums.NotifyUrl;
-import com.fangyuanyouyue.base.enums.ReCode;
-import com.fangyuanyouyue.base.enums.Score;
-import com.fangyuanyouyue.base.enums.Status;
+import com.fangyuanyouyue.base.enums.*;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.DateUtil;
@@ -31,45 +17,18 @@ import com.fangyuanyouyue.order.dao.*;
 import com.fangyuanyouyue.order.dto.*;
 import com.fangyuanyouyue.order.dto.adminDto.*;
 import com.fangyuanyouyue.order.model.*;
-import com.fangyuanyouyue.order.dao.CompanyMapper;
-import com.fangyuanyouyue.order.dao.OrderCommentMapper;
-import com.fangyuanyouyue.order.dao.OrderDetailMapper;
-import com.fangyuanyouyue.order.dao.OrderInfoMapper;
-import com.fangyuanyouyue.order.dao.OrderPayMapper;
-import com.fangyuanyouyue.order.dao.OrderRefundMapper;
-import com.fangyuanyouyue.order.dao.UserBehaviorMapper;
-import com.fangyuanyouyue.order.dao.UserCouponMapper;
-import com.fangyuanyouyue.order.dto.AddOrderDetailDto;
-import com.fangyuanyouyue.order.dto.AddOrderDto;
-import com.fangyuanyouyue.order.dto.CompanyDto;
-import com.fangyuanyouyue.order.dto.OrderDetailDto;
-import com.fangyuanyouyue.order.dto.OrderDto;
-import com.fangyuanyouyue.order.dto.OrderPayDto;
-import com.fangyuanyouyue.order.dto.SellerDto;
-import com.fangyuanyouyue.order.dto.UserCouponDto;
-import com.fangyuanyouyue.order.dto.adminDto.AdminCompanyDto;
-import com.fangyuanyouyue.order.dto.adminDto.AdminOrderDetailDto;
-import com.fangyuanyouyue.order.dto.adminDto.AdminOrderDto;
-import com.fangyuanyouyue.order.dto.adminDto.AdminOrderPayDto;
-import com.fangyuanyouyue.order.dto.adminDto.AdminOrderProcessDto;
-import com.fangyuanyouyue.order.model.Company;
-import com.fangyuanyouyue.order.model.GoodsInfo;
-import com.fangyuanyouyue.order.model.OrderComment;
-import com.fangyuanyouyue.order.model.OrderDetail;
-import com.fangyuanyouyue.order.model.OrderInfo;
-import com.fangyuanyouyue.order.model.OrderPay;
-import com.fangyuanyouyue.order.model.OrderRefund;
-import com.fangyuanyouyue.order.model.UserAddressInfo;
-import com.fangyuanyouyue.order.model.UserBehavior;
-import com.fangyuanyouyue.order.model.UserCoupon;
-import com.fangyuanyouyue.order.model.UserInfo;
 import com.fangyuanyouyue.order.param.AdminOrderParam;
-import com.fangyuanyouyue.order.service.OrderService;
-import com.fangyuanyouyue.order.service.SchedualGoodsService;
-import com.fangyuanyouyue.order.service.SchedualMessageService;
-import com.fangyuanyouyue.order.service.SchedualUserService;
-import com.fangyuanyouyue.order.service.SchedualWalletService;
+import com.fangyuanyouyue.order.service.*;
 import com.snowalker.lock.redisson.RedissonLock;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Service(value = "orderService")
 @Transactional(rollbackFor=Exception.class)
@@ -103,7 +62,6 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public OrderDto saveOrderByCart(String token,String sellerString, Integer userId, Integer addressId) throws ServiceException {
-        // FIXME: 2018/8/5 事务处理（如果提交多个商品，前面的商品状态正常，且正常生成订单后修改状态，再出现异常，前面的商品状态不会rollback）
         //验证手机号
         String verifyUserById = schedualUserService.verifyUserById(userId);
         BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
@@ -223,7 +181,7 @@ public class OrderServiceImpl implements OrderService{
             }
             for(AddOrderDetailDto addOrderDetailDto:addOrderDetailDtos) {
                 BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualGoodsService.goodsInfo(addOrderDetailDto.getGoodsId()));
-                if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
                 GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), GoodsInfo.class);
@@ -296,7 +254,7 @@ public class OrderServiceImpl implements OrderService{
             //订单详情，出现在这里的商品都是正常的商品，不再做判断
             for(AddOrderDetailDto addOrderDetailDto:addOrderDetailDtos){
                 BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualGoodsService.goodsInfo(addOrderDetailDto.getGoodsId()));
-                if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
                 GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), GoodsInfo.class);
@@ -308,7 +266,7 @@ public class OrderServiceImpl implements OrderService{
             StringBuffer goodsName = new StringBuffer();
             for(AddOrderDetailDto addOrderDetailDto:addOrderDetailDtos){
                 BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualGoodsService.goodsInfo(addOrderDetailDto.getGoodsId()));
-                if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
                 GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), GoodsInfo.class);
@@ -345,7 +303,7 @@ public class OrderServiceImpl implements OrderService{
 	                        throw new ServiceException("【"+goods.getName()+"】所属店铺未认证，不可使用优惠券！");
 	                    }
                         baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.getPriceByCoupon(orderInfo.getUserId(),price,couponId));
-                        if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                             throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                         }else{
 	                        orderDetail.setCouponId(couponId);
@@ -365,7 +323,7 @@ public class OrderServiceImpl implements OrderService{
 	                orderDetailMapper.insert(orderDetail);
 	                //修改商品的状态为已售出
                     BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualGoodsService.updateGoodsStatus(addOrderDetailDto.getGoodsId(), 2));//状态  1出售中 2已售出 3已下架（已结束） 5删除
-                    if(!parseReturnValue.getCode().equals(ReCode.SUCCESS)){
+                    if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
                     }
 	                amount = amount.add(orderDetail.getAmount());//原价
@@ -407,7 +365,7 @@ public class OrderServiceImpl implements OrderService{
         Integer[] goodsIds = new Integer[goodsList.size()];
         goodsList.toArray(goodsIds);
         BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualGoodsService.cartRemove(mainOrder.getUserId(),goodsIds));
-        if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
             throw new ServiceException(baseResp.getCode(),baseResp.getReport());
         }
         //总订单
@@ -445,12 +403,12 @@ public class OrderServiceImpl implements OrderService{
             boolean isAuction = false;
             for(OrderDetail orderDetail:orderDetails){
                 BaseResp  baseResp = ParseReturnValue.getParseReturnValue(schedualGoodsService.updateGoodsStatus(orderDetail.getGoodsId(),1));
-                if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
                 baseResp = ParseReturnValue.getParseReturnValue(schedualGoodsService.goodsInfo(orderDetail.getGoodsId()));
                 ;//状态 1出售中 2已售出 3已下架（已结束） 5删除
-                if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
                 GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), GoodsInfo.class);
@@ -475,7 +433,7 @@ public class OrderServiceImpl implements OrderService{
                     boolean auction = false;//是否是抢购
                     for(OrderDetail detail:details){
                         BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualGoodsService.goodsInfo(detail.getGoodsId()));
-                        if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                             throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                         }
                         GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), GoodsInfo.class);
@@ -774,7 +732,7 @@ public class OrderServiceImpl implements OrderService{
 	                throw new ServiceException("【"+goods.getName()+"】所属店铺未认证，不可使用优惠券！");
 	            }
                 BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.getPriceByCoupon(userId,amount,couponId));
-                if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }else{
 	                amount = (BigDecimal)baseResp.getData();
@@ -825,7 +783,7 @@ public class OrderServiceImpl implements OrderService{
 	        orderDetailMapper.insert(orderDetail);
 	        //修改商品的状态为已售出
             BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualGoodsService.updateGoodsStatus(goodsId, 2));//状态  1出售中 2已售出 3已下架（已结束） 5删除
-            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS)){
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
                 throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
 
@@ -885,7 +843,7 @@ public class OrderServiceImpl implements OrderService{
                 if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
                     String getWechatOrder = schedualWalletService.orderPayByWechat(orderInfo.getOrderNo(), orderPay.getPayAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.order_wechat_notify.getNotifUrl());
                     BaseResp result = ParseReturnValue.getParseReturnValue(getWechatOrder);
-                    if(!result.getCode().equals(ReCode.SUCCESS)){
+                    if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(result.getCode(),result.getReport());
                     }
                     WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
@@ -893,21 +851,21 @@ public class OrderServiceImpl implements OrderService{
                 }else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
                     String getALiOrder = schedualWalletService.orderPayByALi(orderInfo.getOrderNo(), orderPay.getPayAmount(),NotifyUrl.notify.getNotifUrl()+NotifyUrl.order_alipay_notify.getNotifUrl());
                     BaseResp result = ParseReturnValue.getParseReturnValue(getALiOrder);
-                    if(!result.getCode().equals(ReCode.SUCCESS)){
+                    if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(result.getCode(),result.getReport());
                     }
                     payInfo.append(result.getData());
                 }else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()){
                     String verifyPayPwd = schedualUserService.verifyPayPwd(userId, payPwd);
                     BaseResp result = ParseReturnValue.getParseReturnValue(verifyPayPwd);
-                    if(!result.getCode().equals(ReCode.SUCCESS)){
+                    if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(result.getCode(),result.getReport());
                     }
                     if (!(boolean)result.getData()) {
                         throw new ServiceException(ReCode.PAYMENT_PASSWORD_ERROR.getValue(),ReCode.PAYMENT_PASSWORD_ERROR.getMessage());
                     }else{
                         BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(userId, orderPay.getPayAmount(), Status.SUB.getValue()));
-                        if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                             throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                         }
                         updateOrder(orderInfo.getOrderNo(),null,payType);
@@ -916,7 +874,7 @@ public class OrderServiceImpl implements OrderService{
                 }else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
                     String getMiniOrder = schedualWalletService.orderPayByWechatMini(userId,orderInfo.getOrderNo(), orderPay.getPayAmount(), NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.order_wechat_notify.getNotifUrl());
                     BaseResp result = ParseReturnValue.getParseReturnValue(getMiniOrder);
-                    if(!result.getCode().equals(ReCode.SUCCESS)){
+                    if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(result.getCode(),result.getReport());
                     }
                     WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
@@ -1021,7 +979,7 @@ public class OrderServiceImpl implements OrderService{
                 orderInfoMapper.updateByPrimaryKey(orderInfo);
                 //卖家增加余额
                 BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(orderInfo.getSellerId(),orderPay.getPayAmount(),Status.ADD.getValue()));
-                if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
                 //商品名称
@@ -1030,7 +988,7 @@ public class OrderServiceImpl implements OrderService{
                 for(OrderDetail detail:orderDetails){
                     //获取商品、抢购信息
                     baseResp = ParseReturnValue.getParseReturnValue(schedualGoodsService.goodsInfo(detail.getGoodsId()));
-                    if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                     }
                     GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), GoodsInfo.class);
@@ -1038,27 +996,27 @@ public class OrderServiceImpl implements OrderService{
                 }
                 //卖家余额账单
                 baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(orderInfo.getSellerId(),orderPay.getPayAmount(),Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),orderInfo.getOrderNo()));
-                if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
                 //卖家增加信誉度
                 if(orderPay.getPayAmount().compareTo(new BigDecimal(2000)) <= 0){
                     String result = schedualWalletService.updateCredit(orderInfo.getSellerId(),Credit.NORMAL_ORDER.getCredit(),Status.ADD.getValue());
                     BaseResp br = ParseReturnValue.getParseReturnValue(result);
-                    if(!br.getCode().equals(ReCode.SUCCESS)){
+                    if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(br.getCode(),br.getReport());
                     }
                 }else {
                     String result = schedualWalletService.updateCredit(orderInfo.getSellerId(), Credit.BIG_ORDER.getCredit(), Status.ADD.getValue());
                     BaseResp br = ParseReturnValue.getParseReturnValue(result);
-                    if(!br.getCode().equals(ReCode.SUCCESS)){
+                    if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(br.getCode(),br.getReport());
                     }
                 }
                 //卖家增加积分
                 String result = schedualWalletService.updateScore(orderInfo.getSellerId(), Score.getScore(orderPay.getPayAmount()), Status.ADD.getValue());
                 BaseResp br = ParseReturnValue.getParseReturnValue(result);
-                if(!br.getCode().equals(ReCode.SUCCESS)){
+                if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(br.getCode(),br.getReport());
                 }
             }
@@ -1122,7 +1080,7 @@ public class OrderServiceImpl implements OrderService{
                         orderComment.setStatus(Status.EVALUATION_BAD.getValue());
                         String result = schedualWalletService.updateCredit(orderInfo.getSellerId(), Credit.EVALUATION_BAD.getCredit(), Status.SUB.getValue());
                         BaseResp br = ParseReturnValue.getParseReturnValue(result);
-                        if(!br.getCode().equals(ReCode.SUCCESS)){
+                        if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
                             throw new ServiceException(br.getCode(),br.getReport());
                         }
                     }else if(3 < start && start <= 6){
@@ -1130,7 +1088,7 @@ public class OrderServiceImpl implements OrderService{
                         orderComment.setStatus(Status.EVALUATION_NORMAL.getValue());
                         String result = schedualWalletService.updateCredit(orderInfo.getSellerId(),Credit.EVALUATION_NORMAL.getCredit(),Status.ADD.getValue());
                         BaseResp br = ParseReturnValue.getParseReturnValue(result);
-                        if(!br.getCode().equals(ReCode.SUCCESS)){
+                        if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
                             throw new ServiceException(br.getCode(),br.getReport());
                         }
                     }else if(6 <= start && start <= 10){
@@ -1138,7 +1096,7 @@ public class OrderServiceImpl implements OrderService{
                         orderComment.setStatus(Status.EVALUATION_GOOD.getValue());
                         String result = schedualWalletService.updateCredit(orderInfo.getSellerId(),Credit.EVALUATION_GOOD.getCredit(),Status.ADD.getValue());
                         BaseResp br = ParseReturnValue.getParseReturnValue(result);
-                        if(!br.getCode().equals(ReCode.SUCCESS)){
+                        if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
                             throw new ServiceException(br.getCode(),br.getReport());
                         }
                     }else{
@@ -1209,7 +1167,7 @@ public class OrderServiceImpl implements OrderService{
                         boolean isAuction = false;
                         for(OrderDetail detail:orderDetails){
                             BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualGoodsService.goodsInfo(detail.getGoodsId()));
-                            if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                            if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                                 throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                             }
                             GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), GoodsInfo.class);
@@ -1222,7 +1180,7 @@ public class OrderServiceImpl implements OrderService{
                                 "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER_SELLER.getMessage(),childOrder.getId().toString());
                         //买家新增余额账单
                         BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(childOrder.getUserId(),pay.getPayAmount(),payType,Status.EXPEND.getValue(),childOrder.getOrderNo(),goodsName.toString(),childOrder.getSellerId(),childOrder.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo));
-                        if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                             throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                         }
                     }
@@ -1241,7 +1199,7 @@ public class OrderServiceImpl implements OrderService{
                             "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER_SELLER.getMessage(),orderInfo.getId().toString());
                     //买家新增余额账单
                     BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(orderInfo.getUserId(),orderPay.getPayAmount(),payType,Status.EXPEND.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo));
-                    if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                     }
                 }

@@ -110,7 +110,7 @@ public class RefundServiceImpl implements RefundService{
                 //扣除信誉度
                 String result = schedualWalletService.updateCredit(orderInfo.getSellerId(), Credit.RETURN_ORDER.getCredit(), Status.SUB.getValue());
                 BaseResp br = ParseReturnValue.getParseReturnValue(result);
-                if(!br.getCode().equals(ReCode.SUCCESS)){
+                if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(br.getCode(),br.getReport());
                 }
                 //环信给卖家发送信息 退货：您的商品【商品名称】、【xxx】、【xx】买家已申请退货，点击此处处理一下吧
@@ -186,7 +186,7 @@ public class RefundServiceImpl implements RefundService{
                 //同意
                 //修改余额
                 BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(orderInfo.getUserId(),orderPay.getPayAmount(),Status.ADD.getValue()));
-                if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
                 orderInfo.setStatus(Status.ORDER_GOODS_COMPLETE.getValue());
@@ -196,7 +196,7 @@ public class RefundServiceImpl implements RefundService{
 
                 baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(orderInfo.getUserId(),orderPay.getPayAmount(),Status.PAY_TYPE_BALANCE.getValue(),
                         Status.REFUND.getValue(),orderInfo.getOrderNo(),goodsName.toString()+"退款成功",orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),orderInfo.getOrderNo()));
-                if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
                 //给买家发信息

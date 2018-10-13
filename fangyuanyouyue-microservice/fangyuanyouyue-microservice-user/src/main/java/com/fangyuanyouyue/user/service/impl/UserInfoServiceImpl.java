@@ -729,7 +729,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                     userFans.setUserId(userId);
                     userFansMapper.insert(userFans);
                     BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBehavior(userId,toUserId,toUserId, Status.BUSINESS_TYPE_USER.getValue(),Status.BEHAVIOR_TYPE_FANS.getValue()));
-                    if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                     }
                 }else if(type == 1){//取消关注

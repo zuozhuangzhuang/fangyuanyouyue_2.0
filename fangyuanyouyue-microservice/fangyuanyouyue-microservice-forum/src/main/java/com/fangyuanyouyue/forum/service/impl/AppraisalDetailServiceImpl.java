@@ -238,7 +238,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 			if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
 				String getWechatOrder = schedualWalletService.orderPayByWechat(argueOrder.getOrderNo(), argueOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.argue_wechat_notify.getNotifUrl());
 				BaseResp result = ParseReturnValue.getParseReturnValue(getWechatOrder);
-				if(!result.getCode().equals(ReCode.SUCCESS)){
+				if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
 					throw new ServiceException(result.getCode(),result.getReport());
 				}
 				WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
@@ -246,21 +246,21 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 			}else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
 				String getALiOrder = schedualWalletService.orderPayByALi(argueOrder.getOrderNo(), argueOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.argue_alipay_notify.getNotifUrl());
 				BaseResp result = ParseReturnValue.getParseReturnValue(getALiOrder);
-				if(!result.getCode().equals(ReCode.SUCCESS)){
+				if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
 					throw new ServiceException(result.getCode(),result.getReport());
 				}
 				payInfo.append(result.getData());
 			}else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()){
 				String verifyPayPwd = schedualUserService.verifyPayPwd(userId, payPwd);
 				BaseResp result = ParseReturnValue.getParseReturnValue(verifyPayPwd);
-				if(!result.getCode().equals(ReCode.SUCCESS)){
+				if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
 					throw new ServiceException(result.getCode(),result.getReport());
 				}
 				if (!(boolean)result.getData()) {
 					throw new ServiceException(ReCode.PAYMENT_PASSWORD_ERROR.getValue(),ReCode.PAYMENT_PASSWORD_ERROR.getMessage());
 				}else{
 					BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(userId, bonus, Status.SUB.getValue()));
-					if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+					if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
 						throw new ServiceException(baseResp.getCode(),baseResp.getReport());
 					}
 				}
@@ -270,7 +270,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 			}else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
 				String getMiniOrder = schedualWalletService.orderPayByWechatMini(userId,argueOrder.getOrderNo(), argueOrder.getAmount(), NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.argue_wechat_notify.getNotifUrl());
 				BaseResp result = ParseReturnValue.getParseReturnValue(getMiniOrder);
-				if(!result.getCode().equals(ReCode.SUCCESS)){
+				if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
 					throw new ServiceException(result.getCode(),result.getReport());
 				}
 				WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
@@ -370,7 +370,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 		}
 		//余额账单
         BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(argueOrder.getUserId(),argueOrder.getAmount(),payType,Status.EXPEND.getValue(),orderNo,"【"+argueOrder.getTitle()+"】",argueOrder.getUserId(),null, Status.APPRAISAL.getValue(),thirdOrderNo));
-        if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
             throw new ServiceException(baseResp.getCode(),baseResp.getReport());
         }
 		argueOrder.setStatus(Status.ORDER_COMPLETE.getValue());
@@ -473,7 +473,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
             }
 			if(detail.getBonus() != null){
 				BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(detail.getUserId(),detail.getBonus(),Status.ADD.getValue()));
-				if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+				if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
 					throw new ServiceException(baseResp.getCode(),baseResp.getReport());
 				}
 				//余额账单
@@ -481,7 +481,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 				final IdGenerator idg = IdGenerator.INSTANCE;
 				String orderNo = idg.nextId();
 				baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(detail.getUserId(),detail.getBonus(), Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,"【"+detail.getTitle()+"】官方删除",detail.getUserId(),null,Status.APPRAISAL.getValue(),orderNo));
-				if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+				if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
 					throw new ServiceException(baseResp.getCode(),baseResp.getReport());
 				}
 			}

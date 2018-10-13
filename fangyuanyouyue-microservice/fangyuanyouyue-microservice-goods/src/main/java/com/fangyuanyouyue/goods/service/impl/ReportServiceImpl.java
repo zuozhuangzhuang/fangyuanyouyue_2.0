@@ -82,13 +82,13 @@ public class ReportServiceImpl implements ReportService{
             //举报者+20
             String reportResult = schedualWalletService.updateCredit(report.getUserId(), Credit.REPORT_VERIFY.getCredit(),Status.ADD.getValue());
             BaseResp reportBr = ParseReturnValue.getParseReturnValue(reportResult);
-            if(!reportBr.getCode().equals(ReCode.SUCCESS)){
+            if(!reportBr.getCode().equals(ReCode.SUCCESS.getValue())){
                 throw new ServiceException(reportBr.getCode(),reportBr.getReport());
             }
             //被举报-40
             String goodsResult = schedualWalletService.updateCredit(goodsInfo.getUserId(), Credit.REPORT_VERIFYED.getCredit(),Status.SUB.getValue());
             BaseResp goodsBr = ParseReturnValue.getParseReturnValue(goodsResult);
-            if(!goodsBr.getCode().equals(ReCode.SUCCESS)){
+            if(!goodsBr.getCode().equals(ReCode.SUCCESS.getValue())){
                 throw new ServiceException(goodsBr.getCode(),goodsBr.getReport());
             }
             //很抱歉，您的商品/抢购【名称】被多用户举报，并经官方核实。已被删除，删除理由：￥@……#%￥&#%￥……@。点击查看详情
