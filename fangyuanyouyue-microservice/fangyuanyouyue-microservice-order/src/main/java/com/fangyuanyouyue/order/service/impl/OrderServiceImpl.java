@@ -15,6 +15,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.codingapi.tx.annotation.TxTransaction;
+import com.esotericsoftware.minlog.Log;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
@@ -104,6 +105,8 @@ public class OrderServiceImpl implements OrderService{
     private UserBehaviorMapper userBehaviorMapper;
     @Autowired
     private UserCouponMapper userCouponMapper;
+    @Autowired
+    private RedissonLock redissonLock;
 
     @Override
     public OrderDto saveOrderByCart(String token,String sellerString, Integer userId, Integer addressId) throws ServiceException {
@@ -317,7 +320,10 @@ public class OrderServiceImpl implements OrderService{
                 GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), GoodsInfo.class);
 
             	//加入分布式锁，锁住商品id，10秒后释放
-            	//redissonLock.lock("GoodsOrder"+addOrderDetailDto.getGoodsId().toString(), 10);
+            	boolean lock = redissonLock.lock("GoodsOrder"+addOrderDetailDto.getGoodsId().toString(), 10);
+            	if(!lock) {
+            		throw new ServiceException("您来晚啦，商品已被抢走了～～");
+            	}
 
 
             	try {
@@ -386,7 +392,7 @@ public class OrderServiceImpl implements OrderService{
             		e.printStackTrace();
                     throw new ServiceException("下单出错，请稍后再试！");
 				}finally {
-                   // redissonLock.release("GoodsOrder"+goods.getId());
+                    redissonLock.release("GoodsOrder"+goods.getId());
 				}
             }
             mainAmount = mainAmount.add(amount);
@@ -705,12 +711,25 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public OrderDto saveOrder(String token,Integer goodsId,Integer couponId,Integer userId,Integer addressId,Integer type) throws ServiceException {
-    	//加入分布式锁，锁住商品id，10秒后释放
-    	//redissonLock.lock("GoodsOrder"+goodsId, 20);
+    	
         try {
+        	//加入分布式锁，锁住商品id，10秒后释放
+        	try {
+        		boolean lock = redissonLock.lock("GoodsOrder"+goodsId, 10);
+        		Log.info("获取分布式锁："+lock);
+        		if(!lock) {
+        			Log.info("分布式锁获取失败");
+        			throw new ServiceException("您来晚啦，商品已被抢走了～～");
+        		}
+        	}catch (Exception e) {
+        		throw new ServiceException("您来晚啦，商品已被抢走了～～");
+			}
+
+			Log.info("分布式锁获取成功");
+        	
 	    	//验证手机号
 	        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
 	        if(StringUtils.isEmpty(user.getPhone())){
@@ -859,7 +878,11 @@ public class OrderServiceImpl implements OrderService{
         	e.printStackTrace();
             throw new ServiceException("下单出错，请稍后再试！");
 		}finally {
-           // redissonLock.release("GoodsOrder" + goodsId);
+			try {
+				redissonLock.release("GoodsOrder" + goodsId);
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
 		}
 
     }
