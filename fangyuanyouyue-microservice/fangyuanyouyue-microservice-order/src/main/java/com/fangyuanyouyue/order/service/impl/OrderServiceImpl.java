@@ -386,8 +386,13 @@ public class OrderServiceImpl implements OrderService{
 	                goodsName.append("【"+goods.getName()+"】");
             	}catch (Exception e) {
             		e.printStackTrace();
+                    throw new ServiceException("下单出错，请稍后再试！");
 				}finally {
-		        	redissonLock.release("GoodsOrder"+goods.getId());
+            	    try{
+		        	    redissonLock.release("GoodsOrder"+goods.getId());
+                    }catch(Exception e){
+                        throw new ServiceException("下单出错，请稍后再试！");
+                    }
 				}
             }
             mainAmount = mainAmount.add(amount);
@@ -861,7 +866,11 @@ public class OrderServiceImpl implements OrderService{
         	e.printStackTrace();
             throw new ServiceException("下单出错，请稍后再试！");
 		}finally {
-        	redissonLock.release("GoodsOrder"+goodsId);
+            try {
+                redissonLock.release("GoodsOrder" + goodsId);
+            }catch(Exception e){
+                throw new ServiceException("下单出错，请稍后再试！");
+            }
 		}
 
     }
