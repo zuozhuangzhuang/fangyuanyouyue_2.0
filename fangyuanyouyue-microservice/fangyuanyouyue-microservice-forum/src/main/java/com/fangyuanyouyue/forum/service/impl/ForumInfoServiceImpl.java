@@ -176,7 +176,8 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 		forumInfo.setTitle(title);
 		forumInfo.setContent(content);
 		forumInfo.setType(type);//帖子类型 1图文 2视频
-		forumInfo.setStatus(1);//状态 1显示 2隐藏
+		forumInfo.setStatus(Status.SHOW.getValue());//状态 1显示 2隐藏
+		forumInfo.setCommentTime(DateStampUtils.getTimesteamp());
 		forumInfo.setAddTime(DateStampUtils.getTimesteamp());
 		if(type == 1){//帖子
 			//获取专栏
