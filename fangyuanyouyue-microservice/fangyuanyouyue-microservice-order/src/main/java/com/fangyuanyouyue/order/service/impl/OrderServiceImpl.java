@@ -713,12 +713,18 @@ public class OrderServiceImpl implements OrderService{
     @Transactional
     @TxTransaction(isStart=true)
     public OrderDto saveOrder(String token,Integer goodsId,Integer couponId,Integer userId,Integer addressId,Integer type) throws ServiceException {
-    	//加入分布式锁，锁住商品id，10秒后释放
-    	boolean lock = redissonLock.lock("GoodsOrder"+goodsId, 20);
-    	if(!lock) {
-    		throw new ServiceException("您来晚啦，商品已被抢走了～～");
-    	}
+    	
         try {
+        	//加入分布式锁，锁住商品id，10秒后释放
+        	try {
+        		if(!redissonLock.lock("GoodsOrder"+goodsId, 20)) {
+        			throw new ServiceException("您来晚啦，商品已被抢走了～～");
+        		}
+        	}catch (Exception e) {
+        		throw new ServiceException("您来晚啦，商品已被抢走了～～");
+			}
+        	
+        	
 	    	//验证手机号
 	        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
 	        if(StringUtils.isEmpty(user.getPhone())){
