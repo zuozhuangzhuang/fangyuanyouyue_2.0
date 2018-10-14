@@ -15,6 +15,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.codingapi.tx.annotation.TxTransaction;
+import com.esotericsoftware.minlog.Log;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
@@ -717,13 +718,17 @@ public class OrderServiceImpl implements OrderService{
         try {
         	//加入分布式锁，锁住商品id，10秒后释放
         	try {
-        		if(!redissonLock.lock("GoodsOrder"+goodsId, 20)) {
+        		boolean lock = redissonLock.lock("GoodsOrder"+goodsId, 10);
+        		Log.info("获取分布式锁："+lock);
+        		if(!lock) {
+        			Log.info("分布式锁获取失败");
         			throw new ServiceException("您来晚啦，商品已被抢走了～～");
         		}
         	}catch (Exception e) {
         		throw new ServiceException("您来晚啦，商品已被抢走了～～");
 			}
-        	
+
+			Log.info("分布式锁获取成功");
         	
 	    	//验证手机号
 	        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
