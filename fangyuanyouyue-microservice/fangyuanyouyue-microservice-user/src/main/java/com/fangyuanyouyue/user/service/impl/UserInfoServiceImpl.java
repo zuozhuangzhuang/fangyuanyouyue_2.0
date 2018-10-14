@@ -699,8 +699,6 @@ public class UserInfoServiceImpl implements UserInfoService {
                 if(userFans != null){
                    userDto.setIsFollow(1);//是否关注 1是 2否
                 }
-            }else{
-                throw new ServiceException(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
             return userDto;
         }
