@@ -388,11 +388,7 @@ public class OrderServiceImpl implements OrderService{
             		e.printStackTrace();
                     throw new ServiceException("下单出错，请稍后再试！");
 				}finally {
-            	    try{
-		        	    redissonLock.release("GoodsOrder"+goods.getId());
-                    }catch(Exception e){
-                        throw new ServiceException("下单出错，请稍后再试！");
-                    }
+                    redissonLock.release("GoodsOrder"+goods.getId());
 				}
             }
             mainAmount = mainAmount.add(amount);
@@ -459,7 +455,7 @@ public class OrderServiceImpl implements OrderService{
                     throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
                 baseResp = ParseReturnValue.getParseReturnValue(schedualGoodsService.goodsInfo(orderDetail.getGoodsId()));
-                ;//状态 1出售中 2已售出 3已下架（已结束） 5删除
+                //状态 1出售中 2已售出 3已下架（已结束） 5删除
                 if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
@@ -866,11 +862,7 @@ public class OrderServiceImpl implements OrderService{
         	e.printStackTrace();
             throw new ServiceException("下单出错，请稍后再试！");
 		}finally {
-            try {
-                redissonLock.release("GoodsOrder" + goodsId);
-            }catch(Exception e){
-                throw new ServiceException("下单出错，请稍后再试！");
-            }
+            redissonLock.release("GoodsOrder" + goodsId);
 		}
 
     }
