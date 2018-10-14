@@ -719,7 +719,6 @@ public class OrderServiceImpl implements OrderService{
         	//加入分布式锁，锁住商品id，10秒后释放
         	try {
         		boolean lock = redissonLock.lock("GoodsOrder"+goodsId, 10);
-        		Log.info("获取分布式锁："+lock);
         		if(!lock) {
         			Log.info("分布式锁获取失败");
         			throw new ServiceException("您来晚啦，商品已被抢走了～～");
@@ -727,7 +726,6 @@ public class OrderServiceImpl implements OrderService{
         	}catch (Exception e) {
         		throw new ServiceException("您来晚啦，商品已被抢走了～～");
 			}
-
 			Log.info("分布式锁获取成功");
         	
 	    	//验证手机号
@@ -874,7 +872,10 @@ public class OrderServiceImpl implements OrderService{
 	                "恭喜您！您的"+(goods.getType()==Status.GOODS.getValue()?"商品【":"抢购【")+goods.getName()+"】已有人下单，点击此处查看订单",
 	                Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER_SELLER.getMessage(),orderInfo.getId().toString());
 	        return orderDto;
-        }catch (Exception e) {
+        }catch (ServiceException e) {
+        	e.printStackTrace();
+            throw e;
+		}catch (Exception e) {
         	e.printStackTrace();
             throw new ServiceException("下单出错，请稍后再试！");
 		}finally {
