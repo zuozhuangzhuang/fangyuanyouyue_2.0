@@ -1,11 +1,12 @@
 package com.fangyuanyouyue.order.service;
 
-import com.fangyuanyouyue.order.service.impl.SchedualRedisServiceImpl;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.fangyuanyouyue.order.service.impl.SchedualRedisServiceImpl;
 
 @FeignClient(value = "redis-service",fallback = SchedualRedisServiceImpl.class)
 @Component
