@@ -710,7 +710,7 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public OrderDto saveOrder(String token,Integer goodsId,Integer couponId,Integer userId,Integer addressId,Integer type) throws ServiceException {
     	
@@ -873,7 +873,11 @@ public class OrderServiceImpl implements OrderService{
         	e.printStackTrace();
             throw new ServiceException("下单出错，请稍后再试！");
 		}finally {
-            redissonLock.release("GoodsOrder" + goodsId);
+			try {
+				redissonLock.release("GoodsOrder" + goodsId);
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
 		}
 
     }
