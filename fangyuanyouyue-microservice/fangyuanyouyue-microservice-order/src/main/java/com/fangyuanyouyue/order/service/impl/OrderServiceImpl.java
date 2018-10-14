@@ -104,6 +104,8 @@ public class OrderServiceImpl implements OrderService{
     private UserBehaviorMapper userBehaviorMapper;
     @Autowired
     private UserCouponMapper userCouponMapper;
+    @Autowired
+    private RedissonLock redissonLock;
 
     @Override
     public OrderDto saveOrderByCart(String token,String sellerString, Integer userId, Integer addressId) throws ServiceException {
@@ -317,7 +319,10 @@ public class OrderServiceImpl implements OrderService{
                 GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), GoodsInfo.class);
 
             	//加入分布式锁，锁住商品id，10秒后释放
-            	//redissonLock.lock("GoodsOrder"+addOrderDetailDto.getGoodsId().toString(), 10);
+            	boolean lock = redissonLock.lock("GoodsOrder"+addOrderDetailDto.getGoodsId().toString(), 10);
+            	if(!lock) {
+            		throw new ServiceException("您来晚啦，商品已被抢走了～～");
+            	}
 
 
             	try {
@@ -386,7 +391,7 @@ public class OrderServiceImpl implements OrderService{
             		e.printStackTrace();
                     throw new ServiceException("下单出错，请稍后再试！");
 				}finally {
-                   // redissonLock.release("GoodsOrder"+goods.getId());
+                    redissonLock.release("GoodsOrder"+goods.getId());
 				}
             }
             mainAmount = mainAmount.add(amount);
@@ -709,7 +714,10 @@ public class OrderServiceImpl implements OrderService{
     @TxTransaction(isStart=true)
     public OrderDto saveOrder(String token,Integer goodsId,Integer couponId,Integer userId,Integer addressId,Integer type) throws ServiceException {
     	//加入分布式锁，锁住商品id，10秒后释放
-    	//redissonLock.lock("GoodsOrder"+goodsId, 20);
+    	boolean lock = redissonLock.lock("GoodsOrder"+goodsId, 20);
+    	if(!lock) {
+    		throw new ServiceException("您来晚啦，商品已被抢走了～～");
+    	}
         try {
 	    	//验证手机号
 	        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
@@ -859,7 +867,7 @@ public class OrderServiceImpl implements OrderService{
         	e.printStackTrace();
             throw new ServiceException("下单出错，请稍后再试！");
 		}finally {
-           // redissonLock.release("GoodsOrder" + goodsId);
+            redissonLock.release("GoodsOrder" + goodsId);
 		}
 
     }
