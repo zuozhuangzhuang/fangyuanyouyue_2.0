@@ -310,7 +310,7 @@
         and (a.title like "%"#{search}"%" or a.content like "%"#{search}"%" or c.nick_name like "%"#{search}"%")
       </if>
     </where>
-    order by b.add_time desc
+    order by a.sort,a.comment_time desc,a.update_time desc
     <if test="start != null and limit != null">
       limit #{start},#{limit}
     </if>
