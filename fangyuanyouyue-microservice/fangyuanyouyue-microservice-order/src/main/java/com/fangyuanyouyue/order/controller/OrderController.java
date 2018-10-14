@@ -16,6 +16,8 @@ import com.fangyuanyouyue.order.service.OrderService;
 import com.fangyuanyouyue.order.service.SchedualGoodsService;
 import com.fangyuanyouyue.order.service.SchedualRedisService;
 import com.fangyuanyouyue.order.service.SchedualUserService;
+import com.snowalker.lock.redisson.RedissonLock;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -53,6 +55,8 @@ public class OrderController extends BaseController{
     private OrderService orderService;
     @Autowired
     private SchedualRedisService schedualRedisService;
+    @Autowired
+    RedissonLock redissonLock;
 
     @ApiOperation(value = "购物车商品下单", notes = "(OrderDto)购物车商品下单",response = BaseResp.class)
     @ApiImplicitParams({
@@ -228,6 +232,8 @@ public class OrderController extends BaseController{
     @PostMapping(value = "/saveOrder")
     @ResponseBody
     public BaseResp saveOrder(OrderParam param) throws IOException {
+
+    	
         try {
             log.info("----》商品/抢购直接下单《----");
             log.info("参数："+param.toString());
@@ -247,8 +253,13 @@ public class OrderController extends BaseController{
             if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
                 return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
+        	//加入分布式锁，锁住商品id，10秒后释放
+        	redissonLock.lock("GoodsOrder"+param.getGoodsId(), 10);
+        	
             //商品/抢购直接下单
             OrderDto orderDto = orderService.saveOrder(param.getToken(),param.getGoodsId(),param.getCouponId(), userId, param.getAddressId(),param.getType());
+            
+            redissonLock.release("GoodsOrder"+param.getGoodsId());
             return toSuccess(orderDto);
         } catch (ServiceException e) {
             e.printStackTrace();
