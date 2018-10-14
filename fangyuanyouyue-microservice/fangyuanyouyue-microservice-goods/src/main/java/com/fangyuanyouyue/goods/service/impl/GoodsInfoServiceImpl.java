@@ -210,19 +210,19 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         //增加积分、信誉度
         String result = schedualWalletService.updateScore(userId, Score.ADD_GOODSINFO.getScore(),Status.ADD.getValue());
         BaseResp br = ParseReturnValue.getParseReturnValue(result);
-        if(!br.getCode().equals(ReCode.SUCCESS)){
+        if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
             throw new ServiceException(br.getCode(),br.getReport());
         }
         if(param.getType() == Status.GOODS.getValue()){
             result = schedualWalletService.updateCredit(userId, Credit.ADD_GOODSINFO.getCredit(),Status.ADD.getValue());
             br = ParseReturnValue.getParseReturnValue(result);
-            if(!br.getCode().equals(ReCode.SUCCESS)){
+            if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
                 throw new ServiceException(br.getCode(),br.getReport());
             }
         }else{
             result = schedualWalletService.updateCredit(userId, Credit.ADD_AUCTION.getCredit(),Status.ADD.getValue());
             br = ParseReturnValue.getParseReturnValue(result);
-            if(!br.getCode().equals(ReCode.SUCCESS)){
+            if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
                 throw new ServiceException(br.getCode(),br.getReport());
             }
         }
@@ -684,11 +684,14 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                     goodsBargainMapper.updateByPrimaryKeySelective(bargain);
                     //退回余额
                     BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),Status.ADD.getValue()));
-                    if(!baseResp.getCode().equals(ReCode.SUCCESS)){
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                     }
                     //买家新增余额账单
-                    schedualWalletService.addUserBalanceDetail(bargain.getUserId(),bargain.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),bargain.getBargainNo(),"【"+goodsInfo.getName()+"】",goodsInfo.getUserId(),bargain.getUserId(),Status.BARGAIN.getValue(),bargain.getBargainNo());
+                    baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(bargain.getUserId(),bargain.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),bargain.getBargainNo(),"【"+goodsInfo.getName()+"】",goodsInfo.getUserId(),bargain.getUserId(),Status.BARGAIN.getValue(),bargain.getBargainNo()));
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                    }
                     schedualMessageService.easemobMessage(bargain.getUserId().toString(),
                             "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),bargain.getGoodsId().toString());
                 }
@@ -821,7 +824,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 //卖家-20信誉度
                 String result = schedualWalletService.updateCredit(goodsInfo.getUserId(),Credit.DELETE_FAKE.getCredit(),Status.SUB.getValue());
                 BaseResp br = ParseReturnValue.getParseReturnValue(result);
-                if(!br.getCode().equals(ReCode.SUCCESS)){
+                if(!br.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(br.getCode(),br.getReport());
                 }
                 //很抱歉，您的商品/抢购【名称】已被官方删除，删除理由：……。点击查看详情
