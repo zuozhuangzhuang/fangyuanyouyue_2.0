@@ -322,7 +322,7 @@
   <select id="countPage" resultType="Integer">
     select count( DISTINCT a.id ) from order_info a,order_detail b,user_info c
     <where>
-        (a.id = b.order_id or a.id = b.main_order_id) and a.is_resolve = 2 and a.user_id = c.id
+        (a.id = b.order_id ) and a.is_resolve = 2 and a.user_id = c.id
       <if test="keyword != null and keyword != ''">
         and (
           a.order_no like "%"#{keyword}"%"
