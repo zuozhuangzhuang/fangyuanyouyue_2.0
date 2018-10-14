@@ -129,14 +129,14 @@
 
 
   <select id="countAll" resultType="java.lang.Integer" >
-    select count(*) from forum_comment where status <![CDATA[ <> ]]> 2
+    select count(*) from forum_comment a,user_info b where a.user_id=b.id and b.status <![CDATA[ <> ]]> 3 and a.status <![CDATA[ <> ]]> 2
   </select>
   <select id="countById" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
-    select count(*) from forum_comment where forum_id = #{forumId,jdbcType=INTEGER} and status <![CDATA[ <> ]]> 2
+    select count(*) from forum_comment a,user_info b where a.user_id=b.id and a.forum_id = #{forumId,jdbcType=INTEGER} and b.status <![CDATA[ <> ]]> 3 and a.status <![CDATA[ <> ]]> 2
   </select>
   
   <select id="countByCommentId" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
-    select count(*) from forum_comment where comment_id = #{commentId,jdbcType=INTEGER} and status <![CDATA[ <> ]]> 2
+    select count(*) from forum_comment a,user_info b where a.user_id=b.id and a.comment_id = #{commentId,jdbcType=INTEGER} and b.status <![CDATA[ <> ]]> 3 and a.status <![CDATA[ <> ]]> 2
   </select>
   <select id="selectByForumId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select
