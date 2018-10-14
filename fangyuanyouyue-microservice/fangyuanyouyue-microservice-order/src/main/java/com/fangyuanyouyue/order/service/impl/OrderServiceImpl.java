@@ -320,11 +320,16 @@ public class OrderServiceImpl implements OrderService{
                 GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), GoodsInfo.class);
 
             	//加入分布式锁，锁住商品id，10秒后释放
-            	boolean lock = redissonLock.lock("GoodsOrder"+addOrderDetailDto.getGoodsId().toString(), 10);
-            	if(!lock) {
+            	try {
+            		boolean lock = redissonLock.lock("GoodsOrder"+addOrderDetailDto.getGoodsId(), 10);
+            		if(!lock) {
+            			Log.info("分布式锁获取失败");
+            			throw new ServiceException("您来晚啦，商品已被抢走了～～");
+            		}
+            	}catch (Exception e) {
             		throw new ServiceException("您来晚啦，商品已被抢走了～～");
-            	}
-
+    			}
+    			Log.info("分布式锁获取成功");
 
             	try {
 	                //计算总订单总金额
