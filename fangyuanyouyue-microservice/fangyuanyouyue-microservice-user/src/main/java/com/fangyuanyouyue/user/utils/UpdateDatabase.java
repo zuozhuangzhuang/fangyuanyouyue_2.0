@@ -25,6 +25,7 @@ import java.util.Date;
 
 public class UpdateDatabase {
     static Connection conn;
+    static Connection new_conn;
     static PreparedStatement ps;
     static ResultSet rs;
     /**
@@ -55,12 +56,12 @@ public class UpdateDatabase {
         return conn;
     }
     public static Connection getNewConnection(){
-//        String url="jdbc:mysql://localhost:3306/new_xiaofangyuan?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=true";
-        String url="jdbc:mysql://xiaofangyuan-prd.mysql.rds.aliyuncs.com:3306/xiaofangyuan?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=true";
-//        String userName="root";
-        String userName="wuzhimin";
-//        String password="123456";
-        String password="Wuzhimin123";
+        String url="jdbc:mysql://localhost:3306/new_xiaofangyuan?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=true";
+//        String url="jdbc:mysql://xiaofangyuan-prd.mysql.rds.aliyuncs.com:3306/xiaofangyuan?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=true";
+        String userName="root";
+//        String userName="wuzhimin";
+        String password="123456";
+//        String password="Wuzhimin123";
         try {
             Class.forName("com.mysql.jdbc.Driver");
         } catch (ClassNotFoundException e) {
@@ -237,39 +238,40 @@ public class UpdateDatabase {
         PreparedStatement reply_ps = null;
         ResultSet reply_rs = null;
         try{
-            /**
-             * goods_comment
-             */
-            Integer id = null;
-            Integer goodsId = null;//商品id
-            Integer userId = rs.getInt("id")+100000;//用户id
-            Integer commentId = null;//回复评论id
-            String content = null;//评论内容
-            Integer likesCount = 0;//点赞次数
-            String img1Url = null;//图片地址1
-            String img2Url = null;//图片地址2
-            String img3Url = null;//图片地址3
-            Integer status = 1;//状态 1正常 2隐藏
-            String addTime = null;//添加时间
-            String updateTime = null;//更新时间
-
-            /**
-             * forum_comment
-             */
-            Integer forumId;//帖子id
-
             //评论
             String selectComment = "select * from a_comment where user_id ="+rs.getInt("id");
             comment_ps = conn.prepareStatement(selectComment);
             comment_rs = comment_ps.executeQuery(selectComment);
             while (comment_rs.next()){
+                /**
+                 * goods_comment
+                 */
+                Integer id = null;
+                Integer goodsId = null;//商品id
+                Integer userId = rs.getInt("id")+100000;//用户id
+                Integer commentId = null;//回复评论id
+                String content = null;//评论内容
+                Integer likesCount = 0;//点赞次数
+                String img1Url = null;//图片地址1
+                String img2Url = null;//图片地址2
+                String img3Url = null;//图片地址3
+                Integer status = 1;//状态 1正常 2隐藏
+                String addTime = null;//添加时间
+                String updateTime = null;//更新时间
+
+                /**
+                 * forum_comment
+                 */
+                Integer forumId;//帖子id
+
                 id = comment_rs.getInt("id");
+                Integer type = comment_rs.getInt("status")!=0?1:2;
                 goodsId = comment_rs.getInt("goods_id");
                 content = comment_rs.getString("content");
 
                 forumId = comment_rs.getInt("appreciate_id");
                 addTime = DateStampUtils.formatUnixTime(comment_rs.getLong("add_time"),DateUtil.DATE_FORMT);
-                if(goodsId != null){
+                if(forumId == 0){
                     commentSql.append("insert into goods_comment (" +
                             "id, " +
                             "goods_id, " +
@@ -303,7 +305,7 @@ public class UpdateDatabase {
                     while (reply_rs.next()){
                         commentId = reply_rs.getInt("comment_id");
                         content = reply_rs.getString("content");
-                        userId = reply_rs.getInt("from_user_id");
+                        userId = reply_rs.getInt("from_user_id")+100000;
                         addTime = DateStampUtils.formatUnixTime(reply_rs.getLong("add_time"),DateUtil.DATE_FORMT);
 
                         commentSql.append("insert into goods_comment (" +
@@ -359,7 +361,7 @@ public class UpdateDatabase {
                     while (reply_rs.next()){
                         commentId = reply_rs.getInt("comment_id");
                         content = reply_rs.getString("content");
-                        userId = reply_rs.getInt("from_user_id");
+                        userId = reply_rs.getInt("from_user_id")+100000;
                         addTime = DateStampUtils.formatUnixTime(reply_rs.getLong("add_time"),DateUtil.DATE_FORMT);
 
                         commentSql.append("insert into forum_comment (" +
@@ -790,6 +792,8 @@ public class UpdateDatabase {
         ResultSet seller_rs = null;
         PreparedStatement refund_ps = null;
         ResultSet refund_rs = null;
+        PreparedStatement pic_ps = null;
+        ResultSet pic_rs = null;
 
         Integer userId = rs.getInt("id")+100000;//用户id
 
@@ -920,7 +924,7 @@ public class UpdateDatabase {
                     Integer returnStatus = order_rs.getInt("return_status");
                     isRefund = returnStatus == null?1:2;
                     sellerIsDelete = order_rs.getInt("sell_delete")==0?1:2;
-                    buyerIsDelete = order_rs.getInt("buy_delete")==0?1:2;
+                    buyerIsDelete = order_rs.getInt("is_delete")==0?1:2;
 
                     orderSql.append("insert into order_info (" +
                             "id, " +
@@ -1029,7 +1033,12 @@ public class UpdateDatabase {
 
                     goodsId = order_rs.getInt("goods_id");
                     goodsName = order_rs.getString("content").replace("'","‘").replace("\"","”");
-
+                    String selectMainPic = "select * from a_goods_pic where is_main = 0 and goods_id ="+goodsId;
+                    pic_ps = conn.prepareStatement(selectMainPic);
+                    pic_rs = pic_ps.executeQuery(selectMainPic);
+                    if(pic_rs.next()){
+                        mainImgUrl = pic_rs.getString("img_url");
+                    }
                     orderSql.append("insert into order_detail (" +
                             "id, " +
                             "user_id, " +
@@ -1768,13 +1777,19 @@ public class UpdateDatabase {
             unionId = rs.getString("qq_cliend");
         }
         if(StringUtils.isNotEmpty(unionId) && type == 1){
-            String selectFuckUser = "select * from a_user where wechat_cliend = '" +unionId+"'";
+            String selectFuckUser = "select * from user_third_party where type = 1 and union_id = '" +unionId+"'";
             try{
-                fuckUser_ps = conn.prepareStatement(selectFuckUser);
+                fuckUser_ps = new_conn.prepareStatement(selectFuckUser);
                 fuckUser_rs = fuckUser_ps.executeQuery(selectFuckUser);
-                if(fuckUser_rs.next() && StringUtils.isEmpty(fuckUser_rs.getString("phone"))){
+                if(fuckUser_rs.next()){
                     unionId = unionId+"-";
                 }
+//                if(fuckUser_rs.next()){
+//                    if(fuckUser_rs.getDouble("balance") == 0){
+//                        if(StringUtils.isEmpty(fuckUser_rs.getString("phone"))){
+//                        }
+//                    }
+//                }
             }catch (SQLException e){
                 e.printStackTrace();
             }finally {
@@ -2041,12 +2056,12 @@ public class UpdateDatabase {
         String level_desc = "";
         Integer status = rs.getInt("status")==0?1:2;
         String addTime = DateStampUtils.formatUnixTime(rs.getLong("add_time"),DateUtil.DATE_FORMT);
-        Integer isRegHx = Integer.parseInt(rs.getString("is_hx"));
-        String selectFuckUser = "select * from a_user where nickName = '"+nickName+"'";
+        Integer isRegHx = 2;
+        String selectFuckUser = "select count(*) as count from a_user where nickName = '"+nickName+"'";
         try{
             fuckUser_ps = conn.prepareStatement(selectFuckUser);
             fuckUser_rs = fuckUser_ps.executeQuery(selectFuckUser);
-            if(fuckUser_rs.next()){
+            if(fuckUser_rs.next() && fuckUser_rs.getInt("count") > 1){
                 nickName = nickName+"-"+((int)(Math.random() * 9000) + 1000);
             }
         }catch (SQLException e){
@@ -2286,7 +2301,7 @@ public class UpdateDatabase {
         List<Map<String,Object>> users = new ArrayList<>();
         try {
             conn=getOldConnection();//连接数据库
-            Connection new_conn = getNewConnection();
+            new_conn = getNewConnection();
             PreparedStatement new_ps = null;
             //confine_user
 //            String confineUserSql = getConfineUserSql();
