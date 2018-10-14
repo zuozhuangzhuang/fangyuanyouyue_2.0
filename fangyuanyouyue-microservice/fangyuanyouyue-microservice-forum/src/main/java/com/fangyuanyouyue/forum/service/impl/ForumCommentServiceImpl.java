@@ -51,7 +51,7 @@ public class ForumCommentServiceImpl implements ForumCommentService {
 
 	@Override
 	public List<ForumCommentDto> getCommentList(Integer userId,Integer forumId, Integer start, Integer limit) throws ServiceException {
-		List<ForumComment> list = forumCommentMapper.selectByForumId(forumId, start, limit);
+		List<ForumComment> list = forumCommentMapper.selectByForumId(forumId, start*limit, limit);
 		List<ForumCommentDto> dtos = new ArrayList<>();
 		for(ForumComment model:list) {
 			ForumCommentDto dto = new ForumCommentDto(model);
