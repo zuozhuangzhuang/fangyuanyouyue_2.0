@@ -102,7 +102,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(rollbackFor=Exception.class)
 	@TxTransaction(isStart=true)
 	public Object addColumn(Integer userId, Integer typeId,String name,Integer payType,String payPwd) throws ServiceException {
 		String verifyUserById = schedualUserService.verifyUserById(userId);
@@ -197,7 +197,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 
 
 	@Override
-	@Transactional
+	@Transactional(rollbackFor=Exception.class)
 	@TxTransaction(isStart=true)
 	public boolean applyColumn(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException{
 		try{
@@ -236,7 +236,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(rollbackFor=Exception.class)
 	@TxTransaction(isStart=true)
 	public void handle(Integer applyId, Integer status,String coverImgUrl,String reason) throws ServiceException {
 		ForumColumnApply forumColumnApply = forumColumnApplyMapper.selectByPrimaryKey(applyId);

@@ -108,7 +108,7 @@ public class ScoreServiceImpl implements ScoreService{
         System.out.println(date);
     }
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction
     public void updateScore(Integer userId, Long score,Integer type) throws ServiceException {
         //每个用户每天可增加500积分 增加一张用户积分记录表，记录用户积分增加历史，按天筛选，不可超过500分

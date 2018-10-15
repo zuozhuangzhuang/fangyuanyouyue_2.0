@@ -158,7 +158,7 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(rollbackFor=Exception.class)
 	@TxTransaction(isStart=true)
 	public void addForum(Integer userId, Integer columnId, String title, String content,String videoUrl,Integer videoLength, String videoImg, Integer type,Integer[] userIds) throws ServiceException {
 		String verifyUserById = schedualUserService.verifyUserById(userId);

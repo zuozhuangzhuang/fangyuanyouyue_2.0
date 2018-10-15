@@ -36,7 +36,7 @@ public class ForumCommentLikesServiceImpl implements ForumCommentLikesService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(rollbackFor=Exception.class)
 	@TxTransaction(isStart=true)
 	public void saveLikes(Integer type, Integer userId, Integer commentId)  throws ServiceException {
 		ForumCommentLikes forumCommentLikes = forumCommentLikesMapper.selectByUserIdCommentId(userId, commentId);

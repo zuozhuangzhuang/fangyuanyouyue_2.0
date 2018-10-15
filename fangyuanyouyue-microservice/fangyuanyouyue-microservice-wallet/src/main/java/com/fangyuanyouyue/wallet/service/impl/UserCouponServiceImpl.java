@@ -30,7 +30,7 @@ public class UserCouponServiceImpl implements UserCouponService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction
     public BigDecimal getPriceByCoupon(Integer userId,BigDecimal price, Integer userCouponId) throws ServiceException {
         //根据用户id，优惠券id查询状态为 未使用 的优惠券
