@@ -77,6 +77,7 @@ public class FileUploadController extends BaseController {
     @PostMapping(value = "/uploadVideo")
     @ResponseBody
     public BaseResp uploadVideo(UserParam param) throws IOException {
+        long start = System.currentTimeMillis();
         try {
             log.info("----》视频上传《----");
             log.info("参数：" + param.toString());
@@ -92,6 +93,8 @@ public class FileUploadController extends BaseController {
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
+        }finally {
+            System.out.println(System.currentTimeMillis()-start);
         }
     }
 }

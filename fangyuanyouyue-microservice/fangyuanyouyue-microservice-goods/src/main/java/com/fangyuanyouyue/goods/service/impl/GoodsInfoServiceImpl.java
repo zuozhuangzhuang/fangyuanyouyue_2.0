@@ -125,9 +125,9 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         //遍历商品列表，添加到GoodsDtos中
         for (GoodsInfo goodsInfo:goodsInfos) {
             //抢购降价
-            if(goodsInfo.getType().equals(Status.AUCTION.getValue())){
-                timerService.getPriceDown(goodsInfo);
-            }
+//            if(goodsInfo.getType().equals(Status.AUCTION.getValue())){
+//                timerService.getPriceDown(goodsInfo);
+//            }
             GoodsDto goodsDto = setDtoByGoodsInfo(param.getUserId(),goodsInfo);
             //token不为空为我的商品列表，均为卖家。商品列表其实不需要返回这些信息
             goodsDtos.add(goodsDto);
@@ -498,9 +498,9 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 throw new ServiceException("未找到商品、抢购！");
             }
             //抢购降价
-            if(goodsInfo.getType().equals(Status.AUCTION.getValue())){
-                timerService.getPriceDown(goodsInfo);
-            }
+//            if(goodsInfo.getType().equals(Status.AUCTION.getValue())){
+//                timerService.getPriceDown(goodsInfo);
+//            }
             goodsDto = setDtoByGoodsInfo(userId,goodsInfo);
             //如果有两条，说明即收藏，又关注
             if(goodsInfos.size()>1){
@@ -523,9 +523,9 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 throw new ServiceException("未找到商品、抢购！");
             }
             //抢购降价
-            if(goodsInfo.getType().equals(Status.AUCTION.getValue())){
-                timerService.getPriceDown(goodsInfo);
-            }
+//            if(goodsInfo.getType().equals(Status.AUCTION.getValue())){
+//                timerService.getPriceDown(goodsInfo);
+//            }
             goodsDto = setDtoByGoodsInfo(userId,goodsInfo);
             goodsDto.setIsCollect(1);
         }
@@ -570,9 +570,9 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             throw new ServiceException("商品不存在或已下架！");
         }
         //抢购降价
-        if(goodsInfo.getType().equals(Status.AUCTION.getValue())){
-            timerService.getPriceDown(goodsInfo);
-        }
+//        if(goodsInfo.getType().equals(Status.AUCTION.getValue())){
+//            timerService.getPriceDown(goodsInfo);
+//        }
         GoodsDto goodsDto = setDtoByGoodsInfo(null,goodsInfo);
         //是否官方认证
         Map<String, Object> goodsUserInfoExtAndVip = goodsInfoMapper.getGoodsUserInfoExtAndVip(goodsId);
