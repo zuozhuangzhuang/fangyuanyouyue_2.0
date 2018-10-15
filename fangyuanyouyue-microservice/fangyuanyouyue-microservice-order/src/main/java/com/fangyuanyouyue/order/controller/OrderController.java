@@ -1,6 +1,8 @@
 package com.fangyuanyouyue.order.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.esotericsoftware.minlog.Log;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
@@ -9,8 +11,7 @@ import com.fangyuanyouyue.base.model.WxPayResult;
 import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.base.util.WechatUtil.WXPayUtil;
 import com.fangyuanyouyue.base.util.alipay.util.AlipayNotify;
-import com.fangyuanyouyue.order.dto.CompanyDto;
-import com.fangyuanyouyue.order.dto.OrderDto;
+import com.fangyuanyouyue.order.dto.*;
 import com.fangyuanyouyue.order.param.OrderParam;
 import com.fangyuanyouyue.order.service.OrderService;
 import com.fangyuanyouyue.order.service.SchedualGoodsService;
@@ -32,10 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @RestController
@@ -55,6 +53,8 @@ public class OrderController extends BaseController{
     private OrderService orderService;
     @Autowired
     private SchedualRedisService schedualRedisService;
+    @Autowired
+    private RedissonLock redissonLock;
 
     @ApiOperation(value = "购物车商品下单", notes = "(OrderDto)购物车商品下单",response = BaseResp.class)
     @ApiImplicitParams({
@@ -84,6 +84,27 @@ public class OrderController extends BaseController{
             if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
                 return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
+
+            //加入分布式锁，锁住商品id，10秒后释放
+            try {
+                List<SellerDto> sellerDtos = new ArrayList<>();
+                List<AddOrderDto> addOrderDtos = new ArrayList<>();
+                JSONArray objects;
+                objects = JSONArray.parseArray(param.getSellerList());
+                for (int i = 0; i < objects.size(); i++) {
+                    String str = objects.getString(i);
+                    AddOrderDto addOrderDto = JSONObject.toJavaObject(JSONObject.parseObject(str), AddOrderDto.class);
+                    for (AddOrderDetailDto detailDto : addOrderDto.getAddOrderDetailDtos()) {
+                        boolean lock = redissonLock.lock("Goods"+detailDto.getGoodsId(), 10);
+                        if(!lock) {
+                            Log.info("分布式锁获取失败");
+                            throw new ServiceException("下单失败，您来晚了，宝贝已被抢走了~");
+                        }
+                    }
+                }
+            }catch (Exception e) {
+                throw new ServiceException("下单失败，您来晚了，宝贝已被抢走了~");
+            }
             //购物车商品下单
             OrderDto orderDto = orderService.saveOrderByCart(param.getToken(),param.getSellerList(), userId, param.getAddressId());
             return toSuccess(orderDto);
@@ -93,6 +114,22 @@ public class OrderController extends BaseController{
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
+        }finally {
+            try {
+                List<SellerDto> sellerDtos = new ArrayList<>();
+                List<AddOrderDto> addOrderDtos = new ArrayList<>();
+                JSONArray objects;
+                objects = JSONArray.parseArray(param.getSellerList());
+                for (int i = 0; i < objects.size(); i++) {
+                    String str = objects.getString(i);
+                    AddOrderDto addOrderDto = JSONObject.toJavaObject(JSONObject.parseObject(str), AddOrderDto.class);
+                    for (AddOrderDetailDto detailDto : addOrderDto.getAddOrderDetailDtos()) {
+                        redissonLock.release("Goods" + detailDto.getGoodsId());
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -251,6 +288,17 @@ public class OrderController extends BaseController{
             if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
                 return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
+
+            //加入分布式锁，锁住商品id，10秒后释放
+            try {
+                boolean lock = redissonLock.lock("Goods"+param.getGoodsId(), 10);
+                if(!lock) {
+                    Log.info("分布式锁获取失败");
+                    throw new ServiceException("下单失败，您来晚了，宝贝已被抢走了~");
+                }
+            }catch (Exception e) {
+                throw new ServiceException("下单失败，您来晚了，宝贝已被抢走了~");
+            }
             //商品/抢购直接下单
             OrderDto orderDto = orderService.saveOrder(param.getToken(),param.getGoodsId(),param.getCouponId(), userId, param.getAddressId(),param.getType());
             return toSuccess(orderDto);
@@ -260,6 +308,12 @@ public class OrderController extends BaseController{
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
+        }finally {
+            try{
+                redissonLock.release("Goods"+param.getGoodsId());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 

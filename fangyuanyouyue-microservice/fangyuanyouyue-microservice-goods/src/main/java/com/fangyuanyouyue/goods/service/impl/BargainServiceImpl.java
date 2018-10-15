@@ -17,10 +17,7 @@ import com.fangyuanyouyue.goods.dto.BargainDto;
 import com.fangyuanyouyue.goods.dto.GoodsCommentDto;
 import com.fangyuanyouyue.goods.dto.GoodsDto;
 import com.fangyuanyouyue.goods.model.*;
-import com.fangyuanyouyue.goods.service.BargainService;
-import com.fangyuanyouyue.goods.service.SchedualMessageService;
-import com.fangyuanyouyue.goods.service.SchedualUserService;
-import com.fangyuanyouyue.goods.service.SchedualWalletService;
+import com.fangyuanyouyue.goods.service.*;
 import org.apache.catalina.User;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +58,8 @@ public class BargainServiceImpl implements BargainService{
     private SchedualMessageService schedualMessageService;
     @Autowired
     private BargainOrderMapper bargainOrderMapper;
+    @Autowired
+    private GoodsInfoService goodsInfoService;
 
     @Override
     @Transactional(rollbackFor=Exception.class)
@@ -240,6 +239,8 @@ public class BargainServiceImpl implements BargainService{
                 }
                 //卖家同意后生成订单，拒绝后退回余额
                 if(status.intValue() == Status.BARGAIN_AGREE.getValue()){
+                    //修改商品的状态为已售出
+                    goodsInfoService.updateGoodsStatus(goodsInfo.getId(),2);
                     //生成订单
                     //每次提交的鉴定生成一个订单，批量鉴定有多个订单详情
                     OrderInfo orderInfo = new OrderInfo();
@@ -306,9 +307,8 @@ public class BargainServiceImpl implements BargainService{
                     orderDetail.setPayAmount(goodsInfo.getPrice());
                     orderDetail.setDescription(goodsInfo.getDescription());
                     orderDetailMapper.insert(orderDetail);
-                    //修改商品的状态为已售出
-                    goodsInfo.setStatus(2);//状态  1出售中 2已售出 3已下架（已结束） 5删除
-                    goodsInfoMapper.updateByPrimaryKey(goodsInfo);
+//                    goodsInfo.setStatus(2);//状态  1出售中 2已售出 3已下架（已结束） 5删除
+//                    goodsInfoMapper.updateByPrimaryKey(goodsInfo);
                     //议价：恭喜您！您对商品【商品名称】的议价卖家已同意，点击此处查看订单详情
                     //如果卖家同意议价，就拒绝此商品剩余的申请中议价
                     orderId = orderInfo.getId();
