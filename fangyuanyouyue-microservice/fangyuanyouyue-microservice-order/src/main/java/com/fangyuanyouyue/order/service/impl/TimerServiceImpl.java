@@ -49,7 +49,7 @@ public class TimerServiceImpl implements TimerService{
     private SchedualRedisService schedualRedisService;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public void cancelOrder() throws ServiceException {
         //1、获取所有未支付的订单 2、判断下单时间与现在时间的差值是否大于24h 3、取消大于24h的订单 4、修改商品状态
@@ -122,7 +122,7 @@ public class TimerServiceImpl implements TimerService{
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public void saveReceiptGoods() throws ServiceException {
         //1、获取所有待收货且发货时间超过12天的订单 2、修改订单状态 3、卖家增加余额 4、买家、卖家增加积分

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@Transactional
+@Transactional(rollbackFor=Exception.class)
 public class SchedualRedisServiceImpl implements SchedualRedisService{
 
 	@Override

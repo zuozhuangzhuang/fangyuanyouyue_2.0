@@ -69,7 +69,7 @@ public class ReportServiceImpl implements ReportService{
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public void dealReport(Integer id, String content) throws ServiceException {
         //1、删除帖子 2、发信息给用户 3、扣除被举报用户信誉度 4、给举报用户增加信誉度
