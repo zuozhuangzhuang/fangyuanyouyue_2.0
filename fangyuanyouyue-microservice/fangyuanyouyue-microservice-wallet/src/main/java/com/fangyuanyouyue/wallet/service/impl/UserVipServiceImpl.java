@@ -231,7 +231,7 @@ public class UserVipServiceImpl implements UserVipService{
             }else if(payType.intValue() == Status.PAY_TYPE_BALANCE.getValue()) {
                 String verifyPayPwd = schedualUserService.verifyPayPwd(userId, payPwd);
                 BaseResp result = ParseReturnValue.getParseReturnValue(verifyPayPwd);
-                if(!result.getCode().equals(ReCode.SUCCESS)){
+                if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(result.getCode(),result.getReport());
                 }
                 if (!(boolean)result.getData()) {
