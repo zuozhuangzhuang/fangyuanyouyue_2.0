@@ -139,7 +139,7 @@
   </update>
 
   <select id="getVersion" resultMap="BaseResultMap">
-    select * from app_version order by version_desc desc limit 0,1
+    select * from app_version order by add_time desc limit 0,1
   </select>
 
 
