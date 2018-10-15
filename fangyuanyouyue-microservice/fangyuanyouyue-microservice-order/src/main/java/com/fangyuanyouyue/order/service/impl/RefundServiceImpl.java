@@ -55,7 +55,7 @@ public class RefundServiceImpl implements RefundService{
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public void orderReturnToSeller(Integer userId, Integer orderId, String reason,String[] imgUrls) throws ServiceException {
         //1、检测订单状态 2、检测是否退货 3、新增退货 4、发送信息
@@ -156,7 +156,7 @@ public class RefundServiceImpl implements RefundService{
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public void platformDealReturns(Integer userId, Integer orderId, String reason, Integer status) throws ServiceException {
         OrderRefund orderRefund = orderRefundMapper.selectByPrimaryKey(orderId);

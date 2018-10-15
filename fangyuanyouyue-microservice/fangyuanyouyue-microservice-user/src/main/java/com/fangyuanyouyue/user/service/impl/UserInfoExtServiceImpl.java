@@ -132,7 +132,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public Object authType(Integer userId,Integer payType,String payPwd) throws ServiceException {
         UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);
@@ -211,7 +211,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
      * @throws ServiceException
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public boolean updateOrder(String orderNo, String thirdOrderNo, Integer payType) throws ServiceException {
         UserAuthOrder authOrder = userAuthOrderMapper.selectByOrderNo(orderNo);
@@ -302,7 +302,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public void updateShopAuth(Integer applyId, Integer status, String content) throws ServiceException {
 

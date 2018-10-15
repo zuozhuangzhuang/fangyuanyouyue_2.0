@@ -127,6 +127,10 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         List<GoodsDto> goodsDtos = new ArrayList<>();
         //遍历商品列表，添加到GoodsDtos中
         for (GoodsInfo goodsInfo:goodsInfos) {
+            //抢购降价
+            if(goodsInfo.getType().equals(Status.AUCTION.getValue())){
+                timerService.getPriceDown(goodsInfo);
+            }
             GoodsDto goodsDto = setDtoByGoodsInfo(param.getUserId(),goodsInfo);
             //token不为空为我的商品列表，均为卖家。商品列表其实不需要返回这些信息
             goodsDtos.add(goodsDto);
@@ -135,7 +139,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public void addGoods(Integer userId,String nickName,GoodsParam param) throws ServiceException {
         String verifyUserById = schedualUserService.verifyUserById(userId);
@@ -665,7 +669,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public void updateGoodsStatus(Integer goodsId,Integer status) throws ServiceException {
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
@@ -763,7 +767,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public void updateGoods(AdminGoodsParam param) throws ServiceException {
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(param.getId());
