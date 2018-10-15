@@ -1,9 +1,11 @@
 package com.fangyuanyouyue.goods.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.esotericsoftware.minlog.Log;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.model.WxPayResult;
 import com.fangyuanyouyue.base.util.ParseReturnValue;
@@ -12,6 +14,7 @@ import com.fangyuanyouyue.base.util.alipay.util.AlipayNotify;
 import com.fangyuanyouyue.goods.dto.GoodsDto;
 import com.fangyuanyouyue.goods.param.GoodsParam;
 import com.fangyuanyouyue.goods.service.*;
+import com.snowalker.lock.redisson.RedissonLock;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -50,6 +53,8 @@ public class BargainController extends BaseController{
     private BargainService bargainService;
     @Autowired
     private SchedualRedisService schedualRedisService;
+    @Autowired
+    private RedissonLock redissonLock;
 
     @ApiOperation(value = "商品压价申请", notes = "(void)用户发起对商品的议价，直接扣除用户余额 ",response = BaseResp.class)
     @ApiImplicitParams({
@@ -132,6 +137,18 @@ public class BargainController extends BaseController{
             if(param.getStatus() == null){
                 return toError("状态不能为空！");
             }
+            if(param.getStatus().equals(Status.BARGAIN_AGREE.getValue())){
+                //加入分布式锁，锁住商品id，10秒后释放
+                try {
+                    boolean lock = redissonLock.lock("Goods"+param.getGoodsId(), 10);
+                    if(!lock) {
+                        Log.info("分布式锁获取失败");
+                        throw new ServiceException("处理失败，您来晚了，宝贝已被抢走了~");
+                    }
+                }catch (Exception e) {
+                    throw new ServiceException("处理失败，您来晚了，宝贝已被抢走了~");
+                }
+            }
             //处理压价
             Integer orderId = bargainService.updateBargain(userId, param.getGoodsId(), param.getBargainId(), param.getStatus());
             return toSuccess(orderId);
@@ -141,6 +158,12 @@ public class BargainController extends BaseController{
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
+        }finally {
+            try{
+                redissonLock.release("Goods"+param.getGoodsId());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 

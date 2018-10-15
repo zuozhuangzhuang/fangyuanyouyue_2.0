@@ -6,11 +6,10 @@ import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.Credit;
 import com.fangyuanyouyue.base.enums.ReCode;
-import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.enums.Score;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
-import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.goods.dao.*;
 import com.fangyuanyouyue.goods.dto.*;
@@ -20,7 +19,6 @@ import com.fangyuanyouyue.goods.model.*;
 import com.fangyuanyouyue.goods.param.AdminGoodsParam;
 import com.fangyuanyouyue.goods.param.GoodsParam;
 import com.fangyuanyouyue.goods.service.*;
-import com.github.pagehelper.PageHelper;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -29,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -676,32 +673,37 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         if(goodsInfo == null){
             throw new ServiceException("获取商品失败！");
         }else{
-            if(goodsInfo.getType().intValue() == Status.AUCTION.getValue()){
-                goodsInfo.setLastIntervalTime(DateStampUtils.getTimesteamp());
-            }
-            if(status == 2){//已售出
-                //拒绝此商品的所有议价
-                //压价信息
-                List<GoodsBargain> goodsBargains = goodsBargainMapper.selectAllByGoodsId(goodsId,1);//状态 1申请 2同意 3拒绝 4取消
-                for(GoodsBargain bargain:goodsBargains){
-                    bargain.setStatus(Status.BARGAIN_REFUSE.getValue());
-                    goodsBargainMapper.updateByPrimaryKeySelective(bargain);
-                    //退回余额
-                    BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),Status.ADD.getValue()));
-                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
-                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
-                    }
-                    //买家新增余额账单
-                    baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(bargain.getUserId(),bargain.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),bargain.getBargainNo(),"【"+goodsInfo.getName()+"】",goodsInfo.getUserId(),bargain.getUserId(),Status.BARGAIN.getValue(),bargain.getBargainNo()));
-                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
-                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
-                    }
-                    schedualMessageService.easemobMessage(bargain.getUserId().toString(),
-                            "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),bargain.getGoodsId().toString());
+            try{
+                if(goodsInfo.getType().intValue() == Status.AUCTION.getValue()){
+                    goodsInfo.setLastIntervalTime(DateStampUtils.getTimesteamp());
                 }
+                if(status == 2){//已售出
+                    //拒绝此商品的所有议价
+                    //压价信息
+                    List<GoodsBargain> goodsBargains = goodsBargainMapper.selectAllByGoodsId(goodsId,1);//状态 1申请 2同意 3拒绝 4取消
+                    for(GoodsBargain bargain:goodsBargains){
+                        bargain.setStatus(Status.BARGAIN_REFUSE.getValue());
+                        goodsBargainMapper.updateByPrimaryKeySelective(bargain);
+                        //退回余额
+                        BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),Status.ADD.getValue()));
+                        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                            throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                        }
+                        //买家新增余额账单
+                        baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(bargain.getUserId(),bargain.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),bargain.getBargainNo(),"【"+goodsInfo.getName()+"】",goodsInfo.getUserId(),bargain.getUserId(),Status.BARGAIN.getValue(),bargain.getBargainNo()));
+                        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                            throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                        }
+                        schedualMessageService.easemobMessage(bargain.getUserId().toString(),
+                                "您对商品【"+goodsInfo.getName()+"】的议价已被卖家拒绝，点击此处查看详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_GOODS.getMessage(),bargain.getGoodsId().toString());
+                    }
+                }
+                goodsInfo.setStatus(status);
+                goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
+            }catch (Exception e) {
+                e.printStackTrace();
+                throw new ServiceException("修改商品状态出错，请稍后再试！");
             }
-            goodsInfo.setStatus(status);
-            goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
         }
     }
 

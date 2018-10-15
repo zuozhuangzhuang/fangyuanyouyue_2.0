@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.fangyuanyouyue.base.util.ParseReturnValue;
+import com.fangyuanyouyue.base.util.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,9 +25,6 @@ import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Score;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.base.util.DateStampUtils;
-import com.fangyuanyouyue.base.util.DateUtil;
-import com.fangyuanyouyue.base.util.IdGenerator;
 import com.fangyuanyouyue.order.dao.CompanyMapper;
 import com.fangyuanyouyue.order.dao.OrderCommentMapper;
 import com.fangyuanyouyue.order.dao.OrderDetailMapper;
@@ -319,17 +316,6 @@ public class OrderServiceImpl implements OrderService{
                 }
                 GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), GoodsInfo.class);
 
-            	//加入分布式锁，锁住商品id，10秒后释放
-            	try {
-            		boolean lock = redissonLock.lock("GoodsOrder"+addOrderDetailDto.getGoodsId(), 10);
-            		if(!lock) {
-            			Log.info("分布式锁获取失败");
-            			throw new ServiceException("您来晚啦，商品已被抢走了～～");
-            		}
-            	}catch (Exception e) {
-            		throw new ServiceException("您来晚啦，商品已被抢走了～～");
-    			}
-    			Log.info("分布式锁获取成功");
 
             	try {
 	                //计算总订单总金额
@@ -396,9 +382,7 @@ public class OrderServiceImpl implements OrderService{
             	}catch (Exception e) {
             		e.printStackTrace();
                     throw new ServiceException("下单出错，请稍后再试！");
-				}finally {
-                    redissonLock.release("GoodsOrder"+goods.getId());
-				}
+                }
             }
             mainAmount = mainAmount.add(amount);
             mainPayAmount = mainPayAmount.add(payAmount.add(payFreight));
@@ -596,7 +580,7 @@ public class OrderServiceImpl implements OrderService{
                 sellerDto.setSellerName(seller.getNickName());
                 boolean flag = true;
                 for(SellerDto dto:sellerDtos){
-                    if(dto.getSellerId() == seller.getId()){
+                    if(dto.getSellerId().equals(seller.getId())){
                         flag = false;
                     }
                 }
@@ -719,25 +703,12 @@ public class OrderServiceImpl implements OrderService{
     @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public OrderDto saveOrder(String token,Integer goodsId,Integer couponId,Integer userId,Integer addressId,Integer type) throws ServiceException {
-    	
-        try {
-        	//加入分布式锁，锁住商品id，10秒后释放
-        	try {
-        		boolean lock = redissonLock.lock("GoodsOrder"+goodsId, 10);
-        		if(!lock) {
-        			Log.info("分布式锁获取失败");
-        			throw new ServiceException("您来晚啦，商品已被抢走了～～");
-        		}
-        	}catch (Exception e) {
-        		throw new ServiceException("您来晚啦，商品已被抢走了～～");
-			}
-			Log.info("分布式锁获取成功");
-        	
-	    	//验证手机号
-	        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
-	        if(StringUtils.isEmpty(user.getPhone())){
-	            throw new ServiceException("未绑定手机号！");
-	        }
+
+        //验证手机号
+        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualUserService.verifyUserById(userId)).getString("data")), UserInfo.class);
+        if(StringUtils.isEmpty(user.getPhone())){
+            throw new ServiceException("未绑定手机号！");
+        }
 
 	        //获取商品信息
 	        GoodsInfo goods = JSONObject.toJavaObject(JSONObject.parseObject(JSONObject.parseObject(schedualGoodsService.goodsInfo(goodsId)).getString("data")),GoodsInfo.class);
@@ -877,19 +848,6 @@ public class OrderServiceImpl implements OrderService{
 	                "恭喜您！您的"+(goods.getType()==Status.GOODS.getValue()?"商品【":"抢购【")+goods.getName()+"】已有人下单，点击此处查看订单",
 	                Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER_SELLER.getMessage(),orderInfo.getId().toString());
 	        return orderDto;
-        }catch (ServiceException e) {
-        	e.printStackTrace();
-            throw e;
-		}catch (Exception e) {
-        	e.printStackTrace();
-            throw new ServiceException("下单出错，请稍后再试！");
-		}finally {
-			try {
-				redissonLock.release("GoodsOrder" + goodsId);
-			}catch(Exception e) {
-				e.printStackTrace();
-			}
-		}
 
     }
 
@@ -1324,7 +1282,7 @@ public class OrderServiceImpl implements OrderService{
         pager.setDatas(orderDtos);
         return pager;
     }
-    
+
     @Override
     public AdminOrderDto adminOrderDetail(Integer orderId) throws ServiceException{
     	OrderInfo info = orderInfoMapper.selectByOrderId(orderId);
@@ -1348,7 +1306,7 @@ public class OrderServiceImpl implements OrderService{
         }
         orderDto.setOrderDetail(orderDetail);
         orderDto.setTotalCount(orderDetailDtos.size());
-         
+
         //卖家信息DTO        // List sellerDtos = new ArrayList<>();
         //sellerDtos.addAll(getSellerDtos(OrderDetailDto.toDtoList(orderDetails)));
         //订单支付表
@@ -1367,7 +1325,7 @@ public class OrderServiceImpl implements OrderService{
         }
         return orderDto;
     }
-    
+
     @Override
     public Pager simpleOrderList(AdminOrderParam param) throws ServiceException {
         //后台查看所有用户订单
