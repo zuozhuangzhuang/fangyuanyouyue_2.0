@@ -37,7 +37,7 @@ public class AppraisalLikesServiceImpl implements AppraisalLikesService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(rollbackFor=Exception.class)
 	@TxTransaction(isStart=true)
 	public void saveLikes(Integer userId, Integer appraisalId,Integer type) throws ServiceException {
 		AppraisalLikes appraisalLikes = appraisalLikesMapper.selectByAppraisalIdUserId(appraisalId, userId);

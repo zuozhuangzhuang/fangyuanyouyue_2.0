@@ -64,7 +64,7 @@ public class AppraisalServiceImpl implements AppraisalService{
     private SchedualMessageService schedualMessageService;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public AppraisalOrderInfoDto addAppraisal(Integer userId, Integer[] goodsIds, String title, String description, String[] imgUrls, String videoUrl,String videoImg) throws ServiceException {
         String verifyUserById = schedualUserService.verifyUserById(userId);
@@ -220,7 +220,7 @@ public class AppraisalServiceImpl implements AppraisalService{
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public void cancelAppraisal(Integer userId, Integer orderId) throws ServiceException {
         //取消鉴定时删除鉴定订单
@@ -280,7 +280,7 @@ public class AppraisalServiceImpl implements AppraisalService{
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public Object payAppraisal(Integer userId, Integer orderId, Integer payType, String payPwd) throws ServiceException {
         //只有买家能调用订单支付接口，直接根据orderId查询订单
@@ -340,7 +340,7 @@ public class AppraisalServiceImpl implements AppraisalService{
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public boolean updateOrder(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException{
         try{
@@ -462,7 +462,7 @@ public class AppraisalServiceImpl implements AppraisalService{
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public void updateAppraisal(Integer id, Integer status, String opinion, Integer isShow) throws ServiceException {
         GoodsAppraisalDetail goodsAppraisalDetail = goodsAppraisalDetailMapper.selectByPrimaryKey(id);

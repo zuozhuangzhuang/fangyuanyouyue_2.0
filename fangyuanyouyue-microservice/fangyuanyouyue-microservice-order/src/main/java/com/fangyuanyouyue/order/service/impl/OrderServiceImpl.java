@@ -213,7 +213,7 @@ public class OrderServiceImpl implements OrderService{
      * @param addOrderDstos 提供每个店铺及店铺商品列表
      * @return
      */
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     private List<OrderDetailDto> separatesOrder(OrderInfo mainOrder,OrderPay mainOrderPay,List<AddOrderDto> addOrderDstos) throws ServiceException{
         if(addOrderDstos.size() == 0){
@@ -439,7 +439,7 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public void cancelOrder(Integer userId, Integer orderId) throws ServiceException {
         //根据订单ID获取订单信息
@@ -894,7 +894,7 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public Object getOrderPay(Integer userId, Integer orderId, Integer payType, String payPwd) throws ServiceException {
         //只有买家能调用订单支付接口，直接根据orderId查询订单
@@ -1024,7 +1024,7 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public void getGoods(Integer userId, Integer orderId) throws ServiceException {
         OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKeyDetail(orderId);
@@ -1127,7 +1127,7 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public void evaluationOrder(Integer userId, Integer orderId, Integer goodsQuality, Integer serviceAttitude) throws ServiceException {
         OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKeyDetail(orderId);
@@ -1208,7 +1208,7 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public boolean updateOrder(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException {
         OrderInfo orderInfo = orderInfoMapper.selectByOrderNo(orderNo);

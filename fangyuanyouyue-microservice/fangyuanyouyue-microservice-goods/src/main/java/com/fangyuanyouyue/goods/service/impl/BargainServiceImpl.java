@@ -63,7 +63,7 @@ public class BargainServiceImpl implements BargainService{
     private BargainOrderMapper bargainOrderMapper;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public Object addBargain(Integer userId, Integer goodsId, BigDecimal price, String reason,Integer addressId,String payPwd,Integer payType) throws ServiceException {
         String verifyUserById = schedualUserService.verifyUserById(userId);
@@ -170,7 +170,7 @@ public class BargainServiceImpl implements BargainService{
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public boolean updateOrder(String orderNo, String thridOrderNo, Integer payType) throws ServiceException{
         BargainOrder bargainOrder = bargainOrderMapper.selectByOrderNo(orderNo);
@@ -205,7 +205,7 @@ public class BargainServiceImpl implements BargainService{
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public Integer updateBargain(Integer userId, Integer goodsId,Integer bargainId,Integer status) throws ServiceException {
         GoodsBargain goodsBargain = goodsBargainMapper.selectByPrimaryKey(bargainId);
@@ -500,7 +500,7 @@ public class BargainServiceImpl implements BargainService{
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public void deleteBargain(Integer userId, Integer[] goodsIds) throws ServiceException {
         for(Integer goodsId:goodsIds){

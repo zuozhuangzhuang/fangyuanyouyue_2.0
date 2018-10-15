@@ -73,7 +73,7 @@ public class ForumCommentServiceImpl implements ForumCommentService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(rollbackFor=Exception.class)
 	@TxTransaction(isStart=true)
 	public ForumCommentDto saveComment(Integer userId, Integer forumId, String content, Integer commentId) throws ServiceException{
 		ForumInfo forumInfo = forumInfoMapper.selectDetailByPrimaryKey(forumId);
