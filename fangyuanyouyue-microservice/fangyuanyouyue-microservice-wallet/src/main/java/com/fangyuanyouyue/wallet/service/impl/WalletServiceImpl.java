@@ -256,7 +256,7 @@ public class WalletServiceImpl implements WalletService{
                 userWallet.setBalance(userWallet.getBalance().add(amount));
             }else if(type.intValue() == 2){//消费
                 //获取被限制的用户（代理不可以余额提现）
-                ConfinedUser confinedUser = confinedUserMapper.selectByUserIdStatus(userId, 0);
+                ConfinedUser confinedUser = confinedUserMapper.selectByUserIdStatus(userId, Status.IS_PROXY.getValue());
                 if(confinedUser != null){
                     throw new ServiceException("此用户被限制使用余额！");
                 }
