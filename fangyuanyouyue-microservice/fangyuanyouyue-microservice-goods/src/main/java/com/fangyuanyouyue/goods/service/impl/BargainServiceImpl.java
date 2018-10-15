@@ -119,7 +119,7 @@ public class BargainServiceImpl implements BargainService{
                 if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
                     String getWechatOrder = schedualWalletService.orderPayByWechat(bargainOrder.getOrderNo(), bargainOrder.getAmount(),NotifyUrl.notify.getNotifUrl()+NotifyUrl.bargain_wechat_notify.getNotifUrl());
                     BaseResp result = ParseReturnValue.getParseReturnValue(getWechatOrder);
-                    if(!result.getCode().equals(ReCode.SUCCESS)){
+                    if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(result.getCode(),result.getReport());
                     }
                     WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
@@ -128,7 +128,7 @@ public class BargainServiceImpl implements BargainService{
                 }else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
                     String getALiOrder = schedualWalletService.orderPayByALi(bargainOrder.getOrderNo(), bargainOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.bargain_alipay_notify.getNotifUrl());
                     BaseResp result = ParseReturnValue.getParseReturnValue(getALiOrder);
-                    if(!result.getCode().equals(ReCode.SUCCESS)){
+                    if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(result.getCode(),result.getReport());
                     }
                     payInfo.append(result.getData());
