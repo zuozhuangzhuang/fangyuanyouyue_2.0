@@ -233,7 +233,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public void cartRemoveByIds(Integer userId,Integer[] goodsIds) throws ServiceException {
         //根据商品ID数组删除购物车内信息

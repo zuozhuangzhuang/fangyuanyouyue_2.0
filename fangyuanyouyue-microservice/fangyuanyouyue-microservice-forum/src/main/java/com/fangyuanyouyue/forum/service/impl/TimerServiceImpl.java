@@ -72,7 +72,7 @@ public class TimerServiceImpl implements TimerService{
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public void appraisalEnd() throws ServiceException {
         //1、获取status=1，enndTime小于当前时间的全民鉴定 2、获取鉴定中评论获取点赞最多的评论，定为获胜者(票数一致最先评论者胜出) 3、向发起者和获胜者发送消息通知
@@ -140,7 +140,7 @@ public class TimerServiceImpl implements TimerService{
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public void dailyWage() throws ServiceException {
         //每天上午08:00 结算专栏返利，200新增浏览量（当前日期前一天0时到24时新增浏览量）/元，浏览量为奇数时，浏览量-1再计算返利金额，直接返到用户余额，并提示用户，新增余额账单

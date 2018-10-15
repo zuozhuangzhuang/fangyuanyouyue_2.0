@@ -192,7 +192,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(rollbackFor=Exception.class)
 	@TxTransaction(isStart=true)
 	public Object addAppraisal(Integer userId, BigDecimal bonus, String title, String content,String[] imgUrls,Integer[] userIds,Integer payType,String payPwd) throws ServiceException {
 
@@ -330,7 +330,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(rollbackFor=Exception.class)
 	@TxTransaction(isStart=true)
 	public boolean applyAppraisal(String orderNo,String thirdOrderNo,Integer payType) throws ServiceException{
 		//获取订单
@@ -450,7 +450,7 @@ public class AppraisalDetailServiceImpl implements AppraisalDetailService {
 	}
 
     @Override
-	@Transactional
+	@Transactional(rollbackFor=Exception.class)
 	@TxTransaction(isStart=true)
     public void updateAppraisal(AdminForumParam param) throws ServiceException {
         AppraisalDetail detail = appraisalDetailMapper.selectByPrimaryKey(param.getId());
