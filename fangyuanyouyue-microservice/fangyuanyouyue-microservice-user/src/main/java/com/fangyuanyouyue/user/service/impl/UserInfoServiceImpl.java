@@ -705,7 +705,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public void fansFollow(Integer userId, Integer toUserId, Integer type) throws ServiceException {
         UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userId);

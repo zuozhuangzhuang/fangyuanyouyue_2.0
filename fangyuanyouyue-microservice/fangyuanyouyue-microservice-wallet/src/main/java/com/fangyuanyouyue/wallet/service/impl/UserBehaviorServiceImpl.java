@@ -33,7 +33,7 @@ public class UserBehaviorServiceImpl implements UserBehaviorService {
     private ScoreService scoreService;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction
     public void addUserBehavior(Integer userId, Integer toUserId, Integer businessId, Integer businessType, Integer type) throws ServiceException {
         UserBehavior userBehavior = userBehaviorMapper.selectByUserIdType(userId, businessId, businessType, type);

@@ -159,7 +159,7 @@ public class TimerServiceImpl implements TimerService{
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public void refuseBargain() throws ServiceException {
         //1、获取所有正在申请中的议价 2、根据议价申请时间进行操作 3、通知买家
