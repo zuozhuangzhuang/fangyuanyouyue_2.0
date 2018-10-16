@@ -102,7 +102,10 @@ public class ConfinedUserServiceImpl implements ConfinedUserService {
             confinedUserMapper.insert(confinedUser);
         }else{
             //TODO 如果取消一级代理，二级代理怎么办
-            ConfinedUser confinedUser = confinedUserMapper.selectByPrimaryKey(id);
+            ConfinedUser confinedUser = confinedUserMapper.selectByUserId(id);
+            if(confinedUser == null){
+                throw new ServiceException("未找到代理！");
+            }
             confinedUser.setStatus(Status.NOT_PROXY.getValue());
             confinedUserMapper.updateByPrimaryKeySelective(confinedUser);
         }
