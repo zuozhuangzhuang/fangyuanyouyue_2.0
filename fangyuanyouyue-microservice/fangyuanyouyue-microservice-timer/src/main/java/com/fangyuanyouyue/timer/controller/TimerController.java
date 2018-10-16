@@ -30,7 +30,7 @@ public class TimerController extends BaseController {
     @Autowired
     private SchedualUserService schedualUserService;
 
-    @Scheduled(cron="0/1 * *  * * ? ")
+    @Scheduled(cron="0 * *  * * ? ")
     public BaseResp depreciate() throws IOException {
         try {
             log.info("----》抢购降价《----");
