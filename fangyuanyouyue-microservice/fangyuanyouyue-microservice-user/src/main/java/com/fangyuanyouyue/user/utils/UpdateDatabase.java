@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
-import com.fangyuanyouyue.base.util.DateStampUtils;
-import com.fangyuanyouyue.base.util.DateUtil;
-import com.fangyuanyouyue.base.util.IdGenerator;
-import com.fangyuanyouyue.base.util.MD5Util;
+import com.fangyuanyouyue.base.util.*;
 import com.fangyuanyouyue.base.util.wechat.pay.utils.MD5;
 import io.swagger.models.auth.In;
 import org.apache.commons.lang.StringUtils;
@@ -56,12 +53,12 @@ public class UpdateDatabase {
         return conn;
     }
     public static Connection getNewConnection(){
-        String url="jdbc:mysql://localhost:3306/new_xiaofangyuan?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=true";
-//        String url="jdbc:mysql://xiaofangyuan-prd.mysql.rds.aliyuncs.com:3306/xiaofangyuan?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=true";
-        String userName="root";
-//        String userName="wuzhimin";
-        String password="123456";
-//        String password="Wuzhimin123";
+//        String url="jdbc:mysql://localhost:3306/new_xiaofangyuan?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=true";
+        String url="jdbc:mysql://xiaofangyuan-prd.mysql.rds.aliyuncs.com:3306/xiaofangyuan?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=true";
+//        String userName="root";
+        String userName="wuzhimin";
+//        String password="123456";
+        String password="Wuzhimin123";
         try {
             Class.forName("com.mysql.jdbc.Driver");
         } catch (ClassNotFoundException e) {
@@ -504,20 +501,25 @@ public class UpdateDatabase {
             confine_user_rs = confine_user_ps.executeQuery(selectConfine);
             while (confine_user_rs.next()){
                 Integer userId = confine_user_rs.getInt("user_id")+100000;//用户id
-                Integer status = confine_user_rs.getInt("status");//用于假删除用户  0被限制用户 1被限制后又被解除限制用户（表面正常用户）
+                Integer status = confine_user_rs.getInt("status")==0?1:2;//代理状态 1代理 2非代理
                 String addTime = DateStampUtils.formatUnixTime(System.currentTimeMillis(),DateUtil.DATE_FORMT);//添加时间
                 String updateTime = null;//更新时间
+                String proxy = CheckCode.getProxyCode();
                 confinedUserSql.append("insert into confined_user (" +
                         "id, " +
                         "user_id, " +
                         "status," +
                         "add_time, " +
-                        "update_time) values ("
+                        "update_time, " +
+                        "parent_id," +
+                        "code) values ("
                         +null+","
                         +userId+","
                         +status+",'"
                         +addTime+"','"
-                        +updateTime+"');\r\n"
+                        +updateTime+"',"
+                        +null+",'"
+                        +proxy+"');\r\n"
                 );
             }
         }catch (SQLException e) {
@@ -587,7 +589,7 @@ public class UpdateDatabase {
                 contentDto.setContent(forum_rs.getString("description"));
                 list.add(contentDto);
                 Object json = JSONObject.toJSON(list);
-                content = json.toString().replace("'","‘").replace("\\","\\/\\/");
+                content = json.toString().replace("'","‘");
                 forumSql.append("insert into forum_info (" +
                         "id, " +
                         "user_id, " +
@@ -921,11 +923,12 @@ public class UpdateDatabase {
                         sellerId = seller_rs.getInt("user_id")+100000;
                     }
                     isResolve = 2;
-                    Integer returnStatus = order_rs.getInt("return_status");
-                    isRefund = returnStatus == null?1:2;
                     sellerIsDelete = order_rs.getInt("sell_delete")==0?1:2;
                     buyerIsDelete = order_rs.getInt("is_delete")==0?1:2;
 
+                    Integer returnStatus = order_rs.getInt("return_status");
+                    Integer refund_detail_id = order_rs.getInt("refund_detail_id");
+                    isRefund = (refund_detail_id != 0?1:2);
                     orderSql.append("insert into order_info (" +
                             "id, " +
                             "user_id, " +
@@ -1071,7 +1074,8 @@ public class UpdateDatabase {
                             +mainOrderId+",'"
                             +description+"');\r\n"
                     );
-                    if(isRefund.equals(1)){
+
+                    if(refund_detail_id != 0){
                         String reason = null;//申请理由
                         String serviceNo = null;//服务单号
                         String pic1 = null;//图片1
@@ -1086,26 +1090,73 @@ public class UpdateDatabase {
                         String endTime = null;//最终（后台管理）处理时间
                         String dealTime = null;//卖家处理时间
                         String platformReason = null;//平台处理原因
-
-                        String selectRefund = "select * from a_refund_detail where order_id ="+orderId;
+                        String selectRefund = "select * from a_refund_detail where id ="+refund_detail_id;
                         refund_ps = conn.prepareStatement(selectRefund);
                         refund_rs = refund_ps.executeQuery(selectRefund);
-                        while (refund_rs.next()){
+                        if (refund_rs.next()){
                             reason = refund_rs.getString("content");
-                            pic1 = refund_rs.getString("file1");
-                            pic2 = refund_rs.getString("file2");
-                            pic3 = refund_rs.getString("file3");
-                            pic4 = refund_rs.getString("file4");
-                            pic5 = refund_rs.getString("file5");
-                            pic6 = refund_rs.getString("file6");
+
                             refundAddtime = DateStampUtils.formatUnixTime(refund_rs.getLong("add_time"),DateUtil.DATE_FORMT);
                             //卖家是否同意退货状态 null正常  1申请退货 2卖家直接同意退货 3卖家直接拒绝退货 4卖家48h不处理默认同意退货 5卖家72h小时不处理默认不同意退货
                             //卖家是否同意退货状态           1申请退货 2卖家直接同意退货 3卖家直接拒绝退货 4卖家48h不处理默认同意退货 5卖家72h小时不处理默认不同意退货
                             sellerReturnStatus = order_rs.getInt("seller_return_status");
                             refuseReason = refund_rs.getString("seller_refuse");
+                            if(StringUtils.isNotEmpty(refuseReason)){
+                                refuseReason = refuseReason.replace("'","‘").replace("\"","”");
+                            }
                             refundAddtime = DateStampUtils.formatUnixTime(refund_rs.getLong("add_time"),DateUtil.DATE_FORMT);
                             endTime = DateStampUtils.formatUnixTime(refund_rs.getLong("end_time"),DateUtil.DATE_FORMT);
                             dealTime = DateStampUtils.formatUnixTime(refund_rs.getLong("seller_return_time"),DateUtil.DATE_FORMT);
+                            List<ColumnContentDto> list = new ArrayList<>();
+                            String[] split = reason.split("#");
+                            if(split.length > 1){
+                                ColumnContentDto contentDto1 = new ColumnContentDto();
+                                contentDto1.setType(0);
+                                contentDto1.setContent(split[1]);
+                                list.add(contentDto1);
+                                ColumnContentDto contentDto2 = new ColumnContentDto();
+                                contentDto2.setType(1);
+                                contentDto2.setContent(split[2]);
+                                list.add(contentDto2);
+                            }else{
+                                //其他
+                                ColumnContentDto contentDto1 = new ColumnContentDto();
+                                contentDto1.setType(0);
+                                contentDto1.setContent("其他");
+                            }
+                            ColumnContentDto pic = new ColumnContentDto();
+                            pic.setType(3);
+                            pic1 = refund_rs.getString("file1");
+                            if(StringUtils.isNotEmpty(pic1)){
+                                pic.setContent(pic1);
+                                list.add(pic);
+                            }
+                            pic2 = refund_rs.getString("file2");
+                            if(StringUtils.isNotEmpty(pic2)){
+                                pic.setContent(pic2);
+                                list.add(pic);
+                            }
+                            pic3 = refund_rs.getString("file3");
+                            if(StringUtils.isNotEmpty(pic3)){
+                                pic.setContent(pic3);
+                                list.add(pic);
+                            }
+                            pic4 = refund_rs.getString("file4");
+                            if(StringUtils.isNotEmpty(pic4)){
+                                pic.setContent(pic4);
+                                list.add(pic);
+                            }
+                            pic5 = refund_rs.getString("file5");
+                            if(StringUtils.isNotEmpty(pic5)){
+                                pic.setContent(pic5);
+                                list.add(pic);
+                            }
+                            pic6 = refund_rs.getString("file6");
+                            if(StringUtils.isNotEmpty(pic6)){
+                                pic.setContent(pic6);
+                                list.add(pic);
+                            }
+                            Object json = JSONObject.toJSON(list);
 
                             //退货表
                             orderSql.append("insert into order_refund (" +
@@ -1130,7 +1181,7 @@ public class UpdateDatabase {
                                     "platform_reason) values ("
                                     +null+","
                                     +orderId+",'"
-                                    +reason+"','"
+                                    +json.toString().replace("'","‘")+"','"
                                     +serviceNo+"','"
                                     +pic1+"','"
                                     +pic2+"','"
@@ -1142,7 +1193,7 @@ public class UpdateDatabase {
                                     +refundAddtime+"','"
                                     +updateTime+"',"
                                     +sellerReturnStatus+","
-                                    +userId+","
+                                    +userId+",'"
                                     +refuseReason+"','"
                                     +endTime+"','"
                                     +dealTime+"','"
@@ -1150,7 +1201,6 @@ public class UpdateDatabase {
                             );
                         }
                     }
-
                 }
             }
         }catch (SQLException e){
@@ -1238,14 +1288,21 @@ public class UpdateDatabase {
             String goodsCategoryName = null;
 
 
-            String selectGoods = "select * from a_goods where is_auction = 0 and (status = 1 or status = 2) and is_delete = 1 and user_id =" + rs.getInt("id");
+//            String selectGoods = "select * from a_goods where is_auction = 0 and (status = 1 or status = 2) and is_delete = 1 and user_id =" + rs.getInt("id");
+            String selectGoods = "select * from a_goods where user_id =" + rs.getInt("id");
             goods_ps = conn.prepareStatement(selectGoods);
             goods_rs = goods_ps.executeQuery(selectGoods);
             while (goods_rs.next()){
                 goodsId = goods_rs.getInt("id");
                 name = goods_rs.getString("title").replace("'","‘").replace("\"","”");
                 price = goods_rs.getBigDecimal("start_price");
+                if(price == null){
+                    price = new BigDecimal(0);
+                }
                 postage = goods_rs.getBigDecimal("postage");
+                if(postage == null){
+                    postage = new BigDecimal(0);
+                }
                 sort = goods_rs.getInt("is_top")==1?1:2;
                 type = 1;
                 status = goods_rs.getInt("status");
@@ -1767,12 +1824,17 @@ public class UpdateDatabase {
         Integer userId = rs.getInt("id")+100000;
         String unionId = null;
         String appOpenId = null;
+        String mpOpenId = null;//公众号openid
         String nickName = null;
         String headImgUrl = null;
         String addTime = DateStampUtils.formatUnixTime(rs.getLong("add_time"),DateUtil.DATE_FORMT);
 
         if(type == 1){
             unionId = rs.getString("wechat_cliend");
+            if(unionId.startsWith("olI")){
+                mpOpenId = unionId;
+                return null;
+            }
         }else{
             unionId = rs.getString("qq_cliend");
         }
@@ -1820,8 +1882,8 @@ public class UpdateDatabase {
                         +userId+","
                         +type+",'"
                         +unionId+"','"
-                        +appOpenId+"',"
-                        +null+","
+                        +appOpenId+"','"
+                        +mpOpenId+"',"
                         +null+",'"
                         +nickName+"','"
                         +headImgUrl+"','"
@@ -1950,7 +2012,11 @@ public class UpdateDatabase {
         Integer fansCount = rs.getInt("fans_count");
         Integer status = 3;
         Integer authType = 3;
-        String payPwd = MD5Util.generate(rs.getString("pay_pwd"));
+        String oldPayPwd = rs.getString("pay_pwd");
+        String payPwd = null;
+        if(oldPayPwd!= null && !oldPayPwd.equals(0)){
+            payPwd = MD5Util.generate(rs.getString("pay_pwd"));
+        }
         String identity = null;
         String name = null;
         if(rs.getString("is_ext") != null && rs.getString("is_ext").equals("1")){
@@ -2304,209 +2370,209 @@ public class UpdateDatabase {
             new_conn = getNewConnection();
             PreparedStatement new_ps = null;
             //confine_user
-//            String confineUserSql = getConfineUserSql();
-//            if(StringUtils.isNotEmpty(confineUserSql)){
-//                try{
-//                    new_ps = new_conn.prepareStatement(confineUserSql);
-//                    new_ps.executeLargeUpdate(confineUserSql);
-//                }catch (SQLException e){
-//                    e.printStackTrace();
-//                }
-//            }
-            //report
-            String reportSql = getReportSql();
-            if(StringUtils.isNotEmpty(reportSql)){
+            String confineUserSql = getConfineUserSql();
+            if(StringUtils.isNotEmpty(confineUserSql)){
                 try{
-                    new_ps = new_conn.prepareStatement(reportSql);
-                    new_ps.executeLargeUpdate(reportSql);
+                    new_ps = new_conn.prepareStatement(confineUserSql);
+                    new_ps.executeLargeUpdate(confineUserSql);
                 }catch (SQLException e){
                     e.printStackTrace();
                 }
             }
-            String countSql = "select count(id) as count from a_user";
-            Integer count = 0;
-            try{
-                ps = conn.prepareStatement(countSql);
-                rs = ps.executeQuery(countSql);
-                if(rs.next()){
-                    count = rs.getInt("count");
-                }
-            }catch (SQLException e){
-                e.printStackTrace();
-            }
+            //report
+//            String reportSql = getReportSql();
+//            if(StringUtils.isNotEmpty(reportSql)){
+//                try{
+//                    new_ps = new_conn.prepareStatement(reportSql);
+//                    new_ps.executeLargeUpdate(reportSql);
+//                }catch (SQLException e){
+//                    e.printStackTrace();
+//                }
+//            }
+//            String countSql = "select count(id) as count from a_user";
+//            Integer count = 0;
+//            try{
+//                ps = conn.prepareStatement(countSql);
+//                rs = ps.executeQuery(countSql);
+//                if(rs.next()){
+//                    count = rs.getInt("count");
+//                }
+//            }catch (SQLException e){
+//                e.printStackTrace();
+//            }
             //执行动态SQL语句。通常通过PreparedStatement实例实现。
             // 3、执行数据库存储过程。通常通过CallableStatement实例实现。
-            ps=conn.prepareStatement(selectUser);// 2.创建Satement并设置参数
-            rs=ps.executeQuery(selectUser);  // 3.ִ执行SQL语句
+//            ps=conn.prepareStatement(selectUser);// 2.创建Satement并设置参数
+//            rs=ps.executeQuery(selectUser);  // 3.ִ执行SQL语句
             // 4.处理结果集
-            while(rs.next()){
-                String nickName = rs.getString("nickName");
-                System.out.println("【"+nickName+"】开始");
-                //user_info
-                String userInfoSql = getUserInfoSql(rs);
-                if(StringUtils.isNotEmpty(userInfoSql)){
-                    try{
-                        new_ps = new_conn.prepareStatement(userInfoSql);
-                        new_ps.executeLargeUpdate(userInfoSql);
-                    }catch (SQLException e){
-                        e.printStackTrace();
-                    }
-                }
-                //user_info_ext
-                String userInfoExtSql = getUserExtSql(rs);
-                if(StringUtils.isNotEmpty(userInfoExtSql)){
-                    try{
-                        new_ps = new_conn.prepareStatement(userInfoExtSql);
-                        new_ps.executeLargeUpdate(userInfoExtSql);
-                    }catch (SQLException e){
-                        e.printStackTrace();
-                    }
-                }
-                //user_vip
-                String userVipSql = getUserVipSql(rs);
-                if(StringUtils.isNotEmpty(userVipSql)){
-                    try{
-                        new_ps = new_conn.prepareStatement(userVipSql);
-                        new_ps.executeLargeUpdate(userVipSql);
-                    }catch (SQLException e){
-                        e.printStackTrace();
-                    }
-                }
-                //user_wallet
-                String userWalletSql = getUserWalletSql(rs);
-                if(StringUtils.isNotEmpty(userWalletSql)){
-                    try{
-                        new_ps = new_conn.prepareStatement(userWalletSql);
-                        new_ps.executeLargeUpdate(userWalletSql);
-                    }catch (SQLException e){
-                        e.printStackTrace();
-                    }
-                }
-                //user_third_party
-                if(StringUtils.isNotEmpty(rs.getString("wechat_cliend"))){
-                    String userWechatSql = getUserThirdSql(rs,1);
-                    if(StringUtils.isNotEmpty(userWechatSql)){
-                        try{
-                            new_ps = new_conn.prepareStatement(userWechatSql);
-                            new_ps.executeLargeUpdate(userWechatSql);
-                        }catch (SQLException e){
-                            e.printStackTrace();
-                        }
-                    }
-                }
-                if(StringUtils.isNotEmpty(rs.getString("qq_cliend"))){
-                    String userQQSql = getUserThirdSql(rs,2);
-                    if(StringUtils.isNotEmpty(userQQSql)){
-                        try{
-                            new_ps = new_conn.prepareStatement(userQQSql);
-                            new_ps.executeLargeUpdate(userQQSql);
-                        }catch (SQLException e){
-                            e.printStackTrace();
-                        }
-                    }
-                }
-                //a_user_withdraw
-                String userWithdrawSql = getUserWithdrawSql(rs);
-                if(StringUtils.isNotEmpty(userWithdrawSql)){
-                    try{
-                        new_ps = new_conn.prepareStatement(userWithdrawSql);
-                        new_ps.executeLargeUpdate(userWithdrawSql);
-                    }catch (SQLException e){
-                        e.printStackTrace();
-                    }
-                }
-                //a_user_finance
-                String userFinanceSql = getUserFinanceSql(rs);
-                if(StringUtils.isNotEmpty(userFinanceSql)){
-                    try{
-                        new_ps = new_conn.prepareStatement(userFinanceSql);
-                        new_ps.executeLargeUpdate(userFinanceSql);
-                    }catch (SQLException e){
-                        e.printStackTrace();
-                    }
-                }
-                //a_address
-                String userAddressSql = getUserAddressSql(rs);
-                if(StringUtils.isNotEmpty(userAddressSql)){
-                    try{
-                        new_ps = new_conn.prepareStatement(userAddressSql);
-                        new_ps.executeLargeUpdate(userAddressSql);
-                    }catch (SQLException e){
-                        e.printStackTrace();
-                    }
-                }
-                //a_user_fans
-                String userFansSql = getUserFansSql(rs);
-                if(StringUtils.isNotEmpty(userFansSql)){
-                    try{
-                        new_ps = new_conn.prepareStatement(userFansSql);
-                        new_ps.executeLargeUpdate(userFansSql);
-                    }catch (SQLException e){
-                        e.printStackTrace();
-                    }
-                }
-                //a_goods
-                String goodsSql = getGoodsSql(rs);
-                if(StringUtils.isNotEmpty(goodsSql)){
-                    try{
-                        new_ps = new_conn.prepareStatement(goodsSql);
-                        new_ps.executeLargeUpdate(goodsSql);
-                    }catch (SQLException e){
-                        e.printStackTrace();
-                    }
-                }
-                //a_order
-                String orderSql = getOrderSql(rs);
-                if(StringUtils.isNotEmpty(orderSql)){
-                    try{
-                        new_ps = new_conn.prepareStatement(orderSql);
-                        new_ps.executeLargeUpdate(orderSql);
-                    }catch (SQLException e){
-                        e.printStackTrace();
-                    }
-                }
-                //a_appraisal
-                String appraisalSql = getAppraisalSql(rs);
-                if(StringUtils.isNotEmpty(appraisalSql)){
-                    try{
-                        new_ps = new_conn.prepareStatement(appraisalSql);
-                        new_ps.executeLargeUpdate(appraisalSql);
-                    }catch (SQLException e){
-                        e.printStackTrace();
-                    }
-                }
-                //a_appreciate
-                String forumSql = getForumSql(rs);
-                if(StringUtils.isNotEmpty(forumSql)){
-                    try{
-                        new_ps = new_conn.prepareStatement(forumSql);
-                        new_ps.executeLargeUpdate(forumSql);
-                    }catch (SQLException e){
-                        e.printStackTrace();
-                    }
-                }
-                //collect
-                String collectSql = getCollectSql(rs);
-                if(StringUtils.isNotEmpty(collectSql)){
-                    try{
-                        new_ps = new_conn.prepareStatement(collectSql);
-                        new_ps.executeLargeUpdate(collectSql);
-                    }catch (SQLException e){
-                        e.printStackTrace();
-                    }
-                }
-                //comment
-                String commentSql = getCommentSql(rs);
-                if(StringUtils.isNotEmpty(commentSql)){
-                    try{
-                        new_ps = new_conn.prepareStatement(commentSql);
-                        new_ps.executeLargeUpdate(commentSql);
-                    }catch (SQLException e){
-                        e.printStackTrace();
-                    }
-                }
-                System.out.println("【"+nickName+"】结束,剩余人数："+(--count));
-            }
+//            while(rs.next()){
+//                String nickName = rs.getString("nickName");
+//                System.out.println("【"+nickName+"】开始");
+//                //user_info
+//                String userInfoSql = getUserInfoSql(rs);
+//                if(StringUtils.isNotEmpty(userInfoSql)){
+//                    try{
+//                        new_ps = new_conn.prepareStatement(userInfoSql);
+//                        new_ps.executeLargeUpdate(userInfoSql);
+//                    }catch (SQLException e){
+//                        e.printStackTrace();
+//                    }
+//                }
+//                //user_info_ext
+//                String userInfoExtSql = getUserExtSql(rs);
+//                if(StringUtils.isNotEmpty(userInfoExtSql)){
+//                    try{
+//                        new_ps = new_conn.prepareStatement(userInfoExtSql);
+//                        new_ps.executeLargeUpdate(userInfoExtSql);
+//                    }catch (SQLException e){
+//                        e.printStackTrace();
+//                    }
+//                }
+//                //user_vip
+//                String userVipSql = getUserVipSql(rs);
+//                if(StringUtils.isNotEmpty(userVipSql)){
+//                    try{
+//                        new_ps = new_conn.prepareStatement(userVipSql);
+//                        new_ps.executeLargeUpdate(userVipSql);
+//                    }catch (SQLException e){
+//                        e.printStackTrace();
+//                    }
+//                }
+//                //user_wallet
+//                String userWalletSql = getUserWalletSql(rs);
+//                if(StringUtils.isNotEmpty(userWalletSql)){
+//                    try{
+//                        new_ps = new_conn.prepareStatement(userWalletSql);
+//                        new_ps.executeLargeUpdate(userWalletSql);
+//                    }catch (SQLException e){
+//                        e.printStackTrace();
+//                    }
+//                }
+//                //user_third_party
+//                if(StringUtils.isNotEmpty(rs.getString("wechat_cliend"))){
+//                    String userWechatSql = getUserThirdSql(rs,1);
+//                    if(StringUtils.isNotEmpty(userWechatSql)){
+//                        try{
+//                            new_ps = new_conn.prepareStatement(userWechatSql);
+//                            new_ps.executeLargeUpdate(userWechatSql);
+//                        }catch (SQLException e){
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//                if(StringUtils.isNotEmpty(rs.getString("qq_cliend"))){
+//                    String userQQSql = getUserThirdSql(rs,2);
+//                    if(StringUtils.isNotEmpty(userQQSql)){
+//                        try{
+//                            new_ps = new_conn.prepareStatement(userQQSql);
+//                            new_ps.executeLargeUpdate(userQQSql);
+//                        }catch (SQLException e){
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//                //a_user_withdraw
+//                String userWithdrawSql = getUserWithdrawSql(rs);
+//                if(StringUtils.isNotEmpty(userWithdrawSql)){
+//                    try{
+//                        new_ps = new_conn.prepareStatement(userWithdrawSql);
+//                        new_ps.executeLargeUpdate(userWithdrawSql);
+//                    }catch (SQLException e){
+//                        e.printStackTrace();
+//                    }
+//                }
+//                //a_user_finance
+//                String userFinanceSql = getUserFinanceSql(rs);
+//                if(StringUtils.isNotEmpty(userFinanceSql)){
+//                    try{
+//                        new_ps = new_conn.prepareStatement(userFinanceSql);
+//                        new_ps.executeLargeUpdate(userFinanceSql);
+//                    }catch (SQLException e){
+//                        e.printStackTrace();
+//                    }
+//                }
+//                //a_address
+//                String userAddressSql = getUserAddressSql(rs);
+//                if(StringUtils.isNotEmpty(userAddressSql)){
+//                    try{
+//                        new_ps = new_conn.prepareStatement(userAddressSql);
+//                        new_ps.executeLargeUpdate(userAddressSql);
+//                    }catch (SQLException e){
+//                        e.printStackTrace();
+//                    }
+//                }
+//                //a_user_fans
+//                String userFansSql = getUserFansSql(rs);
+//                if(StringUtils.isNotEmpty(userFansSql)){
+//                    try{
+//                        new_ps = new_conn.prepareStatement(userFansSql);
+//                        new_ps.executeLargeUpdate(userFansSql);
+//                    }catch (SQLException e){
+//                        e.printStackTrace();
+//                    }
+//                }
+//                //a_goods
+//                String goodsSql = getGoodsSql(rs);
+//                if(StringUtils.isNotEmpty(goodsSql)){
+//                    try{
+//                        new_ps = new_conn.prepareStatement(goodsSql);
+//                        new_ps.executeLargeUpdate(goodsSql);
+//                    }catch (SQLException e){
+//                        e.printStackTrace();
+//                    }
+//                }
+//                //a_order
+//                String orderSql = getOrderSql(rs);
+//                if(StringUtils.isNotEmpty(orderSql)){
+//                    try{
+//                        new_ps = new_conn.prepareStatement(orderSql);
+//                        new_ps.executeLargeUpdate(orderSql);
+//                    }catch (SQLException e){
+//                        e.printStackTrace();
+//                    }
+//                }
+//                //a_appraisal
+//                String appraisalSql = getAppraisalSql(rs);
+//                if(StringUtils.isNotEmpty(appraisalSql)){
+//                    try{
+//                        new_ps = new_conn.prepareStatement(appraisalSql);
+//                        new_ps.executeLargeUpdate(appraisalSql);
+//                    }catch (SQLException e){
+//                        e.printStackTrace();
+//                    }
+//                }
+//                //a_appreciate
+//                String forumSql = getForumSql(rs);
+//                if(StringUtils.isNotEmpty(forumSql)){
+//                    try{
+//                        new_ps = new_conn.prepareStatement(forumSql);
+//                        new_ps.executeLargeUpdate(forumSql);
+//                    }catch (SQLException e){
+//                        e.printStackTrace();
+//                    }
+//                }
+//                //collect
+//                String collectSql = getCollectSql(rs);
+//                if(StringUtils.isNotEmpty(collectSql)){
+//                    try{
+//                        new_ps = new_conn.prepareStatement(collectSql);
+//                        new_ps.executeLargeUpdate(collectSql);
+//                    }catch (SQLException e){
+//                        e.printStackTrace();
+//                    }
+//                }
+//                //comment
+//                String commentSql = getCommentSql(rs);
+//                if(StringUtils.isNotEmpty(commentSql)){
+//                    try{
+//                        new_ps = new_conn.prepareStatement(commentSql);
+//                        new_ps.executeLargeUpdate(commentSql);
+//                    }catch (SQLException e){
+//                        e.printStackTrace();
+//                    }
+//                }
+//                System.out.println("【"+nickName+"】结束,剩余人数："+(--count));
+//            }
         } catch (SQLException e) {
             e.printStackTrace();
         }finally{

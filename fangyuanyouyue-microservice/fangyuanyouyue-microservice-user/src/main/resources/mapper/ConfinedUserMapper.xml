@@ -114,4 +114,8 @@
   <select id="selectByCode" resultMap="BaseResultMap">
     select * from confined_user where code = #{code}
   </select>
+
+  <select id="selectByUserId" resultMap="BaseResultMap">
+    select * from confined_user where user_id = #{userId}
+  </select>
 </mapper>

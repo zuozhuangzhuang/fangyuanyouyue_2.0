@@ -14,6 +14,7 @@ import com.fangyuanyouyue.goods.model.GoodsInfo;
 import com.fangyuanyouyue.goods.model.GoodsIntervalHistory;
 import com.fangyuanyouyue.goods.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -75,6 +76,9 @@ public class TimerServiceImpl implements TimerService{
 
     @Override
     public void getPriceDown(GoodsInfo goodsInfo) throws ServiceException{
+        if(!goodsInfo.getType().equals(Status.AUCTION.getValue())){
+            return;
+        }
         if(goodsInfo.getPrice().compareTo(goodsInfo.getFloorPrice())>=0){
             //当前价格 > 最低价
             if(goodsInfo.getLastIntervalTime() == null){
@@ -154,7 +158,11 @@ public class TimerServiceImpl implements TimerService{
             }
             goodsInfo.setLastIntervalTime(nowTime);
             goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
-            goodsIntervalHistoryMapper.insert(history);
+            try{
+                goodsIntervalHistoryMapper.insert(history);
+            }catch (DuplicateKeyException e){
+                e.printStackTrace();
+            }
         }
     }
 

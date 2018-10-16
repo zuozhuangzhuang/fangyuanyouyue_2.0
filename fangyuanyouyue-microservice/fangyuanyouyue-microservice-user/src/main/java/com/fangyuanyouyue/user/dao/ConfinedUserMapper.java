@@ -24,4 +24,11 @@ public interface ConfinedUserMapper {
      * @return
      */
     ConfinedUser selectByCode(@Param("code")String code);
+
+    /**
+     * 根据用户id获取代理信息
+     * @param userId
+     * @return
+     */
+    ConfinedUser selectByUserId(@Param("userId")Integer userId);
 }
