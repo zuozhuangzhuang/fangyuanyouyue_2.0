@@ -110,6 +110,15 @@
 			<version>1.16.18</version>
 			<scope>provided</scope>
 		</dependency>
+		<!--阿里云oss图片上传 -->
+		<dependency>
+			<groupId>com.aliyun.oss</groupId>
+			<artifactId>aliyun-sdk-oss</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+		</dependency>
 		<!--分布式事务处理-->
 		<dependency>
 			<groupId>com.codingapi</groupId>
