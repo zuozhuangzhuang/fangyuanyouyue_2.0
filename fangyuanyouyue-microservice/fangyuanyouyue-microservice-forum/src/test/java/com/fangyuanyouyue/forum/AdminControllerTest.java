@@ -74,7 +74,7 @@ public class AdminControllerTest {
     @Test
 //    @Transactional
     public void uploadForum() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/adminForum/uploadForum")
+        mvc.perform(MockMvcRequestBuilders.get("/adminForum/uploadForum")
                 .param("filePath", "/Users/wuzhimin/Desktop/unzip")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())

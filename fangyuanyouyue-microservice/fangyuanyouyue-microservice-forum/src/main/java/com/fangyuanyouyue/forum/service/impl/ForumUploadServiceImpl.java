@@ -124,6 +124,7 @@ public class ForumUploadServiceImpl implements ForumUploadService {
 			String lineTxt = null; // 读取文件的方法
 			int i = 0;
 			List<ForumDetailDto> details = new ArrayList<ForumDetailDto>();
+			/**
 			String temp = "";
 	        while ((lineTxt = buff.readLine()) != null) {
 	        	System.out.println(lineTxt);
@@ -157,7 +158,7 @@ public class ForumUploadServiceImpl implements ForumUploadService {
 	    		detail.setContent(temp);
 	    		details.add(detail);
 	        }
-	        
+	        **/
 	        while ((lineTxt = buff.readLine()) != null) {
 	        	System.out.println(lineTxt);
 	        	ForumDetailDto detail = new ForumDetailDto();
@@ -240,7 +241,27 @@ public class ForumUploadServiceImpl implements ForumUploadService {
 		int i = 0;
         
         List<ForumDetailDto> details = new ArrayList<ForumDetailDto>();
-    	boolean any = false;
+
+        while ((lineTxt = buff.readLine()) != null) {
+        	System.out.println(lineTxt);
+        	if(lineTxt.equals("图")) {
+        		//前面的清除
+            	ForumDetailDto detail = new ForumDetailDto();
+            	detail = new ForumDetailDto();
+        		detail.setType(2);
+        		detail.setImgUrl("img");
+        		details.add(detail);
+        	}else {
+
+            	ForumDetailDto detail = new ForumDetailDto();
+        		detail.setType(1);
+        		detail.setContent(lineTxt);
+        		details.add(detail);
+        	}
+        }
+        
+        /**
+        	
     	String temp = "";
         while ((lineTxt = buff.readLine()) != null) {
         	System.out.println(lineTxt);
@@ -270,6 +291,8 @@ public class ForumUploadServiceImpl implements ForumUploadService {
     		detail.setContent(temp);
     		details.add(detail);
         }
+        
+        **/
         
         System.out.println(new Gson().toJson(details));
         
