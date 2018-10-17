@@ -24,6 +24,7 @@ import com.fangyuanyouyue.forum.param.AdminForumParam;
 import com.fangyuanyouyue.forum.service.AppraisalDetailService;
 import com.fangyuanyouyue.forum.service.ForumColumnService;
 import com.fangyuanyouyue.forum.service.ForumInfoService;
+import com.fangyuanyouyue.forum.service.ForumUploadService;
 import com.fangyuanyouyue.forum.service.ReportService;
 import com.fangyuanyouyue.forum.service.SchedualRedisService;
 import com.fangyuanyouyue.forum.service.SchedualUserService;
@@ -53,6 +54,8 @@ public class AdminController extends BaseController {
     @Autowired
     private ReportService reportService;
 
+    @Autowired
+    private ForumUploadService forumUploadService;
 
 	@ApiOperation(value = "专栏列表", notes = "专栏列表", response = BaseResp.class)
 	@ApiImplicitParams({
@@ -419,5 +422,29 @@ public class AdminController extends BaseController {
             return toError("系统繁忙，请稍后再试！");
         }
     }
-
+    
+    @ApiOperation(value = "导入本地路径帖子", notes = "导入本地路径帖子",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "filePath", value = "在本机的路径", required = true, dataType = "String", paramType = "query")
+    })
+    @GetMapping(value = "/uploadForum")
+    @ResponseBody
+    public BaseResp uploadForum(String filePath) throws IOException {
+        try {
+            log.info("----》上传帖子《----");
+            log.info("参数："+filePath);
+            if(filePath == null){
+                return toError("帖子在本机的路径不能为空！");
+            }
+            String result = forumUploadService.uploadForum(filePath);
+            return toSuccess(result);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+        
 }
