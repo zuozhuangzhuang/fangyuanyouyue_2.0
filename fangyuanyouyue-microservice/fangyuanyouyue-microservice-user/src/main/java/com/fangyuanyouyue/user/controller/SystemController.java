@@ -71,6 +71,9 @@ public class SystemController extends BaseController{
             }
             systemService.feedback(user.getId(),param.getContent(),param.getType(),param.getVersion());
             return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");

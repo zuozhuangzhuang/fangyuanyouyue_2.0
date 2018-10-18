@@ -21,8 +21,7 @@ public interface ConfinedUserMapper {
     /**
      * 根据userId和status获取限制用户
      * @param userId
-     * @param status
      * @return
      */
-    ConfinedUser selectByUserIdStatus(@Param("userId")Integer userId,@Param("status")Integer status);
+    ConfinedUser selectByUserId(@Param("userId")Integer userId);
 }

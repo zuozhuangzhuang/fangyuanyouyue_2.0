@@ -795,7 +795,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             if(user.getIsRegHx()==null||user.getIsRegHx().equals(StatusEnum.NO.getCode().intValue())) {
                 String easemobRegist = schedualMessageService.easemobRegist(user.getId().toString(), MD5Util.MD5("xiaofangyuan"+user.getId().toString()));
                 Integer code = JSONObject.parseObject(easemobRegist).getInteger("code");
-                user.setIsRegHx(code.equals(ReCode.FAILD.getValue())?Status.NO.getValue():Status.YES.getValue());
+                user.setIsRegHx(code.equals(ReCode.SUCCESS.getValue())?Status.YES.getValue():Status.NO.getValue());
                 userInfoMapper.updateByPrimaryKey(user);
             }
         }catch (RetryableException e){

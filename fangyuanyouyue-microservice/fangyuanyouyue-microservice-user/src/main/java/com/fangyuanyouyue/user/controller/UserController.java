@@ -832,10 +832,10 @@ public class UserController extends BaseController {
             if(user==null){
                 return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
-            if(user.getStatus() == 2){
+            if(user.getStatus().equals(Status.USER_FROZEN.getValue())){
                 return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
-            if(user.getId() == param.getToUserId()){
+            if(user.getId().equals(param.getToUserId())){
                 return toError("不能关注自己");
             }
             if(param.getToUserId() == null){

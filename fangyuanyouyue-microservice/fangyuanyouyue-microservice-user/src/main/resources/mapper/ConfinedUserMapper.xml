@@ -9,9 +9,10 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="parent_id" jdbcType="INTEGER" property="parentId" />
     <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="can_withdraw" jdbcType="INTEGER" property="canWithdraw" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, user_id, status, add_time, update_time, parent_id, code
+    id, user_id, status, add_time, update_time, parent_id, code, can_withdraw
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -26,10 +27,10 @@
   <insert id="insert" parameterType="com.fangyuanyouyue.user.model.ConfinedUser" useGeneratedKeys="true" keyProperty="id">
     insert into confined_user (id, user_id, status, 
       add_time, update_time, parent_id, 
-      code)
+      code, can_withdraw)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
       #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{parentId,jdbcType=INTEGER}, 
-      #{code,jdbcType=VARCHAR})
+      #{code,jdbcType=VARCHAR}, #{canWithdraw,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.fangyuanyouyue.user.model.ConfinedUser" useGeneratedKeys="true" keyProperty="id">
     insert into confined_user
@@ -55,6 +56,9 @@
       <if test="code != null">
         code,
       </if>
+      <if test="canWithdraw != null">
+        can_withdraw,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -78,6 +82,9 @@
       <if test="code != null">
         #{code,jdbcType=VARCHAR},
       </if>
+      <if test="canWithdraw != null">
+        #{canWithdraw,jdbcType=INTEGER},
+      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.user.model.ConfinedUser">
@@ -92,11 +99,17 @@
       <if test="addTime != null">
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
       <if test="parentId != null">
         parent_id = #{parentId,jdbcType=INTEGER},
       </if>
       <if test="code != null">
         code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="canWithdraw != null">
+        can_withdraw = #{canWithdraw,jdbcType=INTEGER},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -106,8 +119,10 @@
     set user_id = #{userId,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
       parent_id = #{parentId,jdbcType=INTEGER},
-      code = #{code,jdbcType=VARCHAR}
+      code = #{code,jdbcType=VARCHAR},
+      can_withdraw = #{canWithdraw,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
