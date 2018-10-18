@@ -319,16 +319,16 @@ public class WalletController extends BaseController{
     @ResponseBody
     public BaseResp withdrawDeposit(WalletParam param) throws IOException {
         try {
-            Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
-            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
-                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
-            }
             log.info("----》提现《----");
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
                 return toError("用户token不能为空！");
+            }
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
             if(param.getAmount()==null || param.getAmount().doubleValue()==0 ){
                 return toError("提现金额不能为空！");
