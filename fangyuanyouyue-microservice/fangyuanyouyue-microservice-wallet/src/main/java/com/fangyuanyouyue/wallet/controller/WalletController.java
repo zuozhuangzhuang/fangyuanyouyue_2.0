@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.wallet.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.esotericsoftware.minlog.Log;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
@@ -350,7 +351,11 @@ public class WalletController extends BaseController{
             if(StringUtils.isEmpty(param.getPayPwd())){
                 return toError("支付密码为空！");
             }
-            redissonLock.lock("withdraw"+userId,10);
+            boolean lock = redissonLock.lock("withdraw"+userId,10);
+            if(!lock) {
+                Log.info("分布式锁获取失败");
+                throw new ServiceException("提现失败！");
+            }
             //提现
             walletService.withdrawDeposit(userId,param.getAmount(),param.getType(),param.getAccount(),param.getRealName(),param.getPayPwd());
             return toSuccess();
