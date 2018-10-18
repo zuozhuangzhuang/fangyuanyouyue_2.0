@@ -318,12 +318,12 @@ public class WalletController extends BaseController{
     @PostMapping(value = "/withdrawDeposit")
     @ResponseBody
     public BaseResp withdrawDeposit(WalletParam param) throws IOException {
-        Integer userId = (Integer)schedualRedisService.get(param.getToken());
-        BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
-        if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
-            return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
-        }
         try {
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
+            }
             log.info("----》提现《----");
             log.info("参数："+param.toString());
             //验证用户
@@ -362,6 +362,7 @@ public class WalletController extends BaseController{
             return toError("系统繁忙，请稍后再试！");
         }finally {
             try{
+                Integer userId = (Integer)schedualRedisService.get(param.getToken());
                 redissonLock.release("withdraw"+userId);
             }catch (Exception e){
                 e.printStackTrace();
