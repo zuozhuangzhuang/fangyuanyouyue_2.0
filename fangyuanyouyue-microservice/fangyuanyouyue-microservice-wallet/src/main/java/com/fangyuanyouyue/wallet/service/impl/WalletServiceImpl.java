@@ -172,6 +172,7 @@ public class WalletServiceImpl implements WalletService{
                 userWallet.setBalance(userWallet.getBalance().subtract(amount));
             }
         }
+        userWalletMapper.updateByPrimaryKey(userWallet);
         //订单号
         final IdGenerator idg = IdGenerator.INSTANCE;
         String orderNo = idg.nextId();
