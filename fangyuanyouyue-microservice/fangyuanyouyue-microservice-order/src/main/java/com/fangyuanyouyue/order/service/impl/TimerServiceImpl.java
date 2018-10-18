@@ -147,6 +147,18 @@ public class TimerServiceImpl implements TimerService{
                 if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                     throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
+                //商品名称
+                List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderPay.getOrderId());
+                StringBuffer goodsName = new StringBuffer();
+                for(OrderDetail detail:orderDetails){
+                    //获取商品、抢购信息
+                    goodsName.append("【"+detail.getGoodsName()+"】");
+                }
+                //卖家余额账单
+                baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(orderInfo.getSellerId(),orderPay.getPayAmount(),Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),orderInfo.getOrderNo()));
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                }
                 //卖家成交增加积分
                 if(orderPay.getPayAmount().compareTo(new BigDecimal(2000)) <= 0){//2000以内+20分
                     String result = schedualWalletService.updateScore(orderInfo.getSellerId(),20L,1);

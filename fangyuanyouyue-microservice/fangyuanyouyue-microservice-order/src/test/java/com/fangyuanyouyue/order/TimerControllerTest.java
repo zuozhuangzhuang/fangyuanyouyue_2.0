@@ -49,4 +49,17 @@ public class TimerControllerTest {
 //                .andReturn();
 //    }
 
+
+    /**
+     * 自动收货
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void saveReceiptGoods() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/timer/saveReceiptGoods")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
 }

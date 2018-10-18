@@ -170,6 +170,9 @@ public class AdminController extends BaseController{
             if(param.getId() == null){
                 return toError("申请信息id不能为空！");
             }
+            if(param.getStatus() == null){
+                return toError("状态不能为空！");
+            }
             if(param.getStatus().equals(Status.WITHDRAW_REFUSE.getValue())){
                 if(StringUtils.isEmpty(param.getContent())){
                     return toError("拒绝原因不能为空！");
@@ -252,34 +255,6 @@ public class AdminController extends BaseController{
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统错误！");
-        }
-    }
-
-    @ApiOperation(value = "后台设置限制余额用户", notes = "后台设置限制余额用户",response = BaseResp.class)
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "status", value = "状态 1限制 2解除限制",  required = true,dataType = "int", paramType = "query")
-    })
-    @PostMapping(value = "/confinedUser")
-    @ResponseBody
-    public BaseResp confinedUser(AdminWalletParam param) throws IOException {
-        try {
-            log.info("----》后台设置限制用户使用余额《----");
-            log.info(param.toString());
-            if(param.getId() == null){
-                return toError("用户id不能为空！");
-            }
-            if(param.getType() == null){
-                return toError("状态不能为空！");
-            }
-            walletService.confinedUser(param.getId(), param.getStatus());
-            return toSuccess();
-        } catch (ServiceException e) {
-            e.printStackTrace();
-            return toError(e.getMessage());
-        }catch (Exception e) {
-            e.printStackTrace();
-            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
         }
     }
 
