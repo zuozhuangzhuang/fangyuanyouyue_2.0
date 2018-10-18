@@ -103,7 +103,7 @@ public class WalletServiceImpl implements WalletService{
     public void withdrawDeposit(Integer userId, BigDecimal amount, Integer type, String account, String realName, String payPwd) throws ServiceException {
         //获取被限制的用户
         ConfinedUser confinedUser = confinedUserMapper.selectByUserId(userId);
-        if(confinedUser.getCanWithdraw().equals(Status.NOT_WITHDRAW.getValue())){
+        if(confinedUser != null && confinedUser.getCanWithdraw().equals(Status.NOT_WITHDRAW.getValue())){
             throw new ServiceException("此用户被限制使用余额提现！");
         }
         UserWithdraw userWithdraw = new UserWithdraw();
