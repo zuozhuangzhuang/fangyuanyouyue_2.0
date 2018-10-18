@@ -19,6 +19,7 @@ import com.fangyuanyouyue.wallet.service.SchedualRedisService;
 import com.fangyuanyouyue.wallet.service.SchedualUserService;
 import com.fangyuanyouyue.wallet.service.UserCouponService;
 import com.fangyuanyouyue.wallet.service.WalletService;
+import com.snowalker.lock.redisson.RedissonLock;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -58,6 +59,8 @@ public class WalletController extends BaseController{
     private SchedualRedisService schedualRedisService;
     @Autowired
     private UserCouponService userCouponService;
+    @Autowired
+    private RedissonLock redissonLock;
 
     @ApiOperation(value = "充值", notes = "(void)充值",response = BaseResp.class)
     @ApiImplicitParams({
@@ -315,17 +318,17 @@ public class WalletController extends BaseController{
     @PostMapping(value = "/withdrawDeposit")
     @ResponseBody
     public BaseResp withdrawDeposit(WalletParam param) throws IOException {
+        Integer userId = (Integer)schedualRedisService.get(param.getToken());
+        BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+        if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+            return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
+        }
         try {
             log.info("----》提现《----");
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
                 return toError("用户token不能为空！");
-            }
-            Integer userId = (Integer)schedualRedisService.get(param.getToken());
-            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
-            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
-                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
             if(param.getAmount()==null || param.getAmount().doubleValue()==0 ){
                 return toError("提现金额不能为空！");
@@ -347,6 +350,7 @@ public class WalletController extends BaseController{
             if(StringUtils.isEmpty(param.getPayPwd())){
                 return toError("支付密码为空！");
             }
+            redissonLock.lock("withdraw"+userId,10);
             //提现
             walletService.withdrawDeposit(userId,param.getAmount(),param.getType(),param.getAccount(),param.getRealName(),param.getPayPwd());
             return toSuccess();
@@ -356,6 +360,12 @@ public class WalletController extends BaseController{
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
+        }finally {
+            try{
+                redissonLock.release("withdraw"+userId);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 
