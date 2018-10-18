@@ -101,22 +101,21 @@ public class WalletServiceImpl implements WalletService{
 
     @Override
     public void withdrawDeposit(Integer userId, BigDecimal amount, Integer type, String account, String realName, String payPwd) throws ServiceException {
-
-        //获取被限制的用户（代理不可以余额提现）
-        ConfinedUser confinedUser = confinedUserMapper.selectByUserIdStatus(userId, 0);
-        if(confinedUser != null){
+        //获取被限制的用户
+        ConfinedUser confinedUser = confinedUserMapper.selectByUserId(userId);
+        if(confinedUser.getCanWithdraw().equals(Status.NOT_WITHDRAW.getValue())){
             throw new ServiceException("此用户被限制使用余额提现！");
         }
         UserWithdraw userWithdraw = new UserWithdraw();
         userWithdraw.setUserId(userId);
         userWithdraw.setAmount(amount);
         userWithdraw.setPayType(type);
-        userWithdraw.setStatus(1);
+        userWithdraw.setStatus(Status.WITHDRAW_APPLY.getValue());
         userWithdraw.setAddTime(DateStampUtils.getTimesteamp());
 
         UserInfoExt userInfoExt = userInfoExtMapper.selectUserInfoExtByUserId(userId);
         if(type.equals(Status.PAY_TYPE_ALIPAY.getValue())){//提现方式 1微信 2支付宝
-            if(userInfoExt.getPayPwd()==null){
+            if(StringUtils.isEmpty(userInfoExt.getPayPwd())){
                 throw new ServiceException("用户未设置支付密码！");
             }
             if(MD5Util.verify(MD5Util.MD5(payPwd),userInfoExt.getPayPwd()) == false){
@@ -147,7 +146,7 @@ public class WalletServiceImpl implements WalletService{
                 //普通用户
                 percent = new BigDecimal(0.01);
             }else{
-                if(vipLevel.intValue() == 1){
+                if(vipLevel.equals(Status.VIP_LEVEL_LOW.getValue())){
                     //铂金会员
                     percent = new BigDecimal(0.008);
                 }else{
@@ -161,7 +160,18 @@ public class WalletServiceImpl implements WalletService{
         userWithdrawMapper.insert(userWithdraw);
         amount = amount.add(charge);
         //扣除余额 type 类型 1充值 2消费 payType 支付类型 1微信 2支付宝 3余额
-        updateBalance(userId,amount,2);
+        //获取被限制的用户（代理不可以余额提现）
+        //获取用户钱包信息
+        UserWallet userWallet = userWalletMapper.selectByUserId(userId);
+        if(userWallet == null){
+            throw new ServiceException("获取钱包信息失败！");
+        }else{
+            if(userWallet.getBalance().compareTo(amount) < 0){//余额小于消费金额
+                throw new ServiceException(ReCode.INSUFFICIENT_FUND.getValue(),ReCode.INSUFFICIENT_FUND.getMessage());
+            }else{
+                userWallet.setBalance(userWallet.getBalance().subtract(amount));
+            }
+        }
         //订单号
         final IdGenerator idg = IdGenerator.INSTANCE;
         String orderNo = idg.nextId();
@@ -256,8 +266,8 @@ public class WalletServiceImpl implements WalletService{
                 userWallet.setBalance(userWallet.getBalance().add(amount));
             }else if(type.intValue() == 2){//消费
                 //获取被限制的用户（代理不可以余额提现）
-                ConfinedUser confinedUser = confinedUserMapper.selectByUserIdStatus(userId, Status.IS_PROXY.getValue());
-                if(confinedUser != null){
+                ConfinedUser confinedUser = confinedUserMapper.selectByUserId(userId);
+                if(confinedUser != null && confinedUser.getStatus().equals(Status.IS_PROXY.getValue())){
                     throw new ServiceException("此用户被限制使用余额！");
                 }
                 if(userWallet.getBalance().compareTo(amount) < 0){//余额小于消费金额
@@ -647,9 +657,9 @@ public class WalletServiceImpl implements WalletService{
         if(userWallet == null){
             throw new ServiceException("获取钱包信息失败！");
         }else {
-            if (type.intValue() == Status.ADD.getValue()) {
+            if (type.equals(Status.ADD.getValue())) {
                 userWallet.setBalance(userWallet.getBalance().add(amount));
-            } else if (type.intValue() == Status.SUB.getValue()) {
+            } else if (type.equals(Status.SUB.getValue())) {
                 if (userWallet.getBalance().compareTo(amount) < 0) {//余额小于消费金额
                     throw new ServiceException(ReCode.INSUFFICIENT_FUND.getValue(),ReCode.INSUFFICIENT_FUND.getMessage());
                 } else {
@@ -662,7 +672,7 @@ public class WalletServiceImpl implements WalletService{
             //订单号
             final IdGenerator idg = IdGenerator.INSTANCE;
             String orderNo = idg.nextId();
-            addUserBalanceDetail(userId,amount,Status.PAY_TYPE_BALANCE.getValue(),type,orderNo,type==1?"系统增加余额":"系统减少余额",Status.SYSTEM_UPDATE.getValue(),null,userId,orderNo);
+            addUserBalanceDetail(userId,amount,Status.PAY_TYPE_BALANCE.getValue(),type,orderNo,type.equals(Status.ADD.getValue())?"系统增加余额":"系统减少余额",Status.SYSTEM_UPDATE.getValue(),null,userId,orderNo);
         }
     }
 
@@ -683,28 +693,4 @@ public class WalletServiceImpl implements WalletService{
         }
     }
 
-    @Override
-    public void confinedUser(Integer userId, Integer status) throws ServiceException {
-        ConfinedUser confinedUser = confinedUserMapper.selectByUserIdStatus(userId, null);
-        if(confinedUser != null){
-            if(confinedUser.getStatus().intValue() == Status.IS_CONFINED.getValue()){
-                if(status.equals(Status.NO.getValue())){
-                    confinedUser.setStatus(Status.NOT_CONFINED.getValue());
-                }
-            }else{
-                if(status.equals(Status.YES.getValue())){
-                    confinedUser.setStatus(Status.IS_CONFINED.getValue());
-                }
-            }
-            confinedUserMapper.updateByPrimaryKey(confinedUser);
-        }else{
-            if(status.equals(Status.YES.getValue())){
-                confinedUser = new ConfinedUser();
-                confinedUser.setUserId(userId);
-                confinedUser.setStatus(Status.IS_CONFINED.getValue());
-                confinedUser.setAddTime(DateStampUtils.getTimesteamp());
-                confinedUserMapper.insert(confinedUser);
-            }
-        }
-    }
 }

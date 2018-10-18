@@ -86,10 +86,15 @@ public enum Status {
 
     //帖子、视频、评论 状态 1显示 2隐藏
     SHOW(1),HIDE(2),
+
     //状态 1进行中 2结束 3删除
     BEING(1),END(2),DELETE(3),
-    //代理信息
-    IS_PROXY(1),NOT_PROXY(2)
+
+    //代理状态 1代理 2非代理
+    IS_PROXY(1),NOT_PROXY(2),
+
+    //是否可以提现 1可以提现 2无法提现
+    CAN_WITHDRAW(1),NOT_WITHDRAW(2),
     ;
     private Integer value;
     private String message;

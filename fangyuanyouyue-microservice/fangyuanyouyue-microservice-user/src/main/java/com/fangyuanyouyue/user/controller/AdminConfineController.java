@@ -3,6 +3,7 @@ package com.fangyuanyouyue.user.controller;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.service.ConfinedUserService;
 import com.fangyuanyouyue.user.service.UserInfoService;
@@ -53,6 +54,9 @@ public class AdminConfineController extends BaseController {
             }
             confinedUserService.updateConfined(param.getId(), param.getType(), param.getCode());
             return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         }catch (Exception e) {
             e.printStackTrace();
             return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");

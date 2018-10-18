@@ -704,11 +704,11 @@ public class UserController extends BaseController {
 
             }
             //调用短信系统发送短信
-            JSONObject jsonObject = JSONObject.parseObject(schedualMessageService.sendCode(param.getPhone(),param.getType()));
-            String code = jsonObject.getString("data");
+//            JSONObject jsonObject = JSONObject.parseObject(schedualMessageService.sendCode(param.getPhone(),param.getType()));
+//            String code = jsonObject.getString("data");
 //            TODO 开发期间固定1234
-//            String code = "1234";
-//            log.info("code---:"+code);
+            String code = "1234";
+            log.info("code---:"+code);
 
             boolean result = schedualRedisService.set(param.getPhone(), code, 600l);
             log.info("缓存结果："+result);
@@ -832,10 +832,10 @@ public class UserController extends BaseController {
             if(user==null){
                 return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
             }
-            if(user.getStatus() == 2){
+            if(user.getStatus().equals(Status.USER_FROZEN.getValue())){
                 return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
-            if(user.getId() == param.getToUserId()){
+            if(user.getId().equals(param.getToUserId())){
                 return toError("不能关注自己");
             }
             if(param.getToUserId() == null){
