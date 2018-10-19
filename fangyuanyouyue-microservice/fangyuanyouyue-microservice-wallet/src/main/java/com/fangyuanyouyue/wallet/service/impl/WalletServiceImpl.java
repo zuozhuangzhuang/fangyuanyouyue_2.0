@@ -191,16 +191,16 @@ public class WalletServiceImpl implements WalletService{
     }
 
     public static void main(String[] args) {
-        for(int i=0;i<1000;i++){
+//        for(int i=0;i<1000;i++){
             System.out.println("------------------------开始------------------------");
             //初始余额
-            int b = (int)(Math.random()*1000)+200;
-                BigDecimal balance = new BigDecimal(b).setScale(2,BigDecimal.ROUND_HALF_UP);
+//            int b = (int)(Math.random()*1000)+200;
+                BigDecimal balance = new BigDecimal(1000).setScale(2,BigDecimal.ROUND_HALF_UP);
     //        BigDecimal balance = new BigDecimal(300).setScale(2,BigDecimal.ROUND_HALF_UP);
             System.out.println("初始余额："+balance);
             //申请提现金额
-                BigDecimal amount = new BigDecimal(Math.random()*b).setScale(2,BigDecimal.ROUND_HALF_UP);
-    //        BigDecimal amount = new BigDecimal(300).setScale(2,BigDecimal.ROUND_HALF_UP);
+//                BigDecimal amount = new BigDecimal(Math.random()*b).setScale(2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal amount = new BigDecimal(366.89).setScale(2,BigDecimal.ROUND_HALF_UP);
             //手续费倍率
             BigDecimal percent = new BigDecimal(0.01).setScale(2,BigDecimal.ROUND_HALF_UP);
             //手续费
@@ -219,10 +219,10 @@ public class WalletServiceImpl implements WalletService{
             }
             System.out.println("提现金额："+amount);
             System.out.println("到账金额："+afterBalance);
-            System.out.println("手续费："+charge);
+            System.out.println("手续费："+charge.setScale(2,BigDecimal.ROUND_HALF_UP));
             System.out.println("提现后余额："+balance);
             System.out.println("------------------------结束------------------------");
-        }
+//        }
     }
 
     @Override
@@ -667,6 +667,10 @@ public class WalletServiceImpl implements WalletService{
         Integer total = userWithdrawMapper.countPage(param.getPayType(),param.getStatus(),param.getKeyword(),param.getStartDate(),param.getEndDate());
         List<UserWithdraw> userWithdraws = userWithdrawMapper.getPage(param.getPayType(),param.getStatus(),param.getStart(),param.getLimit(),param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
         List<AdminWithdrawDto> datas = AdminWithdrawDto.toDtoList(userWithdraws);
+        for(AdminWithdrawDto dto:datas){
+            UserVip userVip = userVipMapper.selectByUserId(dto.getUserId());
+            dto.setVipLevel(userVip.getVipLevel());
+        }
         Pager pager = new Pager();
         pager.setTotal(total);
         pager.setDatas(datas);
