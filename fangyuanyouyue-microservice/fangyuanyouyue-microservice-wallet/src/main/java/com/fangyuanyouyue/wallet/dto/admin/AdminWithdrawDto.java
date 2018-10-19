@@ -44,6 +44,8 @@ public class AdminWithdrawDto {
 
     private BigDecimal withdrawAmount;//申请金额
 
+    private Integer vipLevel;//会员等级 null非会员 1铂金会员 2至尊会员
+
     public AdminWithdrawDto(UserWithdraw withdraw) {
     	this.id = withdraw.getId();
         this.userId = withdraw.getUserId();

@@ -49,6 +49,8 @@ public class AdminAppraisalDetailDto {
     //用户昵称
     private String nickName;
 
+    private Integer vipLevel;//用户会员等级 null非会员 1铂金会员 2至尊会员
+
     public AdminAppraisalDetailDto() {
     }
 
