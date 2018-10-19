@@ -13,6 +13,7 @@
     <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
     <result column="service_charge" jdbcType="DECIMAL" property="serviceCharge" />
     <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+    <result column="vip_level" jdbcType="INTEGER" property="vipLevel" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, amount, pay_type, status, content, account, real_name, add_time, service_charge
@@ -178,7 +179,7 @@
   </select>
 
   <select id="getPage" resultMap="BaseResultMap">
-    select a.*,b.nick_name from user_withdraw a,user_info b where a.user_id=b.id
+    select a.*,b.nick_name,c.vip_level from user_withdraw a,user_info b,user_vip c where a.user_id=b.id and a.user_id = c.user_id
     <if test="payType != null">
       and a.pay_type = #{payType}
     </if>
@@ -201,7 +202,12 @@
       and a.add_time <![CDATA[ <= ]]> #{endDate}
     </if>
     <if test="orders != null">
-      order by a.${orders}
+      <if test="orders != 'vip_level'">
+        order by a.${orders}
+      </if>
+      <if test="orders == 'vip_level'">
+        order by c.${orders}
+      </if>
       <if test="ascType != null and ascType == 2">
         desc
       </if>

@@ -71,6 +71,7 @@ public class AdminAppraisalDetailDto {
 //        this.updateTime = DateUtil.getFormatDate(goodsAppraisalDetail.getUpdateTime(), DateUtil.DATE_FORMT);
         this.type = goodsAppraisalDetail.getType();
         this.nickName = goodsAppraisalDetail.getNickName();
+        this.vipLevel = goodsAppraisalDetail.getVipLevel();
     }
 
 
