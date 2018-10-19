@@ -59,6 +59,7 @@ public class AdminWithdrawDto {
         this.addTime = DateUtil.getFormatDate(withdraw.getAddTime(), DateUtil.DATE_FORMT);
         this.serviceCharge = withdraw.getServiceCharge();
         this.withdrawAmount = amount.add(serviceCharge);
+        this.vipLevel = withdraw.getVipLevel();
     }
 
 

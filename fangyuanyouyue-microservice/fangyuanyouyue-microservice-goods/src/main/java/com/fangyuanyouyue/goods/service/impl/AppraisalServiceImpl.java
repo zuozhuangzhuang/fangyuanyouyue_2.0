@@ -451,11 +451,6 @@ public class AppraisalServiceImpl implements AppraisalService{
             List<AppraisalUrl> appraisalUrls = appraisalUrlMapper.selectListBuUserId(dto.getAppraisalDetailId());
             ArrayList<AdminAppraisalUrlDto> appraisalUrlDtos = AdminAppraisalUrlDto.toDtoList(appraisalUrls);
             dto.setAppraisalUrlDtos(appraisalUrlDtos);
-            BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.getUserVipLevel(dto.getUserId()));
-            if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
-                throw new ServiceException(baseResp.getCode(),baseResp.getReport());
-            }
-            dto.setVipLevel((Integer) baseResp.getData());
             dtos.add(dto);
         }
         //遍历商品列表，添加到GoodsDtos中
