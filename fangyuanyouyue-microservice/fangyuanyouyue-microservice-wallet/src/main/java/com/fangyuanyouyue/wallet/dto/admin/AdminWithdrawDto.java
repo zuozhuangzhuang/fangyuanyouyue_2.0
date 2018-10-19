@@ -24,7 +24,7 @@ public class AdminWithdrawDto {
 
     private Integer userId;//用户id
 
-    private BigDecimal amount;//提现金额
+    private BigDecimal amount;//到账金额
 
     private Integer payType;//提现方式 1微信 2支付宝
 
