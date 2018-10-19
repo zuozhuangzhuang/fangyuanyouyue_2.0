@@ -186,7 +186,7 @@ public class WalletServiceImpl implements WalletService{
             //订单号
             final IdGenerator idg = IdGenerator.INSTANCE;
             String orderNo = idg.nextId();
-            addUserBalanceDetail(userId,amount,Status.PAY_TYPE_BALANCE.getValue(),Status.EXPEND.getValue(),orderNo,(userWithdraw.getPayType().equals(1)?"微信":"支付宝")+"提现",Status.WITHDRAW.getValue(),null,userId,orderNo);
+            addUserBalanceDetail(userId,withdrawAmount.add(charge),Status.PAY_TYPE_BALANCE.getValue(),Status.EXPEND.getValue(),orderNo,(userWithdraw.getPayType().equals(1)?"微信":"支付宝")+"提现",Status.WITHDRAW.getValue(),null,userId,orderNo);
         }
     }
 
