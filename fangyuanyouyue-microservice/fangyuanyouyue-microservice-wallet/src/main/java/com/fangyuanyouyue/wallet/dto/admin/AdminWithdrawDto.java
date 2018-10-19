@@ -40,6 +40,10 @@ public class AdminWithdrawDto {
     
     private String addTime;//添加时间
 
+    private BigDecimal serviceCharge;//手续费
+
+    private BigDecimal withdrawAmount;//申请金额
+
     public AdminWithdrawDto(UserWithdraw withdraw) {
     	this.id = withdraw.getId();
         this.userId = withdraw.getUserId();
@@ -51,6 +55,8 @@ public class AdminWithdrawDto {
         this.realName = withdraw.getRealName();
         this.nickName = withdraw.getNickName();
         this.addTime = DateUtil.getFormatDate(withdraw.getAddTime(), DateUtil.DATE_FORMT);
+        this.serviceCharge = withdraw.getServiceCharge();
+        this.withdrawAmount = amount.add(serviceCharge);
     }
 
 
