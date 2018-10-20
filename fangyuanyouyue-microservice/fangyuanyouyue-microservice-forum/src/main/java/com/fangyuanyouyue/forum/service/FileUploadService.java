@@ -1,6 +1,6 @@
 package com.fangyuanyouyue.forum.service;
 
-import java.io.File;
+import java.io.InputStream;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
 
@@ -11,7 +11,7 @@ public interface FileUploadService {
      * @return
      * @throws ServiceException
      */
-    String uploadPic(File file) throws Exception;
+    String uploadPic(String name, InputStream file) throws Exception;
 
 
     /**
@@ -22,7 +22,7 @@ public interface FileUploadService {
      * @return
      * @throws ServiceException
      */
-    String uploadFile(File file, String fileUrl, String fileName) throws ServiceException;
+    String uploadFile(InputStream file, String fileUrl, String fileName) throws ServiceException;
 
     /**
      * 获取文件名
