@@ -311,7 +311,7 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
 
-  <select id="selectShopGoodsImg" resultType="Map">
-    select img_url from goods_img where type = 1 and goods_id in (select id from goods_info where user_id = #{userId} order by add_time desc) limit 0,3
+  <select id="selectShopGoodsImg" resultType="String">
+    select a.img_url from goods_img a,(select id from goods_info where user_id = #{userId} order by add_time desc limit 0,3) b where a.goods_id = b.id and a.type = 1
   </select>
 </mapper>
