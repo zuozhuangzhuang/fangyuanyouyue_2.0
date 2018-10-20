@@ -657,21 +657,23 @@ public class UserInfoServiceImpl implements UserInfoService {
         //个人店铺排序：1.会员等级 2.认证店铺 3.信誉度 4.发布商品时间
         List<Map<String, Object>> maps = userInfoMapper.shopList(nickName,start*limit,limit,authType);
         List<ShopDto> shopDtos = ShopDto.toDtoList(maps);
+        long startTime = System.currentTimeMillis();
         for(ShopDto shopDto:shopDtos){
             //根据用户ID获取前三个商品
             List<String> imgs = goodsInfoMapper.selectShopGoodsImg(shopDto.getUserId());
             for(int i=0;i<imgs.size();i++){
-                if(i == 0){
-                    shopDto.setImgUrl1(String.valueOf(imgs.get(i)));
+                if(i == 0 && StringUtils.isNotEmpty(imgs.get(i))){
+                    shopDto.setImgUrl1(imgs.get(i));
                 }
-                if(i == 1){
-                    shopDto.setImgUrl2(String.valueOf(imgs.get(i)));
+                if(i == 1 && StringUtils.isNotEmpty(imgs.get(i))){
+                    shopDto.setImgUrl2(imgs.get(i));
                 }
-                if(i == 3){
-                    shopDto.setImgUrl3(String.valueOf(imgs.get(i)));
+                if(i == 2 && StringUtils.isNotEmpty(imgs.get(i))){
+                    shopDto.setImgUrl3(imgs.get(i));
                 }
             }
         }
+        System.out.println("毫秒数："+(System.currentTimeMillis()-startTime));
         return shopDtos;
     }
 
