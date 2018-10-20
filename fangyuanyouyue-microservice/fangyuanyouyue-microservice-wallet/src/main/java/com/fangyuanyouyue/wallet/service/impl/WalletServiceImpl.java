@@ -667,10 +667,6 @@ public class WalletServiceImpl implements WalletService{
         Integer total = userWithdrawMapper.countPage(param.getPayType(),param.getStatus(),param.getKeyword(),param.getStartDate(),param.getEndDate());
         List<UserWithdraw> userWithdraws = userWithdrawMapper.getPage(param.getPayType(),param.getStatus(),param.getStart(),param.getLimit(),param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
         List<AdminWithdrawDto> datas = AdminWithdrawDto.toDtoList(userWithdraws);
-        for(AdminWithdrawDto dto:datas){
-            UserVip userVip = userVipMapper.selectByUserId(dto.getUserId());
-            dto.setVipLevel(userVip.getVipLevel());
-        }
         Pager pager = new Pager();
         pager.setTotal(total);
         pager.setDatas(datas);

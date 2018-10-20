@@ -55,7 +55,7 @@ public enum Status {
     IS_VIP(1),NOT_VIP(2),
 
     //商品状态 1出售中 2已售出 3已下架（已结束）5删除
-
+    GOODS_IN_SALE(1),GOODS_SOLD(2),GOODS_REMOVED(3),GOODS_DELETE(5),
 
     //(全民鉴定、申请专栏、议价、官方鉴定、充值、开通、续费会员)订单状态 1待支付 2已完成 3已删除
     ORDER_UNPAID(1),ORDER_COMPLETE(2),ORDER_DELETE(3),

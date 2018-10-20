@@ -102,7 +102,7 @@ public class AppraisalServiceImpl implements AppraisalService{
         if(goodsIds != null && goodsIds.length != 0){//用户对商品提交鉴定
             for(Integer goodsId:goodsIds){
                 GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
-                if(goodsInfo == null || goodsInfo.getStatus().intValue() == 3 || goodsInfo.getStatus().intValue() == 5){
+                if(goodsInfo == null || goodsInfo.getStatus().equals(Status.GOODS_REMOVED.getValue()) || goodsInfo.getStatus().equals(Status.GOODS_DELETE.getValue())){
                     throw new ServiceException("商品不存在或已下架！");
                 }else{
                     GoodsAppraisalDetail goodsAppraisalDetail = goodsAppraisalDetailMapper.selectByUserIdGoodsId(userId, goodsId);

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.goods.dto.*;
@@ -218,7 +219,7 @@ public class GoodsController extends BaseController{
             for(Integer goodsId:param.getGoodsIds()){
                 //1、商品是否存在订单 2、订单是否已完成或已取消 3、订单已退款：是否已完成退款、是否已拒绝退款
                 GoodsInfo goodsInfo = goodsInfoService.selectByPrimaryKey(goodsId);
-                if(goodsInfo.getStatus() == 2){
+                if(goodsInfo.getStatus().equals(Status.GOODS_SOLD.getValue())){
                     if(orderInfoService.ifHasOrder(userId,goodsId)){
                         return toError("商品【"+goodsInfo.getName()+"】存在未完成订单，请勿删除！");
                     }
