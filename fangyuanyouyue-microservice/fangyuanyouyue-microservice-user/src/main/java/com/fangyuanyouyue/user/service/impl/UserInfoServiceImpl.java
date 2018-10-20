@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.user.dao.*;
 import com.fangyuanyouyue.user.dto.*;
@@ -81,6 +82,8 @@ public class UserInfoServiceImpl implements UserInfoService {
     private SchedualForumService schedualForumService;
     @Autowired
     private UserAuthApplyMapper userAuthApplyMapper;
+    @Autowired
+    private GoodsInfoMapper goodsInfoMapper;
 
     @Override
     public UserInfo getUserByToken(String token) throws ServiceException {
@@ -656,24 +659,16 @@ public class UserInfoServiceImpl implements UserInfoService {
         List<ShopDto> shopDtos = ShopDto.toDtoList(maps);
         for(ShopDto shopDto:shopDtos){
             //根据用户ID获取前三个商品
-            String goodsLists = schedualGoodsService.goodsList(shopDto.getUserId(), 0, 3);
-//            System.out.println("goodsLists:"+goodsLists);
-            JSONObject jsonObject = JSONObject.parseObject(goodsLists);
-//            System.out.println("jsonObject:"+jsonObject);
-            JSONArray goodsList = JSONArray.parseArray(jsonObject.getString("data"));
-            if(goodsList != null && goodsList.size() > 0){
-                for(int i=0;i<goodsList.size();i++){
-    //                System.out.println("goods:"+goodsList.get(i));
-                    JSONObject goods = JSONObject.parseObject(goodsList.get(i).toString());
-                    if(i == 0){
-                        shopDto.setImgUrl1(goods.getString("mainUrl"));
-                    }else if(i == 1){
-                        shopDto.setImgUrl2(goods.getString("mainUrl"));
-                    }else if(i == 2){
-                        shopDto.setImgUrl3(goods.getString("mainUrl"));
-                    }else{
-                        throw new ServiceException("");
-                    }
+            List<String> imgs = goodsInfoMapper.selectShopGoodsImg(shopDto.getUserId());
+            for(int i=0;i<imgs.size();i++){
+                if(i == 0){
+                    shopDto.setImgUrl1(String.valueOf(imgs.get(i)));
+                }
+                if(i == 1){
+                    shopDto.setImgUrl2(String.valueOf(imgs.get(i)));
+                }
+                if(i == 3){
+                    shopDto.setImgUrl3(String.valueOf(imgs.get(i)));
                 }
             }
         }

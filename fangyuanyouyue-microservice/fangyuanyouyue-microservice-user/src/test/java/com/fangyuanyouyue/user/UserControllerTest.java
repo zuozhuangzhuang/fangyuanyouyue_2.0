@@ -300,10 +300,10 @@ public class UserControllerTest {
     @Transactional
     public void shopList() throws Exception {
         mvc.perform(MockMvcRequestBuilders.get("/user/shopList")
-                .param("nickName","佛")
+//                .param("nickName","佛")
                 .param("start","0")
-                .param("limit","10")
-                .param("authType","1")
+                .param("limit","10000")
+//                .param("authType","1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
