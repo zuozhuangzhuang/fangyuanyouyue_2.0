@@ -1,7 +1,5 @@
 package com.fangyuanyouyue.forum.service.impl;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -37,12 +35,12 @@ public class FileUploadServiceImpl implements FileUploadService{
     private String bucket;
 
     @Override
-    public String uploadPic(File file) throws Exception {
+    public String uploadPic(String name,InputStream file) throws Exception {
 
 //        String watermark = base64Encode("小方圆@"+userInfo.getNickName());
 
         String fileUrl = null;
-        String fileName = getFileName(file.getName());
+        String fileName = getFileName(name);
         fileName = "pic" + fileName;
         fileUrl = uploadFile(file, fileUrl, fileName);
 
@@ -57,11 +55,11 @@ public class FileUploadServiceImpl implements FileUploadService{
      * @return
      */
     @Override
-    public String uploadFile(File file, String fileUrl, String fileName) {
+    public String uploadFile(InputStream file, String fileUrl, String fileName) {
         try{
             OSSClient ossClient = new OSSClient(endpoint, accessKeyId, accessKeySecret);
             // 上传文件流file
-            ossClient.putObject(bucket, fileName, new FileInputStream(file));
+            ossClient.putObject(bucket, fileName, file);
             // 关闭client
             ossClient.shutdown();
             fileUrl = ossPath+fileName;
