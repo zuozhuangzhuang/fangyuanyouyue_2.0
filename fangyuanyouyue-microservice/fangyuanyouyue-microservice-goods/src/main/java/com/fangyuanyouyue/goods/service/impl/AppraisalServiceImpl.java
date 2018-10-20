@@ -451,7 +451,6 @@ public class AppraisalServiceImpl implements AppraisalService{
             List<AppraisalUrl> appraisalUrls = appraisalUrlMapper.selectListBuUserId(dto.getAppraisalDetailId());
             ArrayList<AdminAppraisalUrlDto> appraisalUrlDtos = AdminAppraisalUrlDto.toDtoList(appraisalUrls);
             dto.setAppraisalUrlDtos(appraisalUrlDtos);
-            
             dtos.add(dto);
         }
         //遍历商品列表，添加到GoodsDtos中

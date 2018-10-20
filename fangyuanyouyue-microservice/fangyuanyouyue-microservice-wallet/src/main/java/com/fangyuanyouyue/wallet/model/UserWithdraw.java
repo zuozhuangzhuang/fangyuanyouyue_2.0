@@ -35,4 +35,7 @@ public class UserWithdraw {
     private Date addTime;//添加时间
 
     private BigDecimal serviceCharge;//手续费
+
+    //用户会员等级 null非会员 1铂金会员 2至尊会员
+    private Integer vipLevel;
 }

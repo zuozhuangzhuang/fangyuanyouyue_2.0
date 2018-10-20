@@ -101,73 +101,129 @@ public class WalletServiceImpl implements WalletService{
 
     @Override
     public void withdrawDeposit(Integer userId, BigDecimal amount, Integer type, String account, String realName, String payPwd) throws ServiceException {
-
-        //获取被限制的用户（代理不可以余额提现）
-        ConfinedUser confinedUser = confinedUserMapper.selectByUserIdStatus(userId, 0);
-        if(confinedUser != null){
+        //获取被限制的用户
+        ConfinedUser confinedUser = confinedUserMapper.selectByUserId(userId);
+        if(confinedUser != null && confinedUser.getCanWithdraw().equals(Status.NOT_WITHDRAW.getValue())){
             throw new ServiceException("此用户被限制使用余额提现！");
         }
-        UserWithdraw userWithdraw = new UserWithdraw();
-        userWithdraw.setUserId(userId);
-        userWithdraw.setAmount(amount);
-        userWithdraw.setPayType(type);
-        userWithdraw.setStatus(1);
-        userWithdraw.setAddTime(DateStampUtils.getTimesteamp());
-
-        UserInfoExt userInfoExt = userInfoExtMapper.selectUserInfoExtByUserId(userId);
-        if(type.equals(Status.PAY_TYPE_ALIPAY.getValue())){//提现方式 1微信 2支付宝
-            if(userInfoExt.getPayPwd()==null){
-                throw new ServiceException("用户未设置支付密码！");
-            }
-            if(MD5Util.verify(MD5Util.MD5(payPwd),userInfoExt.getPayPwd()) == false){
-                throw new ServiceException(ReCode.PAYMENT_PASSWORD_ERROR.getValue(),ReCode.PAYMENT_PASSWORD_ERROR.getMessage());
-            }
-            userWithdraw.setAccount(account);
-            userWithdraw.setRealName(realName);
+        //获取用户钱包信息
+        UserWallet userWallet = userWalletMapper.selectByUserId(userId);
+        if(userWallet == null){
+            throw new ServiceException("获取钱包信息失败！");
         }else{
-            //微信提现需要用户绑定微信账号
-            //查询用户的三方记录
-            UserThirdParty userThirdByUserId = userThirdPartyMapper.getUserThirdByUserId(userId, Status.PAY_TYPE_WECHAT.getValue());
-            if(userThirdByUserId == null || StringUtils.isEmpty(userThirdByUserId.getMiniOpenId())){
-                throw new ServiceException("该账号未绑定小程序，无法微信提现！");
-            }else{
-                userWithdraw.setAccount(userThirdByUserId.getMiniOpenId());
+            if(userWallet.getBalance().compareTo(new BigDecimal(2)) <= 0 || userWallet.getBalance().compareTo(amount) < 0){
+                throw new ServiceException(ReCode.INSUFFICIENT_FUND.getValue(),ReCode.INSUFFICIENT_FUND.getMessage());
             }
-        }
+            UserWithdraw userWithdraw = new UserWithdraw();
+            userWithdraw.setUserId(userId);
+            userWithdraw.setPayType(type);
+            userWithdraw.setStatus(Status.WITHDRAW_APPLY.getValue());
+            userWithdraw.setAddTime(DateStampUtils.getTimesteamp());
 
-        //根据用户会员等级扣除不同手续费
-        UserVip userVip = userVipMapper.selectByUserId(userId);
-        Integer vipLevel = userVip.getVipLevel();//会员等级
-        BigDecimal charge;//手续费
-        BigDecimal percent;//提现手续费利率
-        if(amount.compareTo(new BigDecimal(200)) <= 0){
-            charge = new BigDecimal(2);
-        }else{
-            if(vipLevel == null){
-                //普通用户
-                percent = new BigDecimal(0.01);
+            UserInfoExt userInfoExt = userInfoExtMapper.selectUserInfoExtByUserId(userId);
+            if(type.equals(Status.PAY_TYPE_ALIPAY.getValue())){//提现方式 1微信 2支付宝
+                if(StringUtils.isEmpty(userInfoExt.getPayPwd())){
+                    throw new ServiceException("用户未设置支付密码！");
+                }
+                if(MD5Util.verify(MD5Util.MD5(payPwd),userInfoExt.getPayPwd()) == false){
+                    throw new ServiceException(ReCode.PAYMENT_PASSWORD_ERROR.getValue(),ReCode.PAYMENT_PASSWORD_ERROR.getMessage());
+                }
+                userWithdraw.setAccount(account);
+                userWithdraw.setRealName(realName);
             }else{
-                if(vipLevel.intValue() == 1){
-                    //铂金会员
-                    percent = new BigDecimal(0.008);
+                //微信提现需要用户绑定微信账号
+                //查询用户的三方记录
+                UserThirdParty userThirdByUserId = userThirdPartyMapper.getUserThirdByUserId(userId, Status.PAY_TYPE_WECHAT.getValue());
+                if(userThirdByUserId == null || StringUtils.isEmpty(userThirdByUserId.getMiniOpenId())){
+                    throw new ServiceException("该账号未绑定小程序，无法微信提现！");
                 }else{
-                    //至尊会员
-                    percent = new BigDecimal(0.006);
+                    userWithdraw.setAccount(userThirdByUserId.getMiniOpenId());
                 }
             }
-            charge = amount.multiply(percent);
+
+            //根据用户会员等级扣除不同手续费
+            UserVip userVip = userVipMapper.selectByUserId(userId);
+            Integer vipLevel = userVip.getVipLevel();//会员等级
+            BigDecimal charge;//手续费
+            if(amount.compareTo(new BigDecimal(200)) <= 0){
+                charge = new BigDecimal(2);
+            }else{
+                BigDecimal percent;//提现手续费利率
+                if(vipLevel == null){
+                    //普通用户
+                    percent = new BigDecimal(0.01);
+                }else{
+                    if(vipLevel.equals(Status.VIP_LEVEL_LOW.getValue())){
+                        //铂金会员
+                        percent = new BigDecimal(0.008);
+                    }else{
+                        //至尊会员
+                        percent = new BigDecimal(0.006);
+                    }
+                }
+                charge = amount.multiply(percent);
+            }
+            //扣除余额 type 类型 1充值 2消费 payType 支付类型 1微信 2支付宝 3余额
+            //获取被限制的用户（代理不可以余额提现）
+            BigDecimal balance = userWallet.getBalance();
+            //提现到账金额
+            BigDecimal withdrawAmount = new BigDecimal(0);
+            BigDecimal afterBalance = new BigDecimal(0);
+            if(amount.add(charge).compareTo(balance) >= 0){
+                //全部提现
+                withdrawAmount = balance.subtract(charge);
+                afterBalance = new BigDecimal(0);
+            }else{
+                //余额扣除手续费
+                afterBalance = balance.subtract(amount.add(charge));
+                withdrawAmount = amount;
+            }
+            userWithdraw.setAmount(withdrawAmount);
+            userWithdraw.setServiceCharge(charge);
+            userWithdrawMapper.insert(userWithdraw);
+            userWallet.setBalance(afterBalance);
+            userWalletMapper.updateByPrimaryKey(userWallet);
+            //订单号
+            final IdGenerator idg = IdGenerator.INSTANCE;
+            String orderNo = idg.nextId();
+            addUserBalanceDetail(userId,withdrawAmount.add(charge),Status.PAY_TYPE_BALANCE.getValue(),Status.EXPEND.getValue(),orderNo,(userWithdraw.getPayType().equals(1)?"微信":"支付宝")+"提现",Status.WITHDRAW.getValue(),null,userId,orderNo);
         }
-        userWithdraw.setServiceCharge(charge);
-        userWithdrawMapper.insert(userWithdraw);
-        amount = amount.add(charge);
-        //扣除余额 type 类型 1充值 2消费 payType 支付类型 1微信 2支付宝 3余额
-        updateBalance(userId,amount,2);
-        //订单号
-        final IdGenerator idg = IdGenerator.INSTANCE;
-        String orderNo = idg.nextId();
-        addUserBalanceDetail(userId,amount,Status.PAY_TYPE_BALANCE.getValue(),Status.EXPEND.getValue(),orderNo,(userWithdraw.getPayType().equals(1)?"微信":"支付宝")+"提现",Status.WITHDRAW.getValue(),null,userId,orderNo);
     }
 
+    public static void main(String[] args) {
+//        for(int i=0;i<1000;i++){
+            System.out.println("------------------------开始------------------------");
+            //初始余额
+//            int b = (int)(Math.random()*1000)+200;
+                BigDecimal balance = new BigDecimal(1000).setScale(2,BigDecimal.ROUND_HALF_UP);
+    //        BigDecimal balance = new BigDecimal(300).setScale(2,BigDecimal.ROUND_HALF_UP);
+            System.out.println("初始余额："+balance);
+            //申请提现金额
+//                BigDecimal amount = new BigDecimal(Math.random()*b).setScale(2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal amount = new BigDecimal(366.89).setScale(2,BigDecimal.ROUND_HALF_UP);
+            //手续费倍率
+            BigDecimal percent = new BigDecimal(0.01).setScale(2,BigDecimal.ROUND_HALF_UP);
+            //手续费
+            BigDecimal charge = amount.multiply(percent);
+            //提现到账金额
+            BigDecimal afterBalance = new BigDecimal(0);
+            if(amount.add(charge).compareTo(balance) >= 0){
+                charge = balance.multiply(percent);
+                afterBalance = balance.subtract(charge);
+                balance = new BigDecimal(0);
+                System.out.println("全部提现");
+            }else{
+                balance = balance.subtract(amount.add(charge));
+                afterBalance = amount;
+                System.out.println("余额扣除手续费");
+            }
+            System.out.println("提现金额："+amount);
+            System.out.println("到账金额："+afterBalance);
+            System.out.println("手续费："+charge.setScale(2,BigDecimal.ROUND_HALF_UP));
+            System.out.println("提现后余额："+balance);
+            System.out.println("------------------------结束------------------------");
+//        }
+    }
 
     @Override
     public WalletDto getWallet(Integer userId) throws ServiceException {
@@ -252,12 +308,12 @@ public class WalletServiceImpl implements WalletService{
         if(userWallet == null){
             throw new ServiceException("获取钱包信息失败！");
         }else{
-            if(type.intValue() == 1){//充值
+            if(type.equals(Status.ADD.getValue())){//充值
                 userWallet.setBalance(userWallet.getBalance().add(amount));
-            }else if(type.intValue() == 2){//消费
-                //获取被限制的用户（代理不可以余额提现）
-                ConfinedUser confinedUser = confinedUserMapper.selectByUserIdStatus(userId, Status.IS_PROXY.getValue());
-                if(confinedUser != null){
+            }else if(type.equals(Status.SUB.getValue())){//消费
+                //获取被限制的用户（代理不可以余额支付）
+                ConfinedUser confinedUser = confinedUserMapper.selectByUserId(userId);
+                if(confinedUser != null && confinedUser.getStatus().equals(Status.IS_PROXY.getValue())){
                     throw new ServiceException("此用户被限制使用余额！");
                 }
                 if(userWallet.getBalance().compareTo(amount) < 0){//余额小于消费金额
@@ -337,22 +393,22 @@ public class WalletServiceImpl implements WalletService{
 
 
 
-    public static void main(String[] args) throws Exception {
-        //模拟下单
-        /**
-         * 必须参数：
-         *    字段名       变量名             示例值                                 描述
-         * 1  公众账号ID   appid              wxd678efh567hg6787                     微信支付分配的公众账号ID（企业号corpid即为此appId）
-         * 2  商户号       mch_id             1230000109                             微信支付分配的商户号
-         * 3  随机字符串   nonce_str          5K8264ILTKCH16CQ2502SI8ZNMTM67VS       随机字符串，长度要求在32位以内。推荐随机数生成算法
-         * 4  签名         sign               C380BEC2BFD727A4B6845133519F3AD6       通过签名算法计算得出的签名值，详见签名生成算法
-         * 5  商品描述     body               腾讯充值中心-QQ会员充值                商品简单描述，该字段请按照规范传递，具体请见参数规定
-         * 6  商户订单号   out_trade_no       20150806125346                         商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|* 且在同一个商户号下唯一。详见商户订单号
-         * 7  标价金额     total_fee          88                                     订单总金额，单位为分，详见支付金额
-         * 8  终端IP       spbill_create_ip   123.12.12.123                          APP和网页支付提交用户端ip，Native支付填调用微信支付API的机器IP
-         * 9  通知地址     notify_url         http://www.weixin.qq.com/wxpay/pay.php 异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的url，不能携带参数。
-         * 10 交易类型     trade_type         JSAPI                                  JSAPI 公众号支付 NATIVE 扫码支付 APP APP支付
-         */
+//    public static void main(String[] args) throws Exception {
+    //模拟下单
+    /**
+     * 必须参数：
+     *    字段名       变量名             示例值                                 描述
+     * 1  公众账号ID   appid              wxd678efh567hg6787                     微信支付分配的公众账号ID（企业号corpid即为此appId）
+     * 2  商户号       mch_id             1230000109                             微信支付分配的商户号
+     * 3  随机字符串   nonce_str          5K8264ILTKCH16CQ2502SI8ZNMTM67VS       随机字符串，长度要求在32位以内。推荐随机数生成算法
+     * 4  签名         sign               C380BEC2BFD727A4B6845133519F3AD6       通过签名算法计算得出的签名值，详见签名生成算法
+     * 5  商品描述     body               腾讯充值中心-QQ会员充值                商品简单描述，该字段请按照规范传递，具体请见参数规定
+     * 6  商户订单号   out_trade_no       20150806125346                         商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|* 且在同一个商户号下唯一。详见商户订单号
+     * 7  标价金额     total_fee          88                                     订单总金额，单位为分，详见支付金额
+     * 8  终端IP       spbill_create_ip   123.12.12.123                          APP和网页支付提交用户端ip，Native支付填调用微信支付API的机器IP
+     * 9  通知地址     notify_url         http://www.weixin.qq.com/wxpay/pay.php 异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的url，不能携带参数。
+     * 10 交易类型     trade_type         JSAPI                                  JSAPI 公众号支付 NATIVE 扫码支付 APP APP支付
+     */
 /*
 小程序ID	    appid	            是	String(32)	wxd678efh567hg6787	                    微信分配的小程序ID
 商户号	        mch_id	            是	String(32)	1230000109	                            微信支付分配的商户号
@@ -406,7 +462,7 @@ public class WalletServiceImpl implements WalletService{
 //        System.out.println("调用统一下单接口：" + result);
 //        WechatPayDto parMap = PayCommonUtil.startWXPay(result);
 //        System.out.println("最终的map是：" + parMap.toString());
-    }
+//    }
 
     @Override
     @Transactional(rollbackFor=Exception.class)
@@ -611,6 +667,10 @@ public class WalletServiceImpl implements WalletService{
         Integer total = userWithdrawMapper.countPage(param.getPayType(),param.getStatus(),param.getKeyword(),param.getStartDate(),param.getEndDate());
         List<UserWithdraw> userWithdraws = userWithdrawMapper.getPage(param.getPayType(),param.getStatus(),param.getStart(),param.getLimit(),param.getKeyword(),param.getStartDate(),param.getEndDate(),param.getOrders(),param.getAscType());
         List<AdminWithdrawDto> datas = AdminWithdrawDto.toDtoList(userWithdraws);
+        for(AdminWithdrawDto dto:datas){
+            UserVip userVip = userVipMapper.selectByUserId(dto.getUserId());
+            dto.setVipLevel(userVip.getVipLevel());
+        }
         Pager pager = new Pager();
         pager.setTotal(total);
         pager.setDatas(datas);
@@ -647,9 +707,9 @@ public class WalletServiceImpl implements WalletService{
         if(userWallet == null){
             throw new ServiceException("获取钱包信息失败！");
         }else {
-            if (type.intValue() == Status.ADD.getValue()) {
+            if (type.equals(Status.ADD.getValue())) {
                 userWallet.setBalance(userWallet.getBalance().add(amount));
-            } else if (type.intValue() == Status.SUB.getValue()) {
+            } else if (type.equals(Status.SUB.getValue())) {
                 if (userWallet.getBalance().compareTo(amount) < 0) {//余额小于消费金额
                     throw new ServiceException(ReCode.INSUFFICIENT_FUND.getValue(),ReCode.INSUFFICIENT_FUND.getMessage());
                 } else {
@@ -662,7 +722,7 @@ public class WalletServiceImpl implements WalletService{
             //订单号
             final IdGenerator idg = IdGenerator.INSTANCE;
             String orderNo = idg.nextId();
-            addUserBalanceDetail(userId,amount,Status.PAY_TYPE_BALANCE.getValue(),type,orderNo,type==1?"系统增加余额":"系统减少余额",Status.SYSTEM_UPDATE.getValue(),null,userId,orderNo);
+            addUserBalanceDetail(userId,amount,Status.PAY_TYPE_BALANCE.getValue(),type,orderNo,type.equals(Status.ADD.getValue())?"系统增加余额":"系统减少余额",Status.SYSTEM_UPDATE.getValue(),null,userId,orderNo);
         }
     }
 
@@ -683,28 +743,4 @@ public class WalletServiceImpl implements WalletService{
         }
     }
 
-    @Override
-    public void confinedUser(Integer userId, Integer status) throws ServiceException {
-        ConfinedUser confinedUser = confinedUserMapper.selectByUserIdStatus(userId, null);
-        if(confinedUser != null){
-            if(confinedUser.getStatus().intValue() == Status.IS_CONFINED.getValue()){
-                if(status.equals(Status.NO.getValue())){
-                    confinedUser.setStatus(Status.NOT_CONFINED.getValue());
-                }
-            }else{
-                if(status.equals(Status.YES.getValue())){
-                    confinedUser.setStatus(Status.IS_CONFINED.getValue());
-                }
-            }
-            confinedUserMapper.updateByPrimaryKey(confinedUser);
-        }else{
-            if(status.equals(Status.YES.getValue())){
-                confinedUser = new ConfinedUser();
-                confinedUser.setUserId(userId);
-                confinedUser.setStatus(Status.IS_CONFINED.getValue());
-                confinedUser.setAddTime(DateStampUtils.getTimesteamp());
-                confinedUserMapper.insert(confinedUser);
-            }
-        }
-    }
 }

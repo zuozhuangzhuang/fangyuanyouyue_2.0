@@ -17,6 +17,7 @@
     <result column="title" jdbcType="VARCHAR" property="title" />
     <result column="is_show" jdbcType="INTEGER" property="isShow" />
     <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+    <result column="vip_level" jdbcType="INTEGER" property="vipLevel" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.goods.model.GoodsAppraisalDetail">
     <result column="description" jdbcType="LONGVARCHAR" property="description" />
@@ -285,9 +286,9 @@
   </select>
 
   <select id="getAppraisalPage" resultMap="BaseResultMap">
-    select a.*,b.nick_name from goods_appraisal_detail a,user_info b
+    select a.*,b.nick_name,c.vip_level from goods_appraisal_detail a,user_info b,user_vip c
     <where>
-      a.status <![CDATA[ <> ]]> 4 and a.user_id = b.id
+      a.status <![CDATA[ <> ]]> 4 and a.user_id = b.id and a.user_id = c.user_id
       <if test="type != null">
         and a.type = #{type}
       </if>
@@ -305,7 +306,12 @@
       </if>
     </where>
     <if test="orders != null">
-      order by ${orders}
+      <if test="orders == 'vip_level'">
+        order by c.${orders}
+      </if>
+      <if test="orders != 'vip_level'">
+        order by a.${orders}
+      </if>
       <if test="ascType != null and ascType == 2">
         desc
       </if>

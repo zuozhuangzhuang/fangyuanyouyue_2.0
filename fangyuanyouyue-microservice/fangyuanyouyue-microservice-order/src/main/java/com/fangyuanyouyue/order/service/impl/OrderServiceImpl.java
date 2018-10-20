@@ -1023,8 +1023,7 @@ public class OrderServiceImpl implements OrderService{
                     if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                     }
-                    GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), GoodsInfo.class);
-                    goodsName.append("【"+goodsInfo.getName()+"】");
+                    goodsName.append("【"+detail.getGoodsName()+"】");
                 }
                 //卖家余额账单
                 baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(orderInfo.getSellerId(),orderPay.getPayAmount(),Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),orderInfo.getOrderNo()));

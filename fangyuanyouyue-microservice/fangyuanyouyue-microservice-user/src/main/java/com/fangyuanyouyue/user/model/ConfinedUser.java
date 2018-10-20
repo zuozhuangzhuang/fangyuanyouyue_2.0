@@ -26,4 +26,6 @@ public class ConfinedUser {
     private Integer parentId;//代理上级id
 
     private String code;//代理唯一代码
+
+    private Integer canWithdraw=1;//是否可以提现 1可以提现 2无法提现
 }

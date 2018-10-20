@@ -270,9 +270,12 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
             schedualMessageService.easemobMessage(apply.getUserId().toString(),
                     "恭喜您，您申请的实名认证，已通过官方审核！",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_EXT_AGREE.getMessage(),"");
         }else{
+            if(StringUtils.isEmpty(content)){
+                content = "官方审核未通过";
+            }
             //拒绝
             schedualMessageService.easemobMessage(apply.getUserId().toString(),
-                    "很抱歉，您申请的实名认证，官方审核未通过！可重新提交资料再次申请。",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_EXT_REFUSE.getMessage(),"");
+                    "很抱歉，您申请的实名认证，官方审核未通过！原因："+content+"。可重新提交资料再次申请。",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_EXT_REFUSE.getMessage(),"");
         }
         userInfoExtMapper.updateByPrimaryKeySelective(userInfoExt);
     }
@@ -322,6 +325,9 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
             schedualMessageService.easemobMessage(model.getUserId().toString(),
                     "恭喜您，您申请的认证店铺已通过官方审核！您的店铺已添加认证店铺专属标识，快拉您的好友来尽情购买吧！",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_AUTH_TYPE_AGREE.getMessage(),"");
         }else{
+            if(StringUtils.isEmpty(content)){
+                content = "官方审核未通过";
+            }
             model.setReason(content);
             BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(ext.getUserId(),new BigDecimal(360),Status.ADD.getValue()));
             if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
@@ -337,7 +343,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
             }
             //拒绝
             schedualMessageService.easemobMessage(model.getUserId().toString(),
-                    "很抱歉，您申请的认证店铺未通过官方审核，可联系客服咨询详情。",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_AUTH_TYPE_REFUSE.getMessage(),"");
+                    "很抱歉，您申请的认证店铺未通过官方审核，原因："+content+"。可联系客服咨询详情。",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_AUTH_TYPE_REFUSE.getMessage(),"");
         }
         userAuthApplyMapper.updateByPrimaryKey(model);
     }

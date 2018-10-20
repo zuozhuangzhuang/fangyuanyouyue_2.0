@@ -68,14 +68,14 @@ public class AdminControllerTest {
     }
 
     /**
-     * 编辑浏览量基数
+     * 导入本地路径帖子
      * @throws Exception
      */
     @Test
 //    @Transactional
     public void uploadForum() throws Exception {
         mvc.perform(MockMvcRequestBuilders.get("/adminForum/uploadForum")
-                .param("filePath", "/Users/wuzhimin/Desktop/unzip")
+                .param("filePath", "F:\\Data\\专栏")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

@@ -133,7 +133,8 @@ public class AdminUserController extends BaseController {
     @ApiOperation(value = "修改实名认证状态", notes = "修改认证状态",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "申请信息id", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "status", value = "处理状态 2同意 3拒绝",  required = true,dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "status", value = "处理状态 2同意 3拒绝",  required = true,dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "content", value = "原因",  required = false,dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/auth/status")
     @ResponseBody
@@ -199,7 +200,8 @@ public class AdminUserController extends BaseController {
     @ApiOperation(value = "修改认证店铺状态", notes = "修改认证状态",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "申请信息id", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "status", value = "处理状态 2同意 3拒绝",  required = true,dataType = "int", paramType = "query")
+            @ApiImplicitParam(name = "status", value = "处理状态 2同意 3拒绝",  required = true,dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "content", value = "原因",  required = false,dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/auth/order/status")
     @ResponseBody
