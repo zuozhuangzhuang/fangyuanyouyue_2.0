@@ -76,7 +76,7 @@ public class TimerServiceImpl implements TimerService{
 
     @Override
     public void getPriceDown(GoodsInfo goodsInfo) throws ServiceException{
-        if(!goodsInfo.getType().equals(Status.AUCTION.getValue())){
+        if(!goodsInfo.getType().equals(Status.AUCTION.getValue()) || !goodsInfo.getStatus().equals(Status.GOODS_IN_SALE.getValue())){
             return;
         }
         if(goodsInfo.getPrice().compareTo(goodsInfo.getFloorPrice())>=0){
@@ -136,7 +136,7 @@ public class TimerServiceImpl implements TimerService{
             //根据需要降价次数，降价多次
             if(goodsInfo.getPrice().compareTo(goodsInfo.getFloorPrice()) <= 0){
                 //如果当前价格与最低价相同，break
-                goodsInfo.setStatus(3);
+                goodsInfo.setStatus(Status.GOODS_REMOVED.getValue());
                 goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
                 return;
             }

@@ -77,7 +77,7 @@ public class ReportServiceImpl implements ReportService{
             if(goodsInfo == null){
                 throw new ServiceException("未找到商品、抢购");
             }
-            goodsInfo.setStatus(5);
+            goodsInfo.setStatus(Status.GOODS_DELETE.getValue());
             goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
             //举报者+20
             String reportResult = schedualWalletService.updateCredit(report.getUserId(), Credit.REPORT_VERIFY.getCredit(),Status.ADD.getValue());
