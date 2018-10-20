@@ -2,21 +2,17 @@ package com.fangyuanyouyue.forum.controller;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.http.HttpRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BasePageReq;
@@ -216,7 +212,7 @@ public class AdminController extends BaseController {
             @ApiImplicitParam(name = "userId", value = "用户id",required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "status", value = "处理状态 1同意 2拒绝",required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "coverImgUrl", value = "封面图片地址（同意必填）",required = false, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "reason", value = "拒绝理由（拒绝必填）",required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "reason", value = "拒绝理由",required = false, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "isChosen", value = "是否精选1是 2否",required = false, dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/handleApply")
@@ -445,33 +441,6 @@ public class AdminController extends BaseController {
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return toError("系统繁忙，请稍后再试！");
-        }
-    }
-    
-
-    @ApiOperation(value = "导入Zip帖子", notes = "导入Zip帖子，1个zip里面是1个专栏的所有帖子，每个专栏一个zip",response = BaseResp.class)
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "file", value = "一个专栏的帖子zip，格式为：zip",dataType = "file", paramType = "form")
-    })
-    @PostMapping(value = "/uploadZip")
-    @ResponseBody
-    public BaseResp uploadZip(MultipartFile file,HttpServletRequest request) throws IOException {
-        try {
-            log.info("----》上传帖子zip《----");
-            log.info("参数："+file);
-            if(file == null){
-                return toError("帖子zip包不能为空！");
-            }
-            log.info("参数："+file.getOriginalFilename());
-            log.info("参数："+file.getName());
-            if(!file.getOriginalFilename().toLowerCase().endsWith(".zip")) {
-            	return toError("请上传zip文件");
-            }
-            String result = forumUploadService.uploadZipFile(request,file);
-            return toSuccess(result);
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
