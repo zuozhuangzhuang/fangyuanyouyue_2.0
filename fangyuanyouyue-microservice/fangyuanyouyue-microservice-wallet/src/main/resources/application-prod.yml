@@ -42,3 +42,8 @@ debug: true
 logging:
   level:
     com.fangyuanyouyue.wallet: DEBUG
+redisson:
+  lock:
+    server:
+      address: redis:6379
+      type: standalone
