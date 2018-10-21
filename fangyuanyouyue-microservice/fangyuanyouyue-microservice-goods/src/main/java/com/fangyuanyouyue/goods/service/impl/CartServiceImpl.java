@@ -66,7 +66,7 @@ public class CartServiceImpl implements CartService {
             if(goodsInfo == null || goodsInfo.getStatus().equals(Status.GOODS_REMOVED.getValue()) || goodsInfo.getStatus().equals(Status.GOODS_DELETE.getValue())){
                 throw new ServiceException("商品不存在或已下架！");
             } else {
-                if(goodsInfo.getStatus().equals(Status.GOODS_IN_SALE.getValue())){//1出售中
+                if(!goodsInfo.getStatus().equals(Status.GOODS_IN_SALE.getValue())){//1出售中
                     throw new ServiceException("商品状态异常！");
                 }
                 if(goodsInfo.getUserId().intValue() == userId.intValue()){
