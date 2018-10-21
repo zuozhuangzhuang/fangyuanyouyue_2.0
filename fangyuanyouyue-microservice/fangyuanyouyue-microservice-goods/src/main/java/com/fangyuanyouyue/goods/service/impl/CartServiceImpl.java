@@ -179,10 +179,11 @@ public class CartServiceImpl implements CartService {
             goodsCategoryIds.addAll(set);
         }
         List<GoodsInfo> goodsInfos = goodsInfoMapper.selectByCategoryIds(goodsCategoryIds, start * limit, limit);
-        List<GoodsDto> goodsDtos = new ArrayList<>();
-        for (GoodsInfo goodsInfo : goodsInfos) {
-            goodsDtos.add(setDtoByGoodsInfo(goodsInfo));
-        }
+        List<GoodsDto> goodsDtos = GoodsDto.toDtoList(goodsInfos);
+//        List<GoodsDto> goodsDtos = new ArrayList<>();
+//        for (GoodsInfo goodsInfo : goodsInfos) {
+//            goodsDtos.add(setDtoByGoodsInfo(goodsInfo));
+//        }
         return goodsDtos;
     }
 
