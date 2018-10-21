@@ -13,6 +13,8 @@
     <result column="address_id" jdbcType="INTEGER" property="addressId" />
     <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
     <result column="bargain_no" jdbcType="VARCHAR" property="bargainNo" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+    <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, goods_id, price, reason, status, add_time, update_time, address_id, 
@@ -161,27 +163,27 @@
   </update>
 
   <select id="selectByUserIdGoodsId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from goods_bargain where user_id = #{userId} and goods_id = #{goodsId}
+    select a.*,b.nick_name,b.head_img_url from goods_bargain a,user_info b where a.user_id = b.id and a.user_id = #{userId} and a.goods_id = #{goodsId}
     <if test="status != null">
-      and status = #{status}
+      and a.status = #{status}
     </if>
-    order by add_time desc
+    order by a.add_time desc
   </select>
   <select id="selectAllByGoodsId" parameterType="Integer" resultMap="BaseResultMap">
-    select * from goods_bargain
+    select a.*,b.nick_name,b.head_img_url from goods_bargain a,user_info b
     <where>
-      1=1
+      a.user_id = b.id
       <if test="goodsId != null">
-        and goods_id = #{goodsId}
+        and a.goods_id = #{goodsId}
       </if>
       <if test="status != null">
-        and status = #{status}
+        and a.status = #{status}
       </if>
     </where>
-    order by add_time desc
+    order by a.add_time desc
   </select>
-  <select id="selectAllByUserId" parameterType="Integer" resultMap="BaseResultMap">
-    select a.* from goods_bargain a,goods_info b
+  <select id="selectAllByUserId" parameterType="Integer" resultType="Integer">
+    select count(*) from goods_bargain a,goods_info b
     <where>
       a.goods_id = b.id and b.status <![CDATA[ <> ]]> 3 and b.status <![CDATA[ <> ]]> 5
       <if test="userId != null">

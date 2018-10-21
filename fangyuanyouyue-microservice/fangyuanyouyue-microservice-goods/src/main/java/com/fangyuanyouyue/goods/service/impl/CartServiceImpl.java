@@ -224,9 +224,7 @@ public class CartServiceImpl implements CartService {
             if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
                 throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
-            //获取卖家信息
-            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
-            GoodsDto goodsDto = new GoodsDto(user, goodsInfo, goodsImgs, goodsCorrelations, goodsCommentDtos);
+            GoodsDto goodsDto = new GoodsDto(goodsInfo, goodsImgs, goodsCorrelations, goodsCommentDtos);
             goodsDto.setCommentCount(goodsCommentMapperl.selectCount(goodsInfo.getId()));
             return goodsDto;
         }

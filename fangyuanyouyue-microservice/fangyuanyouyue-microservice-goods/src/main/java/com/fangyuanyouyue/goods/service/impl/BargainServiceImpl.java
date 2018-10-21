@@ -384,7 +384,7 @@ public class BargainServiceImpl implements BargainService{
         List<Integer> goodsIdsByUserId = goodsBargainMapper.selectGoodsIdsByUserId(userId,start*limit,limit,search);
         List<GoodsDto> goodsDtos = new ArrayList<>();
         for(Integer goodsId:goodsIdsByUserId){
-            GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
+            GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKeyDetail(goodsId);
             GoodsDto goodsDto = setDtoByGoodsInfo(userId,goodsInfo);
             //压价信息
             List<GoodsBargain> bargains = goodsBargainMapper.selectByUserIdGoodsId(userId, goodsInfo.getId(), null);
@@ -473,14 +473,7 @@ public class BargainServiceImpl implements BargainService{
                     }
                 }
             }
-            String verifyUserById = schedualUserService.verifyUserById(goodsInfo.getUserId());
-            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
-            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
-                throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
-            }
-            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
-            //获取卖家信息
-            GoodsDto goodsDto = new GoodsDto(user,goodsInfo,goodsImgs,goodsCorrelations,goodsCommentDtos);
+            GoodsDto goodsDto = new GoodsDto(goodsInfo,goodsImgs,goodsCorrelations,goodsCommentDtos);
             goodsDto.setCommentCount(goodsCommentMapper.selectCount(goodsInfo.getId()));
             return goodsDto;
         }
@@ -495,8 +488,8 @@ public class BargainServiceImpl implements BargainService{
          *   待处理的议价
          */
         //状态 1申请
-        List<GoodsBargain> goodsIdsByUserId = goodsBargainMapper.selectAllByUserId(userId,1);
-        return goodsIdsByUserId == null?0:goodsIdsByUserId.size();
+        Integer process = goodsBargainMapper.selectAllByUserId(userId,1);
+        return process == null?0:process;
     }
 
     @Override

@@ -56,4 +56,14 @@ public class GoodsInfo {
     private BigDecimal startPrice;//初始价格
 
     private Date commentTime;//最近一次评论时间
+
+    private String mainImgUrl;//商品主图路径
+
+    private String nickName;//昵称
+
+    private String headImgUrl;//头像图片地址
+
+    private String userAddress;//店家地址
+
+    private Integer level;//用户等级
 }

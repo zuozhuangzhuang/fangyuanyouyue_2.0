@@ -1,40 +1,41 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.fangyuanyouyue.user.dao.GoodsInfoMapper" >
-  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.user.model.GoodsInfo" >
-    <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="user_id" property="userId" jdbcType="INTEGER" />
-    <result column="name" property="name" jdbcType="VARCHAR" />
-    <result column="price" property="price" jdbcType="DECIMAL" />
-    <result column="postage" property="postage" jdbcType="DECIMAL" />
-    <result column="sort" property="sort" jdbcType="INTEGER" />
-    <result column="label" property="label" jdbcType="VARCHAR" />
-    <result column="type" property="type" jdbcType="INTEGER" />
-    <result column="status" property="status" jdbcType="INTEGER" />
-    <result column="floor_price" property="floorPrice" jdbcType="DECIMAL" />
-    <result column="interval_time" property="intervalTime" jdbcType="INTEGER" />
-    <result column="markdown" property="markdown" jdbcType="DECIMAL" />
-    <result column="last_interval_time" property="lastIntervalTime" jdbcType="TIMESTAMP" />
-    <result column="is_appraisal" property="isAppraisal" jdbcType="INTEGER" />
-    <result column="video_url" property="videoUrl" jdbcType="VARCHAR" />
-    <result column="add_time" property="addTime" jdbcType="TIMESTAMP" />
-    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
-    <result column="video_length" property="videoLength" jdbcType="INTEGER" />
-    <result column="start_price" property="startPrice" jdbcType="DECIMAL" />
-    <result column="comment_time" property="commentTime" jdbcType="TIMESTAMP" />
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangyuanyouyue.user.dao.GoodsInfoMapper">
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.user.model.GoodsInfo">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="price" jdbcType="DECIMAL" property="price" />
+    <result column="postage" jdbcType="DECIMAL" property="postage" />
+    <result column="sort" jdbcType="INTEGER" property="sort" />
+    <result column="label" jdbcType="VARCHAR" property="label" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="floor_price" jdbcType="DECIMAL" property="floorPrice" />
+    <result column="interval_time" jdbcType="INTEGER" property="intervalTime" />
+    <result column="markdown" jdbcType="DECIMAL" property="markdown" />
+    <result column="last_interval_time" jdbcType="TIMESTAMP" property="lastIntervalTime" />
+    <result column="is_appraisal" jdbcType="INTEGER" property="isAppraisal" />
+    <result column="video_url" jdbcType="VARCHAR" property="videoUrl" />
+    <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="video_length" jdbcType="INTEGER" property="videoLength" />
+    <result column="start_price" jdbcType="DECIMAL" property="startPrice" />
+    <result column="comment_time" jdbcType="TIMESTAMP" property="commentTime" />
+    <result column="main_img_url" jdbcType="VARCHAR" property="mainImgUrl" />
   </resultMap>
-  <resultMap id="ResultMapWithBLOBs" type="com.fangyuanyouyue.user.model.GoodsInfo" extends="BaseResultMap" >
-    <result column="description" property="description" jdbcType="LONGVARCHAR" />
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.user.model.GoodsInfo">
+    <result column="description" jdbcType="LONGVARCHAR" property="description" />
   </resultMap>
-  <sql id="Base_Column_List" >
+  <sql id="Base_Column_List">
     id, user_id, name, price, postage, sort, label, type, status, floor_price, interval_time, 
     markdown, last_interval_time, is_appraisal, video_url, add_time, update_time, video_length, 
-    start_price, comment_time
+    start_price, comment_time, main_img_url
   </sql>
-  <sql id="Blob_Column_List" >
+  <sql id="Blob_Column_List">
     description
   </sql>
-  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
     select 
     <include refid="Base_Column_List" />
     ,
@@ -42,228 +43,234 @@
     from goods_info
     where id = #{id,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from goods_info
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.user.model.GoodsInfo" >
+  <insert id="insert" parameterType="com.fangyuanyouyue.user.model.GoodsInfo">
     insert into goods_info (id, user_id, name, 
       price, postage, sort, 
       label, type, status, 
       floor_price, interval_time, markdown, 
       last_interval_time, is_appraisal, video_url, 
       add_time, update_time, video_length, 
-      start_price, comment_time, description
-      )
+      start_price, comment_time, main_img_url, 
+      description)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, 
       #{price,jdbcType=DECIMAL}, #{postage,jdbcType=DECIMAL}, #{sort,jdbcType=INTEGER}, 
       #{label,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
       #{floorPrice,jdbcType=DECIMAL}, #{intervalTime,jdbcType=INTEGER}, #{markdown,jdbcType=DECIMAL}, 
       #{lastIntervalTime,jdbcType=TIMESTAMP}, #{isAppraisal,jdbcType=INTEGER}, #{videoUrl,jdbcType=VARCHAR}, 
       #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{videoLength,jdbcType=INTEGER}, 
-      #{startPrice,jdbcType=DECIMAL}, #{commentTime,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR}
-      )
+      #{startPrice,jdbcType=DECIMAL}, #{commentTime,jdbcType=TIMESTAMP}, #{mainImgUrl,jdbcType=VARCHAR}, 
+      #{description,jdbcType=LONGVARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.user.model.GoodsInfo" >
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.user.model.GoodsInfo">
     insert into goods_info
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         id,
       </if>
-      <if test="userId != null" >
+      <if test="userId != null">
         user_id,
       </if>
-      <if test="name != null" >
+      <if test="name != null">
         name,
       </if>
-      <if test="price != null" >
+      <if test="price != null">
         price,
       </if>
-      <if test="postage != null" >
+      <if test="postage != null">
         postage,
       </if>
-      <if test="sort != null" >
+      <if test="sort != null">
         sort,
       </if>
-      <if test="label != null" >
+      <if test="label != null">
         label,
       </if>
-      <if test="type != null" >
+      <if test="type != null">
         type,
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         status,
       </if>
-      <if test="floorPrice != null" >
+      <if test="floorPrice != null">
         floor_price,
       </if>
-      <if test="intervalTime != null" >
+      <if test="intervalTime != null">
         interval_time,
       </if>
-      <if test="markdown != null" >
+      <if test="markdown != null">
         markdown,
       </if>
-      <if test="lastIntervalTime != null" >
+      <if test="lastIntervalTime != null">
         last_interval_time,
       </if>
-      <if test="isAppraisal != null" >
+      <if test="isAppraisal != null">
         is_appraisal,
       </if>
-      <if test="videoUrl != null" >
+      <if test="videoUrl != null">
         video_url,
       </if>
-      <if test="addTime != null" >
+      <if test="addTime != null">
         add_time,
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         update_time,
       </if>
-      <if test="videoLength != null" >
+      <if test="videoLength != null">
         video_length,
       </if>
-      <if test="startPrice != null" >
+      <if test="startPrice != null">
         start_price,
       </if>
-      <if test="commentTime != null" >
+      <if test="commentTime != null">
         comment_time,
       </if>
-      <if test="description != null" >
+      <if test="mainImgUrl != null">
+        main_img_url,
+      </if>
+      <if test="description != null">
         description,
       </if>
     </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         #{id,jdbcType=INTEGER},
       </if>
-      <if test="userId != null" >
+      <if test="userId != null">
         #{userId,jdbcType=INTEGER},
       </if>
-      <if test="name != null" >
+      <if test="name != null">
         #{name,jdbcType=VARCHAR},
       </if>
-      <if test="price != null" >
+      <if test="price != null">
         #{price,jdbcType=DECIMAL},
       </if>
-      <if test="postage != null" >
+      <if test="postage != null">
         #{postage,jdbcType=DECIMAL},
       </if>
-      <if test="sort != null" >
+      <if test="sort != null">
         #{sort,jdbcType=INTEGER},
       </if>
-      <if test="label != null" >
+      <if test="label != null">
         #{label,jdbcType=VARCHAR},
       </if>
-      <if test="type != null" >
+      <if test="type != null">
         #{type,jdbcType=INTEGER},
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         #{status,jdbcType=INTEGER},
       </if>
-      <if test="floorPrice != null" >
+      <if test="floorPrice != null">
         #{floorPrice,jdbcType=DECIMAL},
       </if>
-      <if test="intervalTime != null" >
+      <if test="intervalTime != null">
         #{intervalTime,jdbcType=INTEGER},
       </if>
-      <if test="markdown != null" >
+      <if test="markdown != null">
         #{markdown,jdbcType=DECIMAL},
       </if>
-      <if test="lastIntervalTime != null" >
+      <if test="lastIntervalTime != null">
         #{lastIntervalTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="isAppraisal != null" >
+      <if test="isAppraisal != null">
         #{isAppraisal,jdbcType=INTEGER},
       </if>
-      <if test="videoUrl != null" >
+      <if test="videoUrl != null">
         #{videoUrl,jdbcType=VARCHAR},
       </if>
-      <if test="addTime != null" >
+      <if test="addTime != null">
         #{addTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="videoLength != null" >
+      <if test="videoLength != null">
         #{videoLength,jdbcType=INTEGER},
       </if>
-      <if test="startPrice != null" >
+      <if test="startPrice != null">
         #{startPrice,jdbcType=DECIMAL},
       </if>
-      <if test="commentTime != null" >
+      <if test="commentTime != null">
         #{commentTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="description != null" >
+      <if test="mainImgUrl != null">
+        #{mainImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
         #{description,jdbcType=LONGVARCHAR},
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.user.model.GoodsInfo" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.user.model.GoodsInfo">
     update goods_info
-    <set >
-      <if test="userId != null" >
+    <set>
+      <if test="userId != null">
         user_id = #{userId,jdbcType=INTEGER},
       </if>
-      <if test="name != null" >
+      <if test="name != null">
         name = #{name,jdbcType=VARCHAR},
       </if>
-      <if test="price != null" >
+      <if test="price != null">
         price = #{price,jdbcType=DECIMAL},
       </if>
-      <if test="postage != null" >
+      <if test="postage != null">
         postage = #{postage,jdbcType=DECIMAL},
       </if>
-      <if test="sort != null" >
+      <if test="sort != null">
         sort = #{sort,jdbcType=INTEGER},
       </if>
-      <if test="label != null" >
+      <if test="label != null">
         label = #{label,jdbcType=VARCHAR},
       </if>
-      <if test="type != null" >
+      <if test="type != null">
         type = #{type,jdbcType=INTEGER},
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         status = #{status,jdbcType=INTEGER},
       </if>
-      <if test="floorPrice != null" >
+      <if test="floorPrice != null">
         floor_price = #{floorPrice,jdbcType=DECIMAL},
       </if>
-      <if test="intervalTime != null" >
+      <if test="intervalTime != null">
         interval_time = #{intervalTime,jdbcType=INTEGER},
       </if>
-      <if test="markdown != null" >
+      <if test="markdown != null">
         markdown = #{markdown,jdbcType=DECIMAL},
       </if>
-      <if test="lastIntervalTime != null" >
+      <if test="lastIntervalTime != null">
         last_interval_time = #{lastIntervalTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="isAppraisal != null" >
+      <if test="isAppraisal != null">
         is_appraisal = #{isAppraisal,jdbcType=INTEGER},
       </if>
-      <if test="videoUrl != null" >
+      <if test="videoUrl != null">
         video_url = #{videoUrl,jdbcType=VARCHAR},
       </if>
-      <if test="addTime != null" >
+      <if test="addTime != null">
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null" >
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="videoLength != null" >
+      <if test="videoLength != null">
         video_length = #{videoLength,jdbcType=INTEGER},
       </if>
-      <if test="startPrice != null" >
+      <if test="startPrice != null">
         start_price = #{startPrice,jdbcType=DECIMAL},
       </if>
-      <if test="commentTime != null" >
+      <if test="commentTime != null">
         comment_time = #{commentTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="description != null" >
+      <if test="mainImgUrl != null">
+        main_img_url = #{mainImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
         description = #{description,jdbcType=LONGVARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.fangyuanyouyue.user.model.GoodsInfo" >
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.fangyuanyouyue.user.model.GoodsInfo">
     update goods_info
     set user_id = #{userId,jdbcType=INTEGER},
       name = #{name,jdbcType=VARCHAR},
@@ -280,14 +287,14 @@
       is_appraisal = #{isAppraisal,jdbcType=INTEGER},
       video_url = #{videoUrl,jdbcType=VARCHAR},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       video_length = #{videoLength,jdbcType=INTEGER},
       start_price = #{startPrice,jdbcType=DECIMAL},
       comment_time = #{commentTime,jdbcType=TIMESTAMP},
+      main_img_url = #{mainImgUrl,jdbcType=VARCHAR},
       description = #{description,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.user.model.GoodsInfo" >
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.user.model.GoodsInfo">
     update goods_info
     set user_id = #{userId,jdbcType=INTEGER},
       name = #{name,jdbcType=VARCHAR},
@@ -304,10 +311,10 @@
       is_appraisal = #{isAppraisal,jdbcType=INTEGER},
       video_url = #{videoUrl,jdbcType=VARCHAR},
       add_time = #{addTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
       video_length = #{videoLength,jdbcType=INTEGER},
       start_price = #{startPrice,jdbcType=DECIMAL},
-      comment_time = #{commentTime,jdbcType=TIMESTAMP}
+      comment_time = #{commentTime,jdbcType=TIMESTAMP},
+      main_img_url = #{mainImgUrl,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
@@ -315,6 +322,6 @@
     select a.img_url from goods_img a,(select id from goods_info where user_id = #{userId} order by add_time desc limit 0,3) b where a.goods_id = b.id and a.type = 1
   </select>-->
   <select id="selectShopGoodsImg" resultType="String">
-    select main_img_url from goods_info where user_id = #{userId} order by add_time desc limit 0,3
+    select main_img_url from goods_info where status = 1 and type = 1 and user_id = #{userId} order by add_time desc limit 0,3
   </select>
 </mapper>

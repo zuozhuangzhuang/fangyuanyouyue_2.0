@@ -56,4 +56,6 @@ public class GoodsInfo {
     private BigDecimal startPrice;//初始价格
 
     private Date commentTime;//最近一次评论时间
+
+    private String mainImgUrl;//商品主图路径
 }

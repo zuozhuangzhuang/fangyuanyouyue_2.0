@@ -331,8 +331,8 @@ public class OrderServiceImpl implements OrderService{
 	                orderDetail.setGoodsName(goods.getName());
 	                orderDetail.setAddTime(DateStampUtils.getTimesteamp());
 	                //商品主图
-	                String goodsMainImg = JSONObject.parseObject(schedualGoodsService.goodsMainImg(goods.getId())).getString("data");
-	                orderDetail.setMainImgUrl(goodsMainImg);
+//	                String goodsMainImg = JSONObject.parseObject(schedualGoodsService.goodsMainImg(goods.getId())).getString("data");
+	                orderDetail.setMainImgUrl(goods.getMainImgUrl());
 	                orderDetail.setAmount(goods.getPrice());
 
 	                //计算优惠券（每个商品都可以使用优惠券）

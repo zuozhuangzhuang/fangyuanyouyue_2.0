@@ -105,6 +105,9 @@ public class AdminGoodsDto {
         this.name = goodsInfo.getName();
         this.startPrice = goodsInfo.getStartPrice();
         this.isAppraisal = goodsInfo.getIsAppraisal();
+        this.nickName = goodsInfo.getNickName();
+        this.headImgUrl = goodsInfo.getHeadImgUrl();
+        this.userAddress = goodsInfo.getUserAddress();
     }
 
 
