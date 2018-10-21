@@ -24,7 +24,7 @@ public class AdminWithdrawDto {
 
     private Integer userId;//用户id
 
-    private BigDecimal amount;//提现金额
+    private BigDecimal amount;//到账金额
 
     private Integer payType;//提现方式 1微信 2支付宝
 
@@ -40,6 +40,12 @@ public class AdminWithdrawDto {
     
     private String addTime;//添加时间
 
+    private BigDecimal serviceCharge;//手续费
+
+    private BigDecimal withdrawAmount;//申请金额
+
+    private Integer vipLevel;//会员等级 null非会员 1铂金会员 2至尊会员
+
     public AdminWithdrawDto(UserWithdraw withdraw) {
     	this.id = withdraw.getId();
         this.userId = withdraw.getUserId();
@@ -51,6 +57,9 @@ public class AdminWithdrawDto {
         this.realName = withdraw.getRealName();
         this.nickName = withdraw.getNickName();
         this.addTime = DateUtil.getFormatDate(withdraw.getAddTime(), DateUtil.DATE_FORMT);
+        this.serviceCharge = withdraw.getServiceCharge();
+        this.withdrawAmount = amount.add(serviceCharge);
+        this.vipLevel = withdraw.getVipLevel();
     }
 
 

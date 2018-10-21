@@ -106,4 +106,11 @@ public interface SchedualWalletService {
     String addUserBehavior(@RequestParam(value = "userId") Integer userId,@RequestParam(value = "toUserId") Integer toUserId,@RequestParam(value = "businessId") Integer businessId,
                            @RequestParam(value = "businessType") Integer businessType,@RequestParam(value = "type") Integer type);
 
+    /**
+     * 获取用户会员等级
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "/walletFeign/getUserVipLevel",method = RequestMethod.POST)
+    String getUserVipLevel(@RequestParam(value = "userId") Integer userId);
 }

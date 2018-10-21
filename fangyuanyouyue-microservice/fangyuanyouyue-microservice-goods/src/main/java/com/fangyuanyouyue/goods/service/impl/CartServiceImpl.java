@@ -63,10 +63,10 @@ public class CartServiceImpl implements CartService {
 
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
             //判断商品还在不
-            if (goodsInfo == null || goodsInfo.getStatus().intValue() == 3 || goodsInfo.getStatus().intValue() == 5) {
+            if(goodsInfo == null || goodsInfo.getStatus().equals(Status.GOODS_REMOVED.getValue()) || goodsInfo.getStatus().equals(Status.GOODS_DELETE.getValue())){
                 throw new ServiceException("商品不存在或已下架！");
             } else {
-                if(goodsInfo.getStatus().intValue() != 1){//1出售中
+                if(goodsInfo.getStatus().equals(Status.GOODS_IN_SALE.getValue())){//1出售中
                     throw new ServiceException("商品状态异常！");
                 }
                 if(goodsInfo.getUserId().intValue() == userId.intValue()){

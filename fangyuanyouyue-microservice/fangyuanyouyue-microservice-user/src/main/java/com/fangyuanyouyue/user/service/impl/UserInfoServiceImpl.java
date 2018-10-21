@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.user.dao.*;
 import com.fangyuanyouyue.user.dto.*;
@@ -81,6 +82,8 @@ public class UserInfoServiceImpl implements UserInfoService {
     private SchedualForumService schedualForumService;
     @Autowired
     private UserAuthApplyMapper userAuthApplyMapper;
+    @Autowired
+    private GoodsInfoMapper goodsInfoMapper;
 
     @Override
     public UserInfo getUserByToken(String token) throws ServiceException {
@@ -654,29 +657,23 @@ public class UserInfoServiceImpl implements UserInfoService {
         //个人店铺排序：1.会员等级 2.认证店铺 3.信誉度 4.发布商品时间
         List<Map<String, Object>> maps = userInfoMapper.shopList(nickName,start*limit,limit,authType);
         List<ShopDto> shopDtos = ShopDto.toDtoList(maps);
+        long startTime = System.currentTimeMillis();
         for(ShopDto shopDto:shopDtos){
             //根据用户ID获取前三个商品
-            String goodsLists = schedualGoodsService.goodsList(shopDto.getUserId(), 0, 3);
-//            System.out.println("goodsLists:"+goodsLists);
-            JSONObject jsonObject = JSONObject.parseObject(goodsLists);
-//            System.out.println("jsonObject:"+jsonObject);
-            JSONArray goodsList = JSONArray.parseArray(jsonObject.getString("data"));
-            if(goodsList != null && goodsList.size() > 0){
-                for(int i=0;i<goodsList.size();i++){
-    //                System.out.println("goods:"+goodsList.get(i));
-                    JSONObject goods = JSONObject.parseObject(goodsList.get(i).toString());
-                    if(i == 0){
-                        shopDto.setImgUrl1(goods.getString("mainUrl"));
-                    }else if(i == 1){
-                        shopDto.setImgUrl2(goods.getString("mainUrl"));
-                    }else if(i == 2){
-                        shopDto.setImgUrl3(goods.getString("mainUrl"));
-                    }else{
-                        throw new ServiceException("");
-                    }
+            List<String> imgs = goodsInfoMapper.selectShopGoodsImg(shopDto.getUserId());
+            for(int i=0;i<imgs.size();i++){
+                if(i == 0 && StringUtils.isNotEmpty(imgs.get(i))){
+                    shopDto.setImgUrl1(imgs.get(i));
+                }
+                if(i == 1 && StringUtils.isNotEmpty(imgs.get(i))){
+                    shopDto.setImgUrl2(imgs.get(i));
+                }
+                if(i == 2 && StringUtils.isNotEmpty(imgs.get(i))){
+                    shopDto.setImgUrl3(imgs.get(i));
                 }
             }
         }
+        System.out.println("毫秒数："+(System.currentTimeMillis()-startTime));
         return shopDtos;
     }
 

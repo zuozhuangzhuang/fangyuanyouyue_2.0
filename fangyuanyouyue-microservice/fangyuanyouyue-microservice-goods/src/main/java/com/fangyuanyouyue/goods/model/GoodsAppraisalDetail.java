@@ -44,4 +44,6 @@ public class GoodsAppraisalDetail {
     //用户昵称
     private String nickName;
 
+    //用户会员等级 null非会员 1铂金会员 2至尊会员
+    private Integer vipLevel;
 }

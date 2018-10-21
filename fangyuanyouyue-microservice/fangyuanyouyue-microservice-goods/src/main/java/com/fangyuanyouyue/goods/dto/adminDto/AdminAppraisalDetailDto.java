@@ -49,6 +49,8 @@ public class AdminAppraisalDetailDto {
     //用户昵称
     private String nickName;
 
+    private Integer vipLevel;//用户会员等级 null非会员 1铂金会员 2至尊会员
+
     public AdminAppraisalDetailDto() {
     }
 
@@ -69,6 +71,7 @@ public class AdminAppraisalDetailDto {
 //        this.updateTime = DateUtil.getFormatDate(goodsAppraisalDetail.getUpdateTime(), DateUtil.DATE_FORMT);
         this.type = goodsAppraisalDetail.getType();
         this.nickName = goodsAppraisalDetail.getNickName();
+        this.vipLevel = goodsAppraisalDetail.getVipLevel();
     }
 
 

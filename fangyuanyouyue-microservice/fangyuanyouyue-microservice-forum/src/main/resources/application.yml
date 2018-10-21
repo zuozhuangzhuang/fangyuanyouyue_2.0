@@ -11,6 +11,12 @@ spring:
 #    active: test
     active: prod
 #springcloud-bus
+
+  servlet:
+    multipart:
+      max-file-size: 1024MB
+      max-request-size: 10240MB
+      enabled: true
 management:
   endpoints:
     web:

@@ -264,12 +264,12 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 							"恭喜您，您申请的专栏已通过官方审核！快拉您的好友一起来交流学习吧~",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_COLUMN_AGREE.getMessage(),forumColumn.getId().toString());
 				}else if(status.intValue() == Status.NO.getValue()){
 					if(StringUtils.isEmpty(reason)){
-						throw new ServiceException("拒绝原因不能为空");
+						reason = "官方审核未通过";
 					}
 					forumColumnApply.setReason(reason);
 					//很抱歉您的【专栏名称】专栏审核未通过，可联系客服咨询详情
 					schedualMessageService.easemobMessage(forumColumnApply.getUserId().toString(),
-							"很抱歉您的【"+forumColumnApply.getColumnName()+"】专栏审核未通过，可联系客服咨询详情",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_COLUMN_REFUSE.getMessage(),"");
+							"很抱歉您的【"+forumColumnApply.getColumnName()+"】专栏审核未通过，原因："+reason+"。可联系客服咨询详情",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_COLUMN_REFUSE.getMessage(),"");
 					//余额账单
 					BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(forumColumnApply.getUserId(),new BigDecimal(200),Status.ADD.getValue()));
 					if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){

@@ -76,16 +76,16 @@ public class BargainServiceImpl implements BargainService{
             throw new ServiceException(ReCode.NO_PHONE.getValue(),ReCode.NO_PHONE.getMessage());
         }
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
-        if(goodsInfo == null || goodsInfo.getStatus().intValue() == 3 || goodsInfo.getStatus().intValue() == 5){
+        if(goodsInfo == null || goodsInfo.getStatus().equals(Status.GOODS_REMOVED.getValue()) || goodsInfo.getStatus().equals(Status.GOODS_DELETE.getValue())){
             throw new ServiceException("商品不存在或已下架！");
         }else{
             if(goodsInfo.getUserId().intValue() == userId.intValue()){
                 throw new ServiceException("不可以对自己的商品进行压价！");
             }
-            if(goodsInfo.getStatus().intValue() != 1){
+            if(!goodsInfo.getStatus().equals(Status.GOODS_IN_SALE.getValue())){
                 throw new ServiceException("商品已售出或已下架！");
             }
-            if(goodsInfo.getType().intValue() == 2){
+            if(!goodsInfo.getType().equals(Status.GOODS.getValue())){
                 throw new ServiceException("抢购无法压价！");
             }
             //压价金额不可以高于原价，否则岂不是显得客户很傻
@@ -93,7 +93,7 @@ public class BargainServiceImpl implements BargainService{
                 throw new ServiceException("压价不得高于原价！");
             }
             //如果用户已经存在申请中的压价，不能压第二次
-            List<GoodsBargain> goodsBargains = goodsBargainMapper.selectByUserIdGoodsId(userId, goodsId,1);
+            List<GoodsBargain> goodsBargains = goodsBargainMapper.selectByUserIdGoodsId(userId, goodsId,Status.BARGAIN_APPLY.getValue());
             if(goodsBargains != null && goodsBargains.size()>0){
                 throw new ServiceException("此商品您已压价！");
             }else{
@@ -106,7 +106,7 @@ public class BargainServiceImpl implements BargainService{
                 if(StringUtils.isNotEmpty(reason)){
                     bargainOrder.setReason(reason);
                 }
-                bargainOrder.setStatus(1);//状态 1申请 2同意 3拒绝 4取消
+                bargainOrder.setStatus(Status.BARGAIN_APPLY.getValue());//状态 1申请 2同意 3拒绝 4取消
                 bargainOrder.setAddTime(DateStampUtils.getTimesteamp());
                 //订单号
                 final IdGenerator idg = IdGenerator.INSTANCE;
@@ -115,7 +115,7 @@ public class BargainServiceImpl implements BargainService{
                 bargainOrderMapper.insert(bargainOrder);
 
                 StringBuffer payInfo = new StringBuffer();
-                if(payType.intValue() == Status.PAY_TYPE_WECHAT.getValue()){
+                if(payType.equals(Status.PAY_TYPE_WECHAT.getValue())){
                     String getWechatOrder = schedualWalletService.orderPayByWechat(bargainOrder.getOrderNo(), bargainOrder.getAmount(),NotifyUrl.notify.getNotifUrl()+NotifyUrl.bargain_wechat_notify.getNotifUrl());
                     BaseResp result = ParseReturnValue.getParseReturnValue(getWechatOrder);
                     if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
@@ -124,14 +124,14 @@ public class BargainServiceImpl implements BargainService{
                     WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
 
                     return wechatPayDto;
-                }else if(payType.intValue() == Status.PAY_TYPE_ALIPAY.getValue()){
+                }else if(payType.equals(Status.PAY_TYPE_ALIPAY.getValue())){
                     String getALiOrder = schedualWalletService.orderPayByALi(bargainOrder.getOrderNo(), bargainOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.bargain_alipay_notify.getNotifUrl());
                     BaseResp result = ParseReturnValue.getParseReturnValue(getALiOrder);
                     if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(result.getCode(),result.getReport());
                     }
                     payInfo.append(result.getData());
-                }else if(payType == Status.PAY_TYPE_BALANCE.getValue()){
+                }else if(payType.equals(Status.PAY_TYPE_BALANCE.getValue())){
                     if(StringUtils.isEmpty(payPwd)){
                         throw new ServiceException("支付密码不能为空！");
                     }
@@ -151,7 +151,7 @@ public class BargainServiceImpl implements BargainService{
                         payInfo.append("余额支付成功");
                         updateOrder(bargainOrder.getOrderNo(),null,Status.PAY_TYPE_BALANCE.getValue());
                     }
-                }else if(payType.intValue() == Status.PAY_TYPE_MINI.getValue()){
+                }else if(payType.equals(Status.PAY_TYPE_MINI.getValue())){
                     String getMiniOrder = schedualWalletService.orderPayByWechatMini(userId,bargainOrder.getOrderNo(), bargainOrder.getAmount(),NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.bargain_wechat_notify.getNotifUrl());
                     BaseResp result = ParseReturnValue.getParseReturnValue(getMiniOrder);
                     if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
@@ -216,10 +216,10 @@ public class BargainServiceImpl implements BargainService{
         }else{
             //判断商品状态
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
-            if(goodsInfo == null || goodsInfo.getStatus().intValue() == 3 || goodsInfo.getStatus().intValue() == 5){
+            if(goodsInfo == null || goodsInfo.getStatus().equals(Status.GOODS_REMOVED.getValue()) || goodsInfo.getStatus().equals(Status.GOODS_DELETE.getValue())){
                 throw new ServiceException("商品不存在或已下架！");
             }
-            if(goodsInfo.getStatus().intValue() != 1){
+            if(goodsInfo.getStatus().equals(Status.GOODS_IN_SALE.getValue())){
                 throw new ServiceException("商品已售出！");
             }
             //判断压价状态
@@ -413,10 +413,10 @@ public class BargainServiceImpl implements BargainService{
         }else{
             //判断商品状态
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
-            if(goodsInfo == null || goodsInfo.getStatus().intValue() == 3 || goodsInfo.getStatus().intValue() == 5){
+            if(goodsInfo == null || goodsInfo.getStatus().equals(Status.GOODS_REMOVED.getValue()) || goodsInfo.getStatus().equals(Status.GOODS_DELETE.getValue())){
                 throw new ServiceException("商品不存在或已下架！");
             }
-            if(goodsInfo.getStatus().intValue() != 1){
+            if(goodsInfo.getStatus().equals(Status.GOODS_IN_SALE.getValue())){
                 throw new ServiceException("商品已售出！");
             }
             if(goodsInfo.getUserId().intValue() == userId.intValue()){//卖家获取压价详情

@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.wallet.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.esotericsoftware.minlog.Log;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
@@ -19,6 +20,7 @@ import com.fangyuanyouyue.wallet.service.SchedualRedisService;
 import com.fangyuanyouyue.wallet.service.SchedualUserService;
 import com.fangyuanyouyue.wallet.service.UserCouponService;
 import com.fangyuanyouyue.wallet.service.WalletService;
+import com.snowalker.lock.redisson.RedissonLock;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -58,6 +60,8 @@ public class WalletController extends BaseController{
     private SchedualRedisService schedualRedisService;
     @Autowired
     private UserCouponService userCouponService;
+    @Autowired
+    private RedissonLock redissonLock;
 
     @ApiOperation(value = "充值", notes = "(void)充值",response = BaseResp.class)
     @ApiImplicitParams({
@@ -347,6 +351,11 @@ public class WalletController extends BaseController{
             if(StringUtils.isEmpty(param.getPayPwd())){
                 return toError("支付密码为空！");
             }
+            boolean lock = redissonLock.lock("withdraw"+userId,10);
+            if(!lock) {
+                Log.info("分布式锁获取失败");
+                throw new ServiceException("提现失败！");
+            }
             //提现
             walletService.withdrawDeposit(userId,param.getAmount(),param.getType(),param.getAccount(),param.getRealName(),param.getPayPwd());
             return toSuccess();
@@ -356,6 +365,13 @@ public class WalletController extends BaseController{
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
+        }finally {
+            try{
+                Integer userId = (Integer)schedualRedisService.get(param.getToken());
+                redissonLock.release("withdraw"+userId);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 

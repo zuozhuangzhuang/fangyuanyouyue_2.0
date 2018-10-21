@@ -171,7 +171,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             goodsInfo.setLabel(param.getLabel());
         }
         goodsInfo.setType(param.getType());
-        goodsInfo.setStatus(1);//状态 1出售中 2 已售出 3已下架（已结束） 5删除
+        goodsInfo.setStatus(Status.GOODS_IN_SALE.getValue());//状态 1出售中 2 已售出 3已下架（已结束） 5删除
         if(StringUtils.isNotEmpty(param.getVideoUrl())){
             goodsInfo.setVideoUrl(param.getVideoUrl());
             if(param.getVideoLength() != null){
@@ -326,7 +326,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                     goodsDto.setBargainDtos(bargainDtos);
                 }
                 //如果商品status为已售出，获取商品所属订单ID
-                if (goodsInfo.getStatus().intValue() == 2) {
+                if (goodsInfo.getStatus().equals(Status.GOODS_SOLD.getValue())) {
                     OrderDetail orderDetail = orderDetailMapper.selectOrderByGoodsIdStatus(userId, goodsInfo.getId(), type);
                     if (orderDetail != null) {
                         OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderDetail.getOrderId());
@@ -367,7 +367,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         //批量修改商品状态为删除
         for(Integer goodsId:goodsIds){
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
-            if(goodsInfo == null || goodsInfo.getStatus().intValue() == 5){
+            if(goodsInfo == null || goodsInfo.getStatus().equals(Status.GOODS_DELETE.getValue())){
                 throw new ServiceException("商品不存在或已下架！");
             }else{
                 if(!goodsInfo.getUserId().equals(userId)){
@@ -378,7 +378,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 for(GoodsBargain bargain:goodsBargains){
                     bargainService.updateBargain(goodsInfo.getUserId(),goodsId,bargain.getId(),Status.BARGAIN_REFUSE.getValue());
                 }
-                goodsInfo.setStatus(5);//状态 普通商品 1出售中 2已售出 3已下架（已结束） 5删除
+                goodsInfo.setStatus(Status.GOODS_DELETE.getValue());//状态 普通商品 1出售中 2已售出 3已下架（已结束） 5删除
                 goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
             }
         }
@@ -387,10 +387,10 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     @Override
     public void modifyGoods(GoodsParam param) throws ServiceException {
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(param.getGoodsId());
-        if(goodsInfo == null || goodsInfo.getStatus().intValue() == 5){
+        if(goodsInfo == null || goodsInfo.getStatus().equals(Status.GOODS_DELETE.getValue())){
             throw new ServiceException("商品不存在！");
         }else{
-            if(goodsInfo.getStatus() == 2){
+            if(goodsInfo.getStatus().equals(Status.GOODS_SOLD.getValue())){
                 throw new ServiceException("商品已售出！");
             }
             //修改商品信息
@@ -460,7 +460,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 }
             }
             //如果是已下架的商品或抢购，重新上架
-            goodsInfo.setStatus(1);//状态 1出售中 2已售出 3已下架（已结束） 5删除
+            goodsInfo.setStatus(Status.GOODS_IN_SALE.getValue());//状态 1出售中 2已售出 3已下架（已结束） 5删除
             goodsInfo.setUpdateTime(DateStampUtils.getTimesteamp());
             goodsInfo.setCommentTime(DateStampUtils.getTimesteamp());
             if(goodsInfo.getType().equals(Status.AUCTION.getValue())){
