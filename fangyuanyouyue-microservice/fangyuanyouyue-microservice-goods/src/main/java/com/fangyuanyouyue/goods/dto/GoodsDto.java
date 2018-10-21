@@ -1,16 +1,15 @@
 package com.fangyuanyouyue.goods.dto;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fangyuanyouyue.base.util.DateUtil;
-import com.fangyuanyouyue.goods.model.GoodsCorrelation;
-import com.fangyuanyouyue.goods.model.GoodsImg;
-import com.fangyuanyouyue.goods.model.GoodsInfo;
-import com.fangyuanyouyue.goods.model.UserInfo;
+import com.fangyuanyouyue.goods.model.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * 商品信息Dto
@@ -135,20 +134,23 @@ public class GoodsDto {
             this.lastIntervalTime = DateUtil.getFormatDate(goodsInfo.getLastIntervalTime(), DateUtil.DATE_FORMT);
         }
         this.isAppraisal = goodsInfo.getIsAppraisal();
-        this.addTime = DateUtil.getFormatDate(goodsInfo.getAddTime(), DateUtil.DATE_FORMT);
-        this.updateTime = DateUtil.getFormatDate(goodsInfo.getUpdateTime(), DateUtil.DATE_FORMT);
+        if(goodsInfo.getAddTime() != null){
+            this.addTime = DateUtil.getFormatDate(goodsInfo.getAddTime(), DateUtil.DATE_FORMT);
+        }
+        if(goodsInfo.getUpdateTime() != null){
+            this.updateTime = DateUtil.getFormatDate(goodsInfo.getUpdateTime(), DateUtil.DATE_FORMT);
+        }
         this.videoUrl = goodsInfo.getVideoUrl();
         this.videoLength = goodsInfo.getVideoLength();
         this.startPrice = goodsInfo.getStartPrice();
+        this.mainUrl = goodsInfo.getMainImgUrl();
+        this.nickName = goodsInfo.getNickName();
+        this.headImgUrl = goodsInfo.getHeadImgUrl();
+        this.userAddress = goodsInfo.getUserAddress();
+        this.level = goodsInfo.getLevel();
     }
 
-    public GoodsDto(UserInfo user, GoodsInfo goodsInfo, List<GoodsImg> goodsImgs, List<GoodsCorrelation> goodsCorrelations, List<GoodsCommentDto> goodsCommentDtos) {
-        if(user != null){
-            this.nickName = user.getNickName();
-            this.headImgUrl = user.getHeadImgUrl();
-            this.userAddress = user.getAddress();
-            this.level = user.getLevel();
-        }
+    public GoodsDto( GoodsInfo goodsInfo, List<GoodsImg> goodsImgs, List<GoodsCorrelation> goodsCorrelations, List<GoodsCommentDto> goodsCommentDtos) {
         if(goodsInfo != null){
             //GoodsInfo
             this.goodsId = goodsInfo.getId();
@@ -168,11 +170,20 @@ public class GoodsDto {
                 this.lastIntervalTime = DateUtil.getFormatDate(goodsInfo.getLastIntervalTime(), DateUtil.DATE_FORMT);
             }
             this.isAppraisal = goodsInfo.getIsAppraisal();
-            this.addTime = DateUtil.getFormatDate(goodsInfo.getAddTime(), DateUtil.DATE_FORMT);
-            this.updateTime = DateUtil.getFormatDate(goodsInfo.getUpdateTime(), DateUtil.DATE_FORMT_YEAR);
+            if(goodsInfo.getAddTime() != null){
+                this.addTime = DateUtil.getFormatDate(goodsInfo.getAddTime(), DateUtil.DATE_FORMT);
+            }
+            if(goodsInfo.getUpdateTime() != null){
+                this.updateTime = DateUtil.getFormatDate(goodsInfo.getUpdateTime(), DateUtil.DATE_FORMT_YEAR);
+            }
             this.videoUrl = goodsInfo.getVideoUrl();
             this.videoLength = goodsInfo.getVideoLength();
             this.startPrice = goodsInfo.getStartPrice();
+            this.mainUrl = goodsInfo.getMainImgUrl();
+            this.nickName = goodsInfo.getNickName();
+            this.headImgUrl = goodsInfo.getHeadImgUrl();
+            this.userAddress = goodsInfo.getUserAddress();
+            this.level = goodsInfo.getLevel();
 
         }
         //GoodsImg
@@ -180,9 +191,6 @@ public class GoodsDto {
             List<GoodsImgDto> goodsImgDtos = GoodsImgDto.toDtoList(goodsImgs);
             this.goodsImgDtos = goodsImgDtos;
             for(GoodsImgDto goodsImgDto:goodsImgDtos){
-                if(goodsImgDto.getType() == 1){
-                    this.mainUrl = goodsImgDto.getImgUrl();
-                }
                 if(goodsImgDto.getType() == 3){
                     this.videoImg = goodsImgDto.getImgUrl();
                 }
@@ -196,5 +204,18 @@ public class GoodsDto {
         if(goodsCommentDtos != null && goodsCommentDtos.size()>0){
             this.goodsCommentDtos = goodsCommentDtos;
         }
+    }
+
+
+    public static List<GoodsDto> toDtoList(List<GoodsInfo> list) {
+        if (list == null) {
+            return null;
+        }
+        List<GoodsDto> dtolist = new ArrayList<>();
+        for (GoodsInfo model : list) {
+            GoodsDto dto = new GoodsDto(model);
+            dtolist.add(dto);
+        }
+        return dtolist;
     }
 }

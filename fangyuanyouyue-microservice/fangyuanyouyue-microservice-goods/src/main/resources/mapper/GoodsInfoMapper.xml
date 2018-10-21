@@ -26,6 +26,7 @@
         <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl" />
         <result column="address" jdbcType="VARCHAR" property="userAddress" />
         <result column="level" jdbcType="INTEGER" property="level" />
+        <result column="main_img_url" jdbcType="VARCHAR" property="mainImgUrl" />
     </resultMap>
     <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.goods.model.GoodsInfo">
         <result column="description" jdbcType="LONGVARCHAR" property="description" />
@@ -33,7 +34,7 @@
     <sql id="Base_Column_List">
     id, user_id, name, price, postage, sort, label, type, status, floor_price, interval_time, 
     markdown, last_interval_time, is_appraisal, video_url, add_time, update_time, video_length, 
-    start_price, comment_time
+    start_price, comment_time, main_img_url
   </sql>
     <sql id="Blob_Column_List">
     description
@@ -51,22 +52,22 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
     <insert id="insert" parameterType="com.fangyuanyouyue.goods.model.GoodsInfo" useGeneratedKeys="true" keyProperty="id">
-    insert into goods_info (id, user_id, name, 
-      price, postage, sort, 
-      label, type, status, 
-      floor_price, interval_time, markdown, 
-      last_interval_time, is_appraisal, video_url, 
-      add_time, update_time, video_length, 
-      start_price, comment_time, description
-      )
-    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, 
-      #{price,jdbcType=DECIMAL}, #{postage,jdbcType=DECIMAL}, #{sort,jdbcType=INTEGER}, 
-      #{label,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
-      #{floorPrice,jdbcType=DECIMAL}, #{intervalTime,jdbcType=INTEGER}, #{markdown,jdbcType=DECIMAL}, 
-      #{lastIntervalTime,jdbcType=TIMESTAMP}, #{isAppraisal,jdbcType=INTEGER}, #{videoUrl,jdbcType=VARCHAR}, 
-      #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{videoLength,jdbcType=INTEGER}, 
-      #{startPrice,jdbcType=DECIMAL}, #{commentTime,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR}
-      )
+    insert into goods_info (id, user_id, name,
+      price, postage, sort,
+      label, type, status,
+      floor_price, interval_time, markdown,
+      last_interval_time, is_appraisal, video_url,
+      add_time, update_time, video_length,
+      start_price, comment_time, main_img_url,
+      description)
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR},
+      #{price,jdbcType=DECIMAL}, #{postage,jdbcType=DECIMAL}, #{sort,jdbcType=INTEGER},
+      #{label,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{status,jdbcType=INTEGER},
+      #{floorPrice,jdbcType=DECIMAL}, #{intervalTime,jdbcType=INTEGER}, #{markdown,jdbcType=DECIMAL},
+      #{lastIntervalTime,jdbcType=TIMESTAMP}, #{isAppraisal,jdbcType=INTEGER}, #{videoUrl,jdbcType=VARCHAR},
+      #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{videoLength,jdbcType=INTEGER},
+      #{startPrice,jdbcType=DECIMAL}, #{commentTime,jdbcType=TIMESTAMP}, #{mainImgUrl,jdbcType=VARCHAR},
+      #{description,jdbcType=LONGVARCHAR})
   </insert>
     <insert id="insertSelective" parameterType="com.fangyuanyouyue.goods.model.GoodsInfo" useGeneratedKeys="true" keyProperty="id">
         insert into goods_info
@@ -130,6 +131,9 @@
             </if>
             <if test="commentTime != null">
                 comment_time,
+            </if>
+            <if test="mainImgUrl != null">
+                main_img_url,
             </if>
             <if test="description != null">
                 description,
@@ -196,6 +200,9 @@
             <if test="commentTime != null">
                 #{commentTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="mainImgUrl != null">
+                #{mainImgUrl,jdbcType=VARCHAR},
+            </if>
             <if test="description != null">
                 #{description,jdbcType=LONGVARCHAR},
             </if>
@@ -260,6 +267,9 @@
             <if test="commentTime != null">
                 comment_time = #{commentTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="mainImgUrl != null">
+                main_img_url = #{mainImgUrl,jdbcType=VARCHAR},
+            </if>
             <if test="description != null">
                 description = #{description,jdbcType=LONGVARCHAR},
             </if>
@@ -286,6 +296,7 @@
       video_length = #{videoLength,jdbcType=INTEGER},
       start_price = #{startPrice,jdbcType=DECIMAL},
       comment_time = #{commentTime,jdbcType=TIMESTAMP},
+      main_img_url = #{mainImgUrl,jdbcType=VARCHAR},
       description = #{description,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -308,14 +319,15 @@
       add_time = #{addTime,jdbcType=TIMESTAMP},
       video_length = #{videoLength,jdbcType=INTEGER},
       start_price = #{startPrice,jdbcType=DECIMAL},
-      comment_time = #{commentTime,jdbcType=TIMESTAMP}
+      comment_time = #{commentTime,jdbcType=TIMESTAMP},
+      main_img_url = #{mainImgUrl,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
     <select id="getGoodsList" parameterType="Integer" resultMap="BaseResultMap">
-        select * from goods_info a left join user_info_ext b on a.user_id = b.user_id
+        select a.id,a.user_id,a.name,a.price,a.main_img_url,a.markdown,c.nick_name,c.head_img_url from goods_info a,user_info_ext b,user_info c
         <where>
-            1=1
+            a.user_id = b.user_id and a.user_id = c.id
             <if test="status != null and quality != 5">
                 and a.status = #{status,jdbcType=INTEGER}
             </if>
@@ -385,14 +397,10 @@
     </select>
 
 
-    <select id="selectGoodsByIntervalTime" parameterType="Long" resultMap="BaseResultMap">
-        select * from goods_info where type = 2 and status = 1 and interval_time <![CDATA[ <= ]]> (#{nowTime} - last_interval_time)
-    </select>
-
     <select id="selectMyCollectGoods" parameterType="Integer" resultMap="BaseResultMap">
-        select a.* from goods_info a left join collect b on a.id=b.collect_id
+        select a.*,c.nick_name,c.head_img_url,c.address,c.level from goods_info a ,collect b,user_info c
         <where>
-            1=1
+            a.id=b.collect_id and a.user_id = c.id
             <if test="collectType != null">
                 and a.type = #{collectType,jdbcType=INTEGER} and b.collect_type = #{collectType}
             </if>
@@ -417,7 +425,7 @@
     </select>
 
     <select id="selectByCategoryIds" parameterType="Integer" resultMap="BaseResultMap">
-        select a.* from goods_info a,user_info_ext b,user_vip c where a.user_id = b.user_id and a.user_id = c.user_id and a.status = 1
+        select a.id,a.user_id,a.name,a.price,a.main_img_url,a.markdown,d.nick_name,d.head_img_url from goods_info a,user_info_ext b,user_vip c,user_info d where a.user_id = b.user_id and a.user_id = c.user_id and a.status = 1 and a.user_id = d.id
         and a.id in
         (select goods_id from goods_correlation
         <where>

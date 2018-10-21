@@ -19,6 +19,13 @@ public interface GoodsInfoMapper {
 
     GoodsInfo selectByPrimaryKey(Integer id);
 
+    /**
+     * 商品详情（包括用户信息）
+     * @param id
+     * @return
+     */
+    GoodsInfo selectByPrimaryKeyDetail(Integer id);
+
     int updateByPrimaryKeySelective(GoodsInfo record);
 
     int updateByPrimaryKeyWithBLOBs(GoodsInfo record);
@@ -48,12 +55,6 @@ public interface GoodsInfoMapper {
                                  @Param("goodsCategoryIds")Integer[] goodsCategoryIds);
 
 
-    /**
-     * 根据当前时间获取需要降价的抢购列表
-     * @param nowTime
-     * @return
-     */
-    List<GoodsInfo> selectGoodsByIntervalTime(@Param("nowTime") Long nowTime);
 
     /**
      * 获取我收藏/关注的商品、抢购列表

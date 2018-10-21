@@ -54,6 +54,8 @@ public class BargainDto {
         this.addTime = DateUtil.getFormatDate(goodsBargain.getAddTime(), DateUtil.DATE_FORMT);
         this.updateTime = DateUtil.getFormatDate(goodsBargain.getUpdateTime(), DateUtil.DATE_FORMT);
         this.leftTime = DateUtil.getTimeDifference(goodsBargain.getAddTime().getTime()+24*60*60*1000,System.currentTimeMillis());
+        this.nickName = goodsBargain.getNickName();
+        this.headImgUrl = goodsBargain.getHeadImgUrl();
     }
 
     public static List<BargainDto> toDtoList(List<GoodsBargain> list) {

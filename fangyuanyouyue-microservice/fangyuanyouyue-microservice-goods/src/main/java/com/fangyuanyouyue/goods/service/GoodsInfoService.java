@@ -12,6 +12,7 @@ import com.fangyuanyouyue.goods.dto.SearchDto;
 import com.fangyuanyouyue.goods.dto.adminDto.AdminGoodsDto;
 import com.fangyuanyouyue.goods.model.GoodsCategory;
 import com.fangyuanyouyue.goods.model.GoodsInfo;
+import com.fangyuanyouyue.goods.model.UserInfo;
 import com.fangyuanyouyue.goods.param.AdminGoodsParam;
 import com.fangyuanyouyue.goods.param.GoodsParam;
 
@@ -44,7 +45,7 @@ public interface GoodsInfoService {
      * @return
      * @throws ServiceException
      */
-    void addGoods(Integer userId,String nickName,GoodsParam param) throws ServiceException;
+    void addGoods(UserInfo user, GoodsParam param) throws ServiceException;
 
     /**
      * 批量删除商品

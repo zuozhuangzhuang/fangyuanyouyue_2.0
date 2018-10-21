@@ -41,7 +41,7 @@ public interface GoodsBargainMapper {
      * @param userId
      * @return
      */
-    List<GoodsBargain> selectAllByUserId(@Param("userId")Integer userId,@Param("status")Integer status);
+    Integer selectAllByUserId(@Param("userId")Integer userId,@Param("status")Integer status);
 
     /**
      * 根据用户ID获取所有压过价的商品ID列表

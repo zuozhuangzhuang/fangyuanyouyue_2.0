@@ -35,4 +35,8 @@ public class GoodsBargain {
 
     private String bargainNo;//议价订单号
 
+    private String nickName;//昵称
+
+    private String headImgUrl;//头像图片地址
+
 }
