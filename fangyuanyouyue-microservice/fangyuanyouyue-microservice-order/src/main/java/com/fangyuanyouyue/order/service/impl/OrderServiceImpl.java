@@ -719,7 +719,7 @@ public class OrderServiceImpl implements OrderService{
 	            throw new ServiceException("不可以对自己的商品进行下单！");
 	        }
 
-	        if(type.intValue() == Status.AUCTION.getValue()){
+	        if(goods.getType().equals(Status.AUCTION.getValue())){
 	            //非会员只能免费抢购一次，会员可无限制抢购——验证是否为会员
 	            if(!Boolean.valueOf(JSONObject.parseObject(schedualWalletService.isUserVip(userId)).getString("data"))){
 	                List<UserBehavior> userBehaviors = userBehaviorMapper.selectByUserIdType(userId, Status.BUY_AUCTION.getValue());
