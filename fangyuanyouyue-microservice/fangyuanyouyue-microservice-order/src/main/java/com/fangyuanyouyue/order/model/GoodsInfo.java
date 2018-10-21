@@ -50,4 +50,5 @@ public class GoodsInfo {
 
     private Date updateTime;//修改时间
 
+    private String mainImgUrl;//商品主图路径
 }

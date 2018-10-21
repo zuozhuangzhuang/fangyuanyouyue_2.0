@@ -66,7 +66,7 @@ public class CartServiceImpl implements CartService {
             if(goodsInfo == null || goodsInfo.getStatus().equals(Status.GOODS_REMOVED.getValue()) || goodsInfo.getStatus().equals(Status.GOODS_DELETE.getValue())){
                 throw new ServiceException("商品不存在或已下架！");
             } else {
-                if(goodsInfo.getStatus().equals(Status.GOODS_IN_SALE.getValue())){//1出售中
+                if(!goodsInfo.getStatus().equals(Status.GOODS_IN_SALE.getValue())){//1出售中
                     throw new ServiceException("商品状态异常！");
                 }
                 if(goodsInfo.getUserId().intValue() == userId.intValue()){
@@ -179,10 +179,11 @@ public class CartServiceImpl implements CartService {
             goodsCategoryIds.addAll(set);
         }
         List<GoodsInfo> goodsInfos = goodsInfoMapper.selectByCategoryIds(goodsCategoryIds, start * limit, limit);
-        List<GoodsDto> goodsDtos = new ArrayList<>();
-        for (GoodsInfo goodsInfo : goodsInfos) {
-            goodsDtos.add(setDtoByGoodsInfo(goodsInfo));
-        }
+        List<GoodsDto> goodsDtos = GoodsDto.toDtoList(goodsInfos);
+//        List<GoodsDto> goodsDtos = new ArrayList<>();
+//        for (GoodsInfo goodsInfo : goodsInfos) {
+//            goodsDtos.add(setDtoByGoodsInfo(goodsInfo));
+//        }
         return goodsDtos;
     }
 
@@ -224,9 +225,7 @@ public class CartServiceImpl implements CartService {
             if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
                 throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
-            //获取卖家信息
-            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
-            GoodsDto goodsDto = new GoodsDto(user, goodsInfo, goodsImgs, goodsCorrelations, goodsCommentDtos);
+            GoodsDto goodsDto = new GoodsDto(goodsInfo, goodsImgs, goodsCorrelations, goodsCommentDtos);
             goodsDto.setCommentCount(goodsCommentMapperl.selectCount(goodsInfo.getId()));
             return goodsDto;
         }

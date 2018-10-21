@@ -90,7 +90,9 @@ public class GoodsController extends BaseController{
                 }
             }
             //获取商品列表
+            long start = System.currentTimeMillis();
             List<GoodsDto> goodsDtos = goodsInfoService.getGoodsInfoList(param);
+            System.out.println("总计毫秒数："+(System.currentTimeMillis()-start));
             return toSuccess(goodsDtos);
         } catch (ServiceException e) {
             e.printStackTrace();
@@ -158,7 +160,7 @@ public class GoodsController extends BaseController{
             if(param.getType() == null){
                 return  toError("商品类型不能为空！");
             }
-            if(param.getImgUrls() == null || param.getImgUrls().length == 0){
+            if(param.getImgUrls() == null || param.getImgUrls().length < 1){
                 return toError("请至少上传一张图片！");
             }
             if(param.getType() == 2){//抢购
@@ -181,7 +183,7 @@ public class GoodsController extends BaseController{
                     return toError("降价幅度不能大于原价！");
                 }
             }
-            goodsInfoService.addGoods(userId,user.getNickName(),param);
+            goodsInfoService.addGoods(user,param);
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();

@@ -331,8 +331,8 @@ public class OrderServiceImpl implements OrderService{
 	                orderDetail.setGoodsName(goods.getName());
 	                orderDetail.setAddTime(DateStampUtils.getTimesteamp());
 	                //商品主图
-	                String goodsMainImg = JSONObject.parseObject(schedualGoodsService.goodsMainImg(goods.getId())).getString("data");
-	                orderDetail.setMainImgUrl(goodsMainImg);
+//	                String goodsMainImg = JSONObject.parseObject(schedualGoodsService.goodsMainImg(goods.getId())).getString("data");
+	                orderDetail.setMainImgUrl(goods.getMainImgUrl());
 	                orderDetail.setAmount(goods.getPrice());
 
 	                //计算优惠券（每个商品都可以使用优惠券）
@@ -719,7 +719,7 @@ public class OrderServiceImpl implements OrderService{
 	            throw new ServiceException("不可以对自己的商品进行下单！");
 	        }
 
-	        if(type.intValue() == Status.AUCTION.getValue()){
+	        if(goods.getType().equals(Status.AUCTION.getValue())){
 	            //非会员只能免费抢购一次，会员可无限制抢购——验证是否为会员
 	            if(!Boolean.valueOf(JSONObject.parseObject(schedualWalletService.isUserVip(userId)).getString("data"))){
 	                List<UserBehavior> userBehaviors = userBehaviorMapper.selectByUserIdType(userId, Status.BUY_AUCTION.getValue());

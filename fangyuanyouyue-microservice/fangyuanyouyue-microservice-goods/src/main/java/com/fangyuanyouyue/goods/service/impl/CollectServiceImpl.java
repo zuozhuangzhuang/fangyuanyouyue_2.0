@@ -183,14 +183,7 @@ public class CollectServiceImpl implements CollectService{
                 goodsCommentDto.setGoodsName(goodsInfo.getName());
                 goodsCommentDto.setDescription(goodsInfo.getDescription());
             }
-            //获取卖家信息
-            String verifyUserById = schedualUserService.verifyUserById(goodsInfo.getUserId());
-            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(verifyUserById);
-            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
-                throw new ServiceException(parseReturnValue.getCode(),parseReturnValue.getReport());
-            }
-            UserInfo seller = JSONObject.toJavaObject(JSONObject.parseObject(parseReturnValue.getData().toString()), UserInfo.class);
-            GoodsDto goodsDto = new GoodsDto(seller,goodsInfo,goodsImgs,goodsCorrelations,goodsCommentDtos);
+            GoodsDto goodsDto = new GoodsDto(goodsInfo,goodsImgs,goodsCorrelations,goodsCommentDtos);
             goodsDto.setCommentCount(goodsCommentMapperl.selectCount(goodsInfo.getId()));
             return goodsDto;
         }
