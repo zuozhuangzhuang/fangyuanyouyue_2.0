@@ -30,9 +30,8 @@ spring:
       poolPreparedStatements: true
       maxPoolPreparedStatementPerConnectionSize: 20
       maxOpenPreparedStatements: 20
-#bus
-  rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
+redisson:
+  lock:
+    server:
+      address: redis:6379
+      type: standalone
