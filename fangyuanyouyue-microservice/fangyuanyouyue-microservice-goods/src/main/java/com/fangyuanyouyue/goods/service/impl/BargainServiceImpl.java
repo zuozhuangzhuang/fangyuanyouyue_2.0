@@ -219,7 +219,7 @@ public class BargainServiceImpl implements BargainService{
             if(goodsInfo == null || goodsInfo.getStatus().equals(Status.GOODS_REMOVED.getValue()) || goodsInfo.getStatus().equals(Status.GOODS_DELETE.getValue())){
                 throw new ServiceException("商品不存在或已下架！");
             }
-            if(goodsInfo.getStatus().equals(Status.GOODS_IN_SALE.getValue())){
+            if(!goodsInfo.getStatus().equals(Status.GOODS_IN_SALE.getValue())){
                 throw new ServiceException("商品已售出！");
             }
             //判断压价状态
@@ -416,7 +416,7 @@ public class BargainServiceImpl implements BargainService{
             if(goodsInfo == null || goodsInfo.getStatus().equals(Status.GOODS_REMOVED.getValue()) || goodsInfo.getStatus().equals(Status.GOODS_DELETE.getValue())){
                 throw new ServiceException("商品不存在或已下架！");
             }
-            if(goodsInfo.getStatus().equals(Status.GOODS_IN_SALE.getValue())){
+            if(!goodsInfo.getStatus().equals(Status.GOODS_IN_SALE.getValue())){
                 throw new ServiceException("商品已售出！");
             }
             if(goodsInfo.getUserId().intValue() == userId.intValue()){//卖家获取压价详情
