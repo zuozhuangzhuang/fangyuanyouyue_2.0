@@ -360,7 +360,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         if(goodsInfo == null || goodsInfo.getStatus().equals(Status.GOODS_DELETE.getValue())){
             throw new ServiceException("商品不存在！");
         }else{
-            if(goodsInfo.getStatus().equals(Status.GOODS_SOLD.getValue())){
+            if(!goodsInfo.getStatus().equals(Status.GOODS_SOLD.getValue())){
                 throw new ServiceException("商品已售出！");
             }
             //修改商品信息
