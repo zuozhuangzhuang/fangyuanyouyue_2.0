@@ -114,10 +114,8 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         }catch (DuplicateKeyException e){
             e.printStackTrace();
         }
-        long startTime = System.currentTimeMillis();
         List<GoodsInfo> goodsInfos =goodsInfoMapper.getGoodsList(param.getUserId(),param.getStatus(),param.getSearch(),
                 param.getPriceMin(),param.getPriceMax(),param.getSynthesize(),param.getQuality(),param.getStart()*param.getLimit(),param.getLimit(),param.getType(),param.getGoodsCategoryIds());
-        System.out.println("商品列表毫秒数："+(System.currentTimeMillis()-startTime));
         //分类热度加一
         if(param.getGoodsCategoryIds() != null && param.getGoodsCategoryIds().length>0){
             goodsCategoryMapper.addSearchCountByCategoryIds(param.getGoodsCategoryIds());
@@ -360,7 +358,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         if(goodsInfo == null || goodsInfo.getStatus().equals(Status.GOODS_DELETE.getValue())){
             throw new ServiceException("商品不存在！");
         }else{
-            if(!goodsInfo.getStatus().equals(Status.GOODS_SOLD.getValue())){
+            if(goodsInfo.getStatus().equals(Status.GOODS_SOLD.getValue())){
                 throw new ServiceException("商品已售出！");
             }
             //修改商品信息

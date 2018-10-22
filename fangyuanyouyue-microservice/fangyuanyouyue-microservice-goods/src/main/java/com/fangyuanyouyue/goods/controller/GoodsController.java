@@ -90,9 +90,7 @@ public class GoodsController extends BaseController{
                 }
             }
             //获取商品列表
-            long start = System.currentTimeMillis();
             List<GoodsDto> goodsDtos = goodsInfoService.getGoodsInfoList(param);
-            System.out.println("总计毫秒数："+(System.currentTimeMillis()-start));
             return toSuccess(goodsDtos);
         } catch (ServiceException e) {
             e.printStackTrace();
