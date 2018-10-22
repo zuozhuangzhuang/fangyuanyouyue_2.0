@@ -325,7 +325,7 @@
   </update>
 
     <select id="getGoodsList" parameterType="Integer" resultMap="BaseResultMap">
-        select a.id,a.user_id,a.name,a.price,a.main_img_url,a.markdown,a.interval_time,a.last_interval_time,a.type,a.status,c.nick_name,c.head_img_url from goods_info a,user_info_ext b,user_info c
+        select a.id,a.user_id,a.name,a.price,a.main_img_url,a.markdown,a.interval_time,a.last_interval_time,a.floor_price,a.type,a.status,c.nick_name,c.head_img_url from goods_info a,user_info_ext b,user_info c
         <where>
             a.user_id = b.user_id and a.user_id = c.id
             <if test="status != null and quality != 5">
@@ -425,7 +425,7 @@
     </select>
 
     <select id="selectByCategoryIds" parameterType="Integer" resultMap="BaseResultMap">
-        select a.id,a.user_id,a.name,a.price,a.main_img_url,a.markdown,a.interval_time,a.last_interval_time,a.type,a.status,d.nick_name,d.head_img_url from goods_info a,user_info_ext b,user_vip c,user_info d where a.user_id = b.user_id and a.user_id = c.user_id and a.status = 1 and a.user_id = d.id
+        select a.id,a.user_id,a.name,a.price,a.main_img_url,a.markdown,a.interval_time,a.last_interval_time,a.floor_price,a.type,a.status,d.nick_name,d.head_img_url from goods_info a,user_info_ext b,user_vip c,user_info d where a.user_id = b.user_id and a.user_id = c.user_id and a.status = 1 and a.user_id = d.id
         and a.id in
         (select goods_id from goods_correlation
         <where>
