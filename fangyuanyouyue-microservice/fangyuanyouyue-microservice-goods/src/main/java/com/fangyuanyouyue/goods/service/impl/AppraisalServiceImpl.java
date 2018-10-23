@@ -165,7 +165,6 @@ public class AppraisalServiceImpl implements AppraisalService{
             BigDecimal price = new BigDecimal(10);//自己上传图片或视频收费10元
             if(appraisalCount > 0){//免费鉴定
                 //订单直接完成
-                goodsAppraisalDetail.setStatus(0);
                 price = new BigDecimal(0);
                 BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateAppraisalCount(userId, 1, Status.SUB.getValue()));
                 if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
