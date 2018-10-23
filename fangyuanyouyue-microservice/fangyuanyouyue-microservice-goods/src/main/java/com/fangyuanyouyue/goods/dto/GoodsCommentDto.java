@@ -1,9 +1,12 @@
 package com.fangyuanyouyue.goods.dto;
 
+import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.goods.service.TimerService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +60,8 @@ public class GoodsCommentDto {
 
     private List<GoodsCommentDto> replys;//评论下的回复
 
+    private String addTime;//评论时间
+
     public GoodsCommentDto() {
     }
 
@@ -74,6 +79,7 @@ public class GoodsCommentDto {
         this.img2Url = (String)map.get("img2_url");
         this.img3Url = (String)map.get("img3_url");
         this.status = (Integer)map.get("status");
+        this.addTime = DateUtil.getFormatDate((Timestamp)map.get("add_time"),DateUtil.DATE_FORMT);
     }
 
 
