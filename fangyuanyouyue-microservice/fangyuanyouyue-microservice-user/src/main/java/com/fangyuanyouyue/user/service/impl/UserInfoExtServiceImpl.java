@@ -259,7 +259,6 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
         }
         UserInfoExt userInfoExt = userInfoExtMapper.selectByUserId(apply.getUserId());
         apply.setStatus(status);
-        identityAuthApplyMapper.updateByPrimaryKeySelective(apply);
         userInfoExt.setStatus(status);
         if(status.intValue() == StatusEnum.AUTH_ACCEPT.getCode()){
             //通过
@@ -275,8 +274,12 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
             }
             //拒绝
             schedualMessageService.easemobMessage(apply.getUserId().toString(),
-                    "很抱歉，您申请的实名认证，官方审核未通过！原因："+content+"。可重新提交资料再次申请。",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_EXT_REFUSE.getMessage(),"");
+                    "很抱歉，您申请的实名认证，官方审核未通过！原因："+content+" 可重新提交资料再次申请。",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_EXT_REFUSE.getMessage(),"");
         }
+        if(StringUtils.isNotEmpty(content)){
+            apply.setRejectDesc(content);
+        }
+        identityAuthApplyMapper.updateByPrimaryKeySelective(apply);
         userInfoExtMapper.updateByPrimaryKeySelective(userInfoExt);
     }
 
@@ -343,7 +346,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
             }
             //拒绝
             schedualMessageService.easemobMessage(model.getUserId().toString(),
-                    "很抱歉，您申请的认证店铺未通过官方审核，原因："+content+"。可联系客服咨询详情。",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_AUTH_TYPE_REFUSE.getMessage(),"");
+                    "很抱歉，您申请的认证店铺未通过官方审核，原因："+content+" 可联系客服咨询详情。",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_AUTH_TYPE_REFUSE.getMessage(),"");
         }
         userAuthApplyMapper.updateByPrimaryKey(model);
     }
