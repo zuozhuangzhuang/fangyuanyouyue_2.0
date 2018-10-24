@@ -56,7 +56,7 @@ public class BargainController extends BaseController{
     @Autowired
     private RedissonLock redissonLock;
 
-    @ApiOperation(value = "商品压价申请", notes = "(void)用户发起对商品的议价，直接扣除用户余额 ",response = BaseResp.class)
+    @ApiOperation(value = "商品压价申请", notes = "(支付信息)用户发起对商品的议价，直接扣除用户余额 ",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "goodsId", value = "商品ID",required = true,dataType = "int", paramType = "query"),
@@ -95,7 +95,7 @@ public class BargainController extends BaseController{
             }
             //申请商品压价
             Object payInfo = bargainService.addBargain(userId, param.getGoodsId(), param.getPrice(), param.getReason(), param.getAddressId(), param.getPayPwd(), param.getPayType());
-            return toSuccess();
+            return toSuccess(payInfo);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getMessage());
