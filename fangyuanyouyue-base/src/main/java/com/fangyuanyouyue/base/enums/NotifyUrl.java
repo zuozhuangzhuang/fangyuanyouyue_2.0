@@ -12,7 +12,7 @@ public enum NotifyUrl {
 //    生产环境
     prod_notify("http://gateway.fangyuanyouyue.com"),
 
-    notify(prod_notify.getNotifUrl()),
+    notify(test_notify.getNotifUrl()),
     mini_notify(mini_test_notify.getNotifUrl()),
 
 //    微信支付回调接口

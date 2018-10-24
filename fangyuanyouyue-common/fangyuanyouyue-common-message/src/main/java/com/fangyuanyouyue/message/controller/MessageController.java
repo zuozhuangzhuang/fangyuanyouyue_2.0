@@ -183,7 +183,7 @@ public class MessageController extends BaseController{
                 headImgUrl = "https://xiaofangyuan.oss-cn-shenzhen.aliyuncs.com/pic/2018/09/15/d98ddd0a-7b01-4842-8bc2-a070e9a37f29.png";
             }else{
                 nickName = "邀请我";
-//               from = "69";
+//                from = "69";
                 from = "10069";
                 headImgUrl = "https://xiaofangyuan.oss-cn-shenzhen.aliyuncs.com/pic/2018/09/15/3d112104-be4d-4622-80d4-fa2e6585a7b7.png";
             }
