@@ -88,21 +88,29 @@ public class ConfinedUserServiceImpl implements ConfinedUserService {
         if(userInfo == null){
             throw new ServiceException("未找到用户!");
         }
+        ConfinedUser confinedUser = confinedUserMapper.selectByUserId(id);
         if(type.equals(Status.IS_PROXY.getValue())){
-            ConfinedUser confinedUser = new ConfinedUser();
-            confinedUser.setStatus(Status.IS_PROXY.getValue());
-            confinedUser.setAddTime(DateStampUtils.getTimesteamp());
-            confinedUser.setUserId(id);
-            String proxy = CheckCode.getProxyCode();
-            confinedUser.setCode(proxy);
-            if(StringUtils.isNotEmpty(code)){
-                ConfinedUser parentProxy = confinedUserMapper.selectByCode(code);
-                confinedUser.setParentId(parentProxy.getUserId());
+            if(confinedUser == null){
+                confinedUser = new ConfinedUser();
+                confinedUser.setStatus(Status.IS_PROXY.getValue());
+                confinedUser.setAddTime(DateStampUtils.getTimesteamp());
+                confinedUser.setUserId(id);
+                String proxy = CheckCode.getProxyCode();
+                confinedUser.setCode(proxy);
+                if(StringUtils.isNotEmpty(code)){
+                    ConfinedUser parentProxy = confinedUserMapper.selectByCode(code);
+                    confinedUser.setParentId(parentProxy.getUserId());
+                }
+                confinedUserMapper.insert(confinedUser);
+            }else{
+                if(confinedUser.getStatus().equals(Status.IS_PROXY.getValue())){
+                    throw new ServiceException("请勿重复设置!");
+                }
+                confinedUser.setStatus(Status.IS_PROXY.getValue());
+                confinedUserMapper.updateByPrimaryKeySelective(confinedUser);
             }
-            confinedUserMapper.insert(confinedUser);
         }else{
             //TODO 如果取消一级代理，二级代理怎么办
-            ConfinedUser confinedUser = confinedUserMapper.selectByUserId(id);
             if(confinedUser == null){
                 throw new ServiceException("未找到代理！");
             }
