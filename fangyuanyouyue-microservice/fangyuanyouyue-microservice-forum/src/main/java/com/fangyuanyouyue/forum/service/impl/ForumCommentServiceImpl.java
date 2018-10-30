@@ -4,11 +4,9 @@ import java.util.*;
 
 import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.BaseResp;
-import com.fangyuanyouyue.base.enums.MiniMsg;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.ParseReturnValue;
-import com.fangyuanyouyue.base.util.SendMiniMessage;
 import com.fangyuanyouyue.base.util.wechat.pay.WechatPayConfig;
 import com.fangyuanyouyue.base.util.wechat.pojo.AccessToken;
 import com.fangyuanyouyue.base.util.wechat.utils.WeixinUtil;
@@ -39,7 +37,7 @@ public class ForumCommentServiceImpl implements ForumCommentService {
     private ForumCommentMapper forumCommentMapper;
     @Autowired
     private ForumCommentLikesMapper forumCommentLikesMapper;
-    @Autowired
+	@Autowired
 	private SchedualMessageService schedualMessageService;
     @Autowired
 	private ForumInfoMapper forumInfoMapper;
@@ -97,16 +95,6 @@ public class ForumCommentServiceImpl implements ForumCommentService {
 		if(forumInfo.getType() == 1){
 			schedualMessageService.easemobMessage(forumInfo.getUserId().toString(),
 					"您的帖子【"+forumInfo.getTitle()+"】有新的评论，点击此处前往查看吧",Status.SOCIAL_MESSAGE.getMessage(),Status.JUMP_TYPE_FORUM.getMessage(),forumId.toString());
-
-//			System.out.println(formId);
-//			Map<String,Object> map = new HashMap<>();
-//			map.put("keyword1",content);
-//			map.put("keyword2",userId);
-//			map.put("keyword3",forumInfo.getTitle());
-//			AccessToken accessToken = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
-//			String message = SendMiniMessage.makeRouteMessage("onuC35S2SnDltl3BrTtGBGuOcJDg", MiniMsg.ORDER_ADD.getTemplateId(), MiniMsg.ORDER_ADD.getPagePath(), map,formId);
-//			boolean flag = SendMiniMessage.sendTemplateMessage(accessToken.getToken(), message);
-//			System.out.println("发送"+(flag?"成功":"失败"));
 		}else{
 			schedualMessageService.easemobMessage(forumInfo.getUserId().toString(),
 					"您的视频【"+forumInfo.getTitle()+"】有新的评论，点击此处前往查看吧",Status.SOCIAL_MESSAGE.getMessage(),Status.JUMP_TYPE_VIDEO.getMessage(),forumId.toString());
