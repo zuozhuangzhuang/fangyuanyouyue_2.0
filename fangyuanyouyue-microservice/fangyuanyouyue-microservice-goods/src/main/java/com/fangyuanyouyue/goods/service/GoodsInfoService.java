@@ -196,4 +196,24 @@ public interface GoodsInfoService {
     
 	List<GoodsCategory> getCategory();
 
+    /**
+     * 商品置顶下单
+     * @param userId
+     * @param goodsId
+     * @param payType
+     * @param payPwd
+     * @return
+     * @throws ServiceException
+     */
+	Object setGoodsTop(Integer userId,Integer goodsId,Integer payType,String payPwd) throws ServiceException;
+
+    /**
+     * 修改置顶订单状态
+     * @param orderNo
+     * @param thirdOrderNo
+     * @param payType
+     * @return
+     * @throws ServiceException
+     */
+    boolean updateOrder(String orderNo, String thirdOrderNo, Integer payType) throws ServiceException;
 }

@@ -51,6 +51,8 @@ public class OrderRefundDto {
 
     private String platformReason;//平台处理原因
 
+    private Integer returnType;//退货方式 1未发货申请退货 2已发货申请退货
+
     public OrderRefundDto() {
     }
 
@@ -78,5 +80,6 @@ public class OrderRefundDto {
             this.dealTime = DateUtil.getFormatDate(refund.getDealTime(), DateUtil.DATE_FORMT);
         }
         this.platformReason = refund.getPlatformReason();
+        this.returnType = refund.getReturnType();
     }
 }

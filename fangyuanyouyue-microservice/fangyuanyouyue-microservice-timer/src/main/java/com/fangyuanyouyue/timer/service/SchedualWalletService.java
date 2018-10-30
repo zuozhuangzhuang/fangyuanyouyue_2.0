@@ -75,4 +75,11 @@ public interface SchedualWalletService {
     @RequestMapping(value = "/timer/sendCoupon",method = RequestMethod.POST)
     String sendCoupon();
 
+    /**
+     * 送优惠券
+     * @return
+     */
+    @RequestMapping(value = "/timer/resetFreeTopCount",method = RequestMethod.POST)
+    String resetFreeTopCount();
+
 }

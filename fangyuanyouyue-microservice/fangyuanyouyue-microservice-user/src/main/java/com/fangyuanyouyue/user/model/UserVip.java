@@ -1,5 +1,6 @@
 package com.fangyuanyouyue.user.model;
 
+import com.fangyuanyouyue.base.enums.Status;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -36,4 +37,6 @@ public class UserVip {
     private String vipNo;//会员号
 
     private Integer isSendMessage;//是否发送7天后到期信息 1是 2否
+
+    private Integer freeTopCount = Status.NO_VIP_FREE_TOP_COUNT.getValue();//免费置顶次数
 }

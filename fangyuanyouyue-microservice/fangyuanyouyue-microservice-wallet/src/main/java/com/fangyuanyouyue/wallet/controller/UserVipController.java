@@ -93,7 +93,7 @@ public class UserVipController extends BaseController{
             return toSuccess(payInfo);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -301,4 +301,38 @@ public class UserVipController extends BaseController{
         return ret;
 
     }
+
+
+    @ApiOperation(value = "获取用户剩余置顶次数", notes = "(Integer)根据用户token获取用户剩余免费置顶次数",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query")
+    })
+    @PostMapping(value = "/getFreeTopCount")
+    @ResponseBody
+    public BaseResp getFreeTopCount(WalletParam param) throws IOException {
+        try {
+            log.info("----》获取用户剩余置顶次数《----");
+            log.info("参数："+param.toString());
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError("用户token不能为空！");
+            }
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
+            }
+            //查看用户剩余置顶次数
+            Integer time = userVipService.getFreeTopCount(userId);
+            return toSuccess(time);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getCode(),e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+
 }

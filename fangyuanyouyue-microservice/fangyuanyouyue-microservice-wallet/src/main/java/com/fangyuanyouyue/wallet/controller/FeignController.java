@@ -3,7 +3,9 @@ package com.fangyuanyouyue.wallet.controller;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
+import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.wallet.dto.UserCouponDto;
 import com.fangyuanyouyue.wallet.param.WalletParam;
 import com.fangyuanyouyue.wallet.service.*;
@@ -65,7 +67,7 @@ public class FeignController extends BaseController{
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -92,7 +94,7 @@ public class FeignController extends BaseController{
             return toSuccess(result);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -119,7 +121,7 @@ public class FeignController extends BaseController{
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -141,7 +143,7 @@ public class FeignController extends BaseController{
             return toSuccess(count);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -170,7 +172,7 @@ public class FeignController extends BaseController{
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -197,7 +199,7 @@ public class FeignController extends BaseController{
             return toSuccess(wechatPayDto);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -227,7 +229,7 @@ public class FeignController extends BaseController{
             return toSuccess(wechatPayDto);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -254,7 +256,7 @@ public class FeignController extends BaseController{
             return toSuccess(payInfo);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -272,7 +274,7 @@ public class FeignController extends BaseController{
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -298,7 +300,7 @@ public class FeignController extends BaseController{
             return toSuccess(priceByCoupon);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -331,7 +333,7 @@ public class FeignController extends BaseController{
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -352,7 +354,7 @@ public class FeignController extends BaseController{
             return toSuccess(isUserVip);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -372,7 +374,55 @@ public class FeignController extends BaseController{
             return toSuccess(vipLevel);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "获取用户剩余置顶次数", notes = "获取用户剩余置顶次数",hidden = true)
+    @PostMapping(value = "/getFreeTopCount")
+    @ResponseBody
+    public BaseResp getFreeTopCount(Integer userId) throws IOException {
+        try {
+            log.info("----》获取用户剩余置顶次数《----");
+            //验证用户
+            if(userId == null){
+                return toError("用户id不能为空！");
+            }
+            //查看用户剩余置顶次数
+            Integer time = userVipService.getFreeTopCount(userId);
+            return toSuccess(time);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getCode(),e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "修改用户免费置顶次数", notes = "修改用户免费置顶次数",hidden = true)
+    @PostMapping(value = "/updateTopCount")
+    @ResponseBody
+    public BaseResp updateTopCount(Integer userId,Integer type,Integer count) throws IOException {
+        try {
+            log.info("----》修改用户免费置顶次数《----");
+            if(userId == null){
+                return toError("用户id不能为空！");
+            }
+            if(type == null){
+                return toError("类型不能为空！");
+            }
+            if(count == null){
+                return toError("次数不能为空！");
+            }
+            userVipService.updateTopCount(userId,type,count);
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");

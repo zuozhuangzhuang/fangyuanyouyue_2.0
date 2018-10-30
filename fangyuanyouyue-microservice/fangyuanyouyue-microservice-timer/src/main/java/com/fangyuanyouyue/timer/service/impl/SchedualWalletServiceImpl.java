@@ -42,4 +42,9 @@ public class SchedualWalletServiceImpl implements SchedualWalletService{
     public String sendCoupon() {
         return "送优惠券失败！";
     }
+
+    @Override
+    public String resetFreeTopCount() {
+        return "重置置顶次数失败！";
+    }
 }

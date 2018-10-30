@@ -17,8 +17,8 @@ public enum ReCode {
 	LOGIN_TIME_OUT(10,"登录超时，请重新登录！"),
 	FROZEN(11,"您的账号已被冻结，请联系管理员！"),
 	NO_PHONE(12,"未绑定手机号！"),
-	LOCKERROR(13,"商品暂时无法操作，请稍后再试！"),
-
+	LOCK_ERROR(13,"商品暂时无法操作，请稍后再试！"),
+	NOT_VIP(14,"用户非会员"),
 	;
 
 	private final Integer value;

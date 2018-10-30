@@ -63,4 +63,14 @@ public class SchedualWalletServiceImpl implements SchedualWalletService{
     public String getUserVipLevel(Integer userId) {
         return "获取用户会员等级失败！";
     }
+
+    @Override
+    public String updateTopCount(Integer userId, Integer type, Integer count) {
+        return "修改免费置顶次数失败！";
+    }
+
+    @Override
+    public String getFreeTopCount(Integer userId) {
+        return "获取免费置顶次数失败！";
+    }
 }

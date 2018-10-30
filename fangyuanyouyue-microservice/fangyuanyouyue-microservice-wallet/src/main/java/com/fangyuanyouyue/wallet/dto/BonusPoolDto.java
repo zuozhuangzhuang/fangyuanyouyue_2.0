@@ -27,14 +27,23 @@ public class BonusPoolDto {
 
     private String updateTime;//更新时间
 
+    private Integer type;//类型 0谢谢惠顾 1积分 2优惠券
+
+    private Long score;//积分值
+
+    private Integer couponId;//优惠券id
     public BonusPoolDto() {
     }
+
 
     public BonusPoolDto(BonusPool bonusPool) {
         this.bonusId = bonusPool.getId();
         this.bonusName = bonusPool.getBonusName();
         this.addTime = DateUtil.getFormatDate(bonusPool.getAddTime(), DateUtil.DATE_FORMT);
         this.updateTime = DateUtil.getFormatDate(bonusPool.getUpdateTime(), DateUtil.DATE_FORMT);
+        this.type = bonusPool.getType();
+        this.score = bonusPool.getScore();
+        this.couponId = bonusPool.getCouponId();
     }
 
     public static List<BonusPoolDto> toDtoList(List<BonusPool> list) {

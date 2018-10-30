@@ -60,4 +60,21 @@ public interface UserVipService {
      * @throws ServiceException
      */
     Pager vipList(AdminWalletParam param) throws ServiceException;
+
+    /**
+     * 获取用户剩余置顶次数
+     * @param userId
+     * @return
+     * @throws ServiceException
+     */
+    Integer getFreeTopCount(Integer userId) throws ServiceException;
+
+    /**
+     * 修改用户免费置顶次数
+     * @param userId
+     * @param type 1增加 2减少
+     * @param count
+     * @throws ServiceException
+     */
+    void updateTopCount(Integer userId,Integer type,Integer count) throws ServiceException;
 }
