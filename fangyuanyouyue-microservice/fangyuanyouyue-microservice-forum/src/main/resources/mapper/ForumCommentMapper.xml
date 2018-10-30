@@ -142,7 +142,7 @@
     select
     a.*,b.nick_name,b.head_img_url
     from forum_comment a,user_info b
-    where a.user_id=b.id and forum_id=#{forumId} and b.status <![CDATA[ <> ]]> 3 and a.status <![CDATA[ <> ]]> 2
+    where a.user_id=b.id and a.forum_id=#{forumId} and b.status <![CDATA[ <> ]]> 3 and a.status <![CDATA[ <> ]]> 2
     and a.comment_id is null
     order by (select count(id) from forum_comment_likes where comment_id = a.id) desc,a.add_time desc
     limit #{start},#{limit}
