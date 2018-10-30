@@ -523,7 +523,7 @@ public class WalletServiceImpl implements WalletService{
         List<UserBalanceDetail> userBalanceDetails = userBalanceDetailMapper.selectByUserIdType(userId, start * limit, limit, type, date);
         List<UserBalanceDto> dtoList = UserBalanceDto.toDtoList(userBalanceDetails);
         for(UserBalanceDto dto:dtoList){
-            UserInfo info;
+            UserInfo info = null;
             if(dto.getType().intValue() == Status.INCOME.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue()){
                 info = userInfoMapper.selectByPrimaryKey(dto.getBuyerId());
             }else if((dto.getType().intValue() == Status.EXPEND.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue())
@@ -533,7 +533,8 @@ public class WalletServiceImpl implements WalletService{
                     ){
                 info = userInfoMapper.selectByPrimaryKey(dto.getSellerId());
             }else{
-                info = userInfoMapper.selectByPrimaryKey(66);
+            info = userInfoMapper.selectByPrimaryKey(10066);
+//                dto.setImgUrl("https://xiaofangyuan.oss-cn-shenzhen.aliyuncs.com/pic/2018/09/15/cd7397df-feca-4da5-9195-c7bff3b9fb5a.png");
             }
             if(info != null){
                 dto.setImgUrl(info.getHeadImgUrl());
@@ -555,7 +556,7 @@ public class WalletServiceImpl implements WalletService{
             throw new ServiceException("未找到订单!");
         }
         UserBalanceDto dto = new UserBalanceDto(userBalanceDetail);
-        UserInfo info;
+        UserInfo info = null;
         if(dto.getType().intValue() == Status.INCOME.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue()){
             info = userInfoMapper.selectByPrimaryKey(dto.getBuyerId());
             dto.setImgUrl(info.getHeadImgUrl());
@@ -567,7 +568,7 @@ public class WalletServiceImpl implements WalletService{
             info = userInfoMapper.selectByPrimaryKey(dto.getSellerId());
             dto.setImgUrl(info.getHeadImgUrl());
         }else{
-            info = userInfoMapper.selectByPrimaryKey(66);
+            info = userInfoMapper.selectByPrimaryKey(10066);
         }
         if(info != null){
             dto.setImgUrl(info.getHeadImgUrl());

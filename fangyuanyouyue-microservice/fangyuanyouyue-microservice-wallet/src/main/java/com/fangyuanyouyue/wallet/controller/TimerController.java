@@ -57,7 +57,7 @@ public class TimerController extends BaseController {
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -75,7 +75,7 @@ public class TimerController extends BaseController {
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -92,7 +92,24 @@ public class TimerController extends BaseController {
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "重置置顶次数", notes = "(void)重置置顶次数",response = BaseResp.class)
+    @PostMapping(value = "/resetFreeTopCount")
+    @ResponseBody
+    public BaseResp resetFreeTopCount() throws IOException {
+        try {
+            log.info("----》重置置顶次数《----");
+            timerService.resetFreeTopCount();
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");

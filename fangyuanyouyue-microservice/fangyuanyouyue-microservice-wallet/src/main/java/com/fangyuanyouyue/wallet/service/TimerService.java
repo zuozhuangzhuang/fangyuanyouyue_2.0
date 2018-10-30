@@ -23,4 +23,10 @@ public interface TimerService {
      * @throws ServiceException
      */
     void sendCoupon() throws ServiceException, ParseException;
+
+    /**
+     * 重置置顶次数
+     * @throws ServiceException
+     */
+    void resetFreeTopCount() throws ServiceException;
 }

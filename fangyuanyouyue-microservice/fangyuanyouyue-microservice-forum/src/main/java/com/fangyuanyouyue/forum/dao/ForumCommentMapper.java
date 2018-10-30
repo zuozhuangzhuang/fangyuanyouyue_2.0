@@ -39,4 +39,11 @@ public interface ForumCommentMapper {
      * @return
      */
     List<Map> selectByUserId(@Param("userId")Integer userId, @Param("start")Integer start, @Param("limit")Integer limit, @Param("type")Integer type);
+
+    /**
+     * 根据评论id获取所有回复
+     * @param commentId
+     * @return
+     */
+    List<ForumComment> selectReplyByCommentId(@Param("commentId")Integer commentId);
 }

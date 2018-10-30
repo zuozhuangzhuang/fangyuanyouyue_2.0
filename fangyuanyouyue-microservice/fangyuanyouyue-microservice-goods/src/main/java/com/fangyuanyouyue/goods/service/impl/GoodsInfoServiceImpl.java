@@ -4,12 +4,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
-import com.fangyuanyouyue.base.enums.Credit;
-import com.fangyuanyouyue.base.enums.ReCode;
-import com.fangyuanyouyue.base.enums.Score;
-import com.fangyuanyouyue.base.enums.Status;
+import com.fangyuanyouyue.base.dto.WechatPayDto;
+import com.fangyuanyouyue.base.enums.*;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
+import com.fangyuanyouyue.base.util.IdGenerator;
 import com.fangyuanyouyue.base.util.ParseReturnValue;
 import com.fangyuanyouyue.goods.dao.*;
 import com.fangyuanyouyue.goods.dto.*;
@@ -71,6 +70,10 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     private SchedualWalletService schedualWalletService;
     @Autowired
     private TimerService timerService;
+    @Autowired
+    private GoodsTopDetailMapper goodsTopDetailMapper;
+    @Autowired
+    private GoodsTopOrderMapper goodsTopOrderMapper;
 
     @Override
     public GoodsInfo selectByPrimaryKey(Integer id) throws ServiceException{
@@ -895,13 +898,151 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
 		return goodsCategoryMapper.getTopCategory();
 	}
 
-//    @Override
-//    public Integer processMonthGoods() throws ServiceException {
-//        List<Map<Integer, Integer>> monthGoodsCount = goodsInfoMapper.getMonthGoodsCount();
-//        if(monthGoodsCount != null && monthGoodsCount.size() > 0){
-//            for(Map<Integer, Integer> map:monthGoodsCount){
-//                System.out.println(map.toString());
-//            }
-//        }
-//    }
+
+
+    @Override
+    @Transactional(rollbackFor=Exception.class)
+    @TxTransaction(isStart=true)
+    public Object setGoodsTop(Integer userId, Integer goodsId, Integer payType, String payPwd) throws ServiceException {
+        //TODO 1、判断商品与用户关系 2、判断支付方式——免费置顶、下单置顶
+        GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
+        if(goodsInfo == null){
+            throw new ServiceException("商品异常！");
+        }
+        if(!goodsInfo.getUserId().equals(userId)){
+            throw new ServiceException("无权操作！");
+        }
+        if(!goodsInfo.getStatus().equals(Status.GOODS_IN_SALE.getValue())){
+            throw new ServiceException("商品状态异常！");
+        }
+        StringBuffer payInfo = new StringBuffer();
+        if(payType == null){
+            //TODO 免费置顶：1、查看用户会员等级 2、查看用户免费置顶次数 3、生成置顶详情 4、修改免费置顶次数
+            BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.getUserVipLevel(userId));
+            if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+            }
+            Integer vipLevel = (Integer)baseResp.getData();
+            if(vipLevel != null){
+                baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.getFreeTopCount(userId));
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                }
+                Integer topCount = (Integer) baseResp.getData();
+                if(topCount > 0){
+                    //置顶详情
+                    GoodsTopDetail goodsTopDetail = new GoodsTopDetail() ;
+                    goodsTopDetail.setUserId(userId);
+                    goodsTopDetail.setGoodsId(goodsId);
+                    goodsTopDetail.setAddTime(DateStampUtils.getTimesteamp());
+                    goodsTopDetail.setStatus(Status.IS_TOP.getValue());
+                    goodsTopDetailMapper.insert(goodsTopDetail);
+                    //减少免费次数
+                    baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateTopCount(userId,Status.SUB.getValue(),1));
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                    }
+                    goodsInfo.setCommentTime(DateStampUtils.getTimesteamp());
+                    goodsInfoMapper.updateByPrimaryKey(goodsInfo);
+                    return null;
+                }else{
+                    throw new ServiceException("无免费置顶次数！");
+                }
+            }else{
+                throw new ServiceException("此用户无法免费置顶！");
+            }
+        }else{
+            //TODO 下单置顶：生成置顶订单
+            GoodsTopOrder goodsTopOrder = new GoodsTopOrder();
+            goodsTopOrder.setUserId(userId);
+            //订单号
+            final IdGenerator idg = IdGenerator.INSTANCE;
+            String id = idg.nextId();
+            goodsTopOrder.setOrderNo(id);
+            goodsTopOrder.setCount(1);
+            goodsTopOrder.setAmount(new BigDecimal(2).setScale(2,BigDecimal.ROUND_HALF_UP));
+            goodsTopOrder.setStatus(Status.ORDER_UNPAID.getValue());
+            goodsTopOrder.setAddTime(DateStampUtils.getTimesteamp());
+            goodsTopOrder.setGoodsId(goodsId);
+            goodsTopOrderMapper.insert(goodsTopOrder);
+            if(payType.equals(Status.PAY_TYPE_WECHAT.getValue())){
+                String getWechatOrder = schedualWalletService.orderPayByWechat(goodsTopOrder.getOrderNo(), goodsTopOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.top_wechat_notify.getNotifUrl());
+                BaseResp result = ParseReturnValue.getParseReturnValue(getWechatOrder);
+                if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(result.getCode(),result.getReport());
+                }
+                WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
+            }else if(payType.equals(Status.PAY_TYPE_ALIPAY.getValue())){
+                String getALiOrder = schedualWalletService.orderPayByALi(goodsTopOrder.getOrderNo(), goodsTopOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.top_alipay_notify.getNotifUrl());
+                BaseResp result = ParseReturnValue.getParseReturnValue(getALiOrder);
+                if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(result.getCode(),result.getReport());
+                }
+                payInfo.append(result.getData());
+            }else if(payType.equals(Status.PAY_TYPE_BALANCE.getValue())){
+                String verifyPayPwd = schedualUserService.verifyPayPwd(userId, payPwd);
+                BaseResp result = ParseReturnValue.getParseReturnValue(verifyPayPwd);
+                if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(result.getCode(),result.getReport());
+                }
+                if (!(boolean)result.getData()) {
+                    throw new ServiceException(ReCode.PAYMENT_PASSWORD_ERROR.getValue(),ReCode.PAYMENT_PASSWORD_ERROR.getMessage());
+                }else{
+                    BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(userId, goodsTopOrder.getAmount(), Status.SUB.getValue()));
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                    }
+                }
+                payInfo.append("余额支付成功！");
+                //生成商品置顶详情
+                updateOrder(goodsTopOrder.getOrderNo(),null,Status.PAY_TYPE_BALANCE.getValue());
+            }else if(payType.equals(Status.PAY_TYPE_MINI.getValue())){
+                String getMiniOrder = schedualWalletService.orderPayByWechatMini(userId,goodsTopOrder.getOrderNo(), goodsTopOrder.getAmount(), NotifyUrl.mini_notify.getNotifUrl()+NotifyUrl.top_wechat_notify.getNotifUrl());
+                BaseResp result = ParseReturnValue.getParseReturnValue(getMiniOrder);
+                if(!result.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(result.getCode(),result.getReport());
+                }
+                WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
+                return wechatPayDto;
+            }else{
+                throw new ServiceException("支付方式错误！");
+            }
+        }
+        return payInfo.toString();
+    }
+
+    /**
+     * 修改订单状态
+     * @param orderNo
+     * @throws ServiceException
+     */
+    @Override
+    @Transactional(rollbackFor=Exception.class)
+    @TxTransaction(isStart=true)
+    public boolean updateOrder(String orderNo, String thirdOrderNo, Integer payType) throws ServiceException {
+        GoodsTopOrder goodsTopOrder = goodsTopOrderMapper.selectByOrderNo(orderNo);
+        if(goodsTopOrder == null){
+            throw new ServiceException("订单不存在！");
+        }
+        //置顶详情
+        GoodsTopDetail goodsTopDetail = new GoodsTopDetail() ;
+        goodsTopDetail.setUserId(goodsTopOrder.getUserId());
+        goodsTopDetail.setGoodsId(goodsTopOrder.getGoodsId());
+        goodsTopDetail.setAddTime(DateStampUtils.getTimesteamp());
+        goodsTopDetail.setStatus(Status.IS_TOP.getValue());
+        goodsTopDetailMapper.insert(goodsTopDetail);
+        GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsTopOrder.getGoodsId());
+        goodsInfo.setCommentTime(DateStampUtils.getTimesteamp());
+        goodsInfoMapper.updateByPrimaryKey(goodsInfo);
+        goodsTopOrder.setStatus(Status.ORDER_COMPLETE.getValue());
+        goodsTopOrderMapper.updateByPrimaryKey(goodsTopOrder);
+        //新增余额账单
+        BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(goodsTopOrder.getUserId(),goodsTopOrder.getAmount(),payType,Status.EXPEND.getValue(),orderNo,"【"+goodsInfo.getName()+"】置顶",null,goodsTopOrder.getUserId(),Status.GOODS_TOP.getValue(),thirdOrderNo));
+        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+            throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+        }
+        return true;
+    }
+
+
 }

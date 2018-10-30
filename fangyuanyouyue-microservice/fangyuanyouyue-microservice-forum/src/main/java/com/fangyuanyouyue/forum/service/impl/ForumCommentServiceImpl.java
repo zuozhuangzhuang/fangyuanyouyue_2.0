@@ -1,15 +1,17 @@
 package com.fangyuanyouyue.forum.service.impl;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.MiniMsg;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.ParseReturnValue;
+import com.fangyuanyouyue.base.util.SendMiniMessage;
+import com.fangyuanyouyue.base.util.wechat.pay.WechatPayConfig;
+import com.fangyuanyouyue.base.util.wechat.pojo.AccessToken;
+import com.fangyuanyouyue.base.util.wechat.utils.WeixinUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,7 +85,6 @@ public class ForumCommentServiceImpl implements ForumCommentService {
 		ForumComment model = new ForumComment();
 		model.setUserId(userId);
 		model.setForumId(forumId);
-		model.setUserId(userId);
 		model.setAddTime(new Date());
 		model.setContent(content);
 		model.setStatus(StatusEnum.STATUS_NORMAL.getValue());
@@ -97,6 +98,15 @@ public class ForumCommentServiceImpl implements ForumCommentService {
 			schedualMessageService.easemobMessage(forumInfo.getUserId().toString(),
 					"您的帖子【"+forumInfo.getTitle()+"】有新的评论，点击此处前往查看吧",Status.SOCIAL_MESSAGE.getMessage(),Status.JUMP_TYPE_FORUM.getMessage(),forumId.toString());
 
+//			System.out.println(formId);
+//			Map<String,Object> map = new HashMap<>();
+//			map.put("keyword1",content);
+//			map.put("keyword2",userId);
+//			map.put("keyword3",forumInfo.getTitle());
+//			AccessToken accessToken = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
+//			String message = SendMiniMessage.makeRouteMessage("onuC35S2SnDltl3BrTtGBGuOcJDg", MiniMsg.ORDER_ADD.getTemplateId(), MiniMsg.ORDER_ADD.getPagePath(), map,formId);
+//			boolean flag = SendMiniMessage.sendTemplateMessage(accessToken.getToken(), message);
+//			System.out.println("发送"+(flag?"成功":"失败"));
 		}else{
 			schedualMessageService.easemobMessage(forumInfo.getUserId().toString(),
 					"您的视频【"+forumInfo.getTitle()+"】有新的评论，点击此处前往查看吧",Status.SOCIAL_MESSAGE.getMessage(),Status.JUMP_TYPE_VIDEO.getMessage(),forumId.toString());
@@ -163,6 +173,12 @@ public class ForumCommentServiceImpl implements ForumCommentService {
 				if(forumComment.getUserId().equals(userId)){
 					forumComment.setStatus(Status.HIDE.getValue());
 					forumCommentMapper.updateByPrimaryKey(forumComment);
+					//删除评论下的回复
+					List<ForumComment> forumComments = forumCommentMapper.selectReplyByCommentId(commentId);
+					for(ForumComment comment:forumComments){
+						forumComment.setStatus(Status.HIDE.getValue());
+						forumCommentMapper.updateByPrimaryKey(forumComment);
+					}
 				}else{
 					throw new ServiceException("无权删除！");
 				}

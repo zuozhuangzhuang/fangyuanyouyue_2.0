@@ -291,6 +291,7 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 		if(param.getCount()!=null) {
 			forumInfo.setPvCount(param.getCount());
 		}
+		forumInfo.setCommentTime(DateStampUtils.getTimesteamp());
 		forumInfoMapper.updateByPrimaryKey(forumInfo);
 		//很抱歉，您的帖子/视频/全民鉴定/【名称】已被官方删除，删除理由：……
 		if(param.getStatus() != null && param.getStatus().equals(Status.DELETE.getValue())){
@@ -298,7 +299,7 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 				throw new ServiceException("删除理由不能为空！");
 			}
 			schedualMessageService.easemobMessage(forumInfo.getUserId().toString(),
-					"很抱歉，您的"+(forumInfo.getType()==1?"帖子【":"视频【")+forumInfo.getTitle()+"】已被官方删除，删除理由："+param.getContent()+"",
+					"很抱歉，您的"+(forumInfo.getType().equals(Status.FORUM.getValue())?"帖子【":"视频【")+forumInfo.getTitle()+"】已被官方删除，删除理由："+param.getContent()+"",
 					Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
 		}
 	}

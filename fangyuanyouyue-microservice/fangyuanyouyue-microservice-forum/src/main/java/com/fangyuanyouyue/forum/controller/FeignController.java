@@ -54,7 +54,7 @@ public class FeignController extends BaseController{
             return toSuccess(isHasColumn);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -72,7 +72,7 @@ public class FeignController extends BaseController{
             return toSuccess(count);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -89,7 +89,7 @@ public class FeignController extends BaseController{
             return toSuccess(count);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");

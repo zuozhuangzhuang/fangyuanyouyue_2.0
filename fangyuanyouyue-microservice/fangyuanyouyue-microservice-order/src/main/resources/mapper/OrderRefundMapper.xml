@@ -22,10 +22,11 @@
     <result column="deal_time" jdbcType="TIMESTAMP" property="dealTime" />
     <result column="platform_reason" jdbcType="VARCHAR" property="platformReason" />
     <result column="order_no" jdbcType="VARCHAR" property="orderNo" />
+    <result column="return_type" jdbcType="INTEGER" property="returnType" />
   </resultMap>
   <sql id="Base_Column_List">
     id, order_id, reason, service_no, pic1, pic2, pic3, pic4, pic5, pic6, status, add_time, 
-    update_time, seller_return_status, user_id, refuse_reason, end_time,deal_time,platform_reason
+    update_time, seller_return_status, user_id, refuse_reason, end_time,deal_time,platform_reason,return_type
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -43,13 +44,13 @@
       pic3, pic4, pic5, pic6, 
       status, add_time, update_time, 
       seller_return_status, user_id, refuse_reason, 
-      end_time,deal_time,platform_reason)
+      end_time,deal_time,platform_reason,return_type)
     values (#{id,jdbcType=INTEGER}, #{orderId,jdbcType=INTEGER}, #{reason,jdbcType=VARCHAR}, 
       #{serviceNo,jdbcType=VARCHAR}, #{pic1,jdbcType=VARCHAR}, #{pic2,jdbcType=VARCHAR}, 
       #{pic3,jdbcType=VARCHAR}, #{pic4,jdbcType=VARCHAR}, #{pic5,jdbcType=VARCHAR}, #{pic6,jdbcType=VARCHAR}, 
       #{status,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
       #{sellerReturnStatus,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{refuseReason,jdbcType=VARCHAR}, 
-      #{endTime,jdbcType=TIMESTAMP},#{dealTime,jdbcType=TIMESTAMP},#{platformReason,jdbcType=VARCHAR})
+      #{endTime,jdbcType=TIMESTAMP},#{dealTime,jdbcType=TIMESTAMP},#{platformReason,jdbcType=VARCHAR},#{returnType,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.fangyuanyouyue.order.model.OrderRefund">
     insert into order_refund
@@ -111,6 +112,9 @@
       <if test="platformReason != null">
         platform_reason,
       </if>
+      <if test="returnType != null">
+        return_type,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -170,6 +174,9 @@
       <if test="platformReason != null">
         #{platformReason,jdbcType=VARCHAR},
       </if>
+      <if test="returnType != null">
+        #{returnType,jdbcType=INTEGER},
+      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.order.model.OrderRefund">
@@ -228,6 +235,9 @@
       <if test="platformReason != null">
         platform_reason = #{platformReason,jdbcType=VARCHAR},
       </if>
+      <if test="returnType != null">
+        return_type = #{returnType,jdbcType=INTEGER},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -249,7 +259,8 @@
       refuse_reason = #{refuseReason,jdbcType=VARCHAR},
       end_time = #{endTime,jdbcType=TIMESTAMP},
       deal_time = #{dealTime,jdbcType=TIMESTAMP},
-      platform_reason = #{platformReason,jdbcType=VARCHAR}
+      platform_reason = #{platformReason,jdbcType=VARCHAR},
+      return_type = #{returnType,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
 

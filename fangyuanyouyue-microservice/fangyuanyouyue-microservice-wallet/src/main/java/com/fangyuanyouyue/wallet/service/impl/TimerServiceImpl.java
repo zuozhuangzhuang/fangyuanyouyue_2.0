@@ -71,6 +71,7 @@ public class TimerServiceImpl implements TimerService{
                     userVip.setVipType(null);
                     userVip.setStatus(Status.NOT_VIP.getValue());
                     userVip.setIsSendMessage(null);
+                    userVip.setFreeTopCount(Status.NO_VIP_FREE_TOP_COUNT.getValue());
                     userVipMapper.updateByPrimaryKeySelective(userVip);
                     //您的会员已到期！点击此处去重新开通~
                     schedualMessageService.easemobMessage(userVip.getUserId().toString(),
@@ -142,6 +143,16 @@ public class TimerServiceImpl implements TimerService{
                     }
                 }
             }
+        }
+    }
+
+    @Override
+    public void resetFreeTopCount() throws ServiceException {
+        //查询会员用户 userVip:status = 1,freeTopCount 重置
+        List<UserVip> userVips = userVipMapper.getResetFreeTopCountList();
+        for(UserVip userVip:userVips){
+            userVip.setFreeTopCount(userVip.getVipLevel().equals(Status.VIP_LEVEL_LOW.getValue())?Status.LOW_FREE_TOP_COUNT.getValue():Status.HIGH_FREE_TOP_COUNT.getValue());
+            userVipMapper.updateByPrimaryKey(userVip);
         }
     }
 }

@@ -185,4 +185,15 @@ public class TimerController extends BaseController {
         }
     }
 
+    @Scheduled(cron="0 0 0 * * ? ")
+    public BaseResp resetFreeTopCount() throws IOException {
+        try {
+            log.info("----》每天00:00重置免费置顶次数《----");
+            schedualWalletService.resetFreeTopCount();
+            return toSuccess();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
 }

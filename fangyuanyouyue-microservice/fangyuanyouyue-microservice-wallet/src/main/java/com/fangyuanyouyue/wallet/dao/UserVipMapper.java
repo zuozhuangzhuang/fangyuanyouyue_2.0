@@ -70,4 +70,10 @@ public interface UserVipMapper {
     List<UserVip> getPage(@Param("vipLevel")Integer vipLevel,@Param("vipType")Integer vipType,@Param("isSendMessage")Integer isSendMessage, @Param("start") Integer start,
                               @Param("limit") Integer limit, @Param("keyword")String keyword,
                               @Param("startDate")String startDate, @Param("endDate")String endDate, @Param("orders")String orders, @Param("ascType")Integer ascType);
+
+    /**
+     * 获取需要重置置顶次数的会员数据
+     * @return
+     */
+    List<UserVip> getResetFreeTopCountList();
 }
