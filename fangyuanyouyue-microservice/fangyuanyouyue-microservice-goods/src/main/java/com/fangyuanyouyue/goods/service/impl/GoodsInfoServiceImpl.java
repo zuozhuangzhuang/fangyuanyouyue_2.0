@@ -972,6 +972,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                     throw new ServiceException(result.getCode(),result.getReport());
                 }
                 WechatPayDto wechatPayDto = JSONObject.toJavaObject(JSONObject.parseObject(result.getData().toString()), WechatPayDto.class);
+                return wechatPayDto;
             }else if(payType.equals(Status.PAY_TYPE_ALIPAY.getValue())){
                 String getALiOrder = schedualWalletService.orderPayByALi(goodsTopOrder.getOrderNo(), goodsTopOrder.getAmount(), NotifyUrl.notify.getNotifUrl()+NotifyUrl.top_alipay_notify.getNotifUrl());
                 BaseResp result = ParseReturnValue.getParseReturnValue(getALiOrder);
