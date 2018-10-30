@@ -164,8 +164,8 @@ public class ForumCommentServiceImpl implements ForumCommentService {
 					//删除评论下的回复
 					List<ForumComment> forumComments = forumCommentMapper.selectReplyByCommentId(commentId);
 					for(ForumComment comment:forumComments){
-						forumComment.setStatus(Status.HIDE.getValue());
-						forumCommentMapper.updateByPrimaryKey(forumComment);
+						comment.setStatus(Status.HIDE.getValue());
+						forumCommentMapper.updateByPrimaryKey(comment);
 					}
 				}else{
 					throw new ServiceException("无权删除！");

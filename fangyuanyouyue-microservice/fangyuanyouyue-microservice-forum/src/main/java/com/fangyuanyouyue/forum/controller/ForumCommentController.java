@@ -52,7 +52,8 @@ public class ForumCommentController extends BaseController {
         @ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "String", paramType = "query"),
 			@ApiImplicitParam(name = "forumId", value = "帖子id", required = true, dataType = "int", paramType = "query"),
 			@ApiImplicitParam(name = "start", value = "起始条数", required = true, dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "limit", value = "每页条数", required = true, dataType = "int", paramType = "query") })
+			@ApiImplicitParam(name = "limit", value = "每页条数", required = true, dataType = "int", paramType = "query")
+	})
 	@PostMapping(value = "/commentList")
 	@ResponseBody
 	public BaseResp forumComment(ForumParam param) throws IOException {
