@@ -186,13 +186,13 @@ public class UserVipServiceImpl implements UserVipService{
             vipLevel 会员等级 1铂金会员 2至尊会员
             vipType 会员类型 1一个月 2三个月 3一年会员
             铂金会员：
-                35元/月、90元/3个月、300元/年
+                36元/月、90元/3个月、300元/年
             至尊会员：
                 88元/月、240元/3个月、900元/年
              */
             if(vipLevel.intValue() == Status.VIP_LEVEL_LOW.getValue()){
                 if(vipType.intValue() == Status.VIP_TYPE_ONE_MONTH.getValue()){
-                    vipOrder.setAmount(new BigDecimal(35));
+                    vipOrder.setAmount(new BigDecimal(36));
                 }else if(vipType.intValue() == Status.VIP_TYPE_THREE_MONTH.getValue()){
                     vipOrder.setAmount(new BigDecimal(90));
                 }else if(vipType.intValue() == Status.VIP_TYPE_ONE_YEAR.getValue()){
