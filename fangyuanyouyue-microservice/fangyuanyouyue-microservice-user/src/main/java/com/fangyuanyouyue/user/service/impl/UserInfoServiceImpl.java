@@ -15,6 +15,7 @@ import com.fangyuanyouyue.user.model.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -120,12 +121,12 @@ public class UserInfoServiceImpl implements UserInfoService {
     
 
     @Override
-    public UserInfo selectByPrimaryKey(Integer id) {
+    public UserInfo selectByPrimaryKey(Integer id)  throws ServiceException{
         return userInfoMapper.selectByPrimaryKey(id);
     }
 
     @Override
-    public UserInfo getUserByPhone(String phone) {
+    public UserInfo getUserByPhone(String phone) throws ServiceException{
         return userInfoMapper.getUserByPhone(phone);
     }
 
@@ -290,7 +291,11 @@ public class UserInfoServiceImpl implements UserInfoService {
             userThirdParty.setAppOpenId(param.getOpenId());
             userThirdParty.setType(param.getType());
             userThirdParty.setAddTime(DateStampUtils.getTimesteamp());
-            userThirdPartyMapper.insert(userThirdParty);
+            try{
+                userThirdPartyMapper.insert(userThirdParty);
+            }catch (DuplicateKeyException e){
+                e.printStackTrace();
+            }
             //用户扩展信息表
             UserInfoExt userInfoExt = new UserInfoExt();
             userInfoExt.setUserId(user.getId());
