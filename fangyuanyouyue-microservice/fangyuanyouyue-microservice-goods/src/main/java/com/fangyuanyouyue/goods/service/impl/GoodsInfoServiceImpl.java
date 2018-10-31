@@ -904,7 +904,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
     public Object setGoodsTop(Integer userId, Integer goodsId, Integer payType, String payPwd) throws ServiceException {
-        //TODO 1、判断商品与用户关系 2、判断支付方式——免费置顶、下单置顶
+        //1、判断商品与用户关系 2、判断支付方式——免费置顶、下单置顶
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
         if(goodsInfo == null){
             throw new ServiceException("商品异常！");
@@ -917,7 +917,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         }
         StringBuffer payInfo = new StringBuffer();
         if(payType == null){
-            //TODO 免费置顶：1、查看用户会员等级 2、查看用户免费置顶次数 3、生成置顶详情 4、修改免费置顶次数
+            //免费置顶：1、查看用户会员等级 2、查看用户免费置顶次数 3、生成置顶详情 4、修改免费置顶次数
             BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.getUserVipLevel(userId));
             if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                 throw new ServiceException(baseResp.getCode(),baseResp.getReport());
@@ -944,6 +944,9 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                     }
                     goodsInfo.setCommentTime(DateStampUtils.getTimesteamp());
                     goodsInfoMapper.updateByPrimaryKey(goodsInfo);
+                    schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
+                            "您的"+(goodsInfo.getType().equals(Status.AUCTION.getValue())?"抢购【":"商品【")+goodsInfo.getName()+"】已成功置顶啦~",
+                            Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),goodsInfo.getId().toString());
                     return null;
                 }else{
                     throw new ServiceException("无免费置顶次数！");
@@ -952,7 +955,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
                 throw new ServiceException("此用户无法免费置顶！");
             }
         }else{
-            //TODO 下单置顶：生成置顶订单
+            //下单置顶：生成置顶订单
             GoodsTopOrder goodsTopOrder = new GoodsTopOrder();
             goodsTopOrder.setUserId(userId);
             //订单号
@@ -1042,6 +1045,10 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
             throw new ServiceException(baseResp.getCode(),baseResp.getReport());
         }
+        //您的商品/抢购【名称】已成功置顶啦~
+        schedualMessageService.easemobMessage(goodsInfo.getUserId().toString(),
+                "您的"+(goodsInfo.getType().equals(Status.AUCTION.getValue())?"抢购【":"商品【")+goodsInfo.getName()+"】已成功置顶啦~",
+                Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),goodsInfo.getId().toString());
         return true;
     }
 

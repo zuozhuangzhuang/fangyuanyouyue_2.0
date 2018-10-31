@@ -2,6 +2,7 @@ package com.fangyuanyouyue.user.controller;
 
 import java.io.IOException;
 
+import com.fangyuanyouyue.base.exception.ServiceException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,8 @@ public class FeignController  extends BaseController {
                 return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             return toSuccess(userInfo);
+        } catch (ServiceException e) {
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -85,6 +88,8 @@ public class FeignController  extends BaseController {
                 return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             return toSuccess(user);
+        } catch (ServiceException e) {
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -113,6 +118,8 @@ public class FeignController  extends BaseController {
                 return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
             return toSuccess(user);
+        } catch (ServiceException e) {
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -134,6 +141,8 @@ public class FeignController  extends BaseController {
             }
             boolean isAuth = userInfoExtService.userIsAuth(userId);
             return toSuccess(isAuth);
+        } catch (ServiceException e) {
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -160,6 +169,8 @@ public class FeignController  extends BaseController {
             }
             boolean verifyPayPwd = userInfoExtService.verifyPayPwd(userId,payPwd);
             return toSuccess(verifyPayPwd);
+        } catch (ServiceException e) {
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -181,6 +192,8 @@ public class FeignController  extends BaseController {
             }
             boolean isAuth = userInfoExtService.isAuth(userId);
             return toSuccess(isAuth);
+        } catch (ServiceException e) {
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -206,6 +219,8 @@ public class FeignController  extends BaseController {
             }
             boolean isFans = userInfoExtService.isFans(userId,toUserId);
             return toSuccess(isFans);
+        } catch (ServiceException e) {
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
