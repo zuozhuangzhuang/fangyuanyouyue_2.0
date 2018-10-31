@@ -390,10 +390,10 @@ public class UserVipServiceImpl implements UserVipService{
     @Override
     public Integer getFreeTopCount(Integer userId) throws ServiceException {
         UserVip userVip = userVipMapper.selectByUserId(userId);
-        if(userVip != null && userVip.getStatus().equals(Status.IS_VIP.getValue())){
+        if(userVip != null){
             return userVip.getFreeTopCount();
         }else{
-            throw new ServiceException(ReCode.NOT_VIP.getValue(),ReCode.NOT_VIP.getMessage());
+            throw new ServiceException("用户信息异常！");
         }
     }
 

@@ -323,8 +323,8 @@ public class UserVipController extends BaseController{
                 return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
             //查看用户剩余置顶次数
-            Integer time = userVipService.getFreeTopCount(userId);
-            return toSuccess(time);
+            Integer count = userVipService.getFreeTopCount(userId);
+            return toSuccess(count);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getCode(),e.getMessage());
