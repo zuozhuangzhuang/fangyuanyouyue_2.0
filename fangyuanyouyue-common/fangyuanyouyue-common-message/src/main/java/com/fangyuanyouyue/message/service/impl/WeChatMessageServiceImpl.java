@@ -18,7 +18,7 @@ import java.util.Arrays;
 public class WeChatMessageServiceImpl implements WeChatMessageService{
 
     @Override
-    public boolean checkSignature(WeChatMessage message) throws ServiceException{
+    public String checkSignature(WeChatMessage message){
         String signature = message.getSignature();
         String timestamp = message.getTimestamp();
         String nonce = message.getNonce();
@@ -66,11 +66,7 @@ public class WeChatMessageServiceImpl implements WeChatMessageService{
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-        if(tmpStr != null && tmpStr.equals(signature.toUpperCase())){
-            return true;
-        }else{
-            return false;
-        }
+        return tmpStr != null ? tmpStr.equals(signature.toUpperCase()) ? message.getEchostr() : "" : "";
     }
 
     /**

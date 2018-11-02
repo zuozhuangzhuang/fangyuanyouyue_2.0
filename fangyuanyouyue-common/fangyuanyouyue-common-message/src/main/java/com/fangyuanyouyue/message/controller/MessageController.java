@@ -279,13 +279,7 @@ public class MessageController extends BaseController{
     //微信验证开发服务器token
     @GetMapping(value = "/checkSignature")
     @ResponseBody
-    public boolean checkSignature(WeChatMessage message) {
-
-        try {
-            return weChatMessageService.checkSignature(message);
-        } catch (ServiceException e) {
-            e.printStackTrace();
-            return false;
-        }
+    public String checkSignature(WeChatMessage message) {
+        return weChatMessageService.checkSignature(message);
     }
 }
