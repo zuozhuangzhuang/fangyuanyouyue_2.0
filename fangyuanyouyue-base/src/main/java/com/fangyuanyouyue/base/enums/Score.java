@@ -19,7 +19,9 @@ public enum  Score {
     //发布商品、抢购+20
     ADD_GOODSINFO(20L),
     //发布帖子、视频+100
-    ADD_FORUMINFO(100L)
+    ADD_FORUMINFO(100L),
+    //抽奖-1000
+    LOTTERY(1000L)
 
 
     ;
