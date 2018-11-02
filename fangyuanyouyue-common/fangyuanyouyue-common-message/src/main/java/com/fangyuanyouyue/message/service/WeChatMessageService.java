@@ -13,5 +13,5 @@ public interface WeChatMessageService {
      * @param message
      * @return
      */
-    boolean checkSignature(WeChatMessage message)throws ServiceException;
+    String checkSignature(WeChatMessage message);
 }
