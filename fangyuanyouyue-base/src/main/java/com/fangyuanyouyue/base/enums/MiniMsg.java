@@ -13,7 +13,7 @@ public enum MiniMsg {
     WITHDRAW_APPLY(3,"提现申请通知","wlyA_t59AjXVETSgIwR1pUnKOKqj-MChsaRenkvXUTU"),
     //提现到帐通知
     WITHDRAW_FAILED(5,"提现失败通知","hjaNRgn8GIqIx9eTber_iDkJE89RL2hj7z3hyPLweqA"),
-    FORUM_COMMENT(6,"帖子被评论通知","38vDkQ7D2bPTyPe2tBrsdTm7JHKO-VlIKpVPuvQVRnE","123"),
+    FORUM_COMMENT(6,"帖子被评论通知","38vDkQ7D2bPTyPe2tBrsdTm7JHKO-VlIKpVPuvQVRnE","pages/index"),
     ORDER_ADD(7,"商品被购买通知","7RtiYELicy756YYG5bl2-3gnXyi5Z_1bet1AKxIq7B0"),
     GOODS_APPRAISAL_APPLY(8,"鉴定已接单提醒","FytcDjdVUps19nb2cp5Wj3Q27L8eupsMutaDgzq8OIA"),
     GOODS_APPRAISAL_END(9,"鉴定完成通知","vOEK_BEEsojqBe6GXhjhIhh3vMbr7YdiRhxvfQ9c0Vw"),

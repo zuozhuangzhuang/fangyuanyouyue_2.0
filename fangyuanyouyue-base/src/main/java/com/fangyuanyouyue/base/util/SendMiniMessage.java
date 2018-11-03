@@ -45,7 +45,7 @@ public class SendMiniMessage {
         Template template = new Template();
         template.setTouser(openId);
         template.setTemplate_id(template_id);
-        template.setUrl(url);
+        template.setPage(url);
         template.setForm_id(formId);
         Map<String, TemplateData> data = new HashMap<>();
         for(String key:map.keySet()){
@@ -53,8 +53,8 @@ public class SendMiniMessage {
         }
         template.setData(data);
 
-        String templateJsonStr = JSON.toJSONString(template, SerializerFeature.UseSingleQuotes);
-        System.out.println(templateJsonStr);
+        String templateJsonStr = JSON.toJSONString(template);
+       // System.out.println(templateJsonStr);
         return templateJsonStr;
     }
 
@@ -68,7 +68,7 @@ public class SendMiniMessage {
         logger.info("消息内容："+jsonMsg);
         boolean result = false;
         //请求地址
-        String requestUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=ACCESS_TOKEN";
+        String requestUrl = "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=ACCESS_TOKEN";
         requestUrl = requestUrl.replace("ACCESS_TOKEN", accessToken);
         //发送模板消息
         JSONObject jsonObject = WeixinUtil.httpRequest(requestUrl, "POST", jsonMsg);
@@ -83,6 +83,15 @@ public class SendMiniMessage {
             }
         }
         return result;
+    }
+    
+    public static String getTemplate(String accessToken) {
+    	String requestUrl = "https://api.weixin.qq.com/cgi-bin/wxopen/template/list?access_token=ACCESS_TOKEN";
+        requestUrl = requestUrl.replace("ACCESS_TOKEN", accessToken);
+        //发送模板消息
+        JSONObject jsonObject = WeixinUtil.httpRequest(requestUrl, "POST", "{\"offset\":0,\"count\":20}");
+        
+        return jsonObject.toJSONString();
     }
 
     /**
@@ -117,8 +126,12 @@ public class SendMiniMessage {
         map.put("keyword1","我是评论内容");
         map.put("keyword2","我是评论人");
         map.put("keyword3","我是帖子标题");
-        AccessToken accessToken = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
-        String message = makeRouteMessage("onuC35VLb3lBsPPKehB3cNxzBU24", MiniMsg.FORUM_COMMENT.getTemplateId(), MiniMsg.FORUM_COMMENT.getPagePath(), map,"eb32f502c72db00580bd721449b715c6");
-        boolean flag = sendTemplateMessage(accessToken.getToken(), message);
+        String token = "15_COBeoe8kDy9aRkimPHSKeFrQ_1E4zsmhvXZKk71Np4hdaSaEvoPL_6mnz4ZH7I3mWms1WUFsvth5YNIiDPGxUmne_CzP8ckKKAlI-pbWd7V1Xue7boXx4jUYwTt6Kf1A6aGJV6l_6sAgK0UHNSMeAIAGLF";
+        
+        //System.out.println(getTemplate(token));
+        
+        //AccessToken accessToken = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
+        String message = makeRouteMessage("onuC35RHaX-BKjwndrL-PU2IHzHE", MiniMsg.FORUM_COMMENT.getTemplateId(), MiniMsg.FORUM_COMMENT.getPagePath(), map,"wx03113559565681db581349863456419534");
+        boolean flag = sendTemplateMessage(token, message);
     }
 }

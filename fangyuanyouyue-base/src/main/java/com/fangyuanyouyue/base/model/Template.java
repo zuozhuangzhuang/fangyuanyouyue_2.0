@@ -17,7 +17,7 @@ import java.util.Map;
 public class Template {
     private String touser;//接收人的openId
     private String template_id;//模版id
-    private String url;//点击模版访问url
+    private String page;
     private String form_id;//表单提交formId
     private Map<String,TemplateData> data;//消息内容
 }
