@@ -53,8 +53,8 @@ public class SendMiniMessage {
         }
         template.setData(data);
 
-        String templateJsonStr = JSON.toJSONString(template);
-       // System.out.println(templateJsonStr);
+        String templateJsonStr = JSONObject.toJSONString(template);
+        System.out.println(templateJsonStr);
         return templateJsonStr;
     }
 
@@ -84,13 +84,13 @@ public class SendMiniMessage {
         }
         return result;
     }
-    
+
     public static String getTemplate(String accessToken) {
     	String requestUrl = "https://api.weixin.qq.com/cgi-bin/wxopen/template/list?access_token=ACCESS_TOKEN";
         requestUrl = requestUrl.replace("ACCESS_TOKEN", accessToken);
         //发送模板消息
         JSONObject jsonObject = WeixinUtil.httpRequest(requestUrl, "POST", "{\"offset\":0,\"count\":20}");
-        
+
         return jsonObject.toJSONString();
     }
 
@@ -127,9 +127,9 @@ public class SendMiniMessage {
         map.put("keyword2","我是评论人");
         map.put("keyword3","我是帖子标题");
         String token = "15_COBeoe8kDy9aRkimPHSKeFrQ_1E4zsmhvXZKk71Np4hdaSaEvoPL_6mnz4ZH7I3mWms1WUFsvth5YNIiDPGxUmne_CzP8ckKKAlI-pbWd7V1Xue7boXx4jUYwTt6Kf1A6aGJV6l_6sAgK0UHNSMeAIAGLF";
-        
+
         //System.out.println(getTemplate(token));
-        
+
         //AccessToken accessToken = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
         String message = makeRouteMessage("onuC35RHaX-BKjwndrL-PU2IHzHE", MiniMsg.FORUM_COMMENT.getTemplateId(), MiniMsg.FORUM_COMMENT.getPagePath(), map,"wx03113559565681db581349863456419534");
         boolean flag = sendTemplateMessage(token, message);

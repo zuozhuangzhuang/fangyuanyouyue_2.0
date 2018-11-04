@@ -486,7 +486,6 @@
     <select id="getGoodsPage" resultMap="BaseResultMap">
         select * from goods_info
         <where>
-            status != 5
             <if test="type != null">
                 and type = #{type}
             </if>
