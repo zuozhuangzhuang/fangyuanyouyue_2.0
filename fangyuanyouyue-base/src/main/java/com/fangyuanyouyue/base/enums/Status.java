@@ -60,8 +60,8 @@ public enum Status {
     //(全民鉴定、申请专栏、议价、官方鉴定、充值、开通、续费会员)订单状态 1待支付 2已完成 3已删除
     ORDER_UNPAID(1),ORDER_COMPLETE(2),ORDER_DELETE(3),
 
-    //订单类型 1商品、抢购 2官方鉴定 3商品议价 4全民鉴定 5专栏(申请专栏：支出、每日返利：收入、申请被拒：退款) 6充值 7提现 8开通会员 9续费会员 10认证店铺 11系统修改余额
-    GOODS_INFO(1),PLATFORM_APPRAISAL(2),BARGAIN(3),APPRAISAL(4),FORUM_COLUMN(5),RECHARGE(6),WITHDRAW(7),ADD_VIP(8),RENEW_VIP(9),SHOP_AUTH(10),SYSTEM_UPDATE(11),
+    //订单类型 1商品、抢购 2官方鉴定 3商品议价 4全民鉴定 5专栏(申请专栏：支出、每日返利：收入、申请被拒：退款) 6充值 7提现 8开通会员 9续费会员 10认证店铺 11系统修改余额 12置顶订单
+    GOODS_INFO(1),PLATFORM_APPRAISAL(2),BARGAIN(3),APPRAISAL(4),FORUM_COLUMN(5),RECHARGE(6),WITHDRAW(7),ADD_VIP(8),RENEW_VIP(9),SHOP_AUTH(10),SYSTEM_UPDATE(11),GOODS_TOP(12),
 
     //收支类型 1收入 2支出 3退款
     INCOME(1),EXPEND(2),REFUND(3),
@@ -95,6 +95,10 @@ public enum Status {
 
     //是否可以提现 1可以提现 2无法提现
     CAN_WITHDRAW(1),NOT_WITHDRAW(2),
+    //每日置顶次数 无会员0次 铂金3次 至尊8次
+    NO_VIP_FREE_TOP_COUNT(0),LOW_FREE_TOP_COUNT(3),HIGH_FREE_TOP_COUNT(8),
+    //商品置顶状态 1置顶 2未置顶
+    IS_TOP(1),NOT_TOP(2)
     ;
     private Integer value;
     private String message;

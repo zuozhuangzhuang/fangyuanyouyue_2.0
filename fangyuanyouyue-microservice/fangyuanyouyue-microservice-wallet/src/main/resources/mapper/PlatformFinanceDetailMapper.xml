@@ -219,6 +219,7 @@
             or a.order_type = 8
             or a.order_type = 9
             or a.order_type = 10
+            or a.order_type = 12
             )
         </if>
         <if test="startDate != null">
@@ -262,6 +263,7 @@
             or a.order_type = 8
             or a.order_type = 9
             or a.order_type = 10
+            or a.order_type = 12
             )
         </if>
 

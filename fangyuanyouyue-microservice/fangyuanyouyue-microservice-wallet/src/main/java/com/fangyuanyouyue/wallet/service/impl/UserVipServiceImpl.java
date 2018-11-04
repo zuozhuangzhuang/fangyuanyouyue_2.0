@@ -84,7 +84,8 @@ public class UserVipServiceImpl implements UserVipService{
                         throw new ServiceException("会员类型错误！");
                     }
                     userVip.setVipLevel(vipOrder.getVipLevel());//会员等级 1铂金会员 2至尊会员
-                    userVip.setLevelDesc(vipOrder.getVipLevel() == 1?"铂金会员":"至尊会员");
+                    userVip.setLevelDesc(vipOrder.getVipLevel().equals(Status.VIP_LEVEL_LOW.getValue())?"铂金会员":"至尊会员");
+                    userVip.setFreeTopCount(vipOrder.getVipLevel().equals(Status.VIP_LEVEL_LOW.getValue())?Status.LOW_FREE_TOP_COUNT.getValue():Status.HIGH_FREE_TOP_COUNT.getValue());
                     userVip.setVipType(vipOrder.getVipType());//会员类型 1一个月 2三个月 3一年会员
                     userVip.setStatus(Status.IS_VIP.getValue());//会员状态 1已开通 2未开通
                     //生成NO.xxxx :年月日 基数与开通顺序的和，例：180912123457
@@ -121,7 +122,7 @@ public class UserVipServiceImpl implements UserVipService{
             }else{
                 //续费
                 if(userVip.getStatus() == Status.NOT_VIP.getValue()){//未开通
-                    throw new ServiceException("请开通会员！");
+                    throw new ServiceException(ReCode.NOT_VIP.getValue(),ReCode.NOT_VIP.getMessage());
                 }
                 if(userVip.getVipLevel().intValue() == vipOrder.getVipLevel()){//续费相同等级会员
                     //计算结束时间
@@ -185,13 +186,13 @@ public class UserVipServiceImpl implements UserVipService{
             vipLevel 会员等级 1铂金会员 2至尊会员
             vipType 会员类型 1一个月 2三个月 3一年会员
             铂金会员：
-                35元/月、90元/3个月、300元/年
+                36元/月、90元/3个月、300元/年
             至尊会员：
                 88元/月、240元/3个月、900元/年
              */
             if(vipLevel.intValue() == Status.VIP_LEVEL_LOW.getValue()){
                 if(vipType.intValue() == Status.VIP_TYPE_ONE_MONTH.getValue()){
-                    vipOrder.setAmount(new BigDecimal(35));
+                    vipOrder.setAmount(new BigDecimal(36));
                 }else if(vipType.intValue() == Status.VIP_TYPE_THREE_MONTH.getValue()){
                     vipOrder.setAmount(new BigDecimal(90));
                 }else if(vipType.intValue() == Status.VIP_TYPE_ONE_YEAR.getValue()){
@@ -283,13 +284,14 @@ public class UserVipServiceImpl implements UserVipService{
                 throw new ServiceException("会员类型错误！");
             }
             userVip.setVipLevel(vipLevel);//会员等级 1铂金会员 2至尊会员
-            userVip.setLevelDesc(vipLevel == 1?"铂金会员":"至尊会员");
+            userVip.setLevelDesc(vipLevel.equals(Status.VIP_LEVEL_LOW.getValue())?"铂金会员":"至尊会员");
             userVip.setVipType(vipType);//会员类型 1一个月 2三个月 3一年会员
             userVip.setStatus(Status.IS_VIP.getValue());//会员状态 1已开通 2未开通
             //生成NO.xxxx :年月+基数与开通顺序的和，例：1809123457
             int no = 111111 + userVip.getId();
             String date = DateUtil.getFormatDate(DateStampUtils.getTimesteamp(),"yyMM");
             userVip.setVipNo(date + no);
+            userVip.setFreeTopCount(vipLevel.equals(Status.VIP_LEVEL_LOW.getValue())?Status.LOW_FREE_TOP_COUNT.getValue():Status.HIGH_FREE_TOP_COUNT.getValue());
             //开通会员送第一个月优惠券
             if(vipType.intValue() == Status.VIP_TYPE_ONE_YEAR.getValue()){
                 if(vipLevel.intValue() == Status.VIP_LEVEL_LOW.getValue()){
@@ -353,6 +355,7 @@ public class UserVipServiceImpl implements UserVipService{
             userVip.setLevelDesc(null);
             userVip.setVipType(null);
             userVip.setStatus(Status.NOT_VIP.getValue());
+            userVip.setFreeTopCount(Status.NO_VIP_FREE_TOP_COUNT.getValue());
             userVipMapper.updateByPrimaryKey(userVip);
         }else{
             throw new ServiceException("类型错误！");
@@ -382,5 +385,28 @@ public class UserVipServiceImpl implements UserVipService{
         pager.setTotal(total);
         pager.setDatas(datas);
         return pager;
+    }
+
+    @Override
+    public Integer getFreeTopCount(Integer userId) throws ServiceException {
+        UserVip userVip = userVipMapper.selectByUserId(userId);
+        if(userVip != null){
+            return userVip.getFreeTopCount();
+        }else{
+            throw new ServiceException("用户信息异常！");
+        }
+    }
+
+    @Override
+    public void updateTopCount(Integer userId, Integer type, Integer count) throws ServiceException {
+        UserVip userVip = userVipMapper.selectByUserId(userId);
+        if(userVip != null){
+            if(type.equals(Status.ADD.getValue())){
+                userVip.setFreeTopCount(userVip.getFreeTopCount()+count);
+            }else{
+                userVip.setFreeTopCount(userVip.getFreeTopCount()-count);
+            }
+            userVipMapper.updateByPrimaryKey(userVip);
+        }
     }
 }

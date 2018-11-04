@@ -83,11 +83,11 @@ public class ScoreServiceImpl implements ScoreService{
                     }
                 }
                 //扣除积分余额
-                updateScore(userId,10000L,2);
+                updateScore(userId,Score.LOTTERY.getScore(),Status.SUB.getValue());
                 //增加用户积分、优惠券
                 if(bonus.getType() == 1){
                     //积分
-                    updateScore(userId,bonus.getScore(),1);
+                    updateScore(userId,bonus.getScore(),Status.ADD.getValue());
                 }else if(bonus.getType() == 2){
                     //优惠券
                     //保存用户优惠券

@@ -1,5 +1,6 @@
 package com.fangyuanyouyue.wallet.model;
 
+import com.fangyuanyouyue.base.enums.Status;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -40,5 +41,7 @@ public class UserVip {
     private String nickName;//昵称
 
     private String headImgUrl;//头像图片地址
+
+    private Integer freeTopCount = Status.NO_VIP_FREE_TOP_COUNT.getValue();//免费置顶次数
 
 }

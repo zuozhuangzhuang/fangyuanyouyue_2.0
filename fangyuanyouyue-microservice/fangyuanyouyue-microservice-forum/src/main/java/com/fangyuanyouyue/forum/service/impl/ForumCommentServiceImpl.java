@@ -1,15 +1,15 @@
 package com.fangyuanyouyue.forum.service.impl;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.ParseReturnValue;
+import com.fangyuanyouyue.base.util.wechat.pay.WechatPayConfig;
+import com.fangyuanyouyue.base.util.wechat.pojo.AccessToken;
+import com.fangyuanyouyue.base.util.wechat.utils.WeixinUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +37,7 @@ public class ForumCommentServiceImpl implements ForumCommentService {
     private ForumCommentMapper forumCommentMapper;
     @Autowired
     private ForumCommentLikesMapper forumCommentLikesMapper;
-    @Autowired
+	@Autowired
 	private SchedualMessageService schedualMessageService;
     @Autowired
 	private ForumInfoMapper forumInfoMapper;
@@ -83,7 +83,6 @@ public class ForumCommentServiceImpl implements ForumCommentService {
 		ForumComment model = new ForumComment();
 		model.setUserId(userId);
 		model.setForumId(forumId);
-		model.setUserId(userId);
 		model.setAddTime(new Date());
 		model.setContent(content);
 		model.setStatus(StatusEnum.STATUS_NORMAL.getValue());
@@ -96,7 +95,6 @@ public class ForumCommentServiceImpl implements ForumCommentService {
 		if(forumInfo.getType() == 1){
 			schedualMessageService.easemobMessage(forumInfo.getUserId().toString(),
 					"您的帖子【"+forumInfo.getTitle()+"】有新的评论，点击此处前往查看吧",Status.SOCIAL_MESSAGE.getMessage(),Status.JUMP_TYPE_FORUM.getMessage(),forumId.toString());
-
 		}else{
 			schedualMessageService.easemobMessage(forumInfo.getUserId().toString(),
 					"您的视频【"+forumInfo.getTitle()+"】有新的评论，点击此处前往查看吧",Status.SOCIAL_MESSAGE.getMessage(),Status.JUMP_TYPE_VIDEO.getMessage(),forumId.toString());
@@ -163,6 +161,12 @@ public class ForumCommentServiceImpl implements ForumCommentService {
 				if(forumComment.getUserId().equals(userId)){
 					forumComment.setStatus(Status.HIDE.getValue());
 					forumCommentMapper.updateByPrimaryKey(forumComment);
+					//删除评论下的回复
+					List<ForumComment> forumComments = forumCommentMapper.selectReplyByCommentId(commentId);
+					for(ForumComment comment:forumComments){
+						comment.setStatus(Status.HIDE.getValue());
+						forumCommentMapper.updateByPrimaryKey(comment);
+					}
 				}else{
 					throw new ServiceException("无权删除！");
 				}

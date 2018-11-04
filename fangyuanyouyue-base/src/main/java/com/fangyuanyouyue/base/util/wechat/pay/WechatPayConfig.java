@@ -32,6 +32,9 @@ public class WechatPayConfig {
     //小程序APP秘钥
     public static final  String API_KEY_MINI="ShenZhenShiXiaoFangYuan123456789";
 
+    public static final  String MESSAGE_TOKEN = "Xiaofangyuan123"; //必须与请求参数中的token一致
+
+    public static final String SESSION_KEY = "A7vNWMm59XEdvQtAkzSIaJrSr6aZbqH8MzQKFLHefWS";
 
 
 }

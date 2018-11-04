@@ -99,7 +99,9 @@ public class ConfinedUserServiceImpl implements ConfinedUserService {
                 confinedUser.setCode(proxy);
                 if(StringUtils.isNotEmpty(code)){
                     ConfinedUser parentProxy = confinedUserMapper.selectByCode(code);
-                    confinedUser.setParentId(parentProxy.getUserId());
+                    if(parentProxy != null){
+                        confinedUser.setParentId(parentProxy.getUserId());
+                    }
                 }
                 confinedUserMapper.insert(confinedUser);
             }else{

@@ -164,4 +164,7 @@ public class GoodsParam{
 
     @ApiModelProperty(name = "ids", value = "id数组", dataType = "int",hidden = true)
     private Integer[] ids;//id数组
+
+    @ApiModelProperty(name = "formId", value = "小程序表单提交ID", dataType = "String",hidden = true)
+    private String formId;//小程序表单提交ID
 }

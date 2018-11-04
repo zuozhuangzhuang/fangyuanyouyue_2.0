@@ -131,4 +131,22 @@ public interface SchedualWalletService {
      */
     @RequestMapping(value = "/walletFeign/getUserVipLevel",method = RequestMethod.POST)
     String getUserVipLevel(@RequestParam(value = "userId") Integer userId);
+
+    /**
+     * 修改用户免费置顶次数
+     * @param userId
+     * @param type
+     * @param count
+     * @return
+     */
+    @RequestMapping(value = "/walletFeign/updateTopCount",method = RequestMethod.POST)
+    String updateTopCount(@RequestParam(value = "userId") Integer userId,@RequestParam(value = "type") Integer type,@RequestParam(value = "count") Integer count);
+
+    /**
+     * 获取用户免费置顶次数
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "/walletFeign/getFreeTopCount",method = RequestMethod.POST)
+    String getFreeTopCount(@RequestParam(value = "userId") Integer userId);
 }

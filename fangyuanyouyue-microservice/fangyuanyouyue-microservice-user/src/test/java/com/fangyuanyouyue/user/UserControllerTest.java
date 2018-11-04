@@ -57,22 +57,18 @@ public class UserControllerTest {
     @Test
     @Transactional
     public void regist() throws Exception {
-        for(int i=341;i<441;i++){
-            System.out.println("13333333"+i);
-        }
-//        for(int i=341;i<441;i++){
-//            mvc.perform(MockMvcRequestBuilders.post("/user/regist")
-//                    .param("phone","13333333"+i)
-//                    .param("loginPwd","e10adc3949ba59abbe56e057f20f883e")
-//                    .param("nickName","昵称")
-//    //                .param("headImgUrl","123456")
-//    //                .param("bgImgUrl","123456")
-//                    .param("gender","1")
-//                    .param("regPlatform","1")
-//                    .accept(MediaType.APPLICATION_JSON))
-//                    .andDo(MockMvcResultHandlers.print())
-//                    .andReturn();
-//        }
+
+            mvc.perform(MockMvcRequestBuilders.post("/user/regist")
+                    .param("phone","13333333")
+                    .param("loginPwd","e10adc3949ba59abbe56e057f20f883e")
+                    .param("nickName","昵称")
+    //                .param("headImgUrl","123456")
+    //                .param("bgImgUrl","123456")
+                    .param("gender","1")
+                    .param("regPlatform","1")
+                    .accept(MediaType.APPLICATION_JSON))
+                    .andDo(MockMvcResultHandlers.print())
+                    .andReturn();
     }
 
     /**

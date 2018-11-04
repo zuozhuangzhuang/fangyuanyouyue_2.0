@@ -27,14 +27,14 @@ public interface UserInfoService {
      * @param id
      * @return
      */
-    UserInfo selectByPrimaryKey(Integer id);
+    UserInfo selectByPrimaryKey(Integer id) throws ServiceException;
 
     /**
      * 根据手机获取用户
      * @param phone
      * @return
      */
-    UserInfo getUserByPhone(String phone);
+    UserInfo getUserByPhone(String phone) throws ServiceException;
 
     /**
      * 根据昵称获取用户

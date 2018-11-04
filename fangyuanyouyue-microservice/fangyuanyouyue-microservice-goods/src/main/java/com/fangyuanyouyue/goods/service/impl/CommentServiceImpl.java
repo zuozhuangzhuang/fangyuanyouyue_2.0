@@ -232,14 +232,14 @@ public class CommentServiceImpl implements CommentService{
         for(Integer commentId:commentIds){
             //获取评论信息
             GoodsComment goodsComment = goodsCommentMapper.selectByPrimaryKey(commentId);
-            if(goodsComment == null || goodsComment.getStatus() == 2){
+            if(goodsComment == null || goodsComment.getStatus().equals(Status.HIDE.getValue())){
                 throw new ServiceException("评论不存在！");
             }else{
-                goodsComment.setStatus(2);//状态 1正常 2隐藏
+                goodsComment.setStatus(Status.HIDE.getValue());//状态 1正常 2隐藏
                 goodsCommentMapper.updateByPrimaryKey(goodsComment);
                 List<GoodsComment> replys = goodsCommentMapper.selectCommentByCommentId(commentId);
                 for(GoodsComment reply:replys){
-                    reply.setStatus(2);
+                    reply.setStatus(Status.HIDE.getValue());
                     goodsCommentMapper.updateByPrimaryKey(reply);
                 }
             }

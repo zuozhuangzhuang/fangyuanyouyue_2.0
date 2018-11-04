@@ -53,5 +53,6 @@ public class OrderRefund {
     
     private String orderNo;//订单号
 
+    private Integer returnType;//退货方式 1未发货申请退货 2已发货申请退货
     //TODO 后台处理人员id
 }
