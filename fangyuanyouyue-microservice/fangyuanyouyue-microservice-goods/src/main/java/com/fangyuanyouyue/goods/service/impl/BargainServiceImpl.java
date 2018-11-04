@@ -240,9 +240,8 @@ public class BargainServiceImpl implements BargainService{
                 //卖家同意后生成订单，拒绝后退回余额
                 if(status.intValue() == Status.BARGAIN_AGREE.getValue()){
                     //修改商品的状态为已售出
-                    goodsInfoService.updateGoodsStatus(goodsInfo.getId(),2);
+//                    goodsInfoService.updateGoodsStatus(goodsInfo.getId(),2);
                     //生成订单
-                    //每次提交的鉴定生成一个订单，批量鉴定有多个订单详情
                     OrderInfo orderInfo = new OrderInfo();
                     orderInfo.setIsResolve(Status.NO.getValue());
                     orderInfo.setUserId(goodsBargain.getUserId());
@@ -307,8 +306,8 @@ public class BargainServiceImpl implements BargainService{
                     orderDetail.setPayAmount(goodsInfo.getPrice());
                     orderDetail.setDescription(goodsInfo.getDescription());
                     orderDetailMapper.insert(orderDetail);
-//                    goodsInfo.setStatus(2);//状态  1出售中 2已售出 3已下架（已结束） 5删除
-//                    goodsInfoMapper.updateByPrimaryKey(goodsInfo);
+                    goodsInfo.setStatus(2);//状态  1出售中 2已售出 3已下架（已结束） 5删除
+                    goodsInfoMapper.updateByPrimaryKey(goodsInfo);
                     //议价：恭喜您！您对商品【商品名称】的议价卖家已同意，点击此处查看订单详情
                     //如果卖家同意议价，就拒绝此商品剩余的申请中议价
                     orderId = orderInfo.getId();

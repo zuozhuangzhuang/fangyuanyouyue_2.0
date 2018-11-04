@@ -27,7 +27,7 @@ public class WechatPay {
 		WechatPay pay = new WechatPay();
 		//pay.genOrderWeb("o5VaduLtpTIRGv7sHd5QureMkV20","VIP010101", "1", "VIP购买", "http://test.shaugnchiyiming.com/weixin/personal_center", "127.0.0.1");
 //		WechatPayDto dto = pay.genOrderWeb("oteLFwc3oyWMRkXX7PrqWqtD-Z2g","TEST001", "0.01", "小方圆测试支付", "http://wechat.xiaohoukx.com/client/user", "127.0.0.1");
-		WechatPayDto dto = pay.genOrderMini("onuC35VLb3lBsPPKehB3cNxzBU24","123123123", "0.01", "小方圆测试支付", "https://miniprogram.fangyuanyouyue.com/wallet/wallet/notify/wechat", "127.0.0.1");
+		WechatPayDto dto = pay.genOrderMini("onuC35RHaX-BKjwndrL-PU2IHzHE","123123123", "0.01", "小方圆测试支付", "https://miniprogram.fangyuanyouyue.com/wallet/wallet/notify/wechat", "127.0.0.1");
 		System.out.println(dto);
 		
 		/*boolean dto = pay.refund("VI000000057","VI000000057","1","");

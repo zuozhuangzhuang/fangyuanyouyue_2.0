@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.message.param;
 
 import java.util.Date;
+import java.util.Map;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -50,4 +51,15 @@ public class EaseMobParam {
     @ApiModelProperty(name = "businessId", value = "扩展消息业务ID", dataType = "string",hidden = true)
     private String businessId; //扩展消息业务ID，如订单消息里面的订单id
 
+    @ApiModelProperty(name = "miniOpenId", value = "小程序openid", dataType = "string",hidden = true)
+    private String miniOpenId; //小程序openid
+
+    @ApiModelProperty(name = "templateId", value = "模板消息id", dataType = "string",hidden = true)
+    private String templateId; //模板消息id
+
+    @ApiModelProperty(name = "pagePath", value = "页面路径", dataType = "string",hidden = true)
+    private String pagePath; //页面路径
+
+    @ApiModelProperty(name = "map", value = "小程序消息内容", dataType = "map",hidden = true)
+    private Map<String,Object> map;
 }
