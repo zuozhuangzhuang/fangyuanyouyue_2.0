@@ -34,16 +34,11 @@
     <sql id="Base_Column_List">
     id, user_id, name, price, postage, sort, label, type, status, floor_price, interval_time, 
     markdown, last_interval_time, is_appraisal, video_url, add_time, update_time, video_length, 
-    start_price, comment_time, main_img_url
-  </sql>
-    <sql id="Blob_Column_List">
-    description
+    start_price, comment_time, main_img_url,description
   </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
         select
         <include refid="Base_Column_List" />
-        ,
-        <include refid="Blob_Column_List" />
         from goods_info
         where id = #{id,jdbcType=INTEGER}
     </select>
@@ -438,7 +433,7 @@
             </if>
         </where>
         )
-        order by c.vip_level desc,c.vip_type desc,a.update_time desc limit #{start},#{limit}
+        order by c.vip_level desc,a.comment_time desc limit #{start},#{limit}
     </select>
 
     <!--<select id="getGoodsAuthType" parameterType="Integer" resultType="Integer">-->
@@ -464,7 +459,6 @@
     <select id="countPage" resultType="Integer">
         select count(id) from goods_info
         <where>
-            status != 5
             <if test="type != null">
                 and type = #{type}
             </if>
