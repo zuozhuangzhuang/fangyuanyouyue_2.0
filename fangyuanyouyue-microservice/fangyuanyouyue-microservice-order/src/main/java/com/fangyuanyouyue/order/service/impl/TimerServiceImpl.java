@@ -131,8 +131,8 @@ public class TimerServiceImpl implements TimerService{
             for(OrderPay orderPay:orderPays){
                 OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderPay.getOrderId());
                 if(orderInfo.getIsRefund() == Status.YES.getValue()){
-                    OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderInfo.getId(), 1, null);
-                    if(orderRefund != null){
+                    OrderRefund orderRefund = orderRefundMapper.selectByOrderIdStatus(orderInfo.getId(), 3, null);
+                    if(orderRefund == null){
                         continue;
                     }
                 }

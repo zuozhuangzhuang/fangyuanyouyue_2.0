@@ -193,6 +193,7 @@ public class RefundServiceImpl implements RefundService{
                 orderInfo.setStatus(Status.ORDER_GOODS_COMPLETE.getValue());
                 orderPay.setStatus(Status.ORDER_GOODS_COMPLETE.getValue());
                 orderInfoMapper.updateByPrimaryKeySelective(orderInfo);
+                orderPayMapper.updateByPrimaryKeySelective(orderPay);
                 //买家新增余额账单
 
                 baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(orderInfo.getUserId(),orderPay.getPayAmount(),Status.PAY_TYPE_BALANCE.getValue(),
