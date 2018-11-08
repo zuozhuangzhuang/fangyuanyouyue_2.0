@@ -97,7 +97,7 @@ public class WalletDto {
                     this.levelDesc = "升级还需"+(3000-score)+"积分";
                 }else if(3000 <= score && score < 10000){//Lv3
                     this.level = 3;
-                    this.levelDesc = "升级还需"+(10000-score-score)+"积分";
+                    this.levelDesc = "升级还需"+(10000-score)+"积分";
                 }else if(10000 <= score && score < 30000){//Lv4
                     this.level = 4;
                     this.levelDesc = "升级还需"+(30000-score)+"积分";
