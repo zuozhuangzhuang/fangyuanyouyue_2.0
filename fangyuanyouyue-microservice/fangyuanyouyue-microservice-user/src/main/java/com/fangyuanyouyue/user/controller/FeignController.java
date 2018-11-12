@@ -3,6 +3,7 @@ package com.fangyuanyouyue.user.controller;
 import java.io.IOException;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
+import com.fangyuanyouyue.user.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +17,6 @@ import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.user.model.UserInfo;
-import com.fangyuanyouyue.user.service.SchedualGoodsService;
-import com.fangyuanyouyue.user.service.UserAddressInfoService;
-import com.fangyuanyouyue.user.service.UserInfoExtService;
-import com.fangyuanyouyue.user.service.UserInfoService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -41,6 +38,8 @@ public class FeignController  extends BaseController {
     private UserAddressInfoService userAddressInfoService;
     @Autowired
     private SchedualGoodsService schedualGoodsService;//调用其他service时用
+    @Autowired
+    private MiniMsgFormIdService miniMsgFormIdService;
 
 
     @ApiOperation(value = "验证用户", notes = "验证用户",hidden = true)
@@ -219,6 +218,30 @@ public class FeignController  extends BaseController {
             }
             boolean isFans = userInfoExtService.isFans(userId,toUserId);
             return toSuccess(isFans);
+        } catch (ServiceException e) {
+            return toError(e.getCode(),e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "获取用户formId", notes = "获取用户formId",hidden = true)
+    @PostMapping(value = "/getFormId")
+    @ResponseBody
+    public BaseResp getFormId(Integer userId) throws IOException {
+        try {
+            log.info("----》获取用户formId《----");
+            log.info("参数：userId:"+userId);
+            UserInfo user = userInfoService.selectByPrimaryKey(userId);
+            if(user==null){
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
+            }
+            if(user.getStatus() == 2){
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
+            }
+            String formId = miniMsgFormIdService.getFormId(userId);
+            return toSuccess(formId);
         } catch (ServiceException e) {
             return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {

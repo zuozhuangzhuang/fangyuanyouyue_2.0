@@ -62,4 +62,7 @@ public class EaseMobParam {
 
     @ApiModelProperty(name = "map", value = "小程序消息内容", dataType = "map",hidden = true)
     private Map<String,Object> map;
+
+    @ApiModelProperty(name = "formId", value = "用户formId", dataType = "String",hidden = true)
+    private String formId;
 }

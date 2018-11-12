@@ -281,6 +281,7 @@ public class CompensateServiceImpl implements CompensateService {
         logger.info("Compensate Loaded->"+JSON.toJSONString(txGroup));
     }
 
+    @Override
     public TxGroup getCompensateByGroupId(String groupId) {
         String json = compensateDao.getCompensateByGroupId(groupId);
         if (json == null) {

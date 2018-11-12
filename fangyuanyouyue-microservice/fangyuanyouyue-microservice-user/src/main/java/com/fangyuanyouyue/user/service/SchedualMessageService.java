@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Map;
+
 @FeignClient(value = "message-service",fallback = SchedualMessageServiceImpl.class)
 @Component
 public interface SchedualMessageService {
@@ -50,7 +52,7 @@ public interface SchedualMessageService {
      * @return
      */
     @RequestMapping(value = "/message/wechat/message",method = RequestMethod.POST)
-    String wechatMessage(@RequestParam(value = "userName") String userName, @RequestParam(value = "content") String content,
-                         @RequestParam(value = "type") String type, @RequestParam(value = "businessId") String businessId);
+    String wechatMessage(@RequestParam(value = "openId")String openId, @RequestParam(value = "template_id")String template_id,
+                         @RequestParam(value = "url")String url, @RequestParam(value = "map")Map<String,Object> map, @RequestParam(value = "formId")String formId);
 
 }

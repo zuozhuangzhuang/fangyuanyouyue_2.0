@@ -268,6 +268,8 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
 //            schedualWalletService.updateCredit(apply.getUserId(), Credit.EXTAPPLY.getCredit(), Status.ADD.getValue());
             schedualMessageService.easemobMessage(apply.getUserId().toString(),
                     "恭喜您，您申请的实名认证，已通过官方审核！",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_EXT_AGREE.getMessage(),"");
+            //TODO 发送小程序模板消息
+
         }else{
             if(StringUtils.isEmpty(content)){
                 content = "官方审核未通过";
