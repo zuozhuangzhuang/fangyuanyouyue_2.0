@@ -3,6 +3,8 @@ package com.fangyuanyouyue.user.service.impl;
 import com.fangyuanyouyue.user.service.SchedualMessageService;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 public class SchedualMessageServiceImpl implements SchedualMessageService {
 
@@ -21,7 +23,7 @@ public class SchedualMessageServiceImpl implements SchedualMessageService {
         return "发送环信消息失败！";
 	}
     @Override
-    public String wechatMessage(String userName, String content, String type, String businessId) {
+    public String wechatMessage(String openId, String template_id, String url, Map<String, Object> map, String formId) {
         return "发送微信模板消息失败！";
     }
 }

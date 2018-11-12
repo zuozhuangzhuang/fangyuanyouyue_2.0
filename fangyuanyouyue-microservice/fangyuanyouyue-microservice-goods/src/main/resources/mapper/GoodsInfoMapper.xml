@@ -433,7 +433,7 @@
             </if>
         </where>
         )
-        order by c.vip_level desc,a.comment_time desc limit #{start},#{limit}
+        order by c.status,a.comment_time desc limit #{start},#{limit}
     </select>
 
     <!--<select id="getGoodsAuthType" parameterType="Integer" resultType="Integer">-->

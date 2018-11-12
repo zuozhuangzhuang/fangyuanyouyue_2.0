@@ -3,9 +3,14 @@ package com.fangyuanyouyue.message.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
+import com.fangyuanyouyue.base.enums.MiniMsg;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.CheckCode;
 import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.base.util.SendMiniMessage;
+import com.fangyuanyouyue.base.util.wechat.pay.WechatPayConfig;
+import com.fangyuanyouyue.base.util.wechat.pojo.AccessToken;
+import com.fangyuanyouyue.base.util.wechat.utils.WeixinUtil;
 import com.fangyuanyouyue.message.model.UserInfo;
 import com.fangyuanyouyue.message.model.WeChatMessage;
 import com.fangyuanyouyue.message.param.EaseMobParam;
@@ -222,6 +227,15 @@ public class MessageController extends BaseController{
     }
 
     //发送微信模版消息
+
+    @ApiOperation(value = "发送微信模版消息", notes = "(void)发送微信模版消息",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "miniOpenId", value = "用户openid", required = true,dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "templateId", value = "模板消息id", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "pagePath", value = "页面路径", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "map", value = "小程序消息内容", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "formId", value = "用户formId", required = true, dataType = "String", paramType = "query")
+    })
     @PostMapping(value = "/wechat/message")
     @ResponseBody
     public BaseResp wechatMessage(EaseMobParam param) throws IOException {
@@ -234,13 +248,13 @@ public class MessageController extends BaseController{
             msgContent.type(MsgContent.TypeEnum.TXT).msg(param.getContent());
             UserName userName = new UserName();
             userName.add(param.getUserName());
-            Map<String,Object> ext = new HashMap<>();
-            ext.put("nickName", "小方圆官方");
-            ext.put("headImgUrl",param.getHeadImgUrl());
-            ext.put("type",param.getType());
-            ext.put("businessId",param.getBusinessId());
-            msg.from("system").target(userName).targetType("users").msg(msgContent).ext(ext);
-            System.out.println("msg:"+new GsonBuilder().create().toJson(msg));
+//            Map<String,Object> ext = new HashMap<>();
+//            ext.put("nickName", "小方圆官方");
+//            ext.put("headImgUrl",param.getHeadImgUrl());
+//            ext.put("type",param.getType());
+//            ext.put("businessId",param.getBusinessId());
+//            msg.from("system").target(userName).targetType("users").msg(msgContent).ext(ext);
+//            System.out.println("msg:"+new GsonBuilder().create().toJson(msg));
             /**
              * TODO
              * 1、获取表单提交的formId，存入redis，在下次存入之前都可以生效
@@ -250,15 +264,13 @@ public class MessageController extends BaseController{
              * 5、腾讯根据此次请求对服务器路径发送验证请求，再验证一次MESSAGE_TOKEN（写死）
              * 6、如果返回正确的值就进行发送消息
              */
-
-//            String message = SendMiniMessage.makeRouteMessage(param.getMiniOpenId(), param.getTemplateId(), param.getPagePath(),param.getMap(),param.ge);
-//            AccessToken accessToken = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
-//            boolean result = SendMiniMessage.sendTemplateMessage(accessToken.getToken(),message);
+            AccessToken accessToken = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
+            String message = SendMiniMessage.makeRouteMessage(param.getMiniOpenId(), param.getTemplateId(), param.getPagePath(), param.getMap(),param.getFormId());
+            boolean result = SendMiniMessage.sendTemplateMessage(accessToken.getToken(), message);
             //TODO 判断消息是否成功
-//            log.info("判断消息是否成功------:"+result);
+            log.info("判断消息是否成功------:"+result);
 
-//            return toSuccess(result);
-            return toSuccess();
+            return toSuccess(result);
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");

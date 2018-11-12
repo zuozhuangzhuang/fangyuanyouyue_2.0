@@ -123,15 +123,14 @@ public class SendMiniMessage {
 
     public static void main(String[] args) {
         Map<String,Object> map = new HashMap<>();
-        map.put("keyword1","我是评论内容");
-        map.put("keyword2","我是评论人");
-        map.put("keyword3","我是帖子标题");
-        String token = "15_COBeoe8kDy9aRkimPHSKeFrQ_1E4zsmhvXZKk71Np4hdaSaEvoPL_6mnz4ZH7I3mWms1WUFsvth5YNIiDPGxUmne_CzP8ckKKAlI-pbWd7V1Xue7boXx4jUYwTt6Kf1A6aGJV6l_6sAgK0UHNSMeAIAGLF";
+        map.put("keyword1","我是商品名称");
+        map.put("keyword2","我是价格");
+        map.put("keyword3","我是购买人姓名");
+        map.put("keyword4","2018年11月10日15:50:19");
 
-        //System.out.println(getTemplate(token));
-
-        //AccessToken accessToken = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
-        String message = makeRouteMessage("onuC35RHaX-BKjwndrL-PU2IHzHE", MiniMsg.FORUM_COMMENT.getTemplateId(), MiniMsg.FORUM_COMMENT.getPagePath(), map,"wx03113559565681db581349863456419534");
-        boolean flag = sendTemplateMessage(token, message);
+        AccessToken accessToken = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
+//        String message = makeRouteMessage("onuC35VLb3lBsPPKehB3cNxzBU24", MiniMsg.FORUM_COMMENT.getTemplateId(), MiniMsg.FORUM_COMMENT.getPagePath(), map,"aa44b2cb2b527ef1ac91380bc8ddc397");
+        String message = makeRouteMessage("onuC35VLb3lBsPPKehB3cNxzBU24", "7RtiYELicy756YYG5bl2-w_KAau9pgb0-TGuU9EGKEk", "page/tabBar/market/market", map,"wx101549451450129e2031460b3267848754");
+        boolean flag = sendTemplateMessage(accessToken.getToken(), message);
     }
 }

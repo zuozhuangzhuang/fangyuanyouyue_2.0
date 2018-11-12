@@ -8,21 +8,15 @@ import lombok.ToString;
  * 微信小程序模板消息id
  */
 public enum MiniMsg {
-    ORDER_REFUND(1,"退货申请通知","ALEi-Kpw_G8SWKAjde_SV7fsUmY_OfdhRJG17BHdhTA"),
-    ORDER_CANCEL(2,"订单取消通知","wHV3uNVKTgIBcKeLXe5NMT_0gmdwQcQkyVcUzsLyiO0"),
-    WITHDRAW_APPLY(3,"提现申请通知","wlyA_t59AjXVETSgIwR1pUnKOKqj-MChsaRenkvXUTU"),
-    //提现到帐通知
-    WITHDRAW_FAILED(5,"提现失败通知","hjaNRgn8GIqIx9eTber_iDkJE89RL2hj7z3hyPLweqA"),
-    FORUM_COMMENT(6,"帖子被评论通知","38vDkQ7D2bPTyPe2tBrsdTm7JHKO-VlIKpVPuvQVRnE","pages/index"),
-    ORDER_ADD(7,"商品被购买通知","7RtiYELicy756YYG5bl2-3gnXyi5Z_1bet1AKxIq7B0"),
-    GOODS_APPRAISAL_APPLY(8,"鉴定已接单提醒","FytcDjdVUps19nb2cp5Wj3Q27L8eupsMutaDgzq8OIA"),
-    GOODS_APPRAISAL_END(9,"鉴定完成通知","vOEK_BEEsojqBe6GXhjhIhh3vMbr7YdiRhxvfQ9c0Vw"),
-    USER_EXT_APPLY(10,"实名认证审核通知","qJqCQLIl3HHoBYlXeKHzlIfWiqhA3zPaU1i11CSU-p0"),
-    USER_EXT_END(11,"实名认证通知","mZ0SYZ7Q_PAswqY2KNR3hBGO3BZ6rfwC0B5YcMdcjIo"),
-    USER_VIP_CHANGE(12,"会员等级变更通知","k706o2xOjMOAnLxmdCABIvWf17pM5ZZLC9J8cFP9oaI"),
-    USER_VIP_APPLY(13,"会员卡开通成功通知","JZ1z_TTRpv-AfH6sOFUmqvCVo9wcF7aCayF2ZGYDmR8"),
-    SYSTEM_MSG(14,"审核通知","IvdVZ1Elfp1R5U7huyw1yfEE3_THWd7EZLz9mj90a0U"),
-    REFUND_MSG(15,"退款通知","8WxCpfxPAoJFRu3-Wf8lk_SloyiGmQx4Nb2s8IxzqDU"),
+    SYSTEM_MSG(1,"审核结果通知","9PCKkgtnPg0vL_uyz7L0Fr8OvXDJz-amOjG5PCCZg-A"),
+    GOODS_APPRAISAL_END(2,"鉴定结果通知","uqQqr8f4nV7Miu7MgxW6h3H-wa7MBUyBcpujT_rw8B4"),
+    GET_BENEFIT(3,"收益到账通知","YynYJ7m0S-NDPu9UGDKDkGcIH2PLhK46W8a383lhTNA"),
+    WITHDRAW_SUCCESS(4,"提现到账通知","-cbrzZCURwlmrlZ4m2oncE2LMOeDQAr05Zqs2Tnkdik"),
+    WITHDRAW_FAILED(5,"提现失败通知","hjaNRgn8GIqIx9eTber_iLAfE6vcR72bRMjAeikqtj8"),
+    ORDER_ADD(6,"商品被购买通知","7RtiYELicy756YYG5bl2-w_KAau9pgb0-TGuU9EGKEk"),
+    ORDER_REFUND(7,"退货申请通知","ALEi-Kpw_G8SWKAjde_SV7fsUmY_OfdhRJG17BHdhTA"),
+    REFUND_SUCCESS(8,"退款成功通知","0ewa6a6F3A9IQVt4wJwFNv1FEMSk__wRolJJqzUDsGw"),
+    REFUND_FAILED(9,"退款失败通知","IGQUFPamaa3grODQCT6uvTxlq7eWzP_Cq2BeLpfeDNk"),
     ;
 
     private Integer code;//消息

@@ -409,7 +409,7 @@ public class AdminSysController extends BaseController {
     
     
 
-    @ApiOperation(value = "	角色列表", notes = "角色列表",response = BaseResp.class)
+    @ApiOperation(value = "角色列表", notes = "角色列表",response = BaseResp.class)
     @ApiImplicitParams({
     })
     @GetMapping(value = "/roleList")

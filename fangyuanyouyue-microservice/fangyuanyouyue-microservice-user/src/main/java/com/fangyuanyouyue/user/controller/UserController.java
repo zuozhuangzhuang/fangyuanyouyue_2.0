@@ -58,6 +58,8 @@ public class UserController extends BaseController {
     private SchedualMessageService schedualMessageService;//message-service
     @Autowired
     private UserThirdService userThirdService;
+    @Autowired
+    private MiniMsgFormIdService miniMsgFormIdService;
 
 
 
@@ -69,7 +71,8 @@ public class UserController extends BaseController {
             @ApiImplicitParam(name = "headImgUrl", value = "头像图片路径", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "bgImgUrl", value = "背景图片路径", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "gender", value = "性别，1男 2女 0不确定", dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "regPlatform", value = "注册平台 1安卓 2iOS 3小程序", required = true, dataType = "int", paramType = "query",example = "1")
+            @ApiImplicitParam(name = "regPlatform", value = "注册平台 1安卓 2iOS 3小程序", required = true, dataType = "int", paramType = "query",example = "1"),
+            @ApiImplicitParam(name = "inviteCode", value = "邀请码", required = true, dataType = "int", paramType = "query",example = "1")
     })
     @PostMapping(value = "/regist")
     @ResponseBody
@@ -1206,7 +1209,37 @@ public class UserController extends BaseController {
 
     }
 
-
+    @ApiOperation(value = "存储用户formId", notes = "（void）存储用户formId")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "formId", value = "表单提交码", required = true, dataType = "String", paramType = "query")
+    })
+    @PostMapping(value = "/addFormId")
+    @ResponseBody
+    public BaseResp addFormId(UserParam param) throws IOException {
+        try {
+            log.info("----》存储用户formId《----");
+            log.info("参数："+param.toString());
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError("用户token不能为空！");
+            }
+            UserInfo user=userInfoService.getUserByToken(param.getToken());
+            if(user==null){
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
+            }
+            if(user.getStatus() == 2){
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
+            }
+            miniMsgFormIdService.addFormId(user.getId(),param.getFormId());
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
     public static void main(String[] args) {
         //微信获取的code
         String code = "";
