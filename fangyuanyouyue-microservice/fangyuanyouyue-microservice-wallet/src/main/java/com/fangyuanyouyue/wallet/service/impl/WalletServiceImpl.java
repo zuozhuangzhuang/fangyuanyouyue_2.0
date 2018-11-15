@@ -23,10 +23,7 @@ import com.fangyuanyouyue.wallet.dto.admin.AdminUserBalanceDto;
 import com.fangyuanyouyue.wallet.dto.admin.AdminWithdrawDto;
 import com.fangyuanyouyue.wallet.model.*;
 import com.fangyuanyouyue.wallet.param.AdminWalletParam;
-import com.fangyuanyouyue.wallet.service.PlatformFinanceService;
-import com.fangyuanyouyue.wallet.service.SchedualMessageService;
-import com.fangyuanyouyue.wallet.service.UserCouponService;
-import com.fangyuanyouyue.wallet.service.WalletService;
+import com.fangyuanyouyue.wallet.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -64,7 +61,7 @@ public class WalletServiceImpl implements WalletService{
     @Autowired
     private SchedualMessageService schedualMessageService;
     @Autowired
-    private SchedualUserServiceImpl schedualUserService;
+    private SchedualUserService schedualUserService;
 
     @Override
     public Object recharge(Integer userId, BigDecimal amount, Integer type) throws Exception {
