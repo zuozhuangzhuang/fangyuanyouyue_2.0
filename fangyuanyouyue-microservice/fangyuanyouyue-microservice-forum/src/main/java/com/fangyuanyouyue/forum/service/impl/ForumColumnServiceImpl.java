@@ -312,7 +312,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
                         //名称
                         map.put("keyword1",user.getNickName());
                         //审核类别
-                        map.put("keyword2",forumColumnApply.getColumnName());
+                        map.put("keyword2","专栏申请");
                         //审核结果
                         map.put("keyword3",status.equals(Status.YES.getValue())?"您的专栏申请已通过":"您的专栏申请未通过");
                         //备注
