@@ -1,8 +1,11 @@
 package com.fangyuanyouyue.wallet.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.codingapi.tx.annotation.TxTransaction;
+import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
+import com.fangyuanyouyue.base.enums.MiniMsg;
 import com.fangyuanyouyue.base.enums.NotifyUrl;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
@@ -30,10 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
+import java.util.*;
 
 @Service(value = "walletService")
 @Transactional(rollbackFor=Exception.class)
@@ -63,6 +63,8 @@ public class WalletServiceImpl implements WalletService{
     private PlatformFinanceService platformFinanceService;
     @Autowired
     private SchedualMessageService schedualMessageService;
+    @Autowired
+    private SchedualUserServiceImpl schedualUserService;
 
     @Override
     public Object recharge(Integer userId, BigDecimal amount, Integer type) throws Exception {
@@ -694,6 +696,33 @@ public class WalletServiceImpl implements WalletService{
             addUserBalanceDetail(userWithdraw.getUserId(),userWithdraw.getAmount().add(userWithdraw.getServiceCharge()),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),orderNo,(userWithdraw.getPayType().equals(1)?"微信":"支付宝")+"提现失败",Status.WITHDRAW.getValue(),null,userWithdraw.getUserId(),orderNo);
             schedualMessageService.easemobMessage(userWithdraw.getUserId().toString(),"您在小方圆申请￥"+userWithdraw.getAmount()+"的提现申请已被拒绝，拒绝原因："+content,
                     Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),"");
+        }
+        //发送微信消息
+        //formId
+        BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getFormId(userWithdraw.getUserId()));
+        if(baseResp !=null && !baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+            throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+        }
+        if(baseResp.getData() != null){
+            String formId = baseResp.getData().toString();
+            //openId
+            UserThirdParty userThirdParty = userThirdPartyMapper.getUserThirdByUserId(userWithdraw.getUserId(),1);
+            if(userThirdParty != null && StringUtils.isNotEmpty(userThirdParty.getMiniOpenId())){
+                String openId = userThirdParty.getMiniOpenId();
+
+                Map<String,Object> map = new HashMap<>();
+                if(status.intValue() == Status.WITHDRAW_AGGRES.getValue()){
+                    map.put("keyword1",userWithdraw.getAmount()+"元");
+                    map.put("keyword2", DateUtil.getFormatDate(new Date(),DateUtil.DATE_FORMT));
+                    schedualMessageService.wechatMessage(openId, MiniMsg.WITHDRAW_SUCCESS.getTemplateId(),MiniMsg.WITHDRAW_SUCCESS.getPagePath(),map,formId);
+                }else if(status.intValue() == Status.WITHDRAW_REFUSE.getValue()){
+                    map.put("keyword1",userWithdraw.getAmount()+"元");
+                    map.put("keyword2",DateUtil.getFormatDate(userWithdraw.getAddTime(),DateUtil.DATE_FORMT));
+                    map.put("keyword3", content);
+                    schedualMessageService.wechatMessage(openId, MiniMsg.WITHDRAW_FAILED.getTemplateId(),MiniMsg.WITHDRAW_FAILED.getPagePath(),map,formId);
+
+                }
+            }
         }
         userWithdrawMapper.updateByPrimaryKey(userWithdraw);
     }

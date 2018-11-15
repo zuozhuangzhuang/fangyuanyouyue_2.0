@@ -521,18 +521,20 @@ public class AppraisalServiceImpl implements AppraisalService{
             if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                 throw new ServiceException(baseResp.getCode(),baseResp.getReport());
             }
-            String openId = baseResp.getData().toString();
-            baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(goodsAppraisalDetail.getUserId()));
-            if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
-                throw new ServiceException(baseResp.getCode(),baseResp.getReport());
-            }
-            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), UserInfo.class);
-            Map<String,Object> map = new HashMap<>();
-            map.put("keyword1",StringUtils.isEmpty(goodsAppraisalDetail.getTitle())?"官方鉴定":goodsAppraisalDetail.getTitle());
-            map.put("keyword2",status == 1?"鉴定为真":status==2?"鉴定存疑":"鉴定为假");
-            map.put("keyword3",user.getNickName());
+            if(baseResp.getData() != null){
+                String openId = baseResp.getData().toString();
+                baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(goodsAppraisalDetail.getUserId()));
+                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                }
+                UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), UserInfo.class);
+                Map<String,Object> map = new HashMap<>();
+                map.put("keyword1",StringUtils.isEmpty(goodsAppraisalDetail.getTitle())?"我要鉴定":goodsAppraisalDetail.getTitle());
+                map.put("keyword2",status==1?"鉴定为真":status==2?"鉴定存疑":"鉴定为假");
+                map.put("keyword3",user.getNickName());
 
-            schedualMessageService.wechatMessage(openId, MiniMsg.GOODS_APPRAISAL_END.getTemplateId(),MiniMsg.GOODS_APPRAISAL_END.getPagePath(),map,formId);
+                schedualMessageService.wechatMessage(openId, MiniMsg.GOODS_APPRAISAL_END.getTemplateId(),MiniMsg.GOODS_APPRAISAL_END.getPagePath(),map,formId);
+            }
         }
         goodsAppraisalDetailMapper.updateByPrimaryKey(goodsAppraisalDetail);
     }
