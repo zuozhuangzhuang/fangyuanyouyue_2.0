@@ -1,5 +1,6 @@
 package com.fangyuanyouyue.order.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.BaseResp;
@@ -151,7 +152,15 @@ public class RefundServiceImpl implements RefundService{
                         map.put("keyword2",goodsName.toString());
                         map.put("keyword3","￥"+orderInfo.getAmount());
                         map.put("keyword4",DateUtil.getFormatDate(orderRefund.getAddTime(), DateUtil.DATE_FORMT));
-                        map.put("keyword5",reason);
+                        JSONArray jsonArray = JSONArray.parseArray(reason);
+                        StringBuffer content = new StringBuffer();
+                        for(int i=0;i<jsonArray.size();i++){
+                            JSONObject jsonObject = JSONObject.parseObject(jsonArray.get(i).toString());
+                            if(jsonObject.getString("type").equals("0")){
+                                content.append(jsonObject.getString("content"));
+                            }
+                        }
+                        map.put("keyword5",content.toString());
 
                         schedualMessageService.wechatMessage(openId, MiniMsg.ORDER_REFUND.getTemplateId(),MiniMsg.ORDER_REFUND.getPagePath(),map,formId);
                     }
