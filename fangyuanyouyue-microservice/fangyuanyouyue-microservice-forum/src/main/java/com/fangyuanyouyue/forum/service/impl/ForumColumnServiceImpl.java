@@ -303,11 +303,15 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 
                     UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), UserInfo.class);
                     Map<String,Object> map = new HashMap<>();
-                    map.put("keyword1",forumColumnApply.getColumnName());
-                    map.put("keyword2",status.equals(Status.YES.getValue())?"":"");
-                    map.put("keyword3",user.getNickName());
-
-                    schedualMessageService.wechatMessage(openId, MiniMsg.GOODS_APPRAISAL_END.getTemplateId(),MiniMsg.GOODS_APPRAISAL_END.getPagePath(),map,formId);
+					//名称
+					map.put("keyword1",user.getNickName());
+					//审核类别
+					map.put("keyword2",forumColumnApply.getColumnName());
+					//审核结果
+					map.put("keyword3",status.equals(Status.YES.getValue())?"您的专栏申请已通过":"您的专栏申请未通过");
+					//备注
+					map.put("keyword4",status.equals(Status.YES.getValue())?"无":reason);
+                    schedualMessageService.wechatMessage(openId, MiniMsg.SYSTEM_MSG.getTemplateId(),MiniMsg.SYSTEM_MSG.getPagePath(),map,formId);
                 }
 				forumColumnApply.setStatus(status);
 				forumColumnApplyMapper.updateByPrimaryKeySelective(forumColumnApply);
