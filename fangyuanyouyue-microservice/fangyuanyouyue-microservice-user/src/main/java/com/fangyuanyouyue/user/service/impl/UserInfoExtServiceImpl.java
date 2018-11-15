@@ -289,7 +289,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
                 //审核类别
                 map.put("keyword2","实名认证");
                 //审核结果
-                map.put("keyword3",status.equals(StatusEnum.AUTH_ACCEPT.getCode())?"您的申请已通过":"您的申请未通过");
+                map.put("keyword3",status.equals(StatusEnum.AUTH_ACCEPT.getCode())?"您的实名认证已通过":"您的实名认证未通过");
                 //备注
                 map.put("keyword4",status.equals(StatusEnum.AUTH_ACCEPT.getCode())?"无":content);
                 schedualMessageService.wechatMessage(userThirdByUserId.getMiniOpenId(), MiniMsg.SYSTEM_MSG.getTemplateId(),MiniMsg.SYSTEM_MSG.getPagePath(),map,formId);
@@ -366,6 +366,28 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
             //拒绝
             schedualMessageService.easemobMessage(model.getUserId().toString(),
                     "很抱歉，您申请的认证店铺未通过官方审核，原因："+content+" 可联系客服咨询详情。",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_AUTH_TYPE_REFUSE.getMessage(),"");
+        }
+        //TODO 发送微信模板消息消息
+        UserThirdParty userThirdByUserId = userThirdPartyMapper.getUserThirdByUserId(model.getUserId(), 1);
+        if(userThirdByUserId != null && StringUtils.isNotEmpty(userThirdByUserId.getMiniOpenId())){
+            String formId = miniMsgFormIdService.getFormId(model.getUserId());
+            if(StringUtils.isNotEmpty(formId)){
+                UserInfo userInfo = userInfoMapper.selectByPrimaryKey(model.getUserId());
+//                schedualMessageService.wechatMessage(userThirdByUserId.getMiniOpenId(), MiniMsg.SYSTEM_MSG.getTemplateId(),MiniMsg.SYSTEM_MSG.getPagePath(),
+//                        userInfo.getNickName(),"实名认证",status.equals(StatusEnum.AUTH_ACCEPT.getCode())?"您的申请已通过":"您的申请未通过",
+//                        status.equals(StatusEnum.AUTH_ACCEPT.getCode())?"无":content,null,
+//                        formId);
+                Map<String,Object> map = new HashMap<>();
+                //名称
+                map.put("keyword1",userInfo.getNickName());
+                //审核类别
+                map.put("keyword2","认证店铺");
+                //审核结果
+                map.put("keyword3",status.equals(StatusEnum.AUTH_TYPE_ACCEPT.getCode())?"您的店铺认证已通过":"您的店铺认证未通过");
+                //备注
+                map.put("keyword4",status.equals(StatusEnum.AUTH_TYPE_ACCEPT.getCode())?"无":content);
+                schedualMessageService.wechatMessage(userThirdByUserId.getMiniOpenId(), MiniMsg.SYSTEM_MSG.getTemplateId(),MiniMsg.SYSTEM_MSG.getPagePath(),map,formId);
+            }
         }
         userAuthApplyMapper.updateByPrimaryKey(model);
     }

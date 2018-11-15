@@ -1229,6 +1229,9 @@ public class UserController extends BaseController {
             if(StringUtils.isEmpty(param.getFormId())){
                 return toError("formId不能为空！");
             }
+            if(param.getFormId().contains("mock")){
+                return toError("无效的formId！");
+            }
             miniMsgFormIdService.addFormId(user.getId(),param.getFormId());
             return toSuccess();
         } catch (ServiceException e) {
