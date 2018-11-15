@@ -34,4 +34,14 @@ public class SchedualUserServiceImpl implements SchedualUserService{
     public String isAuth(Integer userId) {
         return "验证实名认证失败！";
     }
+
+    @Override
+    public String getFormId(Integer userId) {
+        return "获取用户formId失败";
+    }
+
+    @Override
+    public String getOpenId(Integer userId) {
+        return "获取用户openId失败";
+    }
 }

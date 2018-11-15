@@ -2,11 +2,14 @@ package com.fangyuanyouyue.forum.service;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fangyuanyouyue.forum.service.impl.SchedualMessageServiceImpl;
+
+import java.util.Map;
 
 @FeignClient(value = "message-service",fallback = SchedualMessageServiceImpl.class)
 @Component
@@ -44,14 +47,16 @@ public interface SchedualMessageService {
 
     /**
      * 发送微信模版消息
-     * @param userName
-     * @param content
-     * @param type  扩展消息类型 1系统消息 2商品消息 3订单消息 4视频消息 5帖子消息 6专栏消息 7全民鉴定消息 8商品、抢购评论消息 9帖子评论消息 10视频评论消息 11全民鉴定评论消息 12会员特权 13钱包余额 14官方鉴定消息
-     * @param businessId
+     * @param miniOpenId
+     * @param templateId
+     * @param pagePath
+     * @param map
+     * @param formId
      * @return
      */
     @RequestMapping(value = "/message/wechat/message",method = RequestMethod.POST)
-    String wechatMessage(@RequestParam(value = "userName") String userName, @RequestParam(value = "content") String content,
-                          @RequestParam(value = "type") String type, @RequestParam(value = "businessId") String businessId);
+    String wechatMessage(@RequestParam(value = "miniOpenId")String miniOpenId, @RequestParam(value = "templateId")String templateId,
+                         @RequestParam(value = "pagePath")String pagePath, @RequestBody Map<String,Object> map,
+                         @RequestParam(value = "formId")String formId);
 
 }

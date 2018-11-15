@@ -13,6 +13,7 @@ import com.fangyuanyouyue.user.service.SchedualRedisService;
 import com.fangyuanyouyue.user.service.UserInfoService;
 import com.fangyuanyouyue.user.service.UserThirdService;
 import org.apache.commons.lang.StringUtils;
+import org.bytedeco.javacpp.presets.opencv_core;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -163,4 +164,12 @@ public class UserThirdServiceImpl implements UserThirdService {
         }*/
     }
 
+    @Override
+    public String getOpenId(Integer userId) throws ServiceException {
+        UserThirdParty userThirdByUserId = userThirdPartyMapper.getUserThirdByUserId(userId, 1);
+        if(userThirdByUserId != null && StringUtils.isNotEmpty(userThirdByUserId.getMiniOpenId())){
+            return userThirdByUserId.getMiniOpenId();
+        }
+        return null;
+    }
 }

@@ -6,32 +6,25 @@ import com.fangyuanyouyue.base.BasePageReq;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
-import com.fangyuanyouyue.base.enums.Credit;
-import com.fangyuanyouyue.base.enums.NotifyUrl;
-import com.fangyuanyouyue.base.enums.ReCode;
-import com.fangyuanyouyue.base.enums.Status;
+import com.fangyuanyouyue.base.enums.*;
 import com.fangyuanyouyue.base.util.*;
 import com.fangyuanyouyue.user.constant.StatusEnum;
 import com.fangyuanyouyue.user.dao.*;
 import com.fangyuanyouyue.user.dto.admin.AdminIdentityAuthApplyDto;
 import com.fangyuanyouyue.user.dto.admin.AdminUserAuthApplyDto;
 import com.fangyuanyouyue.user.model.*;
-import com.fangyuanyouyue.user.param.AdminUserParam;
-import com.fangyuanyouyue.user.service.SchedualMessageService;
-import com.fangyuanyouyue.user.service.SchedualWalletService;
-import io.swagger.annotations.Api;
+import com.fangyuanyouyue.user.service.*;
 import org.apache.commons.lang.StringUtils;
-import org.bytedeco.javacpp.presets.opencv_core;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.user.service.UserInfoExtService;
-import com.fangyuanyouyue.user.service.UserInfoService;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service(value = "userInfoExtService")
 @Transactional(rollbackFor=Exception.class)
@@ -55,6 +48,10 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
     private UserAuthApplyMapper userAuthApplyMapper;
     @Autowired
     private UserInfoMapper userInfoMapper;
+    @Autowired
+    private UserThirdPartyMapper userThirdPartyMapper;
+    @Autowired
+    private MiniMsgFormIdService miniMsgFormIdService;
 
     @Override
     public void certification(String token, String name, String identity, String identityImgCoverUrl, String identityImgBackUrl) throws ServiceException {
@@ -268,8 +265,6 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
 //            schedualWalletService.updateCredit(apply.getUserId(), Credit.EXTAPPLY.getCredit(), Status.ADD.getValue());
             schedualMessageService.easemobMessage(apply.getUserId().toString(),
                     "恭喜您，您申请的实名认证，已通过官方审核！",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_EXT_AGREE.getMessage(),"");
-            //TODO 发送小程序模板消息
-
         }else{
             if(StringUtils.isEmpty(content)){
                 content = "官方审核未通过";
@@ -277,6 +272,28 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
             //拒绝
             schedualMessageService.easemobMessage(apply.getUserId().toString(),
                     "很抱歉，您申请的实名认证，官方审核未通过！原因："+content+" 可重新提交资料再次申请。",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_EXT_REFUSE.getMessage(),"");
+        }
+        //发送微信模板消息消息
+        UserThirdParty userThirdByUserId = userThirdPartyMapper.getUserThirdByUserId(apply.getUserId(), 1);
+        if(userThirdByUserId != null && StringUtils.isNotEmpty(userThirdByUserId.getMiniOpenId())){
+            String formId = miniMsgFormIdService.getFormId(apply.getUserId());
+            if(StringUtils.isNotEmpty(formId)){
+                UserInfo userInfo = userInfoMapper.selectByPrimaryKey(apply.getUserId());
+//                schedualMessageService.wechatMessage(userThirdByUserId.getMiniOpenId(), MiniMsg.SYSTEM_MSG.getTemplateId(),MiniMsg.SYSTEM_MSG.getPagePath(),
+//                        userInfo.getNickName(),"实名认证",status.equals(StatusEnum.AUTH_ACCEPT.getCode())?"您的申请已通过":"您的申请未通过",
+//                        status.equals(StatusEnum.AUTH_ACCEPT.getCode())?"无":content,null,
+//                        formId);
+                Map<String,Object> map = new HashMap<>();
+                //名称
+                map.put("keyword1",userInfo.getNickName());
+                //审核类别
+                map.put("keyword2","实名认证");
+                //审核结果
+                map.put("keyword3",status.equals(StatusEnum.AUTH_ACCEPT.getCode())?"您的申请已通过":"您的申请未通过");
+                //备注
+                map.put("keyword4",status.equals(StatusEnum.AUTH_ACCEPT.getCode())?"无":content);
+                schedualMessageService.wechatMessage(userThirdByUserId.getMiniOpenId(), MiniMsg.SYSTEM_MSG.getTemplateId(),MiniMsg.SYSTEM_MSG.getPagePath(),map,formId);
+            }
         }
         if(StringUtils.isNotEmpty(content)){
             apply.setRejectDesc(content);
