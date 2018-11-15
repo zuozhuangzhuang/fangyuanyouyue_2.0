@@ -285,7 +285,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 				}else{
 					throw new ServiceException("状态值错误！");
 				}
-				//TODO 发送微信消息
+				//发送微信消息
 				//openId
 				BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getFormId(forumColumnApply.getUserId()));
 				if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
