@@ -81,7 +81,7 @@ public class AddressController extends BaseController{
             return toSuccess(userAddressDtos);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -136,7 +136,7 @@ public class AddressController extends BaseController{
             return toSuccess("修改收货地址成功");
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -172,7 +172,7 @@ public class AddressController extends BaseController{
             return toSuccess(userAddressDtos);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -205,7 +205,7 @@ public class AddressController extends BaseController{
             return toSuccess(userAddressDtos);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -240,7 +240,7 @@ public class AddressController extends BaseController{
             return toSuccess("设置默认收货地址成功！");
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -273,7 +273,7 @@ public class AddressController extends BaseController{
             return toSuccess(defaultAddress);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");

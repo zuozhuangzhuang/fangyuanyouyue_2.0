@@ -108,7 +108,7 @@ public class UserController extends BaseController {
             return toSuccess(userDto);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -162,7 +162,7 @@ public class UserController extends BaseController {
             return toSuccess(userDto);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -200,7 +200,7 @@ public class UserController extends BaseController {
             return toSuccess(userDto);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -243,11 +243,7 @@ public class UserController extends BaseController {
             return toSuccess(userDto);
         } catch (ServiceException e) {
             e.printStackTrace();
-            //如果可以合并账号，就返回 code = 2
-            if(e.getCode() != null){
-                return toError(e.getCode(),e.getMessage());
-            }
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -292,7 +288,7 @@ public class UserController extends BaseController {
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -361,7 +357,7 @@ public class UserController extends BaseController {
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -399,7 +395,7 @@ public class UserController extends BaseController {
             return toSuccess(mergeDto);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -428,7 +424,7 @@ public class UserController extends BaseController {
             return toSuccess("找回密码成功");
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -469,7 +465,7 @@ public class UserController extends BaseController {
             return toSuccess("修改密码成功");
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -519,7 +515,7 @@ public class UserController extends BaseController {
             return toSuccess(userDto);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -558,7 +554,7 @@ public class UserController extends BaseController {
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -645,7 +641,7 @@ public class UserController extends BaseController {
             }
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -784,7 +780,7 @@ public class UserController extends BaseController {
             return toSuccess(shopDtos);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -809,7 +805,7 @@ public class UserController extends BaseController {
             return toSuccess(userDto);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -854,7 +850,7 @@ public class UserController extends BaseController {
             }
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -896,7 +892,7 @@ public class UserController extends BaseController {
             return toSuccess(fansDto);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -928,7 +924,7 @@ public class UserController extends BaseController {
             return toSuccess(waitProcessDto);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -968,7 +964,7 @@ public class UserController extends BaseController {
             return toSuccess(info);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -1001,7 +997,7 @@ public class UserController extends BaseController {
             return toSuccess(userByName);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -1237,7 +1233,7 @@ public class UserController extends BaseController {
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
