@@ -302,7 +302,11 @@ public class ForumColumnServiceImpl implements ForumColumnService {
                     if(baseResp.getData() != null){
 
                         String openId = baseResp.getData().toString();
-
+						String verifyUserById = schedualUserService.verifyUserById(forumColumnApply.getUserId());
+						baseResp = ParseReturnValue.getParseReturnValue(verifyUserById);
+						if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+							throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+						}
                         UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), UserInfo.class);
                         Map<String,Object> map = new HashMap<>();
                         //名称
