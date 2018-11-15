@@ -381,7 +381,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
                 //名称
                 map.put("keyword1",userInfo.getNickName());
                 //审核类别
-                map.put("keyword2","认证店铺");
+                map.put("keyword2","店铺认证");
                 //审核结果
                 map.put("keyword3",status.equals(StatusEnum.AUTH_TYPE_ACCEPT.getCode())?"您的店铺认证已通过":"您的店铺认证未通过");
                 //备注
