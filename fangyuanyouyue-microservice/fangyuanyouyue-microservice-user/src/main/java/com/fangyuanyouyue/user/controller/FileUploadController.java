@@ -63,7 +63,7 @@ public class FileUploadController extends BaseController {
             return toSuccess(url);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -89,7 +89,7 @@ public class FileUploadController extends BaseController {
             return toSuccess(url);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
