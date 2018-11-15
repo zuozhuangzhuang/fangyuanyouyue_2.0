@@ -215,7 +215,7 @@ public class RefundServiceImpl implements RefundService{
                         "很抱歉，您对"+(isAuction?"抢购":"商品")+goodsName+"申请的退货，官方已拒绝",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),orderInfo.getId().toString());
                 //给卖家发信息
                 schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
-                        "买家申请退货的"+(isAuction?"抢购":"商品")+goodsName+"官方已拒绝，退款已退回买家余额。如有疑问可联系客服咨询详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),orderInfo.getId().toString());
+                        "买家申请退货的"+(isAuction?"抢购":"商品")+goodsName+"官方已拒绝，拒绝理由为："+reason+"。如有疑问可联系客服咨询详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),orderInfo.getId().toString());
 
             }
             orderRefundMapper.updateByPrimaryKeySelective(orderRefund);

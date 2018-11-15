@@ -2,9 +2,12 @@ package com.fangyuanyouyue.goods.service.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.codingapi.tx.annotation.TxTransaction;
+import com.fangyuanyouyue.base.enums.MiniMsg;
 import com.fangyuanyouyue.base.util.ParseReturnValue;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -501,12 +504,34 @@ public class AppraisalServiceImpl implements AppraisalService{
             if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                 throw new ServiceException(baseResp.getCode(),baseResp.getReport());
             }
-
-
             schedualMessageService.easemobMessage(goodsAppraisalDetail.getUserId().toString(),"您申请的鉴定结果为“存疑”鉴定费用已退回您的余额，点击此处查看您的余额吧",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_WALLET.getMessage(),"");
         }else{
             schedualMessageService.easemobMessage(goodsAppraisalDetail.getUserId().toString(),"您申请的鉴定已得到官方专家的答复！点击此处前往查看吧",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_PLATFORM_APPRAISAL.getMessage(),"");
         }
+        //发送微信消息
+        //openId
+        BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getOpenId(goodsAppraisalDetail.getUserId()));
+        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+            throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+        }
+        String formId = baseResp.getData().toString();
+        //formId
+        baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getFormId(goodsAppraisalDetail.getUserId()));
+        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+            throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+        }
+        String openId = baseResp.getData().toString();
+        baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(goodsAppraisalDetail.getUserId()));
+        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+            throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+        }
+        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), UserInfo.class);
+        Map<String,Object> map = new HashMap<>();
+        map.put("keyword1",StringUtils.isEmpty(goodsAppraisalDetail.getTitle())?"官方鉴定":goodsAppraisalDetail.getTitle());
+        map.put("keyword2",status == 1?"鉴定为真":status==2?"鉴定存疑":"鉴定为假");
+        map.put("keyword3",user.getNickName());
+
+        schedualMessageService.wechatMessage(openId, MiniMsg.GOODS_APPRAISAL_END.getTemplateId(),MiniMsg.GOODS_APPRAISAL_END.getPagePath(),map,formId);
         goodsAppraisalDetailMapper.updateByPrimaryKey(goodsAppraisalDetail);
     }
 

@@ -40,6 +40,8 @@ public class FeignController  extends BaseController {
     private SchedualGoodsService schedualGoodsService;//调用其他service时用
     @Autowired
     private MiniMsgFormIdService miniMsgFormIdService;
+    @Autowired
+    private UserThirdService userThirdService;
 
 
     @ApiOperation(value = "验证用户", notes = "验证用户",hidden = true)
@@ -242,6 +244,30 @@ public class FeignController  extends BaseController {
             }
             String formId = miniMsgFormIdService.getFormId(userId);
             return toSuccess(formId);
+        } catch (ServiceException e) {
+            return toError(e.getCode(),e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "获取用户openId", notes = "获取用户openId",hidden = true)
+    @PostMapping(value = "/getOpenId")
+    @ResponseBody
+    public BaseResp getOpenId(Integer userId) throws IOException {
+        try {
+            log.info("----》获取用户getOpenId《----");
+            log.info("参数：userId:"+userId);
+            UserInfo user = userInfoService.selectByPrimaryKey(userId);
+            if(user==null){
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
+            }
+            if(user.getStatus() == 2){
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
+            }
+            String openId = userThirdService.getOpenId(userId);
+            return toSuccess(openId);
         } catch (ServiceException e) {
             return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {

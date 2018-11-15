@@ -1230,6 +1230,9 @@ public class UserController extends BaseController {
             if(user.getStatus() == 2){
                 return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
             }
+            if(StringUtils.isEmpty(param.getFormId())){
+                return toError("formId不能为空！");
+            }
             miniMsgFormIdService.addFormId(user.getId(),param.getFormId());
             return toSuccess();
         } catch (ServiceException e) {

@@ -20,8 +20,4 @@ public class SchedualMessageServiceImpl implements SchedualMessageService {
 	public String easemobMessage(String userName, String content, String type, String jumpType,String businessId) {
         return "发送环信消息失败！";
 	}
-    @Override
-    public String wechatMessage(String userName, String content, String type, String businessId) {
-        return "发送微信模板消息失败！";
-    }
 }

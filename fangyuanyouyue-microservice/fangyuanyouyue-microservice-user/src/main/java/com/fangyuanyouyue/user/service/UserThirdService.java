@@ -29,4 +29,12 @@ public interface UserThirdService {
      * @throws ServiceException
      */
     void accountMerge(String token, String phone, String unionId, Integer type, String loginPwd) throws ServiceException;
+
+    /**
+     * 获取用户的openId
+     * @param userId
+     * @return
+     * @throws ServiceException
+     */
+    String getOpenId(Integer userId) throws ServiceException;
 }

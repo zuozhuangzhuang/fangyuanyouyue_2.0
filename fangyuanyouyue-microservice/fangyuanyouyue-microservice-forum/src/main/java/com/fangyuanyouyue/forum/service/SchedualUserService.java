@@ -32,5 +32,21 @@ public interface SchedualUserService {
     @RequestMapping(value = "/userFeign/isFans",method = RequestMethod.POST)
     String isFans(@RequestParam(value = "userId") Integer userId,@RequestParam(value = "toUserId") Integer toUserId);
 
+    /**
+     * 获取用户formId
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "/userFeign/getFormId",method = RequestMethod.POST)
+    String getFormId(@RequestParam(value = "userId") Integer userId);
+
+    /**
+     * 获取用户openId
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "/userFeign/getOpenId",method = RequestMethod.POST)
+    String getOpenId(@RequestParam(value = "userId") Integer userId);
+
 
 }

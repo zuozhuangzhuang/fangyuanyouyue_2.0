@@ -281,6 +281,9 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 		}
 		if(param.getIsChosen()!=null){
 			forumInfo.setIsChosen(param.getIsChosen());
+			if(param.getIsChosen().equals(1)){
+				forumInfo.setCommentTime(DateStampUtils.getTimesteamp());
+			}
 		}
 		if(param.getSort() != null){
 			forumInfo.setSort(param.getSort());
@@ -291,7 +294,6 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 		if(param.getCount()!=null) {
 			forumInfo.setPvCount(param.getCount());
 		}
-		forumInfo.setCommentTime(DateStampUtils.getTimesteamp());
 		forumInfoMapper.updateByPrimaryKey(forumInfo);
 		//很抱歉，您的帖子/视频/全民鉴定/【名称】已被官方删除，删除理由：……
 		if(param.getStatus() != null && param.getStatus().equals(Status.DELETE.getValue())){

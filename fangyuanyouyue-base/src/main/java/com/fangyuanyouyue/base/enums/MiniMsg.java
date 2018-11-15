@@ -19,7 +19,7 @@ public enum MiniMsg {
     REFUND_FAILED(9,"退款失败通知","IGQUFPamaa3grODQCT6uvTxlq7eWzP_Cq2BeLpfeDNk"),
     ;
 
-    private Integer code;//消息
+    private Integer code;//消息编号
     private String message;//消息内容
     private String templateId;//模板消息id
     private String pagePath;//页面路径

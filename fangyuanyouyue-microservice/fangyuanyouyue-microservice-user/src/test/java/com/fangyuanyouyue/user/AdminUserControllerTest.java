@@ -43,8 +43,9 @@ public class AdminUserControllerTest {
 //    @Transactional
     public void authApplyStatus() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/adminUser/auth/status")
-                .param("id","23")
-                .param("status","2")
+                .param("id","1982")
+                .param("status","1")
+                .param("content","重新提交")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

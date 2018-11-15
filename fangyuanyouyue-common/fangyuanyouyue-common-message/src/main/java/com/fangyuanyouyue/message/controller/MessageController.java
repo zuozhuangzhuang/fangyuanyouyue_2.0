@@ -1,17 +1,12 @@
 package com.fangyuanyouyue.message.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.BaseController;
 import com.fangyuanyouyue.base.BaseResp;
-import com.fangyuanyouyue.base.enums.MiniMsg;
-import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.CheckCode;
-import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.base.util.SendMiniMessage;
 import com.fangyuanyouyue.base.util.wechat.pay.WechatPayConfig;
 import com.fangyuanyouyue.base.util.wechat.pojo.AccessToken;
 import com.fangyuanyouyue.base.util.wechat.utils.WeixinUtil;
-import com.fangyuanyouyue.message.model.UserInfo;
 import com.fangyuanyouyue.message.model.WeChatMessage;
 import com.fangyuanyouyue.message.param.EaseMobParam;
 import com.fangyuanyouyue.message.param.MessageParam;
@@ -32,11 +27,8 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TimeZone;
 
 @RestController
 @RequestMapping(value = "/message")
@@ -227,45 +219,16 @@ public class MessageController extends BaseController{
     }
 
     //发送微信模版消息
-
-    @ApiOperation(value = "发送微信模版消息", notes = "(void)发送微信模版消息",response = BaseResp.class)
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "miniOpenId", value = "用户openid", required = true,dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "templateId", value = "模板消息id", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "pagePath", value = "页面路径", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "map", value = "小程序消息内容", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "formId", value = "用户formId", required = true, dataType = "String", paramType = "query")
-    })
     @PostMapping(value = "/wechat/message")
     @ResponseBody
-    public BaseResp wechatMessage(EaseMobParam param) throws IOException {
+    public BaseResp wechatMessage(@RequestParam(value = "miniOpenId")String miniOpenId, @RequestParam(value = "templateId")String templateId,
+                                  @RequestParam(value = "pagePath",defaultValue = "")String pagePath, @RequestBody Map<String,Object> map,
+                                  @RequestParam(value = "formId")String formId) throws IOException {
         try {
             log.info("----》发送微信模版消息《----");
-            log.info("参数："+param.toString());
-            
-            Msg msg = new Msg();
-            MsgContent msgContent = new MsgContent();
-            msgContent.type(MsgContent.TypeEnum.TXT).msg(param.getContent());
-            UserName userName = new UserName();
-            userName.add(param.getUserName());
-//            Map<String,Object> ext = new HashMap<>();
-//            ext.put("nickName", "小方圆官方");
-//            ext.put("headImgUrl",param.getHeadImgUrl());
-//            ext.put("type",param.getType());
-//            ext.put("businessId",param.getBusinessId());
-//            msg.from("system").target(userName).targetType("users").msg(msgContent).ext(ext);
-//            System.out.println("msg:"+new GsonBuilder().create().toJson(msg));
-            /**
-             * TODO
-             * 1、获取表单提交的formId，存入redis，在下次存入之前都可以生效
-             * 2、根据APPID和secret获取access_token，根据失效时间存入redis，每次去redis取，过期就重新获取
-             * 3、封装要发送的消息，用户的openId（写死），消息模板id（写死），消息模板跳转页面路径（写死）为json对象
-             * 4、根据access_token的token值请求微信，表示我要发送消息
-             * 5、腾讯根据此次请求对服务器路径发送验证请求，再验证一次MESSAGE_TOKEN（写死）
-             * 6、如果返回正确的值就进行发送消息
-             */
+
             AccessToken accessToken = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
-            String message = SendMiniMessage.makeRouteMessage(param.getMiniOpenId(), param.getTemplateId(), param.getPagePath(), param.getMap(),param.getFormId());
+            String message = SendMiniMessage.makeRouteMessage(miniOpenId, templateId, pagePath, map,formId);
             boolean result = SendMiniMessage.sendTemplateMessage(accessToken.getToken(), message);
             //TODO 判断消息是否成功
             log.info("判断消息是否成功------:"+result);
