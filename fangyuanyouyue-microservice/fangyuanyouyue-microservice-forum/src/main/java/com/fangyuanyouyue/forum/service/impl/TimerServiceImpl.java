@@ -198,7 +198,7 @@ public class TimerServiceImpl implements TimerService{
                         map.put("keyword3",amount+"元");
                         map.put("keyword4",DateUtil.getFormatDate(new Date(), DateUtil.DATE_FORMT));
 
-                        schedualMessageService.wechatMessage(openId, MiniMsg.GOODS_APPRAISAL_END.getTemplateId(),MiniMsg.GOODS_APPRAISAL_END.getPagePath(),map,formId);
+                        schedualMessageService.wechatMessage(openId, MiniMsg.GET_BENEFIT.getTemplateId(),MiniMsg.GET_BENEFIT.getPagePath(),map,formId);
                     }
                 }
             }
