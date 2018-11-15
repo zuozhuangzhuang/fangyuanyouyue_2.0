@@ -510,7 +510,7 @@ public class AppraisalServiceImpl implements AppraisalService{
         }
         //发送微信消息
         //openId
-        BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getOpenId(goodsAppraisalDetail.getUserId()));
+        BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getFormId(goodsAppraisalDetail.getUserId()));
         if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
             throw new ServiceException(baseResp.getCode(),baseResp.getReport());
         }
