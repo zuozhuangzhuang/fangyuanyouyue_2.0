@@ -517,7 +517,7 @@ public class AppraisalServiceImpl implements AppraisalService{
         if(baseResp.getData() != null){
             String formId = baseResp.getData().toString();
             //openId
-            baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getFormId(goodsAppraisalDetail.getUserId()));
+            baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getOpenId(goodsAppraisalDetail.getUserId()));
             if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                 throw new ServiceException(baseResp.getCode(),baseResp.getReport());
             }
