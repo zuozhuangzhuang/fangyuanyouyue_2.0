@@ -521,8 +521,8 @@ public class BargainServiceImpl implements BargainService{
 //                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
 //                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
 //                    }
-//                    bargain.setIsDelete(Status.YES.getValue());//是否删除 1是 2否
-//                    goodsBargainMapper.updateByPrimaryKey(bargain);
+                    bargain.setIsDelete(Status.YES.getValue());//是否删除 1是 2否
+                    goodsBargainMapper.updateByPrimaryKey(bargain);
                 }
             }
         }
