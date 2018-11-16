@@ -162,7 +162,7 @@ public class RefundServiceImpl implements RefundService{
                         }
                         map.put("keyword5",content.toString());
 
-                        schedualMessageService.wechatMessage(openId, MiniMsg.ORDER_REFUND.getTemplateId(),MiniMsg.ORDER_REFUND.getPagePath(),map,formId);
+                        schedualMessageService.wechatMessage(openId, MiniMsg.ORDER_REFUND.getTemplateId(),MiniMsg.ORDER_REFUND.getPagePath()+orderInfo.getId(),map,formId);
                     }
                 }
             }else{

@@ -226,10 +226,7 @@ public class MessageController extends BaseController{
                                   @RequestParam(value = "formId")String formId) throws IOException {
         try {
             log.info("----》发送微信模版消息《----");
-
-            AccessToken accessToken = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
-            String message = SendMiniMessage.makeRouteMessage(miniOpenId, templateId, pagePath, map,formId);
-            boolean result = SendMiniMessage.sendTemplateMessage(accessToken.getToken(), message);
+            boolean result = weChatMessageService.sendWechatMessage(miniOpenId, templateId, pagePath, map, formId);
             //TODO 判断消息是否成功
             log.info("判断消息是否成功------:"+result);
 
@@ -252,7 +249,7 @@ public class MessageController extends BaseController{
 
 
     //微信验证开发服务器token
-    @GetMapping(value = "/checkSignature")
+    @PostMapping(value = "/checkSignature")
     @ResponseBody
     public String checkSignature(WeChatMessage message) {
         return weChatMessageService.checkSignature(message);

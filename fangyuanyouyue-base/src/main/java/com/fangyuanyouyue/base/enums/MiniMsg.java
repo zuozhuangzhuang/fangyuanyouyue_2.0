@@ -8,15 +8,15 @@ import lombok.ToString;
  * 微信小程序模板消息id
  */
 public enum MiniMsg {
-    SYSTEM_MSG(1,"审核结果通知","9PCKkgtnPg0vL_uyz7L0Fr8OvXDJz-amOjG5PCCZg-A"),
-    GOODS_APPRAISAL_END(2,"鉴定结果通知","uqQqr8f4nV7Miu7MgxW6h3H-wa7MBUyBcpujT_rw8B4"),
-    GET_BENEFIT(3,"收益到账通知","YynYJ7m0S-NDPu9UGDKDkGcIH2PLhK46W8a383lhTNA"),
+    SYSTEM_MSG(1,"审核结果通知","9PCKkgtnPg0vL_uyz7L0Fr8OvXDJz-amOjG5PCCZg-A","page/tabBar/index"),
+    GOODS_APPRAISAL_END(2,"鉴定结果通知","uqQqr8f4nV7Miu7MgxW6h3H-wa7MBUyBcpujT_rw8B4","page/center/pages/authenticate_demand/authenticate_demand"),
+    GET_BENEFIT(3,"收益到账通知","YynYJ7m0S-NDPu9UGDKDkGcIH2PLhK46W8a383lhTNA","page/center/pages/myWallet/myWallet"),
     WITHDRAW_SUCCESS(4,"提现到账通知","-cbrzZCURwlmrlZ4m2oncE2LMOeDQAr05Zqs2Tnkdik"),
     WITHDRAW_FAILED(5,"提现失败通知","hjaNRgn8GIqIx9eTber_iLAfE6vcR72bRMjAeikqtj8"),
-    ORDER_ADD(6,"商品被购买通知","7RtiYELicy756YYG5bl2-w_KAau9pgb0-TGuU9EGKEk"),
-    ORDER_REFUND(7,"退货申请通知","ALEi-Kpw_G8SWKAjde_SV7fsUmY_OfdhRJG17BHdhTA"),
-    REFUND_SUCCESS(8,"退款成功通知","0ewa6a6F3A9IQVt4wJwFNv1FEMSk__wRolJJqzUDsGw"),
-    REFUND_FAILED(9,"退款失败通知","IGQUFPamaa3grODQCT6uvTxlq7eWzP_Cq2BeLpfeDNk"),
+    ORDER_ADD(6,"商品被购买通知","7RtiYELicy756YYG5bl2-w_KAau9pgb0-TGuU9EGKEk","page/center/pages/Orderdetail/Orderdetail?orderId="),
+    ORDER_REFUND(7,"退货申请通知","ALEi-Kpw_G8SWKAjde_SV7fsUmY_OfdhRJG17BHdhTA","page/center/pages/Orderdetail/Orderdetail?orderId="),
+    REFUND_SUCCESS(8,"退款成功通知","0ewa6a6F3A9IQVt4wJwFNv1FEMSk__wRolJJqzUDsGw","page/tabBar/index"),
+    REFUND_FAILED(9,"退款失败通知","IGQUFPamaa3grODQCT6uvTxlq7eWzP_Cq2BeLpfeDNk","page/tabBar/index"),
     ;
 
     private Integer code;//消息编号

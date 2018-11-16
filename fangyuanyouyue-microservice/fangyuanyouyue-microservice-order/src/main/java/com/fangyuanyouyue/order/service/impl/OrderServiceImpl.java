@@ -1226,11 +1226,11 @@ public class OrderServiceImpl implements OrderService{
                                 UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), UserInfo.class);
                                 Map<String,Object> map = new HashMap<>();
                                 map.put("keyword1",goodsName.toString());
-                                map.put("keyword2", childOrder.getAmount()+"元");
+                                map.put("keyword2", pay.getPayAmount()+"元");
                                 map.put("keyword3",user.getNickName());
                                 map.put("keyword4",DateUtil.getFormatDate(childOrder.getAddTime(), DateUtil.DATE_FORMT));
 
-                                schedualMessageService.wechatMessage(openId, MiniMsg.ORDER_ADD.getTemplateId(),MiniMsg.ORDER_ADD.getPagePath(),map,formId);
+                                schedualMessageService.wechatMessage(openId, MiniMsg.ORDER_ADD.getTemplateId(),MiniMsg.ORDER_ADD.getPagePath()+pay.getOrderId(),map,formId);
                             }
                         }
                         //买家新增余额账单
@@ -1275,11 +1275,11 @@ public class OrderServiceImpl implements OrderService{
                             UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), UserInfo.class);
                             Map<String,Object> map = new HashMap<>();
                             map.put("keyword1",goodsName.toString());
-                            map.put("keyword2", orderInfo.getAmount()+"元");
+                            map.put("keyword2",orderPay.getPayAmount()+"元");
                             map.put("keyword3",user.getNickName());
                             map.put("keyword4",DateUtil.getFormatDate(orderInfo.getAddTime(), DateUtil.DATE_FORMT));
 
-                            schedualMessageService.wechatMessage(openId, MiniMsg.ORDER_ADD.getTemplateId(),MiniMsg.ORDER_ADD.getPagePath(),map,formId);
+                            schedualMessageService.wechatMessage(openId, MiniMsg.ORDER_ADD.getTemplateId(),MiniMsg.ORDER_ADD.getPagePath()+orderPay.getOrderId(),map,formId);
                         }
                     }
                     //买家新增余额账单
