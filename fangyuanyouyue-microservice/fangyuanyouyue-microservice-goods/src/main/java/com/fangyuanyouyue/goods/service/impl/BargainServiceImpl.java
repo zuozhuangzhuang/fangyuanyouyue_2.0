@@ -498,14 +498,14 @@ public class BargainServiceImpl implements BargainService{
         for(Integer goodsId:goodsIds){
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
             //取消用户在所选商品的议价信息
-            List<GoodsBargain> goodsBargains = goodsBargainMapper.selectByUserIdGoodsId(userId, goodsId, Status.BARGAIN_APPLY.getValue());
+            List<GoodsBargain> goodsBargains = goodsBargainMapper.selectByUserIdGoodsId(userId, goodsId, null);
             if(goodsBargains == null || goodsBargains.size() == 0){
                 throw new ServiceException("议价信息不存在！");
             }
             for(GoodsBargain bargain:goodsBargains){
                 //删除商品内所有议价信息
                 if(bargain.getStatus().intValue() == Status.BARGAIN_APPLY.getValue()){
-//                    bargain.setStatus(Status.BARGAIN_CANCEL.getValue());
+                    bargain.setStatus(Status.BARGAIN_CANCEL.getValue());
                     //退回余额
                     //调用wallet-service修改余额功能
 //                    BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),Status.ADD.getValue()));
