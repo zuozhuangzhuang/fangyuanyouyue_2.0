@@ -497,30 +497,33 @@ public class BargainServiceImpl implements BargainService{
     public void deleteBargain(Integer userId, Integer[] goodsIds) throws ServiceException {
         for(Integer goodsId:goodsIds){
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
+            if(goodsInfo.getStatus().equals(Status.GOODS_IN_SALE.getValue())){
+                throw new ServiceException("商品状态异常！");
+            }
             //取消用户在所选商品的议价信息
-            List<GoodsBargain> goodsBargains = goodsBargainMapper.selectByUserIdGoodsId(userId, goodsId, null);
+            List<GoodsBargain> goodsBargains = goodsBargainMapper.selectByUserIdGoodsId(userId, goodsId, Status.BARGAIN_APPLY.getValue());
             if(goodsBargains == null || goodsBargains.size() == 0){
                 throw new ServiceException("议价信息不存在！");
             }
             for(GoodsBargain bargain:goodsBargains){
                 //删除商品内所有议价信息
                 if(bargain.getStatus().intValue() == Status.BARGAIN_APPLY.getValue()){
-                    bargain.setStatus(Status.BARGAIN_CANCEL.getValue());
+//                    bargain.setStatus(Status.BARGAIN_CANCEL.getValue());
                     //退回余额
                     //调用wallet-service修改余额功能
-                    BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),Status.ADD.getValue()));
-                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
-                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
-                    }
+//                    BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),Status.ADD.getValue()));
+//                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+//                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+//                    }
                     updateBargain(userId,goodsId,bargain.getId(),Status.BARGAIN_CANCEL.getValue());
                     //买家新增余额账单
-                    baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(bargain.getUserId(),bargain.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),bargain.getBargainNo(),"【"+goodsInfo.getName()+"】",goodsInfo.getUserId(),bargain.getUserId(),Status.BARGAIN.getValue(),bargain.getBargainNo()));
-                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
-                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
-                    }
+//                    baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(bargain.getUserId(),bargain.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),bargain.getBargainNo(),"【"+goodsInfo.getName()+"】",goodsInfo.getUserId(),bargain.getUserId(),Status.BARGAIN.getValue(),bargain.getBargainNo()));
+//                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+//                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+//                    }
+//                    bargain.setIsDelete(Status.YES.getValue());//是否删除 1是 2否
+//                    goodsBargainMapper.updateByPrimaryKey(bargain);
                 }
-                bargain.setIsDelete(Status.YES.getValue());//是否删除 1是 2否
-                goodsBargainMapper.updateByPrimaryKey(bargain);
             }
         }
     }
