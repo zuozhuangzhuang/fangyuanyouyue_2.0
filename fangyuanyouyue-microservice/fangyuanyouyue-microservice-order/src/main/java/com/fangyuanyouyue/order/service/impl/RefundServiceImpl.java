@@ -150,7 +150,8 @@ public class RefundServiceImpl implements RefundService{
                         Map<String,Object> map = new HashMap<>();
                         map.put("keyword1",user.getNickName());
                         map.put("keyword2",goodsName.toString());
-                        map.put("keyword3","￥"+orderInfo.getAmount());
+                        OrderPay orderPay = orderPayMapper.selectByOrderId(orderId);
+                        map.put("keyword3","￥"+orderPay.getPayAmount());
                         map.put("keyword4",DateUtil.getFormatDate(orderRefund.getAddTime(), DateUtil.DATE_FORMT));
                         JSONArray jsonArray = JSONArray.parseArray(reason);
                         StringBuffer content = new StringBuffer();
