@@ -85,18 +85,24 @@ public class WeChatMessageServiceImpl implements WeChatMessageService{
 
     @Override
     public boolean sendWechatMessage(String miniOpenId, String templateId, String pagePath, Map<String, Object> map, String formId) {
-
-        Object accessTokenRedis = schedualRedisService.get("access_token");
-        String accessToken = "";
-        if(accessTokenRedis != null){
-            accessToken = accessTokenRedis.toString();
-        }else{
-            AccessToken accessTokenObj = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
-            accessToken = accessTokenObj.getToken();
-            schedualRedisService.set("access_token",accessToken,2*60*60L);
-        }
-        String message = SendMiniMessage.makeRouteMessage(miniOpenId, templateId, pagePath, map,formId);
-        boolean result = SendMiniMessage.sendTemplateMessage(accessToken, message);
-        return result;
+//        try{
+//            Object accessTokenRedis = schedualRedisService.get("access_token");
+            String accessToken = "";
+//            if(accessTokenRedis != null){
+//                accessToken = accessTokenRedis.toString();
+//            }else{
+                AccessToken accessTokenObj = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
+                accessToken = accessTokenObj.getToken();
+//                schedualRedisService.set("access_token",accessToken,2*60*60L);
+//            }
+            String message = SendMiniMessage.makeRouteMessage(miniOpenId, templateId, pagePath, map,formId);
+            boolean result = SendMiniMessage.sendTemplateMessage(accessToken, message);
+            return result;
+//        }catch (Exception e){
+//            AccessToken accessTokenObj = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
+//            schedualRedisService.set("access_token",accessTokenObj.getToken(),2*60*60L);
+//            sendWechatMessage(miniOpenId,templateId,pagePath,map,formId);
+//        }
+//        return false;
     }
 }

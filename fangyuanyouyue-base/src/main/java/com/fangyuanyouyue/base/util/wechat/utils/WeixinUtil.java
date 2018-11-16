@@ -2,6 +2,8 @@ package com.fangyuanyouyue.base.util.wechat.utils;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.fangyuanyouyue.base.dto.AccessTokenDto;
+import com.fangyuanyouyue.base.util.HttpUtil;
 import com.fangyuanyouyue.base.util.wechat.pay.WechatPayConfig;
 import com.fangyuanyouyue.base.util.wechat.pojo.AccessToken;
 import com.fangyuanyouyue.base.util.wechat.pojo.Menu;
@@ -157,18 +159,18 @@ public class WeixinUtil {
 	 * @param refresh_token
 	 * @return
 	 */
-//	public static AccessTokenDto updateUserAccessToken(String appId,String refresh_token){
-//		/*
-//		 * access_token是调用授权关系接口的调用凭证，由于access_token有效期（目前为2个小时）较短，当access_token超时后，可以使用refresh_token进行刷新，access_token刷新结果有两种：
-//		 * 1. 若access_token已超时，那么进行refresh_token会获取一个新的access_token，新的超时时间；
-//		 * 2.若access_token未超时，那么进行refresh_token不会改变access_token，但超时时间会刷新，相当于续期access_token。
-//		 *
-//		 * refresh_token拥有较长的有效期（30天），当refresh_token失效的后，需要用户重新授权，所以，请开发者在refresh_token即将过期时（如第29天时），进行定时的自动刷新并保存好它。
-//		 */
-//		String request = HttpUtil.sendGet(refresh_user_token_url, String.format("appid=%s&grant_type=refresh_token&refresh_token=%s", appId, refresh_token));
-//		AccessTokenDto accessTokenDto = (AccessTokenDto) JsonUtil.getDtoFromJsonObjStr(request, AccessTokenDto.class);
-//		return accessTokenDto;
-//	}
+	public static AccessTokenDto updateUserAccessToken(String appId,String refresh_token){
+		/*
+		 * access_token是调用授权关系接口的调用凭证，由于access_token有效期（目前为2个小时）较短，当access_token超时后，可以使用refresh_token进行刷新，access_token刷新结果有两种：
+		 * 1. 若access_token已超时，那么进行refresh_token会获取一个新的access_token，新的超时时间；
+		 * 2.若access_token未超时，那么进行refresh_token不会改变access_token，但超时时间会刷新，相当于续期access_token。
+		 *
+		 * refresh_token拥有较长的有效期（30天），当refresh_token失效的后，需要用户重新授权，所以，请开发者在refresh_token即将过期时（如第29天时），进行定时的自动刷新并保存好它。
+		 */
+		String request = HttpUtil.sendGet(refresh_user_token_url, String.format("appid=%s&grant_type=refresh_token&refresh_token=%s", appId, refresh_token));
+		AccessTokenDto accessTokenDto = JSONObject.toJavaObject(JSONObject.parseObject(request), AccessTokenDto.class);
+		return accessTokenDto;
+	}
 	
 	/**
 	 * 
@@ -179,11 +181,11 @@ public class WeixinUtil {
 	 * @param openid
 	 * @return
 	 */
-//	public static AccessTokenDto getUserCheckAccessToken(String access_token,String openid){
-//		String request = HttpUtil.sendGet(check_user_token_url, String.format("access_token=%s&openid=%s", access_token, openid));
-//		AccessTokenDto accessTokenDto = (AccessTokenDto) JsonUtil.getDtoFromJsonObjStr(request, AccessTokenDto.class);
-//		return accessTokenDto;
-//	}
+	public static AccessTokenDto getUserCheckAccessToken(String access_token, String openid){
+		String request = HttpUtil.sendGet(check_user_token_url, String.format("access_token=%s&openid=%s", access_token, openid));
+		AccessTokenDto accessTokenDto = JSONObject.toJavaObject(JSONObject.parseObject(request), AccessTokenDto.class);
+		return accessTokenDto;
+	}
 	
 	/**
 	 * 
