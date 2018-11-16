@@ -497,9 +497,6 @@ public class BargainServiceImpl implements BargainService{
     public void deleteBargain(Integer userId, Integer[] goodsIds) throws ServiceException {
         for(Integer goodsId:goodsIds){
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
-            if(!goodsInfo.getStatus().equals(Status.GOODS_IN_SALE.getValue())){
-                throw new ServiceException("商品状态异常！");
-            }
             //取消用户在所选商品的议价信息
             List<GoodsBargain> goodsBargains = goodsBargainMapper.selectByUserIdGoodsId(userId, goodsId, Status.BARGAIN_APPLY.getValue());
             if(goodsBargains == null || goodsBargains.size() == 0){
@@ -521,9 +518,9 @@ public class BargainServiceImpl implements BargainService{
 //                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
 //                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
 //                    }
-                    bargain.setIsDelete(Status.YES.getValue());//是否删除 1是 2否
-                    goodsBargainMapper.updateByPrimaryKey(bargain);
                 }
+                bargain.setIsDelete(Status.YES.getValue());//是否删除 1是 2否
+                goodsBargainMapper.updateByPrimaryKey(bargain);
             }
         }
     }
