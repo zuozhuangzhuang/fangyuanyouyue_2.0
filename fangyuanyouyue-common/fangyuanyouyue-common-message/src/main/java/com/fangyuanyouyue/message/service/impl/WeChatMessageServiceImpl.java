@@ -3,50 +3,36 @@ package com.fangyuanyouyue.message.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.AES;
+import com.fangyuanyouyue.base.util.SendMiniMessage;
 import com.fangyuanyouyue.base.util.wechat.pay.WechatPayConfig;
+import com.fangyuanyouyue.base.util.wechat.pojo.AccessToken;
+import com.fangyuanyouyue.base.util.wechat.utils.WeixinUtil;
 import com.fangyuanyouyue.message.model.WeChatMessage;
+import com.fangyuanyouyue.message.service.SchedualRedisService;
 import com.fangyuanyouyue.message.service.WeChatMessageService;
 import lombok.Setter;
 import org.apache.commons.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Map;
 
 @Service(value = "weChatMessageService")
 public class WeChatMessageServiceImpl implements WeChatMessageService{
+    @Autowired
+    private SchedualRedisService schedualRedisService;
 
     @Override
     public String checkSignature(WeChatMessage message){
         String signature = message.getSignature();
         String timestamp = message.getTimestamp();
         String nonce = message.getNonce();
-
+        System.out.println(message);
 
         //将token、timestamp、nonce三个参数进行字典排序
-//        // 被加密的数据
-//        byte[] dataByte = Base64.decodeBase64(signature);
-//        // 加密秘钥
-//        byte[] aeskey = Base64.decodeBase64(WechatPayConfig.SESSION_KEY);
-//        byte[] ivByte = new byte[]{};
-//        // 偏移量
-//        String newuserInfo;
-//        try {
-//            //AES解密
-//            AES aes = new AES();
-//            byte[] resultByte = aes.decrypt(dataByte, aeskey, ivByte);
-//            if (null != resultByte && resultByte.length > 0) {
-//                newuserInfo = new String(resultByte, "UTF-8");
-//                System.out.println("解密完毕,解密结果为newuserInfo:"+ newuserInfo);
-//                JSONObject jsonObject = JSONObject.parseObject(newuserInfo);
-//            }else{
-//                throw new ServiceException("解密异常!");
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            throw new ServiceException("解密异常!检查解密数据！");
-//        }
         String[] arr = new String[] {WechatPayConfig.MESSAGE_TOKEN, timestamp, nonce};
         Arrays.sort(arr);
 
@@ -97,4 +83,20 @@ public class WeChatMessageServiceImpl implements WeChatMessageService{
         return s;
     }
 
+    @Override
+    public boolean sendWechatMessage(String miniOpenId, String templateId, String pagePath, Map<String, Object> map, String formId) {
+
+        Object accessTokenRedis = schedualRedisService.get("access_token");
+        String accessToken = "";
+        if(accessTokenRedis != null){
+            accessToken = accessTokenRedis.toString();
+        }else{
+            AccessToken accessTokenObj = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
+            accessToken = accessTokenObj.getToken();
+            schedualRedisService.set("access_token",accessToken,2*60*60L);
+        }
+        String message = SendMiniMessage.makeRouteMessage(miniOpenId, templateId, pagePath, map,formId);
+        boolean result = SendMiniMessage.sendTemplateMessage(accessToken, message);
+        return result;
+    }
 }

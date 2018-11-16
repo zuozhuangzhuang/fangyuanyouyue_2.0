@@ -6,6 +6,7 @@ import com.fangyuanyouyue.message.model.WeChatMessage;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Map;
 
 public interface WeChatMessageService {
     /**
@@ -14,4 +15,15 @@ public interface WeChatMessageService {
      * @return
      */
     String checkSignature(WeChatMessage message);
+
+    /**
+     * 发送微信模板消息
+     * @param miniOpenId
+     * @param templateId
+     * @param pagePath
+     * @param map
+     * @param formId
+     * @return
+     */
+    boolean sendWechatMessage(String miniOpenId, String templateId, String pagePath, Map<String,Object> map,String formId);
 }
