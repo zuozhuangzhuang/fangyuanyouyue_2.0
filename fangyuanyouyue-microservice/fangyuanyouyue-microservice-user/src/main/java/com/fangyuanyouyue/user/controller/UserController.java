@@ -58,6 +58,8 @@ public class UserController extends BaseController {
     private SchedualMessageService schedualMessageService;//message-service
     @Autowired
     private UserThirdService userThirdService;
+    @Autowired
+    private MiniMsgFormIdService miniMsgFormIdService;
 
 
 
@@ -69,7 +71,8 @@ public class UserController extends BaseController {
             @ApiImplicitParam(name = "headImgUrl", value = "头像图片路径", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "bgImgUrl", value = "背景图片路径", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "gender", value = "性别，1男 2女 0不确定", dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "regPlatform", value = "注册平台 1安卓 2iOS 3小程序", required = true, dataType = "int", paramType = "query",example = "1")
+            @ApiImplicitParam(name = "regPlatform", value = "注册平台 1安卓 2iOS 3小程序", required = true, dataType = "int", paramType = "query",example = "1"),
+            @ApiImplicitParam(name = "inviteCode", value = "邀请码", required = true, dataType = "int", paramType = "query",example = "1")
     })
     @PostMapping(value = "/regist")
     @ResponseBody
@@ -105,7 +108,7 @@ public class UserController extends BaseController {
             return toSuccess(userDto);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -159,7 +162,7 @@ public class UserController extends BaseController {
             return toSuccess(userDto);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -197,7 +200,7 @@ public class UserController extends BaseController {
             return toSuccess(userDto);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -240,11 +243,7 @@ public class UserController extends BaseController {
             return toSuccess(userDto);
         } catch (ServiceException e) {
             e.printStackTrace();
-            //如果可以合并账号，就返回 code = 2
-            if(e.getCode() != null){
-                return toError(e.getCode(),e.getMessage());
-            }
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -289,7 +288,7 @@ public class UserController extends BaseController {
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -358,7 +357,7 @@ public class UserController extends BaseController {
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -396,7 +395,7 @@ public class UserController extends BaseController {
             return toSuccess(mergeDto);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -425,7 +424,7 @@ public class UserController extends BaseController {
             return toSuccess("找回密码成功");
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -466,7 +465,7 @@ public class UserController extends BaseController {
             return toSuccess("修改密码成功");
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -516,7 +515,7 @@ public class UserController extends BaseController {
             return toSuccess(userDto);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -555,7 +554,7 @@ public class UserController extends BaseController {
             return toSuccess();
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -642,7 +641,7 @@ public class UserController extends BaseController {
             }
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -781,7 +780,7 @@ public class UserController extends BaseController {
             return toSuccess(shopDtos);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -806,7 +805,7 @@ public class UserController extends BaseController {
             return toSuccess(userDto);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -851,7 +850,7 @@ public class UserController extends BaseController {
             }
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -893,7 +892,7 @@ public class UserController extends BaseController {
             return toSuccess(fansDto);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -925,7 +924,7 @@ public class UserController extends BaseController {
             return toSuccess(waitProcessDto);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -965,7 +964,7 @@ public class UserController extends BaseController {
             return toSuccess(info);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -998,7 +997,7 @@ public class UserController extends BaseController {
             return toSuccess(userByName);
         } catch (ServiceException e) {
             e.printStackTrace();
-            return toError(e.getMessage());
+            return toError(e.getCode(),e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toError("系统繁忙，请稍后再试！");
@@ -1206,7 +1205,43 @@ public class UserController extends BaseController {
 
     }
 
-
+    @ApiOperation(value = "存储用户formId", notes = "（void）存储用户formId")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "formId", value = "表单提交码", required = true, dataType = "String", paramType = "query")
+    })
+    @PostMapping(value = "/addFormId")
+    @ResponseBody
+    public BaseResp addFormId(UserParam param) throws IOException {
+        try {
+            log.info("----》存储用户formId《----");
+            log.info("参数："+param.toString());
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError("用户token不能为空！");
+            }
+            UserInfo user=userInfoService.getUserByToken(param.getToken());
+            if(user==null){
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
+            }
+            if(user.getStatus() == 2){
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
+            }
+            if(StringUtils.isEmpty(param.getFormId())){
+                return toError("formId不能为空！");
+            }
+            if(param.getFormId().contains("mock")){
+                return toError("无效的formId！");
+            }
+            miniMsgFormIdService.addFormId(user.getId(),param.getFormId());
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getCode(),e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
     public static void main(String[] args) {
         //微信获取的code
         String code = "";

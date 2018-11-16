@@ -4,6 +4,8 @@ import com.fangyuanyouyue.wallet.service.SchedualMessageService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
+
 @Component
 @Transactional
 public class SchedualMessageServiceImpl implements SchedualMessageService {
@@ -24,7 +26,9 @@ public class SchedualMessageServiceImpl implements SchedualMessageService {
 	}
 
     @Override
-    public String wechatMessage(String userName, String content, String type, String businessId) {
+    public String wechatMessage(String miniOpenId,String templateId,
+                                String pagePath,Map<String,Object> map,
+                                String formId) {
         return "发送微信模板消息失败！";
     }
 }

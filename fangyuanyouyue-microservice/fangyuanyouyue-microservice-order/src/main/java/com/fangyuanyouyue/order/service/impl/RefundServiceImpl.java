@@ -1,10 +1,12 @@
 package com.fangyuanyouyue.order.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.Credit;
+import com.fangyuanyouyue.base.enums.MiniMsg;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
@@ -25,9 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service(value = "refundService")
 @Transactional(rollbackFor=Exception.class)
@@ -126,6 +126,45 @@ public class RefundServiceImpl implements RefundService{
                 }
                 schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
                         "您的"+(isAuction?"抢购":"商品")+goodsName+"买家已申请退货，点击此处处理一下吧",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER_SELLER.getMessage(),orderId.toString());
+
+                //发送微信消息
+                //formId
+                BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getFormId(orderInfo.getSellerId()));
+                if(baseResp !=null && !baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                }
+                if(baseResp.getData() != null){
+                    String formId = baseResp.getData().toString();
+                    //openId
+                    baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getOpenId(orderInfo.getSellerId()));
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                    }
+                    if(baseResp.getData() != null){
+                        String openId = baseResp.getData().toString();
+                        baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(orderInfo.getUserId()));
+                        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                            throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                        }
+                        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), UserInfo.class);
+                        Map<String,Object> map = new HashMap<>();
+                        map.put("keyword1",user.getNickName());
+                        map.put("keyword2",goodsName.toString());
+                        map.put("keyword3","￥"+orderInfo.getAmount());
+                        map.put("keyword4",DateUtil.getFormatDate(orderRefund.getAddTime(), DateUtil.DATE_FORMT));
+                        JSONArray jsonArray = JSONArray.parseArray(reason);
+                        StringBuffer content = new StringBuffer();
+                        for(int i=0;i<jsonArray.size();i++){
+                            JSONObject jsonObject = JSONObject.parseObject(jsonArray.get(i).toString());
+                            if(jsonObject.getString("type").equals("0")){
+                                content.append(jsonObject.getString("content"));
+                            }
+                        }
+                        map.put("keyword5",content.toString());
+
+                        schedualMessageService.wechatMessage(openId, MiniMsg.ORDER_REFUND.getTemplateId(),MiniMsg.ORDER_REFUND.getPagePath()+orderInfo.getId(),map,formId);
+                    }
+                }
             }else{
                 throw new ServiceException("订单无法退货！");
             }
@@ -204,19 +243,112 @@ public class RefundServiceImpl implements RefundService{
                 //给买家发信息
                 schedualMessageService.easemobMessage(orderInfo.getUserId().toString(),
                         "您对"+(isAuction?"抢购":"商品")+goodsName+"申请的退货卖家已同意，货款已退回您的余额。点击此处查看您的余额吧",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_WALLET.getMessage(),"");
+                //发送微信消息
+                //formId
+                baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getFormId(orderInfo.getUserId()));
+                if(baseResp !=null && !baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                }
+                if(baseResp.getData() != null){
+                    String formId = baseResp.getData().toString();
+                    //openId
+                    baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getOpenId(orderInfo.getUserId()));
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                    }
+                    if(baseResp.getData() != null){
+                        String openId = baseResp.getData().toString();
+                        Map<String,Object> map = new HashMap<>();
+                        map.put("keyword1",goodsName.toString());
+                        map.put("keyword2", orderInfo.getAmount()+"元");
+                        map.put("keyword3",DateUtil.getFormatDate(orderRefund.getEndTime(), DateUtil.DATE_FORMT));
+
+                        schedualMessageService.wechatMessage(openId, MiniMsg.REFUND_SUCCESS.getTemplateId(),MiniMsg.REFUND_SUCCESS.getPagePath(),map,formId);
+                    }
+                }
                 //给卖家发信息
                 schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
                         "买家申请退货的"+(isAuction?"抢购":"商品")+goodsName+"官方已同意，退款已退回买家余额。如有疑问可联系客服咨询详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),orderInfo.getId().toString());
+                //发送微信消息
+                //formId
+                baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getFormId(orderInfo.getSellerId()));
+                if(baseResp !=null && !baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                }
+                if(baseResp.getData() != null){
+                    String formId = baseResp.getData().toString();
+                    //openId
+                    baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getOpenId(orderInfo.getSellerId()));
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                    }
+                    if(baseResp.getData() != null){
+                        String openId = baseResp.getData().toString();
+                        Map<String,Object> map = new HashMap<>();
+                        map.put("keyword1",goodsName.toString());
+                        map.put("keyword2", orderInfo.getAmount()+"元");
+                        map.put("keyword3",DateUtil.getFormatDate(orderRefund.getEndTime(), DateUtil.DATE_FORMT));
+
+                        schedualMessageService.wechatMessage(openId, MiniMsg.REFUND_SUCCESS.getTemplateId(),MiniMsg.REFUND_SUCCESS.getPagePath(),map,formId);
+                    }
+                }
             }else{
                 //拒绝
                 //订单状态不变
                 //给买家发信息
                 schedualMessageService.easemobMessage(orderInfo.getUserId().toString(),
                         "很抱歉，您对"+(isAuction?"抢购":"商品")+goodsName+"申请的退货，官方已拒绝",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),orderInfo.getId().toString());
+                //发送微信消息
+                //formId
+                BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getFormId(orderInfo.getUserId()));
+                if(baseResp !=null && !baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                }
+                if(baseResp.getData() != null){
+                    String formId = baseResp.getData().toString();
+                    //openId
+                    baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getOpenId(orderInfo.getUserId()));
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                    }
+                    if(baseResp.getData() != null){
+                        String openId = baseResp.getData().toString();
+                        Map<String,Object> map = new HashMap<>();
+                        map.put("keyword1",goodsName.toString());
+                        map.put("keyword2", orderInfo.getAmount()+"元");
+                        map.put("keyword3", reason);
+                        map.put("keyword4",DateUtil.getFormatDate(orderRefund.getEndTime(), DateUtil.DATE_FORMT));
+
+                        schedualMessageService.wechatMessage(openId, MiniMsg.REFUND_FAILED.getTemplateId(),MiniMsg.REFUND_FAILED.getPagePath(),map,formId);
+                    }
+                }
                 //给卖家发信息
                 schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
-                        "买家申请退货的"+(isAuction?"抢购":"商品")+goodsName+"官方已拒绝，退款已退回买家余额。如有疑问可联系客服咨询详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),orderInfo.getId().toString());
+                        "买家申请退货的"+(isAuction?"抢购":"商品")+goodsName+"官方已拒绝，拒绝理由为："+reason+"。如有疑问可联系客服咨询详情",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),orderInfo.getId().toString());
+                //发送微信消息
+                //formId
+                baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getFormId(orderInfo.getSellerId()));
+                if(baseResp !=null && !baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                }
+                if(baseResp.getData() != null){
+                    String formId = baseResp.getData().toString();
+                    //openId
+                    baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getOpenId(orderInfo.getSellerId()));
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                    }
+                    if(baseResp.getData() != null){
+                        String openId = baseResp.getData().toString();
+                        Map<String,Object> map = new HashMap<>();
+                        map.put("keyword1",goodsName.toString());
+                        map.put("keyword2", orderInfo.getAmount()+"元");
+                        map.put("keyword3", reason);
+                        map.put("keyword4",DateUtil.getFormatDate(orderRefund.getEndTime(), DateUtil.DATE_FORMT));
 
+                        schedualMessageService.wechatMessage(openId, MiniMsg.REFUND_FAILED.getTemplateId(),MiniMsg.REFUND_FAILED.getPagePath(),map,formId);
+                    }
+                }
             }
             orderRefundMapper.updateByPrimaryKeySelective(orderRefund);
         }

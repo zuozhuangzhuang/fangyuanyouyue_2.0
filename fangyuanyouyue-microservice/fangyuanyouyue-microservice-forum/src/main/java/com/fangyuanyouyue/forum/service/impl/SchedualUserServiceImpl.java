@@ -40,4 +40,14 @@ public class SchedualUserServiceImpl implements SchedualUserService{
     public String isFans(Integer userId, Integer toUserId) {
         return "查看是否关注失败！";
     }
+
+    @Override
+    public String getFormId(Integer userId) {
+        return "获取用户formId失败";
+    }
+
+    @Override
+    public String getOpenId(Integer userId) {
+        return "获取用户openId失败";
+    }
 }

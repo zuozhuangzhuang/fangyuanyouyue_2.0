@@ -183,4 +183,7 @@ public class UserParam{
 
 	@ApiModelProperty(name = "vresion", value = "版本", dataType = "String",hidden = true)
 	private String version;//版本
+
+	@ApiModelProperty(name = "formId", value = "表单提交码", dataType = "String",hidden = true)
+	private String formId;//表单提交码
 }

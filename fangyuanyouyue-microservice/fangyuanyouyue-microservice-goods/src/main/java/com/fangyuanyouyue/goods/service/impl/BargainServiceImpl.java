@@ -508,16 +508,16 @@ public class BargainServiceImpl implements BargainService{
                     bargain.setStatus(Status.BARGAIN_CANCEL.getValue());
                     //退回余额
                     //调用wallet-service修改余额功能
-                    BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),Status.ADD.getValue()));
-                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
-                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
-                    }
+//                    BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.updateBalance(bargain.getUserId(), bargain.getPrice(),Status.ADD.getValue()));
+//                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+//                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+//                    }
                     updateBargain(userId,goodsId,bargain.getId(),Status.BARGAIN_CANCEL.getValue());
                     //买家新增余额账单
-                    baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(bargain.getUserId(),bargain.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),bargain.getBargainNo(),"【"+goodsInfo.getName()+"】",goodsInfo.getUserId(),bargain.getUserId(),Status.BARGAIN.getValue(),bargain.getBargainNo()));
-                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
-                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
-                    }
+//                    baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(bargain.getUserId(),bargain.getPrice(),Status.PAY_TYPE_BALANCE.getValue(),Status.REFUND.getValue(),bargain.getBargainNo(),"【"+goodsInfo.getName()+"】",goodsInfo.getUserId(),bargain.getUserId(),Status.BARGAIN.getValue(),bargain.getBargainNo()));
+//                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+//                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+//                    }
                 }
                 bargain.setIsDelete(Status.YES.getValue());//是否删除 1是 2否
                 goodsBargainMapper.updateByPrimaryKey(bargain);

@@ -1,12 +1,18 @@
 package com.fangyuanyouyue.forum.service.impl;
 
 import java.math.BigDecimal;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.codingapi.tx.annotation.TxTransaction;
+import com.fangyuanyouyue.base.enums.MiniMsg;
 import com.fangyuanyouyue.base.enums.ReCode;
+import com.fangyuanyouyue.base.util.DateUtil;
 import com.fangyuanyouyue.base.util.ParseReturnValue;
+import com.fangyuanyouyue.forum.model.UserInfo;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -166,6 +172,35 @@ public class TimerServiceImpl implements TimerService{
                     throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                 }
                 schedualMessageService.easemobMessage(forumColumn.getUserId().toString(),"您的专栏本日收益为"+amount+"元！已发放至您的余额，点击此处查看您的余额吧",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_WALLET.getMessage(),"");
+                //发送微信消息
+                //formId
+                baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getFormId(forumColumn.getUserId()));
+                if(baseResp !=null && !baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                }
+                if(baseResp.getData() != null){
+                    String formId = baseResp.getData().toString();
+                    //openId
+                    baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getOpenId(forumColumn.getUserId()));
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                    }
+                    if(baseResp.getData() != null){
+                        String openId = baseResp.getData().toString();
+                        baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(forumColumn.getUserId()));
+                        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                            throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                        }
+                        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), UserInfo.class);
+                        Map<String,Object> map = new HashMap<>();
+                        map.put("keyword1",user.getNickName());
+                        map.put("keyword2", forumColumn.getName());
+                        map.put("keyword3",amount+"元");
+                        map.put("keyword4",DateUtil.getFormatDate(new Date(), DateUtil.DATE_FORMT));
+
+                        schedualMessageService.wechatMessage(openId, MiniMsg.GET_BENEFIT.getTemplateId(),MiniMsg.GET_BENEFIT.getPagePath(),map,formId);
+                    }
+                }
             }
         }
     }

@@ -1,11 +1,10 @@
 package com.fangyuanyouyue.forum.service.impl;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import com.codingapi.tx.annotation.TxTransaction;
+import com.fangyuanyouyue.base.enums.MiniMsg;
 import com.fangyuanyouyue.base.util.ParseReturnValue;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -286,6 +285,41 @@ public class ForumColumnServiceImpl implements ForumColumnService {
 				}else{
 					throw new ServiceException("状态值错误！");
 				}
+				//发送微信消息
+				//openId
+				BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getFormId(forumColumnApply.getUserId()));
+				if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+					throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+				}
+				if(baseResp.getData() != null){
+                    String formId = baseResp.getData().toString();
+
+                    //formId
+                    baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getOpenId(forumColumnApply.getUserId()));
+                    if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                    }
+                    if(baseResp.getData() != null){
+
+                        String openId = baseResp.getData().toString();
+						String verifyUserById = schedualUserService.verifyUserById(forumColumnApply.getUserId());
+						baseResp = ParseReturnValue.getParseReturnValue(verifyUserById);
+						if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+							throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+						}
+                        UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), UserInfo.class);
+                        Map<String,Object> map = new HashMap<>();
+                        //名称
+                        map.put("keyword1",user.getNickName());
+                        //审核类别
+                        map.put("keyword2","专栏申请");
+                        //审核结果
+                        map.put("keyword3",status.equals(Status.YES.getValue())?"您的专栏申请已通过":"您的专栏申请未通过");
+                        //备注
+                        map.put("keyword4",status.equals(Status.YES.getValue())?"无":reason);
+                        schedualMessageService.wechatMessage(openId, MiniMsg.SYSTEM_MSG.getTemplateId(),MiniMsg.SYSTEM_MSG.getPagePath(),map,formId);
+                    }
+                }
 				forumColumnApply.setStatus(status);
 				forumColumnApplyMapper.updateByPrimaryKeySelective(forumColumnApply);
 			}
@@ -364,7 +398,6 @@ public class ForumColumnServiceImpl implements ForumColumnService {
         if(StringUtils.isNotEmpty(coverImgUrl)){
             forumColumn.setCoverImgUrl(coverImgUrl);
         }
-        forumColumn.setIsChosen(isChosen);
         forumColumnMapper.updateByPrimaryKey(forumColumn);
     }
 

@@ -1,10 +1,9 @@
 package com.fangyuanyouyue.order.service.impl;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
+import com.fangyuanyouyue.base.enums.*;
 import com.fangyuanyouyue.base.util.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +18,6 @@ import com.esotericsoftware.minlog.Log;
 import com.fangyuanyouyue.base.BaseResp;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.dto.WechatPayDto;
-import com.fangyuanyouyue.base.enums.Credit;
-import com.fangyuanyouyue.base.enums.NotifyUrl;
-import com.fangyuanyouyue.base.enums.ReCode;
-import com.fangyuanyouyue.base.enums.Score;
-import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.order.dao.CompanyMapper;
 import com.fangyuanyouyue.order.dao.OrderCommentMapper;
@@ -1209,8 +1203,38 @@ public class OrderServiceImpl implements OrderService{
                         //交易信息：恭喜您！您的抢购【xxx】已被买下，点击此处查看订单
                         schedualMessageService.easemobMessage(childOrder.getSellerId().toString(),
                                 "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER_SELLER.getMessage(),childOrder.getId().toString());
+
+                        //发送微信消息
+                        //formId
+                        BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getFormId(childOrder.getSellerId()));
+                        if(baseResp !=null && !baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                            throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                        }
+                        if(baseResp.getData() != null){
+                            String formId = baseResp.getData().toString();
+                            //openId
+                            baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getOpenId(childOrder.getSellerId()));
+                            if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                                throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                            }
+                            if(baseResp.getData() != null){
+                                String openId = baseResp.getData().toString();
+                                baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(childOrder.getUserId()));
+                                if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                                    throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                                }
+                                UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), UserInfo.class);
+                                Map<String,Object> map = new HashMap<>();
+                                map.put("keyword1",goodsName.toString());
+                                map.put("keyword2", pay.getPayAmount()+"元");
+                                map.put("keyword3",user.getNickName());
+                                map.put("keyword4",DateUtil.getFormatDate(childOrder.getAddTime(), DateUtil.DATE_FORMT));
+
+                                schedualMessageService.wechatMessage(openId, MiniMsg.ORDER_ADD.getTemplateId(),MiniMsg.ORDER_ADD.getPagePath()+pay.getOrderId(),map,formId);
+                            }
+                        }
                         //买家新增余额账单
-                        BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(childOrder.getUserId(),pay.getPayAmount(),payType,Status.EXPEND.getValue(),childOrder.getOrderNo(),goodsName.toString(),childOrder.getSellerId(),childOrder.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo));
+                        baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(childOrder.getUserId(),pay.getPayAmount(),payType,Status.EXPEND.getValue(),childOrder.getOrderNo(),goodsName.toString(),childOrder.getSellerId(),childOrder.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo));
                         if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                             throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                         }
@@ -1228,8 +1252,38 @@ public class OrderServiceImpl implements OrderService{
                     //交易信息：恭喜您！您的抢购【xxx】已被买下，点击此处查看订单
                     schedualMessageService.easemobMessage(orderInfo.getSellerId().toString(),
                             "恭喜您！您的"+(isAuction?"抢购":"商品")+goodsName+"已被买下，点击此处查看订单",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_ORDER_SELLER.getMessage(),orderInfo.getId().toString());
+
+                    //发送微信消息
+                    //formId
+                    BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getFormId(orderInfo.getSellerId()));
+                    if(baseResp !=null && !baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                        throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                    }
+                    if(baseResp.getData() != null){
+                        String formId = baseResp.getData().toString();
+                        //openId
+                        baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getOpenId(orderInfo.getSellerId()));
+                        if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                            throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                        }
+                        if(baseResp.getData() != null){
+                            String openId = baseResp.getData().toString();
+                            baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(orderInfo.getUserId()));
+                            if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
+                                throw new ServiceException(baseResp.getCode(),baseResp.getReport());
+                            }
+                            UserInfo user = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), UserInfo.class);
+                            Map<String,Object> map = new HashMap<>();
+                            map.put("keyword1",goodsName.toString());
+                            map.put("keyword2",orderPay.getPayAmount()+"元");
+                            map.put("keyword3",user.getNickName());
+                            map.put("keyword4",DateUtil.getFormatDate(orderInfo.getAddTime(), DateUtil.DATE_FORMT));
+
+                            schedualMessageService.wechatMessage(openId, MiniMsg.ORDER_ADD.getTemplateId(),MiniMsg.ORDER_ADD.getPagePath()+orderPay.getOrderId(),map,formId);
+                        }
+                    }
                     //买家新增余额账单
-                    BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(orderInfo.getUserId(),orderPay.getPayAmount(),payType,Status.EXPEND.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo));
+                    baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(orderInfo.getUserId(),orderPay.getPayAmount(),payType,Status.EXPEND.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo));
                     if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                     }
