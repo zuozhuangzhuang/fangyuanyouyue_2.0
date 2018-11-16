@@ -497,7 +497,7 @@ public class BargainServiceImpl implements BargainService{
     public void deleteBargain(Integer userId, Integer[] goodsIds) throws ServiceException {
         for(Integer goodsId:goodsIds){
             GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsId);
-            if(goodsInfo.getStatus().equals(Status.GOODS_IN_SALE.getValue())){
+            if(!goodsInfo.getStatus().equals(Status.GOODS_IN_SALE.getValue())){
                 throw new ServiceException("商品状态异常！");
             }
             //取消用户在所选商品的议价信息
