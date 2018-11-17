@@ -261,7 +261,7 @@ public class RefundServiceImpl implements RefundService{
                         String openId = baseResp.getData().toString();
                         Map<String,Object> map = new HashMap<>();
                         map.put("keyword1",goodsName.toString());
-                        map.put("keyword2", orderInfo.getAmount()+"元");
+                        map.put("keyword2", orderPay.getPayAmount()+"元");
                         map.put("keyword3",DateUtil.getFormatDate(orderRefund.getEndTime(), DateUtil.DATE_FORMT));
 
                         schedualMessageService.wechatMessage(openId, MiniMsg.REFUND_SUCCESS.getTemplateId(),MiniMsg.REFUND_SUCCESS.getPagePath(),map,formId);
@@ -287,7 +287,7 @@ public class RefundServiceImpl implements RefundService{
                         String openId = baseResp.getData().toString();
                         Map<String,Object> map = new HashMap<>();
                         map.put("keyword1",goodsName.toString());
-                        map.put("keyword2", orderInfo.getAmount()+"元");
+                        map.put("keyword2", orderPay.getPayAmount()+"元");
                         map.put("keyword3",DateUtil.getFormatDate(orderRefund.getEndTime(), DateUtil.DATE_FORMT));
 
                         schedualMessageService.wechatMessage(openId, MiniMsg.REFUND_SUCCESS.getTemplateId(),MiniMsg.REFUND_SUCCESS.getPagePath(),map,formId);
@@ -316,7 +316,7 @@ public class RefundServiceImpl implements RefundService{
                         String openId = baseResp.getData().toString();
                         Map<String,Object> map = new HashMap<>();
                         map.put("keyword1",goodsName.toString());
-                        map.put("keyword2", orderInfo.getAmount()+"元");
+                        map.put("keyword2", orderPay.getPayAmount()+"元");
                         map.put("keyword3", reason);
                         map.put("keyword4",DateUtil.getFormatDate(orderRefund.getEndTime(), DateUtil.DATE_FORMT));
 
@@ -343,7 +343,7 @@ public class RefundServiceImpl implements RefundService{
                         String openId = baseResp.getData().toString();
                         Map<String,Object> map = new HashMap<>();
                         map.put("keyword1",goodsName.toString());
-                        map.put("keyword2", orderInfo.getAmount()+"元");
+                        map.put("keyword2", orderPay.getPayAmount()+"元");
                         map.put("keyword3", reason);
                         map.put("keyword4",DateUtil.getFormatDate(orderRefund.getEndTime(), DateUtil.DATE_FORMT));
 

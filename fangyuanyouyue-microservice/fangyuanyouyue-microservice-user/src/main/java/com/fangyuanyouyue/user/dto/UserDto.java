@@ -70,6 +70,8 @@ public class UserDto {
 
     private Integer isHasColumn = 2;//拥有专栏状态 1已拥有专栏 2未拥有、未申请专栏 3拥有申请中专栏
 
+    //用户邀请码
+    private String inviteCode;
 
     public UserDto() {
     }

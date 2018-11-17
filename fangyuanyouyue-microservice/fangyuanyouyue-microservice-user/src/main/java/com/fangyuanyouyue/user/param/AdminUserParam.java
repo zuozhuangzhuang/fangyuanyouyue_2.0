@@ -74,4 +74,10 @@ public class AdminUserParam extends BasePageReq{
 	@ApiModelProperty(name = "code", value = "代理识别号", dataType = "String",hidden = true)
 	private String code;
 
+	//规则内容
+	@ApiModelProperty(name = "ruleContent", value = "规则内容", dataType = "String",hidden = true)
+	private String ruleContent;
+	//规则类型 1邀请规则
+	@ApiModelProperty(name = "ruleType", value = "规则类型", dataType = "Integer",hidden = true)
+	private Integer ruleType;
 }
