@@ -7,6 +7,7 @@ import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.user.dto.*;
 import com.fangyuanyouyue.user.model.UserInfo;
 import com.fangyuanyouyue.user.model.UserInfoExt;
+import com.fangyuanyouyue.user.model.UserInvite;
 import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.param.UserParam;
 
@@ -214,4 +215,17 @@ public interface UserInfoService {
 
     public void updateUserInfo(AdminUserParam param) throws ServiceException;
 
+    /**
+     * 获取用户邀请信息
+     * @param userId
+     * @return
+     * @throws ServiceException
+     */
+    UserInviteDto getUserInviteInfo(Integer userId) throws ServiceException;
+
+    /**
+     * 给所有用户增加邀请码
+     * @throws ServiceException
+     */
+    void addUserCode() throws ServiceException;
 }

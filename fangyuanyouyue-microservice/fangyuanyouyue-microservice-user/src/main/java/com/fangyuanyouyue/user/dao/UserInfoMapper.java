@@ -115,4 +115,9 @@ public interface UserInfoMapper {
      */
     List<UserInfo> getConfinedUserPage(@Param("start") Integer start,@Param("limit") Integer limit,@Param("keyword")String keyword,@Param("status")Integer status,@Param("startDate")String startDate,@Param("endDate")String endDate,@Param("orders")String orders,@Param("ascType")Integer ascType);
 
+    /**
+     * 获取所有用户
+     * @return
+     */
+    List<UserInfo> findAllUser();
 }
