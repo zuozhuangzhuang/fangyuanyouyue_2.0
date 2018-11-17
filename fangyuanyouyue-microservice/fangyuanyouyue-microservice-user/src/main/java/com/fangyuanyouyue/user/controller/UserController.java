@@ -60,6 +60,8 @@ public class UserController extends BaseController {
     private UserThirdService userThirdService;
     @Autowired
     private MiniMsgFormIdService miniMsgFormIdService;
+    @Autowired
+    private RuleService ruleService;
 
 
 
@@ -72,7 +74,7 @@ public class UserController extends BaseController {
             @ApiImplicitParam(name = "bgImgUrl", value = "背景图片路径", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "gender", value = "性别，1男 2女 0不确定", dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "regPlatform", value = "注册平台 1安卓 2iOS 3小程序", required = true, dataType = "int", paramType = "query",example = "1"),
-            @ApiImplicitParam(name = "inviteCode", value = "邀请码", required = true, dataType = "int", paramType = "query",example = "1")
+            @ApiImplicitParam(name = "inviteCode", value = "邀请码", required = false, dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/regist")
     @ResponseBody
@@ -310,7 +312,8 @@ public class UserController extends BaseController {
             @ApiImplicitParam(name = "identity", value = "身份证号码", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "name", value = "真实姓名", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "payPwd", value = "支付密码，md5加密，32位小写字母", dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "loginPwd", value = "登录密码，md5加密，32位小写字母", dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "loginPwd", value = "登录密码，md5加密，32位小写字母", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "inviteCode", value = "邀请码", required = false, dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/modify")
     @ResponseBody
@@ -330,7 +333,7 @@ public class UserController extends BaseController {
             }
             //手机号不可以重复
             if(StringUtils.isNotEmpty(param.getPhone())){
-                //三方用户未绑定手机，手机用户未绑定次type三方时可以选择合并用户，需要验证手机号
+                //三方用户未绑定手机，手机用户未绑定此type三方时可以选择合并用户，需要验证手机号
                 UserInfo userByPhone = userInfoService.getUserByPhone(param.getPhone());
                 if(userByPhone != null){
                     MergeDto mergeDto = userThirdService.judgeMerge(param.getToken(), null, param.getPhone(),null);
@@ -703,11 +706,11 @@ public class UserController extends BaseController {
 
             }
             //调用短信系统发送短信
-            JSONObject jsonObject = JSONObject.parseObject(schedualMessageService.sendCode(param.getPhone(),param.getType()));
-            String code = jsonObject.getString("data");
+//            JSONObject jsonObject = JSONObject.parseObject(schedualMessageService.sendCode(param.getPhone(),param.getType()));
+//            String code = jsonObject.getString("data");
 //            TODO 开发期间固定1234
-//            String code = "1234";
-//            log.info("code---:"+code);
+            String code = "1234";
+            log.info("code---:"+code);
 
             boolean result = schedualRedisService.set(param.getPhone(), code, 600l);
             log.info("缓存结果："+result);
@@ -1242,6 +1245,79 @@ public class UserController extends BaseController {
             return toError("系统繁忙，请稍后再试！");
         }
     }
+
+    @ApiOperation(value = "获取用户邀请信息", notes = "（UserInviteDto）获取用户邀请信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query")
+    })
+    @PostMapping(value = "/getUserInviteInfo")
+    @ResponseBody
+    public BaseResp getUserInviteInfo(UserParam param){
+        try {
+            log.info("----》获取用户邀请信息《----");
+            log.info("参数："+param.toString());
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError("用户token不能为空！");
+            }
+            UserInfo user=userInfoService.getUserByToken(param.getToken());
+            if(user==null){
+                return toError(ReCode.LOGIN_TIME_OUT.getValue(),ReCode.LOGIN_TIME_OUT.getMessage());
+            }
+            if(user.getStatus() == 2){
+                return toError(ReCode.FROZEN.getValue(),ReCode.FROZEN.getMessage());
+            }
+            UserInviteDto userInviteInfo = userInfoService.getUserInviteInfo(user.getId());
+            return toSuccess(userInviteInfo);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getCode(),e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "获取邀请规则信息", notes = "（RuleDto）获取邀请规则信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "ruleType", value = "规则类型 1邀请规则 2xx规则", required = true, dataType = "int", paramType = "query")
+    })
+    @GetMapping(value = "/getInviteRule")
+    @ResponseBody
+    public BaseResp getInviteRule(UserParam param){
+        try {
+            log.info("----》获取邀请规则信息《----");
+            log.info("参数："+param.toString());
+            if(param.getRuleType() == null){
+                return toError("规则类型不能为空！");
+            }
+            RuleDto inviteRule = ruleService.getInviteRule(param.getRuleType());
+            return toSuccess(inviteRule);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getCode(),e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "给所有用户增加邀请码", notes = "（void）给所有用户增加邀请码")
+    @GetMapping(value = "/addUserCode")
+    @ResponseBody
+    public BaseResp addUserCode(){
+        try {
+            log.info("----》给所有用户增加邀请码《----");
+            userInfoService.addUserCode();
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getCode(),e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
     public static void main(String[] args) {
         //微信获取的code
         String code = "";

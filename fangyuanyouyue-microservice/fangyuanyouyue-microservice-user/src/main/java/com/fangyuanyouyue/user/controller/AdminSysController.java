@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.fangyuanyouyue.user.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +32,6 @@ import com.fangyuanyouyue.user.param.AdminMenuParam;
 import com.fangyuanyouyue.user.param.AdminOperatorParam;
 import com.fangyuanyouyue.user.param.AdminRoleParam;
 import com.fangyuanyouyue.user.param.AdminUserParam;
-import com.fangyuanyouyue.user.service.SysMenuService;
-import com.fangyuanyouyue.user.service.SysOperatorService;
-import com.fangyuanyouyue.user.service.SysRoleService;
-import com.fangyuanyouyue.user.service.SystemService;
-import com.fangyuanyouyue.user.service.UserInfoService;
-import com.fangyuanyouyue.user.service.VersionService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -61,6 +56,8 @@ public class AdminSysController extends BaseController {
     private SysRoleService sysRoleService;
     @Autowired
     private SysOperatorService sysOperatorService;
+    @Autowired
+    private RuleService ruleService;
 
 
 
@@ -526,6 +523,110 @@ public class AdminSysController extends BaseController {
             
             sysOperatorService.saveOperator(param);            
     		
+            return toSuccess();
+        }catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统错误！");
+        }
+    }
+
+    @ApiOperation(value = "规则列表", notes = "规则列表",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "ruleType", value = "规则类型 1邀请规则", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "keyword", value = "搜索词条", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "startDate", value = "开始日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "endDate", value = "结束日期", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orders", value = "排序规则", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "ascType", value = "排序类型 1升序 2降序", required = false, dataType = "int", paramType = "query")
+    })
+    @GetMapping(value = "/ruleList")
+    @ResponseBody
+    public BaseResp ruleList(AdminUserParam param) throws IOException {
+        try {
+            log.info("后台管理查看规则列表");
+            log.info("参数："+param.toString());
+            if(param.getStart() == null || param.getStart() < 0){
+                return toError("起始页数错误！");
+            }
+            if(param.getLimit() == null || param.getLimit() < 1){
+                return toError("每页个数错误！");
+            }
+            Pager pager = ruleService.getPage(param);
+            return toPage(pager);
+        }catch (Exception e) {
+            e.printStackTrace();
+            return toError(ReCode.FAILD.getValue(),"系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "新增规则", notes = "新增规则",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "ruleContent", value = "规则内容", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "ruleType", value = "规则类型 1邀请规则", required = true, dataType = "String", paramType = "query")
+    })
+    @PostMapping(value = "/addRule")
+    @ResponseBody
+    public Object addRule(AdminOperatorParam param) throws IOException {
+        try {
+            log.info("----》新增规则《----");
+            log.info("参数："+param.toString());
+            if(param.getRuleType() == null){
+                return toError("规则类型不能为空！");
+            }
+            if(StringUtils.isEmpty(param.getRuleContent())){
+                return toError("规则内容不能为空！");
+            }
+            ruleService.addRule(param.getRuleContent(),param.getRuleType());
+
+            return toSuccess();
+        }catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统错误！");
+        }
+    }
+    @ApiOperation(value = "修改规则", notes = "修改规则",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "规则id", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "ruleContent", value = "规则内容", required = true, dataType = "String", paramType = "query")
+    })
+    @PostMapping(value = "/updateRule")
+    @ResponseBody
+    public Object updateRule(AdminOperatorParam param) throws IOException {
+        try {
+            log.info("----》修改规则《----");
+            log.info("参数："+param.toString());
+            if(param.getId() == null){
+                return toError("规则id不能为空！");
+            }
+            if(StringUtils.isEmpty(param.getRuleContent())){
+                return toError("修改内容不能为空！");
+            }
+            ruleService.updateRule(param.getId(),param.getRuleContent());
+
+            return toSuccess();
+        }catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统错误！");
+        }
+    }
+
+    @ApiOperation(value = "删除规则", notes = "删除规则",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "规则id", required = true, dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/deleteRule")
+    @ResponseBody
+    public Object deleteRule(AdminOperatorParam param) throws IOException {
+        try {
+            log.info("----》删除规则《----");
+            log.info("参数："+param.toString());
+            if(param.getId() == null){
+                return toError("规则id不能为空！");
+            }
+            ruleService.deleteRule(param.getId());
+
             return toSuccess();
         }catch (Exception e) {
             e.printStackTrace();

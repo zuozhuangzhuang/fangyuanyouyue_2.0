@@ -7,11 +7,11 @@ import java.util.Map;
 
 import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.BaseResp;
-import com.fangyuanyouyue.base.util.DateUtil;
-import com.fangyuanyouyue.base.util.ParseReturnValue;
+import com.fangyuanyouyue.base.util.*;
 import com.fangyuanyouyue.user.dao.*;
 import com.fangyuanyouyue.user.dto.*;
 import com.fangyuanyouyue.user.model.*;
+import org.apache.catalina.User;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +25,6 @@ import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.base.util.DateStampUtils;
-import com.fangyuanyouyue.base.util.MD5Util;
 import com.fangyuanyouyue.user.constant.StatusEnum;
 import com.fangyuanyouyue.user.dto.admin.AdminUserDto;
 import com.fangyuanyouyue.user.dto.admin.AdminUserNickNameDetailDto;
@@ -85,6 +83,10 @@ public class UserInfoServiceImpl implements UserInfoService {
     private UserAuthApplyMapper userAuthApplyMapper;
     @Autowired
     private GoodsInfoMapper goodsInfoMapper;
+    @Autowired
+    private UserInviteMapper userInviteMapper;
+    @Autowired
+    private InviteCodeMapper inviteCodeMapper;
 
     @Override
     public UserInfo getUserByToken(String token) throws ServiceException {
@@ -183,11 +185,56 @@ public class UserInfoServiceImpl implements UserInfoService {
         userWallet.setAddTime(DateStampUtils.getTimesteamp());
         userWallet.setAppraisalCount(1);//普通用户只有1次免费鉴定
         userWalletMapper.insert(userWallet);
+        //生成邀请码
+        addInviteCode(user.getId());
+        //TODO 根据邀请码下发奖励
+        if(StringUtils.isNotEmpty(param.getInviteCode())){
+            setUserInvite(user.getId(),param.getInviteCode());
+        }
         //初始化用户钱包
         UserDto userDto = setUserDtoByInfo(token,user);
         //新增优惠券 两张:1 剩下的各一张:23456
         registSaveUserCoupon(user.getId());
         return userDto;
+    }
+
+    /**
+     * 根据邀请码新增用户邀请信息
+     * @param userId
+     * @param inviteCode
+     * @throws ServiceException
+     */
+    void setUserInvite(Integer userId,String inviteCode) throws ServiceException{
+        //新增邀请信息
+        InviteCode userByCode = inviteCodeMapper.getUserByCode(inviteCode);
+        if(userByCode == null){
+            throw new ServiceException("错误的邀请码！");
+        }
+        UserInvite userInvite = new UserInvite();
+        userInvite.setUserId(userByCode.getUserId());
+        userInvite.setUserInviteCode(inviteCode);
+        userInvite.setInviteUserId(userId);
+        userInvite.setAddTime(DateStampUtils.getTimesteamp());
+        userInviteMapper.insert(userInvite);
+        //TODO 发放奖励
+
+    }
+
+    /**
+     * 生成邀请码
+     * @param userId
+     * @throws ServiceException
+     */
+    void addInviteCode(Integer userId) throws ServiceException{
+        InviteCode inviteCode = new InviteCode();
+        inviteCode.setUserId(userId);
+        String code = CheckCode.getProxyCode();
+        while(inviteCodeMapper.getUserByCode(code) != null){
+            code = CheckCode.getProxyCode();
+        }
+        inviteCode.setUserCode(code);
+        inviteCode.setAddTime(DateStampUtils.getTimesteamp());
+        inviteCodeMapper.insert(inviteCode);
     }
 
     /**
@@ -323,9 +370,11 @@ public class UserInfoServiceImpl implements UserInfoService {
             userWallet.setAddTime(DateStampUtils.getTimesteamp());
             userWallet.setAppraisalCount(1);//普通用户只有1次免费鉴定
             userWalletMapper.insert(userWallet);
-            UserDto userDto = setUserDtoByInfo(token,user);
             //送优惠券
             registSaveUserCoupon(user.getId());
+            //生成邀请码
+            addInviteCode(user.getId());
+            UserDto userDto = setUserDtoByInfo(token,user);
             return userDto;
         }else{
             //记录用户登录时间，登录平台，最后一次登录
@@ -408,12 +457,21 @@ public class UserInfoServiceImpl implements UserInfoService {
         }else{
             //用户信息
             if(StringUtils.isNotEmpty(param.getPhone())){
+                if(StringUtils.isNotEmpty(userInfo.getPhone())){
+                    throw new ServiceException("用户已绑定手机号！");
+                }
                 if(StringUtils.isEmpty(userInfo.getLoginPwd()) && StringUtils.isEmpty(param.getLoginPwd())){
                     throw new ServiceException("登录密码不能为空！");
                 }
                 userInfo.setPhone(param.getPhone());
                 if(StringUtils.isNotEmpty(param.getLoginPwd())){
                     userInfo.setLoginPwd(MD5Util.generate(MD5Util.MD5(param.getLoginPwd())));
+                }
+                if(StringUtils.isNotEmpty(param.getInviteCode())){
+                    //TODO 根据邀请码下发奖励
+                    if(StringUtils.isNotEmpty(param.getInviteCode())){
+                        setUserInvite(userInfo.getId(),param.getInviteCode());
+                    }
                 }
             }
             if(StringUtils.isNotEmpty(param.getEmail())){
@@ -532,6 +590,8 @@ public class UserInfoServiceImpl implements UserInfoService {
                 userDto.setCollectCount(userFansMapper.collectCount(user.getId()));
             }
             userDto.setIsHasColumn(JSONObject.parseObject(schedualForumService.isHasColumn(user.getId())).getIntValue("data"));
+            InviteCode inviteCode = inviteCodeMapper.selectUserCodeByUserId(user.getId());
+            userDto.setInviteCode(inviteCode.getUserCode());
             return userDto;
         }
     }
@@ -620,8 +680,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             userWallet.setAppraisalCount(1);//普通用户只有1次免费鉴定
             userWalletMapper.insert(userWallet);
             UserDto userDto = setUserDtoByInfo(token,user);
-            //送优惠券
-            registSaveUserCoupon(user.getId());
+            addInviteCode(user.getId());
             return userDto;
         }else{
             UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userThirdParty.getUserId());
@@ -911,5 +970,38 @@ public class UserInfoServiceImpl implements UserInfoService {
         userInfoMapper.updateByPrimaryKeySelective(userInfo);
         userInfoExtMapper.updateByPrimaryKeySelective(userInfoExt);
     }
-    
+
+    @Override
+    public UserInviteDto getUserInviteInfo(Integer userId) throws ServiceException {
+        InviteCode inviteCode = inviteCodeMapper.selectUserCodeByUserId(userId);
+        List<UserInvite> userInvites = userInviteMapper.selectUserInviteById(userId);
+
+        UserInviteDto userInviteDto = new UserInviteDto();
+        userInviteDto.setInviteCode(inviteCode.getUserCode());
+        userInviteDto.setInviteCount(userInvites.size());
+        //TODO 奖励内容
+        userInviteDto.setInviteAward("奖励内容");
+        return userInviteDto;
+    }
+
+    @Override
+    public void addUserCode() throws ServiceException {
+        List<UserInfo> allUser = userInfoMapper.findAllUser();
+        for(UserInfo userInfo:allUser){
+             InviteCode inviteCode = inviteCodeMapper.selectUserCodeByUserId(userInfo.getId());
+            if(inviteCode != null){
+                continue;
+            }else{
+                inviteCode = new InviteCode();
+                inviteCode.setAddTime(DateStampUtils.getTimesteamp());
+                String code = CheckCode.getProxyCode();
+                while(inviteCodeMapper.getUserByCode(code) != null){
+                    code = CheckCode.getProxyCode();
+                }
+                inviteCode.setUserCode(code);
+                inviteCode.setUserId(userInfo.getId());
+                inviteCodeMapper.insert(inviteCode);
+            }
+        }
+    }
 }

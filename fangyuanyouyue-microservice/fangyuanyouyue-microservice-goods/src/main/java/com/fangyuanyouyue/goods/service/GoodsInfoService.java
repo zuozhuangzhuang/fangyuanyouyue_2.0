@@ -195,6 +195,9 @@ public interface GoodsInfoService {
 //    Integer processMonthGoods()throws ServiceException;
     
 	List<GoodsCategory> getCategory();
+	
+
+	List<GoodsCategory> getCategoryByParent(Integer parentId);
 
     /**
      * 商品置顶下单
