@@ -709,6 +709,10 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             AdminGoodsDto goodsDto = new AdminGoodsDto(goodsInfo);
 
             List<GoodsImg> goodsImgs = goodsImgMapper.getImgsByGoodsId(goodsInfo.getId());
+            
+            List<GoodsCorrelation> goodsCorrelations = goodsCorrelationMapper.getCorrelationsByGoodsId(goodsInfo.getId());
+            
+            goodsDto.setGoodsCorrelations(GoodsCorrelationDto.toDtoList(goodsCorrelations));
 //            String mainImgUrl = null;
 //            for(GoodsImg goodsImg:goodsImgs){
 //                if(goodsImg.getType() == 1){
@@ -899,6 +903,14 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
 	}
 
 
+
+
+	@Override
+	public List<GoodsCategory> getCategoryByParent(Integer parentId) {
+		return goodsCategoryMapper.getChildCategoryList(parentId);
+	}
+
+	
 
     @Override
     @Transactional(rollbackFor=Exception.class)
