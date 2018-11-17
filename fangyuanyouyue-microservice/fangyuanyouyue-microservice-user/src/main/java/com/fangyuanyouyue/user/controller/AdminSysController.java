@@ -62,6 +62,8 @@ public class AdminSysController extends BaseController {
     private SysRoleService sysRoleService;
     @Autowired
     private SysOperatorService sysOperatorService;
+    @Autowired
+    private RuleService ruleService;
 
 
 
