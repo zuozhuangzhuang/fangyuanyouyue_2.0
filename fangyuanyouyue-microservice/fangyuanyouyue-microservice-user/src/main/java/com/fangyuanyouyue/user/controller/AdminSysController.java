@@ -533,6 +533,29 @@ public class AdminSysController extends BaseController {
         }
     }
 
+    
+
+
+    @ApiOperation(value = "删除操作员", notes = "删除操作员",response = BaseResp.class)
+    @ApiImplicitParams({
+    })
+    @PostMapping(value = "/operatorDelete")
+    @ResponseBody
+    public BaseResp operatorDelete(AdminUserParam param) throws IOException {
+        try {
+            log.info("----》删除操作员《----");
+            log.info("参数："+param.toString());
+            
+            sysOperatorService.deleteOperator(param.getId());
+            
+            return toSuccess();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统错误！");
+        }
+    }
+    
+    
 
     
     
