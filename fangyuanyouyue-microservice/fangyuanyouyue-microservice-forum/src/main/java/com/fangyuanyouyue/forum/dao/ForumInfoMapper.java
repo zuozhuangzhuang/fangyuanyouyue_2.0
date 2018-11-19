@@ -25,9 +25,33 @@ public interface ForumInfoMapper {
 
     int updateByPrimaryKey(ForumInfo record);
 
+    /**
+     * 获取帖子列表
+     * @param columnId
+     * @param userId
+     * @param type
+     * @param keyword
+     * @param start
+     * @param limit
+     * @param searchType
+     * @return
+     */
     List<ForumInfo> selectList(@Param("columnId")Integer columnId,@Param("userId")Integer userId,@Param("type")Integer type,
                                @Param("keyword")String keyword,@Param("start")Integer start,@Param("limit")Integer limit,@Param("searchType")Integer searchType);
 
+    /**
+     * 获取古物圈子列表
+     * @param columnId
+     * @param userId
+     * @param type
+     * @param keyword
+     * @param start
+     * @param limit
+     * @param searchType
+     * @return
+     */
+    List<ForumInfo> selectCircleList(@Param("columnId")Integer columnId,@Param("userId")Integer userId,@Param("type")Integer type,
+                                     @Param("keyword")String keyword,@Param("start")Integer start,@Param("limit")Integer limit,@Param("searchType")Integer searchType);
     /**
      * 获取用户收藏的视频列表
      * @param userId
