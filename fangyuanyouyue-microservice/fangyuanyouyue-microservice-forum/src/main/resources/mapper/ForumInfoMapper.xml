@@ -288,13 +288,13 @@
     <if test="keyword != null">
       AND (a.title like "%"#{keyword}"%" or a.content like "%"#{keyword}"%")
     </if>
-    AND ((a.pv_count + (select count(*) from forum_pv where forum_id = a.id)) >= 1000)
     ORDER BY
     a.sort,
     a.comment_time DESC,
     a.update_time DESC
     LIMIT #{start},#{limit};
   </select>
+  
   <select id="selectList" resultMap="BaseResultMap">
     select
     a.*,b.nick_name,b.head_img_url
