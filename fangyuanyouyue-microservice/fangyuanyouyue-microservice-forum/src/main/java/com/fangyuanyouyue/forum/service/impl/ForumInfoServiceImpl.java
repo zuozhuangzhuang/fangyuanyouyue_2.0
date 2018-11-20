@@ -118,7 +118,11 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 		List<ForumInfo> list;
 		if(listType.intValue() == 1){
 			//普通列表，需要判断是否点赞/收藏
-			list = forumInfoMapper.selectList(columnId,userId,type,keyword, start*limit, limit,searchType);
+			if(searchType != null && searchType == 1){
+				list = forumInfoMapper.selectCircleList(columnId,userId,type,keyword, start*limit, limit,searchType);
+			}else{
+				list = forumInfoMapper.selectList(columnId,userId,type,keyword, start*limit, limit,searchType);
+			}
 		}else if(listType.intValue() == 2){
 //			if(userId == null){
 //				throw new ServiceException("用户信息为空！");
