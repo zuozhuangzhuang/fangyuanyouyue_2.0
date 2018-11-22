@@ -3,5 +3,5 @@ VOLUME /tmp
 ADD fangyuanyouyue-microservice-timer-1.0-SNAPSHOT.jar fangyuanyouyue-microservice-timer.jar
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/fangyuanyouyue-microservice-timer.jar"]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-Xmx256m","-jar","/fangyuanyouyue-microservice-timer.jar"]
 #EXPOSE 8761
