@@ -560,7 +560,6 @@ public class AdminSysController extends BaseController {
 
 
 
-    @ApiOperation(value = "规则列表", notes = "规则列表",response = BaseResp.class)
     @ApiOperation(value = "规则文案列表", notes = "规则文案列表",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "ruleType", value = "规则类型 1邀请规则", required = false, dataType = "int", paramType = "query"),
