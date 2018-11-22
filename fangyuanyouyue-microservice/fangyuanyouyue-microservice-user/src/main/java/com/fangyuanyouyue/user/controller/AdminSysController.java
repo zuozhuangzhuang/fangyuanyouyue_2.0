@@ -32,6 +32,12 @@ import com.fangyuanyouyue.user.param.AdminMenuParam;
 import com.fangyuanyouyue.user.param.AdminOperatorParam;
 import com.fangyuanyouyue.user.param.AdminRoleParam;
 import com.fangyuanyouyue.user.param.AdminUserParam;
+import com.fangyuanyouyue.user.service.SysMenuService;
+import com.fangyuanyouyue.user.service.SysOperatorService;
+import com.fangyuanyouyue.user.service.SysRoleService;
+import com.fangyuanyouyue.user.service.SystemService;
+import com.fangyuanyouyue.user.service.UserInfoService;
+import com.fangyuanyouyue.user.service.VersionService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -530,6 +536,31 @@ public class AdminSysController extends BaseController {
         }
     }
 
+
+
+
+    @ApiOperation(value = "删除操作员", notes = "删除操作员",response = BaseResp.class)
+    @ApiImplicitParams({
+    })
+    @PostMapping(value = "/operatorDelete")
+    @ResponseBody
+    public BaseResp operatorDelete(AdminUserParam param) throws IOException {
+        try {
+            log.info("----》删除操作员《----");
+            log.info("参数："+param.toString());
+
+            sysOperatorService.deleteOperator(param.getId());
+
+            return toSuccess();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统错误！");
+        }
+    }
+
+
+
+    @ApiOperation(value = "规则列表", notes = "规则列表",response = BaseResp.class)
     @ApiOperation(value = "规则文案列表", notes = "规则文案列表",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "ruleType", value = "规则类型 1邀请规则", required = false, dataType = "int", paramType = "query"),
