@@ -606,11 +606,11 @@ public class UserController extends BaseController {
                 if(StringUtils.isEmpty(unionid)){
                     //获取不到unionId，根据算法解密得到unionID
                     // 被加密的数据
-                    byte[] dataByte = Base64.decodeBase64(weChatSession.getEncryptedData());
+                    byte[] dataByte = Base64.decodeBase64(param.getEncryptedData());
                     // 加密秘钥
                     byte[] aeskey = Base64.decodeBase64(session_key);
                     // 偏移量
-                    byte[] ivByte = Base64.decodeBase64(weChatSession.getIv());
+                    byte[] ivByte = Base64.decodeBase64(param.getIv());
                     String newuserInfo;
                     try {
                         //AES解密
@@ -620,7 +620,7 @@ public class UserController extends BaseController {
                             newuserInfo = new String(resultByte, "UTF-8");
                             log.info("解密完毕,解密结果为newuserInfo:"+ newuserInfo);
                             JSONObject jsonObject = JSONObject.parseObject(newuserInfo);
-                            unionid = jsonObject.getString("unionid");
+                            unionid = jsonObject.getString("unionId");
                             param.setUnionId(unionid);
                             UserDto userDto = userInfoService.miniLogin(param,openid,session_key);
                             return toSuccess(userDto);
@@ -1276,7 +1276,7 @@ public class UserController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "获取邀请规则信息", notes = "（RuleDto）获取邀请规则信息")
+    @ApiOperation(value = "获取邀请规则信息", notes = "（SysPropertyDto）获取邀请规则信息")
     @ApiImplicitParams({
 //            @ApiImplicitParam(name = "ruleKey", value = "规则标识码", required = true, dataType = "int", paramType = "query")
     })
@@ -1317,13 +1317,36 @@ public class UserController extends BaseController {
         }
     }
 
+    @ApiOperation(value = "验证邀请码是否存在", notes = "（void）验证邀请码是否存在")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "inviteCode", value = "邀请码", required = true, dataType = "String", paramType = "query")
+    })
+    @GetMapping(value = "/verifyInviteCode")
+    @ResponseBody
+    public BaseResp verifyInviteCode(UserParam param){
+        try {
+            log.info("----》验证邀请码是否存在《----");
+            if(StringUtils.isEmpty(param.getInviteCode())){
+                return toError("邀请码不能为空！");
+            }
+            userInfoService.verifyInviteCode(param.getInviteCode());
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getCode(),e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
     public static void main(String[] args) {
         //微信获取的code
-        String code = "";
+        String code = "033tlrFb1a4gLu0RCVGb1OYhFb1tlrF8";
         //包括敏感数据在内的完整用户信息的加密数据
-        String encryptedData = "";
+        String encryptedData = "P6rz9DRWkVxxT1rRaePY+e7J5aeV2aiSkaWOG3EifJbQP8BVP6FEWoJZxq5MV33Z7iXKtEJHU+MUXv57acekJo1e1Rd9ZuGgXP2EIOWWkYRe2fg7sVDWBaXWo3E1gYdWBsP9FLQZ36lw9wA3NhaBiRLSsVMFSr+JHmqPurvzhDe81VhIb/xcDPmV01GV+KPrBFdwdkJaSnVkXifo+1MV2TYNAHd8EW/pBw81Q7s1HnoiLV4RhBGQqUzb1ON4ed16pan5CSsNNAsgZKd6ArWzu1DpGyGAPc+GNV/eEmim65L1XHJx5zp2PmQhHnICbkFzCcSHcHXInJRm2lx9mUqpNur3iA7mK5ZvnZ1uPudPqT4AuHeKe9/B/Jp4GFwUI/v2BbuKQj64FeukETMyR1NSqNrCdI1zcrY5bfFliVdGuM1sNNjvJLx1fgh2Fs8acVVYnZDkSjAb8Hb/HJV/Aiqua4DXbbqtsCNLU4iZv7cm8bBCVzGCIgoI4XaaZ6AVz8Pt9DNgundTjbqnjL95i2odVPnfkBbECoyKpTNTI2ki6lM=";
         //加密算法的初始向量
-        String iv = "";
+        String iv = "vyyNGom/jdoOAWFSzZelyg==";
         String url = "https://api.weixin.qq.com/sns/jscode2session?appid="+WeChatSession.APPID+
                 "&secret="+WeChatSession.SECRET+"&js_code="+ code +"&grant_type=authorization_code";
         RestTemplate restTemplate = new RestTemplate();

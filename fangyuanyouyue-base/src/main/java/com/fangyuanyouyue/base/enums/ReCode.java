@@ -19,6 +19,7 @@ public enum ReCode {
 	NO_PHONE(12,"未绑定手机号！"),
 	LOCK_ERROR(13,"商品暂时无法操作，请稍后再试！"),
 	NOT_VIP(14,"用户非会员"),
+	WRONG_INVITE_CODE(15,"错误的邀请码"),
 	;
 
 	private final Integer value;

@@ -730,8 +730,8 @@ public class UserInfoServiceImpl implements UserInfoService {
             userWallet.setAddTime(DateStampUtils.getTimesteamp());
             userWallet.setAppraisalCount(1);//普通用户只有1次免费鉴定
             userWalletMapper.insert(userWallet);
-            UserDto userDto = setUserDtoByInfo(token,user);
             addInviteCode(user.getId());
+            UserDto userDto = setUserDtoByInfo(token,user);
             return userDto;
         }else{
             UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userThirdParty.getUserId());
@@ -1081,6 +1081,15 @@ public class UserInfoServiceImpl implements UserInfoService {
                 inviteCode.setUserId(userInfo.getId());
                 inviteCodeMapper.insert(inviteCode);
             }
+        }
+    }
+
+
+    @Override
+    public void verifyInviteCode(String inviteCode) throws ServiceException {
+        InviteCode userByCode = inviteCodeMapper.getUserByCode(inviteCode);
+        if(userByCode == null){
+            throw new ServiceException(ReCode.WRONG_INVITE_CODE.getValue(),ReCode.WRONG_INVITE_CODE.getMessage());
         }
     }
 }
