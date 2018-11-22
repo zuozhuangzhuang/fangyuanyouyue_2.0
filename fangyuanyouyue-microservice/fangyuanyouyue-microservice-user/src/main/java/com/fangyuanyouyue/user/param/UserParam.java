@@ -190,6 +190,6 @@ public class UserParam{
 	@ApiModelProperty(name = "inviteCode", value = "邀请码", dataType = "String",hidden = true)
 	private String inviteCode;//邀请码
 
-	@ApiModelProperty(name = "ruleType", value = "规则类型", dataType = "int",hidden = true)
-	private Integer ruleType;//规则类型
+	@ApiModelProperty(name = "ruleKey", value = "规则标识码", dataType = "String",hidden = true)
+	private String ruleKey;//规则标识码
 }

@@ -57,7 +57,7 @@ public class AdminSysController extends BaseController {
     @Autowired
     private SysOperatorService sysOperatorService;
     @Autowired
-    private RuleService ruleService;
+    private SysPropertyService sysPropertyService;
 
 
 
@@ -530,7 +530,7 @@ public class AdminSysController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "规则列表", notes = "规则列表",response = BaseResp.class)
+    @ApiOperation(value = "规则文案列表", notes = "规则文案列表",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "ruleType", value = "规则类型 1邀请规则", required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
@@ -545,7 +545,7 @@ public class AdminSysController extends BaseController {
     @ResponseBody
     public BaseResp ruleList(AdminUserParam param) throws IOException {
         try {
-            log.info("后台管理查看规则列表");
+            log.info("后台管理查看规则文案列表");
             log.info("参数："+param.toString());
             if(param.getStart() == null || param.getStart() < 0){
                 return toError("起始页数错误！");
@@ -553,7 +553,7 @@ public class AdminSysController extends BaseController {
             if(param.getLimit() == null || param.getLimit() < 1){
                 return toError("每页个数错误！");
             }
-            Pager pager = ruleService.getPage(param);
+            Pager pager = sysPropertyService.getPage(param);
             return toPage(pager);
         }catch (Exception e) {
             e.printStackTrace();
@@ -561,24 +561,24 @@ public class AdminSysController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "新增规则", notes = "新增规则",response = BaseResp.class)
+    @ApiOperation(value = "新增规则文案", notes = "新增规则文案",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "ruleContent", value = "规则内容", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "ruleType", value = "规则类型 1邀请规则", required = true, dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "ruleKey", value = "规则标识码", required = true, dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/addRule")
     @ResponseBody
     public Object addRule(AdminOperatorParam param) throws IOException {
         try {
-            log.info("----》新增规则《----");
+            log.info("----》新增规则文案《----");
             log.info("参数："+param.toString());
-            if(param.getRuleType() == null){
+            if(param.getRuleKey() == null){
                 return toError("规则类型不能为空！");
             }
             if(StringUtils.isEmpty(param.getRuleContent())){
                 return toError("规则内容不能为空！");
             }
-            ruleService.addRule(param.getRuleContent(),param.getRuleType());
+            sysPropertyService.addRule(param.getRuleContent(),param.getRuleKey());
 
             return toSuccess();
         }catch (Exception e) {
@@ -586,7 +586,7 @@ public class AdminSysController extends BaseController {
             return toError("系统错误！");
         }
     }
-    @ApiOperation(value = "修改规则", notes = "修改规则",response = BaseResp.class)
+    @ApiOperation(value = "修改规则文案", notes = "修改规则文案",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "规则id", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "ruleContent", value = "规则内容", required = true, dataType = "String", paramType = "query")
@@ -595,7 +595,7 @@ public class AdminSysController extends BaseController {
     @ResponseBody
     public Object updateRule(AdminOperatorParam param) throws IOException {
         try {
-            log.info("----》修改规则《----");
+            log.info("----》修改规则文案《----");
             log.info("参数："+param.toString());
             if(param.getId() == null){
                 return toError("规则id不能为空！");
@@ -603,7 +603,7 @@ public class AdminSysController extends BaseController {
             if(StringUtils.isEmpty(param.getRuleContent())){
                 return toError("修改内容不能为空！");
             }
-            ruleService.updateRule(param.getId(),param.getRuleContent());
+            sysPropertyService.updateRule(param.getId(),param.getRuleContent(),param.getRuleKey());
 
             return toSuccess();
         }catch (Exception e) {
@@ -612,7 +612,7 @@ public class AdminSysController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "删除规则", notes = "删除规则",response = BaseResp.class)
+    @ApiOperation(value = "删除规则文案", notes = "删除规则文案",response = BaseResp.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "规则id", required = true, dataType = "int", paramType = "query")
     })
@@ -620,12 +620,12 @@ public class AdminSysController extends BaseController {
     @ResponseBody
     public Object deleteRule(AdminOperatorParam param) throws IOException {
         try {
-            log.info("----》删除规则《----");
+            log.info("----》删除规则文案《----");
             log.info("参数："+param.toString());
             if(param.getId() == null){
                 return toError("规则id不能为空！");
             }
-            ruleService.deleteRule(param.getId());
+            sysPropertyService.deleteRule(param.getId());
 
             return toSuccess();
         }catch (Exception e) {

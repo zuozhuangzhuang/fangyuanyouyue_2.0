@@ -14,7 +14,7 @@ import java.util.Date;
 public class SysProperty {
     private Integer id;
 
-    private String key;//信息配置表
+    private String keyWord;//信息配置表
 
     private Date addTime;//添加时间
 
