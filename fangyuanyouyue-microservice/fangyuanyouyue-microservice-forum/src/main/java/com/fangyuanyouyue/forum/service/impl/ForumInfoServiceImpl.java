@@ -124,9 +124,6 @@ public class ForumInfoServiceImpl implements ForumInfoService {
 				list = forumInfoMapper.selectList(columnId,userId,type,keyword, start*limit, limit,searchType);
 			}
 		}else if(listType.intValue() == 2){
-//			if(userId == null){
-//				throw new ServiceException("用户信息为空！");
-//			}
 			//我的xx列表
 			list = forumInfoMapper.selectList(columnId,requesterId,type,keyword, start*limit, limit,searchType);
 		}else{

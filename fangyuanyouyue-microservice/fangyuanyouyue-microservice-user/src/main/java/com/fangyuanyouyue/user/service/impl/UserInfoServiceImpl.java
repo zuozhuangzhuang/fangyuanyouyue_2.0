@@ -187,7 +187,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         userWalletMapper.insert(userWallet);
         //生成邀请码
         addInviteCode(user.getId());
-        //TODO 根据邀请码下发奖励
+        //根据邀请码新增用户邀请信息
         if(StringUtils.isNotEmpty(param.getInviteCode())){
             setUserInvite(user.getId(),param.getInviteCode());
         }
@@ -217,7 +217,54 @@ public class UserInfoServiceImpl implements UserInfoService {
         userInvite.setAddTime(DateStampUtils.getTimesteamp());
         userInviteMapper.insert(userInvite);
         //TODO 发放奖励
+        issueRewards(userByCode.getUserId());
+    }
 
+    /**
+     * 发放奖励
+     * @throws ServiceException
+     */
+    void issueRewards(Integer userId) throws ServiceException{
+
+        List<UserInvite> userInvites = userInviteMapper.selectUserInviteById(userId);
+        int inviteCount = userInvites.size();
+        if(inviteCount == 3){
+
+        }
+        //TODO 根据邀请规则
+        UserVip userVipByUserId = userVipMapper.getUserVipByUserId(userId);
+        if(userVipByUserId.getStatus().equals(Status.NOT_VIP.getValue())){
+            //非会员
+            userVipByUserId.setStatus(Status.IS_VIP.getValue());
+            userVipByUserId.setStartTime(DateStampUtils.getTimesteamp());
+            if(inviteCount == 3){
+
+            }else if(inviteCount == 6){
+
+            }else if(inviteCount == 10){
+
+            }else if(inviteCount == 15){
+
+            }else if(inviteCount == 20){
+
+            }else if(inviteCount == 25){
+
+            }else if(inviteCount == 30){
+
+            }else if(inviteCount == 35){
+
+            }else if(inviteCount == 40){
+
+            }else if(inviteCount == 45){
+
+            }else if(inviteCount == 50){
+
+            }else if(inviteCount == 55){
+
+            }
+        }else{
+
+        }
     }
 
     /**
@@ -468,7 +515,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                     userInfo.setLoginPwd(MD5Util.generate(MD5Util.MD5(param.getLoginPwd())));
                 }
                 if(StringUtils.isNotEmpty(param.getInviteCode())){
-                    //TODO 根据邀请码下发奖励
+                    //根据邀请码新增用户邀请信息
                     if(StringUtils.isNotEmpty(param.getInviteCode())){
                         setUserInvite(userInfo.getId(),param.getInviteCode());
                     }
@@ -591,6 +638,10 @@ public class UserInfoServiceImpl implements UserInfoService {
             }
             userDto.setIsHasColumn(JSONObject.parseObject(schedualForumService.isHasColumn(user.getId())).getIntValue("data"));
             InviteCode inviteCode = inviteCodeMapper.selectUserCodeByUserId(user.getId());
+            if(inviteCode == null){
+                addInviteCode(user.getId());
+                inviteCode = inviteCodeMapper.selectUserCodeByUserId(user.getId());
+            }
             userDto.setInviteCode(inviteCode.getUserCode());
             return userDto;
         }
@@ -975,12 +1026,40 @@ public class UserInfoServiceImpl implements UserInfoService {
     public UserInviteDto getUserInviteInfo(Integer userId) throws ServiceException {
         InviteCode inviteCode = inviteCodeMapper.selectUserCodeByUserId(userId);
         List<UserInvite> userInvites = userInviteMapper.selectUserInviteById(userId);
-
+        int inviteCount = userInvites.size();
         UserInviteDto userInviteDto = new UserInviteDto();
         userInviteDto.setInviteCode(inviteCode.getUserCode());
-        userInviteDto.setInviteCount(userInvites.size());
-        //TODO 奖励内容
-        userInviteDto.setInviteAward("奖励内容");
+        userInviteDto.setInviteCount(inviteCount);
+        //奖励内容
+        String inviteContent = "无";
+        UserVip userVipByUserId = userVipMapper.getUserVipByUserId(userId);
+        String vipLevelDesc = StringUtils.isEmpty(userVipByUserId.getLevelDesc())?"铂金会员":userVipByUserId.getLevelDesc();
+        if(3<=inviteCount && inviteCount<6){
+            inviteContent = "一个月"+vipLevelDesc;
+        }else if(6<=inviteCount && inviteCount<10){
+            inviteContent = "两个月"+vipLevelDesc;
+        }else if(10<=inviteCount && inviteCount<15){
+            inviteContent = "三个月"+vipLevelDesc;
+        }else if(15<=inviteCount && inviteCount<20){
+            inviteContent = "四个月"+vipLevelDesc;
+        }else if(20<=inviteCount && inviteCount<25){
+            inviteContent = "五个月"+vipLevelDesc;
+        }else if(25<=inviteCount && inviteCount<30){
+            inviteContent = "六个月"+vipLevelDesc;
+        }else if(30<=inviteCount && inviteCount<35){
+            inviteContent = "七个月"+vipLevelDesc;
+        }else if(35<=inviteCount && inviteCount<40){
+            inviteContent = "八个月"+vipLevelDesc;
+        }else if(40<=inviteCount && inviteCount<45){
+            inviteContent = "九个月"+vipLevelDesc;
+        }else if(45<=inviteCount && inviteCount<50){
+            inviteContent = "十个月"+vipLevelDesc;
+        }else if(50<=inviteCount && inviteCount<55){
+            inviteContent = "十一个月"+vipLevelDesc;
+        }else if(55<=inviteCount){
+            inviteContent = "十二个月"+vipLevelDesc;
+        }
+        userInviteDto.setInviteAward(inviteContent);
         return userInviteDto;
     }
 

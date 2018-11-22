@@ -294,7 +294,6 @@
     a.update_time DESC
     LIMIT #{start},#{limit};
   </select>
-  
   <select id="selectList" resultMap="BaseResultMap">
     select
     a.*,b.nick_name,b.head_img_url

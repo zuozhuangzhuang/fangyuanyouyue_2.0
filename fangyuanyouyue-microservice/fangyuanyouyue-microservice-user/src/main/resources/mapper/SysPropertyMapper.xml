@@ -1,22 +1,22 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.fangyuanyouyue.user.dao.SysPropertyMapper" >
-  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.user.model.SysProperty" >
-    <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="key" property="key" jdbcType="VARCHAR" />
-    <result column="add_time" property="addTime" jdbcType="TIMESTAMP" />
-    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangyuanyouyue.user.dao.SysPropertyMapper">
+  <resultMap id="BaseResultMap" type="com.fangyuanyouyue.user.model.SysProperty">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="key_word" jdbcType="VARCHAR" property="keyWord" />
+    <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
-  <resultMap id="ResultMapWithBLOBs" type="com.fangyuanyouyue.user.model.SysProperty" extends="BaseResultMap" >
-    <result column="value" property="value" jdbcType="LONGVARCHAR" />
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.user.model.SysProperty">
+    <result column="value" jdbcType="LONGVARCHAR" property="value" />
   </resultMap>
-  <sql id="Base_Column_List" >
-    id, key, add_time, update_time
+  <sql id="Base_Column_List">
+    id, key_word, add_time, update_time
   </sql>
-  <sql id="Blob_Column_List" >
+  <sql id="Blob_Column_List">
     value
   </sql>
-  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
     select 
     <include refid="Base_Column_List" />
     ,
@@ -24,81 +24,134 @@
     from sys_property
     where id = #{id,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from sys_property
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.fangyuanyouyue.user.model.SysProperty"  useGeneratedKeys="true" keyProperty="id">
-    insert into sys_property (id, key, add_time, 
+  <insert id="insert" parameterType="com.fangyuanyouyue.user.model.SysProperty" useGeneratedKeys="true" keyProperty="id">
+    insert into sys_property (id, key_word, add_time, 
       update_time, value)
-    values (#{id,jdbcType=INTEGER}, #{key,jdbcType=VARCHAR}, #{addTime,jdbcType=TIMESTAMP}, 
+    values (#{id,jdbcType=INTEGER}, #{keyWord,jdbcType=VARCHAR}, #{addTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP}, #{value,jdbcType=LONGVARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.fangyuanyouyue.user.model.SysProperty"  useGeneratedKeys="true" keyProperty="id">
+  <insert id="insertSelective" parameterType="com.fangyuanyouyue.user.model.SysProperty" useGeneratedKeys="true" keyProperty="id">
     insert into sys_property
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         id,
       </if>
-      <if test="key != null" >
-        key,
+      <if test="keyWord != null">
+        key_word,
       </if>
-      <if test="addTime != null" >
+      <if test="addTime != null">
         add_time,
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         update_time,
       </if>
-      <if test="value != null" >
+      <if test="value != null">
         value,
       </if>
     </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         #{id,jdbcType=INTEGER},
       </if>
-      <if test="key != null" >
-        #{key,jdbcType=VARCHAR},
+      <if test="keyWord != null">
+        #{keyWord,jdbcType=VARCHAR},
       </if>
-      <if test="addTime != null" >
+      <if test="addTime != null">
         #{addTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="value != null" >
+      <if test="value != null">
         #{value,jdbcType=LONGVARCHAR},
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.user.model.SysProperty" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.fangyuanyouyue.user.model.SysProperty">
     update sys_property
-    <set >
-      <if test="key != null" >
-        key = #{key,jdbcType=VARCHAR},
+    <set>
+      <if test="keyWord != null">
+        key_word = #{keyWord,jdbcType=VARCHAR},
       </if>
-      <if test="addTime != null" >
+      <if test="addTime != null">
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="value != null" >
+      <if test="value != null">
         value = #{value,jdbcType=LONGVARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.fangyuanyouyue.user.model.SysProperty" >
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.fangyuanyouyue.user.model.SysProperty">
     update sys_property
-    set key = #{key,jdbcType=VARCHAR},
+    set key_word = #{keyWord,jdbcType=VARCHAR},
       add_time = #{addTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
       value = #{value,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.user.model.SysProperty" >
+  <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.user.model.SysProperty">
     update sys_property
-    set key = #{key,jdbcType=VARCHAR},
-      add_time = #{addTime,jdbcType=TIMESTAMP}
+    set key_word = #{keyWord,jdbcType=VARCHAR},
+      add_time = #{addTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+  <select id="getRuleByKey" resultMap="ResultMapWithBLOBs">
+    select * from sys_property where key_word = #{ruleKey}
+  </select>
+
+  <select id="countPage" resultType="Integer">
+    select count(id) from sys_property
+    <where>
+      <if test="ruleKey != null and ruleKey != ''">
+        and key_word = #{ruleKey}
+      </if>
+      <if test="keyword != null and keyword != ''">
+        and rule_content like '%'#{keyword}'%'
+      </if>
+      <if test="startDate != null">
+        and add_time <![CDATA[ > ]]> #{startDate}
+      </if>
+      <if test="endDate != null">
+        and add_time <![CDATA[ <= ]]> #{endDate}
+      </if>
+    </where>
+  </select>
+
+  <select id="getPage" resultMap="ResultMapWithBLOBs">
+    select * from sys_property
+    <where>
+      <if test="ruleKey != null and ruleKey != ''">
+        and key_word = #{ruleKey}
+      </if>
+      <if test="keyword != null and keyword != ''">
+        and rule_content like '%'#{keyword}'%'
+      </if>
+      <if test="startDate != null">
+        and add_time <![CDATA[ > ]]> #{startDate}
+      </if>
+      <if test="endDate != null">
+        and add_time <![CDATA[ <= ]]> #{endDate}
+      </if>
+    </where>
+    <if test="orders != null">
+      order by ${orders}
+      <if test="ascType != null and ascType == 2">
+        desc
+      </if>
+    </if>
+    <if test="limit != null and start != null">
+      limit #{start},#{limit}
+    </if>
+  </select>
 </mapper>

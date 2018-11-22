@@ -17,6 +17,8 @@ public class AdminRoleParam {
 
     private Integer menuId;
     
+    private Integer roleId;
+    
     private String roleName;
     
     private String roleAuth;

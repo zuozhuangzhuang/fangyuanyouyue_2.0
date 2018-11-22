@@ -8,7 +8,6 @@ import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.model.WxPayResult;
 import com.fangyuanyouyue.base.util.AES;
-import com.fangyuanyouyue.base.util.MD5Util;
 import com.fangyuanyouyue.base.util.WechatUtil.WXPayUtil;
 import com.fangyuanyouyue.base.util.alipay.util.AlipayNotify;
 import com.fangyuanyouyue.user.constant.PhoneCodeEnum;
@@ -61,7 +60,7 @@ public class UserController extends BaseController {
     @Autowired
     private MiniMsgFormIdService miniMsgFormIdService;
     @Autowired
-    private RuleService ruleService;
+    private SysPropertyService sysPropertyService;
 
 
 
@@ -1279,18 +1278,18 @@ public class UserController extends BaseController {
 
     @ApiOperation(value = "获取邀请规则信息", notes = "（RuleDto）获取邀请规则信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "ruleType", value = "规则类型 1邀请规则 2xx规则", required = true, dataType = "int", paramType = "query")
+//            @ApiImplicitParam(name = "ruleKey", value = "规则标识码", required = true, dataType = "int", paramType = "query")
     })
     @GetMapping(value = "/getInviteRule")
     @ResponseBody
     public BaseResp getInviteRule(UserParam param){
         try {
             log.info("----》获取邀请规则信息《----");
-            log.info("参数："+param.toString());
-            if(param.getRuleType() == null){
-                return toError("规则类型不能为空！");
-            }
-            RuleDto inviteRule = ruleService.getInviteRule(param.getRuleType());
+//            log.info("参数："+param.toString());
+//            if(StringUtils.isEmpty(param.getRuleKey())){
+//                return toError("规则标识码不能为空！");
+//            }
+            SysPropertyDto inviteRule = sysPropertyService.getInviteRule();
             return toSuccess(inviteRule);
         } catch (ServiceException e) {
             e.printStackTrace();

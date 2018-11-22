@@ -55,6 +55,10 @@ public class SysOperatorServiceImpl implements SysOperatorService{
 		
 		dto.setLoginPwd(null);
 		
+		operator.setLastLoginTime(new Date());
+		
+		sysOperatorMapper.updateByPrimaryKey(operator);
+		
 		//获取权限菜单
 		List<AdminMenuDto> menus = sysMenuServiceImpl.getMenuByUser(operator.getId());
 		
@@ -71,7 +75,7 @@ public class SysOperatorServiceImpl implements SysOperatorService{
 			//oper.setUserCode(param.getUserCode());
 			//oper.setUserName(param.getUserCode());
 			if(param.getPassword()!=null) {
-                oper.setLoginPwd(MD5Util.generate(param.getPassword()));
+                oper.setLoginPwd(MD5Util.getMD5String(param.getPassword()));
             }
 			oper.setStatus(0);
 			if("FORBIDDEN".equals(param.getState())) {
@@ -90,7 +94,7 @@ public class SysOperatorServiceImpl implements SysOperatorService{
 			SysOperator oper = new SysOperator();
 			oper.setAddTime(new Date());
 			oper.setUserCode(param.getUserCode());
-			oper.setLoginPwd(MD5Util.generate(param.getPassword()));
+			oper.setLoginPwd(MD5Util.getMD5String(param.getPassword()));
 			oper.setUserName(param.getUserCode());
 			oper.setStatus(0);
 			if("FORBIDDEN".equals(param.getState())) {
