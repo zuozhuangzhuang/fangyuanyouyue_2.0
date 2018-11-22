@@ -228,4 +228,11 @@ public interface UserInfoService {
      * @throws ServiceException
      */
     void addUserCode() throws ServiceException;
+
+    /**
+     * 验证邀请码是否存在
+     * @param inviteCode
+     * @throws ServiceException
+     */
+    void verifyInviteCode(String inviteCode) throws ServiceException;
 }
