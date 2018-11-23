@@ -1,5 +1,6 @@
 package com.fangyuanyouyue.order.dto.adminDto;
 
+import com.fangyuanyouyue.order.dto.UserCouponDto;
 import com.fangyuanyouyue.order.model.OrderDetail;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,6 +44,8 @@ public class AdminOrderDetailDto {
     private String headImgUrl;//用户头像
 
     private String phone;//用户手机
+
+    private UserCouponDto userCouponDto;//优惠券信息
 
     //优惠券
 

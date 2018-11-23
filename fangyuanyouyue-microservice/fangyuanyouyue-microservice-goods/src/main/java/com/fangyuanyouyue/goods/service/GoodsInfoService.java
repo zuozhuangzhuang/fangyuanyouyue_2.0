@@ -37,7 +37,7 @@ public interface GoodsInfoService {
      * @param param
      * @return
      */
-    List<GoodsDto> getGoodsInfoList(GoodsParam param) throws ServiceException;
+    List<GoodsDto> getGoodsInfoList(Integer myId,GoodsParam param) throws ServiceException;
 
     /**
      * 新增商品

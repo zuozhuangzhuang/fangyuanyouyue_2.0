@@ -62,7 +62,7 @@ public class GoodsController extends BaseController{
             @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "search", value = "搜索词条", dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "synthesize", value = "综合 1：综合排序 2：信用排序 3：价格升序 4：价格降序",dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "synthesize", value = "综合 1：综合排序 2：信用排序 3：价格升序 4：价格降序 5：时间升序 6：时间降序",dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "priceMin", value = "最小价格", dataType = "BigDecimal", paramType = "query"),
             @ApiImplicitParam(name = "priceMax", value = "最大价格", dataType = "BigDecimal", paramType = "query"),
             @ApiImplicitParam(name = "quality", value = "品质 1：认证店铺 2：官方保真 3：高信誉度 4：我的关注 5：（抢购）已完成", dataType = "int", paramType = "query"),
@@ -81,26 +81,26 @@ public class GoodsController extends BaseController{
             if(param.getLimit() == null || param.getLimit() < 1){
                 return toError("每页个数错误！");
             }
+            Integer myId = null;
             if(StringUtils.isNotEmpty(param.getToken())){//我的商品验证用户
                 //根据用户token获取userId
-                Integer userId = (Integer)schedualRedisService.get(param.getToken());
-                BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+                 myId = (Integer)schedualRedisService.get(param.getToken());
+                BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(myId));
                 if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
                     return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
                 }
-                param.setUserId(userId);
             }else{
                 if(param.getQuality() != null && param.getQuality() == 4){//我的关注，要求登录授权
                     return toError("未登录，无法获取我的关注！");
                 }
             }
             if(param.getQuality() != null && param.getQuality() == 5){
-                if(param.getType() != 2){
+                if(!Status.AUCTION.getValue().equals(param.getType())){
                     return toError("只有抢购可选已完成！");
                 }
             }
             //获取商品列表
-            List<GoodsDto> goodsDtos = goodsInfoService.getGoodsInfoList(param);
+            List<GoodsDto> goodsDtos = goodsInfoService.getGoodsInfoList(myId,param);
             return toSuccess(goodsDtos);
         } catch (ServiceException e) {
             e.printStackTrace();
@@ -110,6 +110,179 @@ public class GoodsController extends BaseController{
             return toError("系统繁忙，请稍后再试！");
         }
     }
+//    @ApiOperation(value = "获取抢购列表", notes = "(GoodsDto)根据start和limit获取分页后的商品/抢购，根据用户token获取买家相关商品/抢购列表，" +
+//            "根据userId获取卖家相关商品/抢购列表，根据search、synthesizer、priceMin、priceMax、quality、goodsCategoryIds对列表进行筛选，根据type进行区分商品和抢购",response = BaseResp.class)
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "token", value = "用户token，不为空则为：我的商品", dataType = "String", paramType = "query"),
+//            @ApiImplicitParam(name = "userId", value = "卖家id，不为空则为：他的商品", dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "status", value = "状态 1出售中 2已售出  3已下架（已结束） 5删除", dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "search", value = "搜索词条", dataType = "String", paramType = "query"),
+//            @ApiImplicitParam(name = "synthesize", value = "综合 1：综合排序 2：信用排序 3：价格升序 4：价格降序",dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "priceMin", value = "最小价格", dataType = "BigDecimal", paramType = "query"),
+//            @ApiImplicitParam(name = "priceMax", value = "最大价格", dataType = "BigDecimal", paramType = "query"),
+//            @ApiImplicitParam(name = "quality", value = "品质 1：认证店铺 2：官方保真 3：高信誉度 4：我的关注 5：（抢购）已完成", dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "type", value = "类型 1普通商品 2抢购商品",required = true, dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "goodsCategoryIds", value = "商品分类数组（同一商品可多种分类）",allowMultiple = true, dataType = "int", paramType = "query")
+//    })
+//    @PostMapping(value = "/auctionList")
+//    @ResponseBody
+//    public BaseResp auctionList(GoodsParam param) throws IOException {
+//        try {
+//            log.info("----》获取商品列表《----");
+//            log.info("参数：" + param.toString());
+//            if(param.getStart() == null || param.getStart() < 0){
+//                return toError("起始页数错误！");
+//            }
+//            if(param.getLimit() == null || param.getLimit() < 1){
+//                return toError("每页个数错误！");
+//            }
+//            if(StringUtils.isNotEmpty(param.getToken())){//我的商品验证用户
+//                //根据用户token获取userId
+//                Integer userId = (Integer)schedualRedisService.get(param.getToken());
+//                BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+//                if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+//                    return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
+//                }
+//                param.setUserId(userId);
+//            }else{
+//                if(param.getQuality() != null && param.getQuality() == 4){//我的关注，要求登录授权
+//                    return toError("未登录，无法获取我的关注！");
+//                }
+//            }
+//            if(param.getQuality() != null && param.getQuality() == 5){
+//                if(param.getType() != 2){
+//                    return toError("只有抢购可选已完成！");
+//                }
+//            }
+//            //获取商品列表
+//            List<GoodsDto> goodsDtos = goodsInfoService.getGoodsInfoList(param);
+//            return toSuccess(goodsDtos);
+//        } catch (ServiceException e) {
+//            e.printStackTrace();
+//            return toError(e.getCode(),e.getMessage());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return toError("系统繁忙，请稍后再试！");
+//        }
+//    }
+//
+//    @ApiOperation(value = "获取个人店铺商品列表", notes = "(GoodsDto)根据start和limit获取分页后的商品/抢购，根据用户token获取买家相关商品/抢购列表，" +
+//            "根据userId获取卖家相关商品/抢购列表，根据search、synthesizer、priceMin、priceMax、quality、goodsCategoryIds对列表进行筛选，根据type进行区分商品和抢购",response = BaseResp.class)
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "token", value = "用户token，不为空则为：我的商品", dataType = "String", paramType = "query"),
+//            @ApiImplicitParam(name = "userId", value = "卖家id，不为空则为：他的商品", dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "status", value = "状态 1出售中 2已售出  3已下架（已结束） 5删除", dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "search", value = "搜索词条", dataType = "String", paramType = "query"),
+//            @ApiImplicitParam(name = "synthesize", value = "综合 1：综合排序 2：信用排序 3：价格升序 4：价格降序",dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "priceMin", value = "最小价格", dataType = "BigDecimal", paramType = "query"),
+//            @ApiImplicitParam(name = "priceMax", value = "最大价格", dataType = "BigDecimal", paramType = "query"),
+//            @ApiImplicitParam(name = "quality", value = "品质 1：认证店铺 2：官方保真 3：高信誉度 4：我的关注 5：（抢购）已完成", dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "type", value = "类型 1普通商品 2抢购商品",required = true, dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "goodsCategoryIds", value = "商品分类数组（同一商品可多种分类）",allowMultiple = true, dataType = "int", paramType = "query")
+//    })
+//    @PostMapping(value = "/shopGoodsList")
+//    @ResponseBody
+//    public BaseResp shopGoodsList(GoodsParam param) throws IOException {
+//        try {
+//            log.info("----》获取商品列表《----");
+//            log.info("参数：" + param.toString());
+//            if(param.getStart() == null || param.getStart() < 0){
+//                return toError("起始页数错误！");
+//            }
+//            if(param.getLimit() == null || param.getLimit() < 1){
+//                return toError("每页个数错误！");
+//            }
+//            if(StringUtils.isNotEmpty(param.getToken())){//我的商品验证用户
+//                //根据用户token获取userId
+//                Integer userId = (Integer)schedualRedisService.get(param.getToken());
+//                BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+//                if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+//                    return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
+//                }
+//                param.setUserId(userId);
+//            }else{
+//                if(param.getQuality() != null && param.getQuality() == 4){//我的关注，要求登录授权
+//                    return toError("未登录，无法获取我的关注！");
+//                }
+//            }
+//            if(param.getQuality() != null && param.getQuality() == 5){
+//                if(param.getType() != 2){
+//                    return toError("只有抢购可选已完成！");
+//                }
+//            }
+//            //获取商品列表
+//            List<GoodsDto> goodsDtos = goodsInfoService.getGoodsInfoList(param);
+//            return toSuccess(goodsDtos);
+//        } catch (ServiceException e) {
+//            e.printStackTrace();
+//            return toError(e.getCode(),e.getMessage());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return toError("系统繁忙，请稍后再试！");
+//        }
+//    }
+//
+//    @ApiOperation(value = "获取个人店铺抢购列表", notes = "(GoodsDto)根据start和limit获取分页后的商品/抢购，根据用户token获取买家相关商品/抢购列表，" +
+//            "根据userId获取卖家相关商品/抢购列表，根据search、synthesizer、priceMin、priceMax、quality、goodsCategoryIds对列表进行筛选，根据type进行区分商品和抢购",response = BaseResp.class)
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "token", value = "用户token，不为空则为：我的商品", dataType = "String", paramType = "query"),
+//            @ApiImplicitParam(name = "userId", value = "卖家id，不为空则为：他的商品", dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "status", value = "状态 1出售中 2已售出  3已下架（已结束） 5删除", dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "limit", value = "每页个数", required = true, dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "search", value = "搜索词条", dataType = "String", paramType = "query"),
+//            @ApiImplicitParam(name = "synthesize", value = "综合 1：综合排序 2：信用排序 3：价格升序 4：价格降序",dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "priceMin", value = "最小价格", dataType = "BigDecimal", paramType = "query"),
+//            @ApiImplicitParam(name = "priceMax", value = "最大价格", dataType = "BigDecimal", paramType = "query"),
+//            @ApiImplicitParam(name = "quality", value = "品质 1：认证店铺 2：官方保真 3：高信誉度 4：我的关注 5：（抢购）已完成", dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "type", value = "类型 1普通商品 2抢购商品",required = true, dataType = "int", paramType = "query"),
+//            @ApiImplicitParam(name = "goodsCategoryIds", value = "商品分类数组（同一商品可多种分类）",allowMultiple = true, dataType = "int", paramType = "query")
+//    })
+//    @PostMapping(value = "/shopAuctionList")
+//    @ResponseBody
+//    public BaseResp shopAuctionList(GoodsParam param) throws IOException {
+//        try {
+//            log.info("----》获取商品列表《----");
+//            log.info("参数：" + param.toString());
+//            if(param.getStart() == null || param.getStart() < 0){
+//                return toError("起始页数错误！");
+//            }
+//            if(param.getLimit() == null || param.getLimit() < 1){
+//                return toError("每页个数错误！");
+//            }
+//            if(StringUtils.isNotEmpty(param.getToken())){//我的商品验证用户
+//                //根据用户token获取userId
+//                Integer userId = (Integer)schedualRedisService.get(param.getToken());
+//                BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+//                if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+//                    return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
+//                }
+//                param.setUserId(userId);
+//            }else{
+//                if(param.getQuality() != null && param.getQuality() == 4){//我的关注，要求登录授权
+//                    return toError("未登录，无法获取我的关注！");
+//                }
+//            }
+//            if(param.getQuality() != null && param.getQuality() == 5){
+//                if(param.getType() != 2){
+//                    return toError("只有抢购可选已完成！");
+//                }
+//            }
+//            //获取商品列表
+//            List<GoodsDto> goodsDtos = goodsInfoService.getGoodsInfoList(param);
+//            return toSuccess(goodsDtos);
+//        } catch (ServiceException e) {
+//            e.printStackTrace();
+//            return toError(e.getCode(),e.getMessage());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return toError("系统繁忙，请稍后再试！");
+//        }
+//    }
 
     @ApiOperation(value = "发布商品/抢购", notes = "(void)发布商品/抢购",response = BaseResp.class)
     @ApiImplicitParams({

@@ -99,7 +99,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     }
 
     @Override
-    public List<GoodsDto> getGoodsInfoList(GoodsParam param) throws ServiceException{
+    public List<GoodsDto> getGoodsInfoList(Integer myId,GoodsParam param) throws ServiceException{
         try{
             if(StringUtils.isNotEmpty(param.getSearch())){
                 HotSearch hotSearch = hotSearchMapper.selectByName(param.getSearch());
@@ -117,8 +117,14 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         }catch (DuplicateKeyException e){
             e.printStackTrace();
         }
-        List<GoodsInfo> goodsInfos =goodsInfoMapper.getGoodsList(param.getUserId(),param.getStatus(),param.getSearch(),
-                param.getPriceMin(),param.getPriceMax(),param.getSynthesize(),param.getQuality(),param.getStart()*param.getLimit(),param.getLimit(),param.getType(),param.getGoodsCategoryIds());
+        List<GoodsInfo> goodsInfos = new ArrayList<>();
+        if(param.getType().equals(Status.AUCTION.getValue())){
+            goodsInfos = goodsInfoMapper.getAuctionList(myId,param.getUserId(),param.getStatus(),param.getSearch(),
+                    param.getPriceMin(),param.getPriceMax(),param.getSynthesize(),param.getQuality(),param.getStart()*param.getLimit(),param.getLimit(),param.getGoodsCategoryIds());
+        }else{
+            goodsInfos = goodsInfoMapper.getGoodsList(myId,param.getUserId(),param.getStatus(),param.getSearch(),
+                    param.getPriceMin(),param.getPriceMax(),param.getSynthesize(),param.getQuality(),param.getStart()*param.getLimit(),param.getLimit(),param.getType(),param.getGoodsCategoryIds());
+        }
         //分类热度加一
         if(param.getGoodsCategoryIds() != null && param.getGoodsCategoryIds().length>0){
             goodsCategoryMapper.addSearchCountByCategoryIds(param.getGoodsCategoryIds());
@@ -181,8 +187,9 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             goodsInfo.setIntervalTime(param.getIntervalTime());
             goodsInfo.setMarkdown(param.getMarkdown());
             goodsInfo.setLastIntervalTime(DateStampUtils.getTimesteamp());
+        }else{
+            goodsInfo.setCommentTime(DateStampUtils.getTimesteamp());
         }
-        goodsInfo.setCommentTime(DateStampUtils.getTimesteamp());
         goodsInfo.setMainImgUrl(param.getImgUrls()[0]);
         goodsInfoMapper.insert(goodsInfo);
         //视频截图路径
@@ -433,7 +440,9 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             //如果是已下架的商品或抢购，重新上架
             goodsInfo.setStatus(Status.GOODS_IN_SALE.getValue());//状态 1出售中 2已售出 3已下架（已结束） 5删除
             goodsInfo.setUpdateTime(DateStampUtils.getTimesteamp());
-            goodsInfo.setCommentTime(DateStampUtils.getTimesteamp());
+            if(goodsInfo.getType().equals(Status.GOODS.getValue())){
+                goodsInfo.setCommentTime(DateStampUtils.getTimesteamp());
+            }
             if(goodsInfo.getType().equals(Status.AUCTION.getValue())){
                 goodsInfo.setLastIntervalTime(DateStampUtils.getTimesteamp());
             }

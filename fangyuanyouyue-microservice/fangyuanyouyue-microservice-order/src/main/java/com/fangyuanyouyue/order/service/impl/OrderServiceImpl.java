@@ -1321,11 +1321,20 @@ public class OrderServiceImpl implements OrderService{
                 orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
             }
             ArrayList<AdminOrderDetailDto> orderDetailDtos = AdminOrderDetailDto.toDtoList(orderDetails);
-            String orderDetail = "";
-            for(AdminOrderDetailDto detail:orderDetailDtos) {
-            	orderDetail += "卖家："+detail.getNickName()+" - "+detail.getPhone()+"，商品："+detail.getGoodsName() + "<br>";
+            StringBuffer orderDetail = new StringBuffer();
+            for(OrderDetail detail:orderDetails){
+                AdminOrderDetailDto adminOrderDetailDto = new AdminOrderDetailDto(detail);
+                orderDetail.append("卖家："+detail.getNickName()+" - "+detail.getPhone()+"，商品："+detail.getGoodsName());
+                //优惠券
+                if(detail.getCouponId() != null){
+                    UserCoupon userCoupon = userCouponMapper.selectUserCouponDetail(detail.getCouponId());
+                    if(userCoupon != null){
+                        orderDetail.append("，优惠券："+userCoupon.getCouponAmount());
+                    }
+                }
+                orderDetail.append("<br>");
             }
-            orderDto.setOrderDetail(orderDetail);
+            orderDto.setOrderDetail(orderDetail.toString());
             orderDto.setTotalCount(orderDetailDtos.size());
 
             orderDtos.add(orderDto);
