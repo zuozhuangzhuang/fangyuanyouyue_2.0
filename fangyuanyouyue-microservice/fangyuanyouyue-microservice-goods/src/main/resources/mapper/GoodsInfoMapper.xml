@@ -329,8 +329,13 @@
             <if test="status == null">
                 and a.status <![CDATA[ <> ]]> 5
             </if>
-            <if test="userId != null and quality == null">
-                and a.user_id = #{userId,jdbcType=INTEGER}
+            <if test="quality == null">
+                <if test="myId != null">
+                    and a.user_id = #{myId,jdbcType=INTEGER}
+                </if>
+                <if test="myId == null and userId != null">
+                    and a.user_id = #{userId,jdbcType=INTEGER} and a.status <![CDATA[ <> ]]> 3
+                </if>
             </if>
             <if test="priceMin != null">
                 and a.price <![CDATA[ >= ]]> #{priceMin,jdbcType=DECIMAL}
@@ -354,8 +359,8 @@
                 <if test="quality == 3">
                     and b.credit <![CDATA[ >= ]]> 10000
                 </if>
-                <if test="userId != null and quality == 4">
-                    and a.user_id in (select to_user_id from user_fans where user_id = #{userId,jdbcType=INTEGER})
+                <if test="myId != null and quality == 4">
+                    and a.user_id in (select to_user_id from user_fans where user_id = #{myId,jdbcType=INTEGER})
                 </if>
                 <if test="type == 2 and quality == 5">
                     and a.status = 2
@@ -387,8 +392,94 @@
             <if test="synthesize == 4">
                 a.price desc,
             </if>
+            <if test="synthesize == 5">
+                a.add_time,
+            </if>
+            <if test="synthesize == 6">
+                a.add_time desc,
+            </if>
         </if>
         a.sort,a.comment_time desc,a.update_time desc limit #{start},#{limit}
+    </select>
+
+    <select id="getAuctionList" parameterType="Integer" resultMap="BaseResultMap">
+        select a.id,a.user_id,a.name,a.price,a.main_img_url,a.markdown,a.interval_time,a.last_interval_time,a.floor_price,a.type,a.status,c.nick_name,c.head_img_url from goods_info a,user_info_ext b,user_info c
+        <where>
+            a.user_id = b.user_id and a.user_id = c.id and a.type = 2
+            <if test="status != null and quality != 5">
+                and a.status = #{status,jdbcType=INTEGER}
+            </if>
+            <if test="status == null">
+                and a.status <![CDATA[ <> ]]> 5
+            </if>
+            <if test="quality == null">
+                <if test="myId != null">
+                    and a.user_id = #{myId,jdbcType=INTEGER}
+                </if>
+                <if test="myId == null and userId != null">
+                    and a.user_id = #{userId,jdbcType=INTEGER} and a.status <![CDATA[ <> ]]> 3
+                </if>
+            </if>
+            <if test="priceMin != null">
+                and a.price <![CDATA[ >= ]]> #{priceMin,jdbcType=DECIMAL}
+            </if>
+            <if test="priceMax != null">
+                and a.price <![CDATA[ < ]]> #{priceMax,jdbcType=DECIMAL}
+            </if>
+            <if test="search != null and search != ''">
+                and (a.name like "%"#{search}"%" or a.description like "%"#{search}"%" or a.user_id in (select id from user_info where nick_name like "%"#{search}"%" and status <![CDATA[ <> ]]> 3))
+            </if>
+            <if test="quality != null">
+                <if test="quality == 1">
+                    and b.auth_type = 2
+                </if>
+                <if test="quality == 2">
+                    and a.is_appraisal = 1
+                </if>
+                <if test="quality == 3">
+                    and b.credit <![CDATA[ >= ]]> 10000
+                </if>
+                <if test="myId != null and quality == 4">
+                    and a.user_id in (select to_user_id from user_fans where user_id = #{myId,jdbcType=INTEGER})
+                </if>
+                <if test="type == 2 and quality == 5">
+                    and a.status = 2
+                </if>
+            </if>
+            <if test="goodsCategoryIds != null and goodsCategoryIds.length &gt; 0">
+                and a.id in (select goods_id from goods_correlation where (goods_category_id in
+                <foreach close=")" collection="goodsCategoryIds" index="index" item="categoryId" open="(" separator=",">
+                    #{categoryId,jdbcType=INTEGER}
+                </foreach>
+                or category_parent_id in
+                <foreach close=")" collection="goodsCategoryIds" index="index" item="categoryId" open="(" separator=",">
+                    #{categoryId,jdbcType=INTEGER}
+                </foreach>
+                ))
+            </if>
+        </where>
+        order by
+        <if test="synthesize != null">
+            <if test="synthesize == 1">
+
+            </if>
+            <if test="synthesize == 2">
+                b.credit desc,
+            </if>
+            <if test="synthesize == 3">
+                a.price,
+            </if>
+            <if test="synthesize == 4">
+                a.price desc,
+            </if>
+            <if test="synthesize == 5">
+                a.add_time,
+            </if>
+            <if test="synthesize == 6">
+                a.add_time desc,
+            </if>
+        </if>
+        a.sort,a.comment_time desc,a.add_time limit #{start},#{limit}
     </select>
 
 
