@@ -4,6 +4,8 @@ import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.wallet.param.AdminWalletParam;
 
+import java.math.BigDecimal;
+
 public interface UserVipService {
     /**
      * 开通/续费会员
@@ -77,4 +79,12 @@ public interface UserVipService {
      * @throws ServiceException
      */
     void updateTopCount(Integer userId,Integer type,Integer count) throws ServiceException;
+
+    /**
+     * 获取用户剩余会员时长价值金额
+     * @param userId
+     * @return
+     * @throws ServiceException
+     */
+    BigDecimal getVipWorth(Integer userId) throws ServiceException;
 }

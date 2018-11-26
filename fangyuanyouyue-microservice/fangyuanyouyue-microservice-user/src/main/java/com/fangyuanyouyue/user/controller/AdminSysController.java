@@ -633,7 +633,7 @@ public class AdminSysController extends BaseController {
             if(StringUtils.isEmpty(param.getRuleContent())){
                 return toError("修改内容不能为空！");
             }
-            sysPropertyService.updateRule(param.getId(),param.getRuleContent(),param.getRuleKey());
+            sysPropertyService.updateRule(param.getId(),param.getRuleContent());
 
             return toSuccess();
         }catch (Exception e) {

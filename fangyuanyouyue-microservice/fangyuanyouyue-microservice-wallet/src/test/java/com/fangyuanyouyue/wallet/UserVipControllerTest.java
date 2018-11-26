@@ -43,16 +43,29 @@ public class UserVipControllerTest {
 //    @Transactional
     public void updateMember() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/userVip/updateMember")
-                .param("token","10045FY1535423776645")
+                .param("token","116418FY1543173760806")
                 //会员等级 1铂金会员 2至尊会员
                 .param("vipLevel","2")
                 //会员类型 1一个月 2三个月 3一年会员
-                .param("vipType","3")
+                .param("vipType","2")
                 //类型 1开通 2续费
                 .param("type","2")
                 //支付方式  1微信 2支付宝 3余额 4小程序
                 .param("payType","3")
-                .param("payPwd","123456")
+                .param("payPwd","e10adc3949ba59abbe56e057f20f883e")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+    /**
+     * 获取用户剩余会员时长价值金额
+     * @throws Exception
+     */
+    @Test
+//    @Transactional
+    public void getVipWorth() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/userVip/getVipWorth")
+                .param("token","116418FY1543173760806")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
