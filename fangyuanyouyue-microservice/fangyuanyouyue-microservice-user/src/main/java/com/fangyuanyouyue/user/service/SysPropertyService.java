@@ -33,10 +33,9 @@ public interface SysPropertyService {
      * 后台修改规则内容
      * @param id
      * @param ruleContent
-     * @param ruleKey
      * @throws ServiceException
      */
-    void updateRule(Integer id,String ruleContent,String ruleKey) throws ServiceException;
+    void updateRule(Integer id,String ruleContent) throws ServiceException;
 
     /**
      * 后台删除规则

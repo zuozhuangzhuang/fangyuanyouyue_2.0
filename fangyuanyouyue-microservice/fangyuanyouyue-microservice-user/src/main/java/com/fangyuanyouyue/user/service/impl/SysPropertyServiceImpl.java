@@ -55,13 +55,12 @@ public class SysPropertyServiceImpl implements SysPropertyService {
     }
 
     @Override
-    public void updateRule(Integer id, String ruleContent, String ruleKey) throws ServiceException {
+    public void updateRule(Integer id, String ruleContent) throws ServiceException {
         SysProperty sysProperty = sysPropertyMapper.selectByPrimaryKey(id);
         if(sysProperty == null){
             throw new ServiceException("规则不存在！");
         }
         sysProperty.setValue(ruleContent);
-        sysProperty.setKeyWord(ruleKey);
         sysPropertyMapper.updateByPrimaryKey(sysProperty);
     }
 

@@ -442,7 +442,7 @@
                 <if test="myId != null and quality == 4">
                     and a.user_id in (select to_user_id from user_fans where user_id = #{myId,jdbcType=INTEGER})
                 </if>
-                <if test="type == 2 and quality == 5">
+                <if test="quality == 5">
                     and a.status = 2
                 </if>
             </if>
