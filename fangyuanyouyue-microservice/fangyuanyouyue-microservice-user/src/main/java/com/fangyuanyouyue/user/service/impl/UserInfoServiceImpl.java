@@ -1049,11 +1049,12 @@ public class UserInfoServiceImpl implements UserInfoService {
             }
         }
         StringBuffer inviteContent = new StringBuffer();
-        if(lowCount > 0){
+        if(lowCount > 0 && highCount == 0){
             inviteContent.append(lowCount+"个月铂金会员");
-            if(highCount > 0){
-                inviteContent.append("#"+highCount+"个月至尊会员");
-            }
+        }else if(highCount > 0 && lowCount == 0){
+            inviteContent.append(highCount+"个月至尊会员");
+        }else if(lowCount > 0 && highCount > 0){
+            inviteContent.append(lowCount+"个月铂金会员#"+highCount+"个月至尊会员");
         }else{
             inviteContent.append("无");
         }
