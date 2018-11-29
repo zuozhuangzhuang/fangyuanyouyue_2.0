@@ -58,12 +58,12 @@ public class SysOperatorServiceImpl implements SysOperatorService{
 		operator.setLastLoginTime(new Date());
 		
 		sysOperatorMapper.updateByPrimaryKey(operator);
-		
+
 		//获取权限菜单
 		List<AdminMenuDto> menus = sysMenuServiceImpl.getMenuByUser(operator.getId());
-		
+
 		//处理菜单
-		dto.setMenus(menus);
+		dto.setMenu(menus);
 		
 		return dto;
 	}
@@ -74,7 +74,7 @@ public class SysOperatorServiceImpl implements SysOperatorService{
 			SysOperator oper = sysOperatorMapper.selectByPrimaryKey(param.getUserId());
 			//oper.setUserCode(param.getUserCode());
 			//oper.setUserName(param.getUserCode());
-			if(param.getPassword()!=null) {
+			if(param.getPassword()!=null&&param.getPassword().trim().length()>0) {
                 oper.setLoginPwd(MD5Util.getMD5String(param.getPassword()));
             }
 			oper.setStatus(0);
@@ -90,7 +90,9 @@ public class SysOperatorServiceImpl implements SysOperatorService{
 			if(sysOperatorMapper.countUser(param.getUserCode())>0) {
 				throw new ServiceException("登录名不能重复");
 			}
-			
+			if(param.getPassword()!=null&&param.getPassword().trim().length()>0) {
+				throw new ServiceException("登录密码不能为空");
+			}
 			SysOperator oper = new SysOperator();
 			oper.setAddTime(new Date());
 			oper.setUserCode(param.getUserCode());
