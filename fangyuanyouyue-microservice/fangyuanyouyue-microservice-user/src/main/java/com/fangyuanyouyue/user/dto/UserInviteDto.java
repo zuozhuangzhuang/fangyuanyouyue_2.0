@@ -14,9 +14,11 @@ import lombok.ToString;
 public class UserInviteDto {
     //用户邀请码
     private String inviteCode;
-    //邀请总人数
+    //已邀请总人数
     private Integer inviteCount;
     //邀请奖励
     private String inviteAward;
+    //下一阶段条件
+    private Integer nextCondition;
 
 }

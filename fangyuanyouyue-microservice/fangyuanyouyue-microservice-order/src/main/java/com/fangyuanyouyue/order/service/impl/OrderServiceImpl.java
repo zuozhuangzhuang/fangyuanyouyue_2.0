@@ -718,7 +718,7 @@ public class OrderServiceImpl implements OrderService{
 	            if(!Boolean.valueOf(JSONObject.parseObject(schedualWalletService.isUserVip(userId)).getString("data"))){
 	                List<UserBehavior> userBehaviors = userBehaviorMapper.selectByUserIdType(userId, Status.BUY_AUCTION.getValue());
 	                if(userBehaviors != null && userBehaviors.size() > 0){
-	                    throw new ServiceException("非会员只能免费抢购一次！");
+	                    throw new ServiceException(ReCode.INSUFFICIENT_FREE_AUCTION.getValue(),ReCode.INSUFFICIENT_FREE_AUCTION.getMessage());
 	                }else{
 	                    UserBehavior userBehavior = new UserBehavior();
 	                    userBehavior.setUserId(userId);
@@ -1465,4 +1465,18 @@ public class OrderServiceImpl implements OrderService{
         return allOrderCount;
     }
 
+    @Override
+    public Boolean verifyFreeAuction(Integer userId) throws ServiceException {
+        //非会员只能免费抢购一次，会员可无限制抢购——验证是否为会员
+        if(!Boolean.valueOf(JSONObject.parseObject(schedualWalletService.isUserVip(userId)).getString("data"))){
+            List<UserBehavior> userBehaviors = userBehaviorMapper.selectByUserIdType(userId, Status.BUY_AUCTION.getValue());
+            if(userBehaviors != null && userBehaviors.size() > 0){
+                return false;
+            }else{
+                return true;
+            }
+        }else{
+            return true;
+        }
+    }
 }
