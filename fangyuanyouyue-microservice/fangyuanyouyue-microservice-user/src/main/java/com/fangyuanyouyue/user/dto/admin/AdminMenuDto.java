@@ -43,7 +43,7 @@ public class AdminMenuDto {
         this.text = model.getName();
         this.icon = model.getIcon();
         this.layer = this.id.toString();
-        this.url = this.getUrl();
+        this.url = model.getUrl();
     }
 
 
