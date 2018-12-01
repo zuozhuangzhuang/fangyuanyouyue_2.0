@@ -227,7 +227,7 @@ public interface OrderService {
     Integer processAllOrder(Integer status)throws ServiceException;
 
     /**
-     * 验证是否可以免费鉴定
+     * 验证是否可以购买抢购
      * @param userId
      * @return
      * @throws ServiceException
