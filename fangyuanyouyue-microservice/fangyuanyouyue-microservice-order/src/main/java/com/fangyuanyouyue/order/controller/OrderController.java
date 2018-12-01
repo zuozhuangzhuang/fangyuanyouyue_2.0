@@ -826,7 +826,7 @@ public class OrderController extends BaseController{
 
 
 
-    @ApiOperation(value = "验证是否可以免费鉴定", notes = "(Boolean)验证是否可以免费鉴定")
+    @ApiOperation(value = "验证是否可以购买抢购", notes = "(Boolean)验证是否可以购买抢购")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query")
     })
@@ -834,7 +834,7 @@ public class OrderController extends BaseController{
     @ResponseBody
     public BaseResp verifyFreeAuction(OrderParam param) throws IOException {
         try {
-            log.info("----》验证是否可以免费鉴定《----");
+            log.info("----》验证是否可以购买抢购《----");
             log.info("参数："+param.toString());
             //验证用户
             if(StringUtils.isEmpty(param.getToken())){
@@ -845,7 +845,7 @@ public class OrderController extends BaseController{
             if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
                 return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
             }
-            //验证是否可以免费鉴定
+            //验证是否可以购买抢购
             Boolean result = orderService.verifyFreeAuction(userId);
             return toSuccess(result);
         } catch (ServiceException e) {
