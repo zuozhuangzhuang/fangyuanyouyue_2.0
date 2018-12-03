@@ -120,13 +120,13 @@ public class WalletServiceImpl implements WalletService{
             userWithdraw.setAddTime(DateStampUtils.getTimesteamp());
 
             UserInfoExt userInfoExt = userInfoExtMapper.selectUserInfoExtByUserId(userId);
+            if(StringUtils.isEmpty(userInfoExt.getPayPwd())){
+                throw new ServiceException("用户未设置支付密码！");
+            }
+            if(MD5Util.verify(MD5Util.MD5(payPwd),userInfoExt.getPayPwd()) == false){
+                throw new ServiceException(ReCode.PAYMENT_PASSWORD_ERROR.getValue(),ReCode.PAYMENT_PASSWORD_ERROR.getMessage());
+            }
             if(type.equals(Status.PAY_TYPE_ALIPAY.getValue())){//提现方式 1微信 2支付宝
-                if(StringUtils.isEmpty(userInfoExt.getPayPwd())){
-                    throw new ServiceException("用户未设置支付密码！");
-                }
-                if(MD5Util.verify(MD5Util.MD5(payPwd),userInfoExt.getPayPwd()) == false){
-                    throw new ServiceException(ReCode.PAYMENT_PASSWORD_ERROR.getValue(),ReCode.PAYMENT_PASSWORD_ERROR.getMessage());
-                }
                 userWithdraw.setAccount(account);
                 userWithdraw.setRealName(realName);
             }else{
