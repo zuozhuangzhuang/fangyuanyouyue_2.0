@@ -1,13 +1,16 @@
 package com.fangyuanyouyue.user.service.impl;
 
 import com.fangyuanyouyue.base.Pager;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.WaterMarkUtils;
 import com.fangyuanyouyue.user.dao.AppVersionMapper;
+import com.fangyuanyouyue.user.dao.SysPropertyMapper;
 import com.fangyuanyouyue.user.dto.AppVersionDto;
 import com.fangyuanyouyue.user.dto.admin.AdminAppVersionDto;
 import com.fangyuanyouyue.user.model.AppVersion;
+import com.fangyuanyouyue.user.model.SysProperty;
 import com.fangyuanyouyue.user.model.UserInfo;
 import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.service.FileUploadService;
@@ -26,6 +29,8 @@ public class VersionServiceImpl implements VersionService {
     private AppVersionMapper appVersionMapper;
     @Autowired
     private FileUploadService fileUploadService;
+    @Autowired
+    private SysPropertyMapper sysPropertyMapper;
 
     @Override
     public AppVersionDto getVersion() throws ServiceException {
@@ -33,7 +38,23 @@ public class VersionServiceImpl implements VersionService {
         if(version == null){
             throw new ServiceException("未发现新版本！");
         }
-        return new AppVersionDto(version);
+        AppVersionDto appVersionDto = new AppVersionDto(version);
+
+        SysProperty inviteRule = sysPropertyMapper.getRuleByKey(Status.INVITE_RULE.getMessage());
+        if(inviteRule != null){
+            appVersionDto.setIsInvite(Status.ISINVITE.getValue());
+        }else{
+            appVersionDto.setIsInvite(Status.NOTINVITE.getValue());
+        }
+
+        SysProperty qrRule = sysPropertyMapper.getRuleByKey(Status.QR_RULE.getMessage());
+        if(qrRule != null){
+            appVersionDto.setSwitchQRCode(Status.ISQRCODE.getValue());
+        }else{
+            appVersionDto.setSwitchQRCode(Status.NOTQRCODE.getValue());
+        }
+
+        return appVersionDto;
     }
 
     @Override

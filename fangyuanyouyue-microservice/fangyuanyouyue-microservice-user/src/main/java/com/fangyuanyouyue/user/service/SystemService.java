@@ -75,4 +75,12 @@ public interface SystemService {
      */
     List<AdminDailyStatisticsDto> getProcessList(Integer count) throws ServiceException;
 
+    /**
+     * 
+     * @param id
+     * @param type
+     * @return
+     * @throws ServiceException
+     */
+    String getQRCode(Integer id,Integer type) throws ServiceException;
 }

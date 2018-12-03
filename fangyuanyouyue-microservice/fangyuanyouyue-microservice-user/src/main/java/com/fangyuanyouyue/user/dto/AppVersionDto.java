@@ -31,6 +31,10 @@ public class AppVersionDto {
 
     private String updateTime;//更新时间
 
+    private Integer isInvite;//邀请活动按钮开关 1打开 2关闭
+
+    private Integer switchQRCode;//小程序二维码开关 1打开 2关闭
+
     public AppVersionDto() {
     }
 
