@@ -4,11 +4,7 @@ import java.util.List;
 
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.goods.dto.BannerIndexDto;
-import com.fangyuanyouyue.goods.dto.GoodsCategoryDto;
-import com.fangyuanyouyue.goods.dto.GoodsDto;
-import com.fangyuanyouyue.goods.dto.GoodsQuickSearchDto;
-import com.fangyuanyouyue.goods.dto.SearchDto;
+import com.fangyuanyouyue.goods.dto.*;
 import com.fangyuanyouyue.goods.dto.adminDto.AdminGoodsDto;
 import com.fangyuanyouyue.goods.model.GoodsCategory;
 import com.fangyuanyouyue.goods.model.GoodsInfo;
@@ -219,4 +215,12 @@ public interface GoodsInfoService {
      * @throws ServiceException
      */
     boolean updateOrder(String orderNo, String thirdOrderNo, Integer payType) throws ServiceException;
+
+    /**
+     * 获取分享店铺数据
+     * @param shopId
+     * @return
+     * @throws ServiceException
+     */
+    ShareDto getShareData(Integer shopId) throws ServiceException;
 }

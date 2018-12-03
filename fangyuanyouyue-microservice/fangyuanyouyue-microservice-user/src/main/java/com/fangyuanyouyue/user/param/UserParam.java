@@ -192,4 +192,7 @@ public class UserParam{
 
 	@ApiModelProperty(name = "ruleKey", value = "规则标识码", dataType = "String",hidden = true)
 	private String ruleKey;//规则标识码
+
+	@ApiModelProperty(name = "id", value = "id", dataType = "int",hidden = true)
+	private Integer id;
 }

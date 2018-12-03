@@ -170,4 +170,18 @@ public interface GoodsInfoMapper {
      */
 //    Integer getMonthGoodsCount();
 
+    /**
+     * 获取分享页面店铺内商品列表
+     * @param shopId
+     * @return
+     */
+    List<GoodsInfo> getShareGoodsImgs(@Param("shopId")Integer shopId);
+
+    /**
+     * 用户上传的商品
+     * @param userId
+     * @return
+     */
+    int goodsCount(@Param("userId")Integer userId);
+
 }

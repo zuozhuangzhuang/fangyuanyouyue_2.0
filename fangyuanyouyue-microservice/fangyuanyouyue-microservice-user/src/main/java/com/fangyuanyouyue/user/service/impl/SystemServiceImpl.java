@@ -5,18 +5,12 @@ import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
-import com.fangyuanyouyue.user.dao.DailyStatisticsMapper;
-import com.fangyuanyouyue.user.dao.FeedbackMapper;
-import com.fangyuanyouyue.user.dao.SysMsgLogMapper;
-import com.fangyuanyouyue.user.dao.UserInfoMapper;
+import com.fangyuanyouyue.user.dao.*;
 import com.fangyuanyouyue.user.dto.admin.AdminDailyStatisticsDto;
 import com.fangyuanyouyue.user.dto.admin.AdminFeedbackDto;
 import com.fangyuanyouyue.user.dto.admin.AdminProcessDto;
 import com.fangyuanyouyue.user.dto.admin.AdminSysMsgLogDto;
-import com.fangyuanyouyue.user.model.DailyStatistics;
-import com.fangyuanyouyue.user.model.Feedback;
-import com.fangyuanyouyue.user.model.SysMsgLog;
-import com.fangyuanyouyue.user.model.UserInfo;
+import com.fangyuanyouyue.user.model.*;
 import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -157,5 +151,10 @@ public class SystemServiceImpl implements SystemService {
         List<AdminDailyStatisticsDto> dtos = AdminDailyStatisticsDto.toDtoList(dailyStatistics);
         Collections.reverse(dtos);
         return dtos;
+    }
+
+    @Override
+    public String getQRCode(Integer id, Integer type) throws ServiceException {
+        return "";
     }
 }

@@ -99,4 +99,28 @@ public class SystemController extends BaseController{
             return toError("系统繁忙，请稍后再试！");
         }
     }
+
+
+    @ApiOperation(value = "获取小程序二维码", notes = "获取小程序二维码",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "id",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1抢购 2商品 3帖子 4个人店铺",required = true, dataType = "int", paramType = "query"),
+    })
+    @GetMapping(value = "/getQRCode")
+    @ResponseBody
+    public BaseResp getQRCode(UserParam param) throws IOException {
+        try {
+            log.info("----》获取小程序二维码《----");
+
+            String qrCode= systemService.getQRCode(param.getId(),param.getType());
+
+            return toSuccess(qrCode);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getCode(),e.getMessage());
+        }catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
 }
