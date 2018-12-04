@@ -298,7 +298,7 @@ public class RefundServiceImpl implements RefundService{
                 //订单状态不变
                 //给买家发信息
                 schedualMessageService.easemobMessage(orderInfo.getUserId().toString(),
-                        "很抱歉，您对"+(isAuction?"抢购":"商品")+goodsName+"申请的退货，官方已拒绝",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),orderInfo.getId().toString());
+                        "很抱歉，您对"+(isAuction?"抢购":"商品")+goodsName+"申请的退货，官方已拒绝，拒绝理由为："+reason,Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),orderInfo.getId().toString());
                 //发送微信消息
                 //formId
                 BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getFormId(orderInfo.getUserId()));
