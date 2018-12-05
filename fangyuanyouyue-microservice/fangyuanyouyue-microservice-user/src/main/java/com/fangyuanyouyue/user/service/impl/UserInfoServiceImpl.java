@@ -737,6 +737,8 @@ public class UserInfoServiceImpl implements UserInfoService {
             userWallet.setAppraisalCount(1);//普通用户只有1次免费鉴定
             userWalletMapper.insert(userWallet);
             addInviteCode(user.getId());
+            //送优惠券
+            registSaveUserCoupon(user.getId());
             UserDto userDto = setUserDtoByInfo(token,user);
             return userDto;
         }else{
