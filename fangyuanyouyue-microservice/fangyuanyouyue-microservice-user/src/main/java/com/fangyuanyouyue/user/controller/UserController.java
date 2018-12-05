@@ -505,11 +505,11 @@ public class UserController extends BaseController {
             }
             UserInfo oldUser = userInfoService.getUserByPhone(param.getPhone());
             if(oldUser != null){
-                MergeDto mergeDto = userThirdService.judgeMerge(param.getToken(), null, param.getPhone(),null);
-                if(mergeDto != null){
-                    //可以合并账号
-                    return toError(ReCode.IS_MERGE.getValue(),ReCode.IS_MERGE.getMessage());
-                }
+//                MergeDto mergeDto = userThirdService.judgeMerge(param.getToken(), null, param.getPhone(),null);
+//                if(mergeDto != null){
+//                    //可以合并账号
+//                    return toError(ReCode.IS_MERGE.getValue(),ReCode.IS_MERGE.getMessage());
+//                }
                 return toError("该手机已被其他帐号绑定，请不要重复绑定！");
             }
             //修改绑定手机

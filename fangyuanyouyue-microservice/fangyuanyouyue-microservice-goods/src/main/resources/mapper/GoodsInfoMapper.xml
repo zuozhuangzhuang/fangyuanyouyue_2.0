@@ -593,7 +593,7 @@
     </select>-->
 
     <select id="getShareGoodsImgs" resultMap="BaseResultMap">
-        select status,main_img_url from goods_info where user_id = #{shopId} and status <![CDATA[ <> ]]> 3 and status <![CDATA[ <> ]]> 5 limit 0,6
+        select status,main_img_url from goods_info where user_id = #{shopId} and status <![CDATA[ <> ]]> 3 and status <![CDATA[ <> ]]> 5 order by add_time desc limit 0,6
     </select>
 
     <select id="goodsCount" resultType="Integer">
