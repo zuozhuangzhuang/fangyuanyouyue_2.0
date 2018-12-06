@@ -1,5 +1,6 @@
 package com.fangyuanyouyue.base.util;
 
+import com.fangyuanyouyue.base.enums.MiniPage;
 import com.fangyuanyouyue.base.util.wechat.pay.WechatPayConfig;
 import com.fangyuanyouyue.base.util.wechat.pojo.AccessToken;
 import com.fangyuanyouyue.base.util.wechat.utils.WeixinUtil;
@@ -24,7 +25,7 @@ import java.util.Map;
 public class WXQRCode {
     protected static Logger logger = Logger.getLogger(WXQRCode.class);
 
-    public static String getMiniQr(Integer type,Integer id,String sceneStr, String accessToken) {
+    public static String getMiniQr(String sceneStr, String accessToken,String page) {
         RestTemplate rest = new RestTemplate();
         InputStream inputStream = null;
         String resultStr = null;
@@ -32,7 +33,7 @@ public class WXQRCode {
             String url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" + accessToken;
             Map<String, Object> param = new HashMap<>();
             param.put("scene", sceneStr);
-            param.put("page", "page/center/pages/Orderdetail/Orderdetail");
+            param.put("page", page);
             param.put("width", 280);
             logger.info("调用生成微信URL接口传参：" + param);
 
@@ -62,7 +63,7 @@ public class WXQRCode {
 
     public static void main(String[] args) {
         AccessToken accessToken = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
-        String miniQr = getMiniQr(1, 1, "1", accessToken.getToken());
+        String miniQr = getMiniQr("1", accessToken.getToken(), MiniPage.AUCTION_DETAIL.getUrl());
         System.out.println(miniQr);
     }
 
