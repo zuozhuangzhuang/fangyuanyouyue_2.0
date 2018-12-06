@@ -432,6 +432,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             if(param.getImgUrls() != null && param.getImgUrls().length > 0){
                 //删除旧商品图片信息
                 goodsImgMapper.deleteByGoodsId(goodsInfo.getId());
+                goodsInfo.setMainImgUrl(param.getImgUrls()[0]);
                 for(int i=0;i<param.getImgUrls().length;i++){
                     if(i == 0){
                         saveGoodsPicOne(goodsInfo.getId(),param.getImgUrls()[i],1,i+1);
