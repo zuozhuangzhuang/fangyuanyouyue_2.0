@@ -33,17 +33,17 @@ public class WXQRCode {
             String url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" + accessToken;
             Map<String, Object> param = new HashMap<>();
             param.put("scene", sceneStr);
-            param.put("page", page);
+            param.put("path", page);
             param.put("width", 280);
-            logger.info("调用生成微信URL接口传参：" + param);
+//            logger.info("调用生成微信URL接口传参：" + param);
 
             MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
             org.springframework.http.HttpEntity requestEntity = new org.springframework.http.HttpEntity(param, headers);
             ResponseEntity<byte[]> entity = rest.exchange(url, HttpMethod.POST, requestEntity, byte[].class);
-            logger.info("调用小程序生成微信小程序码URL接口返回结果：" + entity.getBody());
 
             byte[] result = entity.getBody();
-            resultStr = new String(result);
+            resultStr = "data:image/png;base64,"+Base64.encodeBase64String(result);
+//            logger.info("调用小程序生成微信小程序码URL接口返回结果：" + resultStr);
 
 
         } catch (Exception e) {
@@ -64,7 +64,6 @@ public class WXQRCode {
     public static void main(String[] args) {
         AccessToken accessToken = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
         String miniQr = getMiniQr("1", accessToken.getToken(), MiniPage.AUCTION_DETAIL.getUrl());
-        System.out.println(miniQr);
     }
 
 }
