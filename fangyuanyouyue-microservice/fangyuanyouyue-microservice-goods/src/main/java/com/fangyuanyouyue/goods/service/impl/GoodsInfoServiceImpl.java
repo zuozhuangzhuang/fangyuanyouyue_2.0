@@ -18,6 +18,7 @@ import com.fangyuanyouyue.goods.model.*;
 import com.fangyuanyouyue.goods.param.AdminGoodsParam;
 import com.fangyuanyouyue.goods.param.GoodsParam;
 import com.fangyuanyouyue.goods.service.*;
+import io.swagger.annotations.ApiImplicitParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -74,6 +75,8 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     private GoodsTopDetailMapper goodsTopDetailMapper;
     @Autowired
     private GoodsTopOrderMapper goodsTopOrderMapper;
+    @Autowired
+    private SysPropertyMapper sysPropertyMapper;
 
     @Override
     public GoodsInfo selectByPrimaryKey(Integer id) throws ServiceException{
@@ -118,7 +121,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             e.printStackTrace();
         }
         List<GoodsInfo> goodsInfos = new ArrayList<>();
-        if(param.getType().equals(Status.AUCTION.getValue())){
+        if(Status.AUCTION.getValue().equals(param.getType())){
             goodsInfos = goodsInfoMapper.getAuctionList(myId,param.getUserId(),param.getStatus(),param.getSearch(),
                     param.getPriceMin(),param.getPriceMax(),param.getSynthesize(),param.getQuality(),param.getStart()*param.getLimit(),param.getLimit(),param.getGoodsCategoryIds());
         }else{
@@ -429,6 +432,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             if(param.getImgUrls() != null && param.getImgUrls().length > 0){
                 //删除旧商品图片信息
                 goodsImgMapper.deleteByGoodsId(goodsInfo.getId());
+                goodsInfo.setMainImgUrl(param.getImgUrls()[0]);
                 for(int i=0;i<param.getImgUrls().length;i++){
                     if(i == 0){
                         saveGoodsPicOne(goodsInfo.getId(),param.getImgUrls()[i],1,i+1);
@@ -1073,5 +1077,22 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         return true;
     }
 
-
+    @Override
+    public ShareDto getShareData(Integer shopId) throws ServiceException {
+        ShareDto shareDto = new ShareDto();
+        int count = goodsInfoMapper.goodsCount(shopId);
+        shareDto.setGoodsCount(count);
+        List<GoodsInfo> goodsList = goodsInfoMapper.getShareGoodsImgs(shopId);
+        List<GoodsDto> goodsDtos = GoodsDto.toDtoList(goodsList);
+        shareDto.setGoodsList(goodsDtos);
+        SysProperty ruleByKey = sysPropertyMapper.getRuleByKey(Status.SHARE_INVITE_RULE.getMessage());
+        if(ruleByKey != null){
+            shareDto.setRule(ruleByKey.getValue());
+        }
+        SysProperty shareImgUrl = sysPropertyMapper.getRuleByKey(Status.SHARE_IMG_URL.getMessage());
+        if(shareImgUrl != null){
+            shareDto.setImgUrl(shareImgUrl.getValue());
+        }
+        return shareDto;
+    }
 }

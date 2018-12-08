@@ -220,7 +220,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         userInvite.setAddTime(DateStampUtils.getTimesteamp());
         try {
             userInviteMapper.insert(userInvite);
-           //TODO 发放奖励
+           //发放奖励
             issueRewards(userByCode.getUserId());
         } catch (DuplicateKeyException e) {
            e.printStackTrace();
@@ -236,7 +236,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 
         List<UserInvite> userInvites = userInviteMapper.selectUserInviteById(userId);
         int inviteCount = userInvites.size();
-        //TODO 根据邀请规则
+        //根据邀请规则
         UserVip userVipByUserId = userVipMapper.getUserVipByUserId(userId);
         if(inviteCount == 3 || inviteCount == 6 || inviteCount == 10 || inviteCount == 15 || inviteCount == 20 || inviteCount == 25
                 || inviteCount == 30 || inviteCount == 35 || inviteCount == 40 || inviteCount == 45 || inviteCount == 50 || inviteCount == 55) {
@@ -296,7 +296,7 @@ public class UserInfoServiceImpl implements UserInfoService {
      * @throws ServiceException
      */
     void registSaveUserCoupon(Integer userId) throws ServiceException{
-        //TODO 1、获取注册赠送的代金券
+        //1、获取注册赠送的代金券
         saveUserCoupon(userId,1);
         saveUserCoupon(userId,1);
         saveUserCoupon(userId,2);
@@ -737,6 +737,8 @@ public class UserInfoServiceImpl implements UserInfoService {
             userWallet.setAppraisalCount(1);//普通用户只有1次免费鉴定
             userWalletMapper.insert(userWallet);
             addInviteCode(user.getId());
+            //送优惠券
+            registSaveUserCoupon(user.getId());
             UserDto userDto = setUserDtoByInfo(token,user);
             return userDto;
         }else{
@@ -1036,6 +1038,35 @@ public class UserInfoServiceImpl implements UserInfoService {
         UserInviteDto userInviteDto = new UserInviteDto();
         userInviteDto.setInviteCode(inviteCode.getUserCode());
         userInviteDto.setInviteCount(inviteCount);
+        Integer nextCondition = 3;
+        if(inviteCount < 3){
+
+        }else if(inviteCount >=3 && inviteCount < 6){
+            nextCondition = 6;
+        }else if(inviteCount >=6 && inviteCount < 10){
+            nextCondition = 10;
+        }else if(inviteCount >=10 && inviteCount < 15){
+            nextCondition = 15;
+        }else if(inviteCount >=15 && inviteCount < 20){
+            nextCondition = 20;
+        }else if(inviteCount >=20 && inviteCount < 25){
+            nextCondition = 25;
+        }else if(inviteCount >=25 && inviteCount < 30){
+            nextCondition = 30;
+        }else if(inviteCount >=30 && inviteCount < 35){
+            nextCondition = 35;
+        }else if(inviteCount >=35 && inviteCount < 40){
+            nextCondition = 40;
+        }else if(inviteCount >=40 && inviteCount < 45){
+            nextCondition = 45;
+        }else if(inviteCount >=45 && inviteCount < 50){
+            nextCondition = 50;
+        }else if(inviteCount >=50 && inviteCount < 55){
+            nextCondition = 55;
+        }else if(inviteCount >=55){
+            nextCondition = 55;
+        }
+        userInviteDto.setNextCondition(nextCondition);
         //奖励内容
         List<InviteAward> inviteAwards = inviteAwardMapper.selectAwardByUserId(userId);
         int lowCount = 0;

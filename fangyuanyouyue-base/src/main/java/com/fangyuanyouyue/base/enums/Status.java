@@ -98,7 +98,13 @@ public enum Status {
     //每日置顶次数 无会员0次 铂金3次 至尊8次
     NO_VIP_FREE_TOP_COUNT(0),LOW_FREE_TOP_COUNT(3),HIGH_FREE_TOP_COUNT(8),
     //商品置顶状态 1置顶 2未置顶
-    IS_TOP(1),NOT_TOP(2)
+    IS_TOP(1),NOT_TOP(2),
+    //邀请码开关 1打开 2关闭
+    ISINVITE(1),NOTINVITE(2),
+    //二维码开关 1打开 2关闭
+    ISQRCODE(1),NOTQRCODE(2),
+    //系统配置信息
+    INVITE_RULE("invite_rule"),INVITE_RULE_OFF("invite_rule_off"),QR_RULE("QR_rule"),QR_RULE_OFF("QR_rule_off"),SHARE_INVITE_RULE("share_invite_rule"),SHARE_IMG_URL("share_img_url")
     ;
     private Integer value;
     private String message;

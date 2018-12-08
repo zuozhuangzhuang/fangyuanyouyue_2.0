@@ -227,4 +227,18 @@ public class GoodsControllerTest {
                 .andReturn();
     }
 
+    /**
+     * 获取快速查询条件
+     * @throws Exception
+     */
+    @Test
+    @Transactional
+    public void getShareData() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/goods/getShareData")
+                .param("shopId","106418")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
 }

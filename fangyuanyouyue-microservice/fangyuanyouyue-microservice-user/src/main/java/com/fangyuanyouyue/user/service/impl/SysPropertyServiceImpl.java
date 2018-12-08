@@ -1,6 +1,7 @@
 package com.fangyuanyouyue.user.service.impl;
 
 import com.fangyuanyouyue.base.Pager;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.user.dao.SysPropertyMapper;
@@ -21,8 +22,7 @@ public class SysPropertyServiceImpl implements SysPropertyService {
 
     @Override
     public SysPropertyDto getInviteRule() throws ServiceException {
-        String ruleKey = "invite_rule";
-        SysProperty sysProperty = sysPropertyMapper.getRuleByKey(ruleKey);
+        SysProperty sysProperty = sysPropertyMapper.getRuleByKey(Status.INVITE_RULE.getMessage());
         if(sysProperty == null){
             throw new ServiceException("规则标识码错误！");
         }

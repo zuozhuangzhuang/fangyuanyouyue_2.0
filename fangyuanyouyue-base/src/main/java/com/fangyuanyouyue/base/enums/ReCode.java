@@ -20,6 +20,7 @@ public enum ReCode {
 	LOCK_ERROR(13,"商品暂时无法操作，请稍后再试！"),
 	NOT_VIP(14,"用户非会员"),
 	WRONG_INVITE_CODE(15,"错误的邀请码"),
+	INSUFFICIENT_FREE_AUCTION(16,"免费抢购次数不足"),
 	;
 
 	private final Integer value;

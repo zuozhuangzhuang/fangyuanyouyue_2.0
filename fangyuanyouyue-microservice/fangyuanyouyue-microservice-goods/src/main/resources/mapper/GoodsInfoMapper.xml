@@ -27,8 +27,6 @@
         <result column="address" jdbcType="VARCHAR" property="userAddress" />
         <result column="level" jdbcType="INTEGER" property="level" />
         <result column="main_img_url" jdbcType="VARCHAR" property="mainImgUrl" />
-    </resultMap>
-    <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fangyuanyouyue.goods.model.GoodsInfo">
         <result column="description" jdbcType="LONGVARCHAR" property="description" />
     </resultMap>
     <sql id="Base_Column_List">
@@ -36,7 +34,7 @@
     markdown, last_interval_time, is_appraisal, video_url, add_time, update_time, video_length, 
     start_price, comment_time, main_img_url,description
   </sql>
-    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
         from goods_info
@@ -271,7 +269,7 @@
         </set>
         where id = #{id,jdbcType=INTEGER}
     </update>
-    <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.fangyuanyouyue.goods.model.GoodsInfo">
+    <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.goods.model.GoodsInfo">
     update goods_info
     set user_id = #{userId,jdbcType=INTEGER},
       name = #{name,jdbcType=VARCHAR},
@@ -293,29 +291,6 @@
       comment_time = #{commentTime,jdbcType=TIMESTAMP},
       main_img_url = #{mainImgUrl,jdbcType=VARCHAR},
       description = #{description,jdbcType=LONGVARCHAR}
-    where id = #{id,jdbcType=INTEGER}
-  </update>
-    <update id="updateByPrimaryKey" parameterType="com.fangyuanyouyue.goods.model.GoodsInfo">
-    update goods_info
-    set user_id = #{userId,jdbcType=INTEGER},
-      name = #{name,jdbcType=VARCHAR},
-      price = #{price,jdbcType=DECIMAL},
-      postage = #{postage,jdbcType=DECIMAL},
-      sort = #{sort,jdbcType=INTEGER},
-      label = #{label,jdbcType=VARCHAR},
-      type = #{type,jdbcType=INTEGER},
-      status = #{status,jdbcType=INTEGER},
-      floor_price = #{floorPrice,jdbcType=DECIMAL},
-      interval_time = #{intervalTime,jdbcType=INTEGER},
-      markdown = #{markdown,jdbcType=DECIMAL},
-      last_interval_time = #{lastIntervalTime,jdbcType=TIMESTAMP},
-      is_appraisal = #{isAppraisal,jdbcType=INTEGER},
-      video_url = #{videoUrl,jdbcType=VARCHAR},
-      add_time = #{addTime,jdbcType=TIMESTAMP},
-      video_length = #{videoLength,jdbcType=INTEGER},
-      start_price = #{startPrice,jdbcType=DECIMAL},
-      comment_time = #{commentTime,jdbcType=TIMESTAMP},
-      main_img_url = #{mainImgUrl,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
@@ -598,7 +573,7 @@
         </if>
     </select>
 
-    <select id="selectByPrimaryKeyDetail" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    <select id="selectByPrimaryKeyDetail" parameterType="java.lang.Integer" resultMap="BaseResultMap">
         select
         a.*,b.nick_name,b.head_img_url,b.address,b.level
         from goods_info a,user_info b
@@ -617,4 +592,11 @@
         select count(*) count,type from goods_info where date_format(add_time,'%Y-%m')=date_format(now(),'%Y-%m') group by type
     </select>-->
 
+    <select id="getShareGoodsImgs" resultMap="BaseResultMap">
+        select status,main_img_url from goods_info where user_id = #{shopId} and status <![CDATA[ <> ]]> 3 and status <![CDATA[ <> ]]> 5 order by add_time desc limit 0,6
+    </select>
+
+    <select id="goodsCount" resultType="Integer">
+        select count(id) from goods_info where user_id = #{userId} and status <![CDATA[ <> ]]> 3 and status <![CDATA[ <> ]]> 5
+    </select>
 </mapper>
