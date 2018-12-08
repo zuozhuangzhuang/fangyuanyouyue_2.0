@@ -116,5 +116,5 @@ public class SysOperatorServiceImpl implements SysOperatorService{
 		
 	}
 
-	
+
 }
