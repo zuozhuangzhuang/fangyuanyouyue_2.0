@@ -85,6 +85,7 @@ public class WeChatMessageServiceImpl implements WeChatMessageService{
 
     @Override
     public boolean sendWechatMessage(String miniOpenId, String templateId, String pagePath, Map<String, Object> map, String formId) {
+        //TODO 从redis中取出access_token，目前未将其存入redis (#^.^#)
 //        try{
 //            Object accessTokenRedis = schedualRedisService.get("access_token");
             String accessToken = "";

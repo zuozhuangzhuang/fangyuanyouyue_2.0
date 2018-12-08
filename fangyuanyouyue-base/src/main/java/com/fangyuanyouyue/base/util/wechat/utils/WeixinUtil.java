@@ -124,7 +124,7 @@ public class WeixinUtil {
 
 	/**
 	 * 获取access_token
-	 * 
+	 *
 	 * @param appid 凭证
 	 * @param appsecret 密钥
 	 * @return
@@ -138,6 +138,7 @@ public class WeixinUtil {
 		if (null != jsonObject) {
 			try {
 				accessToken = new AccessToken();
+				//TODO 获取token后应做保存，2h失效，目前未做此处理
 				accessToken.setToken(jsonObject.getString("access_token"));
 				accessToken.setExpiresIn(jsonObject.getIntValue("expires_in"));
 			} catch (Exception e) {

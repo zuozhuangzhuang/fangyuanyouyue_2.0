@@ -220,7 +220,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         userInvite.setAddTime(DateStampUtils.getTimesteamp());
         try {
             userInviteMapper.insert(userInvite);
-           //TODO 发放奖励
+           //发放奖励
             issueRewards(userByCode.getUserId());
         } catch (DuplicateKeyException e) {
            e.printStackTrace();
@@ -236,7 +236,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 
         List<UserInvite> userInvites = userInviteMapper.selectUserInviteById(userId);
         int inviteCount = userInvites.size();
-        //TODO 根据邀请规则
+        //根据邀请规则
         UserVip userVipByUserId = userVipMapper.getUserVipByUserId(userId);
         if(inviteCount == 3 || inviteCount == 6 || inviteCount == 10 || inviteCount == 15 || inviteCount == 20 || inviteCount == 25
                 || inviteCount == 30 || inviteCount == 35 || inviteCount == 40 || inviteCount == 45 || inviteCount == 50 || inviteCount == 55) {
@@ -296,7 +296,7 @@ public class UserInfoServiceImpl implements UserInfoService {
      * @throws ServiceException
      */
     void registSaveUserCoupon(Integer userId) throws ServiceException{
-        //TODO 1、获取注册赠送的代金券
+        //1、获取注册赠送的代金券
         saveUserCoupon(userId,1);
         saveUserCoupon(userId,1);
         saveUserCoupon(userId,2);

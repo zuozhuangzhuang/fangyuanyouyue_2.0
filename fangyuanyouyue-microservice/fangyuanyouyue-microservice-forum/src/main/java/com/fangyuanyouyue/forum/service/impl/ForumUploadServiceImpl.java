@@ -53,7 +53,7 @@ public class ForumUploadServiceImpl implements ForumUploadService {
 			File file = new File(filePath);
 			File[] files = file.listFiles();
 
-			//TODO 遍历每个分类
+			//遍历每个分类
 			for(File element:files) {
 				System.out.println(element.getName());
 				String cloumnType = element.getName().split("-")[0];
@@ -388,7 +388,7 @@ public class ForumUploadServiceImpl implements ForumUploadService {
 				
 				
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				//Auto-generated catch block
 				e.printStackTrace();
 			}
 			return false;
