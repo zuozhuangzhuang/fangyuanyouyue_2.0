@@ -367,7 +367,7 @@ public class UserInfoExtServiceImpl implements UserInfoExtService {
             schedualMessageService.easemobMessage(model.getUserId().toString(),
                     "很抱歉，您申请的认证店铺未通过官方审核，原因："+content+" 可联系客服咨询详情。",Status.SYSTEM_MESSAGE.getMessage(),Status.JUMP_TYPE_AUTH_TYPE_REFUSE.getMessage(),"");
         }
-        //TODO 发送微信模板消息消息
+        //发送微信模板消息消息
         UserThirdParty userThirdByUserId = userThirdPartyMapper.getUserThirdByUserId(model.getUserId(), 1);
         if(userThirdByUserId != null && StringUtils.isNotEmpty(userThirdByUserId.getMiniOpenId())){
             String formId = miniMsgFormIdService.getFormId(model.getUserId());

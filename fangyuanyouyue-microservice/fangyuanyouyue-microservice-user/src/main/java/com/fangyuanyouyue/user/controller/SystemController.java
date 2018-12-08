@@ -123,4 +123,53 @@ public class SystemController extends BaseController{
             return toError("系统繁忙，请稍后再试！");
         }
     }
+
+    @ApiOperation(value = "小程序二维码开关", notes = "小程序二维码开关",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "status", value = "开关 1打开 2关闭",required = true, dataType = "int", paramType = "query")
+    })
+    @GetMapping(value = "/updateQRSwitch")
+    @ResponseBody
+    public BaseResp updateQRSwitch(UserParam param) throws IOException {
+        try {
+            log.info("----》小程序二维码开关《----");
+            if(param.getStatus() == null){
+                return toError("开关状态不能为空！");
+            }
+            systemService.updateQRSwitch(param.getStatus());
+
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getCode(),e.getMessage());
+        }catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "邀请活动开关", notes = "邀请活动开关",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "status", value = "开关 1打开 2关闭",required = true, dataType = "int", paramType = "query")
+    })
+    @GetMapping(value = "/updateInviteSwitch")
+    @ResponseBody
+    public BaseResp updateInviteSwitch(UserParam param) throws IOException {
+        try {
+            log.info("----》邀请活动开关《----");
+            if(param.getStatus() == null){
+                return toError("开关状态不能为空！");
+            }
+            systemService.updateInviteSwitch(param.getStatus());
+
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getCode(),e.getMessage());
+        }catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
 }
