@@ -77,12 +77,13 @@ public interface SystemService {
 
     /**
      * 
+     * @param userId
      * @param id
      * @param type
      * @return
      * @throws ServiceException
      */
-    String getQRCode(Integer id,Integer type) throws ServiceException;
+    String getQRCode(Integer userId,Integer id,Integer type) throws ServiceException;
 
     /**
      * 小程序二维码开关

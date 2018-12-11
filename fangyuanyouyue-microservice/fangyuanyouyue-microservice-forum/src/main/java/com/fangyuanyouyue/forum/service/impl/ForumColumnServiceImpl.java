@@ -398,6 +398,7 @@ public class ForumColumnServiceImpl implements ForumColumnService {
         if(StringUtils.isNotEmpty(coverImgUrl)){
             forumColumn.setCoverImgUrl(coverImgUrl);
         }
+		forumColumn.setIsChosen(isChosen);
         forumColumnMapper.updateByPrimaryKey(forumColumn);
     }
 

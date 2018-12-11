@@ -50,6 +50,8 @@ public class SystemServiceImpl implements SystemService {
     private DailyStatisticsMapper dailyStatisticsMapper;
     @Autowired
     private SysPropertyMapper sysPropertyMapper;
+    @Autowired
+    private InviteCodeMapper inviteCodeMapper;
 
     @Override
     public void feedback(Integer userId, String content, Integer type, String version) throws ServiceException {
@@ -163,16 +165,24 @@ public class SystemServiceImpl implements SystemService {
     }
 
     @Override
-    public String getQRCode(Integer id, Integer type) throws ServiceException {
+    public String getQRCode(Integer userId,Integer id, Integer type) throws ServiceException {
         String url = null;
+        String scene = null;
         for(MiniPage miniPage : MiniPage.values()){
             if(type.equals(miniPage.getType())){
                 url = miniPage.getUrl();
+                scene = miniPage.getScene()+id;
+            }
+        }
+        if(userId != null && type.equals(MiniPage.SHOP_DETAIL.getType())){
+            InviteCode inviteCode = inviteCodeMapper.selectUserCodeByUserId(userId);
+            if(inviteCode != null){
+                scene += "#inviteCode="+inviteCode.getUserCode();
             }
         }
         //TODO 从redis中取出access_token，目前未将其存入redis (#^.^#)
         AccessToken accessTokenObj = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
-        String miniQr = WXQRCode.getMiniQr(id.toString(), accessTokenObj.getToken(), url);
+        String miniQr = WXQRCode.getMiniQr(scene, accessTokenObj.getToken(), url);
         return miniQr;
     }
 
