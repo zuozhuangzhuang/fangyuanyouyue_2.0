@@ -1011,13 +1011,16 @@ public class OrderServiceImpl implements OrderService{
                 //商品名称
                 List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderId);
                 StringBuffer goodsName = new StringBuffer();
+                boolean isAuction = false;
                 for(OrderDetail detail:orderDetails){
                     //获取商品、抢购信息
                     baseResp = ParseReturnValue.getParseReturnValue(schedualGoodsService.goodsInfo(detail.getGoodsId()));
                     if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                     }
-                    goodsName.append("【"+detail.getGoodsName()+"】");
+                    GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), GoodsInfo.class);
+                    isAuction = goodsInfo.getType().intValue() == Status.AUCTION.getValue()?true:false;
+                    goodsName.append("【"+goodsInfo.getName()+"】");
                 }
                 //卖家余额账单
                 baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(orderInfo.getSellerId(),orderPay.getPayAmount(),Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),orderInfo.getOrderNo()));
@@ -1234,7 +1237,7 @@ public class OrderServiceImpl implements OrderService{
                             }
                         }
                         //买家新增余额账单
-                        baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(childOrder.getUserId(),pay.getPayAmount(),payType,Status.EXPEND.getValue(),childOrder.getOrderNo(),goodsName.toString(),childOrder.getSellerId(),childOrder.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo));
+                        baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(childOrder.getUserId(),pay.getPayAmount(),payType,Status.EXPEND.getValue(),childOrder.getOrderNo(),goodsName.toString(),childOrder.getSellerId(),childOrder.getUserId(),isAuction?Status.AUCTION_INFO.getValue():Status.GOODS_INFO.getValue(),thirdOrderNo));
                         if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                             throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                         }
@@ -1283,7 +1286,7 @@ public class OrderServiceImpl implements OrderService{
                         }
                     }
                     //买家新增余额账单
-                    baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(orderInfo.getUserId(),orderPay.getPayAmount(),payType,Status.EXPEND.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo));
+                    baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(orderInfo.getUserId(),orderPay.getPayAmount(),payType,Status.EXPEND.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),isAuction?Status.AUCTION_INFO.getValue():Status.GOODS_INFO.getValue(),thirdOrderNo));
                     if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                     }

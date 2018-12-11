@@ -523,11 +523,11 @@ public class WalletServiceImpl implements WalletService{
         List<UserBalanceDto> dtoList = UserBalanceDto.toDtoList(userBalanceDetails);
         for(UserBalanceDto dto:dtoList){
             UserInfo info = null;
-            if(dto.getType().intValue() == Status.INCOME.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue()){
+            if(dto.getType().intValue() == Status.INCOME.getValue() && (dto.getOrderType().intValue() == Status.GOODS_INFO.getValue() || dto.getOrderType().equals(Status.AUCTION_INFO.getValue()))){
                 info = userInfoMapper.selectByPrimaryKey(dto.getBuyerId());
-            }else if((dto.getType().intValue() == Status.EXPEND.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue())
+            }else if((dto.getType().intValue() == Status.EXPEND.getValue() && (dto.getOrderType().intValue() == Status.GOODS_INFO.getValue() || dto.getOrderType().equals(Status.AUCTION_INFO.getValue())))
                     || (dto.getType().intValue() == Status.EXPEND.getValue() && dto.getOrderType().intValue() == Status.BARGAIN.getValue())
-                    || (dto.getType().intValue() == Status.REFUND.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue())
+                    || (dto.getType().intValue() == Status.REFUND.getValue() && (dto.getOrderType().intValue() == Status.GOODS_INFO.getValue() || dto.getOrderType().equals(Status.AUCTION_INFO.getValue())))
                     || (dto.getType().intValue() == Status.REFUND.getValue() && dto.getOrderType().intValue() == Status.BARGAIN.getValue())
                     ){
                 info = userInfoMapper.selectByPrimaryKey(dto.getSellerId());
@@ -556,12 +556,12 @@ public class WalletServiceImpl implements WalletService{
         }
         UserBalanceDto dto = new UserBalanceDto(userBalanceDetail);
         UserInfo info = null;
-        if(dto.getType().intValue() == Status.INCOME.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue()){
+        if(dto.getType().intValue() == Status.INCOME.getValue() && (dto.getOrderType().intValue() == Status.GOODS_INFO.getValue() || dto.getOrderType().equals(Status.AUCTION_INFO.getValue()))){
             info = userInfoMapper.selectByPrimaryKey(dto.getBuyerId());
             dto.setImgUrl(info.getHeadImgUrl());
-        }else if((dto.getType().intValue() == Status.EXPEND.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue())
+        }else if((dto.getType().intValue() == Status.EXPEND.getValue() && (dto.getOrderType().intValue() == Status.GOODS_INFO.getValue() || dto.getOrderType().equals(Status.AUCTION_INFO.getValue())))
                 || (dto.getType().intValue() == Status.EXPEND.getValue() && dto.getOrderType().intValue() == Status.BARGAIN.getValue())
-                || (dto.getType().intValue() == Status.REFUND.getValue() && dto.getOrderType().intValue() == Status.GOODS_INFO.getValue())
+                || (dto.getType().intValue() == Status.REFUND.getValue() && (dto.getOrderType().intValue() == Status.GOODS_INFO.getValue() || dto.getOrderType().equals(Status.AUCTION_INFO.getValue())))
                 || (dto.getType().intValue() == Status.REFUND.getValue() && dto.getOrderType().intValue() == Status.BARGAIN.getValue())
                 ){
             info = userInfoMapper.selectByPrimaryKey(dto.getSellerId());
