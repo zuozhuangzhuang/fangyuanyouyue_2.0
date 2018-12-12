@@ -124,7 +124,7 @@ public class ForumCommentServiceImpl implements ForumCommentService {
 	public List<ForumCommentDto> getCommentCommentList(Integer userId,Integer commentId, Integer start, Integer limit)
 			throws ServiceException {
 		
-		List<ForumComment> list = forumCommentMapper.selectByCommentId(commentId, start, limit);
+		List<ForumComment> list = forumCommentMapper.selectByCommentId(commentId, start*limit, limit);
 		List<ForumCommentDto> dtos = new ArrayList<>();
 		for(ForumComment model:list) {
 			ForumCommentDto dto = new ForumCommentDto(model);
