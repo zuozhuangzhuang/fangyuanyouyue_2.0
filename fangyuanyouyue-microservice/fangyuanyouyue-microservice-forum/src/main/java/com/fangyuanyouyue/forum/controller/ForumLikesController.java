@@ -46,7 +46,7 @@ public class ForumLikesController extends BaseController {
 	@ApiOperation(value = "帖子点赞列表", notes = "（ForumLikesDto）根据id获取帖子点赞列表", response = BaseResp.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "forumId", value = "帖子id", required = true, dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "start", value = "起始条数", required = true, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "start", value = "起始页数", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "limit", value = "每页条数", required = true, dataType = "int", paramType = "query")
 	})
 	@PostMapping(value = "/list")
