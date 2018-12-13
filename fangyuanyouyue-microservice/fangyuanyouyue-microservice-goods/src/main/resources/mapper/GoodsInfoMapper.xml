@@ -492,7 +492,7 @@
         <where>
             1=1
             <if test="goodsId != null">
-              and id <![CDATA[ <> ]]> #{goodsId}
+              and goods_id <![CDATA[ <> ]]> #{goodsId}
             </if>
             <if test="goodsCategoryIds != null and goodsCategoryIds.size() &gt; 0">
                 and  goods_category_id in
