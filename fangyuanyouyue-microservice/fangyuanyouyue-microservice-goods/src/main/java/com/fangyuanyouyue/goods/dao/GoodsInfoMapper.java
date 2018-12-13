@@ -98,7 +98,7 @@ public interface GoodsInfoMapper {
      * @param limit
      * @return
      */
-    List<GoodsInfo> selectByCategoryIds(@Param("goodsCategoryIds")List<Integer> goodsCategoryIds,@Param("start")Integer start,@Param("limit")Integer limit);
+    List<GoodsInfo> selectByCategoryIds(@Param("goodsId")Integer goodsId,@Param("goodsCategoryIds")List<Integer> goodsCategoryIds,@Param("start")Integer start,@Param("limit")Integer limit);
 
     /**
      * 获取商品所在店铺是否官方认证

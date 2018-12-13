@@ -604,7 +604,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             //按照会员和认证店铺进行排序
             List<Integer> goodsCategoryIds = goodsCorrelationMapper.selectCategoryIdByGoodsId(goodsId);
             //根据分类列表获取商品的列表
-            List<GoodsInfo> goodsInfos = goodsInfoMapper.selectByCategoryIds(goodsCategoryIds,pageNum*pageSize,pageSize);
+            List<GoodsInfo> goodsInfos = goodsInfoMapper.selectByCategoryIds(goodsId,goodsCategoryIds,pageNum*pageSize,pageSize);
             //获取商品的分类集合
             List<GoodsDto> goodsDtos = GoodsDto.toDtoList(goodsInfos);
 //            for(GoodsInfo model:goodsInfos){
