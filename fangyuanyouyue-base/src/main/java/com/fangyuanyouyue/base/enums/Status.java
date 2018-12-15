@@ -104,7 +104,8 @@ public enum Status {
     //二维码开关 1打开 2关闭
     ISQRCODE(1),NOTQRCODE(2),
     //系统配置信息
-    INVITE_RULE("invite_rule"),INVITE_RULE_OFF("invite_rule_off"),QR_RULE("QR_rule"),QR_RULE_OFF("QR_rule_off"),SHARE_INVITE_RULE("share_invite_rule"),SHARE_IMG_URL("share_img_url")
+    INVITE_RULE("invite_rule"),INVITE_RULE_OFF("invite_rule_off"),QR_RULE("QR_rule"),QR_RULE_OFF("QR_rule_off"),SHARE_INVITE_RULE("share_invite_rule"),SHARE_IMG_URL("share_img_url"),
+    FORUM_SUFFIX("forum_suffix"),GOODS_SUFFIX("goods_suffix"),SHOP_SUFFIX("shop_suffix"),VIDEO_SUFFIX("video_suffix"),DETAIL_SUFFIX("detail_suffix"),
     ;
     private Integer value;
     private String message;

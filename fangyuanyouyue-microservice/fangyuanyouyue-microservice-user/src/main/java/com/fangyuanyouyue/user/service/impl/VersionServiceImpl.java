@@ -53,7 +53,27 @@ public class VersionServiceImpl implements VersionService {
         }else{
             appVersionDto.setSwitchQRCode(Status.NOTQRCODE.getValue());
         }
-
+        //添加列表后缀配置
+        SysProperty forumSuffix = sysPropertyMapper.getRuleByKey(Status.FORUM_SUFFIX.getMessage());
+        if(forumSuffix != null){
+            appVersionDto.setForumSuffix(forumSuffix.getValue());
+        }
+        SysProperty goodsSuffix = sysPropertyMapper.getRuleByKey(Status.GOODS_SUFFIX.getMessage());
+        if(goodsSuffix != null){
+            appVersionDto.setGoodsSuffix(goodsSuffix.getValue());
+        }
+        SysProperty shopSuffix = sysPropertyMapper.getRuleByKey(Status.SHOP_SUFFIX.getMessage());
+        if(shopSuffix != null){
+            appVersionDto.setShopSuffix(shopSuffix.getValue());
+        }
+        SysProperty videoSuffix = sysPropertyMapper.getRuleByKey(Status.VIDEO_SUFFIX.getMessage());
+        if(videoSuffix != null){
+            appVersionDto.setVideoSuffix(videoSuffix.getValue());
+        }
+        SysProperty detailSuffix = sysPropertyMapper.getRuleByKey(Status.DETAIL_SUFFIX.getMessage());
+        if(detailSuffix != null){
+            appVersionDto.setDetailSuffix(detailSuffix.getValue());
+        }
         return appVersionDto;
     }
 
