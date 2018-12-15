@@ -162,7 +162,7 @@ public class AppraisalServiceImpl implements AppraisalService{
             goodsAppraisalDetail.setAddTime(DateStampUtils.getTimesteamp());
             goodsAppraisalDetail.setOrderId(appraisalOrderInfo.getId());
             goodsAppraisalDetail.setType(3);//鉴定类型 1商家鉴定 2买家 3普通用户
-            goodsAppraisalDetail.setTitle(title);
+            goodsAppraisalDetail.setTitle(StringUtils.isEmpty(title)?"我要鉴定":title);
             goodsAppraisalDetail.setDescription(description);
             goodsAppraisalDetail.setStatus(4);//状态 0申请 1真 2假 3存疑 4待支付(在列表中不显示)
             BigDecimal price = new BigDecimal(10);//自己上传图片或视频收费10元

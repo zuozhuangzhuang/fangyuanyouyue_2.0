@@ -705,10 +705,10 @@ public class UserController extends BaseController {
 
             }
             //调用短信系统发送短信
-//            JSONObject jsonObject = JSONObject.parseObject(schedualMessageService.sendCode(param.getPhone(),param.getType()));
-//            String code = jsonObject.getString("data");
+            JSONObject jsonObject = JSONObject.parseObject(schedualMessageService.sendCode(param.getPhone(),param.getType()));
+            String code = jsonObject.getString("data");
 //            TODO 开发期间固定1234
-            String code = "1234";
+//            String code = "1234";
             log.info("code---:"+code);
 
             boolean result = schedualRedisService.set(param.getPhone(), code, 600l);
