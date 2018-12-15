@@ -530,6 +530,9 @@ public class AdminSysController extends BaseController {
             sysOperatorService.saveOperator(param);            
     		
             return toSuccess();
+        }catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getMessage());
         }catch (Exception e) {
             e.printStackTrace();
             return toError("系统错误！");
