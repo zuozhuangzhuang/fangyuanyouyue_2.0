@@ -34,7 +34,8 @@ public interface GoodsInfoMapper {
 
 
     /**
-     * 分页获取商品/抢购列表
+     * 获取商品列表
+     * @param myId
      * @param userId
      * @param status
      * @param search
@@ -48,12 +49,33 @@ public interface GoodsInfoMapper {
      * @param goodsCategoryIds
      * @return
      */
-    List<GoodsInfo> getGoodsList(@Param("userId") Integer userId, @Param("status") Integer status, @Param("search") String search,
+    List<GoodsInfo> getGoodsList(@Param("myId") Integer myId,@Param("userId") Integer userId, @Param("status") Integer status, @Param("search") String search,
                                  @Param("priceMin") BigDecimal priceMin, @Param("priceMax") BigDecimal priceMax,
                                  @Param("synthesize")Integer synthesize, @Param("quality")Integer quality,
-                                 @Param("start") Integer start, @Param("limit") Integer limit, @Param("type")Integer type,
+                                 @Param("start") Integer start, @Param("limit") Integer limit,@Param("type")Integer type,
                                  @Param("goodsCategoryIds")Integer[] goodsCategoryIds);
 
+    /**
+     * 获取抢购列表
+     * @param myId
+     * @param userId
+     * @param status
+     * @param search
+     * @param priceMin
+     * @param priceMax
+     * @param synthesize
+     * @param quality
+     * @param start
+     * @param limit
+     * @param type
+     * @param goodsCategoryIds
+     * @return
+     */
+    List<GoodsInfo> getAuctionList(@Param("myId") Integer myId,@Param("userId") Integer userId, @Param("status") Integer status, @Param("search") String search,
+                                   @Param("priceMin") BigDecimal priceMin, @Param("priceMax") BigDecimal priceMax,
+                                   @Param("synthesize")Integer synthesize, @Param("quality")Integer quality,
+                                   @Param("start") Integer start, @Param("limit") Integer limit,
+                                   @Param("goodsCategoryIds")Integer[] goodsCategoryIds);
 
 
     /**
@@ -76,7 +98,7 @@ public interface GoodsInfoMapper {
      * @param limit
      * @return
      */
-    List<GoodsInfo> selectByCategoryIds(@Param("goodsCategoryIds")List<Integer> goodsCategoryIds,@Param("start")Integer start,@Param("limit")Integer limit);
+    List<GoodsInfo> selectByCategoryIds(@Param("goodsId")Integer goodsId,@Param("goodsCategoryIds")List<Integer> goodsCategoryIds,@Param("start")Integer start,@Param("limit")Integer limit);
 
     /**
      * 获取商品所在店铺是否官方认证
@@ -147,4 +169,19 @@ public interface GoodsInfoMapper {
      * @return
      */
 //    Integer getMonthGoodsCount();
+
+    /**
+     * 获取分享页面店铺内商品列表
+     * @param shopId
+     * @return
+     */
+    List<GoodsInfo> getShareGoodsImgs(@Param("shopId")Integer shopId);
+
+    /**
+     * 用户上传的商品
+     * @param userId
+     * @return
+     */
+    int goodsCount(@Param("userId")Integer userId);
+
 }

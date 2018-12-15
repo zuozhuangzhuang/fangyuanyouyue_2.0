@@ -186,4 +186,13 @@ public class UserParam{
 
 	@ApiModelProperty(name = "formId", value = "表单提交码", dataType = "String",hidden = true)
 	private String formId;//表单提交码
+
+	@ApiModelProperty(name = "inviteCode", value = "邀请码", dataType = "String",hidden = true)
+	private String inviteCode;//邀请码
+
+	@ApiModelProperty(name = "ruleKey", value = "规则标识码", dataType = "String",hidden = true)
+	private String ruleKey;//规则标识码
+
+	@ApiModelProperty(name = "id", value = "id", dataType = "int",hidden = true)
+	private Integer id;
 }

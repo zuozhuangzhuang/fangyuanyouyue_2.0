@@ -18,6 +18,7 @@ import com.fangyuanyouyue.goods.model.*;
 import com.fangyuanyouyue.goods.param.AdminGoodsParam;
 import com.fangyuanyouyue.goods.param.GoodsParam;
 import com.fangyuanyouyue.goods.service.*;
+import io.swagger.annotations.ApiImplicitParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -74,6 +75,8 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     private GoodsTopDetailMapper goodsTopDetailMapper;
     @Autowired
     private GoodsTopOrderMapper goodsTopOrderMapper;
+    @Autowired
+    private SysPropertyMapper sysPropertyMapper;
 
     @Override
     public GoodsInfo selectByPrimaryKey(Integer id) throws ServiceException{
@@ -99,7 +102,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
     }
 
     @Override
-    public List<GoodsDto> getGoodsInfoList(GoodsParam param) throws ServiceException{
+    public List<GoodsDto> getGoodsInfoList(Integer myId,GoodsParam param) throws ServiceException{
         try{
             if(StringUtils.isNotEmpty(param.getSearch())){
                 HotSearch hotSearch = hotSearchMapper.selectByName(param.getSearch());
@@ -117,8 +120,14 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         }catch (DuplicateKeyException e){
             e.printStackTrace();
         }
-        List<GoodsInfo> goodsInfos =goodsInfoMapper.getGoodsList(param.getUserId(),param.getStatus(),param.getSearch(),
-                param.getPriceMin(),param.getPriceMax(),param.getSynthesize(),param.getQuality(),param.getStart()*param.getLimit(),param.getLimit(),param.getType(),param.getGoodsCategoryIds());
+        List<GoodsInfo> goodsInfos = new ArrayList<>();
+        if(Status.AUCTION.getValue().equals(param.getType())){
+            goodsInfos = goodsInfoMapper.getAuctionList(myId,param.getUserId(),param.getStatus(),param.getSearch(),
+                    param.getPriceMin(),param.getPriceMax(),param.getSynthesize(),param.getQuality(),param.getStart()*param.getLimit(),param.getLimit(),param.getGoodsCategoryIds());
+        }else{
+            goodsInfos = goodsInfoMapper.getGoodsList(myId,param.getUserId(),param.getStatus(),param.getSearch(),
+                    param.getPriceMin(),param.getPriceMax(),param.getSynthesize(),param.getQuality(),param.getStart()*param.getLimit(),param.getLimit(),param.getType(),param.getGoodsCategoryIds());
+        }
         //分类热度加一
         if(param.getGoodsCategoryIds() != null && param.getGoodsCategoryIds().length>0){
             goodsCategoryMapper.addSearchCountByCategoryIds(param.getGoodsCategoryIds());
@@ -181,8 +190,9 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             goodsInfo.setIntervalTime(param.getIntervalTime());
             goodsInfo.setMarkdown(param.getMarkdown());
             goodsInfo.setLastIntervalTime(DateStampUtils.getTimesteamp());
+        }else{
+            goodsInfo.setCommentTime(DateStampUtils.getTimesteamp());
         }
-        goodsInfo.setCommentTime(DateStampUtils.getTimesteamp());
         goodsInfo.setMainImgUrl(param.getImgUrls()[0]);
         goodsInfoMapper.insert(goodsInfo);
         //视频截图路径
@@ -422,6 +432,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             if(param.getImgUrls() != null && param.getImgUrls().length > 0){
                 //删除旧商品图片信息
                 goodsImgMapper.deleteByGoodsId(goodsInfo.getId());
+                goodsInfo.setMainImgUrl(param.getImgUrls()[0]);
                 for(int i=0;i<param.getImgUrls().length;i++){
                     if(i == 0){
                         saveGoodsPicOne(goodsInfo.getId(),param.getImgUrls()[i],1,i+1);
@@ -433,7 +444,9 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             //如果是已下架的商品或抢购，重新上架
             goodsInfo.setStatus(Status.GOODS_IN_SALE.getValue());//状态 1出售中 2已售出 3已下架（已结束） 5删除
             goodsInfo.setUpdateTime(DateStampUtils.getTimesteamp());
-            goodsInfo.setCommentTime(DateStampUtils.getTimesteamp());
+            if(goodsInfo.getType().equals(Status.GOODS.getValue())){
+                goodsInfo.setCommentTime(DateStampUtils.getTimesteamp());
+            }
             if(goodsInfo.getType().equals(Status.AUCTION.getValue())){
                 goodsInfo.setLastIntervalTime(DateStampUtils.getTimesteamp());
             }
@@ -591,7 +604,7 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             //按照会员和认证店铺进行排序
             List<Integer> goodsCategoryIds = goodsCorrelationMapper.selectCategoryIdByGoodsId(goodsId);
             //根据分类列表获取商品的列表
-            List<GoodsInfo> goodsInfos = goodsInfoMapper.selectByCategoryIds(goodsCategoryIds,pageNum*pageSize,pageSize);
+            List<GoodsInfo> goodsInfos = goodsInfoMapper.selectByCategoryIds(goodsId,goodsCategoryIds,pageNum*pageSize,pageSize);
             //获取商品的分类集合
             List<GoodsDto> goodsDtos = GoodsDto.toDtoList(goodsInfos);
 //            for(GoodsInfo model:goodsInfos){
@@ -709,6 +722,10 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
             AdminGoodsDto goodsDto = new AdminGoodsDto(goodsInfo);
 
             List<GoodsImg> goodsImgs = goodsImgMapper.getImgsByGoodsId(goodsInfo.getId());
+            
+            List<GoodsCorrelation> goodsCorrelations = goodsCorrelationMapper.getCorrelationsByGoodsId(goodsInfo.getId());
+            
+            goodsDto.setGoodsCorrelations(GoodsCorrelationDto.toDtoList(goodsCorrelations));
 //            String mainImgUrl = null;
 //            for(GoodsImg goodsImg:goodsImgs){
 //                if(goodsImg.getType() == 1){
@@ -900,6 +917,14 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
 
 
 
+
+	@Override
+	public List<GoodsCategory> getCategoryByParent(Integer parentId) {
+		return goodsCategoryMapper.getChildCategoryList(parentId);
+	}
+
+	
+
     @Override
     @Transactional(rollbackFor=Exception.class)
     @TxTransaction(isStart=true)
@@ -1052,5 +1077,22 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         return true;
     }
 
-
+    @Override
+    public ShareDto getShareData(Integer shopId) throws ServiceException {
+        ShareDto shareDto = new ShareDto();
+        int count = goodsInfoMapper.goodsCount(shopId);
+        shareDto.setGoodsCount(count);
+        List<GoodsInfo> goodsList = goodsInfoMapper.getShareGoodsImgs(shopId);
+        List<GoodsDto> goodsDtos = GoodsDto.toDtoList(goodsList);
+        shareDto.setGoodsList(goodsDtos);
+        SysProperty ruleByKey = sysPropertyMapper.getRuleByKey(Status.SHARE_INVITE_RULE.getMessage());
+        if(ruleByKey != null){
+            shareDto.setRule(ruleByKey.getValue());
+        }
+        SysProperty shareImgUrl = sysPropertyMapper.getRuleByKey(Status.SHARE_IMG_URL.getMessage());
+        if(shareImgUrl != null){
+            shareDto.setImgUrl(shareImgUrl.getValue());
+        }
+        return shareDto;
+    }
 }

@@ -7,11 +7,12 @@ import java.util.Map;
 
 import com.codingapi.tx.annotation.TxTransaction;
 import com.fangyuanyouyue.base.BaseResp;
-import com.fangyuanyouyue.base.util.DateUtil;
-import com.fangyuanyouyue.base.util.ParseReturnValue;
+import com.fangyuanyouyue.base.util.*;
 import com.fangyuanyouyue.user.dao.*;
 import com.fangyuanyouyue.user.dto.*;
 import com.fangyuanyouyue.user.model.*;
+import io.swagger.models.auth.In;
+import org.apache.catalina.User;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,6 @@ import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.ReCode;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
-import com.fangyuanyouyue.base.util.DateStampUtils;
-import com.fangyuanyouyue.base.util.MD5Util;
 import com.fangyuanyouyue.user.constant.StatusEnum;
 import com.fangyuanyouyue.user.dto.admin.AdminUserDto;
 import com.fangyuanyouyue.user.dto.admin.AdminUserNickNameDetailDto;
@@ -85,6 +84,12 @@ public class UserInfoServiceImpl implements UserInfoService {
     private UserAuthApplyMapper userAuthApplyMapper;
     @Autowired
     private GoodsInfoMapper goodsInfoMapper;
+    @Autowired
+    private UserInviteMapper userInviteMapper;
+    @Autowired
+    private InviteCodeMapper inviteCodeMapper;
+    @Autowired
+    private InviteAwardMapper inviteAwardMapper;
 
     @Override
     public UserInfo getUserByToken(String token) throws ServiceException {
@@ -183,6 +188,12 @@ public class UserInfoServiceImpl implements UserInfoService {
         userWallet.setAddTime(DateStampUtils.getTimesteamp());
         userWallet.setAppraisalCount(1);//普通用户只有1次免费鉴定
         userWalletMapper.insert(userWallet);
+        //生成邀请码
+        addInviteCode(user.getId());
+        //根据邀请码新增用户邀请信息
+        if(StringUtils.isNotEmpty(param.getInviteCode())){
+            setUserInvite(user.getId(),param.getInviteCode());
+        }
         //初始化用户钱包
         UserDto userDto = setUserDtoByInfo(token,user);
         //新增优惠券 两张:1 剩下的各一张:23456
@@ -191,12 +202,101 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     /**
+     * 根据邀请码新增用户邀请信息
+     * @param userId
+     * @param inviteCode
+     * @throws ServiceException
+     */
+    void setUserInvite(Integer userId,String inviteCode) throws ServiceException{
+        //新增邀请信息
+        InviteCode userByCode = inviteCodeMapper.getUserByCode(inviteCode);
+        if(userByCode == null){
+            throw new ServiceException("错误的邀请码！");
+        }
+        UserInvite userInvite = new UserInvite();
+        userInvite.setUserId(userByCode.getUserId());
+        userInvite.setUserInviteCode(inviteCode);
+        userInvite.setInviteUserId(userId);
+        userInvite.setAddTime(DateStampUtils.getTimesteamp());
+        try {
+            userInviteMapper.insert(userInvite);
+           //发放奖励
+            issueRewards(userByCode.getUserId());
+        } catch (DuplicateKeyException e) {
+           e.printStackTrace();
+           throw new ServiceException("您已使用过邀请码");
+        }
+    }
+
+    /**
+     * 发放奖励
+     * @throws ServiceException
+     */
+    void issueRewards(Integer userId) throws ServiceException{
+
+        List<UserInvite> userInvites = userInviteMapper.selectUserInviteById(userId);
+        int inviteCount = userInvites.size();
+        //根据邀请规则
+        UserVip userVipByUserId = userVipMapper.getUserVipByUserId(userId);
+        if(inviteCount == 3 || inviteCount == 6 || inviteCount == 10 || inviteCount == 15 || inviteCount == 20 || inviteCount == 25
+                || inviteCount == 30 || inviteCount == 35 || inviteCount == 40 || inviteCount == 45 || inviteCount == 50 || inviteCount == 55) {
+            if (userVipByUserId.getStatus().equals(Status.NOT_VIP.getValue())) {
+                //非会员
+                InviteAward inviteAward = new InviteAward();
+                inviteAward.setAddTime(DateStampUtils.getTimesteamp());
+                inviteAward.setUserId(userId);
+                inviteAward.setVipLevel(Status.VIP_LEVEL_LOW.getValue());
+                inviteAward.setLevelDesc("铂金会员");
+                inviteAwardMapper.insert(inviteAward);
+
+                userVipByUserId.setStartTime(inviteAward.getAddTime());
+                userVipByUserId.setEndTime(DateUtil.getDateAfterMonth(inviteAward.getAddTime(), 1));
+                userVipByUserId.setStatus(Status.IS_VIP.getValue());
+                userVipByUserId.setVipLevel(inviteAward.getVipLevel());
+                userVipByUserId.setLevelDesc(inviteAward.getLevelDesc());
+                userVipByUserId.setFreeTopCount(Status.LOW_FREE_TOP_COUNT.getValue());
+                userVipByUserId.setVipType(Status.VIP_TYPE_ONE_MONTH.getValue());
+                userVipMapper.updateByPrimaryKey(userVipByUserId);
+
+            } else {
+                //会员
+                InviteAward inviteAward = new InviteAward();
+                inviteAward.setAddTime(DateStampUtils.getTimesteamp());
+                inviteAward.setUserId(userId);
+                inviteAward.setVipLevel(userVipByUserId.getVipLevel());
+                inviteAward.setLevelDesc(userVipByUserId.getLevelDesc());
+                inviteAwardMapper.insert(inviteAward);
+                //续费
+                userVipByUserId.setEndTime(DateUtil.getDateAfterMonth(userVipByUserId.getEndTime(), 1));
+                userVipMapper.updateByPrimaryKey(userVipByUserId);
+            }
+        }
+    }
+
+    /**
+     * 生成邀请码
+     * @param userId
+     * @throws ServiceException
+     */
+    void addInviteCode(Integer userId) throws ServiceException{
+        InviteCode inviteCode = new InviteCode();
+        inviteCode.setUserId(userId);
+        String code = CheckCode.getProxyCode();
+        while(inviteCodeMapper.getUserByCode(code) != null){
+            code = CheckCode.getProxyCode();
+        }
+        inviteCode.setUserCode(code);
+        inviteCode.setAddTime(DateStampUtils.getTimesteamp());
+        inviteCodeMapper.insert(inviteCode);
+    }
+
+    /**
      * 用户注册送代金券
      * @param userId
      * @throws ServiceException
      */
     void registSaveUserCoupon(Integer userId) throws ServiceException{
-        //TODO 1、获取注册赠送的代金券
+        //1、获取注册赠送的代金券
         saveUserCoupon(userId,1);
         saveUserCoupon(userId,1);
         saveUserCoupon(userId,2);
@@ -323,9 +423,11 @@ public class UserInfoServiceImpl implements UserInfoService {
             userWallet.setAddTime(DateStampUtils.getTimesteamp());
             userWallet.setAppraisalCount(1);//普通用户只有1次免费鉴定
             userWalletMapper.insert(userWallet);
-            UserDto userDto = setUserDtoByInfo(token,user);
             //送优惠券
             registSaveUserCoupon(user.getId());
+            //生成邀请码
+            addInviteCode(user.getId());
+            UserDto userDto = setUserDtoByInfo(token,user);
             return userDto;
         }else{
             //记录用户登录时间，登录平台，最后一次登录
@@ -408,12 +510,21 @@ public class UserInfoServiceImpl implements UserInfoService {
         }else{
             //用户信息
             if(StringUtils.isNotEmpty(param.getPhone())){
+                if(StringUtils.isNotEmpty(userInfo.getPhone())){
+                    throw new ServiceException("用户已绑定手机号！");
+                }
                 if(StringUtils.isEmpty(userInfo.getLoginPwd()) && StringUtils.isEmpty(param.getLoginPwd())){
                     throw new ServiceException("登录密码不能为空！");
                 }
                 userInfo.setPhone(param.getPhone());
                 if(StringUtils.isNotEmpty(param.getLoginPwd())){
                     userInfo.setLoginPwd(MD5Util.generate(MD5Util.MD5(param.getLoginPwd())));
+                }
+                if(StringUtils.isNotEmpty(param.getInviteCode())){
+                    //根据邀请码新增用户邀请信息
+                    if(StringUtils.isNotEmpty(param.getInviteCode())){
+                        setUserInvite(userInfo.getId(),param.getInviteCode());
+                    }
                 }
             }
             if(StringUtils.isNotEmpty(param.getEmail())){
@@ -532,6 +643,12 @@ public class UserInfoServiceImpl implements UserInfoService {
                 userDto.setCollectCount(userFansMapper.collectCount(user.getId()));
             }
             userDto.setIsHasColumn(JSONObject.parseObject(schedualForumService.isHasColumn(user.getId())).getIntValue("data"));
+            InviteCode inviteCode = inviteCodeMapper.selectUserCodeByUserId(user.getId());
+            if(inviteCode == null){
+                addInviteCode(user.getId());
+                inviteCode = inviteCodeMapper.selectUserCodeByUserId(user.getId());
+            }
+            userDto.setInviteCode(inviteCode.getUserCode());
             return userDto;
         }
     }
@@ -619,9 +736,10 @@ public class UserInfoServiceImpl implements UserInfoService {
             userWallet.setAddTime(DateStampUtils.getTimesteamp());
             userWallet.setAppraisalCount(1);//普通用户只有1次免费鉴定
             userWalletMapper.insert(userWallet);
-            UserDto userDto = setUserDtoByInfo(token,user);
+            addInviteCode(user.getId());
             //送优惠券
             registSaveUserCoupon(user.getId());
+            UserDto userDto = setUserDtoByInfo(token,user);
             return userDto;
         }else{
             UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userThirdParty.getUserId());
@@ -911,5 +1029,98 @@ public class UserInfoServiceImpl implements UserInfoService {
         userInfoMapper.updateByPrimaryKeySelective(userInfo);
         userInfoExtMapper.updateByPrimaryKeySelective(userInfoExt);
     }
-    
+
+    @Override
+    public UserInviteDto getUserInviteInfo(Integer userId) throws ServiceException {
+        InviteCode inviteCode = inviteCodeMapper.selectUserCodeByUserId(userId);
+        List<UserInvite> userInvites = userInviteMapper.selectUserInviteById(userId);
+        int inviteCount = userInvites.size();
+        UserInviteDto userInviteDto = new UserInviteDto();
+        userInviteDto.setInviteCode(inviteCode.getUserCode());
+        userInviteDto.setInviteCount(inviteCount);
+        Integer nextCondition = 3;
+        if(inviteCount < 3){
+
+        }else if(inviteCount >=3 && inviteCount < 6){
+            nextCondition = 6;
+        }else if(inviteCount >=6 && inviteCount < 10){
+            nextCondition = 10;
+        }else if(inviteCount >=10 && inviteCount < 15){
+            nextCondition = 15;
+        }else if(inviteCount >=15 && inviteCount < 20){
+            nextCondition = 20;
+        }else if(inviteCount >=20 && inviteCount < 25){
+            nextCondition = 25;
+        }else if(inviteCount >=25 && inviteCount < 30){
+            nextCondition = 30;
+        }else if(inviteCount >=30 && inviteCount < 35){
+            nextCondition = 35;
+        }else if(inviteCount >=35 && inviteCount < 40){
+            nextCondition = 40;
+        }else if(inviteCount >=40 && inviteCount < 45){
+            nextCondition = 45;
+        }else if(inviteCount >=45 && inviteCount < 50){
+            nextCondition = 50;
+        }else if(inviteCount >=50 && inviteCount < 55){
+            nextCondition = 55;
+        }else if(inviteCount >=55){
+            nextCondition = 55;
+        }
+        userInviteDto.setNextCondition(nextCondition);
+        //奖励内容
+        List<InviteAward> inviteAwards = inviteAwardMapper.selectAwardByUserId(userId);
+        int lowCount = 0;
+        int highCount = 0;
+        for(InviteAward inviteAward:inviteAwards){
+            if(inviteAward.getVipLevel().equals(Status.VIP_LEVEL_LOW.getValue())){
+                lowCount++;
+            }
+            if(inviteAward.getVipLevel().equals(Status.VIP_LEVEL_HIGH.getValue())){
+                highCount++;
+            }
+        }
+        StringBuffer inviteContent = new StringBuffer();
+        if(lowCount > 0 && highCount == 0){
+            inviteContent.append(lowCount+"个月铂金会员");
+        }else if(highCount > 0 && lowCount == 0){
+            inviteContent.append(highCount+"个月至尊会员");
+        }else if(lowCount > 0 && highCount > 0){
+            inviteContent.append(lowCount+"个月铂金会员#"+highCount+"个月至尊会员");
+        }else{
+            inviteContent.append("无");
+        }
+
+        userInviteDto.setInviteAward(inviteContent.toString());
+        return userInviteDto;
+    }
+
+    @Override
+    public void addUserCode() throws ServiceException {
+        List<UserInfo> allUser = userInfoMapper.findAllUser();
+        for(UserInfo userInfo:allUser){
+             InviteCode inviteCode = inviteCodeMapper.selectUserCodeByUserId(userInfo.getId());
+            if(inviteCode != null){
+                continue;
+            }else{
+                inviteCode = new InviteCode();
+                inviteCode.setAddTime(DateStampUtils.getTimesteamp());
+                String code = CheckCode.getProxyCode();
+                while(inviteCodeMapper.getUserByCode(code) != null){
+                    code = CheckCode.getProxyCode();
+                }
+                inviteCode.setUserCode(code);
+                inviteCode.setUserId(userInfo.getId());
+                inviteCodeMapper.insert(inviteCode);
+            }
+        }
+    }
+
+
+    @Override
+    public void verifyInviteCode(String inviteCode) throws ServiceException {
+        InviteCode userByCode = inviteCodeMapper.getUserByCode(inviteCode);
+        if(userByCode == null){
+            throw new ServiceException(ReCode.WRONG_INVITE_CODE.getValue(),ReCode.WRONG_INVITE_CODE.getMessage());
+        }
+    }
 }

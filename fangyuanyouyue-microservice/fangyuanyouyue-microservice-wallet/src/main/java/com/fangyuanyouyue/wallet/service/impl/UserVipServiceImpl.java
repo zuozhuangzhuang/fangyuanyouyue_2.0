@@ -210,6 +210,16 @@ public class UserVipServiceImpl implements UserVipService{
                 }else{
                     throw new ServiceException("会员类型错误！");
                 }
+                UserVip userVip = userVipMapper.selectByUserId(userId);
+                if(userVip.getStatus().equals(Status.IS_VIP.getValue()) && userVip.getVipLevel().equals(Status.VIP_LEVEL_LOW.getValue())){
+                    BigDecimal worth = getVipWorth(userId);
+                    if(worth.compareTo(vipOrder.getAmount()) > 0){
+                        //免费
+                        vipOrder.setAmount(new BigDecimal(0));
+                    }else{
+                        vipOrder.setAmount(vipOrder.getAmount().subtract(worth));
+                    }
+                }
             }else{
                 throw new ServiceException("会员等级错误！");
             }
@@ -252,7 +262,7 @@ public class UserVipServiceImpl implements UserVipService{
             }
             return payInfo.toString();
         }catch (ServiceException e){
-            throw new ServiceException(e.getMessage());
+            throw new ServiceException(e.getCode(),e.getMessage());
         }catch (Exception e){
             throw new ServiceException("会员开通/续费下单失败！");
         }
@@ -408,5 +418,20 @@ public class UserVipServiceImpl implements UserVipService{
             }
             userVipMapper.updateByPrimaryKey(userVip);
         }
+    }
+
+    @Override
+    public BigDecimal getVipWorth(Integer userId) throws ServiceException {
+        UserVip userVip = userVipMapper.selectByUserId(userId);
+        if(!userVip.getStatus().equals(Status.IS_VIP.getValue())){
+            throw new ServiceException("用户非会员");
+        }
+        if(!userVip.getVipLevel().equals(Status.VIP_LEVEL_LOW.getValue())){
+            throw new ServiceException("用户非铂金会员");
+        }
+        long day = (userVip.getEndTime().getTime()-System.currentTimeMillis())/1000/60/60/24;
+        System.out.println(day);
+        BigDecimal worth = new BigDecimal(day).multiply(new BigDecimal(0.8)).setScale(2,BigDecimal.ROUND_HALF_UP);
+        return worth;
     }
 }

@@ -75,4 +75,27 @@ public interface SystemService {
      */
     List<AdminDailyStatisticsDto> getProcessList(Integer count) throws ServiceException;
 
+    /**
+     * 
+     * @param userId
+     * @param id
+     * @param type
+     * @return
+     * @throws ServiceException
+     */
+    String getQRCode(Integer userId,Integer id,Integer type) throws ServiceException;
+
+    /**
+     * 小程序二维码开关
+     * @param status
+     * @throws ServiceException
+     */
+    void updateQRSwitch(Integer status) throws ServiceException;
+
+    /**
+     * 邀请活动开关
+     * @param status
+     * @throws ServiceException
+     */
+    void updateInviteSwitch(Integer status) throws ServiceException;
 }

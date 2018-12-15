@@ -44,6 +44,9 @@ public class UserThirdServiceImpl implements UserThirdService {
     public MergeDto judgeMerge(String token, String unionId, String phone,Integer type) throws ServiceException {
         //当前用户
         UserInfo user = userInfoService.getUserByToken(token);
+        if(StringUtils.isNotEmpty(user.getPhone())){
+            throw new ServiceException("此用户已绑定手机，请勿重复绑定！");
+        }
         UserThirdParty userThird = userThirdPartyMapper.getUserThirdByUserId(user.getId(),type);
         MergeDto mergeDto = new MergeDto();
         mergeDto.setFromUserId(user.getId());

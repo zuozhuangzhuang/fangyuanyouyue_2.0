@@ -84,7 +84,7 @@ public class ForumController extends BaseController {
         @ApiImplicitParam(name = "keyword", value = "搜索关键字",required = false, dataType = "string", paramType = "query"),
         @ApiImplicitParam(name = "searchType", value = "搜索类型 1古物圈子 2专栏精选 ",required = false, dataType = "int", paramType = "query"),
         @ApiImplicitParam(name = "type", value = "帖子类型1帖子 2视频",required = false, dataType = "int", paramType = "query"),
-        @ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
+        @ApiImplicitParam(name = "start", value = "起始页数",required = true, dataType = "int", paramType = "query"),
         @ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query"),
         @ApiImplicitParam(name = "listType", value = "列表类型 1普通列表 2我的帖子/视频列表", required = true, dataType = "int", paramType = "query")
     })

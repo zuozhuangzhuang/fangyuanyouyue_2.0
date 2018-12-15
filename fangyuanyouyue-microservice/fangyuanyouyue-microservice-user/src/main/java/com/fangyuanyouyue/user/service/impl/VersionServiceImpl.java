@@ -1,13 +1,16 @@
 package com.fangyuanyouyue.user.service.impl;
 
 import com.fangyuanyouyue.base.Pager;
+import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
 import com.fangyuanyouyue.base.util.WaterMarkUtils;
 import com.fangyuanyouyue.user.dao.AppVersionMapper;
+import com.fangyuanyouyue.user.dao.SysPropertyMapper;
 import com.fangyuanyouyue.user.dto.AppVersionDto;
 import com.fangyuanyouyue.user.dto.admin.AdminAppVersionDto;
 import com.fangyuanyouyue.user.model.AppVersion;
+import com.fangyuanyouyue.user.model.SysProperty;
 import com.fangyuanyouyue.user.model.UserInfo;
 import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.service.FileUploadService;
@@ -26,6 +29,8 @@ public class VersionServiceImpl implements VersionService {
     private AppVersionMapper appVersionMapper;
     @Autowired
     private FileUploadService fileUploadService;
+    @Autowired
+    private SysPropertyMapper sysPropertyMapper;
 
     @Override
     public AppVersionDto getVersion() throws ServiceException {
@@ -33,7 +38,43 @@ public class VersionServiceImpl implements VersionService {
         if(version == null){
             throw new ServiceException("未发现新版本！");
         }
-        return new AppVersionDto(version);
+        AppVersionDto appVersionDto = new AppVersionDto(version);
+
+        SysProperty inviteRule = sysPropertyMapper.getRuleByKey(Status.INVITE_RULE.getMessage());
+        if(inviteRule != null){
+            appVersionDto.setIsInvite(Status.ISINVITE.getValue());
+        }else{
+            appVersionDto.setIsInvite(Status.NOTINVITE.getValue());
+        }
+
+        SysProperty qrRule = sysPropertyMapper.getRuleByKey(Status.QR_RULE.getMessage());
+        if(qrRule != null){
+            appVersionDto.setSwitchQRCode(Status.ISQRCODE.getValue());
+        }else{
+            appVersionDto.setSwitchQRCode(Status.NOTQRCODE.getValue());
+        }
+        //添加列表后缀配置
+        SysProperty forumSuffix = sysPropertyMapper.getRuleByKey(Status.FORUM_SUFFIX.getMessage());
+        if(forumSuffix != null){
+            appVersionDto.setForumSuffix(forumSuffix.getValue());
+        }
+        SysProperty goodsSuffix = sysPropertyMapper.getRuleByKey(Status.GOODS_SUFFIX.getMessage());
+        if(goodsSuffix != null){
+            appVersionDto.setGoodsSuffix(goodsSuffix.getValue());
+        }
+        SysProperty shopSuffix = sysPropertyMapper.getRuleByKey(Status.SHOP_SUFFIX.getMessage());
+        if(shopSuffix != null){
+            appVersionDto.setShopSuffix(shopSuffix.getValue());
+        }
+        SysProperty videoSuffix = sysPropertyMapper.getRuleByKey(Status.VIDEO_SUFFIX.getMessage());
+        if(videoSuffix != null){
+            appVersionDto.setVideoSuffix(videoSuffix.getValue());
+        }
+        SysProperty detailSuffix = sysPropertyMapper.getRuleByKey(Status.DETAIL_SUFFIX.getMessage());
+        if(detailSuffix != null){
+            appVersionDto.setDetailSuffix(detailSuffix.getValue());
+        }
+        return appVersionDto;
     }
 
     @Override

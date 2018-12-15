@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -325,6 +326,37 @@ public class UserVipController extends BaseController{
             //查看用户剩余置顶次数
             Integer count = userVipService.getFreeTopCount(userId);
             return toSuccess(count);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getCode(),e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "获取用户剩余会员时长价值金额", notes = "(double)根据用户token获取用户剩余会员时长价值金额",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query")
+    })
+    @PostMapping(value = "/getVipWorth")
+    @ResponseBody
+    public BaseResp getVipWorth(WalletParam param) throws IOException {
+        try {
+            log.info("----》获取用户剩余会员时长价值金额《----");
+            log.info("参数："+param.toString());
+            //验证用户
+            if(StringUtils.isEmpty(param.getToken())){
+                return toError("用户token不能为空！");
+            }
+            Integer userId = (Integer)schedualRedisService.get(param.getToken());
+            BaseResp parseReturnValue = ParseReturnValue.getParseReturnValue(schedualUserService.verifyUserById(userId));
+            if(!parseReturnValue.getCode().equals(ReCode.SUCCESS.getValue())){
+                return toError(parseReturnValue.getCode(),parseReturnValue.getReport());
+            }
+            //获取用户剩余会员时长价值金额
+            BigDecimal worth = userVipService.getVipWorth(userId);
+            return toSuccess(worth);
         } catch (ServiceException e) {
             e.printStackTrace();
             return toError(e.getCode(),e.getMessage());

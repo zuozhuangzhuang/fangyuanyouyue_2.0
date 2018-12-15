@@ -146,23 +146,23 @@ public class SendMiniMessage {
         map.put("keyword4","2018年11月10日15:50:19");
 
         AccessToken accessToken = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
-//        String message = makeRouteMessage("onuC35VLb3lBsPPKehB3cNxzBU24", MiniMsg.FORUM_COMMENT.getTemplateId(), MiniMsg.FORUM_COMMENT.getPagePath(), map,"aa44b2cb2b527ef1ac91380bc8ddc397");
+        String message = makeRouteMessage("onuC35VLb3lBsPPKehB3cNxzBU24", MiniMsg.GOODS_APPRAISAL_END.getTemplateId(), MiniMsg.GOODS_APPRAISAL_END.getPagePath(), map,"1542359565074");
         //微信模板消息
 //        String message = makeRouteMessage("onuC35VLb3lBsPPKehB3cNxzBU24", "7RtiYELicy756YYG5bl2-w_KAau9pgb0-TGuU9EGKEk", "page/tabBar/market/market", map,"wx101549451450129e2031460b3267848754");
-//        boolean flag = sendTemplateMessage(accessToken.getToken(), message);
+        boolean flag = sendTemplateMessage(accessToken.getToken(), message);
         //微信客服消息
-        JSONObject message = new JSONObject();
-        //用户的 OpenID
-        message.put("touser","onuC35VLb3lBsPPKehB3cNxzBU24");
-        //消息类型 text:文本消息 image:图片消息 link:图文链接 miniprogrampage:小程序卡片
-        message.put("msgtype","text");
-        //文本消息内容，msgtype="text" 时必填
-        message.put("content","哈哈哈哈哈哈哈哈");
-        //图片消息，msgtype="image" 时必填
-        message.put("image","");
-        //图片消息，msgtype="link" 时必填
-        message.put("link","");
-        message.put("miniprogrampage","");
+//        JSONObject message = new JSONObject();
+//        //用户的 OpenID
+//        message.put("touser","onuC35VLb3lBsPPKehB3cNxzBU24");
+//        //消息类型 text:文本消息 image:图片消息 link:图文链接 miniprogrampage:小程序卡片
+//        message.put("msgtype","text");
+//        //文本消息内容，msgtype="text" 时必填
+//        message.put("content","哈哈哈哈哈哈哈哈");
+//        //图片消息，msgtype="image" 时必填
+//        message.put("image","");
+//        //图片消息，msgtype="link" 时必填
+//        message.put("link","");
+//        message.put("miniprogrampage","");
 //        boolean flag = sendCustomerMessage(accessToken.getToken(), message.toJSONString());
 //        boolean flag = sendCustomerMessage("15_Jtfz1LXay3JP7RyMsuHsIaKSjz948Ly2jTlWXBIr2s5usCGpXdpu88Ov18wnwoIhaTZhnn_d0LdGGOs4lS4mo_l440AU_enJ4K6h9sZkr467mKmA16ZOAERGVtQSWPfAFAWAT", message.toJSONString());
 //        String token = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI).getToken();

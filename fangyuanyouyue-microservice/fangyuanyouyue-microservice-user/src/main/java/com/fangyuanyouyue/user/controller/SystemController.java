@@ -7,6 +7,7 @@ import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.user.dto.AppVersionDto;
 import com.fangyuanyouyue.user.model.UserInfo;
 import com.fangyuanyouyue.user.param.UserParam;
+import com.fangyuanyouyue.user.service.SchedualRedisService;
 import com.fangyuanyouyue.user.service.SystemService;
 import com.fangyuanyouyue.user.service.UserInfoService;
 import com.fangyuanyouyue.user.service.VersionService;
@@ -36,6 +37,8 @@ public class SystemController extends BaseController{
     private SystemService systemService;
     @Autowired
     private VersionService versionService;
+    @Autowired
+    private SchedualRedisService schedualRedisService;
 
     @ApiOperation(value = "意见反馈", notes = "(void)意见反馈",response = BaseResp.class)
     @ApiImplicitParams({
@@ -99,4 +102,81 @@ public class SystemController extends BaseController{
             return toError("系统繁忙，请稍后再试！");
         }
     }
+
+
+    @ApiOperation(value = "获取小程序二维码", notes = "获取小程序二维码",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token",required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "id", value = "id",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1抢购 2商品 3帖子 4个人店铺",required = true, dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/getQRCode")
+    @ResponseBody
+    public BaseResp getQRCode(UserParam param) throws IOException {
+        try {
+            log.info("----》获取小程序二维码《----");
+            Integer userId = null;
+//            if(StringUtils.isNotEmpty(param.getToken())) {
+//                userId = (Integer)schedualRedisService.get(param.getToken());
+//            }
+            String qrCode= systemService.getQRCode(userId,param.getId(),param.getType());
+
+            return toSuccess(qrCode);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getCode(),e.getMessage());
+        }catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "小程序二维码开关", notes = "小程序二维码开关",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "status", value = "开关 1打开 2关闭",required = true, dataType = "int", paramType = "query")
+    })
+    @GetMapping(value = "/updateQRSwitch")
+    @ResponseBody
+    public BaseResp updateQRSwitch(UserParam param) throws IOException {
+        try {
+            log.info("----》小程序二维码开关《----");
+            if(param.getStatus() == null){
+                return toError("开关状态不能为空！");
+            }
+            systemService.updateQRSwitch(param.getStatus());
+
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getCode(),e.getMessage());
+        }catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "邀请活动开关", notes = "邀请活动开关",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "status", value = "开关 1打开 2关闭",required = true, dataType = "int", paramType = "query")
+    })
+    @GetMapping(value = "/updateInviteSwitch")
+    @ResponseBody
+    public BaseResp updateInviteSwitch(UserParam param) throws IOException {
+        try {
+            log.info("----》邀请活动开关《----");
+            if(param.getStatus() == null){
+                return toError("开关状态不能为空！");
+            }
+            systemService.updateInviteSwitch(param.getStatus());
+
+            return toSuccess();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getCode(),e.getMessage());
+        }catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
 }

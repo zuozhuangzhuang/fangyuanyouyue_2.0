@@ -280,6 +280,21 @@ public class AdminController  extends BaseController {
     }
 
 
+    @ApiOperation(value = "获取分类列表", notes = "查看分类列表",response = BaseResp.class)
+    @GetMapping(value = "/childCategorys")
+    @ResponseBody
+    public BaseResp childCategorys(Integer parentId) throws IOException {
+        try {
+            log.info("----》获取菜单列表列表《----");
+            
+            //获取分类列表
+            List<GoodsCategory> datas = goodsInfoService.getCategoryByParent(parentId);
+            return toSuccess(datas);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
 
     //获取商品列表
     @ApiOperation(value = "获取商品、抢购列表", notes = "获取商品、抢购列表",response = BaseResp.class)

@@ -150,7 +150,8 @@ public class RefundServiceImpl implements RefundService{
                         Map<String,Object> map = new HashMap<>();
                         map.put("keyword1",user.getNickName());
                         map.put("keyword2",goodsName.toString());
-                        map.put("keyword3","￥"+orderInfo.getAmount());
+                        OrderPay orderPay = orderPayMapper.selectByOrderId(orderId);
+                        map.put("keyword3","￥"+orderPay.getPayAmount());
                         map.put("keyword4",DateUtil.getFormatDate(orderRefund.getAddTime(), DateUtil.DATE_FORMT));
                         JSONArray jsonArray = JSONArray.parseArray(reason);
                         StringBuffer content = new StringBuffer();
@@ -260,7 +261,7 @@ public class RefundServiceImpl implements RefundService{
                         String openId = baseResp.getData().toString();
                         Map<String,Object> map = new HashMap<>();
                         map.put("keyword1",goodsName.toString());
-                        map.put("keyword2", orderInfo.getAmount()+"元");
+                        map.put("keyword2", orderPay.getPayAmount()+"元");
                         map.put("keyword3",DateUtil.getFormatDate(orderRefund.getEndTime(), DateUtil.DATE_FORMT));
 
                         schedualMessageService.wechatMessage(openId, MiniMsg.REFUND_SUCCESS.getTemplateId(),MiniMsg.REFUND_SUCCESS.getPagePath(),map,formId);
@@ -286,7 +287,7 @@ public class RefundServiceImpl implements RefundService{
                         String openId = baseResp.getData().toString();
                         Map<String,Object> map = new HashMap<>();
                         map.put("keyword1",goodsName.toString());
-                        map.put("keyword2", orderInfo.getAmount()+"元");
+                        map.put("keyword2", orderPay.getPayAmount()+"元");
                         map.put("keyword3",DateUtil.getFormatDate(orderRefund.getEndTime(), DateUtil.DATE_FORMT));
 
                         schedualMessageService.wechatMessage(openId, MiniMsg.REFUND_SUCCESS.getTemplateId(),MiniMsg.REFUND_SUCCESS.getPagePath(),map,formId);
@@ -297,7 +298,7 @@ public class RefundServiceImpl implements RefundService{
                 //订单状态不变
                 //给买家发信息
                 schedualMessageService.easemobMessage(orderInfo.getUserId().toString(),
-                        "很抱歉，您对"+(isAuction?"抢购":"商品")+goodsName+"申请的退货，官方已拒绝",Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),orderInfo.getId().toString());
+                        "很抱歉，您对"+(isAuction?"抢购":"商品")+goodsName+"申请的退货，官方已拒绝，拒绝理由为："+reason,Status.SELLER_MESSAGE.getMessage(),Status.JUMP_TYPE_SYSTEM.getMessage(),orderInfo.getId().toString());
                 //发送微信消息
                 //formId
                 BaseResp baseResp = ParseReturnValue.getParseReturnValue(schedualUserService.getFormId(orderInfo.getUserId()));
@@ -315,7 +316,7 @@ public class RefundServiceImpl implements RefundService{
                         String openId = baseResp.getData().toString();
                         Map<String,Object> map = new HashMap<>();
                         map.put("keyword1",goodsName.toString());
-                        map.put("keyword2", orderInfo.getAmount()+"元");
+                        map.put("keyword2", orderPay.getPayAmount()+"元");
                         map.put("keyword3", reason);
                         map.put("keyword4",DateUtil.getFormatDate(orderRefund.getEndTime(), DateUtil.DATE_FORMT));
 
@@ -342,7 +343,7 @@ public class RefundServiceImpl implements RefundService{
                         String openId = baseResp.getData().toString();
                         Map<String,Object> map = new HashMap<>();
                         map.put("keyword1",goodsName.toString());
-                        map.put("keyword2", orderInfo.getAmount()+"元");
+                        map.put("keyword2", orderPay.getPayAmount()+"元");
                         map.put("keyword3", reason);
                         map.put("keyword4",DateUtil.getFormatDate(orderRefund.getEndTime(), DateUtil.DATE_FORMT));
 

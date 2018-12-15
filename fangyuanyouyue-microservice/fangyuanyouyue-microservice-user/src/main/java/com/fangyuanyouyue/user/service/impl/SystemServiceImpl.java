@@ -2,23 +2,24 @@ package com.fangyuanyouyue.user.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fangyuanyouyue.base.Pager;
+import com.fangyuanyouyue.base.enums.MiniPage;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
-import com.fangyuanyouyue.user.dao.DailyStatisticsMapper;
-import com.fangyuanyouyue.user.dao.FeedbackMapper;
-import com.fangyuanyouyue.user.dao.SysMsgLogMapper;
-import com.fangyuanyouyue.user.dao.UserInfoMapper;
+import com.fangyuanyouyue.base.util.WXQRCode;
+import com.fangyuanyouyue.base.util.wechat.pay.WechatPayConfig;
+import com.fangyuanyouyue.base.util.wechat.pojo.AccessToken;
+import com.fangyuanyouyue.base.util.wechat.utils.WeixinUtil;
+import com.fangyuanyouyue.user.dao.*;
 import com.fangyuanyouyue.user.dto.admin.AdminDailyStatisticsDto;
 import com.fangyuanyouyue.user.dto.admin.AdminFeedbackDto;
 import com.fangyuanyouyue.user.dto.admin.AdminProcessDto;
 import com.fangyuanyouyue.user.dto.admin.AdminSysMsgLogDto;
-import com.fangyuanyouyue.user.model.DailyStatistics;
-import com.fangyuanyouyue.user.model.Feedback;
-import com.fangyuanyouyue.user.model.SysMsgLog;
-import com.fangyuanyouyue.user.model.UserInfo;
+import com.fangyuanyouyue.user.model.*;
 import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.service.*;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.enums.Enum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +48,10 @@ public class SystemServiceImpl implements SystemService {
     private SysMsgLogMapper sysMsgLogMapper;
     @Autowired
     private DailyStatisticsMapper dailyStatisticsMapper;
+    @Autowired
+    private SysPropertyMapper sysPropertyMapper;
+    @Autowired
+    private InviteCodeMapper inviteCodeMapper;
 
     @Override
     public void feedback(Integer userId, String content, Integer type, String version) throws ServiceException {
@@ -157,5 +162,73 @@ public class SystemServiceImpl implements SystemService {
         List<AdminDailyStatisticsDto> dtos = AdminDailyStatisticsDto.toDtoList(dailyStatistics);
         Collections.reverse(dtos);
         return dtos;
+    }
+
+    @Override
+    public String getQRCode(Integer userId,Integer id, Integer type) throws ServiceException {
+        String url = null;
+        String scene = null;
+        for(MiniPage miniPage : MiniPage.values()){
+            if(type.equals(miniPage.getType())){
+                url = miniPage.getUrl();
+                scene = miniPage.getScene()+id;
+            }
+        }
+        if(userId != null && type.equals(MiniPage.SHOP_DETAIL.getType())){
+            InviteCode inviteCode = inviteCodeMapper.selectUserCodeByUserId(userId);
+            if(inviteCode != null){
+                scene += "#inviteCode="+inviteCode.getUserCode();
+            }
+        }
+        //TODO 从redis中取出access_token，目前未将其存入redis (#^.^#)
+        AccessToken accessTokenObj = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
+        String miniQr = WXQRCode.getMiniQr(scene, accessTokenObj.getToken(), url);
+        return miniQr;
+    }
+
+    @Override
+    public void updateQRSwitch(Integer status) throws ServiceException {
+        if(status.equals(Status.ISQRCODE.getValue())){
+            //开
+            SysProperty ruleByKey = sysPropertyMapper.getRuleByKey(Status.QR_RULE_OFF.getMessage());
+            if(ruleByKey == null){
+                throw new ServiceException("没有找到此配置！");
+            }
+            ruleByKey.setKeyWord(Status.QR_RULE.getMessage());
+            sysPropertyMapper.updateByPrimaryKey(ruleByKey);
+        }else if(status.equals(Status.NOTQRCODE.getValue())){
+            //关
+            SysProperty ruleByKey = sysPropertyMapper.getRuleByKey(Status.QR_RULE.getMessage());
+            if(ruleByKey == null){
+                throw new ServiceException("没有找到此配置！");
+            }
+            ruleByKey.setKeyWord(Status.QR_RULE_OFF.getMessage());
+            sysPropertyMapper.updateByPrimaryKey(ruleByKey);
+        }else{
+            throw new ServiceException("开关状态错误！");
+        }
+    }
+
+    @Override
+    public void updateInviteSwitch(Integer status) throws ServiceException {
+        if(status.equals(Status.ISINVITE.getValue())){
+            //开
+            SysProperty ruleByKey = sysPropertyMapper.getRuleByKey(Status.INVITE_RULE_OFF.getMessage());
+            if(ruleByKey == null){
+                throw new ServiceException("没有找到此配置！");
+            }
+            ruleByKey.setKeyWord(Status.INVITE_RULE.getMessage());
+            sysPropertyMapper.updateByPrimaryKey(ruleByKey);
+        }else if(status.equals(Status.NOTINVITE.getValue())){
+            //关
+            SysProperty ruleByKey = sysPropertyMapper.getRuleByKey(Status.INVITE_RULE.getMessage());
+            if(ruleByKey == null){
+                throw new ServiceException("没有找到此配置！");
+            }
+            ruleByKey.setKeyWord(Status.INVITE_RULE_OFF.getMessage());
+            sysPropertyMapper.updateByPrimaryKey(ruleByKey);
+        }else{
+            throw new ServiceException("开关状态错误！");
+        }
     }
 }

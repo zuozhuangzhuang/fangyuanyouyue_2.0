@@ -71,9 +71,9 @@ public class SysRoleServiceImpl implements SysRoleService{
 	public void saveRole(AdminRoleParam param) throws ServiceException {
 
 		SysRole role = null;
-		if(param.getId()!=null&&param.getId()>0) {
-			role = sysRoleMapper.selectByPrimaryKey(param.getId());
-			role.setAddTime(new Date());
+		if(param.getRoleId()!=null&&param.getRoleId()>0) {
+			role = sysRoleMapper.selectByPrimaryKey(param.getRoleId());
+			//role.setup(new Date());
 			role.setName(param.getRoleName());
 			role.setStatus(0);
 			sysRoleMapper.updateByPrimaryKey(role);

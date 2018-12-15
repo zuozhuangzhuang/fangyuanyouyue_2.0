@@ -101,7 +101,7 @@ public class AppraisalController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "keyword", value = "关键字",required = false, dataType = "string", paramType = "query"),
-            @ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "start", value = "起始页数",required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "type", value = "类型 1我参与的 2我发起的(为空则是普通列表)",required = false, dataType = "int", paramType = "query")
     })
@@ -136,7 +136,7 @@ public class AppraisalController extends BaseController {
     @ApiImplicitParams({ 
     		@ApiImplicitParam(name = "token", value = "用户token", required = false, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "appraisalId", value = "鉴定id",required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "start", value = "起始条数",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "start", value = "起始页数",required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "limit", value = "每页条数",required = true, dataType = "int", paramType = "query")
     })
     @PostMapping(value = "/comment/list")

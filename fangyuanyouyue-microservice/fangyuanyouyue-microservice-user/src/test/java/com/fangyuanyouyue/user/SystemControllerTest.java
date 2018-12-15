@@ -65,6 +65,7 @@ public class SystemControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
+
     /**
      * 获取统计信息
      * @throws Exception
@@ -74,6 +75,21 @@ public class SystemControllerTest {
     public void getProcessList() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/system/getProcessList")
                 .param("count","7")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    /**
+     * 获取小程序二维码
+     * @throws Exception
+     */
+    @Test
+    public void getQRCode() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/system/getQRCode")
+                .param("token","116418FY1544238047739")
+                .param("id","106418")
+                .param("type","1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();

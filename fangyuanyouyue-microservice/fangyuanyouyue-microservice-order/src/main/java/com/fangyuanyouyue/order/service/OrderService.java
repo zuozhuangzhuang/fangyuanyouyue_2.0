@@ -226,5 +226,11 @@ public interface OrderService {
      */
     Integer processAllOrder(Integer status)throws ServiceException;
 
-
+    /**
+     * 验证是否可以购买抢购
+     * @param userId
+     * @return
+     * @throws ServiceException
+     */
+    Boolean verifyFreeAuction(Integer userId) throws ServiceException;
 }

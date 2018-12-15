@@ -718,7 +718,7 @@ public class OrderServiceImpl implements OrderService{
 	            if(!Boolean.valueOf(JSONObject.parseObject(schedualWalletService.isUserVip(userId)).getString("data"))){
 	                List<UserBehavior> userBehaviors = userBehaviorMapper.selectByUserIdType(userId, Status.BUY_AUCTION.getValue());
 	                if(userBehaviors != null && userBehaviors.size() > 0){
-	                    throw new ServiceException("非会员只能免费抢购一次！");
+	                    throw new ServiceException(ReCode.INSUFFICIENT_FREE_AUCTION.getValue(),ReCode.INSUFFICIENT_FREE_AUCTION.getMessage());
 	                }else{
 	                    UserBehavior userBehavior = new UserBehavior();
 	                    userBehavior.setUserId(userId);
@@ -1011,13 +1011,16 @@ public class OrderServiceImpl implements OrderService{
                 //商品名称
                 List<OrderDetail> orderDetails = orderDetailMapper.selectByOrderId(orderId);
                 StringBuffer goodsName = new StringBuffer();
+                boolean isAuction = false;
                 for(OrderDetail detail:orderDetails){
                     //获取商品、抢购信息
                     baseResp = ParseReturnValue.getParseReturnValue(schedualGoodsService.goodsInfo(detail.getGoodsId()));
                     if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                     }
-                    goodsName.append("【"+detail.getGoodsName()+"】");
+                    GoodsInfo goodsInfo = JSONObject.toJavaObject(JSONObject.parseObject(baseResp.getData().toString()), GoodsInfo.class);
+                    isAuction = goodsInfo.getType().intValue() == Status.AUCTION.getValue()?true:false;
+                    goodsName.append("【"+goodsInfo.getName()+"】");
                 }
                 //卖家余额账单
                 baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(orderInfo.getSellerId(),orderPay.getPayAmount(),Status.PAY_TYPE_BALANCE.getValue(),Status.INCOME.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),orderInfo.getOrderNo()));
@@ -1234,7 +1237,7 @@ public class OrderServiceImpl implements OrderService{
                             }
                         }
                         //买家新增余额账单
-                        baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(childOrder.getUserId(),pay.getPayAmount(),payType,Status.EXPEND.getValue(),childOrder.getOrderNo(),goodsName.toString(),childOrder.getSellerId(),childOrder.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo));
+                        baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(childOrder.getUserId(),pay.getPayAmount(),payType,Status.EXPEND.getValue(),childOrder.getOrderNo(),goodsName.toString(),childOrder.getSellerId(),childOrder.getUserId(),isAuction?Status.AUCTION_INFO.getValue():Status.GOODS_INFO.getValue(),thirdOrderNo));
                         if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                             throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                         }
@@ -1283,7 +1286,7 @@ public class OrderServiceImpl implements OrderService{
                         }
                     }
                     //买家新增余额账单
-                    baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(orderInfo.getUserId(),orderPay.getPayAmount(),payType,Status.EXPEND.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),Status.GOODS_INFO.getValue(),thirdOrderNo));
+                    baseResp = ParseReturnValue.getParseReturnValue(schedualWalletService.addUserBalanceDetail(orderInfo.getUserId(),orderPay.getPayAmount(),payType,Status.EXPEND.getValue(),orderInfo.getOrderNo(),goodsName.toString(),orderInfo.getSellerId(),orderInfo.getUserId(),isAuction?Status.AUCTION_INFO.getValue():Status.GOODS_INFO.getValue(),thirdOrderNo));
                     if(!baseResp.getCode().equals(ReCode.SUCCESS.getValue())){
                         throw new ServiceException(baseResp.getCode(),baseResp.getReport());
                     }
@@ -1321,11 +1324,20 @@ public class OrderServiceImpl implements OrderService{
                 orderDetails = orderDetailMapper.selectByOrderId(orderDto.getOrderId());
             }
             ArrayList<AdminOrderDetailDto> orderDetailDtos = AdminOrderDetailDto.toDtoList(orderDetails);
-            String orderDetail = "";
-            for(AdminOrderDetailDto detail:orderDetailDtos) {
-            	orderDetail += "卖家："+detail.getNickName()+" - "+detail.getPhone()+"，商品："+detail.getGoodsName() + "<br>";
+            StringBuffer orderDetail = new StringBuffer();
+            for(OrderDetail detail:orderDetails){
+                AdminOrderDetailDto adminOrderDetailDto = new AdminOrderDetailDto(detail);
+                orderDetail.append("卖家："+detail.getNickName()+" - "+detail.getPhone()+"，商品："+detail.getGoodsName());
+                //优惠券
+                if(detail.getCouponId() != null){
+                    UserCoupon userCoupon = userCouponMapper.selectUserCouponDetail(detail.getCouponId());
+                    if(userCoupon != null){
+                        orderDetail.append("，优惠券："+userCoupon.getCouponAmount());
+                    }
+                }
+                orderDetail.append("<br>");
             }
-            orderDto.setOrderDetail(orderDetail);
+            orderDto.setOrderDetail(orderDetail.toString());
             orderDto.setTotalCount(orderDetailDtos.size());
 
             orderDtos.add(orderDto);
@@ -1456,4 +1468,18 @@ public class OrderServiceImpl implements OrderService{
         return allOrderCount;
     }
 
+    @Override
+    public Boolean verifyFreeAuction(Integer userId) throws ServiceException {
+        //非会员只能免费抢购一次，会员可无限制抢购——验证是否为会员
+        if(!Boolean.valueOf(JSONObject.parseObject(schedualWalletService.isUserVip(userId)).getString("data"))){
+            List<UserBehavior> userBehaviors = userBehaviorMapper.selectByUserIdType(userId, Status.BUY_AUCTION.getValue());
+            if(userBehaviors != null && userBehaviors.size() > 0){
+                return false;
+            }else{
+                return true;
+            }
+        }else{
+            return true;
+        }
+    }
 }

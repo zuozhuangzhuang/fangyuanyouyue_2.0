@@ -167,4 +167,9 @@ public class GoodsParam{
 
     @ApiModelProperty(name = "formId", value = "小程序表单提交ID", dataType = "String",hidden = true)
     private String formId;//小程序表单提交ID
+
+    @ApiModelProperty(name = "id", value = "id", dataType = "int",hidden = true)
+    private Integer id;
+    @ApiModelProperty(name = "shopId", value = "店铺id", dataType = "int",hidden = true)
+    private Integer shopId;
 }

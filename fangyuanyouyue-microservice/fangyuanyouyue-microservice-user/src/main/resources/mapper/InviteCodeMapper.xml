@@ -86,4 +86,12 @@
       add_time = #{addTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="getUserByCode" resultMap="BaseResultMap">
+    select * from invite_code where user_code = #{inviteCode}
+  </select>
+
+  <select id="selectUserCodeByUserId" resultMap="BaseResultMap">
+    select * from invite_code where user_id = #{userId}
+  </select>
 </mapper>
