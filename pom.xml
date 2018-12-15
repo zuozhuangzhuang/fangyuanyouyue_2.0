@@ -21,6 +21,7 @@
 		<module>fangyuanyouyue-common</module>
 		<module>fangyuanyouyue-microservice</module>
 		<module>fangyuanyouyue-server</module>
+		<module>tx-manager</module>
 	</modules>
 	<properties>
 		<spring-cloud-starter-openfeign.version>2.0.0.RELEASE</spring-cloud-starter-openfeign.version>

@@ -90,7 +90,7 @@ public class SysOperatorServiceImpl implements SysOperatorService{
 			if(sysOperatorMapper.countUser(param.getUserCode())>0) {
 				throw new ServiceException("登录名不能重复");
 			}
-			if(param.getPassword()!=null&&param.getPassword().trim().length()>0) {
+			if(param.getPassword()==null||param.getPassword().trim().length()<=0) {
 				throw new ServiceException("登录密码不能为空");
 			}
 			SysOperator oper = new SysOperator();
