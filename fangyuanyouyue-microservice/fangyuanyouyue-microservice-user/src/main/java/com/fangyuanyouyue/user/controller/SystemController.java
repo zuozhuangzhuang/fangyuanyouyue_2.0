@@ -116,9 +116,9 @@ public class SystemController extends BaseController{
         try {
             log.info("----》获取小程序二维码《----");
             Integer userId = null;
-            if(StringUtils.isNotEmpty(param.getToken())) {
-                userId = (Integer)schedualRedisService.get(param.getToken());
-            }
+//            if(StringUtils.isNotEmpty(param.getToken())) {
+//                userId = (Integer)schedualRedisService.get(param.getToken());
+//            }
             String qrCode= systemService.getQRCode(userId,param.getId(),param.getType());
 
             return toSuccess(qrCode);
