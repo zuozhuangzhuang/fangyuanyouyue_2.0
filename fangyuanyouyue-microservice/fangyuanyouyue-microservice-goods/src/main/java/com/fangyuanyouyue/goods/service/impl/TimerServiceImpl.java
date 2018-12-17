@@ -137,7 +137,8 @@ public class TimerServiceImpl implements TimerService{
             if(goodsInfo.getPrice().compareTo(goodsInfo.getFloorPrice()) <= 0){
                 //如果当前价格与最低价相同，break
                 goodsInfo.setStatus(Status.GOODS_REMOVED.getValue());
-                goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
+                goodsInfo.setCommentTime(null);
+                goodsInfoMapper.updateByPrimaryKey(goodsInfo);
                 return;
             }
             //抢购降价历史
