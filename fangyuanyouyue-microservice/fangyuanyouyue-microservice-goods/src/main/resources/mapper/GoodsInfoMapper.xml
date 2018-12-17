@@ -454,7 +454,7 @@
                 a.add_time desc,
             </if>
         </if>
-        a.sort,a.comment_time desc,a.add_time limit #{start},#{limit}
+        a.sort,a.comment_time desc,((unix_timestamp(a.add_time)+((a.start_price-a.floor_price)/a.markdown+1)*a.interval_time*1000-unix_timestamp(now()))) limit #{start},#{limit}
     </select>
 
 
