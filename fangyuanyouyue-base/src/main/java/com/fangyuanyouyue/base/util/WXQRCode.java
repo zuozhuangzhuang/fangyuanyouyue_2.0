@@ -67,7 +67,7 @@ public class WXQRCode {
             String url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" + accessToken;
             Map<String, Object> param = new HashMap<>();
             param.put("scene", sceneStr);
-//            param.put("page", page);
+            param.put("page", page);
             param.put("width", 280);
             logger.info("调用生成微信URL接口传参：" + param);
 

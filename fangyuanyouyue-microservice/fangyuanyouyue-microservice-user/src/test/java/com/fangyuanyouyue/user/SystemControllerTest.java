@@ -104,7 +104,7 @@ public class SystemControllerTest {
         mvc.perform(MockMvcRequestBuilders.post("/system/getQRCodeUrl")
                 .param("token","116418FY1545086580844")
                 .param("id","106418")
-                .param("type","4")
+                .param("type","1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
