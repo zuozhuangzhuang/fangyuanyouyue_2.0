@@ -1,11 +1,14 @@
 package com.fangyuanyouyue.user.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.aliyun.oss.OSSClient;
 import com.fangyuanyouyue.base.Pager;
 import com.fangyuanyouyue.base.enums.MiniPage;
 import com.fangyuanyouyue.base.enums.Status;
 import com.fangyuanyouyue.base.exception.ServiceException;
 import com.fangyuanyouyue.base.util.DateStampUtils;
+import com.fangyuanyouyue.base.util.DateUtil;
+import com.fangyuanyouyue.base.util.IdGenerator;
 import com.fangyuanyouyue.base.util.WXQRCode;
 import com.fangyuanyouyue.base.util.wechat.pay.WechatPayConfig;
 import com.fangyuanyouyue.base.util.wechat.pojo.AccessToken;
@@ -18,16 +21,15 @@ import com.fangyuanyouyue.user.dto.admin.AdminSysMsgLogDto;
 import com.fangyuanyouyue.user.model.*;
 import com.fangyuanyouyue.user.param.AdminUserParam;
 import com.fangyuanyouyue.user.service.*;
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.enums.Enum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.InputStream;
+import java.util.*;
 
 @Service(value = "systemService")
 @Transactional(rollbackFor=Exception.class)
@@ -52,6 +54,8 @@ public class SystemServiceImpl implements SystemService {
     private SysPropertyMapper sysPropertyMapper;
     @Autowired
     private InviteCodeMapper inviteCodeMapper;
+    @Autowired
+    private FileUploadService fileUploadService;
 
     @Override
     public void feedback(Integer userId, String content, Integer type, String version) throws ServiceException {
@@ -167,23 +171,47 @@ public class SystemServiceImpl implements SystemService {
     @Override
     public String getQRCode(Integer userId,Integer id, Integer type) throws ServiceException {
         String url = null;
-        String scene = null;
+        String scene = ""+id;
         for(MiniPage miniPage : MiniPage.values()){
             if(type.equals(miniPage.getType())){
                 url = miniPage.getUrl();
-                scene = miniPage.getScene()+id;
             }
         }
         if(userId != null && type.equals(MiniPage.SHOP_DETAIL.getType())){
             InviteCode inviteCode = inviteCodeMapper.selectUserCodeByUserId(userId);
             if(inviteCode != null){
-                scene += "#inviteCode="+inviteCode.getUserCode();
+                scene += "#"+inviteCode.getUserCode();
             }
         }
         //TODO 从redis中取出access_token，目前未将其存入redis (#^.^#)
         AccessToken accessTokenObj = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
-        String miniQr = WXQRCode.getMiniQr(scene, accessTokenObj.getToken(), url);
+        String miniQr = WXQRCode.getMiniQrBase64(scene, accessTokenObj.getToken(), url);
         return miniQr;
+    }
+
+    @Override
+    public String getQRCodeUrl(Integer userId,Integer id, Integer type) throws ServiceException {
+        String url = null;
+        String scene = ""+id;
+        for(MiniPage miniPage : MiniPage.values()){
+            if(type.equals(miniPage.getType())){
+                url = miniPage.getUrl();
+            }
+        }
+        if(userId != null && type.equals(MiniPage.SHOP_DETAIL.getType())){
+            InviteCode inviteCode = inviteCodeMapper.selectUserCodeByUserId(userId);
+            if(inviteCode != null){
+                scene += "#"+inviteCode.getUserCode();
+            }
+        }
+        //TODO 从redis中取出access_token，目前未将其存入redis (#^.^#)
+        AccessToken accessTokenObj = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
+        InputStream miniQrInput = WXQRCode.getMiniQrInput(scene, accessTokenObj.getToken(), url);
+
+        final IdGenerator idg = IdGenerator.INSTANCE;
+        String fileName = "pic" +DateUtil.getCurrentDate("/yyyy/MM/dd/")+UUID.randomUUID()+".png";
+        String imgUrl = fileUploadService.uploadFileByInputStream(miniQrInput,fileName);
+        return imgUrl;
     }
 
     @Override

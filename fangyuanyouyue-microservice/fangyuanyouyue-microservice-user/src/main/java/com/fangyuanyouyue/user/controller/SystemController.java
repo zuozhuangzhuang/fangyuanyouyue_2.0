@@ -116,10 +116,37 @@ public class SystemController extends BaseController{
         try {
             log.info("----》获取小程序二维码《----");
             Integer userId = null;
-//            if(StringUtils.isNotEmpty(param.getToken())) {
-//                userId = (Integer)schedualRedisService.get(param.getToken());
-//            }
+            if(StringUtils.isNotEmpty(param.getToken())) {
+                userId = (Integer)schedualRedisService.get(param.getToken());
+            }
             String qrCode= systemService.getQRCode(userId,param.getId(),param.getType());
+
+            return toSuccess(qrCode);
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            return toError(e.getCode(),e.getMessage());
+        }catch (Exception e) {
+            e.printStackTrace();
+            return toError("系统繁忙，请稍后再试！");
+        }
+    }
+
+    @ApiOperation(value = "获取小程序二维码路径", notes = "获取小程序二维码路径",response = BaseResp.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "用户token",required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "id", value = "id",required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "类型 1抢购 2商品 3帖子 4个人店铺",required = true, dataType = "int", paramType = "query")
+    })
+    @PostMapping(value = "/getQRCodeUrl")
+    @ResponseBody
+    public BaseResp getQRCodeUrl(UserParam param) throws IOException {
+        try {
+            log.info("----》获取小程序二维码路径《----");
+            Integer userId = null;
+            if(StringUtils.isNotEmpty(param.getToken())) {
+                userId = (Integer)schedualRedisService.get(param.getToken());
+            }
+            String qrCode= systemService.getQRCodeUrl(userId,param.getId(),param.getType());
 
             return toSuccess(qrCode);
         } catch (ServiceException e) {
