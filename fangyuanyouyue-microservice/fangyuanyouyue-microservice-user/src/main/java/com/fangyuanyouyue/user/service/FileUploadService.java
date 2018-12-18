@@ -4,6 +4,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fangyuanyouyue.base.exception.ServiceException;
 
+import java.io.InputStream;
+
 public interface FileUploadService {
     /**
      * 上传图片文件，获取下载url
@@ -30,6 +32,15 @@ public interface FileUploadService {
      * @throws ServiceException
      */
     String uploadFile(MultipartFile file, String fileUrl, String fileName) throws ServiceException;
+
+    /**
+     * 根据输入流上传文件，获取地址
+     * @param inputStream
+     * @param fileName
+     * @return
+     * @throws ServiceException
+     */
+    String uploadFileByInputStream(InputStream inputStream, String fileName) throws ServiceException;
 
     /**
      * 获取文件名

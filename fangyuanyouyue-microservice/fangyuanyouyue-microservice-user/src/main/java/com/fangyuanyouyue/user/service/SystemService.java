@@ -86,6 +86,16 @@ public interface SystemService {
     String getQRCode(Integer userId,Integer id,Integer type) throws ServiceException;
 
     /**
+     * 获取小程序二维码路径
+     * @param userId
+     * @param id
+     * @param type
+     * @return
+     * @throws ServiceException
+     */
+    String getQRCodeUrl(Integer userId,Integer id,Integer type) throws ServiceException;
+
+    /**
      * 小程序二维码开关
      * @param status
      * @throws ServiceException
