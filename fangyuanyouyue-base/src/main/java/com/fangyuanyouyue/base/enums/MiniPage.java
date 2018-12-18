@@ -23,7 +23,7 @@ public enum MiniPage {
     MiniPage() {
     }
 
-    MiniPage(Integer type, String urle) {
+    MiniPage(Integer type, String url) {
         this.type = type;
         this.url = url;
     }
