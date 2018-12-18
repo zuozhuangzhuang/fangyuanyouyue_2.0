@@ -100,6 +100,28 @@ public class FileUploadServiceImpl implements FileUploadService{
     }
 
     /**
+     * 根据输入流上传文件，获取地址
+     * @param file
+     * @param fileName
+     * @return
+     */
+    @Override
+    public String uploadFileByInputStream(InputStream inputStream, String fileName) {
+        String fileUrl = "";
+        try{
+            OSSClient ossClient = new OSSClient(endpoint, accessKeyId, accessKeySecret);
+            // 上传文件流file
+            ossClient.putObject(bucket, fileName, inputStream);
+            // 关闭client
+            ossClient.shutdown();
+            fileUrl = ossPath+fileName;
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return fileUrl;
+    }
+
+    /**
      * 获取文件名
      * @param fileName
      * @return
