@@ -42,7 +42,7 @@ public class WXQRCode {
 
             byte[] result = entity.getBody();
             resultStr = "data:image/png;base64,"+Base64.encodeBase64String(result);
-            logger.info("调用小程序生成微信小程序码URL接口返回结果：" + resultStr);
+//            logger.info("调用小程序生成微信小程序码URL接口返回结果：" + resultStr);
 
         } catch (Exception e) {
             logger.error("调用小程序生成微信小程序码URL接口异常", e);
@@ -77,7 +77,7 @@ public class WXQRCode {
 
             byte[] result = entity.getBody();
             resultStr = "data:image/png;base64,"+Base64.encodeBase64String(result);
-            logger.info("调用小程序生成微信小程序码URL接口返回结果：" + resultStr);
+//            logger.info("调用小程序生成微信小程序码URL接口返回结果：" + resultStr);
             inputStream = new ByteArrayInputStream(result);
 
         } catch (Exception e) {
@@ -95,39 +95,9 @@ public class WXQRCode {
         return inputStream;
     }
 
-    //base64字符串转化成图片
-    public static boolean GenerateImage(String imgStr)
-    {   //对字节数组字符串进行Base64解码并生成图片
-        if (imgStr == null) //图像数据为空
-            return false;
-        BASE64Decoder decoder = new BASE64Decoder();
-        try
-        {
-            //Base64解码
-            byte[] b = decoder.decodeBuffer(imgStr);
-            for(int i=0;i<b.length;++i)
-            {
-                if(b[i]<0)
-                {//调整异常数据
-                    b[i]+=256;
-                }
-            }
-            //生成jpeg图片
-            String imgFilePath = "D:\\new.png";//新生成的图片
-            OutputStream out = new FileOutputStream(imgFilePath);
-            out.write(b);
-            out.flush();
-            out.close();
-            return true;
-        }
-        catch (Exception e)
-        {
-            return false;
-        }
-    }
     public static void main(String[] args) {
         AccessToken accessToken = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
-//        String miniQr = getMiniQr("1", accessToken.getToken(), MiniPage.SHOP_DETAIL.getUrl());
+        String miniQr = getMiniQrBase64("userId=106418#inviteCode=abcdefgh", accessToken.getToken(), MiniPage.SHOP_DETAIL.getUrl());
     }
 
 }
