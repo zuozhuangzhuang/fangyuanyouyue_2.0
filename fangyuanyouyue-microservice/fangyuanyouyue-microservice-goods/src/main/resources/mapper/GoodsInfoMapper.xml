@@ -462,7 +462,7 @@
     <select id="getCompletedAuctionList" parameterType="Integer" resultMap="BaseResultMap">
         select
         a.id,a.user_id,a.name,a.price,a.main_img_url,a.markdown,a.interval_time,a.last_interval_time,a.floor_price,a.type,a.status,c.nick_name,c.head_img_url
-        from goods_info a left join user_info c on a.user_id = c.id left join order_detail d on a.id = d.goods_id left join order_info e on d.order_id = e.id and e.status <![CDATA[ <> ]]> 5
+        from goods_info a join user_info c on a.user_id = c.id join order_detail d on a.id = d.goods_id join order_info e on d.order_id = e.id and e.status <![CDATA[ <> ]]> 5
         <where>
             a.type = 2 and a.status = 2
             <if test="priceMin != null">
