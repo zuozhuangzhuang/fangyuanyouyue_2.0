@@ -171,17 +171,16 @@ public class SystemServiceImpl implements SystemService {
     @Override
     public String getQRCode(Integer userId,Integer id, Integer type) throws ServiceException {
         String url = null;
-        String scene = null;
+        String scene = ""+id;
         for(MiniPage miniPage : MiniPage.values()){
             if(type.equals(miniPage.getType())){
                 url = miniPage.getUrl();
-                scene = miniPage.getScene()+id;
             }
         }
         if(userId != null && type.equals(MiniPage.SHOP_DETAIL.getType())){
             InviteCode inviteCode = inviteCodeMapper.selectUserCodeByUserId(userId);
             if(inviteCode != null){
-                scene += "#inviteCode="+inviteCode.getUserCode();
+                scene += "#"+inviteCode.getUserCode();
             }
         }
         //TODO 从redis中取出access_token，目前未将其存入redis (#^.^#)
@@ -193,27 +192,25 @@ public class SystemServiceImpl implements SystemService {
     @Override
     public String getQRCodeUrl(Integer userId,Integer id, Integer type) throws ServiceException {
         String url = null;
-        String scene = null;
+        String scene = ""+id;
         for(MiniPage miniPage : MiniPage.values()){
             if(type.equals(miniPage.getType())){
                 url = miniPage.getUrl();
-                scene = miniPage.getScene()+id;
             }
         }
         if(userId != null && type.equals(MiniPage.SHOP_DETAIL.getType())){
             InviteCode inviteCode = inviteCodeMapper.selectUserCodeByUserId(userId);
             if(inviteCode != null){
-                scene += "#inviteCode="+inviteCode.getUserCode();
+                scene += "#"+inviteCode.getUserCode();
             }
         }
         //TODO 从redis中取出access_token，目前未将其存入redis (#^.^#)
         AccessToken accessTokenObj = WeixinUtil.getAccessToken(WechatPayConfig.APP_ID_MINI, WechatPayConfig.APP_SECRET_MINI);
-//        String miniQr = WXQRCode.getMiniQr(scene, accessTokenObj.getToken(), url);
-        InputStream miniQr = WXQRCode.getMiniQrInput(scene, accessTokenObj.getToken(), url);
+        InputStream miniQrInput = WXQRCode.getMiniQrInput(scene, accessTokenObj.getToken(), url);
 
         final IdGenerator idg = IdGenerator.INSTANCE;
         String fileName = "pic" +DateUtil.getCurrentDate("/yyyy/MM/dd/")+UUID.randomUUID()+".png";
-        String imgUrl = fileUploadService.uploadFileByInputStream(miniQr,fileName);
+        String imgUrl = fileUploadService.uploadFileByInputStream(miniQrInput,fileName);
         return imgUrl;
     }
 
