@@ -378,9 +378,11 @@
     </select>
 
     <select id="getAuctionList" parameterType="Integer" resultMap="BaseResultMap">
-        select a.id,a.user_id,a.name,a.price,a.main_img_url,a.markdown,a.interval_time,a.last_interval_time,a.floor_price,a.type,a.status,c.nick_name,c.head_img_url from goods_info a,user_info_ext b,user_info c
+        select
+        a.id,a.user_id,a.name,a.price,a.main_img_url,a.markdown,a.interval_time,a.last_interval_time,a.floor_price,a.type,a.status,c.nick_name,c.head_img_url
+        from goods_info a left join user_info_ext b on a.user_id = b.user_id left join user_info c on a.user_id = c.id
         <where>
-            a.user_id = b.user_id and a.user_id = c.id and a.type = 2
+            a.type = 2
             <if test="status != null and quality != 5">
                 and a.status = #{status,jdbcType=INTEGER}
             </if>
@@ -455,6 +457,33 @@
             </if>
         </if>
         a.sort,a.comment_time desc,((unix_timestamp(a.add_time)+((a.start_price-a.floor_price)/a.markdown+1)*a.interval_time*1000-unix_timestamp(now()))) limit #{start},#{limit}
+    </select>
+
+    <select id="getCompletedAuctionList" parameterType="Integer" resultMap="BaseResultMap">
+        select
+        DISTINCT a.id,a.user_id,a.name,a.price,a.main_img_url,a.markdown,a.interval_time,a.last_interval_time,a.floor_price,a.type,a.status,c.nick_name,c.head_img_url
+        from goods_info a left join user_info c on a.user_id = c.id left join order_detail d on a.id = d.goods_id
+        <where>
+            a.type = 2 and a.status = 2
+            <if test="priceMin != null">
+                and a.price <![CDATA[ >= ]]> #{priceMin,jdbcType=DECIMAL}
+            </if>
+            <if test="priceMax != null">
+                and a.price <![CDATA[ < ]]> #{priceMax,jdbcType=DECIMAL}
+            </if>
+            <if test="goodsCategoryIds != null and goodsCategoryIds.length &gt; 0">
+                and a.id in (select goods_id from goods_correlation where (goods_category_id in
+                <foreach close=")" collection="goodsCategoryIds" index="index" item="categoryId" open="(" separator=",">
+                    #{categoryId,jdbcType=INTEGER}
+                </foreach>
+                or category_parent_id in
+                <foreach close=")" collection="goodsCategoryIds" index="index" item="categoryId" open="(" separator=",">
+                    #{categoryId,jdbcType=INTEGER}
+                </foreach>
+                ))
+            </if>
+        </where>
+        order by a.sort,d.add_time desc limit #{start},#{limit}
     </select>
 
 

@@ -59,9 +59,9 @@ public class GoodsControllerTest {
 //                .param("priceMin","10")
 //                .param("priceMax","1000")
                 //品质 1：认证店铺 2：官方保真 3：高信誉度 4.我的关注 5：(已完成)已完成
-//                .param("quality","5")
+                .param("quality","5")
                 //类型 1普通商品 2抢购商品
-                .param("type","1")
+                .param("type","2")
 //                .param("goodsCategoryIds", "23,121,5")
 
                 .accept(MediaType.APPLICATION_JSON))
