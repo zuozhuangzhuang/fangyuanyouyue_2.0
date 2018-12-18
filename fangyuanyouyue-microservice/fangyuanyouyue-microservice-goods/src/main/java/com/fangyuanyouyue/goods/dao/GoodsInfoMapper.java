@@ -77,6 +77,28 @@ public interface GoodsInfoMapper {
                                    @Param("start") Integer start, @Param("limit") Integer limit,
                                    @Param("goodsCategoryIds")Integer[] goodsCategoryIds);
 
+    /**
+     * 获取已完成抢购列表
+     * @param myId
+     * @param userId
+     * @param status
+     * @param search
+     * @param priceMin
+     * @param priceMax
+     * @param synthesize
+     * @param quality
+     * @param start
+     * @param limit
+     * @param type
+     * @param goodsCategoryIds
+     * @return
+     */
+    List<GoodsInfo> getCompletedAuctionList(@Param("myId") Integer myId,@Param("userId") Integer userId, @Param("status") Integer status, @Param("search") String search,
+                                   @Param("priceMin") BigDecimal priceMin, @Param("priceMax") BigDecimal priceMax,
+                                   @Param("synthesize")Integer synthesize, @Param("quality")Integer quality,
+                                   @Param("start") Integer start, @Param("limit") Integer limit,
+                                   @Param("goodsCategoryIds")Integer[] goodsCategoryIds);
+
 
     /**
      * 获取我收藏/关注的商品、抢购列表

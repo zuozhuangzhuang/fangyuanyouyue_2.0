@@ -122,8 +122,13 @@ public class GoodsInfoServiceImpl implements GoodsInfoService{
         }
         List<GoodsInfo> goodsInfos = new ArrayList<>();
         if(Status.AUCTION.getValue().equals(param.getType())){
-            goodsInfos = goodsInfoMapper.getAuctionList(myId,param.getUserId(),param.getStatus(),param.getSearch(),
-                    param.getPriceMin(),param.getPriceMax(),param.getSynthesize(),param.getQuality(),param.getStart()*param.getLimit(),param.getLimit(),param.getGoodsCategoryIds());
+            if(param.getQuality() != null && param.getQuality().equals(5)){
+                goodsInfos = goodsInfoMapper.getCompletedAuctionList(myId,param.getUserId(),param.getStatus(),param.getSearch(),
+                        param.getPriceMin(),param.getPriceMax(),param.getSynthesize(),param.getQuality(),param.getStart()*param.getLimit(),param.getLimit(),param.getGoodsCategoryIds());
+            }else{
+                goodsInfos = goodsInfoMapper.getAuctionList(myId,param.getUserId(),param.getStatus(),param.getSearch(),
+                        param.getPriceMin(),param.getPriceMax(),param.getSynthesize(),param.getQuality(),param.getStart()*param.getLimit(),param.getLimit(),param.getGoodsCategoryIds());
+            }
         }else{
             goodsInfos = goodsInfoMapper.getGoodsList(myId,param.getUserId(),param.getStatus(),param.getSearch(),
                     param.getPriceMin(),param.getPriceMax(),param.getSynthesize(),param.getQuality(),param.getStart()*param.getLimit(),param.getLimit(),param.getType(),param.getGoodsCategoryIds());

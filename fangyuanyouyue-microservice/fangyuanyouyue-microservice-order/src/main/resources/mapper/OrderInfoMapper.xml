@@ -216,9 +216,9 @@
   </select>
 
   <select id="getListByUserIdStatus" parameterType="Integer" resultMap="BaseResultMap">
-    select DISTINCT a.*,c.nick_name,c.head_img_url from order_info a,order_detail b,user_info c
+    select DISTINCT a.*,c.nick_name,c.head_img_url from order_info a left join order_detail b on (a.id = b.order_id or a.id = b.main_order_id) left join user_info c on a.user_id = c.id
     <where>
-      (a.id = b.order_id or a.id = b.main_order_id) and a.is_resolve = 2 and a.user_id = c.id and a.buyer_is_delete <![CDATA[ <> ]]> 1
+      a.is_resolve = 2 and a.buyer_is_delete <![CDATA[ <> ]]> 1
       <if test="userId != null">
         and a.user_id = #{userId}
       </if>
@@ -253,9 +253,9 @@
   </select>
 
   <select id="getOrderBySellerId" parameterType="Integer" resultMap="BaseResultMap">
-    select DISTINCT a.*,c.nick_name,c.head_img_url from order_info a,order_detail b,user_info c
+    select DISTINCT a.*,c.nick_name,c.head_img_url from order_info a left join order_detail b on a.id = b.order_id left join user_info c on a.user_id = c.id
     <where>
-      a.id = b.order_id and a.seller_is_delete <![CDATA[ <> ]]> 1 and a.is_resolve = 2 and a.user_id = c.id
+      a.seller_is_delete <![CDATA[ <> ]]> 1 and a.is_resolve = 2
       <if test="sellerId != null">
         and a.seller_id = #{sellerId}
       </if>
