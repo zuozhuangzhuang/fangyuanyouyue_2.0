@@ -256,8 +256,8 @@ public class UserController extends BaseController {
             @ApiImplicitParam(name = "token", value = "用户token", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "name", value = "真实姓名", required = true,dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "identity", value = "身份证号", required = true,dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "identityImgCoverUrl", value = "身份证封面图路径",dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "identityImgBackUrl", value = "身份证背面路径",dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "identityImgCoverUrl", value = "身份证封面图路径",required = true,dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "identityImgBackUrl", value = "身份证背面路径",required = true,dataType = "String", paramType = "query")
     })
     @PostMapping(value = "/certification")
     @ResponseBody
@@ -273,6 +273,12 @@ public class UserController extends BaseController {
             }
             if(StringUtils.isEmpty(param.getToken())){
                 return toError("用户token不能为空！");
+            }
+            if(StringUtils.isEmpty(param.getIdentityImgCoverUrl())){
+                return toError("身份证封面图路径不能为空！");
+            }
+            if(StringUtils.isEmpty(param.getIdentityImgBackUrl())){
+                return toError("身份证背面路径不能为空！");
             }
             UserInfo user=userInfoService.getUserByToken(param.getToken());
             if(user==null){
